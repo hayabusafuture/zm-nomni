@@ -983,7 +983,26 @@
 </div>
 
 <script>
-  // ── Copy hex codes to clipboard ──
+  // ── Palette map: normalised uppercase hex → colour name ──
+  const PALETTE = {
+    '#2AC864': 'Nomni Green',
+    '#0E3727': 'Seaweed',
+    '#1A8040': 'Spinach',
+    '#E2FFE6': 'Mint',
+    '#FAF7E9': 'Cream',
+    '#1F2226': 'Topbar',
+    '#F5F5F5': 'Background',
+    '#FFFFFF': 'White',
+    '#1A1F2B': 'Ink',
+    '#3B4150': 'Ink 2',
+    '#8A8F98': 'Ink Mute',
+    '#C7C9CF': 'Ink Soft',
+    '#E7E8EC': 'Rule',
+  };
+
+  function normHex(h) { return h.toUpperCase(); }
+  function paletteName(hex) { return PALETTE[normHex(hex)] || null; }
+
   const HEX_RE = /^#([0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
 
   function showToast(el, text) {
@@ -992,8 +1011,6 @@
     toast.className = 'hex-toast';
     toast.textContent = text + ' copied!';
     toast.style.left = Math.max(4, rect.left) + 'px';
-    toast.style.top  = (rect.top - 32 + window.scrollY) + 'px';
-    // use fixed positioning relative to viewport
     toast.style.top  = (rect.top - 32) + 'px';
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -1010,6 +1027,25 @@
       e.stopPropagation();
       navigator.clipboard.writeText(hex).then(() => showToast(el, hex));
     });
+
+    // Append colour name badge if this hex is in the palette,
+    // but only for inline code-tags (not the swatch hex labels where the name is already shown above)
+    const name = paletteName(hex);
+    if (name && !el.closest('.swatch-info')) {
+      const badge = document.createElement('span');
+      badge.textContent = name;
+      badge.style.cssText = [
+        'display:inline-block',
+        'margin-left:5px',
+        'font-size:10px',
+        'font-weight:600',
+        'color:#8a8f98',
+        'font-style:normal',
+        'letter-spacing:0.02em',
+        'pointer-events:none',
+      ].join(';');
+      el.insertAdjacentElement('afterend', badge);
+    }
   }
 
   // Target swatch-hex divs explicitly
@@ -1019,10 +1055,9 @@
   });
 
   // Target all leaf-node elements whose full text is a hex code
-  // (catches inline code-tag spans, text-scale color display divs, etc.)
   document.querySelectorAll('div, span').forEach(el => {
-    if (el.classList.contains('hex-copyable')) return; // already done
-    if (el.children.length > 0) return;               // skip non-leaves
+    if (el.classList.contains('hex-copyable')) return;
+    if (el.children.length > 0) return;
     const hex = el.textContent.trim();
     if (HEX_RE.test(hex)) makeHexCopyable(el, hex);
   });
