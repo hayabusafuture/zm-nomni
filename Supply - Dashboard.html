@@ -159,7 +159,19 @@
     font-size: 14px; font-weight: 400;
     transition: background-color .15s ease, color .15s ease;
   }
-  .nav a .icon { width: 18px; height: 18px; font-size: 18px; color: #888888; flex: 0 0 auto; line-height: 1; transition: color .15s ease; }
+  .nav a .icon-wrap {
+    flex: 0 0 18px;
+    width: 18px; height: 18px;
+    position: relative;
+    display: block;
+  }
+  .nav a .icon {
+    position: absolute;
+    top: 0; left: 0;
+    width: 18px; height: 18px;
+    color: #888888;
+    transition: color .15s ease;
+  }
   .nav a .icon-green { display: none; }
   .nav a.active .icon-grey { display: none; }
   .nav a.active .icon-green { display: block; }
@@ -170,11 +182,13 @@
   .nav .badge {
     margin-left: auto; background: var(--nomni-green); color: var(--seaweed);
     font-size: 10px; font-weight: 700; min-width: 18px; height: 18px;
-    padding: 0 5px; border-radius: 9px; display: inline-grid; place-items: center;
+    padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; align-self: center;
   }
   .nav .warn-icon {
     margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0;
+    height: 18px; align-self: center;
   }
+  .nav .warn-icon img { height: 18px; width: 18px; }
   .sidebar-foot { padding: 16px; }
   .help-fab {
     width: 44px; height: 44px; border-radius: 50%; background: #6c4df2;
@@ -449,6 +463,35 @@
   .user-menu-item.supplier-hub svg { color: #1a6fcc; }
   .user-menu-item.logout { color: #e53535; }
 
+  .nav-label { line-height: 1; }
+
+  /* ---------- Sidenav collapse at 1280px ---------- */
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      width: 64px;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+      transition: width 0.2s ease;
+      z-index: 4;
+    }
+    .sidebar:hover {
+      width: 232px;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
+    }
+    .main { min-width: 1140px; }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label,
+    .sidebar .nav .badge,
+    .sidebar .nav .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .nav .badge { display: inline-grid; }
+    .sidebar:hover .nav .warn-icon { display: inline-flex; }
+  }
+
   </style>
 </head>
 <body>
@@ -530,16 +573,16 @@
   <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <nav class="nav" aria-label="Primary">
-      <a href="Supply - Dashboard.html" class="active"><img class="icon icon-grey" src="sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Dashboard - green.png" alt="" aria-hidden="true">Dashboard</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Orders - green.png" alt="" aria-hidden="true">Orders</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Invoice - green.png" alt="" aria-hidden="true">Invoices</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Payments - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Payments - green.png" alt="" aria-hidden="true">Payments</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Chef - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Chef - green.png" alt="" aria-hidden="true">Customers</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Inventory - green.png" alt="" aria-hidden="true">Inventory</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Items - green.png" alt="" aria-hidden="true">Catalogue</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Reports - green.png" alt="" aria-hidden="true">Reports</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Directory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Directory - green.png" alt="" aria-hidden="true">Directory</a>
-      <a href="#"><img class="icon icon-grey" src="sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Users - green.png" alt="" aria-hidden="true">Users</a>
+      <a href="Supply - Dashboard.html" class="active"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Payments - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Payments - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Payments</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Chef - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Chef - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Customers</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Catalogue</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Directory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Directory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Directory</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
     </nav>
     <div class="sidebar-foot">
       <div class="help-fab" title="Help">
