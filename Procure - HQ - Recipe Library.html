@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procure — HQ · Recipe library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --seaweed: #0E3727;
+    --nomni-green: #2AC864;
+    --spinach: #1A8040;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42, 200, 100, 0.14);
+    --sidebar-text: #1a1f2b;
+    --ink: #1a1f2b;
+    --ink-2: #1a1f2b;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+    --primary: #2AC864;
+    --row-hover: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  .app { display: grid; grid-template-columns: 232px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* Topbar */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1f2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #7F6AD0; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+
+  /* Sidebar */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--sidebar-bg); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); }
+  .nav { margin-top: 12px; padding: 6px 10px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: var(--sidebar-text); text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav a .icon-wrap { flex: 0 0 18px; width: 18px; height: 18px; position: relative; display: block; }
+  .nav a .icon { position: absolute; top: 0; left: 0; width: 18px; height: 18px; }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a.active { background: var(--sidebar-item-active); color: var(--seaweed); font-weight: 600; }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; align-self: center; }
+  .nav .warn-icon { margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; height: 18px; align-self: center; }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+  .sidebar-foot { padding: 16px; }
+  .help-fab { width: 44px; height: 44px; border-radius: 50%; background: #6c4df2; display: grid; place-items: center; color: #fff; box-shadow: 0 6px 18px rgba(108,77,242,.4); }
+  .nav-label { line-height: 1; }
+
+  /* Main */
+  .main { grid-column: 2; grid-row: 2; padding: 32px 40px 56px; min-width: 0; background: #fff; }
+
+  /* Page header */
+  .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 16px; }
+  .page-title-wrap { display: flex; align-items: center; gap: 10px; }
+  .page-title { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.03em; }
+  .hq-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--seaweed); color: var(--nomni-green); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 5px; }
+  .page-head-right { display: flex; align-items: center; gap: 8px; }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; white-space: nowrap; }
+  .btn-primary:hover { background: #22b055; }
+  .btn-ghost { background: none; border: 1px solid #d0d2d8; color: var(--ink); border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .13s, border-color .13s; white-space: nowrap; }
+  .btn-ghost:hover { background: #f3f4f6; border-color: #b0b2b8; }
+  .page-subtitle { font-size: 13px; color: var(--ink-mute); margin-bottom: 24px; }
+
+  /* Site group tabs */
+  .sg-tabs { display: flex; border-bottom: 1px solid var(--rule); margin-bottom: 20px; overflow-x: auto; }
+  .sg-tab { padding: 9px 18px; font-size: 13px; font-weight: 600; color: var(--ink-mute); cursor: pointer; position: relative; background: none; border: none; font-family: inherit; transition: color .15s; white-space: nowrap; flex-shrink: 0; }
+  .sg-tab:hover { color: var(--ink); }
+  .sg-tab.active { color: var(--ink); }
+  .sg-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--primary); border-radius: 2px; }
+
+  /* Filter row */
+  .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .search-wrap { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; width: 220px; }
+  .search-wrap svg { color: var(--ink-mute); flex: 0 0 auto; }
+  .search-wrap input { border: 0; outline: 0; background: transparent; font: inherit; color: var(--ink); width: 100%; }
+  .search-wrap input::placeholder { color: var(--ink-mute); }
+  .filter-btn { height: 36px; padding: 0 12px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: border-color .13s, background .13s; white-space: nowrap; }
+  .filter-btn:hover { border-color: #b0b2b8; background: #fafafa; }
+  .filter-btn .chev-sm { width: 8px; height: 8px; border-right: 1.5px solid var(--ink-mute); border-bottom: 1.5px solid var(--ink-mute); transform: rotate(45deg) translate(-1px,-2px); display: inline-block; }
+  .filter-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .action-btn { background: transparent; border: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--spinach); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 6px; transition: background .13s; }
+  .action-btn:hover { background: #f0faf3; }
+  .action-btn.ink { color: var(--ink-2); }
+  .action-btn.ink:hover { background: #f3f4f6; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table.rl-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  .rl-table thead th { text-align: left; font-weight: 600; color: var(--ink-mute); padding: 12px 14px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fff; font-size: 12px; white-space: nowrap; }
+  .rl-table tbody td { padding: 14px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; background: #fff; transition: background .1s; }
+  .rl-table tbody tr:hover td { background: var(--row-hover); }
+  .rl-table tbody tr { cursor: pointer; }
+  .col-name { min-width: 260px; }
+  .col-cost { width: 100px; }
+  .col-retail { width: 110px; }
+  .col-pct { width: 80px; }
+  .col-avail { min-width: 220px; }
+  .col-vars { width: 130px; }
+  .col-date { width: 150px; }
+
+  /* Recipe name cell */
+  .recipe-name { font-weight: 500; color: var(--ink); }
+  .recipe-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .recipe-tag { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; }
+  .tag-recipe { background: #ede9fb; color: #6c4df2; }
+  .tag-sub { background: #fef3e0; color: #b35e00; }
+
+  /* Availability indicators */
+  .avail-ok { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--spinach); font-weight: 500; }
+  .avail-ok svg { flex: 0 0 auto; color: var(--spinach); }
+  .avail-warn { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #b35e00; cursor: pointer; }
+  .avail-warn svg { flex: 0 0 auto; }
+  .avail-groups { display: flex; flex-direction: column; gap: 3px; }
+  .avail-group-row { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+
+  /* Variation badge */
+  .vars-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #6c4df2; background: #ede9fb; padding: 3px 9px; border-radius: 4px; }
+  .vars-none { color: var(--ink-soft); font-size: 13px; }
+  .add-var-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--spinach); background: none; border: none; font-family: inherit; cursor: pointer; padding: 2px 4px; border-radius: 4px; transition: background .12s; }
+  .add-var-btn:hover { background: #f0faf3; }
+
+  /* Cost/pct values */
+  .cost-val { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .cost-empty { color: var(--ink-soft); }
+  .cost-pct-ok { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .cost-pct-high { font-variant-numeric: tabular-nums; color: #e53535; font-weight: 600; }
+  .date-val { color: var(--ink-mute); font-size: 13px; }
+
+  /* Availability detail panel (expanded row) */
+  .avail-detail-row { background: #fafcff !important; }
+  .avail-detail-row td { padding: 0 !important; }
+  .avail-detail-panel { padding: 14px 14px 14px 42px; border-bottom: 1px solid var(--rule); }
+  .avail-detail-title { font-size: 12px; font-weight: 600; color: var(--ink-mute); margin-bottom: 10px; text-transform: uppercase; letter-spacing: .05em; }
+  .avail-detail-grid { display: flex; flex-direction: column; gap: 8px; }
+  .avail-detail-item { display: flex; align-items: flex-start; gap: 10px; }
+  .avail-detail-site { font-size: 13px; font-weight: 600; color: var(--ink); min-width: 140px; }
+  .avail-detail-ingredients { display: flex; flex-wrap: wrap; gap: 5px; }
+  .ing-unavail-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #b35e00; background: #fff8ee; border: 1px solid #f5d9a8; border-radius: 4px; padding: 2px 8px; }
+  .var-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #6c4df2; background: #ede9fb; border-radius: 4px; padding: 2px 8px; }
+  .avail-detail-ok { font-size: 12px; color: var(--spinach); display: flex; align-items: center; gap: 4px; }
+
+  /* Pagination */
+  .pager { display: flex; align-items: center; justify-content: space-between; padding: 16px 4px 4px; color: var(--ink-2); font-size: 12px; }
+  .pager .count b { color: var(--ink); }
+  .pager-btns { display: flex; gap: 4px; }
+  .pager-btn { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--rule); background: #fff; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .12s; }
+  .pager-btn:hover { background: #f3f4f6; }
+  .pager-btn.active { background: var(--seaweed); color: #fff; border-color: var(--seaweed); }
+  .pager-btn:disabled { opacity: .4; cursor: default; }
+
+  /* User menu */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+  .user-menu-item.supplier-hub { color: #1a6fcc; font-weight: 500; }
+  .font-inspector-btn { background: transparent; border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.6); cursor: pointer; display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: monospace; }
+  .font-inspector-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 64px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); }
+    .main { min-width: 900px; }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label, .sidebar .nav .badge, .sidebar .nav .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .nav .badge { display: inline-grid; }
+    .sidebar:hover .nav .warn-icon { display: inline-flex; }
+  }
+
+  /* HQ Mgmt nav section */
+  .nav-section-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); padding: 14px 12px 4px; line-height: 1; }
+  .nav-hq-wrap { background: rgba(14,55,39,.05); margin: 4px -10px 0; padding: 4px 10px 8px; border-top: 1px solid rgba(42,200,100,.2); flex-shrink: 0; }
+  .nav-hq-wrap a { display: flex; align-items: center; gap: 12px; padding: 9px 12px; color: #2a5a40; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav-hq-wrap a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #7aab8a; transition: color .15s; }
+  .nav-hq-wrap a:hover { background: rgba(42,200,100,.1); color: var(--seaweed); }
+  .nav-hq-wrap a:hover .ms-icon { color: var(--spinach); }
+  .nav-hq-wrap a.active { background: rgba(42,200,100,.16); color: var(--seaweed); font-weight: 600; }
+  .nav-hq-wrap a.active .ms-icon { color: var(--spinach); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Procure</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="font-inspector-btn" title="Font inspector">Aa</button>
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="avatar">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya (Zeemart)</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Supply - Dashboard.html" class="user-menu-item supplier-hub"><span class="material-symbols-outlined" style="font-size:16px;line-height:1">open_in_new</span>Use Nomni Supply</a>
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+            <a href="#" class="user-menu-item">Companies</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">language</span>English</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="https://www.nomni.ai/terms" class="user-menu-item" target="_blank">Terms of use</a>
+            <a href="https://www.nomni.ai/privacy" class="user-menu-item" target="_blank">Privacy Policy</a>
+            <a href="Procure - Login.html" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav" aria-label="Primary">
+      <div class="nav-section-label">Outlet</div>
+      <a href="Procure - Dashboard.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+      <a href="Procure - Orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Payments - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Payments - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Payments</span></a>
+      <a href="Procure - Items.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a href="Procure - Inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a href="Procure - Recipes.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span><span class="warn-icon"><img src="error_24dp_1F1F1F 1.png" width="20" height="20" alt=""></span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
+      <div class="nav-section-label">HQ Mgmt</div>
+      <div class="nav-hq-wrap">
+        <a href="Procure - HQ - Outlet Groups.html"><span class="ms-icon material-symbols-outlined">account_tree</span><span class="nav-label">Outlet groups</span></a>
+        <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Market lists</span></a>
+        <a href="Procure - HQ - Recipe Library.html" class="active"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipe library</span></a>
+        <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inv. master</span></a>
+        <a href="#"><span class="ms-icon material-symbols-outlined">point_of_sale</span><span class="nav-label">POS mapping</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/><path d="M12 8v5l3 2"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="page-head">
+      <div class="page-title-wrap">
+        <h1 class="page-title">Recipe library</h1>
+        <span class="hq-badge">HQ</span>
+      </div>
+      <div class="page-head-right">
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add recipe
+        </button>
+        <button class="btn-ghost">Manage variations</button>
+      </div>
+    </div>
+    <p class="page-subtitle">Managing recipes for Zeemart Group · 88 outlets across 6 site groups</p>
+
+    <!-- Site group tabs -->
+    <div class="sg-tabs">
+      <button class="sg-tab active" data-group="" onclick="setSGTab(this)">All</button>
+      <button class="sg-tab" data-group="nsw" onclick="setSGTab(this)">NSW Metro</button>
+      <button class="sg-tab" data-group="vic" onclick="setSGTab(this)">VIC Central</button>
+      <button class="sg-tab" data-group="qld" onclick="setSGTab(this)">QLD Coastal</button>
+      <button class="sg-tab" data-group="wa" onclick="setSGTab(this)">WA Metro</button>
+      <button class="sg-tab" data-group="sa" onclick="setSGTab(this)">SA Regional</button>
+      <button class="sg-tab" data-group="tas" onclick="setSGTab(this)">TAS Island</button>
+    </div>
+
+    <div class="filter-row">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search recipes" />
+      </div>
+      <button class="filter-btn">Type <span class="chev-sm"></span></button>
+      <button class="filter-btn">Availability <span class="chev-sm"></span></button>
+      <div class="filter-right">
+        <button class="action-btn ink">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="rl-table">
+        <thead>
+          <tr>
+            <th class="col-name">Name</th>
+            <th class="col-cost">Cost</th>
+            <th class="col-retail">Retail price</th>
+            <th class="col-pct">Cost %</th>
+            <th class="col-avail">Ingredient availability</th>
+            <th class="col-vars">Variations</th>
+            <th class="col-date">Last modified</th>
+          </tr>
+        </thead>
+        <tbody id="recipeTableBody">
+
+          <!-- Row 1: has availability issues, expandable -->
+          <tr class="recipe-row" data-id="1">
+            <td>
+              <div class="recipe-name">Bar BQ Chicken</div>
+              <div class="recipe-meta"><span class="recipe-tag tag-sub">Sub-recipe</span></div>
+            </td>
+            <td class="cost-val">A$1.39</td>
+            <td class="cost-empty">—</td>
+            <td class="cost-empty">—</td>
+            <td>
+              <div class="avail-groups">
+                <div class="avail-group-row">
+                  <div class="avail-warn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    2 ingredients not available in QLD Coastal
+                  </div>
+                </div>
+                <div class="avail-group-row">
+                  <div class="avail-ok">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    NSW Metro — all available
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td><span class="vars-none">—</span></td>
+            <td class="date-val">19 May 2026</td>
+          </tr>
+          <tr class="avail-detail-row" id="detail-1" style="display:none">
+            <td colspan="7">
+              <div class="avail-detail-panel">
+                <div class="avail-detail-title">Ingredient availability by site group</div>
+                <div class="avail-detail-grid">
+                  <div class="avail-detail-item">
+                    <div class="avail-detail-site">QLD Coastal</div>
+                    <div class="avail-detail-ingredients">
+                      <span class="ing-unavail-chip">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                        BÁNH NGÒ MINI ROLLS
+                      </span>
+                      <span class="ing-unavail-chip">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                        Chip Cup 90W
+                      </span>
+                    </div>
+                  </div>
+                  <div class="avail-detail-item">
+                    <div class="avail-detail-site">NSW Metro</div>
+                    <div class="avail-detail-ok">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                      All 10 ingredients available
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 2: all available, has a variation -->
+          <tr class="recipe-row" data-id="2">
+            <td>
+              <div class="recipe-name">Vietnamese Pho Bo</div>
+              <div class="recipe-meta"><span class="recipe-tag tag-recipe">Recipe</span></div>
+            </td>
+            <td class="cost-val">A$8.45</td>
+            <td class="cost-val">A$18.00</td>
+            <td class="cost-pct-high">46.9%</td>
+            <td>
+              <div class="avail-ok">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                All state groups — all ingredients available
+              </div>
+            </td>
+            <td>
+              <span class="vars-badge">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                +1 variation
+              </span>
+            </td>
+            <td class="date-val">15 May 2026</td>
+          </tr>
+
+          <!-- Row 3: all available, no variation -->
+          <tr class="recipe-row" data-id="3">
+            <td>
+              <div class="recipe-name">Fresh Spring Rolls</div>
+              <div class="recipe-meta"><span class="recipe-tag tag-recipe">Recipe</span></div>
+            </td>
+            <td class="cost-val">A$3.20</td>
+            <td class="cost-val">A$9.50</td>
+            <td class="cost-pct-ok">33.7%</td>
+            <td>
+              <div class="avail-ok">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                All state groups — all ingredients available
+              </div>
+            </td>
+            <td><span class="vars-none">—</span></td>
+            <td class="date-val">12 May 2026</td>
+          </tr>
+
+          <!-- Row 4: SG availability issue -->
+          <tr class="recipe-row" data-id="4">
+            <td>
+              <div class="recipe-name">Hoisin Dipping Sauce</div>
+              <div class="recipe-meta"><span class="recipe-tag tag-sub">Sub-recipe</span></div>
+            </td>
+            <td class="cost-val">A$0.48</td>
+            <td class="cost-empty">—</td>
+            <td class="cost-empty">—</td>
+            <td>
+              <div class="avail-groups">
+                <div class="avail-group-row">
+                  <div class="avail-warn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    1 ingredient not available in WA Metro
+                  </div>
+                </div>
+                <div class="avail-group-row">
+                  <div class="avail-ok">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    VIC Central — all available
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td><span class="vars-none">—</span></td>
+            <td class="date-val">10 May 2026</td>
+          </tr>
+          <tr class="avail-detail-row" id="detail-4" style="display:none">
+            <td colspan="7">
+              <div class="avail-detail-panel">
+                <div class="avail-detail-title">Ingredient availability by site group</div>
+                <div class="avail-detail-grid">
+                  <div class="avail-detail-item">
+                    <div class="avail-detail-site">WA Metro</div>
+                    <div class="avail-detail-ingredients">
+                      <span class="ing-unavail-chip">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                        Hoisin Sauce 5L Premium
+                      </span>
+                    </div>
+                  </div>
+                  <div class="avail-detail-item">
+                    <div class="avail-detail-site">VIC Central</div>
+                    <div class="avail-detail-ok">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                      All 6 ingredients available
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 5: issues in both groups, 2 variations -->
+          <tr class="recipe-row" data-id="5">
+            <td>
+              <div class="recipe-name">Grilled Lemongrass Chicken</div>
+              <div class="recipe-meta"><span class="recipe-tag tag-recipe">Recipe</span></div>
+            </td>
+            <td class="cost-val">A$6.10</td>
+            <td class="cost-val">A$15.00</td>
+            <td class="cost-pct-ok">40.7%</td>
+            <td>
+              <div class="avail-groups">
+                <div class="avail-group-row">
+                  <div class="avail-warn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    3 ingredients not available in SA Regional
+                  </div>
+                </div>
+                <div class="avail-group-row">
+                  <div class="avail-warn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    1 ingredient not available in TAS Island
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="vars-badge">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                +2 variations
+              </span>
+            </td>
+            <td class="date-val">08 May 2026</td>
+          </tr>
+          <tr class="avail-detail-row" id="detail-5" style="display:none">
+            <td colspan="7">
+              <div class="avail-detail-panel">
+                <div class="avail-detail-title">Ingredient availability by site group</div>
+                <div class="avail-detail-grid">
+                  <div class="avail-detail-item">
+                    <div class="avail-detail-site">SA Regional</div>
+                    <div class="avail-detail-ingredients">
+                      <span class="ing-unavail-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Fresh Lemongrass 1kg</span>
+                      <span class="ing-unavail-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Kaffir Lime Leaves</span>
+                      <span class="ing-unavail-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Fish Sauce Tiparos</span>
+                      <span class="var-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>Variation: SA adapted</span>
+                    </div>
+                  </div>
+                  <div class="avail-detail-item">
+                    <div class="avail-detail-site">TAS Island</div>
+                    <div class="avail-detail-ingredients">
+                      <span class="ing-unavail-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Fresh Lemongrass 1kg</span>
+                      <span class="var-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>Variation: TAS adapted</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Row 6: all available, no variation -->
+          <tr class="recipe-row" data-id="6">
+            <td>
+              <div class="recipe-name">Vermicelli Bowl Base</div>
+              <div class="recipe-meta"><span class="recipe-tag tag-sub">Sub-recipe</span></div>
+            </td>
+            <td class="cost-val">A$2.85</td>
+            <td class="cost-empty">—</td>
+            <td class="cost-empty">—</td>
+            <td>
+              <div class="avail-ok">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                All state groups — all ingredients available
+              </div>
+            </td>
+            <td><span class="vars-none">—</span></td>
+            <td class="date-val">02 May 2026</td>
+          </tr>
+
+          <!-- Row 7: MY issues, 1 variation -->
+          <tr class="recipe-row" data-id="7">
+            <td>
+              <div class="recipe-name">Fried Rice</div>
+              <div class="recipe-meta"><span class="recipe-tag tag-recipe">Recipe</span></div>
+            </td>
+            <td class="cost-val">A$4.20</td>
+            <td class="cost-val">A$12.00</td>
+            <td class="cost-pct-ok">35.0%</td>
+            <td>
+              <div class="avail-groups">
+                <div class="avail-group-row">
+                  <div class="avail-warn">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    3 ingredients not available in VIC Central
+                  </div>
+                </div>
+                <div class="avail-group-row">
+                  <div class="avail-ok">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    NSW Metro — all available
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="vars-badge">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                +1 variation
+              </span>
+            </td>
+            <td class="date-val">28 Apr 2026</td>
+          </tr>
+
+          <!-- Row 8: all available -->
+          <tr class="recipe-row" data-id="8">
+            <td>
+              <div class="recipe-name">Banh Mi Filling</div>
+              <div class="recipe-meta"><span class="recipe-tag tag-sub">Sub-recipe</span></div>
+            </td>
+            <td class="cost-val">A$2.10</td>
+            <td class="cost-empty">—</td>
+            <td class="cost-empty">—</td>
+            <td>
+              <div class="avail-ok">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                All state groups — all ingredients available
+              </div>
+            </td>
+            <td><span class="vars-none">—</span></td>
+            <td class="date-val">22 Apr 2026</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span class="count">Showing <b>1 to 8</b> of <b>24</b> entries</span>
+      <div class="pager-btns">
+        <button class="pager-btn" disabled>«</button>
+        <button class="pager-btn" disabled>‹</button>
+        <button class="pager-btn active">1</button>
+        <button class="pager-btn">2</button>
+        <button class="pager-btn">3</button>
+        <button class="pager-btn">›</button>
+        <button class="pager-btn">»</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Cache original availability cell HTML to restore on "All" tab
+  const origAvail = {};
+  document.querySelectorAll('.recipe-row').forEach(row => {
+    origAvail[row.dataset.id] = row.querySelectorAll('td')[4].innerHTML;
+  });
+
+  // Per-group availability: null = all ok for every group
+  const rlData = {
+    '1': { qld: { ok: false, n: 2 }, nsw: { ok: true }, vic: { ok: true }, wa: { ok: true }, sa: { ok: true }, tas: { ok: true } },
+    '2': null,
+    '3': null,
+    '4': { wa: { ok: false, n: 1 }, vic: { ok: true }, nsw: { ok: true }, qld: { ok: true }, sa: { ok: true }, tas: { ok: true } },
+    '5': { sa: { ok: false, n: 3 }, tas: { ok: false, n: 1 }, nsw: { ok: true }, vic: { ok: true }, qld: { ok: true }, wa: { ok: true } },
+    '6': null,
+    '7': { vic: { ok: false, n: 3 }, nsw: { ok: true }, qld: { ok: true }, wa: { ok: true }, sa: { ok: true }, tas: { ok: true } },
+    '8': null
+  };
+
+  function groupAvail(id, gk) {
+    const d = rlData[id];
+    if (!d) return { ok: true };
+    return d[gk] || { ok: true };
+  }
+
+  function availHTML(a) {
+    if (a.ok) return `<div class="avail-ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>All available</div>`;
+    return `<div class="avail-warn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>${a.n} ingredient${a.n > 1 ? 's' : ''} missing</div>`;
+  }
+
+  let currentGroup = null;
+
+  function applyRLGroup(gk) {
+    currentGroup = gk;
+    const isAll = !gk;
+    // Always close all detail rows when switching tabs
+    document.querySelectorAll('.avail-detail-row').forEach(r => r.style.display = 'none');
+    document.querySelectorAll('.recipe-row').forEach(row => {
+      const id = row.dataset.id;
+      const td = row.querySelectorAll('td')[4];
+      td.innerHTML = isAll ? origAvail[id] : availHTML(groupAvail(id, gk));
+    });
+  }
+
+  function setSGTab(el) {
+    document.querySelectorAll('.sg-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    applyRLGroup(el.dataset.group || null);
+  }
+
+  document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+  // Expand detail rows on "All" tab only
+  const expandableIds = [1, 4, 5];
+  document.querySelectorAll('.recipe-row').forEach(row => {
+    row.addEventListener('click', function() {
+      if (currentGroup) return;
+      const id = this.dataset.id;
+      const detail = document.getElementById('detail-' + id);
+      if (!detail) return;
+      const isOpen = detail.style.display !== 'none';
+      expandableIds.forEach(eid => { const d = document.getElementById('detail-' + eid); if (d) d.style.display = 'none'; });
+      if (!isOpen) detail.style.display = '';
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procure — HQ · NSW Metro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --seaweed: #0E3727; --nomni-green: #2AC864; --spinach: #1A8040;
+    --sidebar-bg: #F5F5F5; --sidebar-item-active: rgba(42,200,100,.14);
+    --sidebar-text: #1a1f2b; --ink: #1a1f2b; --ink-2: #1a1f2b;
+    --ink-mute: #8a8f98; --ink-soft: #c7c9cf; --rule: #e7e8ec;
+    --primary: #2AC864; --row-hover: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  .app { display: grid; grid-template-columns: 232px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* Topbar */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1f2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #7F6AD0; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+
+  /* Sidebar */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--sidebar-bg); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .nav { margin-top: 12px; padding: 6px 10px 0; display: flex; flex-direction: column; gap: 2px; }
+  .nav-section-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); padding: 14px 12px 4px; line-height: 1; }
+  .nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: var(--sidebar-text); text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav a .icon-wrap { flex: 0 0 18px; width: 18px; height: 18px; position: relative; display: block; }
+  .nav a .icon { position: absolute; top: 0; left: 0; width: 18px; height: 18px; }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a.active { background: var(--sidebar-item-active); color: var(--seaweed); font-weight: 600; }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; align-self: center; }
+  .nav .warn-icon { margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; height: 18px; align-self: center; }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+  .nav-label { line-height: 1; }
+  .nav-hq-wrap { background: rgba(14,55,39,.05); margin: 4px -10px 0; padding: 4px 10px 8px; border-top: 1px solid rgba(42,200,100,.2); }
+  .nav-hq-wrap a { display: flex; align-items: center; gap: 12px; padding: 9px 12px; color: #2a5a40; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav-hq-wrap a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #7aab8a; transition: color .15s; }
+  .nav-hq-wrap a:hover { background: rgba(42,200,100,.1); color: var(--seaweed); }
+  .nav-hq-wrap a:hover .ms-icon { color: var(--spinach); }
+  .nav-hq-wrap a.active { background: rgba(42,200,100,.16); color: var(--seaweed); font-weight: 600; }
+  .nav-hq-wrap a.active .ms-icon { color: var(--spinach); }
+  .sidebar-foot { padding: 16px; flex-shrink: 0; }
+  .help-fab { width: 44px; height: 44px; border-radius: 50%; background: #6c4df2; display: grid; place-items: center; color: #fff; box-shadow: 0 6px 18px rgba(108,77,242,.4); }
+
+  /* Main */
+  .main { grid-column: 2; grid-row: 2; padding: 28px 40px 56px; min-width: 0; background: #fff; }
+
+  /* Breadcrumb */
+  .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-mute); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--ink-mute); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: color .13s; }
+  .breadcrumb a:hover { color: var(--spinach); }
+  .breadcrumb-sep { color: var(--ink-soft); }
+  .breadcrumb-current { color: var(--ink); font-weight: 600; }
+
+  /* Page head */
+  .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .page-head-left { display: flex; align-items: center; gap: 12px; }
+  .page-title { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.03em; }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; white-space: nowrap; }
+  .btn-primary:hover { background: #22b055; }
+  .btn-outline { background: none; border: 1px solid #d0d2d8; color: var(--ink); border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .13s; white-space: nowrap; }
+  .btn-outline:hover { background: #f3f4f6; }
+  .btn-ghost-danger { background: none; border: none; color: #c02020; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 10px; cursor: pointer; border-radius: 6px; transition: background .13s; }
+  .btn-ghost-danger:hover { background: #fff0f0; }
+  .head-actions { display: flex; align-items: center; gap: 8px; }
+
+  /* Stat grid */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .stat-card { background: #f9fafb; border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; }
+  .stat-val { font-size: 30px; font-weight: 700; letter-spacing: -0.04em; color: var(--ink); line-height: 1; }
+  .stat-val.amber { color: #d97706; }
+  .stat-val.frac { font-size: 22px; }
+  .stat-lbl { font-size: 12px; color: var(--ink-mute); margin-top: 6px; }
+
+  /* Two-column layout */
+  .detail-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+
+  /* Section card */
+  .section-card { border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--rule); background: #fafafa; }
+  .section-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .section-action { background: none; border: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--spinach); cursor: pointer; padding: 3px 6px; border-radius: 5px; transition: background .12s; }
+  .section-action:hover { background: #f0faf3; }
+
+  /* Config list */
+  .config-list { display: flex; flex-direction: column; }
+  .config-row { display: flex; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--rule); gap: 12px; }
+  .config-row:last-child { border-bottom: none; }
+  .config-icon { width: 32px; height: 32px; border-radius: 7px; background: #f0f0f4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ink-mute); }
+  .config-info { flex: 1; min-width: 0; }
+  .config-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .config-detail { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .config-status { flex-shrink: 0; }
+  .status-synced { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--spinach); background: #e8f8ee; border: 1px solid #b6e8c5; border-radius: 5px; padding: 3px 10px; }
+  .status-pending { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #b35e00; background: #fff8ee; border: 1px solid #f5d9a8; border-radius: 5px; padding: 3px 10px; }
+  .status-notset { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--ink-mute); background: #f3f4f6; border: 1px solid var(--rule); border-radius: 5px; padding: 3px 10px; }
+
+  /* Outlet list */
+  .outlet-list { display: flex; flex-direction: column; }
+  .outlet-row { display: flex; align-items: center; padding: 13px 18px; border-bottom: 1px solid var(--rule); gap: 12px; cursor: pointer; transition: background .1s; }
+  .outlet-row:last-child { border-bottom: none; }
+  .outlet-row:hover { background: var(--row-hover); }
+  .outlet-avatar { width: 30px; height: 30px; border-radius: 50%; background: #ede9fb; color: #6c4df2; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .outlet-info { flex: 1; min-width: 0; }
+  .outlet-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .outlet-user { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .outlet-status { flex-shrink: 0; }
+  .status-active { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; color: var(--spinach); background: #e8f8ee; border: 1px solid #b6e8c5; border-radius: 5px; padding: 3px 10px; }
+  .status-exc { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; color: #b35e00; background: #fff8ee; border: 1px solid #f5d9a8; border-radius: 5px; padding: 3px 10px; }
+  .status-pending-outlet { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; color: #1a6fcc; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 5px; padding: 3px 10px; }
+
+  /* Right panel */
+  .right-panel { display: flex; flex-direction: column; gap: 16px; }
+  .info-card { border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; }
+  .info-card-title { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 12px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--rule); }
+  .info-row:last-child { border-bottom: none; }
+  .info-row-label { color: var(--ink-mute); }
+  .info-row-val { font-weight: 600; color: var(--ink); }
+
+  /* Sync now btn */
+  .sync-btn { width: 100%; background: var(--seaweed); color: var(--nomni-green); border: none; border-radius: 7px; font: inherit; font-size: 14px; font-weight: 600; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; transition: background .15s; }
+  .sync-btn:hover { background: #0c2e20; }
+
+  /* User menu */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+  .user-menu-item.supplier-hub { color: #1a6fcc; font-weight: 500; }
+  .font-inspector-btn { background: transparent; border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.6); cursor: pointer; display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: monospace; }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 64px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); overflow-y: auto; }
+    .main { min-width: 900px; }
+    .nav a { white-space: nowrap; }
+    .nav-hq-wrap a { white-space: nowrap; }
+    .sidebar .nav-label, .sidebar .badge, .sidebar .warn-icon, .sidebar .nav-section-label { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .nav-section-label { display: block; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Procure</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="font-inspector-btn" title="Font inspector">Aa</button>
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="avatar">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya (Zeemart)</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Supply - Dashboard.html" class="user-menu-item supplier-hub"><span class="material-symbols-outlined" style="font-size:16px;line-height:1">open_in_new</span>Use Nomni Supply</a>
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Procure - Login.html" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <nav class="nav" aria-label="Primary">
+      <div class="nav-section-label">Outlet</div>
+      <a href="Procure - Dashboard.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+      <a href="Procure - Orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Payments - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Payments - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Payments</span></a>
+      <a href="Procure - Items.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a href="Procure - Inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a href="Procure - Recipes.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span><span class="warn-icon"><img src="error_24dp_1F1F1F 1.png" width="20" height="20" alt=""></span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
+      <div class="nav-section-label">HQ Mgmt</div>
+      <div class="nav-hq-wrap">
+        <a href="Procure - HQ - Outlet Groups.html" class="active"><span class="ms-icon material-symbols-outlined">account_tree</span><span class="nav-label">Outlet groups</span></a>
+        <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Market lists</span></a>
+        <a href="Procure - HQ - Recipe Library.html"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipe library</span></a>
+        <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inv. master</span></a>
+        <a href="#"><span class="ms-icon material-symbols-outlined">point_of_sale</span><span class="nav-label">POS mapping</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/><path d="M12 8v5l3 2"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="breadcrumb">
+      <a href="Procure - HQ - Outlet Groups.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Outlet groups
+      </a>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-current">NSW Metro</span>
+    </div>
+
+    <div class="page-head">
+      <h1 class="page-title">NSW Metro</h1>
+      <div class="head-actions">
+        <button class="btn-ghost-danger">Delete group</button>
+        <button class="btn-outline">
+          <span class="material-symbols-outlined" style="font-size:16px;line-height:1">edit</span>
+          Edit group
+        </button>
+        <button class="btn-primary">
+          <span class="material-symbols-outlined" style="font-size:16px;line-height:1">add</span>
+          Add outlets
+        </button>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-val">8</div>
+        <div class="stat-lbl">Outlets</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val frac">3<span style="font-size:16px;font-weight:400;color:var(--ink-mute)">/4</span></div>
+        <div class="stat-lbl">Configs assigned</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val amber">2</div>
+        <div class="stat-lbl">Pending sync</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val amber">3</div>
+        <div class="stat-lbl">Exceptions</div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+
+      <!-- Left: configs + outlets -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Assigned configs -->
+        <div class="section-card">
+          <div class="section-head">
+            <span class="section-title">Assigned configs</span>
+            <button class="section-action">Manage</button>
+          </div>
+          <div class="config-list">
+            <div class="config-row">
+              <div class="config-icon">
+                <span class="material-symbols-outlined" style="font-size:17px">list_alt</span>
+              </div>
+              <div class="config-info">
+                <div class="config-name">Market lists</div>
+                <div class="config-detail">3 suppliers · Last synced 21 May 2026</div>
+              </div>
+              <div class="config-status">
+                <span class="status-synced">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  Synced
+                </span>
+              </div>
+            </div>
+            <div class="config-row">
+              <div class="config-icon">
+                <span class="material-symbols-outlined" style="font-size:17px">menu_book</span>
+              </div>
+              <div class="config-info">
+                <div class="config-name">Recipe library</div>
+                <div class="config-detail">42 recipes · 2 outlets pending</div>
+              </div>
+              <div class="config-status">
+                <span class="status-pending">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Pending
+                </span>
+              </div>
+            </div>
+            <div class="config-row">
+              <div class="config-icon">
+                <span class="material-symbols-outlined" style="font-size:17px">inventory</span>
+              </div>
+              <div class="config-info">
+                <div class="config-name">Inventory master</div>
+                <div class="config-detail">128 items · Last synced 20 May 2026</div>
+              </div>
+              <div class="config-status">
+                <span class="status-synced">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  Synced
+                </span>
+              </div>
+            </div>
+            <div class="config-row">
+              <div class="config-icon" style="color:var(--ink-soft)">
+                <span class="material-symbols-outlined" style="font-size:17px">point_of_sale</span>
+              </div>
+              <div class="config-info">
+                <div class="config-name" style="color:var(--ink-mute)">POS mapping</div>
+                <div class="config-detail">Not assigned</div>
+              </div>
+              <div class="config-status">
+                <span class="status-notset">Not set</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Outlets -->
+        <div class="section-card">
+          <div class="section-head">
+            <span class="section-title">Outlets <span style="font-size:12px;font-weight:400;color:var(--ink-mute);margin-left:4px">8</span></span>
+            <button class="section-action">Manage outlets</button>
+          </div>
+          <div class="outlet-list">
+            <div class="outlet-row">
+              <div class="outlet-avatar">SC</div>
+              <div class="outlet-info">
+                <div class="outlet-name">Sydney CBD</div>
+                <div class="outlet-user">Jane Smith</div>
+              </div>
+              <div class="outlet-status"><span class="status-active">Active</span></div>
+            </div>
+            <div class="outlet-row">
+              <div class="outlet-avatar">PA</div>
+              <div class="outlet-info">
+                <div class="outlet-name">Parramatta</div>
+                <div class="outlet-user">Tom Lee</div>
+              </div>
+              <div class="outlet-status"><span class="status-active">Active</span></div>
+            </div>
+            <div class="outlet-row">
+              <div class="outlet-avatar">CH</div>
+              <div class="outlet-info">
+                <div class="outlet-name">Chatswood</div>
+                <div class="outlet-user">Lisa Park</div>
+              </div>
+              <div class="outlet-status"><span class="status-exc">2 exceptions</span></div>
+            </div>
+            <div class="outlet-row">
+              <div class="outlet-avatar">NW</div>
+              <div class="outlet-info">
+                <div class="outlet-name">Newtown</div>
+                <div class="outlet-user">Marcus Reid</div>
+              </div>
+              <div class="outlet-status"><span class="status-active">Active</span></div>
+            </div>
+            <div class="outlet-row">
+              <div class="outlet-avatar">NC</div>
+              <div class="outlet-info">
+                <div class="outlet-name">Newcastle</div>
+                <div class="outlet-user">Amy Tran</div>
+              </div>
+              <div class="outlet-status"><span class="status-exc">1 exception</span></div>
+            </div>
+            <div class="outlet-row">
+              <div class="outlet-avatar">WO</div>
+              <div class="outlet-info">
+                <div class="outlet-name">Wollongong</div>
+                <div class="outlet-user">Sam Nguyen</div>
+              </div>
+              <div class="outlet-status"><span class="status-pending-outlet">Syncing</span></div>
+            </div>
+            <div class="outlet-row">
+              <div class="outlet-avatar">PE</div>
+              <div class="outlet-info">
+                <div class="outlet-name">Penrith</div>
+                <div class="outlet-user">Rachel Kim</div>
+              </div>
+              <div class="outlet-status"><span class="status-pending-outlet">Syncing</span></div>
+            </div>
+            <div class="outlet-row">
+              <div class="outlet-avatar">MB</div>
+              <div class="outlet-info">
+                <div class="outlet-name">Manly Beach</div>
+                <div class="outlet-user">Daniel Cho</div>
+              </div>
+              <div class="outlet-status"><span class="status-active">Active</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right panel -->
+      <div class="right-panel">
+
+        <button class="sync-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8 8 8 0 0 1-5.66-2.34"/><path d="M3 12a8 8 0 0 1 8-8 8 8 0 0 1 5.66 2.34"/><polyline points="21 3 21 9 15 9"/><polyline points="3 21 3 15 9 15"/></svg>
+          Sync now
+        </button>
+
+        <div class="info-card">
+          <div class="info-card-title">Group details</div>
+          <div class="info-row">
+            <span class="info-row-label">Name</span>
+            <span class="info-row-val">NSW Metro</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row-label">Description</span>
+            <span class="info-row-val" style="color:var(--ink-mute);font-weight:400">Metro outlets across New South Wales</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row-label">Created</span>
+            <span class="info-row-val">14 Jan 2026</span>
+          </div>
+          <div class="info-row">
+            <span class="info-row-label">Last synced</span>
+            <span class="info-row-val">21 May 2026</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-title">Exceptions <span style="font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-soft)">3 outlets</span></div>
+          <div class="info-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+            <div style="font-size:13px;font-weight:600;color:var(--ink)">Chatswood</div>
+            <div style="font-size:12px;color:var(--ink-mute)">Recipe library: 2 ingredients not in catalogue</div>
+          </div>
+          <div class="info-row" style="flex-direction:column;align-items:flex-start;gap:3px">
+            <div style="font-size:13px;font-weight:600;color:var(--ink)">Newcastle</div>
+            <div style="font-size:12px;color:var(--ink-mute)">Market list: 1 item visibility excluded</div>
+          </div>
+          <div class="info-row" style="border-bottom:none;flex-direction:column;align-items:flex-start;gap:3px">
+            <div style="font-size:13px;font-weight:600;color:var(--ink)">Manly Beach</div>
+            <div style="font-size:12px;color:var(--ink-mute)">Inventory master: UOM mismatch on 3 items</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userMenu').classList.toggle('open'); });
+  document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+</script>
+</body>
+</html>

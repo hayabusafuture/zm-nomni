@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procure — Recipes · Bar BQ Chicken</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --seaweed: #0E3727;
+    --nomni-green: #2AC864;
+    --spinach: #1A8040;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42, 200, 100, 0.14);
+    --sidebar-text: #1a1f2b;
+    --ink: #1a1f2b;
+    --ink-2: #1a1f2b;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+    --primary: #2AC864;
+    --row-hover: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  .app { display: grid; grid-template-columns: 232px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* Topbar */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1f2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #7F6AD0; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+
+  /* Sidebar */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--sidebar-bg); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); }
+  .nav { margin-top: 12px; padding: 6px 10px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: var(--sidebar-text); text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav a .icon-wrap { flex: 0 0 18px; width: 18px; height: 18px; position: relative; display: block; }
+  .nav a .icon { position: absolute; top: 0; left: 0; width: 18px; height: 18px; }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a.active { background: var(--sidebar-item-active); color: var(--seaweed); font-weight: 600; }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; align-self: center; }
+  .nav .warn-icon { margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; height: 18px; align-self: center; }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+  .sidebar-foot { padding: 16px; }
+  .help-fab { width: 44px; height: 44px; border-radius: 50%; background: #6c4df2; display: grid; place-items: center; color: #fff; box-shadow: 0 6px 18px rgba(108,77,242,.4); }
+  .nav-label { line-height: 1; }
+
+  /* Main */
+  .main { grid-column: 2; grid-row: 2; padding: 32px 40px 56px; min-width: 0; background: #fff; }
+
+  /* Breadcrumb + header */
+  .recipe-header { margin-bottom: 28px; }
+  .breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+  .breadcrumb a { color: var(--spinach); font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+  .breadcrumb a:hover { color: var(--seaweed); }
+  .breadcrumb-sep { color: var(--ink-soft); font-size: 13px; }
+  .breadcrumb-current { color: var(--ink-mute); font-size: 13px; }
+  .recipe-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .recipe-title-left { display: flex; align-items: center; gap: 10px; }
+  .recipe-badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 3px 9px; border-radius: 4px; background: #fef3e0; color: #b35e00; flex: 0 0 auto; }
+  .recipe-name-input { font-size: 22px; font-weight: 700; color: var(--ink); border: none; outline: none; background: transparent; letter-spacing: -0.02em; padding: 0; font-family: inherit; width: 400px; }
+  .recipe-name-input:focus { border-bottom: 2px solid var(--nomni-green); }
+  .recipe-actions { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+  .btn-text-danger { background: none; border: none; font: inherit; font-size: 14px; font-weight: 600; color: #c02020; cursor: pointer; padding: 7px 10px; border-radius: 6px; transition: background .13s; }
+  .btn-text-danger:hover { background: #fde8e8; }
+  .btn-text { background: none; border: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink-2); cursor: pointer; padding: 7px 10px; border-radius: 6px; transition: background .13s; }
+  .btn-text:hover { background: #f3f4f6; }
+  .btn-ghost { background: none; border: 1px solid #d0d2d8; color: var(--ink); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 7px 14px; border-radius: 6px; transition: background .13s, border-color .13s; white-space: nowrap; }
+  .btn-ghost:hover { background: #f3f4f6; border-color: #b0b2b8; }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 7px 20px; border-radius: 6px; transition: background .13s; white-space: nowrap; }
+  .btn-primary:hover { background: #22b055; }
+
+  /* Layout */
+  .recipe-layout { display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: start; }
+
+  /* Form fields */
+  .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+  .field-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .field-hint { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .field-input { width: 100%; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input::placeholder { color: var(--ink-mute); }
+  .yield-row { display: flex; align-items: center; gap: 8px; }
+  .yield-input { width: 80px; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; text-align: center; transition: border-color .13s; }
+  .yield-input:focus { border-color: var(--nomni-green); }
+  .yield-sep { color: var(--ink-mute); font-size: 14px; }
+  .yield-unit-select { padding: 9px 28px 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; }
+  .yield-eq { color: var(--ink-mute); font-size: 14px; }
+  .yield-amount { width: 60px; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; text-align: center; transition: border-color .13s; }
+
+  /* Ingredients table */
+  .ingredients-section { margin-bottom: 4px; }
+  .ingredients-table-wrap { overflow-x: auto; margin-bottom: 12px; }
+  table.ing-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  .ing-table thead th { text-align: left; font-weight: 600; color: var(--ink-mute); padding: 10px 12px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fafafa; font-size: 12px; white-space: nowrap; }
+  .ing-table thead th.col-amount, .ing-table thead th.col-uprice { text-align: right; }
+  .ing-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: middle; background: #fff; }
+  .ing-table tbody tr:hover td { background: var(--row-hover); }
+  .col-del { width: 32px; padding-right: 4px !important; }
+  .col-ingname { min-width: 200px; }
+  .col-qty { width: 80px; }
+  .col-unit { width: 110px; }
+  .col-uprice { width: 90px; }
+  .col-amount { width: 80px; }
+  .ing-name { font-weight: 500; color: var(--ink); font-size: 13px; }
+  .ing-supplier { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+  .ing-input { width: 100%; padding: 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; text-align: right; outline: none; transition: border-color .13s; }
+  .ing-input:focus { border-color: var(--nomni-green); }
+  .ing-unit-select { width: 100%; padding: 5px 22px 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 6px center; }
+  .amount-val { font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right; display: block; }
+  .uprice-val { font-variant-numeric: tabular-nums; color: var(--ink-mute); text-align: right; display: block; }
+  .del-btn { background: none; border: none; cursor: pointer; color: var(--ink-soft); display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; transition: background .12s, color .12s; }
+  .del-btn:hover { background: #fde8e8; color: #c02020; }
+
+  /* Bottom actions */
+  .ing-actions { display: flex; align-items: center; gap: 8px; padding-top: 4px; }
+  .ing-add-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: 1px dashed #c0c2c8; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-mute); cursor: pointer; padding: 8px 14px; transition: border-color .13s, color .13s; }
+  .ing-add-btn:hover { border-color: var(--spinach); color: var(--spinach); }
+  .ing-copy-btn { background: none; border: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--spinach); cursor: pointer; padding: 8px 10px; border-radius: 6px; transition: background .12s; }
+  .ing-copy-btn:hover { background: #f0faf3; }
+
+  /* Sidebar panel */
+  .recipe-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 80px; }
+  .cost-card { border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; background: #fafcfa; }
+  .cost-card-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 10px; }
+  .cost-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .cost-row:last-child { margin-bottom: 0; }
+  .cost-key { font-size: 13px; color: var(--ink-mute); }
+  .cost-val { font-size: 18px; font-weight: 700; color: var(--spinach); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .cost-unit-val { font-size: 14px; font-weight: 600; color: var(--spinach); font-variant-numeric: tabular-nums; }
+  .cost-unit-desc { font-size: 11px; color: var(--ink-mute); }
+  .cooking-card { border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .cooking-card-label { font-size: 12px; font-weight: 600; color: var(--ink-mute); padding: 12px 14px 8px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; }
+  .cooking-char-count { font-size: 11px; font-weight: 400; color: var(--ink-soft); }
+  .cooking-textarea { width: 100%; border: none; outline: none; font: inherit; font-size: 13px; color: var(--ink); padding: 12px 14px; resize: none; min-height: 140px; background: #fff; }
+  .cooking-textarea::placeholder { color: var(--ink-soft); }
+
+  /* User menu */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+  .user-menu-item.supplier-hub { color: #1a6fcc; font-weight: 500; }
+  .font-inspector-btn { background: transparent; border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.6); cursor: pointer; display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: monospace; }
+  .font-inspector-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 64px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); }
+    .main { min-width: 900px; }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label, .sidebar .nav .badge, .sidebar .nav .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .nav .badge { display: inline-grid; }
+    .sidebar:hover .nav .warn-icon { display: inline-flex; }
+  }
+
+  /* HQ Mgmt nav section */
+  .nav-section-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); padding: 14px 12px 4px; line-height: 1; }
+  .nav-hq-wrap { background: rgba(14,55,39,.05); margin: 4px -10px 0; padding: 4px 10px 8px; border-top: 1px solid rgba(42,200,100,.2); flex-shrink: 0; }
+  .nav-hq-wrap a { display: flex; align-items: center; gap: 12px; padding: 9px 12px; color: #2a5a40; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav-hq-wrap a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #7aab8a; transition: color .15s; }
+  .nav-hq-wrap a:hover { background: rgba(42,200,100,.1); color: var(--seaweed); }
+  .nav-hq-wrap a:hover .ms-icon { color: var(--spinach); }
+  .nav-hq-wrap a.active { background: rgba(42,200,100,.16); color: var(--seaweed); font-weight: 600; }
+  .nav-hq-wrap a.active .ms-icon { color: var(--spinach); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Procure</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="font-inspector-btn" title="Font inspector">Aa</button>
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="avatar">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya (Zeemart)</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Supply - Dashboard.html" class="user-menu-item supplier-hub"><span class="material-symbols-outlined" style="font-size:16px;line-height:1">open_in_new</span>Use Nomni Supply</a>
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+            <a href="#" class="user-menu-item">Companies</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">language</span>English</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="https://www.nomni.ai/terms" class="user-menu-item" target="_blank">Terms of use</a>
+            <a href="https://www.nomni.ai/privacy" class="user-menu-item" target="_blank">Privacy Policy</a>
+            <a href="Procure - Login.html" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav" aria-label="Primary">
+      <div class="nav-section-label">Outlet</div>
+      <a href="Procure - Dashboard.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+      <a href="Procure - Orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Payments - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Payments - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Payments</span></a>
+      <a href="Procure - Items.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a href="Procure - Inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a href="Procure - Recipes.html" class="active"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span><span class="warn-icon"><img src="error_24dp_1F1F1F 1.png" width="20" height="20" alt=""></span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
+      <div class="nav-section-label">HQ Mgmt</div>
+      <div class="nav-hq-wrap">
+        <a href="Procure - HQ - Outlet Groups.html"><span class="ms-icon material-symbols-outlined">account_tree</span><span class="nav-label">Outlet groups</span></a>
+        <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Market lists</span></a>
+        <a href="Procure - HQ - Recipe Library.html"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipe library</span></a>
+        <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inv. master</span></a>
+        <a href="#"><span class="ms-icon material-symbols-outlined">point_of_sale</span><span class="nav-label">POS mapping</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/><path d="M12 8v5l3 2"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="recipe-header">
+      <div class="breadcrumb">
+        <a href="Procure - Recipes.html">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Recipes
+        </a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="Procure - Recipes - Outlet.html">Test Outlet ZM</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Bar BQ Chicken</span>
+      </div>
+      <div class="recipe-title-row">
+        <div class="recipe-title-left">
+          <span class="recipe-badge">Sub-recipe</span>
+          <input type="text" class="recipe-name-input" value="Bar BQ Chicken" />
+        </div>
+        <div class="recipe-actions">
+          <button class="btn-text-danger">Delete</button>
+          <button class="btn-text">Duplicate</button>
+          <button class="btn-ghost">Save &amp; create another</button>
+          <button class="btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="recipe-layout">
+
+      <!-- Left: fields + ingredients -->
+      <div class="recipe-main">
+
+        <div class="field-group">
+          <label class="field-label">Name</label>
+          <input type="text" class="field-input" value="Bar BQ Chicken" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Yield</label>
+          <div class="yield-row">
+            <input type="number" class="yield-input" value="1" min="0" step="0.01" />
+            <select class="yield-unit-select">
+              <option>unit</option>
+              <option>kg</option>
+              <option>portion</option>
+              <option>batch</option>
+            </select>
+            <span class="yield-eq">=</span>
+            <input type="number" class="yield-amount" value="4" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Tags</label>
+          <input type="text" class="field-input" placeholder="Select or add tags" />
+          <p class="field-hint">Use this to group recipes. Sub Recipes eg. Sub Courses / Dessert, Sides, etc.</p>
+        </div>
+
+        <div class="ingredients-section">
+          <div class="ingredients-table-wrap">
+            <table class="ing-table">
+              <thead>
+                <tr>
+                  <th class="col-del"></th>
+                  <th class="col-ingname">Name</th>
+                  <th class="col-qty">Recipe Qty</th>
+                  <th class="col-unit">Unit</th>
+                  <th class="col-uprice">Unit price</th>
+                  <th class="col-amount">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">CUCUMBER TGL tray (75cr)</div>
+                    <div class="ing-supplier">Parisi Bakery</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="15" /></td>
+                  <td><select class="ing-unit-select"><option>Grams</option><option>kg</option><option>ea</option></select></td>
+                  <td><span class="uprice-val">A$0.12</span></td>
+                  <td><span class="amount-val">A$0.13</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Pickled Shredded Carrot</div>
+                    <div class="ing-supplier">Sydney Direct Herbs Produce Pty Limited</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="15" /></td>
+                  <td><select class="ing-unit-select"><option>Grams</option><option>kg</option><option>ea</option></select></td>
+                  <td><span class="uprice-val">A$0.16</span></td>
+                  <td><span class="amount-val">A$0.02</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">LETTUCE SHREDDED 5mm bag 12.5kg</div>
+                    <div class="ing-supplier">Sydney Direct Herbs Produce Pty Limited</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="15" /></td>
+                  <td><select class="ing-unit-select"><option>Grams</option><option>kg</option><option>bag</option></select></td>
+                  <td><span class="uprice-val">A$1.01</span></td>
+                  <td><span class="amount-val">A$0.15</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Fried Shallots</div>
+                    <div class="ing-supplier">Sydney Direct Herbs Produce Pty Limited</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="5" /></td>
+                  <td><select class="ing-unit-select"><option>Grams</option><option>kg</option><option>ea</option></select></td>
+                  <td><span class="uprice-val">A$0.81</span></td>
+                  <td><span class="amount-val">A$0.04</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">MINT bunch</div>
+                    <div class="ing-supplier">Sydney Direct Herbs Produce Pty Limited</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="1" /></td>
+                  <td><select class="ing-unit-select"><option>Grams</option><option>bunch</option><option>kg</option></select></td>
+                  <td><span class="uprice-val">A$0.51</span></td>
+                  <td><span class="amount-val">A$0.01</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">CORIANDER NO ROOT H&amp;J By ROOT</div>
+                    <div class="ing-supplier">Sydney Direct Herbs Produce Pty Limited</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="0.5" /></td>
+                  <td><select class="ing-unit-select"><option>Grams</option><option>kg</option><option>bunch</option></select></td>
+                  <td><span class="uprice-val">A$0.21</span></td>
+                  <td><span class="amount-val">A$0.01</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Vermicelli (Cooked) - Yield Adjusted</div>
+                    <div class="ing-supplier">Roll'd Kitchen</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="0.96" /></td>
+                  <td><select class="ing-unit-select"><option>Ingredient</option><option>Grams</option><option>kg</option></select></td>
+                  <td><span class="uprice-val">A$0.01</span></td>
+                  <td><span class="amount-val">A$0.01</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">BBQ Chicken - Yield Adjusted</div>
+                    <div class="ing-supplier">Roll'd Kitchen</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="1" /></td>
+                  <td><select class="ing-unit-select"><option>Unit</option><option>Grams</option><option>kg</option></select></td>
+                  <td><span class="uprice-val">A$0.39</span></td>
+                  <td><span class="amount-val">A$0.39</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Chip Cup 90W (52 + 50)</div>
+                    <div class="ing-supplier">Parisi Bakery</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="1" /></td>
+                  <td><select class="ing-unit-select"><option>Unit</option><option>box</option><option>ea</option></select></td>
+                  <td><span class="uprice-val">A$0.14</span></td>
+                  <td><span class="amount-val">A$0.14</span></td>
+                </tr>
+                <tr>
+                  <td><button class="del-btn" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">BÁNH NGÒ MINI ROLLS</div>
+                    <div class="ing-supplier">Sydney Direct Herbs Produce Pty Limited</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="1" /></td>
+                  <td><select class="ing-unit-select"><option>Unit</option><option>ea</option><option>bag</option></select></td>
+                  <td><span class="uprice-val">A$0.54</span></td>
+                  <td><span class="amount-val">A$0.54</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="ing-actions">
+            <button class="ing-add-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Add Ingredient
+            </button>
+            <button class="ing-copy-btn">Copy data from…</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: cost + cooking instructions -->
+      <div class="recipe-sidebar">
+        <div class="cost-card">
+          <div class="cost-card-label">Cost summary</div>
+          <div class="cost-row">
+            <span class="cost-key">Cost</span>
+            <span class="cost-val">A$1.39</span>
+          </div>
+          <div class="cost-row" style="align-items:baseline">
+            <span class="cost-key">Unit cost</span>
+            <div style="text-align:right">
+              <div class="cost-unit-val">A$1.39</div>
+              <div class="cost-unit-desc">per unit</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cooking-card">
+          <div class="cooking-card-label">
+            Cooking instructions
+            <span class="cooking-char-count" id="charCount">0/500</span>
+          </div>
+          <textarea class="cooking-textarea" id="cookingInstructions" maxlength="500" placeholder="Add cooking instructions for this recipe…" rows="6"></textarea>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script>
+  document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+  const ta = document.getElementById('cookingInstructions');
+  const cc = document.getElementById('charCount');
+  ta.addEventListener('input', () => { cc.textContent = ta.value.length + '/500'; });
+
+  document.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      this.closest('tr').remove();
+    });
+  });
+</script>
+</body>
+</html>

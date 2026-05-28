@@ -430,5 +430,17 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- nomni — Dashboard mockup: extracted/zm-test/project/uploads/nomni_dashboard_mockup.html
+- Procure — POS Dashboard: extracted/zm-test/project/Procure - POS.html
+- Procure — Orders: extracted/zm-test/project/Buyer Hub - Orders.html
+- Procure — Order Detail: extracted/zm-test/project/Buyer Hub - Order Detail.html
+- Reset password — Nomni Procure: Procure - Reset Password.html
+- Procure — Recipes · Test Outlet ZM: Procure - Recipes - Outlet.html
+- Procure — Recipes · Bar BQ Chicken: Procure - Recipes - Detail.html
+- Procure — Inventory: Procure - Inventory.html
+- Procure — Inventory · Roll'd - Broadway: Procure - Inventory - Outlet.html
+- Procure — HQ · Recipe library: Procure - HQ - Recipe Library.html
+- Procure — HQ · NSW Metro: Procure - HQ - Outlet Groups - Detail.html
+- Forgot password — Nomni Procure: Procure - Forgot Password.html
 - Procure — Blank: test-hook.html
 - Procure — Recipes: Procure - Recipes.html
