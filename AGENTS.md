@@ -430,6 +430,10 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- ZM Admin — Create Buyer User: ZM Admin - Buyer User.html
+- Procure — Users: Procure - Users.html
+- Procure — Edit User: Procure - User Detail.html
+- Procure — HQ · Market Lists: Procure - HQ - Market Lists.html
 - Forgot password — Nomni Procure: Procure - Forgot Password.html
 - Procure — HQ · NSW Metro: Procure - HQ - Outlet Groups - Detail.html
 - Procure — HQ · Recipe library: Procure - HQ - Recipe Library.html

@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ZM Admin — Create Buyer User</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864;
+    --seaweed: #0E3727;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --ink: #1a1f2b;
+    --ink-2: #4a4f5a;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; background: #fff; }
+  .app { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* ── Topbar ── */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1F2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .font-inspector-btn { background: transparent; border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.6); cursor: pointer; display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: monospace; }
+  .font-inspector-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  /* ── Sidebar — dark green ── */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--seaweed); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .nav { padding: 8px 0; flex: 1; }
+  .nav-section-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.28); padding: 14px 16px 4px; line-height: 1; }
+  .nav a { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: rgba(255,255,255,.55); text-decoration: none; font-size: 13px; font-weight: 400; transition: background .15s, color .15s; border-left: 2px solid transparent; white-space: nowrap; }
+  .nav a svg { flex-shrink: 0; transition: color .15s; color: rgba(255,255,255,.3); }
+  .nav a:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
+  .nav a:hover svg { color: rgba(255,255,255,.6); }
+  .nav a.active { color: #fff; background: rgba(42,200,100,.12); border-left-color: var(--nomni-green); font-weight: 500; padding-left: 14px; }
+  .nav a.active svg { color: var(--nomni-green); }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sidebar-foot { padding: 12px 14px 16px; border-top: 1px solid rgba(255,255,255,.08); }
+  .sidebar-user { display: flex; align-items: center; gap: 10px; }
+  .sidebar-avt { width: 30px; height: 30px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; flex-shrink: 0; }
+  .sidebar-uname { font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,.8); }
+  .sidebar-role-lbl { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 1px; }
+
+  /* ── Main ── */
+  .main { grid-column: 2; grid-row: 2; padding: 28px 40px 80px; min-width: 0; background: #fff; }
+
+  /* Breadcrumb */
+  .breadcrumb { margin-bottom: 10px; }
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; }
+  .back-link:hover { color: var(--seaweed); }
+
+  /* Page title */
+  .page-title { font-size: 24px; font-weight: 700; margin: 0 0 16px; letter-spacing: -0.03em; }
+  .title-divider { height: 1px; background: var(--rule); margin: 0 0 28px; }
+
+  /* Form body */
+  .form-body { max-width: 640px; margin: 0 auto; }
+
+  /* Section headings */
+  .section-heading { font-size: 21px; font-weight: 700; margin: 32px 0 14px; letter-spacing: -0.02em; color: var(--ink); }
+  .section-note { font-size: 12px; color: var(--ink-mute); margin: -8px 0 14px; }
+  .section-note-prominent { display: inline-flex; align-items: flex-start; gap: 7px; font-size: 13px; font-weight: 500; color: var(--seaweed); background: var(--mint); border: 1px solid #B9F0C5; border-radius: 6px; padding: 8px 12px; margin-bottom: 18px; line-height: 1.4; }
+  .section-note-prominent svg { flex-shrink: 0; margin-top: 1px; color: var(--spinach); }
+  .section-note-prominent.error { background: #FDD6DC; border-color: #F5A0AA; color: #D0291E; }
+  .section-note-prominent.error svg { color: #D0291E; }
+  .tag-select-box.error { border-color: #D0291E; }
+  .hq-toggle-row.error { border-color: #D0291E; background: #fff8f8; }
+  .section-divider { height: 1px; background: var(--rule); margin: 28px 0; }
+
+  /* Fields */
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+  .form-row .field-group { flex: 1; margin-bottom: 0; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .field-input { width: 100%; padding: 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; background: #fff; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input::placeholder { color: var(--ink-mute); }
+  .field-hint { font-size: 12px; color: var(--ink-mute); margin-top: 4px; display: block; }
+  .field-select { width: 100%; padding: 8px 28px 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; transition: border-color .13s; }
+  .field-select:focus { border-color: var(--nomni-green); }
+
+  /* Checkbox row */
+  .checkbox-row { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; cursor: pointer; }
+  .checkbox-row input[type="checkbox"] { width: 14px; height: 14px; margin-top: 2px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .checkbox-row span { font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+
+  /* File row */
+  .file-row { display: flex; border: 1px solid #dcdee3; border-radius: 6px; overflow: hidden; }
+  .file-display { flex: 1; padding: 8px 12px; font-size: 14px; color: var(--ink-mute); background: #fff; border: none; outline: none; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .browse-btn { padding: 8px 16px; background: var(--nomni-green); color: var(--seaweed); font: inherit; font-size: 14px; font-weight: 600; border: none; cursor: pointer; flex-shrink: 0; transition: background .15s; }
+  .browse-btn:hover { background: #22b055; }
+
+  /* Tag multi-select */
+  .tag-select-wrap { position: relative; }
+  .tag-select-box { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; border: 1px solid #dcdee3; border-radius: 6px; padding: 6px 36px 6px 8px; min-height: 40px; cursor: pointer; background: #fff; transition: border-color .13s; }
+  .tag-select-box.open { border-color: var(--nomni-green); }
+  .tag-placeholder { font-size: 14px; color: var(--ink-mute); padding: 1px 4px; }
+  .tag-select-arrow { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+  .tag { display: inline-flex; align-items: center; gap: 3px; border-radius: 4px; padding: 2px 4px 2px 8px; font-size: 13px; font-weight: 500; color: var(--ink); background: #fff; border: 1px solid #dcdee3; }
+  .tag-x { background: none; border: none; cursor: pointer; color: var(--nomni-green); font-size: 14px; font-weight: 700; line-height: 1; padding: 0; display: flex; align-items: center; transition: color .1s; }
+  .tag-x:hover { color: var(--seaweed); }
+  .tag-dropdown { display: none; position: absolute; left: 0; top: calc(100% + 4px); min-width: 100%; background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 50; overflow: hidden; max-height: 220px; overflow-y: auto; }
+  .tag-dropdown.open { display: block; }
+  .tag-option { padding: 10px 14px; font-size: 14px; cursor: pointer; transition: background .1s; }
+  .tag-option:hover { background: var(--mint); }
+
+  /* Notification box */
+  .notif-heading { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .notif-box { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+  .notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--rule); cursor: pointer; }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item input[type="checkbox"] { width: 14px; height: 14px; margin-top: 3px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .notif-item-text { flex: 1; }
+  .notif-item-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .notif-item-desc { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+
+  /* Permissions */
+  .perm-heading { font-size: 21px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .perm-desc { font-size: 13px; color: var(--ink-mute); margin: 0 0 16px; }
+  .subsection-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-mute); margin: 0 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); display: block; }
+  .inner-divider { height: 1px; background: var(--rule); margin: 24px 0; }
+  .perm-role-select { padding: 7px 28px 7px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; min-width: 180px; margin-bottom: 24px; }
+  .perm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; }
+  .perm-col { display: flex; flex-direction: column; }
+  .perm-cat { margin-bottom: 22px; }
+  .perm-cat-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+  .perm-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 7px; cursor: pointer; }
+  .perm-item input[type="checkbox"] { width: 14px; height: 14px; margin-top: 1px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .perm-item label { font-size: 13px; color: var(--ink-2); cursor: pointer; line-height: 1.4; }
+  .perm-full .perm-cat { max-width: 100%; }
+
+  /* Sticky footer */
+  .sticky-footer { position: fixed; bottom: 0; left: 220px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .cancel-link { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: none; transition: color .13s; }
+  .cancel-link:hover { color: var(--ink); }
+  .save-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 24px; cursor: pointer; transition: background .15s; }
+  .save-btn:hover { background: #22b055; }
+
+  /* User menu */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 56px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 220px; box-shadow: 2px 0 16px rgba(0,0,0,.25); }
+    .nav a span { display: none; }
+    .nav a.active { padding-left: 16px; border-left-width: 0; }
+    .sidebar:hover .nav a span { display: inline; }
+    .sidebar:hover .nav a.active { padding-left: 14px; border-left-width: 2px; }
+    .sidebar .sidebar-foot { display: none; }
+    .sidebar:hover .sidebar-foot { display: block; }
+    .sticky-footer { left: 56px; }
+  }
+
+  /* ── HQ access section ── */
+  .hq-toggle-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; margin-bottom: 20px; transition: background .13s; user-select: none; }
+  .hq-toggle-row:hover { background: #fafafa; }
+  .toggle-track { width: 36px; height: 20px; border-radius: 10px; background: #dcdee3; position: relative; transition: background .2s; flex-shrink: 0; margin-top: 2px; }
+  .toggle-track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: left .2s; }
+  .toggle-track.on { background: var(--nomni-green); }
+  .toggle-track.on::after { left: 18px; }
+  .hq-toggle-text { flex: 1; }
+  .hq-toggle-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .hq-toggle-desc { font-size: 12px; color: var(--ink-mute); margin-top: 3px; line-height: 1.5; }
+
+  .hq-features { display: none; margin-bottom: 8px; }
+  .hq-features.visible { display: block; }
+  .hq-feat-group { margin-bottom: 16px; }
+  .hq-feat-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-mute); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+  .hq-feat-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; cursor: pointer; }
+  .hq-feat-item input[type="checkbox"] { width: 14px; height: 14px; margin-top: 2px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .hq-feat-item-text { flex: 1; }
+  .hq-feat-label { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .hq-feat-desc { font-size: 12px; color: var(--ink-mute); margin-top: 2px; line-height: 1.4; }
+  .hq-perm-group { transition: opacity .2s; }
+  .hq-perm-group.disabled { opacity: .35; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="font-inspector-btn" title="Font inspector">Aa</button>
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="topbar-avt">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">language</span>English</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav" aria-label="Primary">
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+        <span>Orders</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg>
+        <span>Invoices</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg>
+        <span>Reports</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        <span>Promotions</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Buyers</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg>
+        <span>Suppliers</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>Notifications</span><span class="badge">4</span>
+      </a>
+      <a href="ZM Admin - Buyer User.html" class="active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+        <span>Users</span>
+      </a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="sidebar-user">
+        <div class="sidebar-avt">WA</div>
+        <div>
+          <div class="sidebar-uname">William Arya</div>
+          <div class="sidebar-role-lbl">Super admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Breadcrumb + title run full width -->
+    <div class="breadcrumb">
+      <a href="#" class="back-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Users
+      </a>
+    </div>
+    <h1 class="page-title">Create buyer user</h1>
+    <div class="title-divider"></div>
+
+    <div class="form-body">
+
+      <!-- ── Basic information ── -->
+      <h2 class="section-heading" style="margin-top:0">Basic information</h2>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">First name</label>
+          <input type="text" class="field-input" placeholder="e.g. William" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Last name</label>
+          <input type="text" class="field-input" placeholder="e.g. Arya" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Job title</label>
+        <input type="text" class="field-input" placeholder="e.g. Store manager, Head chef" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input type="email" class="field-input" placeholder="name@company.com" />
+        <span class="field-hint">This will be used to log in — the user will receive a default password</span>
+        <label class="checkbox-row">
+          <input type="checkbox" />
+          <span>Send email notifications to outlet email instead of the email above</span>
+        </label>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Mobile phone</label>
+        <input type="tel" class="field-input" placeholder="+6591234567" />
+        <span class="field-hint">Used for SMS notifications. If the number is 91234567 and country code is +65, enter +6591234567</span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Profile photo (optional)</label>
+        <div class="file-row">
+          <span class="file-display">No file chosen</span>
+          <button class="browse-btn">Browse</button>
+        </div>
+        <span class="field-hint">JPEG, PNG files only — max 5MB</span>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── Access & permissions ── -->
+      <h2 class="section-heading" style="margin-top:0">Outlet access &amp; permissions</h2>
+
+      <div class="section-note-prominent" id="linkingNote">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        User must be linked to at least ONE outlet or HQ
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Group</label>
+        <select class="field-select" id="groupSelect">
+          <option value="">Select Group</option>
+          <option>Baoshi</option>
+          <option>Guzman Y Gomez</option>
+          <option>Liven Group</option>
+          <option>Roll'd Australia</option>
+          <option>Shake Shack SG</option>
+          <option>The Coffee Bean & Tea Leaf</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Company</label>
+        <div class="tag-select-wrap">
+          <div class="tag-select-box" id="companyBox">
+            <span class="tag-placeholder" id="companyPlaceholder">Select Company</span>
+          </div>
+          <svg class="tag-select-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#8a8f98" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="tag-dropdown" id="companyDropdown">
+            <div class="tag-option" onclick="addTag('companyBox','companyDropdown','companyPlaceholder',this)">JJ Yummy Food Pte Ltd</div>
+            <div class="tag-option" onclick="addTag('companyBox','companyDropdown','companyPlaceholder',this)">Bamb Pte Ltd</div>
+            <div class="tag-option" onclick="addTag('companyBox','companyDropdown','companyPlaceholder',this)">JJ Delicious Food Pte Ltd</div>
+            <div class="tag-option" onclick="addTag('companyBox','companyDropdown','companyPlaceholder',this)">Bao Shi F&amp;B Management Pte Ltd</div>
+            <div class="tag-option" onclick="addTag('companyBox','companyDropdown','companyPlaceholder',this)">JJ Hainan Bao Pte Ltd</div>
+            <div class="tag-option" onclick="addTag('companyBox','companyDropdown','companyPlaceholder',this)">JJ Hainan Bao Story Pte Ltd</div>
+            <div class="tag-option" onclick="addTag('companyBox','companyDropdown','companyPlaceholder',this)">Shangri-La Hotel Limited</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Outlet</label>
+        <div class="tag-select-wrap">
+          <div class="tag-select-box" id="outletBox">
+            <span class="tag-placeholder" id="outletPlaceholder">Select Outlet</span>
+          </div>
+          <svg class="tag-select-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#8a8f98" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="tag-dropdown" id="outletDropdown">
+            <div class="tag-option" onclick="addTag('outletBox','outletDropdown','outletPlaceholder',this)">Urban Market (TEST)</div>
+            <div class="tag-option" onclick="addTag('outletBox','outletDropdown','outletPlaceholder',this)">Shake Shack (Demo)</div>
+            <div class="tag-option" onclick="addTag('outletBox','outletDropdown','outletPlaceholder',this)">Happy Cakes CK</div>
+            <div class="tag-option" onclick="addTag('outletBox','outletDropdown','outletPlaceholder',this)">Abacus Cafe (TEST)</div>
+            <div class="tag-option" onclick="addTag('outletBox','outletDropdown','outletPlaceholder',this)">Test Outlet ZM</div>
+            <div class="tag-option" onclick="addTag('outletBox','outletDropdown','outletPlaceholder',this)">Happy Cakes (ABC Shopping Centre)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-divider"></div>
+
+      <!-- Permissions sub-section -->
+      <div class="field-group" style="margin-bottom:16px">
+        <label class="field-label">Permissions</label>
+        <span class="field-hint">Set what the user can do in Zeemart</span>
+      </div>
+
+      <select class="perm-role-select">
+        <option>Admin</option>
+        <option>Custom</option>
+        <option>Basic</option>
+        <option>Owner</option>
+        <option>Standard</option>
+        <option>Guest</option>
+      </select>
+
+      <!-- 2-column permission grid -->
+      <div class="perm-grid">
+        <!-- Left column -->
+        <div class="perm-col">
+          <div class="perm-cat">
+            <div class="perm-cat-title">Companies</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit companies</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create companies</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View companies</label></label>
+          </div>
+          <div class="perm-cat">
+            <div class="perm-cat-title">Orders</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit order limits</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Delete drafts</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage standing orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Approve orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create bulk orders</label></label>
+          </div>
+          <div class="perm-cat">
+            <div class="perm-cat-title">Payments &amp; Reports</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage accounting integration</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage payments</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage reports</label></label>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="perm-col">
+          <div class="perm-cat">
+            <div class="perm-cat-title">Invoices</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>Delete digitised invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage e-Credit notes</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage e-Invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Delete uploaded invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Export invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Upload invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Digitise uploaded invoices</label></label>
+          </div>
+          <div class="perm-cat">
+            <div class="perm-cat-title">Outlets</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>View marketlist</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage marketlist</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage supplier</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View outlets</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit outlets</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage inventory</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create outlets</label></label>
+          </div>
+          <div class="perm-cat">
+            <div class="perm-cat-title">User Access</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>View users</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Web panel access</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Receive push notifications</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Delete users</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage user roles</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View promocode</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View essentials</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create users</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Show prices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View announcement</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View deals</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Personal profile update</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit users</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View recipes</label></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Other settings (full width) -->
+      <div class="perm-full">
+        <div class="perm-cat">
+          <div class="perm-cat-title">Other settings</div>
+          <label class="perm-item"><input type="checkbox" /><label>Disable user from uploading invoices without reference to any orders</label></label>
+          <label class="perm-item"><input type="checkbox" /><label>Allow user to cancel any orders</label></label>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── HQ access ── -->
+      <h2 class="section-heading" style="margin-top:0">HQ access</h2>
+      <p class="perm-desc">When enabled, the user can switch to HQ mode in Buyer Hub to access cross-outlet governance tools.</p>
+
+      <div class="hq-toggle-row" id="hqToggleRow">
+        <span class="toggle-track" id="hqToggle"></span>
+        <div class="hq-toggle-text">
+          <div class="hq-toggle-label">Enable HQ mode for this user</div>
+          <div class="hq-toggle-desc">The user will see a mode switcher to move between their outlet view and the HQ management view</div>
+        </div>
+      </div>
+
+      <div class="hq-features" id="hqFeatures">
+
+        <div class="field-group">
+          <label class="field-label">Linked HQs</label>
+          <div class="tag-select-wrap">
+            <div class="tag-select-box" id="hqBox">
+              <span class="tag-placeholder" id="hqPlaceholder">Select HQ</span>
+            </div>
+            <svg class="tag-select-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#8a8f98" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="tag-dropdown" id="hqDropdown">
+              <div class="tag-option" onclick="addTag('hqBox','hqDropdown','hqPlaceholder',this)">Roll'd Australia HQ</div>
+              <div class="tag-option" onclick="addTag('hqBox','hqDropdown','hqPlaceholder',this)">Liven Group HQ</div>
+              <div class="tag-option" onclick="addTag('hqBox','hqDropdown','hqPlaceholder',this)">Shake Shack SG HQ</div>
+              <div class="tag-option" onclick="addTag('hqBox','hqDropdown','hqPlaceholder',this)">Baoshi HQ</div>
+              <div class="tag-option" onclick="addTag('hqBox','hqDropdown','hqPlaceholder',this)">Guzman Y Gomez HQ</div>
+            </div>
+          </div>
+          <span class="field-hint">The user will have access to HQ features for each linked HQ</span>
+        </div>
+
+        <div class="hq-feat-group hq-perm-group disabled" id="hqPermGroup">
+          <label class="field-label" style="margin-bottom:4px;display:block">Permissions</label>
+          <span class="field-hint" style="display:block;margin-bottom:12px">These permissions only apply while the user is in HQ mode</span>
+          <label class="hq-feat-item">
+            <input type="checkbox" />
+            <div class="hq-feat-item-text">
+              <div class="hq-feat-label">Manage user accounts</div>
+              <div class="hq-feat-desc">Can create accounts, update contact details, and disable outlet accounts (except Owners) and HQ users</div>
+            </div>
+          </label>
+          <label class="hq-feat-item">
+            <input type="checkbox" />
+            <div class="hq-feat-item-text">
+              <div class="hq-feat-label">Grant HQ access</div>
+              <div class="hq-feat-desc">Can enable HQ mode on a user account</div>
+            </div>
+          </label>
+          <label class="hq-feat-item">
+            <input type="checkbox" />
+            <div class="hq-feat-item-text">
+              <div class="hq-feat-label">Revoke HQ access</div>
+              <div class="hq-feat-desc">Can disable HQ mode on a user account</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="inner-divider"></div>
+
+        <div class="field-group" style="margin-bottom:0">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+            <div>
+              <div style="font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px">HQ Owner</div>
+              <div style="font-size:12px;color:var(--ink-mute);line-height:1.5">Protects this user from being disabled or removed by other HQ users. Can only be changed from ZM Admin.</div>
+            </div>
+            <span class="toggle-track off" id="hqOwnerToggle" style="flex-shrink:0;margin-top:2px"></span>
+          </div>
+        </div>
+
+      </div><!-- /hq-features -->
+
+      <div class="section-divider"></div>
+
+      <!-- ── Notifications ── -->
+      <h2 class="section-heading" style="margin-top:0">Get notifications when…</h2>
+
+      <div class="field-group" style="margin-bottom:0">
+        <div class="notif-box">
+          <label class="notif-item">
+            <input type="checkbox" />
+            <div class="notif-item-text">
+              <div class="notif-item-label">Order email remains unopened</div>
+              <div class="notif-item-desc">Email(s) sent for an order has not been opened after some time</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+    </div><!-- /form-body -->
+  </main>
+</div>
+
+<!-- Sticky footer -->
+<div class="sticky-footer">
+  <a href="#" class="cancel-link">Cancel</a>
+  <button class="save-btn" id="saveBtn">Save changes</button>
+</div>
+
+<script>
+  // User menu
+  document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+  // Tag select: toggle dropdown
+  document.querySelectorAll('.tag-select-box').forEach(box => {
+    box.addEventListener('click', function(e) {
+      if (e.target.closest('.tag-x')) return;
+      const wrap = this.closest('.tag-select-wrap');
+      const dropdown = wrap.querySelector('.tag-dropdown');
+      const isOpen = dropdown.classList.contains('open');
+      document.querySelectorAll('.tag-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.tag-select-box.open').forEach(b => b.classList.remove('open'));
+      if (!isOpen) { dropdown.classList.add('open'); this.classList.add('open'); }
+    });
+  });
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.tag-select-wrap')) {
+      document.querySelectorAll('.tag-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.tag-select-box.open').forEach(b => b.classList.remove('open'));
+    }
+  });
+
+  function addTag(boxId, dropdownId, placeholderId, optionEl) {
+    const box = document.getElementById(boxId);
+    const placeholder = document.getElementById(placeholderId);
+    if (placeholder) placeholder.style.display = 'none';
+    const text = optionEl.textContent.trim();
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = '<span>' + text + '</span><button class="tag-x" onclick="removeTag(this,\'' + placeholderId + '\')">×</button>';
+    box.appendChild(tag);
+    document.getElementById(dropdownId).classList.remove('open');
+    box.classList.remove('open');
+    optionEl.remove();
+    if (boxId === 'outletBox' || boxId === 'hqBox') clearLinkingErrors();
+    if (boxId === 'hqBox') updateHqPermGroup();
+  }
+
+  function removeTag(btn, placeholderId) {
+    const box = btn.closest('.tag-select-box');
+    btn.closest('.tag').remove();
+    if (!box.querySelector('.tag')) {
+      const ph = document.getElementById(placeholderId);
+      if (ph) ph.style.display = '';
+    }
+    if (box.id === 'hqBox') updateHqPermGroup();
+  }
+
+  function updateHqPermGroup() {
+    const hasLinkedHQ = document.querySelectorAll('#hqBox .tag').length > 0;
+    document.getElementById('hqPermGroup').classList.toggle('disabled', !hasLinkedHQ);
+  }
+
+  // HQ Owner toggle
+  document.getElementById('hqOwnerToggle').addEventListener('click', function(e) {
+    e.stopPropagation();
+    this.classList.toggle('on');
+  });
+
+  // HQ toggle
+  document.getElementById('hqToggleRow').addEventListener('click', function() {
+    const track = document.getElementById('hqToggle');
+    const features = document.getElementById('hqFeatures');
+    const isOn = track.classList.toggle('on');
+    features.classList.toggle('visible', isOn);
+    // Clear error state when user interacts
+    clearLinkingErrors();
+  });
+
+  // Validation
+  function hasOutlet() {
+    return document.querySelectorAll('#outletBox .tag').length > 0;
+  }
+  function hasHQ() {
+    return document.getElementById('hqToggle').classList.contains('on')
+        && document.querySelectorAll('#hqBox .tag').length > 0;
+  }
+  function clearLinkingErrors() {
+    document.getElementById('linkingNote').classList.remove('error');
+    document.getElementById('outletBox').classList.remove('error');
+    document.getElementById('hqToggleRow').classList.remove('error');
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', function() {
+    if (!hasOutlet() && !hasHQ()) {
+      document.getElementById('linkingNote').classList.add('error');
+      document.getElementById('outletBox').classList.add('error');
+      document.getElementById('hqToggleRow').classList.add('error');
+      document.getElementById('linkingNote').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    // Pass — proceed
+    window.location.href = '#';
+  });
+</script>
+</body>
+</html>

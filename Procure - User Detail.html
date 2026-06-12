@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procure — Edit User</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --seaweed: #0E3727;
+    --nomni-green: #2AC864;
+    --spinach: #1A8040;
+    --cream: #FAF7E9;
+    --mint: #E2FFE6;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42, 200, 100, 0.14);
+    --sidebar-text: #1a1f2b;
+    --ink: #1a1f2b;
+    --ink-2: #1a1f2b;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+    --primary: #2AC864;
+    --primary-ink: #0E3727;
+    --row-hover: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  .app { display: grid; grid-template-columns: 232px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* Topbar */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1f2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: #7F6AD0; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; font-family: "Hanken Grotesk", sans-serif; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+
+  /* Sidebar */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--sidebar-bg); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .nav { margin-top: 12px; padding: 6px 10px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: var(--sidebar-text); text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav a .icon-wrap { flex: 0 0 18px; width: 18px; height: 18px; position: relative; display: block; }
+  .nav a .icon { position: absolute; top: 0; left: 0; width: 18px; height: 18px; }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a.active { background: var(--sidebar-item-active); color: var(--seaweed); font-weight: 600; }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; align-self: center; }
+  .nav .warn-icon { margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; height: 18px; align-self: center; }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+  .sidebar-foot { padding: 16px; }
+  .help-fab { width: 44px; height: 44px; border-radius: 50%; background: #6c4df2; display: grid; place-items: center; color: #fff; box-shadow: 0 6px 18px rgba(108,77,242,.4); }
+  .nav-label { line-height: 1; }
+  .nav-section-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); padding: 14px 12px 4px; line-height: 1; }
+  .nav-hq-wrap { background: rgba(14,55,39,.05); margin: 4px -10px 0; padding: 4px 10px 8px; border-top: 1px solid rgba(42,200,100,.2); flex-shrink: 0; }
+  .nav-hq-wrap a { display: flex; align-items: center; gap: 12px; padding: 9px 12px; color: #2a5a40; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav-hq-wrap a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #7aab8a; transition: color .15s; }
+  .nav-hq-wrap a:hover { background: rgba(42,200,100,.1); color: var(--seaweed); }
+  .nav-hq-wrap a:hover .ms-icon { color: var(--spinach); }
+
+  /* Main */
+  .main { grid-column: 2; grid-row: 2; padding: 28px 40px 80px; min-width: 0; background: #fff; }
+
+  /* Form body — constrained width, centered */
+  .form-body { max-width: 640px; margin: 0 auto; }
+
+  /* Breadcrumb */
+  .breadcrumb { margin-bottom: 10px; }
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; }
+  .back-link:hover { color: var(--seaweed); }
+
+  /* Page title */
+  .page-title { font-size: 24px; font-weight: 700; margin: 0 0 16px; letter-spacing: -0.03em; }
+  .title-divider { height: 1px; background: var(--rule); margin: 0 0 28px; }
+
+  /* Section headings */
+  .section-heading { font-size: 21px; font-weight: 700; margin: 32px 0 14px; letter-spacing: -0.02em; color: var(--ink); }
+  .section-note { font-size: 12px; color: var(--ink-mute); margin: -8px 0 14px; }
+
+  /* Form fields */
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+  .form-row .field-group { flex: 1; margin-bottom: 0; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .field-input { width: 100%; padding: 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; background: #fff; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input::placeholder { color: var(--ink-mute); }
+  .field-hint { font-size: 12px; color: var(--ink-mute); margin-top: 4px; display: block; }
+
+  /* Checkbox row */
+  .checkbox-row { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; cursor: pointer; }
+  .checkbox-row input[type="checkbox"] { width: 14px; height: 14px; margin-top: 2px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .checkbox-row span { font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+
+  /* File input row */
+  .file-row { display: flex; border: 1px solid #dcdee3; border-radius: 6px; overflow: hidden; }
+  .file-display { flex: 1; padding: 8px 12px; font-size: 14px; color: var(--ink-mute); background: #fff; border: none; outline: none; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .browse-btn { padding: 8px 16px; background: var(--nomni-green); color: var(--seaweed); font: inherit; font-size: 14px; font-weight: 600; border: none; cursor: pointer; flex-shrink: 0; transition: background .15s; }
+  .browse-btn:hover { background: #22b055; }
+  .photo-preview { position: relative; display: inline-block; margin-top: 10px; }
+  .photo-avt { width: 52px; height: 52px; border-radius: 6px; background: #7F6AD0; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+  .photo-remove { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--seaweed); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; border: none; line-height: 1; }
+  .photo-remove:hover { background: #000; }
+
+  /* Tag multi-select */
+  .tag-select-wrap { position: relative; }
+  .tag-select-box { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; border: 1px solid #dcdee3; border-radius: 6px; padding: 6px 36px 6px 8px; min-height: 40px; cursor: pointer; background: #fff; transition: border-color .13s; }
+  .tag-select-box:focus-within,
+  .tag-select-box.open { border-color: var(--nomni-green); }
+  .tag-select-arrow { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+  .tag { display: inline-flex; align-items: center; gap: 3px; border-radius: 4px; padding: 2px 4px 2px 6px; font-size: 13px; font-weight: 500; color: var(--ink); background: #fff; border: 1px solid #dcdee3; }
+  .tag-x { background: none; border: none; cursor: pointer; color: var(--nomni-green); font-size: 14px; font-weight: 700; line-height: 1; padding: 0; display: flex; align-items: center; transition: color .1s; }
+  .tag-x:hover { color: var(--seaweed); }
+  .tag-dropdown { display: none; position: absolute; left: 0; top: calc(100% + 4px); min-width: 100%; background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 50; overflow: hidden; }
+  .tag-dropdown.open { display: block; }
+  .tag-option { padding: 10px 14px; font-size: 14px; cursor: pointer; transition: background .1s; }
+  .tag-option:hover { background: var(--mint); }
+
+  /* Section divider */
+  .section-divider { height: 1px; background: var(--rule); margin: 28px 0; }
+
+  /* Permissions */
+  .perm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .perm-heading { font-size: 21px; font-weight: 700; margin: 0; letter-spacing: -0.02em; }
+  .copy-from-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-2); background: #fff; cursor: pointer; transition: background .13s; }
+  .copy-from-btn:hover { background: #f3f4f6; }
+  .perm-desc { font-size: 13px; color: var(--ink-mute); margin: 6px 0 14px; }
+  .perm-role-select { padding: 7px 28px 7px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; min-width: 180px; margin-bottom: 20px; }
+  .perm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; }
+  .perm-col { display: flex; flex-direction: column; }
+  .perm-cat { margin-bottom: 22px; }
+  .perm-cat-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+  .perm-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 7px; cursor: pointer; }
+  .perm-item input[type="checkbox"] { width: 14px; height: 14px; margin-top: 1px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .perm-item label { font-size: 13px; color: var(--ink-2); cursor: pointer; line-height: 1.4; }
+  .perm-full .perm-cat { max-width: 100%; }
+
+  /* Sticky footer */
+  .sticky-footer { position: fixed; bottom: 0; left: 232px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .cancel-link { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: none; transition: color .13s; }
+  .cancel-link:hover { color: var(--ink); }
+  .save-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 24px; cursor: pointer; transition: background .15s; }
+  .save-btn:hover { background: #22b055; }
+
+  /* Copy-from modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; align-items: flex-start; justify-content: center; padding-top: 72px; }
+  .modal-overlay.open { display: flex; }
+  .modal-card { background: #fff; border-radius: 12px; width: 440px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); position: relative; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-close { position: absolute; top: 14px; right: 14px; background: none; border: none; cursor: pointer; color: var(--ink-mute); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: color .12s, background .12s; }
+  .modal-close:hover { color: var(--ink); background: #f3f4f6; }
+  .modal-header { padding: 20px 24px 0; }
+  .modal-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; letter-spacing: -.02em; }
+  .modal-sub { font-size: 13px; color: var(--ink-mute); margin: 0; }
+  .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .field-select { width: 100%; padding: 9px 28px 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; }
+  .field-hint2 { font-size: 12px; color: var(--ink-mute); margin-top: 4px; }
+  .modal-foot { padding: 0 24px 18px; display: flex; gap: 10px; }
+  .btn-apply { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 20px; cursor: pointer; }
+  .btn-apply:hover { background: #22b055; }
+  .btn-cancel-sm { background: #f3f4f6; color: var(--ink-2); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 20px; cursor: pointer; }
+  .btn-cancel-sm:hover { background: #e6e8ec; }
+
+  /* User menu */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+  .user-menu-item.supplier-hub { color: #1a6fcc; font-weight: 500; }
+  .font-inspector-btn { background: transparent; border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.6); cursor: pointer; display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: monospace; }
+  .font-inspector-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 64px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); }
+    .main { min-width: 900px; }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label, .sidebar .nav .badge, .sidebar .nav .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .nav .badge { display: inline-grid; }
+    .sidebar:hover .nav .warn-icon { display: inline-flex; }
+    .sticky-footer { left: 64px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Procure</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="font-inspector-btn" title="Font inspector">Aa</button>
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="topbar-avt">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya (Zeemart)</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Supply - Dashboard.html" class="user-menu-item supplier-hub"><span class="material-symbols-outlined" style="font-size:16px;line-height:1">open_in_new</span>Use Nomni Supply</a>
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+            <a href="#" class="user-menu-item">Companies</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">language</span>English</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="https://www.nomni.ai/terms" class="user-menu-item" target="_blank">Terms of use</a>
+            <a href="https://www.nomni.ai/privacy" class="user-menu-item" target="_blank">Privacy Policy</a>
+            <a href="Procure - Login.html" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav" aria-label="Primary">
+      <div class="nav-section-label">Outlet</div>
+      <a href="Procure - Dashboard.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+      <a href="Procure - Orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Payments - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Payments - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Payments</span></a>
+      <a href="Procure - Items.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a href="Procure - Inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a href="Procure - Recipes.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span><span class="warn-icon"><img src="error_24dp_1F1F1F 1.png" width="20" height="20" alt=""></span></a>
+      <a href="Procure - Users.html" class="active"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
+      <div class="nav-section-label">HQ Mgmt</div>
+      <div class="nav-hq-wrap">
+        <a href="Procure - HQ - Outlet Groups.html"><span class="ms-icon material-symbols-outlined">account_tree</span><span class="nav-label">Outlet groups</span></a>
+        <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Market lists</span></a>
+        <a href="Procure - HQ - Recipe Library.html"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipe library</span></a>
+        <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inv. master</span></a>
+        <a href="#"><span class="ms-icon material-symbols-outlined">point_of_sale</span><span class="nav-label">POS mapping</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/><path d="M12 8v5l3 2"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Breadcrumb + title run full width -->
+    <div class="breadcrumb">
+      <a href="Procure - Users.html" class="back-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Users
+      </a>
+    </div>
+    <h1 class="page-title">Edit user</h1>
+    <div class="title-divider"></div>
+
+    <div class="form-body">
+
+      <!-- ── Basic information ── -->
+      <h2 class="section-heading">Basic information</h2>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">First name</label>
+          <input type="text" class="field-input" value="William" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Last name</label>
+          <input type="text" class="field-input" value="Arya (Zeemart)" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Job title</label>
+        <input type="text" class="field-input" value="Staff" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input type="email" class="field-input" value="william@zeemart.co" />
+        <label class="checkbox-row">
+          <input type="checkbox" />
+          <span>Send email notifications to outlet email instead of the email above</span>
+        </label>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Mobile phone</label>
+        <input type="tel" class="field-input" value="+6598159051" />
+        <span class="field-hint">Used for SMS notifications. If the number is 91234567 and country code is 65, enter +6591234567</span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Profile photo (optional)</label>
+        <div class="file-row">
+          <span class="file-display">6434f74b4afe700001e98271.jpg</span>
+          <button class="browse-btn">Browse</button>
+        </div>
+        <span class="field-hint">JPEG, PNG files only — max 5MB</span>
+        <div class="photo-preview" id="photoPreview">
+          <div class="photo-avt">WA</div>
+          <button class="photo-remove" id="photoRemove" title="Remove photo">×</button>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── Outlet ── -->
+      <h2 class="section-heading" style="margin-top:0">Outlet</h2>
+      <p class="section-note">Note: User must be linked to at least ONE outlet</p>
+
+      <div class="field-group">
+        <label class="field-label">Company</label>
+        <div class="tag-select-wrap">
+          <div class="tag-select-box" id="companyBox">
+            <span class="tag"><span>Will A Company</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Will AB Company</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Whole Foods Pte Ltd (TEST)</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Kind Foods Pte Ltd (TEST)</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Tester Company</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+          </div>
+          <svg class="tag-select-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#8a8f98" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="tag-dropdown" id="companyDropdown">
+            <div class="tag-option" onclick="addTag('companyBox', 'companyDropdown', this)">Zeemart Asia</div>
+            <div class="tag-option" onclick="addTag('companyBox', 'companyDropdown', this)">Liven Group</div>
+            <div class="tag-option" onclick="addTag('companyBox', 'companyDropdown', this)">Urban Foods Pte Ltd</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Outlet</label>
+        <div class="tag-select-wrap">
+          <div class="tag-select-box" id="outletBox">
+            <span class="tag"><span>Urban Market (TEST)</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Shake Shack (Demo)</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Happy Cakes CK</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Abacus Cafe (TEST)</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Test Outlet ZM</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+            <span class="tag"><span>Happy Cakes (ABC Shopping Centre)</span><button class="tag-x" onclick="removeTag(this)">×</button></span>
+          </div>
+          <svg class="tag-select-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#8a8f98" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="tag-dropdown" id="outletDropdown">
+            <div class="tag-option" onclick="addTag('outletBox', 'outletDropdown', this)">Urban Market SG</div>
+            <div class="tag-option" onclick="addTag('outletBox', 'outletDropdown', this)">Cali Poke (Pitt Street)</div>
+            <div class="tag-option" onclick="addTag('outletBox', 'outletDropdown', this)">Guzman Y Gomez (Bondi)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── Permissions ── -->
+      <div class="perm-header">
+        <h2 class="perm-heading">Permissions</h2>
+        <button class="copy-from-btn" id="copyFromBtn">
+          Copy from...
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#1a1f2b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <p class="perm-desc">Set what the user can do in Nomni Procure</p>
+
+      <select class="perm-role-select" id="permRole">
+        <option>Owner</option>
+        <option>Admin</option>
+        <option>Standard</option>
+        <option>Basic</option>
+        <option>Guest</option>
+        <option>Custom</option>
+      </select>
+
+      <!-- 2-column permission grid -->
+      <div class="perm-grid">
+        <!-- Left column -->
+        <div class="perm-col">
+          <div class="perm-cat">
+            <div class="perm-cat-title">Companies</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit companies</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create companies</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View companies</label></label>
+          </div>
+          <div class="perm-cat">
+            <div class="perm-cat-title">Orders</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit order limits</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage standing orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Approve orders</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create bulk orders</label></label>
+          </div>
+          <div class="perm-cat">
+            <div class="perm-cat-title">Payments &amp; Reports</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage accounting integration</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage payments</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage reports</label></label>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="perm-col">
+          <div class="perm-cat">
+            <div class="perm-cat-title">Invoices</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>Delete digitised invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage e-Credit notes</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage e-Invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Delete uploaded invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Export invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Upload invoices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Digitise uploaded invoices</label></label>
+          </div>
+          <div class="perm-cat">
+            <div class="perm-cat-title">Outlets</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>View marketlist</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage marketlist</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage supplier</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View outlets</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit outlets</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage inventory</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create outlets</label></label>
+          </div>
+          <div class="perm-cat">
+            <div class="perm-cat-title">User Access</div>
+            <label class="perm-item"><input type="checkbox" checked /><label>View users</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Web panel access</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Delete users</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Manage user roles</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Create users</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Show prices</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>Edit users</label></label>
+            <label class="perm-item"><input type="checkbox" checked /><label>View recipes</label></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications (full width) -->
+      <div class="perm-full">
+        <div class="perm-cat">
+          <div class="perm-cat-title">Notifications</div>
+          <label class="perm-item"><input type="checkbox" /><label>Notify user when order email remains unopened after some time</label></label>
+        </div>
+      </div>
+
+      <!-- Other permissions (full width) -->
+      <div class="perm-full">
+        <div class="perm-cat">
+          <div class="perm-cat-title">Other permissions</div>
+          <label class="perm-item"><input type="checkbox" /><label>Disable user from uploading invoices without reference to any orders</label></label>
+          <label class="perm-item"><input type="checkbox" /><label>Allow user to cancel any orders</label></label>
+        </div>
+      </div>
+
+    </div><!-- /form-body -->
+  </main>
+</div>
+
+<!-- Sticky footer -->
+<div class="sticky-footer">
+  <a href="Procure - Users.html" class="cancel-link">Cancel</a>
+  <button class="save-btn" id="saveBtn">Save</button>
+</div>
+
+<!-- Copy from modal -->
+<div class="modal-overlay" id="copyModal">
+  <div class="modal-card">
+    <button class="modal-close" id="copyClose">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="modal-header">
+      <p class="modal-title">Copy from...</p>
+      <p class="modal-sub">Apply the same permissions from another user:</p>
+    </div>
+    <div class="modal-body">
+      <div>
+        <select class="field-select" style="margin-bottom:6px">
+          <option value="">Select user</option>
+          <option>Adeline Kusuma</option>
+          <option>Amit Malhotra</option>
+          <option>Narendra Sagadevan</option>
+          <option>Paran Chinniah</option>
+          <option>Sindoora Iyer</option>
+        </select>
+        <p class="field-hint2">You can only copy permissions from a user with equal or lesser permissions.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-apply">Update</button>
+      <button class="btn-cancel-sm" id="copyCancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // User menu
+  document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+  // Tag select: toggle dropdown on box click
+  document.querySelectorAll('.tag-select-box').forEach(box => {
+    box.addEventListener('click', function(e) {
+      if (e.target.closest('.tag-x')) return;
+      const wrap = this.closest('.tag-select-wrap');
+      const dropdown = wrap.querySelector('.tag-dropdown');
+      const isOpen = dropdown.classList.contains('open');
+      document.querySelectorAll('.tag-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.tag-select-box.open').forEach(b => b.classList.remove('open'));
+      if (!isOpen) {
+        dropdown.classList.add('open');
+        this.classList.add('open');
+      }
+    });
+  });
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.tag-select-wrap')) {
+      document.querySelectorAll('.tag-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.tag-select-box.open').forEach(b => b.classList.remove('open'));
+    }
+  });
+
+  function removeTag(btn) {
+    btn.closest('.tag').remove();
+  }
+
+  function addTag(boxId, dropdownId, optionEl) {
+    const box = document.getElementById(boxId);
+    const text = optionEl.textContent.trim();
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = '<span>' + text + '</span><button class="tag-x" onclick="removeTag(this)">×</button>';
+    box.appendChild(tag);
+    document.getElementById(dropdownId).classList.remove('open');
+    box.classList.remove('open');
+    optionEl.remove();
+  }
+
+  // Photo remove
+  document.getElementById('photoRemove').addEventListener('click', function() {
+    document.getElementById('photoPreview').style.display = 'none';
+  });
+
+  // Copy from modal
+  const copyModal = document.getElementById('copyModal');
+  document.getElementById('copyFromBtn').addEventListener('click', () => copyModal.classList.add('open'));
+  document.getElementById('copyClose').addEventListener('click', () => copyModal.classList.remove('open'));
+  document.getElementById('copyCancelBtn').addEventListener('click', () => copyModal.classList.remove('open'));
+  copyModal.addEventListener('click', e => { if (e.target === copyModal) copyModal.classList.remove('open'); });
+
+  // Save → back to users list
+  document.getElementById('saveBtn').addEventListener('click', () => window.location.href = 'Procure - Users.html');
+</script>
+</body>
+</html>
