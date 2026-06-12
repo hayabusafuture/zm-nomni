@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ZM Admin — Create Outlet Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864;
+    --seaweed: #0E3727;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --ink: #1a1f2b;
+    --ink-2: #4a4f5a;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+    --row-hover: #f7f8fa;
+    --primary: #2AC864;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; background: #fff; }
+  .app { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* ── Topbar ── */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1F2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+
+  /* ── Sidebar — dark green ── */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--seaweed); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .nav { padding: 8px 0; flex: 1; }
+  .nav a { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: rgba(255,255,255,.55); text-decoration: none; font-size: 13px; font-weight: 400; transition: background .15s, color .15s; border-left: 2px solid transparent; white-space: nowrap; }
+  .nav a svg { flex-shrink: 0; transition: color .15s; color: rgba(255,255,255,.3); }
+  .nav a:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
+  .nav a:hover svg { color: rgba(255,255,255,.6); }
+  .nav a.active { color: #fff; background: rgba(42,200,100,.12); border-left-color: var(--nomni-green); font-weight: 500; padding-left: 14px; }
+  .nav a.active svg { color: var(--nomni-green); }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sidebar-foot { padding: 12px 14px 16px; border-top: 1px solid rgba(255,255,255,.08); }
+  .sidebar-user { display: flex; align-items: center; gap: 10px; }
+  .sidebar-avt { width: 30px; height: 30px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; flex-shrink: 0; }
+  .sidebar-uname { font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,.8); }
+  .sidebar-role-lbl { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 1px; }
+
+  /* ── Main ── */
+  .main { grid-column: 2; grid-row: 2; padding: 28px 40px 80px; min-width: 0; background: #fff; }
+
+  /* ── Back link ── */
+  .breadcrumb { margin-bottom: 10px; }
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; }
+  .back-link:hover { color: var(--seaweed); }
+
+  /* ── Page title ── */
+  .page-title { font-size: 26px; font-weight: 800; margin: 0 0 16px; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .title-divider { height: 1px; background: var(--rule); margin: 0 0 28px; }
+
+  /* ── Form body ── */
+  .form-body { max-width: 640px; }
+
+  /* ── Section headings ── */
+  .section-heading { font-size: 21px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.02em; color: var(--ink); }
+  .section-note { font-size: 13px; color: var(--ink-mute); margin: 0 0 18px; }
+  .section-divider { height: 1px; background: var(--rule); margin: 28px 0; }
+
+  /* ── Fields ── */
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .field-label .opt { font-weight: 400; color: var(--ink-mute); font-size: 13px; margin-left: 4px; }
+  .field-input { width: 100%; padding: 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; background: #fff; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input::placeholder { color: var(--ink-mute); }
+  .field-textarea { min-height: 80px; resize: vertical; font-family: inherit; line-height: 1.5; }
+  .field-hint { font-size: 12px; color: var(--ink-mute); margin-top: 4px; display: block; }
+
+  /* ── Two-panel outlet picker ── */
+  .outlet-picker { display: flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; height: 420px; }
+
+  .picker-available { flex: 1; display: flex; flex-direction: column; min-width: 0; border-right: 1px solid var(--rule); }
+  .picker-filters { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--rule); background: #f9fafb; }
+  .picker-search-wrap { display: inline-flex; align-items: center; gap: 7px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 10px; height: 32px; flex: 1; min-width: 0; }
+  .picker-search-wrap svg { flex-shrink: 0; color: var(--ink-mute); }
+  .picker-search-wrap input { border: none; outline: none; font: inherit; font-size: 13px; color: var(--ink); background: transparent; width: 100%; min-width: 0; }
+  .picker-search-wrap input::placeholder { color: var(--ink-mute); }
+  .picker-filter-sel { height: 32px; padding: 0 24px 0 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 12px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center; flex-shrink: 0; max-width: 130px; }
+  .picker-filter-sel:focus { border-color: var(--nomni-green); }
+
+  .picker-list-meta { display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; border-bottom: 1px solid var(--rule); background: #fff; }
+  .picker-meta-count { font-size: 12px; color: var(--ink-mute); }
+  .select-all-btn { background: none; border: none; color: var(--spinach); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; transition: color .13s; }
+  .select-all-btn:hover { text-decoration: underline; }
+
+  .picker-list { flex: 1; overflow-y: auto; }
+  .picker-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid var(--rule); cursor: pointer; transition: background .1s; user-select: none; }
+  .picker-item:hover { background: var(--row-hover); }
+  .picker-item.is-selected { background: #f0faf4; }
+  .picker-item:last-child { border-bottom: none; }
+  .picker-item input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--nomni-green); cursor: pointer; flex-shrink: 0; pointer-events: none; }
+  .picker-item-info { flex: 1; min-width: 0; }
+  .picker-item-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picker-item-meta { font-size: 12px; color: var(--ink-mute); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .meta-sep { margin: 0 5px; color: var(--ink-soft); }
+  .picker-no-results { padding: 32px 14px; text-align: center; color: var(--ink-mute); font-size: 13px; }
+
+  .picker-selected { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; background: #f9fafb; }
+  .picker-sel-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+  .picker-sel-title { font-size: 12px; font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: .05em; }
+  .picker-sel-count { display: inline-flex; align-items: center; justify-content: center; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; margin-left: 6px; }
+  .clear-all-btn { background: none; border: none; color: var(--ink-mute); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; padding: 0; transition: color .13s; }
+  .clear-all-btn:hover { color: #D0291E; }
+  .picker-sel-list { flex: 1; overflow-y: auto; }
+  .picker-sel-item { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+  .picker-sel-item:last-child { border-bottom: none; }
+  .picker-sel-info { flex: 1; min-width: 0; }
+  .picker-sel-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picker-sel-company { font-size: 11px; color: var(--ink-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picker-remove { background: none; border: none; color: var(--ink-soft); cursor: pointer; padding: 3px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: color .1s, background .1s; }
+  .picker-remove:hover { color: #D0291E; background: #FDD6DC; }
+  .picker-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 24px; text-align: center; gap: 6px; }
+  .picker-empty-icon { color: var(--ink-soft); }
+  .picker-empty-title { font-size: 13px; font-weight: 600; color: var(--ink-mute); }
+  .picker-empty-hint { font-size: 12px; color: var(--ink-soft); line-height: 1.5; }
+
+  /* ── Sticky footer ── */
+  .sticky-footer { position: fixed; bottom: 0; left: 220px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .cancel-link { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: none; transition: color .13s; }
+  .cancel-link:hover { color: var(--ink); }
+  .save-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 24px; cursor: pointer; transition: background .15s; }
+  .save-btn:hover { background: #22b055; }
+  .save-btn:disabled { background: #a3e5bc; color: #5a9e6f; cursor: not-allowed; }
+
+  /* ── User menu ── */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+
+  /* ── Toast ── */
+  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--seaweed); color: #fff; font-size: 14px; font-weight: 500; padding: 12px 20px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 9999; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 56px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 220px; box-shadow: 2px 0 16px rgba(0,0,0,.25); }
+    .nav a span { display: none; }
+    .sidebar:hover .nav a span { display: inline; }
+    .sidebar .sidebar-foot { display: none; }
+    .sidebar:hover .sidebar-foot { display: block; }
+    .sticky-footer { left: 56px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="topbar-avt">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav" aria-label="Primary">
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+        <span>Orders</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg>
+        <span>Invoices</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg>
+        <span>Reports</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        <span>Promotions</span>
+      </a>
+      <a href="ZM Admin - Buyers.html" class="active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Buyers</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg>
+        <span>Suppliers</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>Notifications</span><span class="badge">4</span>
+      </a>
+      <a href="ZM Admin - Buyer User.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+        <span>Users</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="breadcrumb">
+      <a href="ZM Admin - Buyers.html" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Buyers
+      </a>
+    </div>
+
+    <h1 class="page-title">Create outlet group</h1>
+    <div class="title-divider"></div>
+
+    <div class="form-body">
+
+      <!-- Group details -->
+      <div class="section-heading">Group details</div>
+      <div class="section-note">Basic information about this group.</div>
+
+      <div class="field-group">
+        <label class="field-label">Group name <span style="color:#e53535">*</span></label>
+        <input type="text" class="field-input" id="groupName" placeholder="e.g. CBD Lunch Venues" oninput="checkReady()" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Description <span class="opt">Optional</span></label>
+        <textarea class="field-input field-textarea" id="groupDesc" placeholder="Briefly describe what this group is for…"></textarea>
+        <span class="field-hint">Used as internal notes only. Not visible to buyers.</span>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Outlets -->
+      <div class="section-heading">Outlets</div>
+      <div class="section-note">Select the outlets that belong to this group. Outlets can come from any company or cluster.</div>
+
+      <div class="outlet-picker">
+
+        <!-- Left: available outlets -->
+        <div class="picker-available">
+          <div class="picker-filters">
+            <div class="picker-search-wrap">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="searchInput" placeholder="Search outlets…" oninput="renderList()" />
+            </div>
+            <select class="picker-filter-sel" id="companyFilter" onchange="renderList()">
+              <option value="">All companies</option>
+              <option>The Grand Hospitality Group</option>
+              <option>Rolling Dough Co.</option>
+              <option>Pepper Lane Restaurants</option>
+              <option>Coastal Kitchen Group</option>
+              <option>Urban Bites</option>
+            </select>
+            <select class="picker-filter-sel" id="clusterFilter" onchange="renderList()">
+              <option value="">All clusters</option>
+              <option>CBD Cluster</option>
+              <option>Metro East Cluster</option>
+              <option>Metro West Cluster</option>
+              <option>Northern Region</option>
+            </select>
+          </div>
+          <div class="picker-list-meta">
+            <span class="picker-meta-count" id="metaCount"></span>
+            <button class="select-all-btn" onclick="selectAllVisible()">Select all</button>
+          </div>
+          <div class="picker-list" id="outletList"></div>
+        </div>
+
+        <!-- Right: selected outlets -->
+        <div class="picker-selected">
+          <div class="picker-sel-header">
+            <span style="display:inline-flex;align-items:center">
+              <span class="picker-sel-title">Selected</span>
+              <span class="picker-sel-count" id="selCount">0</span>
+            </span>
+            <button class="clear-all-btn" id="clearAllBtn" onclick="clearAll()">Clear all</button>
+          </div>
+          <div class="picker-sel-list" id="selectedList">
+            <div class="picker-empty" id="pickerEmpty">
+              <div class="picker-empty-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+              </div>
+              <div class="picker-empty-title">No outlets selected</div>
+              <div class="picker-empty-hint">Check outlets on the left to add them here</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- Sticky footer -->
+<div class="sticky-footer">
+  <a href="ZM Admin - Buyers.html" class="cancel-link">Cancel</a>
+  <button class="save-btn" id="saveBtn" disabled onclick="handleCreate()">Create outlet group</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+  Outlet group created
+</div>
+
+<script>
+const OUTLETS = [
+  { id:  1, name: "Amber Restaurant",               company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
+  { id:  2, name: "Sky Bar & Lounge",                company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
+  { id:  3, name: "Garden Terrace Cafe",             company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
+  { id:  4, name: "Executive Dining Room",           company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
+  { id:  5, name: "Roll'd Broadway",                 company: "Rolling Dough Co.",           cluster: "Metro East Cluster" },
+  { id:  6, name: "Roll'd Pitt Street",              company: "Rolling Dough Co.",           cluster: "CBD Cluster" },
+  { id:  7, name: "Roll'd Chatswood",                company: "Rolling Dough Co.",           cluster: "Northern Region" },
+  { id:  8, name: "Roll'd Parramatta",               company: "Rolling Dough Co.",           cluster: "Metro West Cluster" },
+  { id:  9, name: "Roll'd Bondi Junction",           company: "Rolling Dough Co.",           cluster: "Metro East Cluster" },
+  { id: 10, name: "Roll'd Newtown",                  company: "Rolling Dough Co.",           cluster: "Metro East Cluster" },
+  { id: 11, name: "Pepper Lane CBD",                 company: "Pepper Lane Restaurants",     cluster: "CBD Cluster" },
+  { id: 12, name: "Pepper Lane Darling Harbour",     company: "Pepper Lane Restaurants",     cluster: "CBD Cluster" },
+  { id: 13, name: "Pepper Lane North Sydney",        company: "Pepper Lane Restaurants",     cluster: "Northern Region" },
+  { id: 14, name: "Pepper Lane Surry Hills",         company: "Pepper Lane Restaurants",     cluster: "Metro East Cluster" },
+  { id: 15, name: "Manly Beach Kitchen",             company: "Coastal Kitchen Group",       cluster: "Northern Region" },
+  { id: 16, name: "Bondi Coastal Kitchen",           company: "Coastal Kitchen Group",       cluster: "Metro East Cluster" },
+  { id: 17, name: "Coogee Coastal Kitchen",          company: "Coastal Kitchen Group",       cluster: "Metro East Cluster" },
+  { id: 18, name: "Cronulla Coastal Kitchen",        company: "Coastal Kitchen Group",       cluster: "Metro East Cluster" },
+  { id: 19, name: "Palm Beach Kitchen",              company: "Coastal Kitchen Group",       cluster: "Northern Region" },
+  { id: 20, name: "Urban Bites Central Station",     company: "Urban Bites",                 cluster: "CBD Cluster" },
+  { id: 21, name: "Urban Bites Redfern",             company: "Urban Bites",                 cluster: "Metro East Cluster" },
+  { id: 22, name: "Urban Bites Surry Hills",         company: "Urban Bites",                 cluster: "Metro East Cluster" },
+  { id: 23, name: "Urban Bites Newtown",             company: "Urban Bites",                 cluster: "Metro East Cluster" },
+  { id: 24, name: "Urban Bites Chippendale",         company: "Urban Bites",                 cluster: "Metro East Cluster" },
+  { id: 25, name: "Urban Bites Ultimo",              company: "Urban Bites",                 cluster: "CBD Cluster" },
+];
+
+const selected = new Set();
+
+function getVisible() {
+  const q  = document.getElementById('searchInput').value.trim().toLowerCase();
+  const co = document.getElementById('companyFilter').value;
+  const cl = document.getElementById('clusterFilter').value;
+  return OUTLETS.filter(o => {
+    if (co && o.company !== co) return false;
+    if (cl && o.cluster !== cl) return false;
+    if (q && !o.name.toLowerCase().includes(q) && !o.company.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function renderList() {
+  const visible = getVisible();
+  const list = document.getElementById('outletList');
+  document.getElementById('metaCount').textContent = visible.length === OUTLETS.length
+    ? `${OUTLETS.length} outlets`
+    : `${visible.length} of ${OUTLETS.length} outlets`;
+
+  if (!visible.length) {
+    list.innerHTML = '<div class="picker-no-results">No outlets match your filters</div>';
+    return;
+  }
+  list.innerHTML = visible.map(o => `
+    <div class="picker-item${selected.has(o.id) ? ' is-selected' : ''}" onclick="toggleOutlet(${o.id})">
+      <input type="checkbox" ${selected.has(o.id) ? 'checked' : ''} />
+      <div class="picker-item-info">
+        <div class="picker-item-name">${o.name}</div>
+        <div class="picker-item-meta">${o.company}<span class="meta-sep">·</span>${o.cluster}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderSelected() {
+  const selList = document.getElementById('selectedList');
+  const empty   = document.getElementById('pickerEmpty');
+  document.getElementById('selCount').textContent = selected.size;
+  document.getElementById('clearAllBtn').style.visibility = selected.size ? 'visible' : 'hidden';
+
+  if (!selected.size) {
+    selList.innerHTML = '';
+    selList.appendChild(empty);
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+  const items = OUTLETS.filter(o => selected.has(o.id));
+  selList.innerHTML = items.map(o => `
+    <div class="picker-sel-item">
+      <div class="picker-sel-info">
+        <div class="picker-sel-name">${o.name}</div>
+        <div class="picker-sel-company">${o.company}</div>
+      </div>
+      <button class="picker-remove" onclick="removeOutlet(${o.id})" title="Remove">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function toggleOutlet(id) {
+  selected.has(id) ? selected.delete(id) : selected.add(id);
+  renderList(); renderSelected(); checkReady();
+}
+function removeOutlet(id) {
+  selected.delete(id);
+  renderList(); renderSelected(); checkReady();
+}
+function selectAllVisible() {
+  getVisible().forEach(o => selected.add(o.id));
+  renderList(); renderSelected(); checkReady();
+}
+function clearAll() {
+  selected.clear();
+  renderList(); renderSelected(); checkReady();
+}
+function checkReady() {
+  const ok = document.getElementById('groupName').value.trim().length > 0 && selected.size > 0;
+  document.getElementById('saveBtn').disabled = !ok;
+}
+function handleCreate() {
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => { window.location.href = 'ZM Admin - Buyers.html'; }, 300);
+  }, 1800);
+}
+
+document.getElementById('userMenuBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('userMenu').classList.toggle('open');
+});
+document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+renderList();
+renderSelected();
+document.getElementById('clearAllBtn').style.visibility = 'hidden';
+</script>
+</body>
+</html>
