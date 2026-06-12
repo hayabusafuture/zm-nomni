@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Procure — HQ · Outlet groups</title>
+<title>Procure — HQ · Outlets</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -233,6 +233,21 @@
   .nav a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #888888; transition: color .15s; }
   .nav a:hover .ms-icon { color: #888; }
   .nav a.active .ms-icon { color: var(--spinach); }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 28px; border-bottom: 1px solid var(--rule); margin: 0 0 24px; padding: 0 2px; }
+  .tab { position: relative; padding: 10px 2px 14px; color: var(--ink-mute); font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; user-select: none; transition: color .13s; }
+  .tab.active { color: var(--ink); }
+  .tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--primary); border-radius: 2px; }
+  .tab .count { background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+  /* Outlets table */
+  .outlet-name-cell { font-weight: 600; color: var(--ink); }
+  .outlet-sub-cell { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .group-chip { display: inline-flex; align-items: center; background: #f3f4f6; color: var(--ink-2); font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 4px; }
+  .unassigned-chip { background: #fff8ee; color: #b35e00; border: 1px solid #f5d9a8; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; }
+  .status-active { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--spinach); font-weight: 500; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--nomni-green); flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -304,7 +319,7 @@
 
     <nav class="nav" aria-label="Primary">
       <a href="Procure - HQ - Dashboard.html"><span class="ms-icon material-symbols-outlined">dashboard</span><span class="nav-label">Dashboard</span></a>
-      <a href="Procure - HQ - Outlet Groups.html" class="active"><span class="ms-icon material-symbols-outlined">account_tree</span><span class="nav-label">Outlet groups</span></a>
+      <a href="Procure - HQ - Outlet Groups.html" class="active"><span class="ms-icon material-symbols-outlined">account_tree</span><span class="nav-label">Outlets</span></a>
       <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Items</span></a>
       <a href="Procure - HQ - Recipe Library.html"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipes</span></a>
       <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inventory</span></a>
@@ -320,97 +335,131 @@
   <main class="main">
     <div class="page-head">
       <div class="page-head-left">
-        <h1 class="page-title">Outlet groups</h1>
+        <h1 class="page-title">Outlets</h1>
         <span class="hq-badge">HQ</span>
       </div>
-      <button class="btn-primary" id="addGroupBtn">
+      <button class="btn-primary" id="actionBtn">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-        Add group
+        <span id="actionBtnLabel">Add outlet</span>
       </button>
     </div>
-    <hr class="page-divider" />
 
-    <div class="dot-legend">
-      <span style="font-weight:600;color:var(--ink-2);margin-right:2px">Configs:</span>
-      <span class="dot-legend-item"><span class="cdot cdot-green"></span>Synced</span>
-      <span class="dot-legend-item"><span class="cdot cdot-amber"></span>Pending</span>
-      <span class="dot-legend-item"><span class="cdot cdot-grey"></span>Not set</span>
-      <span style="margin-left:8px;color:var(--ink-soft)">M = Market lists &nbsp;·&nbsp; R = Recipe library &nbsp;·&nbsp; I = Inv. master &nbsp;·&nbsp; P = POS mapping</span>
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" id="tabOutletsBtn">Outlets <span class="count">88</span></div>
+      <div class="tab" id="tabGroupsBtn">Outlet groups <span class="count">6</span></div>
     </div>
 
-    <div class="table-wrap">
-      <table class="og-table">
-        <thead>
-          <tr>
-            <th class="col-group">Group</th>
-            <th class="col-sync">Sync</th>
-            <th class="col-configs">Configs <span style="font-weight:400;color:var(--ink-soft)">(M · R · I · P)</span></th>
-            <th class="col-exc">Exceptions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
-            <td>
-              <div class="group-name">NSW Metro</div>
-              <div class="group-sub">8 outlets</div>
-            </td>
-            <td><span class="sync-pending"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>2 pending</span></td>
-            <td><div class="cdots"><span class="cdot cdot-green" title="Market lists: Synced"></span><span class="cdot cdot-amber" title="Recipe library: Pending"></span><span class="cdot cdot-green" title="Inventory master: Synced"></span><span class="cdot cdot-grey" title="POS mapping: Not set"></span></div></td>
-            <td><span class="exc-badge">3 outlets</span></td>
-          </tr>
-          <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
-            <td>
-              <div class="group-name">VIC Central</div>
-              <div class="group-sub">14 outlets</div>
-            </td>
-            <td><span class="sync-ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Synced</span></td>
-            <td><div class="cdots"><span class="cdot cdot-green" title="Market lists: Synced"></span><span class="cdot cdot-green" title="Recipe library: Synced"></span><span class="cdot cdot-green" title="Inventory master: Synced"></span><span class="cdot cdot-grey" title="POS mapping: Not set"></span></div></td>
-            <td><span class="exc-badge">1 outlet</span></td>
-          </tr>
-          <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
-            <td>
-              <div class="group-name">QLD Coastal</div>
-              <div class="group-sub">19 outlets</div>
-            </td>
-            <td><span class="sync-pending"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>1 pending</span></td>
-            <td><div class="cdots"><span class="cdot cdot-green" title="Market lists: Synced"></span><span class="cdot cdot-amber" title="Recipe library: Pending"></span><span class="cdot cdot-green" title="Inventory master: Synced"></span><span class="cdot cdot-grey" title="POS mapping: Not set"></span></div></td>
-            <td><span class="exc-badge">4 outlets</span></td>
-          </tr>
-          <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
-            <td>
-              <div class="group-name">WA Metro</div>
-              <div class="group-sub">12 outlets</div>
-            </td>
-            <td><span class="sync-ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Synced</span></td>
-            <td><div class="cdots"><span class="cdot cdot-green" title="Market lists: Synced"></span><span class="cdot cdot-green" title="Recipe library: Synced"></span><span class="cdot cdot-green" title="Inventory master: Synced"></span><span class="cdot cdot-grey" title="POS mapping: Not set"></span></div></td>
-            <td><span class="exc-none">None</span></td>
-          </tr>
-          <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
-            <td>
-              <div class="group-name">SA Regional</div>
-              <div class="group-sub">31 outlets</div>
-            </td>
-            <td><span class="sync-none">Not pushed</span></td>
-            <td><div class="cdots"><span class="cdot cdot-grey" title="Market lists: Not pushed"></span><span class="cdot cdot-grey" title="Recipe library: Not pushed"></span><span class="cdot cdot-grey" title="Inventory master: Not pushed"></span><span class="cdot cdot-grey" title="POS mapping: Not set"></span></div></td>
-            <td><span class="exc-dash">—</span></td>
-          </tr>
-          <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
-            <td>
-              <div class="group-name">TAS Island</div>
-              <div class="group-sub">4 outlets</div>
-            </td>
-            <td><span class="sync-none">Not pushed</span></td>
-            <td><div class="cdots"><span class="cdot cdot-grey" title="Market lists: Not pushed"></span><span class="cdot cdot-grey" title="Recipe library: Not pushed"></span><span class="cdot cdot-grey" title="Inventory master: Not pushed"></span><span class="cdot cdot-grey" title="POS mapping: Not set"></span></div></td>
-            <td><span class="exc-dash">—</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- ── Outlets panel ── -->
+    <div id="panelOutlets">
+      <div class="table-wrap">
+        <table class="og-table">
+          <thead>
+            <tr>
+              <th>Outlet</th>
+              <th style="width:180px">Group</th>
+              <th style="width:80px">State</th>
+              <th style="width:120px">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><div class="outlet-name-cell">Sydney CBD</div></td><td><span class="group-chip">NSW Metro</span></td><td>NSW</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Parramatta</div></td><td><span class="group-chip">NSW Metro</span></td><td>NSW</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Chatswood</div></td><td><span class="group-chip">NSW Metro</span></td><td>NSW</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Newtown</div></td><td><span class="group-chip">NSW Metro</span></td><td>NSW</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Newcastle</div></td><td><span class="group-chip">NSW Metro</span></td><td>NSW</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Wollongong</div></td><td><span class="group-chip">NSW Metro</span></td><td>NSW</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Penrith</div></td><td><span class="group-chip">NSW Metro</span></td><td>NSW</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Manly</div></td><td><span class="group-chip">NSW Metro</span></td><td>NSW</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Melbourne CBD</div></td><td><span class="group-chip">VIC Central</span></td><td>VIC</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Fitzroy</div></td><td><span class="group-chip">VIC Central</span></td><td>VIC</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">St Kilda</div></td><td><span class="group-chip">VIC Central</span></td><td>VIC</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Southbank</div></td><td><span class="group-chip">VIC Central</span></td><td>VIC</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Brisbane CBD</div></td><td><span class="group-chip">QLD Coastal</span></td><td>QLD</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Fortitude Valley</div></td><td><span class="group-chip">QLD Coastal</span></td><td>QLD</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Sunshine Coast</div></td><td><span class="group-chip">QLD Coastal</span></td><td>QLD</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Perth CBD</div></td><td><span class="group-chip">WA Metro</span></td><td>WA</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Fremantle</div></td><td><span class="group-chip">WA Metro</span></td><td>WA</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Subiaco</div></td><td><span class="group-chip">WA Metro</span></td><td>WA</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Adelaide CBD</div></td><td><span class="group-chip">SA Regional</span></td><td>SA</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Glenelg</div></td><td><span class="group-chip">SA Regional</span></td><td>SA</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Hobart City</div></td><td><span class="group-chip">TAS Island</span></td><td>TAS</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Launceston</div></td><td><span class="group-chip">TAS Island</span></td><td>TAS</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Devonport</div></td><td><span class="group-chip">TAS Island</span></td><td>TAS</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Gold Coast</div><div class="outlet-sub-cell">Not in any group</div></td><td><span class="unassigned-chip">Unassigned</span></td><td>QLD</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Cairns</div><div class="outlet-sub-cell">Not in any group</div></td><td><span class="unassigned-chip">Unassigned</span></td><td>QLD</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Canberra City</div><div class="outlet-sub-cell">Not in any group</div></td><td><span class="unassigned-chip">Unassigned</span></td><td>ACT</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+            <tr><td><div class="outlet-name-cell">Darwin CBD</div><div class="outlet-sub-cell">Not in any group</div></td><td><span class="unassigned-chip">Unassigned</span></td><td>NT</td><td><span class="status-active"><span class="status-dot"></span>Active</span></td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="unassigned-banner">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span><strong>8 outlets</strong> are not assigned to any group — they won't receive HQ configs until assigned. <a href="#">Review unassigned outlets</a></span>
+    <!-- ── Outlet groups panel ── -->
+    <div id="panelGroups" style="display:none">
+      <div class="dot-legend">
+        <span style="font-weight:600;color:var(--ink-2);margin-right:2px">Configs:</span>
+        <span class="dot-legend-item"><span class="cdot cdot-green"></span>Synced</span>
+        <span class="dot-legend-item"><span class="cdot cdot-amber"></span>Pending</span>
+        <span class="dot-legend-item"><span class="cdot cdot-grey"></span>Not set</span>
+        <span style="margin-left:8px;color:var(--ink-soft)">M = Items &nbsp;·&nbsp; R = Recipes &nbsp;·&nbsp; I = Inventory &nbsp;·&nbsp; P = POS mapping</span>
+      </div>
+      <div class="table-wrap">
+        <table class="og-table">
+          <thead>
+            <tr>
+              <th class="col-group">Group</th>
+              <th class="col-sync">Sync</th>
+              <th class="col-configs">Configs <span style="font-weight:400;color:var(--ink-soft)">(M · R · I · P)</span></th>
+              <th class="col-exc">Exceptions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
+              <td><div class="group-name">NSW Metro</div><div class="group-sub">8 outlets</div></td>
+              <td><span class="sync-pending"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>2 pending</span></td>
+              <td><div class="cdots"><span class="cdot cdot-green"></span><span class="cdot cdot-amber"></span><span class="cdot cdot-green"></span><span class="cdot cdot-grey"></span></div></td>
+              <td><span class="exc-badge">3 outlets</span></td>
+            </tr>
+            <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
+              <td><div class="group-name">VIC Central</div><div class="group-sub">14 outlets</div></td>
+              <td><span class="sync-ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Synced</span></td>
+              <td><div class="cdots"><span class="cdot cdot-green"></span><span class="cdot cdot-green"></span><span class="cdot cdot-green"></span><span class="cdot cdot-grey"></span></div></td>
+              <td><span class="exc-badge">1 outlet</span></td>
+            </tr>
+            <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
+              <td><div class="group-name">QLD Coastal</div><div class="group-sub">19 outlets</div></td>
+              <td><span class="sync-pending"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>1 pending</span></td>
+              <td><div class="cdots"><span class="cdot cdot-green"></span><span class="cdot cdot-amber"></span><span class="cdot cdot-green"></span><span class="cdot cdot-grey"></span></div></td>
+              <td><span class="exc-badge">4 outlets</span></td>
+            </tr>
+            <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
+              <td><div class="group-name">WA Metro</div><div class="group-sub">12 outlets</div></td>
+              <td><span class="sync-ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Synced</span></td>
+              <td><div class="cdots"><span class="cdot cdot-green"></span><span class="cdot cdot-green"></span><span class="cdot cdot-green"></span><span class="cdot cdot-grey"></span></div></td>
+              <td><span class="exc-none">None</span></td>
+            </tr>
+            <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
+              <td><div class="group-name">SA Regional</div><div class="group-sub">31 outlets</div></td>
+              <td><span class="sync-none">Not pushed</span></td>
+              <td><div class="cdots"><span class="cdot cdot-grey"></span><span class="cdot cdot-grey"></span><span class="cdot cdot-grey"></span><span class="cdot cdot-grey"></span></div></td>
+              <td><span class="exc-dash">—</span></td>
+            </tr>
+            <tr onclick="window.location='Procure - HQ - Outlet Groups - Detail.html'">
+              <td><div class="group-name">TAS Island</div><div class="group-sub">4 outlets</div></td>
+              <td><span class="sync-none">Not pushed</span></td>
+              <td><div class="cdots"><span class="cdot cdot-grey"></span><span class="cdot cdot-grey"></span><span class="cdot cdot-grey"></span><span class="cdot cdot-grey"></span></div></td>
+              <td><span class="exc-dash">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="unassigned-banner">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span><strong>8 outlets</strong> are not assigned to any group. <a href="#" onclick="switchTab('outlets');return false;">View unassigned outlets</a></span>
+      </div>
     </div>
+
   </main>
 </div>
 
@@ -538,8 +587,22 @@
   document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userMenu').classList.toggle('open'); });
   document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
 
+  // Tabs
+  function switchTab(tab) {
+    const isOutlets = tab === 'outlets';
+    document.getElementById('tabOutletsBtn').classList.toggle('active', isOutlets);
+    document.getElementById('tabGroupsBtn').classList.toggle('active', !isOutlets);
+    document.getElementById('panelOutlets').style.display = isOutlets ? '' : 'none';
+    document.getElementById('panelGroups').style.display = isOutlets ? 'none' : '';
+    document.getElementById('actionBtnLabel').textContent = isOutlets ? 'Add outlet' : 'Add group';
+  }
+  document.getElementById('tabOutletsBtn').addEventListener('click', () => switchTab('outlets'));
+  document.getElementById('tabGroupsBtn').addEventListener('click', () => switchTab('groups'));
+
   const modal = document.getElementById('modal');
-  document.getElementById('addGroupBtn').addEventListener('click', () => modal.classList.add('open'));
+  document.getElementById('actionBtn').addEventListener('click', () => {
+    if (document.getElementById('tabGroupsBtn').classList.contains('active')) modal.classList.add('open');
+  });
   document.getElementById('modalClose').addEventListener('click', () => modal.classList.remove('open'));
   document.getElementById('modalCancel').addEventListener('click', () => modal.classList.remove('open'));
   modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
