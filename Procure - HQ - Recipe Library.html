@@ -79,11 +79,6 @@
   .page-subtitle { font-size: 13px; color: var(--ink-mute); margin-bottom: 24px; }
 
   /* Site group tabs */
-  .sg-tabs { display: flex; border-bottom: 1px solid var(--rule); margin-bottom: 20px; overflow-x: auto; }
-  .sg-tab { padding: 9px 18px; font-size: 13px; font-weight: 600; color: var(--ink-mute); cursor: pointer; position: relative; background: none; border: none; font-family: inherit; transition: color .15s; white-space: nowrap; flex-shrink: 0; }
-  .sg-tab:hover { color: var(--ink); }
-  .sg-tab.active { color: var(--ink); }
-  .sg-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--primary); border-radius: 2px; }
 
   /* Filter row */
   .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
@@ -242,6 +237,21 @@
   .nav a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #888888; transition: color .15s; }
   .nav a:hover .ms-icon { color: #888; }
   .nav a.active .ms-icon { color: var(--spinach); }
+
+  /* Group filter panel */
+  .content-layout { display: flex; gap: 28px; align-items: flex-start; }
+  .content-main { flex: 1; min-width: 0; }
+  .filter-panel { width: 200px; flex-shrink: 0; position: sticky; top: 80px; background: #f9fafb; border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; }
+  .filter-heading { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-mute); margin: 0 0 12px; }
+  .filter-section-label { font-size: 13px; font-weight: 600; color: var(--ink); margin: 0 0 8px; }
+  .filter-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 0; cursor: pointer; }
+  .filter-item-left { display: flex; align-items: center; gap: 8px; }
+  .filter-cb { width: 15px; height: 15px; accent-color: var(--nomni-green); cursor: pointer; flex-shrink: 0; }
+  .filter-item-label { font-size: 13px; color: var(--ink); }
+  .filter-item-count { font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #f0f1f3; border-radius: 10px; padding: 1px 7px; }
+  .filter-divider { height: 1px; background: var(--rule); margin: 10px 0; }
+  .filter-clear { background: none; border: none; font: inherit; font-size: 12px; font-weight: 600; color: var(--ink-mute); cursor: pointer; padding: 0; transition: color .13s; }
+  .filter-clear:hover { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -353,17 +363,9 @@
     </div>
     <p class="page-subtitle">Managing recipes for Zeemart Group · 88 outlets across 6 site groups</p>
 
-    <!-- Site group tabs -->
-    <div class="sg-tabs">
-      <button class="sg-tab active" data-group="" onclick="setSGTab(this)">All</button>
-      <button class="sg-tab" data-group="nsw" onclick="setSGTab(this)">NSW Metro</button>
-      <button class="sg-tab" data-group="vic" onclick="setSGTab(this)">VIC Central</button>
-      <button class="sg-tab" data-group="qld" onclick="setSGTab(this)">QLD Coastal</button>
-      <button class="sg-tab" data-group="wa" onclick="setSGTab(this)">WA Metro</button>
-      <button class="sg-tab" data-group="sa" onclick="setSGTab(this)">SA Regional</button>
-      <button class="sg-tab" data-group="tas" onclick="setSGTab(this)">TAS Island</button>
-    </div>
 
+    <div class="content-layout">
+      <div class="content-main">
     <div class="filter-row">
       <div class="search-wrap">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
@@ -696,6 +698,21 @@
         <button class="pager-btn">»</button>
       </div>
     </div>
+      </div><!-- /content-main -->
+        <aside class="filter-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span class="filter-heading" style="margin:0">Filters</span>
+            <button class="filter-clear" id="filterClearBtn">Clear all</button>
+          </div>
+          <div class="filter-section-label">Outlet group</div>
+          <label class="filter-item"><div class="filter-item-left"><input type="checkbox" class="grp-cb" value="nsw" checked /><span class="filter-item-label">NSW Metro</span></div><span class="filter-item-count">8</span></label>
+          <label class="filter-item"><div class="filter-item-left"><input type="checkbox" class="grp-cb" value="vic" checked /><span class="filter-item-label">VIC Central</span></div><span class="filter-item-count">14</span></label>
+          <label class="filter-item"><div class="filter-item-left"><input type="checkbox" class="grp-cb" value="qld" checked /><span class="filter-item-label">QLD Coastal</span></div><span class="filter-item-count">19</span></label>
+          <label class="filter-item"><div class="filter-item-left"><input type="checkbox" class="grp-cb" value="wa" checked /><span class="filter-item-label">WA Metro</span></div><span class="filter-item-count">12</span></label>
+          <label class="filter-item"><div class="filter-item-left"><input type="checkbox" class="grp-cb" value="sa" checked /><span class="filter-item-label">SA Regional</span></div><span class="filter-item-count">31</span></label>
+          <label class="filter-item"><div class="filter-item-left"><input type="checkbox" class="grp-cb" value="tas" checked /><span class="filter-item-label">TAS Island</span></div><span class="filter-item-count">4</span></label>
+        </aside>
+    </div><!-- /content-layout -->
 
   </main>
 </div>
@@ -744,12 +761,21 @@
     });
   }
 
-  function setSGTab(el) {
-    document.querySelectorAll('.sg-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    applyRLGroup(el.dataset.group || null);
+  // Group filter panel
+  document.querySelectorAll('.grp-cb').forEach(cb => cb.addEventListener('change', applyGroupFilter));
+  document.getElementById('filterClearBtn').addEventListener('click', function() {
+    const allChecked = Array.from(document.querySelectorAll('.grp-cb')).every(cb => cb.checked);
+    document.querySelectorAll('.grp-cb').forEach(cb => { cb.checked = !allChecked; });
+    this.textContent = allChecked ? 'Select all' : 'Clear all';
+    applyGroupFilter();
+  });
+  function applyGroupFilter() {
+    const checked = Array.from(document.querySelectorAll('.grp-cb:checked')).map(cb => cb.value);
+    const gk = checked.length === 6 ? null : checked.length === 1 ? checked[0] : null;
+    applyRLGroup(gk);
   }
 
+  
   document.getElementById('userMenuBtn').addEventListener('click', function(e) {
     e.stopPropagation();
     document.getElementById('userMenu').classList.toggle('open');
