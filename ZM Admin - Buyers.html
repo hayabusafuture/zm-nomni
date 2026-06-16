@@ -146,9 +146,42 @@
   /* Groups table */
   .group-outlet-count { color: var(--ink-2); font-size: 13px; }
 
+  /* ── Outlet groups accordion ── */
+  .og-hq-block { margin-bottom: 8px; }
+  .og-hq-header { display: flex; align-items: center; gap: 10px; padding: 11px 16px; background: #f9fafb; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; user-select: none; transition: background .13s; }
+  .og-hq-header:hover { background: #f0f1f3; }
+  .og-hq-header.is-open { border-radius: 8px 8px 0 0; border-bottom-color: transparent; }
+  .og-chevron { flex-shrink: 0; color: var(--ink-soft); transition: transform .18s; }
+  .og-chevron.is-open { transform: rotate(90deg); }
+  .og-hq-name { font-size: 14px; font-weight: 600; color: var(--ink); flex: 1; }
+  .og-hq-name a { color: inherit; text-decoration: none; }
+  .og-hq-name a:hover { color: var(--spinach); text-decoration: underline; }
+  .og-hq-name-wrap { flex: 1; min-width: 0; }
+  .og-hq-name-wrap .og-hq-name { flex: none; }
+  .og-hq-company { font-size: 12px; color: var(--ink-mute); margin-top: 2px; display: block; }
+  .og-hq-badge { font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #e8e9ec; padding: 2px 8px; border-radius: 10px; }
+  .og-badge-ungrouped { background: #FFF3CD; color: #7A5F00; }
+  .og-add-group-btn { font-size: 12px; font-weight: 600; color: var(--ink); background: #fff; border: 1px solid var(--rule); border-radius: 5px; padding: 3px 10px; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; transition: background .13s, border-color .13s; white-space: nowrap; }
+  .og-add-group-btn:hover { background: #f0f1f3; border-color: #c5c7cc; }
+  .og-hq-rows { display: none; border: 1px solid var(--rule); border-radius: 0 0 8px 8px; overflow: visible; margin-bottom: 2px; }
+  .og-hq-rows.is-open { display: block; }
+  .og-hq-rows table { border-top: none; }
+  .og-hq-rows table thead th { background: #fff; }
+  .og-hq-rows table tbody tr:last-child td { border-bottom: none; }
+
   /* Outlet group chip */
   .og-chip { background: #f0f1f3; color: var(--ink-2); font-size: 12px; font-weight: 500; padding: 2px 9px; border-radius: 4px; display: inline-block; white-space: nowrap; }
   .og-chip:hover { background: #e4e6ea; cursor: pointer; }
+
+  /* HQ indicator below outlet name */
+  .outlet-hq-tag { display: flex; align-items: center; gap: 5px; margin-top: 3px; font-size: 12px; color: var(--ink-mute); }
+  .hq-pill { display: inline-flex; align-items: center; border: 1px solid #c0c2c8; border-radius: 4px; padding: 0 5px; font-size: 10px; font-weight: 600; color: var(--ink-mute); line-height: 16px; letter-spacing: 0.04em; }
+
+  /* Ungrouped outlet rows inside HQ */
+  .og-outlet-row:hover td { background: var(--row-hover); }
+  /* Align first column with HQ name (chevron 14px + gap 10px + padding 16px = 40px) */
+  .og-hq-rows thead th:first-child,
+  .og-hq-rows tbody td:first-child { padding-left: 40px; }
 
   /* User menu */
   .user-wrap { position: relative; }
@@ -265,9 +298,10 @@
           <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="margin-left:2px"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="add-dropdown" id="addDropdown">
-          <div class="add-option">New Buyer</div>
+          <div class="add-option">New Outlet</div>
           <div class="add-option">New Company</div>
           <div class="add-option">New Cluster</div>
+          <div class="add-option" onclick="window.location.href='ZM Admin - Create HQ.html'">New HQ</div>
           <div class="add-option" onclick="window.location.href='ZM Admin - Create Outlet Group.html'">New Outlet Group</div>
         </div>
       </div>
@@ -278,7 +312,7 @@
       <div class="tab active" data-tab="outlets">Outlets</div>
       <div class="tab" data-tab="companies">Companies</div>
       <div class="tab" data-tab="groups">Clusters</div>
-      <div class="tab" data-tab="outlet-groups">Outlet groups</div>
+      <div class="tab" data-tab="outlet-groups">HQ &amp; Outlet groups</div>
       <div class="tab" data-tab="verification">Verification requests <span class="dot-badge"></span></div>
     </div>
 
@@ -322,7 +356,7 @@
           <tbody>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">(WF 301) Chargrill @ 301 Punggol</div></td>
+              <td><div class="outlet-name">(WF 301) Chargrill @ 301 Punggol</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> Garden Cuisine HQ</div></td>
               <td><span class="company-name">Garden Cuisine Pte Ltd</span></td>
               <td><span class="og-chip">Chargrill Outlets</span></td>
               <td><span class="date-val">05/09/2019</span></td>
@@ -352,7 +386,7 @@
             </tr>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">(WF 107) Chargrill @ 107 Serangoon</div></td>
+              <td><div class="outlet-name">(WF 107) Chargrill @ 107 Serangoon</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> Garden Cuisine HQ</div></td>
               <td><span class="company-name">Garden Cuisine Pte Ltd</span></td>
               <td><span class="og-chip">Chargrill Outlets</span></td>
               <td><span class="date-val">05/09/2019</span></td>
@@ -372,7 +406,7 @@
             </tr>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">(WF 259) Chargrill @ 259 Bukit Panjang</div></td>
+              <td><div class="outlet-name">(WF 259) Chargrill @ 259 Bukit Panjang</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> Garden Cuisine HQ</div></td>
               <td><span class="company-name">Garden Cuisine Pte Ltd</span></td>
               <td><span class="og-chip">Chargrill Outlets</span></td>
               <td><span class="date-val">05/09/2019</span></td>
@@ -382,7 +416,7 @@
             </tr>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">(WF 280) Chargrill @ 280 Bishan</div></td>
+              <td><div class="outlet-name">(WF 280) Chargrill @ 280 Bishan</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> Garden Cuisine HQ</div></td>
               <td><span class="company-name">Garden Cuisine Pte Ltd</span></td>
               <td><span class="og-chip">Chargrill Outlets</span></td>
               <td><span class="date-val">05/09/2019</span></td>
@@ -392,7 +426,7 @@
             </tr>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">1-Alfaro - Bar</div></td>
+              <td><div class="outlet-name">1-Alfaro - Bar</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> 1-Group HQ</div></td>
               <td><span class="company-name">1-Alfaro Pte Ltd</span></td>
               <td><span class="og-chip">1-Group Outlets</span></td>
               <td><span class="date-val">06/05/2025</span></td>
@@ -402,7 +436,7 @@
             </tr>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">1-Arden - Bar</div></td>
+              <td><div class="outlet-name">1-Arden - Bar</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> 1-Group HQ</div></td>
               <td><span class="company-name">1-Spring Pte Ltd</span></td>
               <td><span class="og-chip">1-Group Outlets</span></td>
               <td><span class="date-val">26/11/2024</span></td>
@@ -412,7 +446,7 @@
             </tr>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">1-Arden - Culinary</div></td>
+              <td><div class="outlet-name">1-Arden - Culinary</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> 1-Group HQ</div></td>
               <td><span class="company-name">1-Spring Pte Ltd</span></td>
               <td><span class="og-chip">1-Group Outlets</span></td>
               <td><span class="date-val">20/07/2022</span></td>
@@ -422,7 +456,7 @@
             </tr>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">1-Atico - Bar</div></td>
+              <td><div class="outlet-name">1-Atico - Bar</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> 1-Group HQ</div></td>
               <td><span class="company-name">1-Atico Pte Ltd</span></td>
               <td><span class="og-chip">1-Group Outlets</span></td>
               <td><span class="date-val">31/11/2024</span></td>
@@ -432,7 +466,7 @@
             </tr>
             <tr>
               <td class="col-check"><input type="checkbox" /></td>
-              <td><div class="outlet-name">1-Atico - Culinary</div></td>
+              <td><div class="outlet-name">1-Atico - Culinary</div><div class="outlet-hq-tag"><span class="hq-pill">HQ</span> 1-Group HQ</div></td>
               <td><span class="company-name">1-Atico Pte Ltd</span></td>
               <td><span class="og-chip">1-Group Outlets</span></td>
               <td><span class="date-val">01/09/2021</span></td>
@@ -546,50 +580,364 @@
     <!-- ── Outlet groups tab ── -->
     <div class="tab-panel" id="panel-outlet-groups">
       <div class="filter-row">
-        <div class="search-wrap">
+        <div class="search-wrap" style="min-width:320px">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--ink-mute)"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" placeholder="Search outlet groups" />
+          <input type="text" id="ogSearchInput" placeholder="Search HQs or outlet groups…" oninput="searchOG(this.value)" />
         </div>
       </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th class="sortable" style="width:28%">Group name</th>
-              <th style="width:10%">Outlets</th>
-              <th>Description</th>
-              <th class="col-actions">Actions</th>
-            </tr>
-          </thead>
+      <!-- 1-Group HQ -->
+      <!-- 1-Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">1-Group HQ</span>
+          <span class="og-hq-badge">2 groups · 8 outlets</span><span class="og-hq-badge og-badge-ungrouped">1 ungrouped</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
           <tbody>
-            <tr>
-              <td><span style="font-weight:500">Chargrill Outlets</span></td>
-              <td><span class="group-outlet-count">4</span></td>
-              <td><span class="company-name">Garden Cuisine Chargrill chain locations</span></td>
-              <td class="col-actions"><div class="actions-wrap"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-item">View outlets</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td>
-            </tr>
-            <tr>
-              <td><span style="font-weight:500">1-Group Outlets</span></td>
-              <td><span class="group-outlet-count">5</span></td>
-              <td><span class="company-name">1-Group family of restaurants and bars</span></td>
-              <td class="col-actions"><div class="actions-wrap"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-item">View outlets</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td>
-            </tr>
-            <tr>
-              <td><span style="font-weight:500">CBD High-Volume</span></td>
-              <td><span class="group-outlet-count">8</span></td>
-              <td><span class="company-name">High-traffic CBD outlets for consolidated ordering</span></td>
-              <td class="col-actions"><div class="actions-wrap"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-item">View outlets</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td>
-            </tr>
-            <tr>
-              <td><span style="font-weight:500">Casual Dining Bundle</span></td>
-              <td><span class="group-outlet-count">3</span></td>
-              <td><span class="date-empty">—</span></td>
-              <td class="col-actions"><div class="actions-wrap"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-item">View outlets</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td>
-            </tr>
-          </tbody>
-        </table>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">1-Group Outlets</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">CBD Premium Bars</span></td><td><span class="group-outlet-count">3</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">1-Atico - Main Kitchen</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+          </tbody></table>
+        </div>
       </div>
+
+      <!-- Alchemy Dining Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Alchemy Dining Group HQ</span>
+          <span class="og-hq-badge">1 group · 5 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">City Dining</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Baoshi HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Baoshi HQ</span>
+          <span class="og-hq-badge">3 groups · 27 outlets</span><span class="og-hq-badge og-badge-ungrouped">3 ungrouped</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">CBD Core</span></td><td><span class="group-outlet-count">12</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Northern Heartlands</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Western Suburbs</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi Central Kitchen</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi Catering Office</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi R&amp;D Lab</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Braise Collective HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Braise Collective HQ</span>
+          <span class="og-hq-badge">3 groups · 21 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Bistro Format</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Rooftop Bars</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Supper Clubs</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Char Restaurant Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Char Restaurant Group HQ</span>
+          <span class="og-hq-badge">2 groups · 11 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Grill &amp; Charcoal</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Takeaway Counters</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Da Paolo HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Da Paolo HQ</span>
+          <span class="og-hq-badge">2 groups · 13 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">City Dining</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Italian Casual</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Dandy Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Dandy Group HQ</span>
+          <span class="og-hq-badge">2 groups · 10 outlets</span><span class="og-hq-badge og-badge-ungrouped">2 ungrouped</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">East Coast Venues</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Premium Format</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- East Coast Eats HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">East Coast Eats HQ</span>
+          <span class="og-hq-badge">2 groups · 16 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Seafood Shacks</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Katong Outlets</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Fable Hospitality HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Fable Hospitality HQ</span>
+          <span class="og-hq-badge">1 group · 8 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Hotel F&amp;B</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Garden Cuisine HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Garden Cuisine HQ</span>
+          <span class="og-hq-badge">2 groups · 10 outlets</span><span class="og-hq-badge og-badge-ungrouped">2 ungrouped</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Chargrill Outlets</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Family Dining Express</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">(WF 139) Chargrill @ 139 Tampines</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">(WF 290) Garden Express @ 290 Sengkang</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Grain Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Grain Group HQ</span>
+          <span class="og-hq-badge">3 groups · 19 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Artisan Bakeries</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Café Counters</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Grain Kitchen</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Hua Ting Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Hua Ting Group HQ</span>
+          <span class="og-hq-badge">2 groups · 10 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Cantonese Banquet</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Dim Sum Express</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Imperial Palace HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Imperial Palace HQ</span>
+          <span class="og-hq-badge">1 group · 6 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Premium Outlets</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Juniper Hospitality HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Juniper Hospitality HQ</span>
+          <span class="og-hq-badge">2 groups · 10 outlets</span><span class="og-hq-badge og-badge-ungrouped">2 ungrouped</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Garden Dining</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Terrace Bars</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Kinship Dining HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Kinship Dining HQ</span>
+          <span class="og-hq-badge">1 group · 7 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Community Tables</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Laut Seafood Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Laut Seafood Group HQ</span>
+          <span class="og-hq-badge">2 groups · 14 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Live Seafood Tanks</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Prawn Noodle Stalls</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Mosaic Food Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Mosaic Food Group HQ</span>
+          <span class="og-hq-badge">3 groups · 22 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Fusion Kitchen</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Cloud Kitchen West</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Food Courts</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Noodle Republic HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Noodle Republic HQ</span>
+          <span class="og-hq-badge">2 groups · 15 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Ramen Bars</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Wanton Express</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Paradise Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Paradise Group HQ</span>
+          <span class="og-hq-badge">3 groups · 13 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Casual Dining Bundle</span></td><td><span class="group-outlet-count">3</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">CBD High-Volume</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Weekend Markets</span></td><td><span class="group-outlet-count">2</span></td><td><span class="date-empty">—</span></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Pique Restaurant Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Pique Restaurant Group HQ</span>
+          <span class="og-hq-badge">1 group · 9 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Orchard &amp; Marina</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Soup Restaurant Group HQ -->
+      <div class="og-hq-block">
+        <div class="og-hq-header" onclick="toggleHQ(this)">
+          <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="og-hq-name">Soup Restaurant Group HQ</span>
+          <span class="og-hq-badge">2 groups · 13 outlets</span>
+        </div>
+        <div class="og-hq-rows">
+          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Heritage Format</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='ZM Admin - Edit Outlet Group.html'"><td><span style="font-weight:500">Kopitiam Kiosks</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- Pager -->
+      <div class="pager" id="ogPager" style="margin-top:16px;display:none">
+        <span id="ogPagerInfo" style="font-size:12px;color:var(--ink-mute)"></span>
+        <div style="display:flex;align-items:center;gap:4px">
+          <button class="pager-btn" id="ogPrevBtn" onclick="ogGoPage(-1)">&#8592;</button>
+          <button class="pager-btn" id="ogNextBtn" onclick="ogGoPage(1)">&#8594;</button>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── Verification requests tab ── -->
@@ -664,10 +1012,187 @@
     });
   });
 
+  // Activate tab from URL hash (e.g. #outlet-groups)
+  var hash = window.location.hash.slice(1);
+  if (hash) {
+    var target = document.querySelector('.tab[data-tab="' + hash + '"]');
+    if (target) target.click();
+  }
+
   // Add new dropdown
   document.getElementById('addBtn').addEventListener('click', function(e) {
     e.stopPropagation();
     document.getElementById('addDropdown').classList.toggle('open');
+  });
+
+  // Outlet group search + pagination
+  var OG_PAGE_SIZE = 20;
+  var ogCurrentPage = 1;
+  var ogSearchQuery = '';
+
+  function applyOGFilter() {
+    var q = ogSearchQuery;
+    var allBlocks = Array.from(document.querySelectorAll('.og-hq-block'));
+    var matching = [];
+
+    allBlocks.forEach(function(block) {
+      var hqName = block.querySelector('.og-hq-name').textContent.toLowerCase();
+      var hqMatches = !q || hqName.includes(q);
+      var rows = Array.from(block.querySelectorAll('tbody tr'));
+      var anyRowMatch = false;
+      rows.forEach(function(row) {
+        var show = !q || hqMatches || row.textContent.toLowerCase().includes(q);
+        row.style.display = show ? '' : 'none';
+        if (show) anyRowMatch = true;
+      });
+      var visible = !q || hqMatches || anyRowMatch;
+      if (visible) matching.push(block);
+
+      var header = block.querySelector('.og-hq-header');
+      var rowsEl = block.querySelector('.og-hq-rows');
+      var chevron = block.querySelector('.og-chevron');
+      if (!q) {
+        header.classList.remove('is-open');
+        rowsEl.classList.remove('is-open');
+        chevron.classList.remove('is-open');
+      } else if (visible) {
+        header.classList.add('is-open');
+        rowsEl.classList.add('is-open');
+        chevron.classList.add('is-open');
+      }
+    });
+
+    var total = matching.length;
+    var totalPages = Math.ceil(total / OG_PAGE_SIZE) || 1;
+    if (ogCurrentPage > totalPages) ogCurrentPage = totalPages;
+
+    allBlocks.forEach(function(block) {
+      var idx = matching.indexOf(block);
+      if (idx === -1) {
+        block.style.display = 'none';
+      } else {
+        var onPage = Math.floor(idx / OG_PAGE_SIZE) + 1 === ogCurrentPage;
+        block.style.display = onPage ? '' : 'none';
+      }
+    });
+
+    var pager = document.getElementById('ogPager');
+    if (totalPages <= 1) { pager.style.display = 'none'; return; }
+    pager.style.display = 'flex';
+    var start = (ogCurrentPage - 1) * OG_PAGE_SIZE + 1;
+    var end = Math.min(ogCurrentPage * OG_PAGE_SIZE, total);
+    document.getElementById('ogPagerInfo').textContent = start + '–' + end + ' of ' + total + ' HQs';
+    document.getElementById('ogPrevBtn').disabled = ogCurrentPage <= 1;
+    document.getElementById('ogNextBtn').disabled = ogCurrentPage >= totalPages;
+  }
+
+  function searchOG(val) { ogSearchQuery = val.trim().toLowerCase(); ogCurrentPage = 1; applyOGFilter(); }
+  function renderOGPager() { applyOGFilter(); }
+  function ogGoPage(dir) { ogCurrentPage += dir; applyOGFilter(); }
+
+  renderOGPager();
+
+  // Outlet group HQ accordion
+  function toggleHQ(header) {
+    event.stopPropagation();
+    var rows = header.nextElementSibling;
+    var chevron = header.querySelector('.og-chevron');
+    var isOpen = rows.classList.contains('is-open');
+    rows.classList.toggle('is-open', !isOpen);
+    header.classList.toggle('is-open', !isOpen);
+    chevron.classList.toggle('is-open', !isOpen);
+  }
+
+  // ── HQ company names, Add group buttons, last-updated dates ──
+  var HQ_COMPANIES = {
+    '1-Group HQ': '1-Group Holdings Pte Ltd',
+    'Alchemy Dining Group HQ': 'Alchemy Dining Group Pte Ltd',
+    'Baoshi HQ': 'Baoshi Pte Ltd',
+    'Braise Collective HQ': 'Braise Collective Pte Ltd',
+    'Char Restaurant Group HQ': 'Char Restaurant Group Pte Ltd',
+    'Da Paolo HQ': 'Da Paolo Gastronomia Pte Ltd',
+    'Dandy Group HQ': 'Dandy Group Pte Ltd',
+    'East Coast Eats HQ': 'East Coast Eats Pte Ltd',
+    'Fable Hospitality HQ': 'Fable Hospitality Group Pte Ltd',
+    'Garden Cuisine HQ': 'Garden Cuisine Pte Ltd',
+    'Grain Group HQ': 'Grain Group Pte Ltd',
+    'Hua Ting Group HQ': 'Hua Ting Restaurant Group Pte Ltd',
+    'Imperial Palace HQ': 'Imperial Palace Restaurant Pte Ltd',
+    'Juniper Hospitality HQ': 'Juniper Hospitality Pte Ltd',
+    'Kinship Dining HQ': 'Kinship Dining Pte Ltd',
+    'Laut Seafood Group HQ': 'Laut Seafood Group Pte Ltd',
+    'Mosaic Food Group HQ': 'Mosaic Food Group Pte Ltd',
+    'Noodle Republic HQ': 'Noodle Republic Pte Ltd',
+    'Paradise Group HQ': 'Paradise Group Pte Ltd',
+    'Pique Restaurant Group HQ': 'Pique Restaurant Group Pte Ltd',
+    'Soup Restaurant Group HQ': 'Soup Restaurant Group Pte Ltd'
+  };
+
+  var HQ_LINKS = {
+    'Garden Cuisine HQ': 'ZM Admin - HQ Settings.html'
+  };
+
+  document.querySelectorAll('#panel-outlet-groups .og-hq-header').forEach(function(header) {
+    var nameSpan = header.querySelector('.og-hq-name');
+    var hqName = nameSpan.textContent.trim();
+
+    // Make name a link if settings page exists
+    var hqLink = HQ_LINKS[hqName];
+    if (hqLink) {
+      var a = document.createElement('a');
+      a.href = hqLink;
+      a.textContent = hqName;
+      a.onclick = function(e) { e.stopPropagation(); };
+      nameSpan.textContent = '';
+      nameSpan.appendChild(a);
+    }
+
+    // Wrap name + company
+    var company = HQ_COMPANIES[hqName];
+    if (company) {
+      var wrap = document.createElement('div');
+      wrap.className = 'og-hq-name-wrap';
+      nameSpan.parentNode.insertBefore(wrap, nameSpan);
+      wrap.appendChild(nameSpan);
+      var companyEl = document.createElement('span');
+      companyEl.className = 'og-hq-company';
+      companyEl.textContent = company;
+      wrap.appendChild(companyEl);
+    }
+
+    // Add group button (appended last so it sits after badges)
+    var btn = document.createElement('button');
+    btn.className = 'og-add-group-btn';
+    btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add group';
+    btn.onclick = function(e) {
+      e.stopPropagation();
+      window.location.href = 'ZM Admin - Create Outlet Group.html?hq=' + encodeURIComponent(hqName);
+    };
+    header.appendChild(btn);
+  });
+
+  // Last-updated dates for group rows
+  var GROUP_DATES = [
+    '10 Jun 2026','4 Jun 2026','28 May 2026','21 May 2026','14 May 2026',
+    '6 May 2026','29 Apr 2026','22 Apr 2026','15 Apr 2026','8 Apr 2026',
+    '1 Apr 2026','25 Mar 2026','18 Mar 2026','12 Mar 2026','5 Mar 2026',
+    '26 Feb 2026','19 Feb 2026','12 Feb 2026','5 Feb 2026','28 Jan 2026',
+    '21 Jan 2026','14 Jan 2026','7 Jan 2026','31 Dec 2025','24 Dec 2025',
+    '17 Dec 2025','10 Dec 2025','3 Dec 2025','26 Nov 2025','19 Nov 2025',
+    '12 Nov 2025','5 Nov 2025','29 Oct 2025','22 Oct 2025','15 Oct 2025',
+    '8 Oct 2025','1 Oct 2025','24 Sep 2025','17 Sep 2025','10 Sep 2025',
+    '3 Sep 2025','27 Aug 2025','20 Aug 2025','13 Aug 2025','6 Aug 2025',
+    '30 Jul 2025','23 Jul 2025','16 Jul 2025','9 Jul 2025','2 Jul 2025',
+    '25 Jun 2025','18 Jun 2025','11 Jun 2025','4 Jun 2025','28 May 2025',
+    '21 May 2025','14 May 2025','7 May 2025','30 Apr 2025','23 Apr 2025'
+  ];
+  var gdi = 0;
+  document.querySelectorAll('#panel-outlet-groups .og-hq-rows tbody tr:not(.og-outlet-row)').forEach(function(row) {
+    var td = row.cells[2];
+    if (td) {
+      td.innerHTML = '<span style="color:var(--ink-mute);font-size:13px">' + GROUP_DATES[gdi % GROUP_DATES.length] + '</span>';
+      gdi++;
+    }
   });
 
   // Actions dropdowns

@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ZM Admin — Create Outlet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864;
+    --seaweed: #0E3727;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --ink: #1a1f2b;
+    --ink-2: #4a4f5a;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; background: #fff; }
+  .app { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* ── Topbar ── */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1F2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+
+  /* ── Sidebar — dark green ── */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--seaweed); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .nav { padding: 8px 0; flex: 1; }
+  .nav-section-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.28); padding: 14px 16px 4px; line-height: 1; }
+  .nav a { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: rgba(255,255,255,.55); text-decoration: none; font-size: 13px; font-weight: 400; transition: background .15s, color .15s; border-left: 2px solid transparent; white-space: nowrap; }
+  .nav a svg { flex-shrink: 0; transition: color .15s; color: rgba(255,255,255,.3); }
+  .nav a:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
+  .nav a:hover svg { color: rgba(255,255,255,.6); }
+  .nav a.active { color: #fff; background: rgba(42,200,100,.12); border-left-color: var(--nomni-green); font-weight: 500; padding-left: 14px; }
+  .nav a.active svg { color: var(--nomni-green); }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* ── Main ── */
+  .main { grid-column: 2; grid-row: 2; padding: 28px 40px 100px; min-width: 0; background: #fff; }
+
+  /* Breadcrumb */
+  .breadcrumb { margin-bottom: 10px; }
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; }
+  .back-link:hover { color: var(--seaweed); }
+
+  /* Page title */
+  .page-title { font-size: 26px; font-weight: 800; margin: 0 0 16px; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .title-divider { height: 1px; background: var(--rule); margin: 0 0 28px; }
+
+  /* Form body */
+  .form-body { max-width: 640px; }
+
+  /* Section headings */
+  .section-heading { font-size: 18px; font-weight: 700; margin: 0 0 16px; letter-spacing: -0.02em; color: var(--ink); }
+  .section-divider { height: 1px; background: var(--rule); margin: 28px 0; }
+
+  /* Fields */
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+  .form-row .field-group { flex: 1; margin-bottom: 0; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .field-label .optional { font-size: 12px; font-weight: 400; color: var(--ink-mute); margin-left: 4px; }
+  .field-input { width: 100%; padding: 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; background: #fff; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input::placeholder { color: var(--ink-mute); }
+  .field-input:disabled { background: #f3f4f6; color: var(--ink-mute); cursor: not-allowed; }
+  .field-hint { font-size: 12px; color: var(--ink-mute); margin-top: 4px; display: block; line-height: 1.5; }
+  .field-select { width: 100%; padding: 8px 28px 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; transition: border-color .13s; }
+  .field-select:focus { border-color: var(--nomni-green); }
+  .field-select:disabled { background-color: #f3f4f6; color: var(--ink-mute); cursor: not-allowed; }
+
+  /* File row */
+  .file-row { display: flex; border: 1px solid #dcdee3; border-radius: 6px; overflow: hidden; }
+  .file-display { flex: 1; padding: 8px 12px; font-size: 14px; color: var(--ink-mute); background: #fff; border: none; outline: none; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .browse-btn { padding: 8px 16px; background: var(--nomni-green); color: var(--seaweed); font: inherit; font-size: 14px; font-weight: 600; border: none; cursor: pointer; flex-shrink: 0; transition: background .15s; }
+  .browse-btn:hover { background: #22b055; }
+
+  /* Radio rows */
+  .radio-group { display: flex; flex-direction: column; gap: 10px; }
+  .radio-row { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+  .radio-row input[type="radio"] { width: 16px; height: 16px; margin-top: 1px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .radio-row-text { flex: 1; }
+  .radio-row-label { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.4; }
+  .radio-row-desc { font-size: 12px; color: var(--ink-mute); margin-top: 2px; line-height: 1.4; }
+  .radio-row-warning { font-size: 12px; color: #D0291E; margin-top: 2px; }
+
+  /* Indented sub-field under a radio */
+  .radio-indent { padding-left: 26px; margin-top: 8px; }
+
+  /* Subscription plan cards */
+  .plan-cards { display: flex; flex-direction: column; gap: 8px; }
+  .plan-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; transition: border-color .15s, background .15s; }
+  .plan-card:has(input:checked) { border-color: var(--nomni-green); background: #F6FFF9; }
+  .plan-card input[type="radio"] { width: 16px; height: 16px; margin-top: 1px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .plan-card-body { flex: 1; }
+  .plan-card-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .plan-card-desc { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .plan-card-billing { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .plan-card-billing select { padding: 4px 24px 4px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 6px center; }
+  .plan-card-billing label { font-size: 13px; color: var(--ink-mute); }
+  .plan-badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 4px; padding: 2px 7px; margin-left: 6px; }
+  .plan-badge-free { background: #D9F5E4; color: var(--spinach); }
+
+  /* Checkbox items */
+  .check-item { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 3px 0; }
+  .check-item input[type="checkbox"] { width: 14px; height: 14px; margin-top: 1px; accent-color: var(--nomni-green); flex-shrink: 0; cursor: pointer; }
+  .check-item-text { flex: 1; }
+  .check-item-label { font-size: 14px; color: var(--ink); line-height: 1.4; }
+  .check-item-warning { font-size: 12px; color: #D0291E; margin-top: 1px; line-height: 1.4; }
+  .check-list { display: flex; flex-direction: column; gap: 10px; }
+
+  /* Cuisine grid */
+  .cuisine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+
+  /* User menu */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+
+  /* Sticky footer */
+  .sticky-footer { position: fixed; bottom: 0; left: 220px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .cancel-link { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: none; transition: color .13s; }
+  .cancel-link:hover { color: var(--ink); }
+  .save-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 24px; cursor: pointer; transition: background .15s; }
+  .save-btn:hover { background: #22b055; }
+
+  /* Conditional sub-panels */
+  .conditional-panel { display: none; }
+  .conditional-panel.visible { display: block; }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 56px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 220px; box-shadow: 2px 0 16px rgba(0,0,0,.25); }
+    .nav a span { display: none; }
+    .nav a.active { padding-left: 16px; border-left-width: 0; }
+    .sidebar:hover .nav a span { display: inline; }
+    .sidebar:hover .nav a.active { padding-left: 14px; border-left-width: 2px; }
+    .sticky-footer { left: 56px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="topbar-avt">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item">Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav" aria-label="Primary">
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+        <span>Orders</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg>
+        <span>Invoices</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg>
+        <span>Reports</span>
+      </a>
+      <a href="ZM Admin - Buyers.html" class="active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Buyers</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg>
+        <span>Suppliers</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>Notifications</span><span class="badge">4</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+        <span>Users</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="breadcrumb">
+      <a href="ZM Admin - Buyers.html" class="back-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Buyers
+      </a>
+    </div>
+    <h1 class="page-title">Create outlet</h1>
+    <div class="title-divider"></div>
+
+    <div class="form-body">
+
+      <!-- ── Basic information ── -->
+      <h2 class="section-heading" style="margin-top:0">Basic information</h2>
+
+      <div class="field-group">
+        <label class="field-label">Company</label>
+        <select class="field-select" disabled>
+          <option>Garden Cuisine Pte Ltd</option>
+        </select>
+        <span class="field-hint">Company is set at the group level and cannot be changed here</span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Outlet name</label>
+        <input type="text" class="field-input" placeholder="e.g. Garden Cuisine (Toa Payoh)" />
+        <span class="field-hint">Use "Brand Name (Outlet Name)" format when the brand has multiple outlets</span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Type</label>
+        <div class="radio-group" id="typeRadioGroup">
+          <label class="radio-row">
+            <input type="radio" name="outletType" value="regular" checked onchange="onTypeChange(this.value)" />
+            <div class="radio-row-text">
+              <div class="radio-row-label">Regular outlet</div>
+            </div>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="outletType" value="ck" onchange="onTypeChange(this.value)" />
+            <div class="radio-row-text">
+              <div class="radio-row-label">Central Kitchen</div>
+              <div class="radio-row-warning">Creates a supplier account with the same name as this outlet</div>
+            </div>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="outletType" value="hq" onchange="onTypeChange(this.value)" />
+            <div class="radio-row-text">
+              <div class="radio-row-label">HQ</div>
+              <div class="radio-row-desc">This outlet acts as the HQ for a group of outlets</div>
+            </div>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="outletType" value="managed" onchange="onTypeChange(this.value)" />
+            <div class="radio-row-text">
+              <div class="radio-row-label">Managed by HQ</div>
+              <div class="radio-row-desc">This outlet is governed by an existing HQ</div>
+            </div>
+          </label>
+        </div>
+        <!-- Conditional: shown when "Managed by HQ" is selected -->
+        <div class="radio-indent conditional-panel" id="selectHqPanel">
+          <label class="field-label" style="margin-bottom:6px">Select HQ</label>
+          <select class="field-select" style="max-width:360px">
+            <option value="">Select HQ</option>
+            <option>Garden Cuisine HQ</option>
+            <option>Wok &amp; Roll HQ</option>
+            <option>Spice Garden HQ</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Address</label>
+        <input type="text" class="field-input" placeholder="Address Line 1" style="margin-bottom:8px" />
+        <input type="text" class="field-input" placeholder="Address Line 2 (optional)" style="margin-bottom:8px" />
+        <div class="form-row" style="margin-bottom:0">
+          <div class="field-group" style="margin-bottom:0">
+            <input type="text" class="field-input" placeholder="City / State" />
+          </div>
+          <div class="field-group" style="margin-bottom:0">
+            <input type="text" class="field-input" placeholder="Postal code" />
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <select class="field-select">
+            <option>Singapore</option>
+            <option>Australia</option>
+            <option>Malaysia</option>
+            <option>Indonesia</option>
+            <option>Thailand</option>
+            <option>Hong Kong</option>
+            <option>United Kingdom</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Logo <span class="optional">(optional)</span></label>
+        <div class="file-row">
+          <span class="file-display">No file chosen</span>
+          <button class="browse-btn">Browse</button>
+        </div>
+        <span class="field-hint">JPEG, PNG files only — max 5MB</span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Outlet email</label>
+        <input type="email" class="field-input" placeholder="outlet@company.com" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Mobile phone <span class="optional">(optional)</span></label>
+        <input type="tel" class="field-input" placeholder="+6591234567" />
+        <span class="field-hint">Include country code, e.g. +6591234567</span>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── Subscription information ── -->
+      <h2 class="section-heading" style="margin-top:0">Subscription information</h2>
+
+      <div class="field-group">
+        <label class="check-item">
+          <input type="checkbox" />
+          <div class="check-item-text">
+            <div class="check-item-label">Has used SG government grant</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Subscription plan</label>
+        <div class="plan-cards">
+          <label class="plan-card">
+            <input type="radio" name="plan" value="starter" checked />
+            <div class="plan-card-body">
+              <div class="plan-card-name">Starter <span class="plan-badge plan-badge-free">Free</span></div>
+              <div class="plan-card-desc">Basic ordering and supplier management</div>
+            </div>
+          </label>
+          <label class="plan-card">
+            <input type="radio" name="plan" value="growth" />
+            <div class="plan-card-body">
+              <div class="plan-card-name">Growth</div>
+              <div class="plan-card-desc">Advanced reporting, invoice processing, and market lists</div>
+              <div class="plan-card-billing">
+                <label style="font-size:13px;color:var(--ink-mute)">Billed</label>
+                <select>
+                  <option>annually</option>
+                  <option>monthly</option>
+                </select>
+              </div>
+            </div>
+          </label>
+          <label class="plan-card">
+            <input type="radio" name="plan" value="premium" />
+            <div class="plan-card-body">
+              <div class="plan-card-name">Premium</div>
+              <div class="plan-card-desc">Full suite — inventory, recipes, HQ management, and AI features</div>
+              <div class="plan-card-billing">
+                <label style="font-size:13px;color:var(--ink-mute)">Billed</label>
+                <select>
+                  <option>annually</option>
+                  <option>monthly</option>
+                </select>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Add-ons</label>
+        <div class="check-list">
+          <label class="check-item">
+            <input type="checkbox" />
+            <div class="check-item-text">
+              <div class="check-item-label">Invoice processing (automated / assisted)</div>
+            </div>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" />
+            <div class="check-item-text">
+              <div class="check-item-label">3-way match</div>
+            </div>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" />
+            <div class="check-item-text">
+              <div class="check-item-label">Retail POS (Sales)</div>
+              <div class="check-item-warning">Disabling an active Retail POS module will erase all Sales data</div>
+            </div>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" />
+            <div class="check-item-text">
+              <div class="check-item-label">Inventory tracking for recipes</div>
+              <div class="check-item-warning">Disabling will remove recipes from Inventory (past data will be kept)</div>
+            </div>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" />
+            <div class="check-item-text">
+              <div class="check-item-label">Price changes from invoice processing require buyer approval</div>
+            </div>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" />
+            <div class="check-item-text">
+              <div class="check-item-label">AI features</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Payment method</label>
+        <select class="field-select">
+          <option>GIRO</option>
+          <option>Credit card</option>
+          <option>Bank transfer</option>
+          <option>Invoice</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Invoice email</label>
+        <input type="email" class="field-input" placeholder="billing@company.com" />
+        <span class="field-hint">Separate multiple addresses with commas</span>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── Additional details ── -->
+      <h2 class="section-heading" style="margin-top:0">Additional details</h2>
+
+      <div class="field-group">
+        <label class="field-label">Type of business <span class="optional">(optional)</span></label>
+        <select class="field-select">
+          <option value="">Select</option>
+          <option>Restaurant</option>
+          <option>Café</option>
+          <option>Bar &amp; Nightlife</option>
+          <option>Hotel &amp; Hospitality</option>
+          <option>Catering</option>
+          <option>Food court stall</option>
+          <option>Quick service / Fast food</option>
+          <option>Franchise</option>
+          <option>Cloud kitchen</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Type of cuisine <span class="optional">(optional)</span></label>
+        <div class="cuisine-grid">
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Asian</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Western</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Chinese</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Mediterranean</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Japanese</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Middle Eastern</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Korean</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Pizza &amp; Pasta</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Thai</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Burgers &amp; Sandwiches</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Vietnamese</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Seafood</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Indian</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Vegetarian &amp; Vegan</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Desserts &amp; Bakery</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Beverages</div></div></label>
+          <label class="check-item" style="grid-column:1/-1">
+            <input type="checkbox" id="cuisineOtherCheck" onchange="document.getElementById('cuisineOtherInput').style.display=this.checked?'block':'none'" />
+            <div class="check-item-text">
+              <div class="check-item-label">Others</div>
+              <input type="text" class="field-input" id="cuisineOtherInput" placeholder="Specify…" style="display:none;margin-top:6px;max-width:280px" />
+            </div>
+          </label>
+        </div>
+      </div>
+
+    </div><!-- /form-body -->
+  </main>
+</div>
+
+<!-- Sticky footer -->
+<div class="sticky-footer">
+  <a href="ZM Admin - Buyers.html" class="cancel-link">Cancel</a>
+  <button class="save-btn">Create outlet</button>
+</div>
+
+<script>
+  // User menu
+  document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', function() {
+    document.getElementById('userMenu').classList.remove('open');
+  });
+
+  // Outlet type radio — show/hide "Select HQ" conditional panel
+  function onTypeChange(val) {
+    var panel = document.getElementById('selectHqPanel');
+    if (val === 'managed') {
+      panel.classList.add('visible');
+    } else {
+      panel.classList.remove('visible');
+    }
+  }
+</script>
+</body>
+</html>

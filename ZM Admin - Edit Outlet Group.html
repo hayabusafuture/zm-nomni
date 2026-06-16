@@ -1,0 +1,1469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ZM Admin — Chargrill Outlets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864;
+    --seaweed: #0E3727;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --ink: #1a1f2b;
+    --ink-2: #4a4f5a;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+    --row-hover: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; background: #fff; }
+  .app { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* ── Topbar ── */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1F2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+
+  /* ── Sidebar ── */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--seaweed); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .nav { padding: 8px 0; flex: 1; }
+  .nav a { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: rgba(255,255,255,.55); text-decoration: none; font-size: 13px; font-weight: 400; transition: background .15s, color .15s; border-left: 2px solid transparent; white-space: nowrap; }
+  .nav a svg { flex-shrink: 0; color: rgba(255,255,255,.3); transition: color .15s; }
+  .nav a:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
+  .nav a:hover svg { color: rgba(255,255,255,.6); }
+  .nav a.active { color: #fff; background: rgba(42,200,100,.12); border-left-color: var(--nomni-green); font-weight: 500; padding-left: 14px; }
+  .nav a.active svg { color: var(--nomni-green); }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* ── Main ── */
+  .main { grid-column: 2; grid-row: 2; padding: 28px 40px 56px; min-width: 0; background: #fff; }
+
+  /* ── Back link ── */
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; margin-bottom: 14px; }
+  .back-link:hover { color: var(--seaweed); }
+
+  /* ── Page head ── */
+  .page-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
+  .page-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .page-hq { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 13px; color: var(--ink-mute); }
+  .page-hq a { color: var(--spinach); font-weight: 500; text-decoration: none; }
+  .page-hq a:hover { text-decoration: underline; }
+  .head-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .btn-ghost-danger { background: none; border: none; color: #c02020; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 12px; cursor: pointer; border-radius: 6px; transition: background .13s; }
+  .btn-ghost-danger:hover { background: #fff0f0; }
+  .btn-outline { background: none; border: 1px solid #d0d2d8; color: var(--ink); border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .13s; text-decoration: none; }
+  .btn-outline:hover { background: #f3f4f6; }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
+  .btn-primary:hover { background: #22b055; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; border-bottom: 1px solid var(--rule); margin-bottom: 24px; }
+  .tab { position: relative; padding: 12px 18px 14px; color: var(--ink-mute); font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; user-select: none; transition: color .13s; }
+  .tab.active { color: var(--ink); }
+  .tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--nomni-green); border-radius: 2px; }
+  .tab:first-child { padding-left: 0; }
+  .tab:hover:not(.active) { color: var(--ink); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Two-column layout ── */
+  .detail-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+
+  /* ── Section card ── */
+  .section-card { border: 1px solid var(--rule); border-radius: 10px; overflow: clip; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--rule); background: #fafafa; }
+  .section-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .section-count-badge { font-size: 12px; font-weight: 400; color: var(--ink-mute); margin-left: 6px; }
+  .section-action { background: none; border: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--spinach); cursor: pointer; padding: 3px 8px; border-radius: 5px; transition: background .12s; }
+  .section-action:hover { background: #f0faf3; }
+
+  /* ── Outlet list ── */
+  .outlet-list { display: flex; flex-direction: column; }
+  .outlet-row { display: flex; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--rule); gap: 12px; }
+  .outlet-row:last-child { border-bottom: none; }
+  .outlet-row:hover { background: var(--row-hover); }
+  .outlet-avatar { width: 30px; height: 30px; border-radius: 50%; background: #ede9fb; color: #6c4df2; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .outlet-info { flex: 1; min-width: 0; }
+  .outlet-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .outlet-company { font-size: 12px; color: var(--ink-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Per-row ··· actions */
+  .row-actions-wrap { position: relative; display: inline-block; }
+  .btn-row-actions { background: none; border: none; color: var(--ink-mute); cursor: pointer; padding: 4px 6px; border-radius: 4px; font-size: 16px; line-height: 1; display: flex; align-items: center; transition: background .1s, color .1s; }
+  .btn-row-actions:hover { background: #f0f1f3; color: var(--ink); }
+  .row-actions-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 300; overflow: hidden; min-width: 180px; }
+  .row-actions-menu.open { display: block; }
+  .row-action-item { padding: 10px 16px; font-size: 13px; color: var(--ink); cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .row-action-item:hover { background: var(--mint); }
+  .row-action-item.danger { color: #D0291E; }
+  .row-action-item.danger:hover { background: #FDD6DC; }
+
+  /* ── Right panel info card ── */
+  .info-card { border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; }
+  .info-card-title { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 14px; }
+  .info-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .info-row:first-child { padding-top: 0; }
+  .info-label { font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; }
+  .info-val { font-size: 13px; font-weight: 500; color: var(--ink); margin-top: 2px; line-height: 1.4; }
+  .info-val.empty { color: var(--ink-soft); font-weight: 400; font-style: italic; }
+
+  /* ── Picker modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal-card { background: #fff; border-radius: 12px; width: 720px; max-width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,.22); display: flex; flex-direction: column; overflow: hidden; max-height: calc(100vh - 80px); }
+  .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .modal-title { font-size: 17px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+  .modal-close { background: none; border: none; cursor: pointer; color: var(--ink-mute); padding: 4px; border-radius: 4px; display: flex; align-items: center; transition: color .13s; }
+  .modal-close:hover { color: var(--ink); }
+  .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+  .modal-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+  .modal-cancel { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; transition: color .13s; }
+  .modal-cancel:hover { color: var(--ink); }
+  .modal-add-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 20px; cursor: pointer; transition: background .15s; }
+  .modal-add-btn:hover { background: #22b055; }
+  .modal-add-btn:disabled { background: #a3e5bc; color: #5a9e6f; cursor: not-allowed; }
+
+  /* ── Picker ── */
+  .outlet-picker { display: flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; height: 380px; }
+  .picker-available { flex: 1; display: flex; flex-direction: column; min-width: 0; border-right: 1px solid var(--rule); }
+  .picker-filters { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-bottom: 1px solid var(--rule); background: #f9fafb; }
+  .picker-filter-row { display: flex; gap: 8px; }
+  .picker-search-wrap { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; width: 100%; }
+  .picker-search-wrap svg { flex-shrink: 0; color: var(--ink-mute); }
+  .picker-search-wrap input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
+  .picker-search-wrap input::placeholder { color: var(--ink-mute); }
+  .picker-filter-sel { flex: 1; height: 32px; padding: 0 24px 0 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 12px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center; }
+  .picker-list-meta { display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; border-bottom: 1px solid var(--rule); }
+  .picker-meta-count { font-size: 12px; color: var(--ink-mute); }
+  .select-all-btn { background: none; border: none; color: var(--spinach); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; }
+  .select-all-btn:hover { text-decoration: underline; }
+  .picker-list { flex: 1; overflow-y: auto; }
+  .picker-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid var(--rule); cursor: pointer; transition: background .1s; user-select: none; }
+  .picker-item:hover { background: var(--row-hover); }
+  .picker-item.is-selected { background: #f0faf4; }
+  .picker-item:last-child { border-bottom: none; }
+  .picker-item input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--nomni-green); flex-shrink: 0; pointer-events: none; }
+  .picker-item-info { flex: 1; min-width: 0; }
+  .picker-item-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picker-item-meta { font-size: 12px; color: var(--ink-mute); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picker-no-results { padding: 32px 14px; text-align: center; color: var(--ink-mute); font-size: 13px; }
+  .picker-left-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 32px 24px; text-align: center; gap: 10px; }
+  .picker-left-empty svg { color: var(--ink-soft); }
+  .picker-left-empty p { font-size: 13px; color: var(--ink-mute); line-height: 1.5; margin: 0; max-width: 200px; }
+  .picker-selected { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; background: #f9fafb; }
+  .picker-sel-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+  .picker-sel-title { font-size: 12px; font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: .05em; }
+  .picker-sel-count { display: inline-flex; align-items: center; justify-content: center; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; margin-left: 6px; }
+  .clear-all-btn { background: none; border: none; color: var(--ink-mute); font: inherit; font-size: 12px; cursor: pointer; padding: 0; transition: color .13s; }
+  .clear-all-btn:hover { color: #D0291E; }
+  .picker-sel-list { flex: 1; overflow-y: auto; }
+  .picker-sel-item { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+  .picker-sel-item:last-child { border-bottom: none; }
+  .picker-sel-info { flex: 1; min-width: 0; }
+  .picker-sel-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picker-sel-company { font-size: 11px; color: var(--ink-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .picker-remove { background: none; border: none; color: var(--ink-soft); cursor: pointer; padding: 3px; border-radius: 4px; display: flex; align-items: center; flex-shrink: 0; transition: color .1s, background .1s; }
+  .picker-remove:hover { color: #D0291E; background: #FDD6DC; }
+  .picker-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 24px; text-align: center; gap: 6px; }
+  .picker-empty-icon { color: var(--ink-soft); }
+  .picker-empty-title { font-size: 13px; font-weight: 600; color: var(--ink-mute); }
+  .picker-empty-hint { font-size: 12px; color: var(--ink-soft); line-height: 1.5; }
+
+  /* ── Confirm dialog ── */
+  .confirm-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 1000; display: none; align-items: center; justify-content: center; }
+  .confirm-overlay.open { display: flex; }
+  .confirm-card { background: #fff; border-radius: 10px; width: 420px; max-width: calc(100vw - 32px); padding: 24px; box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+  .confirm-title { font-size: 17px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 10px; }
+  .confirm-body { font-size: 14px; color: var(--ink-2); line-height: 1.5; margin-bottom: 22px; }
+  .confirm-body strong { color: var(--ink); font-weight: 600; }
+  .confirm-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+  .btn-danger { background: #D0291E; color: #fff; border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 18px; cursor: pointer; transition: background .15s; }
+  .btn-danger:hover { background: #b8220f; }
+
+  /* ── Overview two-column layout ── */
+  .overview-grid { display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: start; }
+  .overview-right { display: flex; flex-direction: column; gap: 28px; }
+
+  /* ── Items table ── */
+  .items-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  .items-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 10px 18px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fff; white-space: nowrap; }
+  .items-table tbody td { padding: 11px 18px; border-bottom: 1px solid var(--rule); vertical-align: middle; color: var(--ink); }
+  .items-table tbody tr:last-child td { border-bottom: none; }
+  .items-table tbody tr:hover td { background: var(--row-hover); }
+  .item-cat { display: inline-block; font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #f0f1f3; border-radius: 4px; padding: 1px 7px; }
+
+  /* ── Outlet mini-list ── */
+  .outlet-mini-row { display: flex; flex-direction: column; padding: 9px 16px; border-bottom: 1px solid var(--rule); }
+  .outlet-mini-row:last-child { border-bottom: none; }
+  .outlet-mini-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .outlet-mini-company { font-size: 12px; color: var(--ink-mute); margin-top: 1px; }
+  .view-all-row { padding: 10px 16px; border-top: 1px solid var(--rule); }
+  .view-all-btn { background: none; border: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--spinach); cursor: pointer; padding: 0; }
+  .view-all-btn:hover { text-decoration: underline; }
+
+  /* ── Items table extras ── */
+  .uom-options { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border-radius: 4px; padding: 1px 6px; margin-left: 3px; }
+  .uom-text { font-size: 12px; color: var(--ink-mute); }
+  .price-cell { white-space: nowrap; font-weight: 500; }
+  .moq-cell { color: var(--ink-mute); white-space: nowrap; }
+  .supplier-cell { color: var(--ink-mute); }
+
+  /* ── Items pager ── */
+  .items-pager-wrap { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-top: 1px solid var(--rule); }
+  .pager-info { font-size: 12px; color: var(--ink-mute); }
+  .pager-btns { display: flex; align-items: center; gap: 3px; }
+  .items-pager-btn { min-width: 28px; height: 28px; padding: 0 6px; border-radius: 5px; border: 1px solid var(--rule); background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--ink); font-family: inherit; transition: background .1s; }
+  .items-pager-btn:hover:not([disabled]) { background: var(--row-hover); }
+  .items-pager-btn.active { background: var(--seaweed); color: #fff; border-color: var(--seaweed); }
+  .items-pager-btn[disabled] { opacity: 0.35; cursor: default; }
+
+  /* ── Item row click ── */
+  .item-row { cursor: pointer; }
+  /* .item-name-cell moved to beautification block below */
+  .item-custom-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--spinach); background: var(--mint); border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
+
+  /* ── Inventory status in item modal ── */
+  .inv-status-card { background: var(--row-hover); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .inv-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; }
+  .inv-badge.in-inv { color: #1A8040; }
+  .inv-badge.not-inv { color: var(--ink-mute); }
+
+  /* ── Item modal form fields ── */
+  .modal-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .modal-field { display: flex; flex-direction: column; gap: 5px; }
+  .modal-field label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; }
+  .modal-field-input { background: #fff; border: 1px solid #DCDEE3; border-radius: 6px; padding: 9px 12px; font-size: 14px; color: var(--ink); font-family: inherit; outline: none; transition: border-color .13s; width: 100%; box-sizing: border-box; }
+  .modal-field-input:focus { border-color: var(--nomni-green); }
+  .modal-field-hint { font-size: 12px; color: var(--ink-mute); }
+  .inv-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-mute); margin-bottom: 8px; }
+
+  /* ── User menu ── */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+
+  /* Panel label row (title + action above a card) */
+  .panel-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; min-height: 28px; }
+  .panel-label-text { font-size: 21px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
+  .panel-label-count { font-size: 14px; font-weight: 400; color: var(--ink-mute); }
+
+  /* Stats strip */
+  .stats-strip { display: flex; gap: 10px; margin-bottom: 32px; }
+  .stat-chip { flex: 1; display: flex; align-items: center; gap: 14px; background: #F7F8FA; border: 1px solid #EEEFF2; border-radius: 10px; padding: 16px 20px; }
+  .stat-chip-icon { width: 40px; height: 40px; background: #ECEEF2; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #6B7280; }
+  .stat-chip-body { display: flex; flex-direction: column; }
+  .stat-chip-num { font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.03em; line-height: 1.1; }
+  .stat-chip-label { font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px; }
+
+  /* Sticky items table header */
+  .items-table thead th { position: sticky; top: 56px; z-index: 2; background: #fff; box-shadow: 0 1px 0 var(--rule); border-top: none; border-bottom: none; }
+
+  /* Zebra rows */
+  .items-table tbody tr:nth-child(even) td { background: #f9fafb; }
+  .items-table tbody tr:hover td { background: var(--row-hover) !important; }
+
+  /* Item name with supplier sub-line */
+  .item-name-cell { max-width: 0; width: 100%; }
+  .item-name-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+  .item-supplier-text { font-size: 12px; color: var(--ink-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Items filter row */
+  .items-filter-row { display: flex; gap: 8px; padding: 10px 18px; border-bottom: 1px solid var(--rule); background: #fafafa; align-items: center; }
+  .item-search-wrap { flex: 1; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 34px; }
+  .item-search-wrap:focus-within { border-color: var(--nomni-green); }
+  .item-search-input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; min-width: 0; }
+  .item-search-input::placeholder { color: var(--ink-mute); }
+  .items-cat-select { border: 1px solid #dcdee3; border-radius: 6px; padding: 0 28px 0 10px; height: 34px; font: inherit; font-size: 13px; color: var(--ink); background: #fff; appearance: none; -webkit-appearance: none; cursor: pointer; outline: none; white-space: nowrap; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A8F98' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; }
+  .items-cat-select:focus { border-color: var(--nomni-green); }
+
+  /* Sortable column headers */
+  .sort-th { cursor: pointer; user-select: none; transition: color .1s, background .1s; }
+  .sort-th:hover { background: #f3f4f6; }
+  .sort-ind::after { content: ' ⇅'; font-size: 10px; opacity: 0.3; }
+  .sort-th.sort-asc .sort-ind::after { content: ' ↑'; opacity: 1; color: var(--spinach); }
+  .sort-th.sort-desc .sort-ind::after { content: ' ↓'; opacity: 1; color: var(--spinach); }
+
+  /* Multi-UOM options button */
+  .uom-options-btn { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: inherit; transition: background .12s; }
+  .uom-options-btn:hover { background: #c6f2ce; }
+
+  /* UOM breakdown table in modal */
+  .uom-breakdown-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+  .uom-breakdown-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; padding: 8px 14px; background: #f9fafb; border-bottom: 1px solid var(--rule); }
+  .uom-breakdown-table td { padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+  .uom-breakdown-table tr:last-child td { border-bottom: none; }
+  .uom-breakdown-table tbody tr:hover td { background: var(--row-hover); }
+
+  /* Manage items modal */
+  .manage-item-row { display: flex; align-items: center; gap: 14px; padding: 11px 18px; border-bottom: 1px solid var(--rule); transition: opacity .15s, background .1s; }
+  .manage-item-row:hover { background: var(--row-hover); }
+  .manage-item-row.manage-removed { opacity: 0.38; }
+  .manage-item-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .manage-item-meta { font-size: 12px; color: var(--ink-mute); margin-top: 1px; }
+  .manage-item-price { font-size: 12px; color: var(--ink-mute); white-space: nowrap; }
+  .manage-toggle { display: inline-flex; cursor: pointer; flex-shrink: 0; }
+  .manage-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .manage-toggle-track { display: block; width: 34px; height: 19px; border-radius: 10px; background: var(--nomni-green); position: relative; transition: background .15s; flex-shrink: 0; }
+  .manage-toggle input:not(:checked) + .manage-toggle-track { background: #dcdee3; }
+  .manage-toggle-track::after { content: ''; position: absolute; width: 15px; height: 15px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .manage-toggle input:checked + .manage-toggle-track::after { transform: translateX(15px); }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 56px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 220px; box-shadow: 2px 0 16px rgba(0,0,0,.25); }
+    .nav a span { display: none; }
+    .sidebar:hover .nav a span { display: inline; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="topbar-avt">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item">Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span>Orders</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg><span>Invoices</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg><span>Reports</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><span>Promotions</span></a>
+      <a href="ZM Admin - Buyers.html" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Buyers</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg><span>Suppliers</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>Notifications</span><span class="badge">4</span></a>
+      <a href="ZM Admin - Buyer User.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Users</span></a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <a href="ZM Admin - Buyers.html#outlet-groups" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Outlet groups
+    </a>
+
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Chargrill Outlets</h1>
+        <div class="page-hq">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <a href="ZM Admin - Buyers.html">Garden Cuisine HQ</a>
+          <span style="color:var(--rule);margin:0 2px">·</span>
+          <span>Last updated 10 Jun 2026</span>
+        </div>
+      </div>
+      <div class="head-actions">
+        <button class="btn-ghost-danger" onclick="openDeleteGroup()">Delete group</button>
+        <button class="btn-outline" onclick="openSettings()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+        <button class="btn-primary" onclick="openPickerModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add outlets
+        </button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="overview">Overview</div>
+      <div class="tab" data-tab="outlets">Outlets</div>
+      <div class="tab" data-tab="suppliers">Suppliers</div>
+    </div>
+
+    <!-- Overview tab -->
+    <div class="tab-panel active" id="panel-overview">
+      <div id="statsStrip" class="stats-strip"></div>
+      <div class="overview-grid">
+
+        <!-- Left: items -->
+        <div>
+          <div class="panel-label-row">
+            <span class="panel-label-text">Items <span class="panel-label-count" id="itemCountBadge">100</span></span>
+            <button class="section-action" onclick="openManageModal()">Manage</button>
+          </div>
+          <div style="overflow:clip">
+          <div class="items-filter-row">
+            <div class="item-search-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" class="item-search-input" id="itemSearchInput" placeholder="Search items or suppliers…" oninput="setItemSearch(this.value)" />
+            </div>
+            <select class="items-cat-select" id="itemCatSelect" onchange="setItemCatFilter(this.value)">
+              <option value="">All categories</option>
+              <option>Poultry</option>
+              <option>Beef</option>
+              <option>Pork</option>
+              <option>Lamb</option>
+              <option>Seafood</option>
+              <option>Produce</option>
+              <option>Dry Goods</option>
+              <option>Sauces</option>
+              <option>Dairy &amp; Eggs</option>
+              <option>Frozen</option>
+              <option>Beverages</option>
+              <option>Supplies</option>
+            </select>
+          </div>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th id="sortTh-name" class="sort-th" onclick="setItemSort('name')">Item name <span class="sort-ind"></span></th>
+                <th id="sortTh-price" class="sort-th" style="width:140px" onclick="setItemSort('price')">Unit price <span class="sort-ind"></span></th>
+                <th style="width:88px">MOQ</th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+          </table>
+          <div id="itemsPager" class="items-pager-wrap"></div>
+          </div>
+        </div>
+
+        <!-- Right: mini-outlets + mini-suppliers + group info -->
+        <div class="overview-right">
+          <div>
+            <div class="panel-label-row">
+              <span class="panel-label-text">Outlets <span class="panel-label-count" id="outletCountOverview">4</span></span>
+              <button class="section-action" onclick="openPickerModal()">Add outlets</button>
+            </div>
+            <div class="section-card">
+              <div id="miniOutletList"></div>
+            </div>
+          </div>
+          <div>
+            <div class="panel-label-row">
+              <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supplierCountOverview">0</span></span>
+              <button class="section-action" onclick="switchToTab('suppliers')">View all</button>
+            </div>
+            <div class="section-card">
+              <div id="miniSupplierList"></div>
+            </div>
+          </div>
+          <div>
+            <div class="panel-label-row">
+              <span class="panel-label-text">Group info</span>
+            </div>
+            <div class="info-card">
+            <div class="info-row">
+              <div class="info-label">Name</div>
+              <div class="info-val">Chargrill Outlets</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Description</div>
+              <div class="info-val">Garden Cuisine Chargrill chain locations</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Created</div>
+              <div class="info-val">05 Sep 2019</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Last updated</div>
+              <div class="info-val">10 Jun 2026</div>
+            </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Outlets tab -->
+    <div class="tab-panel" id="panel-outlets">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Outlets <span class="panel-label-count" id="outletCountLabel">4</span></span>
+        <button class="section-action" onclick="openPickerModal()">Add outlets</button>
+      </div>
+      <div class="section-card">
+        <div class="outlet-list" id="outletsBody"></div>
+      </div>
+    </div>
+
+    <!-- Suppliers tab -->
+    <div class="tab-panel" id="panel-suppliers">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supplierCountLabel">0</span></span>
+      </div>
+      <div class="section-card">
+        <div id="suppliersBody" class="outlet-list"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Item detail modal -->
+<div class="modal-overlay" id="itemModal">
+  <div class="modal-card" style="width:540px">
+    <div class="modal-header">
+      <div style="flex:1; min-width:0">
+        <div class="modal-title" id="itemModalTitle" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:16px"></div>
+        <div style="margin-top:6px; display:flex; align-items:center; gap:8px">
+          <span class="item-cat" id="itemModalCat"></span>
+          <span style="font-size:13px; color:var(--ink-mute)" id="itemModalSupplier"></span>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeItemModal()" style="flex-shrink:0; margin-left:12px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Custom name <span style="font-weight:400; text-transform:none; color:var(--ink-mute)">(optional)</span></label>
+        <input id="itemCustomName" class="modal-field-input" type="text" placeholder="Leave blank to use the catalogue name" />
+        <div class="modal-field-hint">Overrides how this item appears on orders for this group</div>
+      </div>
+      <div id="itemPriceSection"></div>
+      <div>
+        <div class="inv-section-label">Inventory</div>
+        <div class="inv-status-card" id="invStatusCard"></div>
+      </div>
+    </div>
+    <div class="modal-foot" style="display:flex; justify-content:flex-end; gap:8px">
+      <button class="btn btn-tertiary" onclick="closeItemModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveItemModal()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manage items modal -->
+<div class="modal-overlay" id="manageModal">
+  <div class="modal-card" style="width:620px">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">Manage items</h2>
+        <div style="font-size:13px;color:var(--ink-mute);margin-top:3px">Add or remove items from this group's ordering list</div>
+      </div>
+      <button class="modal-close" onclick="closeManageModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="padding:12px 18px;border-bottom:1px solid var(--rule)">
+      <div class="item-search-wrap" style="width:100%">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="item-search-input" placeholder="Search market list…" oninput="renderManageList(this.value)" style="width:100%" />
+      </div>
+    </div>
+    <div id="manageItemsList" style="overflow-y:auto;max-height:400px"></div>
+    <div class="modal-foot" style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:12px;color:var(--ink-mute)">Sourced from Garden Cuisine HQ market list</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-tertiary" onclick="closeManageModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="closeManageModal()">Apply changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings dialog -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-card" style="width:480px">
+    <div class="modal-header">
+      <h2 class="modal-title">Settings</h2>
+      <button class="modal-close" onclick="closeSettings()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="gap:16px;display:flex;flex-direction:column">
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px">Group name</label>
+        <input type="text" style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none" value="Chargrill Outlets" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'" />
+      </div>
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px">Description <span style="font-weight:400;color:var(--ink-mute);font-size:13px">Optional</span></label>
+        <textarea style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none;min-height:80px;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'">Garden Cuisine Chargrill chain locations</textarea>
+        <span style="font-size:12px;color:var(--ink-mute);margin-top:4px;display:block">Used as internal notes only. Not visible to buyers.</span>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeSettings()">Cancel</button>
+      <button class="modal-add-btn" style="background:var(--nomni-green);color:var(--seaweed)" onclick="saveSettings()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add outlets modal -->
+<div class="modal-overlay" id="pickerModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title">Add outlets</h2>
+      <button class="modal-close" onclick="closePickerModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="outlet-picker">
+        <div class="picker-available">
+          <div class="picker-filters">
+            <div class="picker-search-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="modalSearch" placeholder="Search by outlet or company name…" oninput="renderPickerList()" />
+            </div>
+            <div class="picker-filter-row">
+              <select class="picker-filter-sel" id="modalCompanyFilter" onchange="renderPickerList()">
+                <option value="">All companies</option>
+                <option>Garden Cuisine Pte Ltd</option>
+                <option>1-Alfaro Pte Ltd</option>
+                <option>1-Spring Pte Ltd</option>
+                <option>1-Atico Pte Ltd</option>
+                <option>1036 Seafood Holdings Pte Ltd</option>
+                <option>Baker &amp; Cook Pte Ltd</option>
+                <option>Da Paolo Pte Ltd</option>
+                <option>Paradise Group</option>
+                <option>Soup Restaurant Group</option>
+              </select>
+            </div>
+          </div>
+          <div class="picker-list-meta">
+            <span class="picker-meta-count" id="modalMetaCount"></span>
+            <button class="select-all-btn" id="modalSelectAll" onclick="selectAllVisible()">Select all</button>
+          </div>
+          <div class="picker-list" id="modalOutletList"></div>
+        </div>
+        <div class="picker-selected">
+          <div class="picker-sel-header">
+            <span style="display:inline-flex;align-items:center">
+              <span class="picker-sel-title">To add</span>
+              <span class="picker-sel-count" id="modalSelCount">0</span>
+            </span>
+            <button class="clear-all-btn" id="modalClearBtn" onclick="clearPending()">Clear all</button>
+          </div>
+          <div class="picker-sel-list" id="modalSelectedList">
+            <div class="picker-empty" id="modalPickerEmpty">
+              <div class="picker-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></div>
+              <div class="picker-empty-title">Nothing selected yet</div>
+              <div class="picker-empty-hint">Check outlets on the left to add them here</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closePickerModal()">Cancel</button>
+      <button class="modal-add-btn" id="modalAddBtn" disabled onclick="confirmAddOutlets()">Add outlets</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete group confirmation -->
+<div class="confirm-overlay" id="deleteGroupOverlay">
+  <div class="confirm-card">
+    <div class="confirm-title">Delete group?</div>
+    <div class="confirm-body"><strong>Chargrill Outlets</strong> will be permanently deleted. All outlets in this group will remain in the HQ as ungrouped.</div>
+    <div class="confirm-foot">
+      <button class="modal-cancel" onclick="closeDeleteGroup()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeleteGroup()">Delete group</button>
+    </div>
+  </div>
+</div>
+
+<!-- Remove confirmation -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-card">
+    <div class="confirm-title">Remove from group?</div>
+    <div class="confirm-body"><strong id="confirmOutletName"></strong> will be removed from <strong>Chargrill Outlets</strong>. It will remain in the HQ and can be added to another group later.</div>
+    <div class="confirm-foot">
+      <button class="modal-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-danger" onclick="confirmRemove()">Remove from group</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const OUTLETS = [
+  { id:  1, name: "(WF 301) Chargrill @ 301 Punggol",       company: "Garden Cuisine Pte Ltd" },
+  { id:  2, name: "(WF 107) Chargrill @ 107 Serangoon",     company: "Garden Cuisine Pte Ltd" },
+  { id:  3, name: "(WF 259) Chargrill @ 259 Bukit Panjang", company: "Garden Cuisine Pte Ltd" },
+  { id:  4, name: "(WF 280) Chargrill @ 280 Bishan",        company: "Garden Cuisine Pte Ltd" },
+  { id:  5, name: "(WF 139) Chargrill @ 139 Tampines",      company: "Garden Cuisine Pte Ltd" },
+  { id:  6, name: "1-Alfaro - Bar",                          company: "1-Alfaro Pte Ltd" },
+  { id:  7, name: "1-Arden - Bar",                           company: "1-Spring Pte Ltd" },
+  { id:  8, name: "1-Arden - Culinary",                      company: "1-Spring Pte Ltd" },
+  { id:  9, name: "1-Atico - Bar",                           company: "1-Atico Pte Ltd" },
+  { id: 10, name: "1-Atico - Culinary",                      company: "1-Atico Pte Ltd" },
+  { id: 11, name: "1036 Seafood",                            company: "1036 Seafood Holdings Pte Ltd" },
+  { id: 12, name: "1036 Seafood & Bar",                      company: "1036 Seafood Holdings Pte Ltd" },
+  { id: 13, name: "Baker & Cook Dempsey",                    company: "Baker & Cook Pte Ltd" },
+  { id: 14, name: "Baker & Cook Club Street",                company: "Baker & Cook Pte Ltd" },
+  { id: 15, name: "Da Paolo Dempsey",                        company: "Da Paolo Pte Ltd" },
+  { id: 16, name: "Da Paolo Cicchetti",                      company: "Da Paolo Pte Ltd" },
+  { id: 17, name: "Paradise Dynasty Marina",                 company: "Paradise Group" },
+  { id: 18, name: "Paradise Classic Bedok",                  company: "Paradise Group" },
+  { id: 19, name: "Soup Restaurant Tampines",               company: "Soup Restaurant Group" },
+  { id: 20, name: "(WF 412) Chargrill @ 412 Jurong West",   company: "Garden Cuisine Pte Ltd" },
+  { id: 21, name: "(WF 345) Chargrill @ 345 Woodlands",     company: "Garden Cuisine Pte Ltd" },
+  { id: 22, name: "(WF 217) Chargrill @ 217 Clementi",      company: "Garden Cuisine Pte Ltd" },
+  { id: 23, name: "(WF 508) Chargrill @ 508 Pasir Ris",     company: "Garden Cuisine Pte Ltd" },
+  { id: 24, name: "(WF 163) Chargrill @ 163 Buona Vista",   company: "Garden Cuisine Pte Ltd" },
+  { id: 25, name: "(WF 331) Chargrill @ 331 Toa Payoh",     company: "Garden Cuisine Pte Ltd" },
+  { id: 26, name: "(WF 489) Chargrill @ 489 Yishun",        company: "Garden Cuisine Pte Ltd" },
+  { id: 27, name: "(WF 274) Chargrill @ 274 Ang Mo Kio",    company: "Garden Cuisine Pte Ltd" },
+  { id: 28, name: "(WF 622) Chargrill @ 622 Bedok",         company: "Garden Cuisine Pte Ltd" },
+  { id: 29, name: "(WF 155) Chargrill @ 155 Queenstown",    company: "Garden Cuisine Pte Ltd" },
+  { id: 30, name: "(WF 338) Chargrill @ 338 Hougang",       company: "Garden Cuisine Pte Ltd" },
+  { id: 31, name: "(WF 447) Chargrill @ 447 Sengkang",      company: "Garden Cuisine Pte Ltd" },
+  { id: 32, name: "(WF 191) Chargrill @ 191 Bukit Timah",   company: "Garden Cuisine Pte Ltd" },
+  { id: 33, name: "(WF 563) Chargrill @ 563 Punggol East",  company: "Garden Cuisine Pte Ltd" },
+  { id: 34, name: "(WF 229) Chargrill @ 229 Redhill",       company: "Garden Cuisine Pte Ltd" },
+  { id: 35, name: "(WF 774) Chargrill @ 774 Tampines West", company: "Garden Cuisine Pte Ltd" },
+  { id: 36, name: "(WF 103) Chargrill @ 103 Novena",        company: "Garden Cuisine Pte Ltd" },
+  { id: 37, name: "(WF 419) Chargrill @ 419 Geylang",       company: "Garden Cuisine Pte Ltd" },
+  { id: 38, name: "(WF 286) Chargrill @ 286 Simei",         company: "Garden Cuisine Pte Ltd" },
+  { id: 39, name: "(WF 551) Chargrill @ 551 Choa Chu Kang", company: "Garden Cuisine Pte Ltd" },
+];
+
+const currentGroup = new Set([1,2,3,4,5,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]);
+const pendingAdd   = new Set();
+let   pendingRemoveId = null;
+
+function initials(name) {
+  return name.replace(/[^a-zA-Z ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '??';
+}
+
+function renderOutlets() {
+  const body = document.getElementById('outletsBody');
+  const items = OUTLETS.filter(o => currentGroup.has(o.id));
+  const count = items.length;
+  document.getElementById('outletCountLabel').textContent = count;
+  const ov = document.getElementById('outletCountOverview');
+  if (ov) ov.textContent = count;
+
+  body.innerHTML = items.map(o => `
+    <div class="outlet-row">
+      <div class="outlet-avatar">${initials(o.name)}</div>
+      <div class="outlet-info">
+        <div class="outlet-name">${o.name}</div>
+        <div class="outlet-company">${o.company}</div>
+      </div>
+      <div class="row-actions-wrap">
+        <button class="btn-row-actions" onclick="toggleRowMenu(this)" title="Actions">•••</button>
+        <div class="row-actions-menu">
+          <div class="row-action-item danger" onclick="openConfirm(${o.id}, '${o.name.replace(/'/g,"\\'")}')">Remove from group</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  renderMiniOutlets();
+  renderStatsStrip();
+}
+
+const MINI_OUTLETS_MAX = 5;
+function renderMiniOutlets() {
+  const mini = document.getElementById('miniOutletList');
+  if (!mini) return;
+  const items = OUTLETS.filter(o => currentGroup.has(o.id));
+  const show  = items.slice(0, MINI_OUTLETS_MAX);
+  mini.innerHTML = show.map(o => `
+    <div class="outlet-mini-row">
+      <div class="outlet-mini-name">${o.name}</div>
+      <div class="outlet-mini-company">${o.company}</div>
+    </div>
+  `).join('');
+  if (items.length > MINI_OUTLETS_MAX) {
+    mini.insertAdjacentHTML('beforeend', `
+      <div class="view-all-row">
+        <button class="view-all-btn" onclick="switchToTab('outlets')">View all ${items.length} outlets →</button>
+      </div>
+    `);
+  }
+}
+
+function switchToTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const t = document.querySelector('.tab[data-tab="' + name + '"]');
+  if (t) t.classList.add('active');
+  const p = document.getElementById('panel-' + name);
+  if (p) p.classList.add('active');
+}
+
+const ITEMS = [
+  // Poultry
+  { name: "Chilled Chicken Thigh Fillet Skinless Boneless IVP 500g",                cat: "Poultry",     supplier: "Kee Song Group",       price:  7.50, uom: "per kg",                         moq: "5 kg"        },
+  { name: "Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray",               cat: "Poultry",     supplier: "Kee Song Group",       price:  8.20, uom: ["per kg", "per tray"],            moq: "5 kg"        },
+  { name: "Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack",                  cat: "Poultry",     supplier: "Kee Song Group",       price:  4.80, uom: "per kg",                         moq: "5 kg"        },
+  { name: "Chilled Chicken Drumstick Grade A Fresh 1kg Pack",                       cat: "Poultry",     supplier: "Kee Song Group",       price:  4.50, uom: "per kg",                         moq: "5 kg"        },
+  { name: "Chilled Chicken Liver Fresh Singapore Standard Grade 500g",              cat: "Poultry",     supplier: "Kee Song Group",       price:  3.20, uom: "per kg",                         moq: "5 kg"        },
+  { name: "Chilled Boneless Duck Breast with Skin French Origin 200g Each",         cat: "Poultry",     supplier: "Kee Song Group",       price: 18.00, uom: "per pc",                         moq: "5 pc"        },
+  { name: "Chilled Whole Quail Farm Fresh Halal Certified 500g",                    cat: "Poultry",     supplier: "Sustenir Agriculture", price:  6.50, uom: "per pc",                         moq: "10 pc"       },
+  { name: "Chilled Chicken Mince 80/20 Lean-to-Fat Ratio 1kg Vacuum",              cat: "Poultry",     supplier: "Kee Song Group",       price:  6.80, uom: "per kg",                         moq: "5 kg"        },
+  // Beef
+  { name: "Chilled Australian Grain-Fed Beef Chuck Roll BMS3+ 2kg Vacuum Pack",    cat: "Beef",        supplier: "Meat King",            price: 22.50, uom: ["per kg", "per pack (2kg)"],     moq: "2 kg"        },
+  { name: "Chilled Australian Wagyu Beef Ribeye Marbling Score 4 500g Portioned",   cat: "Beef",        supplier: "NH Foods",             price: 85.00, uom: "per kg",                         moq: "1 kg"        },
+  { name: "Chilled USDA Choice Beef Short Rib Bone-In 2.5kg Slab",                 cat: "Beef",        supplier: "Meat King",            price: 38.00, uom: "per kg",                         moq: "2.5 kg"      },
+  { name: "Chilled NZ Grass-Fed Beef Striploin MB2 500g Portioned Vacuum Sealed",  cat: "Beef",        supplier: "NH Foods",             price: 45.00, uom: ["per kg", "per portion (500g)"], moq: "1 kg"        },
+  { name: "Chilled Australian Beef Tenderloin Centre-Cut Trimmed 500g Vacuum",     cat: "Beef",        supplier: "Provenir",             price: 68.00, uom: "per kg",                         moq: "1 kg"        },
+  { name: "Frozen Wagyu-Blend Beef Burger Patty 180g x 6pcs Retail Sleeve",        cat: "Beef",        supplier: "Meat King",            price: 12.00, uom: "per pc",                         moq: "6 pc"        },
+  { name: "Chilled US Black Angus Beef Brisket Flat Cut Bone-In 2kg",              cat: "Beef",        supplier: "NH Foods",             price: 28.00, uom: "per kg",                         moq: "2 kg"        },
+  { name: "Chilled Australian Beef Mince 80/20 Fat Content Fresh 1kg Tray",        cat: "Beef",        supplier: "Meat King",            price: 18.00, uom: "per kg",                         moq: "2 kg"        },
+  // Pork
+  { name: "Chilled Pork Belly Slab Skin-On Bone-Out Australia Origin 2kg",         cat: "Pork",        supplier: "Prima Deli",           price: 15.00, uom: ["per kg", "per slab (2kg)"],     moq: "2 kg"        },
+  { name: "Chilled Boneless Pork Collar Shoulder Butt 1.5kg Vacuum Sealed",        cat: "Pork",        supplier: "Prima Deli",           price: 16.50, uom: "per kg",                         moq: "1.5 kg"      },
+  { name: "Chilled Pork Loin Eye Fillet Skinless Boneless 1kg Vacuum Pack",        cat: "Pork",        supplier: "Prima Deli",           price: 18.00, uom: "per kg",                         moq: "1 kg"        },
+  { name: "Chilled Pork Shoulder Bone-In Picnic Cut USA Origin 2kg",               cat: "Pork",        supplier: "Prima Deli",           price: 12.00, uom: "per kg",                         moq: "2 kg"        },
+  { name: "Chilled Baby Back Pork Ribs St Louis Cut 1.2kg Half Rack Vacuum",       cat: "Pork",        supplier: "Prima Deli",           price: 28.00, uom: "per rack",                       moq: "2 racks"     },
+  { name: "Chilled Pork Mince Lean-to-Fat 70/30 Fresh 1kg Tray",                   cat: "Pork",        supplier: "Prima Deli",           price:  9.50, uom: "per kg",                         moq: "2 kg"        },
+  // Lamb
+  { name: "Chilled NZ Lamb Rack Frenched 8-Rib French Trimmed 400g Vacuum Pack",   cat: "Lamb",        supplier: "Provenir",             price: 55.00, uom: "per rack",                       moq: "2 racks"     },
+  { name: "Frozen Australian Lamb Leg Bone-Out Butterflied 2kg Vacuum Sealed",     cat: "Lamb",        supplier: "Provenir",             price: 38.00, uom: "per kg",                         moq: "2 kg"        },
+  { name: "Frozen Australian Lamb Shoulder Rolled Boneless 1.5kg Vacuum",          cat: "Lamb",        supplier: "Meat King",            price: 32.00, uom: "per kg",                         moq: "1.5 kg"      },
+  { name: "Frozen New Zealand Lamb Mince 80/20 Fresh Frozen 500g Vacuum Bag",      cat: "Lamb",        supplier: "Provenir",             price: 22.00, uom: "per pkg",                        moq: "4 pkg"       },
+  // Seafood
+  { name: "Frozen Black Tiger Prawn HLSO Head-On Shell-On 16/20 IQF 500g Net",    cat: "Seafood",     supplier: "Ocean Fresh",          price: 28.00, uom: ["per kg", "per carton (5kg)"],   moq: "2 kg"        },
+  { name: "Fresh Local Squid Whole Medium Size 500g to 800g Per Piece",            cat: "Seafood",     supplier: "Ocean Fresh",          price: 18.00, uom: "per kg",                         moq: "2 kg"        },
+  { name: "Chilled Asian Sea Bass Fillet Skin-On 300g to 400g Per Piece",          cat: "Seafood",     supplier: "Deli Hub",             price: 32.00, uom: "per kg",                         moq: "2 kg"        },
+  { name: "Chilled Norwegian Atlantic Salmon Fillet Skin-On 200g Portioned",       cat: "Seafood",     supplier: "Deli Hub",             price: 48.00, uom: ["per kg", "per portion (200g)"], moq: "2 kg"        },
+  { name: "Chilled Australian Barramundi Fillet Skin-On Boneless 300g Each",       cat: "Seafood",     supplier: "Ocean Fresh",          price: 35.00, uom: "per kg",                         moq: "2 kg"        },
+  { name: "Frozen Pacific Scallop Meat Size 30/40 IQF 1kg Retail Bag",            cat: "Seafood",     supplier: "Ocean Fresh",          price: 58.00, uom: "per kg",                         moq: "1 kg"        },
+  { name: "Fresh Local Manila Clam Medium Grade Live 1kg Bag",                     cat: "Seafood",     supplier: "Song Fish Dealer",     price:  8.50, uom: "per kg",                         moq: "2 kg"        },
+  { name: "Live Mud Crab Sri Lankan Origin Grade A 600g to 800g Per Crab",        cat: "Seafood",     supplier: "Song Fish Dealer",     price: 38.00, uom: "per kg",                         moq: "2 kg"        },
+  // Produce
+  { name: "Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag",       cat: "Produce",     supplier: "FairPrice Finest",     price:  4.20, uom: "per kg",                         moq: "2 kg"        },
+  { name: "Fresh Yellow Brown Onion Standard Grade A Loose 1kg Bag",              cat: "Produce",     supplier: "FairPrice Finest",     price:  1.80, uom: "per kg",                         moq: "5 kg"        },
+  { name: "Fresh Local Spring Onion Scallion Bunch Rubber Banded 500g",           cat: "Produce",     supplier: "Sustenir Agriculture", price:  2.50, uom: "per bag",                        moq: "10 bags"     },
+  { name: "Fresh Thai Red Bird's Eye Chilli Prik Kee Noo Grade A 500g Bag",      cat: "Produce",     supplier: "Sustenir Agriculture", price:  3.80, uom: "per bag",                        moq: "5 bags"      },
+  { name: "Fresh Lemongrass Stalks Local Hydroponic Farm Bundle 200g",            cat: "Produce",     supplier: "FairPrice Finest",     price:  1.50, uom: "per bag",                        moq: "10 bags"     },
+  { name: "Fresh Young Ginger Root Thai Origin Unpeeled Loose 1kg",               cat: "Produce",     supplier: "FairPrice Finest",     price:  3.20, uom: "per kg",                         moq: "3 kg"        },
+  { name: "Fresh Coriander with Root Hydroponic Local Grown 100g Bunch",          cat: "Produce",     supplier: "Sustenir Agriculture", price:  2.20, uom: "per bunch",                      moq: "5 bunches"   },
+  { name: "Fresh Kaffir Lime Whole Imported Thailand Grade A 10 Pieces Bag",      cat: "Produce",     supplier: "FairPrice Finest",     price:  4.50, uom: "per bag",                        moq: "5 bags"      },
+  { name: "Fresh Sweet Corn on Cob Premium Grade Unwrapped 4 Pieces Pack",        cat: "Produce",     supplier: "Sustenir Agriculture", price:  3.80, uom: "per pack",                       moq: "5 packs"     },
+  { name: "Fresh Cherry Tomatoes Mixed Red Yellow Heirloom 250g Punnet",          cat: "Produce",     supplier: "Sustenir Agriculture", price:  3.20, uom: "per punnet",                     moq: "5 punnets"   },
+  { name: "Fresh Mesclun Salad Leaves Ready-to-Eat Triple Washed 200g Bag",       cat: "Produce",     supplier: "Sustenir Agriculture", price:  2.80, uom: "per bag",                        moq: "10 bags"     },
+  { name: "Fresh Baby Spinach Leaves Triple Washed Ready-to-Eat 150g Bag",        cat: "Produce",     supplier: "Sustenir Agriculture", price:  2.50, uom: "per bag",                        moq: "10 bags"     },
+  // Dry Goods
+  { name: "Thai Hom Mali Jasmine Rice Grade A Premium Long Grain 25kg Woven Sack",cat: "Dry Goods",   supplier: "Tee Yih Jia Food",     price: 68.00, uom: ["per sack (25kg)", "per kg"],    moq: "1 sack"      },
+  { name: "RBD Palm Olein Cooking Oil Refined Bleached Deodorised 5L PET Bottle", cat: "Dry Goods",   supplier: "Lam Soon",             price: 12.50, uom: ["per btl", "per ctn of 6"],      moq: "6 btl"       },
+  { name: "Coarse Sea Salt Unrefined Non-Iodised Food Grade 1kg Bag",             cat: "Dry Goods",   supplier: "Olam Food",            price:  2.20, uom: "per bag",                        moq: "10 bags"     },
+  { name: "Tellicherry Black Pepper Ground Fine Grade Food Service 500g Tub",     cat: "Dry Goods",   supplier: "Olam Food",            price:  8.50, uom: "per tub",                        moq: "6 tubs"      },
+  { name: "Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub",    cat: "Dry Goods",   supplier: "Olam Food",            price:  9.80, uom: "per tub",                        moq: "6 tubs"      },
+  { name: "Ground Cumin Powder Premium Spice Food Service Grade 500g Bag",        cat: "Dry Goods",   supplier: "Olam Food",            price:  8.50, uom: "per bag",                        moq: "6 bags"      },
+  { name: "Dehydrated Garlic Powder Fine Grade A Food Service 500g Tub",          cat: "Dry Goods",   supplier: "Olam Food",            price:  7.20, uom: "per tub",                        moq: "6 tubs"      },
+  { name: "Dehydrated Onion Powder Fine Grade A Food Service 500g Tub",           cat: "Dry Goods",   supplier: "Olam Food",            price:  7.20, uom: "per tub",                        moq: "6 tubs"      },
+  { name: "Dried Crushed Chilli Flakes Medium Heat Level 500g Resealable Bag",    cat: "Dry Goods",   supplier: "Olam Food",            price:  6.80, uom: "per bag",                        moq: "6 bags"      },
+  { name: "Maize Cornstarch Thickener Food Grade White Powder 1kg Foil Bag",      cat: "Dry Goods",   supplier: "Tee Yih Jia Food",     price:  3.50, uom: "per bag",                        moq: "12 bags"     },
+  { name: "Bleached All-Purpose Plain Wheat Flour Protein 10.5% 5kg Bag",         cat: "Dry Goods",   supplier: "Tee Yih Jia Food",     price:  8.80, uom: "per bag",                        moq: "5 bags"      },
+  { name: "Light Soft Brown Cane Sugar Fine Grain Food Service Grade 1kg Bag",    cat: "Dry Goods",   supplier: "Olam Food",            price:  2.80, uom: "per bag",                        moq: "10 bags"     },
+  // Sauces
+  { name: "Lee Kum Kee Premium Oyster Sauce Extra Oyster Flavour 2.55kg Catering Tin",  cat: "Sauces", supplier: "Lee Kum Kee",        price: 18.50, uom: ["per tin", "per case of 6"],      moq: "6 tins"      },
+  { name: "Lee Kum Kee Premium Dark Soy Sauce Aged Brewed 3 Years 1.1L Glass Bottle",   cat: "Sauces", supplier: "Lee Kum Kee",        price: 12.80, uom: ["per btl", "per case of 12"],     moq: "12 btl"      },
+  { name: "Lee Kum Kee Premium Light Soy Sauce Less Sodium 1.1L Glass Bottle",          cat: "Sauces", supplier: "Lee Kum Kee",        price: 11.50, uom: ["per btl", "per case of 12"],     moq: "12 btl"      },
+  { name: "Knorr Liquid Seasoning BBQ Marinade Original Recipe 5L Catering Drum",       cat: "Sauces", supplier: "AmoyFoods",          price: 68.00, uom: "per drum",                        moq: "1 drum"      },
+  { name: "Tiparos Fish Sauce Premium Grade Original Thai Recipe 700mL Glass Bottle",   cat: "Sauces", supplier: "AmoyFoods",          price:  4.80, uom: "per btl",                         moq: "12 btl"      },
+  { name: "Lee Kum Kee Pure Sesame Oil 100% Cold Pressed Dark Roasted 750mL Bottle",    cat: "Sauces", supplier: "Lee Kum Kee",        price:  9.50, uom: "per btl",                         moq: "12 btl"      },
+  { name: "Mizkan Genuine Brewed White Rice Vinegar Natural Fermented 2L PET Bottle",   cat: "Sauces", supplier: "Kikkoman",           price:  6.80, uom: "per btl",                         moq: "12 btl"      },
+  { name: "Lee Kum Kee Hoisin Sauce Sweet Savoury Premium Catering Size 2.5kg Tub",     cat: "Sauces", supplier: "Lee Kum Kee",        price: 22.00, uom: "per tub",                         moq: "4 tubs"      },
+  { name: "AmoyFoods Chilli Garlic Sauce Sichuan Style Catering Size 3kg Plastic Tub",  cat: "Sauces", supplier: "AmoyFoods",          price: 45.00, uom: "per tub",                         moq: "2 tubs"      },
+  { name: "Kikkoman Takumi Teriyaki Sauce Original Japanese Recipe 1.9L PET Bottle",    cat: "Sauces", supplier: "Kikkoman",           price: 14.50, uom: ["per btl", "per case of 6"],       moq: "6 btl"       },
+  // Dairy & Eggs
+  { name: "Seng Choon Free Range Chicken Eggs Singapore Grade A Large 30pcs Flat",    cat: "Dairy & Eggs", supplier: "Seng Choon Farm",  price:  8.50, uom: ["per flat (30)", "per pc"],     moq: "3 flats"     },
+  { name: "Anchor Unsalted Butter Blocks New Zealand Pasteurised 1kg Carton",          cat: "Dairy & Eggs", supplier: "Fonterra",         price: 18.80, uom: ["per block", "per ctn of 12"], moq: "2 blocks"    },
+  { name: "Bulla Thickened Cream Full Fat 35% Butterfat Homogenised 1L Bottle",        cat: "Dairy & Eggs", supplier: "Fonterra",         price:  7.20, uom: "per L",                        moq: "12 L"        },
+  { name: "Perfect Italiano Shredded Mozzarella Cheese Low Moisture 2kg Catering Bag", cat: "Dairy & Eggs", supplier: "Dairy Farm",       price: 28.00, uom: "per bag",                      moq: "2 bags"      },
+  { name: "Mainland Grated Parmesan Cheese Premium Aged 12 Months 1kg Catering Pouch", cat: "Dairy & Eggs", supplier: "Fonterra",         price: 22.00, uom: "per pouch",                    moq: "2 pouches"   },
+  { name: "Farmer's Union Sour Cream Natural Full Fat 35% Butterfat 1kg Tub",         cat: "Dairy & Eggs", supplier: "Dairy Farm",       price:  8.50, uom: "per tub",                      moq: "4 tubs"      },
+  // Frozen
+  { name: "McCain IQF Mixed Vegetables Carrot Corn Pea Green Bean Blend 1kg Bag",     cat: "Frozen",      supplier: "Rich Products",    price:  4.20, uom: "per bag",                        moq: "10 bags"     },
+  { name: "J-Basket Frozen Edamame Beans Shelled Lightly Salted IQF 500g Bag",        cat: "Frozen",      supplier: "McCain Foods",     price:  3.80, uom: "per bag",                        moq: "12 bags"     },
+  { name: "McCain IQF Whole Sweet Corn Kernel Yellow Frozen 1kg Retail Bag",           cat: "Frozen",      supplier: "McCain Foods",     price:  3.50, uom: "per bag",                        moq: "12 bags"     },
+  { name: "Birds Eye Garden Peas Petite Sweet Frozen IQF 1kg Retail Bag",              cat: "Frozen",      supplier: "Rich Products",    price:  3.20, uom: "per bag",                        moq: "12 bags"     },
+  { name: "Ocean Treasure Squid Rings Breaded Frozen Ready-to-Fry 1kg Bag",            cat: "Frozen",      supplier: "Ocean Fresh",      price:  8.50, uom: "per bag",                        moq: "6 bags"      },
+  { name: "Fong's Premium Prawn Crackers Uncooked Dried White Flat 1kg Bag",          cat: "Frozen",      supplier: "Rich Products",    price:  6.80, uom: "per bag",                        moq: "6 bags"      },
+  { name: "Stockyard Gold Wagyu-Blend Beef Burger Patty 150g x 10pcs Frozen Pack",    cat: "Frozen",      supplier: "NH Foods",         price: 22.00, uom: "per pack",                       moq: "4 packs"     },
+  { name: "Spring Home Vegetable Spring Roll Mini Halal Certified Frozen 400g 20pcs", cat: "Frozen",      supplier: "Tee Yih Jia Food", price:  4.50, uom: "per pack",                       moq: "12 packs"    },
+  // Beverages
+  { name: "Evian Natural Spring Still Mineral Water 1.5L x 12 Bottles Shrink Pack",   cat: "Beverages",   supplier: "Danone",           price: 28.00, uom: ["per pack (12)", "per btl"],      moq: "2 packs"     },
+  { name: "San Pellegrino Sparkling Natural Mineral Water 750mL x 12 Glass Bottles",  cat: "Beverages",   supplier: "Danone",           price: 42.00, uom: "per pack",                        moq: "2 packs"     },
+  { name: "Tiger Crystal Lager Beer Can 330mL x 24 Cans Refrigerated Shrink Pack",    cat: "Beverages",   supplier: "Tiger Beer",       price: 38.00, uom: ["per pack (24)", "per can"],      moq: "2 packs"     },
+  { name: "Jacob's Creek Classic Shiraz Cabernet Sauvignon Red Wine 750mL x 6 Case", cat: "Beverages",   supplier: "Moet Hennessy",    price: 85.00, uom: "per case",                        moq: "1 case"      },
+  { name: "Oyster Bay Marlborough Sauvignon Blanc White Wine 750mL x 6 Bottles Case", cat: "Beverages",   supplier: "Moet Hennessy",    price: 95.00, uom: "per case",                        moq: "1 case"      },
+  { name: "Coca-Cola Original Taste Carbonated Soft Drink 330mL x 24 Cans Pack",      cat: "Beverages",   supplier: "F&N",              price: 22.00, uom: ["per pack (24)", "per can"],      moq: "2 packs"     },
+  // Supplies
+  { name: "Coconut Shell Charcoal Briquettes Restaurant Grade Hexagonal 5kg Sack",    cat: "Supplies",    supplier: "Grill Master SG",  price: 12.50, uom: ["per sack (5kg)", "per kg"],      moq: "5 sacks"     },
+  { name: "Aluminised Extra Heavy-Duty Aluminium Foil 30cm Width x 100m Length Roll", cat: "Supplies",    supplier: "Grill Master SG",  price:  8.80, uom: ["per roll", "per case of 12"],    moq: "12 rolls"    },
+  { name: "PVC Cling Wrap Food Grade BPA-Free Clear Film 30cm x 300m Roll",           cat: "Supplies",    supplier: "Globe Pack",       price:  6.50, uom: ["per roll", "per case of 12"],    moq: "12 rolls"    },
+  { name: "Latex-Free Disposable Vinyl Food-Safe Gloves Powder-Free Large 100pcs Box",cat: "Supplies",    supplier: "Globe Pack",       price: 12.00, uom: "per box",                         moq: "6 boxes"     },
+  { name: "Scott Performance Tissue Kitchen Paper Towel 2-Ply Embossed 12 Rolls Pack",cat: "Supplies",    supplier: "Globe Pack",       price: 18.00, uom: ["per pack (12)", "per roll"],     moq: "4 packs"     },
+  { name: "PackAway Hinged Lid Kraft Pulp Takeaway Box 17cm Square 500ml 50pcs Sleeve",cat: "Supplies",   supplier: "Globe Pack",       price: 22.00, uom: "per sleeve",                      moq: "4 sleeves"   },
+  { name: "Kraft Brown SOS Paper Bag with Flat Handle Medium 26x12x35cm 100pcs",      cat: "Supplies",    supplier: "Globe Pack",       price: 28.00, uom: "per bundle",                      moq: "4 bundles"   },
+  { name: "Bamboo Individual Wrapped Chopsticks Premium Round 23cm 100 Pairs Sleeve", cat: "Supplies",    supplier: "Globe Pack",       price: 12.00, uom: "per sleeve",                      moq: "6 sleeves"   },
+  { name: "Natural Bamboo BBQ Grill Skewer Flat Blade 30cm Length 100pcs Bag",        cat: "Supplies",    supplier: "Grill Master SG",  price:  4.50, uom: "per bag",                         moq: "12 bags"     },
+  { name: "Stainless Steel BBQ Grill Brush Wide Face Replacement Head Heavy Duty",    cat: "Supplies",    supplier: "Grill Master SG",  price: 18.00, uom: "per pc",                          moq: "1 pc"        },
+  { name: "Pam Professional Non-Stick Canola Oil Cooking Spray Zero Trans-Fat 500mL", cat: "Supplies",    supplier: "Grill Master SG",  price:  8.80, uom: "per can",                         moq: "12 cans"     },
+  { name: "Taylor Precision Digital Instant-Read Probe Meat Thermometer NSF Certified",cat: "Supplies",   supplier: "Grill Master SG",  price: 35.00, uom: "per pc",                          moq: "1 pc"        },
+];
+
+const CAT_ORDER = ["Poultry","Beef","Pork","Lamb","Seafood","Produce","Dry Goods","Sauces","Dairy & Eggs","Frozen","Beverages","Supplies"];
+const sortedItems = ITEMS.slice().sort((a, b) => {
+  const ci = CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat);
+  return ci !== 0 ? ci : a.name.localeCompare(b.name);
+});
+
+let itemsPage = 1;
+const ITEMS_PER_PAGE = 20;
+let itemSearch = '';
+let itemCatFilter = '';
+let itemSortKey = 'default';
+let currentItemIdx = null;
+const itemOverrides = {};
+
+const UOM_MULTIPLIER = {
+  'per kg': 1, 'per g': 0.001, 'per btl': 1, 'per can': 1, 'per pc': 1,
+  'per roll': 1, 'per rack': 1, 'per tray': 2, 'per bag': 1, 'per pack': 1,
+  'per bunch': 1, 'per punnet': 1, 'per pkg': 1, 'per unit': 1, 'per block': 1,
+  'per carton (5kg)': 5, 'per sack (25kg)': 25,
+  'per pack (2kg)': 2, 'per slab (2kg)': 2,
+  'per portion (500g)': 0.5, 'per portion (200g)': 0.2,
+  'per case of 6': 6, 'per case of 12': 12,
+  'per ctn of 6': 6, 'per ctn of 12': 12,
+  'per pack (10)': 10, 'per pack (12)': 12, 'per pack (24)': 24,
+  'per flat (30)': 30,
+};
+
+function getUOMBreakdown(item) {
+  if (!Array.isArray(item.uom)) return null;
+  const primaryMult = UOM_MULTIPLIER[item.uom[0]] || 1;
+  const unitPrice = item.price / primaryMult;
+  return item.uom.map(uom => ({
+    uom,
+    price: unitPrice * (UOM_MULTIPLIER[uom] || 1),
+  }));
+}
+
+function getGroupedSuppliers() {
+  const map = {};
+  ITEMS.forEach(item => {
+    map[item.supplier] = (map[item.supplier] || 0) + 1;
+  });
+  return Object.entries(map)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+const MINI_SUPPLIERS_MAX = 5;
+function renderMiniSuppliers() {
+  const mini = document.getElementById('miniSupplierList');
+  if (!mini) return;
+  const suppliers = getGroupedSuppliers();
+  const badge = document.getElementById('supplierCountOverview');
+  if (badge) badge.textContent = suppliers.length;
+  const show = suppliers.slice(0, MINI_SUPPLIERS_MAX);
+  mini.innerHTML = show.map(s =>
+    '<div class="outlet-mini-row">' +
+      '<div class="outlet-mini-name">' + s.name + '</div>' +
+      '<div class="outlet-mini-company">' + s.count + ' item' + (s.count !== 1 ? 's' : '') + '</div>' +
+    '</div>'
+  ).join('');
+  if (suppliers.length > MINI_SUPPLIERS_MAX) {
+    mini.insertAdjacentHTML('beforeend',
+      '<div class="view-all-row">' +
+        '<button class="view-all-btn" data-tab="suppliers" onclick="switchToTab(this.dataset.tab)">View all ' + suppliers.length + ' suppliers →</button>' +
+      '</div>'
+    );
+  }
+}
+
+function renderSuppliers() {
+  const body = document.getElementById('suppliersBody');
+  if (!body) return;
+  const suppliers = getGroupedSuppliers();
+  const badge = document.getElementById('supplierCountLabel');
+  if (badge) badge.textContent = suppliers.length;
+  body.innerHTML = suppliers.map(s =>
+    '<div class="outlet-row" style="cursor:default">' +
+      '<div class="outlet-info">' +
+        '<div class="outlet-name">' + s.name + '</div>' +
+        '<div class="outlet-company">' + s.count + ' item' + (s.count !== 1 ? 's' : '') + ' in this group</div>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function renderStatsStrip() {
+  const strip = document.getElementById('statsStrip');
+  if (!strip) return;
+  const outletCount   = currentGroup.size;
+  const itemCount     = ITEMS.length;
+  const supplierCount = getGroupedSuppliers().length;
+  const sc = (icon, num, label, iconBg, iconColor) =>
+    '<div class="stat-chip"><div class="stat-chip-icon" style="background:' + iconBg + ';color:' + iconColor + '">' + icon + '</div>' +
+    '<div class="stat-chip-body"><div class="stat-chip-num">' + num + '</div><div class="stat-chip-label">' + label + '</div></div></div>';
+  strip.innerHTML =
+    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', outletCount, 'Outlets', '#E2FFE6', '#1A8040') +
+    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>', itemCount, 'Items', '#EFF6FF', '#2563EB') +
+    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>', supplierCount, 'Suppliers', '#FEF3C7', '#D97706');
+}
+
+function getDisplayItems() {
+  let items = ITEMS.slice();
+  if (itemCatFilter) items = items.filter(i => i.cat === itemCatFilter);
+  if (itemSearch) {
+    const q = itemSearch.toLowerCase();
+    items = items.filter(i =>
+      i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)
+    );
+  }
+  if (itemSortKey === 'name-asc') {
+    items.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (itemSortKey === 'name-desc') {
+    items.sort((a, b) => b.name.localeCompare(a.name));
+  } else if (itemSortKey === 'price-asc') {
+    items.sort((a, b) => a.price - b.price);
+  } else if (itemSortKey === 'price-desc') {
+    items.sort((a, b) => b.price - a.price);
+  } else {
+    items.sort((a, b) => {
+      const ci = CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat);
+      return ci !== 0 ? ci : a.name.localeCompare(b.name);
+    });
+  }
+  return items;
+}
+
+function setItemSearch(val) {
+  itemSearch = val;
+  itemsPage = 1;
+  renderItems();
+}
+
+function setItemCatFilter(val) {
+  itemCatFilter = val;
+  itemsPage = 1;
+  renderItems();
+}
+
+function setItemSort(key) {
+  if (itemSortKey === key + '-asc') itemSortKey = key + '-desc';
+  else itemSortKey = key + '-asc';
+  renderItems();
+}
+
+function renderItems() {
+  const body = document.getElementById('itemsBody');
+  if (!body) return;
+  const display = getDisplayItems();
+  const total = display.length;
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1;
+  if (itemsPage > totalPages) itemsPage = totalPages;
+  document.getElementById('itemCountBadge').textContent = total;
+
+  ['name', 'price'].forEach(key => {
+    const th = document.getElementById('sortTh-' + key);
+    if (!th) return;
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (itemSortKey === key + '-asc') th.classList.add('sort-asc');
+    else if (itemSortKey === key + '-desc') th.classList.add('sort-desc');
+  });
+
+  const start = (itemsPage - 1) * ITEMS_PER_PAGE;
+  const page = display.slice(start, start + ITEMS_PER_PAGE);
+
+  if (!page.length) {
+    body.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--ink-mute)">No items match your search</td></tr>';
+    renderItemsPager(0, total);
+    return;
+  }
+
+  body.innerHTML = page.map(item => {
+    const rawIdx = ITEMS.indexOf(item);
+    const ov = itemOverrides[rawIdx] || {};
+    const displayName = ov.customName || item.name;
+    const displayMOQ = ov.moq || item.moq;
+    let priceHtml;
+    if (Array.isArray(item.uom)) {
+      priceHtml = '<button class="uom-options-btn" onclick="event.stopPropagation();openItemModal(' + rawIdx + ')">' + item.uom.length + ' options</button>';
+    } else {
+      const displayPrice = (ov.price != null) ? ov.price : item.price;
+      priceHtml = 'S$' + parseFloat(displayPrice).toFixed(2) + ' <span class="uom-text">/ ' + item.uom + '</span>';
+    }
+    const customTag = ov.customName ? ' <span class="item-custom-tag">custom</span>' : '';
+    return '<tr class="item-row" onclick="openItemModal(' + rawIdx + ')">' +
+      '<td class="item-name-cell">' +
+        '<div class="item-name-text">' + displayName + customTag + '</div>' +
+        '<div class="item-supplier-text">' + item.supplier + '</div>' +
+      '</td>' +
+      '<td class="price-cell">' + priceHtml + '</td>' +
+      '<td class="moq-cell">' + displayMOQ + '</td>' +
+      '</tr>';
+  }).join('');
+
+  renderItemsPager(totalPages, total);
+}
+
+function renderItemsPager(totalPages, total) {
+  const pager = document.getElementById('itemsPager');
+  if (!pager) return;
+  if (totalPages <= 1) { pager.innerHTML = ''; return; }
+  const s = (itemsPage - 1) * ITEMS_PER_PAGE + 1;
+  const e = Math.min(itemsPage * ITEMS_PER_PAGE, total);
+  let pages = '';
+  for (let i = 1; i <= totalPages; i++) {
+    pages += '<button class="items-pager-btn' + (i === itemsPage ? ' active' : '') + '" onclick="goItemsPage(' + i + ')">' + i + '</button>';
+  }
+  pager.innerHTML =
+    '<span class="pager-info">Showing ' + s + '–' + e + ' of ' + total + ' items</span>' +
+    '<div class="pager-btns">' +
+    '<button class="items-pager-btn" onclick="goItemsPage(' + (itemsPage - 1) + ')"' + (itemsPage === 1 ? ' disabled' : '') + '>‹</button>' +
+    pages +
+    '<button class="items-pager-btn" onclick="goItemsPage(' + (itemsPage + 1) + ')"' + (itemsPage === totalPages ? ' disabled' : '') + '>›</button>' +
+    '</div>';
+}
+
+function goItemsPage(n) {
+  const tp = Math.ceil(getDisplayItems().length / ITEMS_PER_PAGE) || 1;
+  if (n < 1 || n > tp) return;
+  itemsPage = n;
+  renderItems();
+}
+
+function openItemModal(idx) {
+  currentItemIdx = idx;
+  const item = ITEMS[idx];
+  const ov = itemOverrides[idx] || {};
+  document.getElementById('itemModalTitle').textContent = item.name;
+  document.getElementById('itemModalCat').textContent = item.cat;
+  document.getElementById('itemModalSupplier').textContent = item.supplier;
+  document.getElementById('itemCustomName').value = ov.customName || '';
+
+  const section = document.getElementById('itemPriceSection');
+  if (Array.isArray(item.uom)) {
+    const breakdown = getUOMBreakdown(item);
+    const rows = breakdown.map(r =>
+      '<tr><td>' + r.uom + '</td><td style="font-weight:500">S$' + r.price.toFixed(2) + '</td></tr>'
+    ).join('');
+    section.innerHTML =
+      '<div class="modal-field">' +
+        '<label>UOM Pricing</label>' +
+        '<table class="uom-breakdown-table">' +
+          '<thead><tr><th>Unit of measure</th><th>Unit price</th></tr></thead>' +
+          '<tbody>' + rows + '</tbody>' +
+        '</table>' +
+        '<div class="modal-field-hint">Prices set at catalogue level — contact your account manager to override</div>' +
+      '</div>' +
+      '<div class="modal-field-row" style="margin-top:0">' +
+        '<div class="modal-field">' +
+          '<label>MOQ</label>' +
+          '<input id="itemMOQ" class="modal-field-input" type="text" value="' + (ov.moq || item.moq) + '" />' +
+        '</div>' +
+      '</div>';
+  } else {
+    const displayPrice = parseFloat((ov.price != null) ? ov.price : item.price).toFixed(2);
+    section.innerHTML =
+      '<div class="modal-field-row">' +
+        '<div class="modal-field">' +
+          '<label>Unit price (S$)</label>' +
+          '<input id="itemPrice" class="modal-field-input" type="text" value="' + displayPrice + '" />' +
+          '<div class="modal-field-hint">' + item.uom + '</div>' +
+        '</div>' +
+        '<div class="modal-field">' +
+          '<label>MOQ</label>' +
+          '<input id="itemMOQ" class="modal-field-input" type="text" value="' + (ov.moq || item.moq) + '" />' +
+        '</div>' +
+      '</div>';
+  }
+
+  renderInvStatus(idx % 4 !== 0);
+  document.getElementById('itemModal').classList.add('open');
+}
+
+function renderInvStatus(inInv) {
+  const card = document.getElementById('invStatusCard');
+  if (inInv) {
+    card.innerHTML =
+      '<div>' +
+        '<div class="inv-badge in-inv">' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+          ' In Inventory' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--ink-mute);margin-top:3px">Orders will update stock levels automatically</div>' +
+      '</div>' +
+      '<a href="Procure - Inventory.html" class="btn btn-tertiary" style="font-size:13px;white-space:nowrap;flex-shrink:0">View in Inventory →</a>';
+  } else {
+    card.innerHTML =
+      '<div>' +
+        '<div class="inv-badge not-inv">Not in Inventory</div>' +
+        '<div style="font-size:12px;color:var(--ink-mute);margin-top:3px">Add this item to track and manage stock levels</div>' +
+      '</div>' +
+      '<button class="btn btn-secondary" style="white-space:nowrap;flex-shrink:0" onclick="addToInventory()">+ Add to Inventory</button>';
+  }
+}
+
+function addToInventory() { renderInvStatus(true); }
+
+function closeItemModal() {
+  document.getElementById('itemModal').classList.remove('open');
+  currentItemIdx = null;
+}
+
+function saveItemModal() {
+  if (currentItemIdx === null) return;
+  const priceEl = document.getElementById('itemPrice');
+  const moqEl = document.getElementById('itemMOQ');
+  const parsed = priceEl ? parseFloat(priceEl.value) : null;
+  itemOverrides[currentItemIdx] = {
+    customName: document.getElementById('itemCustomName').value.trim() || null,
+    price: (priceEl && !isNaN(parsed)) ? parsed : null,
+    moq: moqEl ? moqEl.value.trim() || null : null,
+  };
+  closeItemModal();
+  renderItems();
+}
+
+function openManageModal() {
+  renderManageList('');
+  document.getElementById('manageModal').classList.add('open');
+}
+
+function closeManageModal() {
+  document.getElementById('manageModal').classList.remove('open');
+}
+
+function toggleManageItem(el) {
+  el.closest('.manage-item-row').classList.toggle('manage-removed', !el.checked);
+}
+
+function renderManageList(q) {
+  const body = document.getElementById('manageItemsList');
+  if (!body) return;
+  const lq = q.toLowerCase();
+  const items = lq
+    ? ITEMS.filter(i =>
+        i.name.toLowerCase().includes(lq) ||
+        i.cat.toLowerCase().includes(lq) ||
+        i.supplier.toLowerCase().includes(lq)
+      )
+    : ITEMS;
+  if (!items.length) {
+    body.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink-mute)">No items found</div>';
+    return;
+  }
+  const show = items.slice(0, 50);
+  body.innerHTML = show.map(item =>
+    '<div class="manage-item-row">' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="manage-item-name">' + item.name + '</div>' +
+        '<div class="manage-item-meta">' + item.cat + ' · ' + item.supplier + '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:12px;flex-shrink:0">' +
+        '<span class="manage-item-price">S$' + item.price.toFixed(2) + '</span>' +
+        '<label class="manage-toggle">' +
+          '<input type="checkbox" checked onchange="toggleManageItem(this)" />' +
+          '<span class="manage-toggle-track"></span>' +
+        '</label>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+  if (items.length > 50) {
+    body.insertAdjacentHTML('beforeend',
+      '<div style="text-align:center;padding:12px;font-size:12px;color:var(--ink-mute)">Showing 50 of ' + items.length + ' — refine your search to see more</div>'
+    );
+  }
+}
+
+
+function toggleRowMenu(btn) {
+  event.stopPropagation();
+  const menu = btn.nextElementSibling;
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
+  if (!isOpen) menu.classList.add('open');
+}
+
+// ── Picker ─────────────────────────────────────────────────
+function getPickerVisible() {
+  const q  = document.getElementById('modalSearch').value.trim().toLowerCase();
+  const co = document.getElementById('modalCompanyFilter').value;
+  if (!q && !co) return null;
+  return OUTLETS.filter(o => {
+    if (currentGroup.has(o.id)) return false;
+    if (co && o.company !== co) return false;
+    if (q && !o.name.toLowerCase().includes(q) && !o.company.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function renderPickerList() {
+  const visible = getPickerVisible();
+  const list    = document.getElementById('modalOutletList');
+  const total   = OUTLETS.filter(o => !currentGroup.has(o.id)).length;
+  const metaEl  = document.getElementById('modalMetaCount');
+  const selAllBtn = document.getElementById('modalSelectAll');
+
+  if (visible === null) {
+    metaEl.textContent = `${total} outlets available`;
+    selAllBtn.style.display = 'none';
+    list.innerHTML = `<div class="picker-left-empty">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <p>Search by name, or filter by company to find outlets</p>
+    </div>`;
+    return;
+  }
+  selAllBtn.style.display = '';
+  metaEl.textContent = visible.length === total ? `${total} outlets` : `${visible.length} of ${total} outlets`;
+
+  if (!visible.length) { list.innerHTML = '<div class="picker-no-results">No outlets match your filters</div>'; return; }
+  list.innerHTML = visible.map(o => `
+    <div class="picker-item${pendingAdd.has(o.id) ? ' is-selected' : ''}" onclick="togglePending(${o.id})">
+      <input type="checkbox" ${pendingAdd.has(o.id) ? 'checked' : ''} />
+      <div class="picker-item-info">
+        <div class="picker-item-name">${o.name}</div>
+        <div class="picker-item-meta">${o.company}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderPickerSelected() {
+  const selList  = document.getElementById('modalSelectedList');
+  const empty    = document.getElementById('modalPickerEmpty');
+  const count    = pendingAdd.size;
+  document.getElementById('modalSelCount').textContent = count;
+  document.getElementById('modalClearBtn').style.visibility = count ? 'visible' : 'hidden';
+  const addBtn = document.getElementById('modalAddBtn');
+  addBtn.textContent = count ? `Add ${count} outlet${count > 1 ? 's' : ''}` : 'Add outlets';
+  addBtn.disabled = count === 0;
+
+  if (!count) { selList.innerHTML = ''; selList.appendChild(empty); empty.style.display = 'flex'; return; }
+  empty.style.display = 'none';
+  selList.innerHTML = OUTLETS.filter(o => pendingAdd.has(o.id)).map(o => `
+    <div class="picker-sel-item">
+      <div class="picker-sel-info">
+        <div class="picker-sel-name">${o.name}</div>
+        <div class="picker-sel-company">${o.company}</div>
+      </div>
+      <button class="picker-remove" onclick="removePending(${o.id})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function togglePending(id) { pendingAdd.has(id) ? pendingAdd.delete(id) : pendingAdd.add(id); renderPickerList(); renderPickerSelected(); }
+function removePending(id) { pendingAdd.delete(id); renderPickerList(); renderPickerSelected(); }
+function selectAllVisible() { (getPickerVisible()||[]).forEach(o => pendingAdd.add(o.id)); renderPickerList(); renderPickerSelected(); }
+function clearPending() { pendingAdd.clear(); renderPickerList(); renderPickerSelected(); }
+
+function openPickerModal() {
+  pendingAdd.clear();
+  document.getElementById('modalSearch').value = '';
+  document.getElementById('modalCompanyFilter').value = '';
+  renderPickerList(); renderPickerSelected();
+  document.getElementById('pickerModal').classList.add('open');
+  document.getElementById('modalSearch').focus();
+}
+function closePickerModal() { document.getElementById('pickerModal').classList.remove('open'); }
+function confirmAddOutlets() { pendingAdd.forEach(id => currentGroup.add(id)); pendingAdd.clear(); renderOutlets(); closePickerModal(); }
+
+// ── Remove ─────────────────────────────────────────────────
+function openConfirm(id, name) {
+  document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
+  pendingRemoveId = id;
+  document.getElementById('confirmOutletName').textContent = name;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm() { pendingRemoveId = null; document.getElementById('confirmOverlay').classList.remove('open'); }
+function confirmRemove() { if (pendingRemoveId !== null) { currentGroup.delete(pendingRemoveId); renderOutlets(); } closeConfirm(); }
+
+function openDeleteGroup() { document.getElementById('deleteGroupOverlay').classList.add('open'); }
+function closeDeleteGroup() { document.getElementById('deleteGroupOverlay').classList.remove('open'); }
+function confirmDeleteGroup() { window.location.href = 'ZM Admin - Buyers.html'; }
+
+// ── Global ─────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  if (!e.target.closest('.row-actions-wrap')) document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
+  if (!e.target.closest('.user-wrap')) document.getElementById('userMenu').classList.remove('open');
+});
+document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userMenu').classList.toggle('open'); });
+document.getElementById('pickerModal').addEventListener('click', e => { if (e.target === document.getElementById('pickerModal')) closePickerModal(); });
+document.getElementById('settingsModal').addEventListener('click', e => { if (e.target === document.getElementById('settingsModal')) closeSettings(); });
+document.getElementById('confirmOverlay').addEventListener('click', e => { if (e.target === document.getElementById('confirmOverlay')) closeConfirm(); });
+document.getElementById('deleteGroupOverlay').addEventListener('click', e => { if (e.target === document.getElementById('deleteGroupOverlay')) closeDeleteGroup(); });
+
+// ── Settings dialog ────────────────────────────────────────
+function openSettings() { document.getElementById('settingsModal').classList.add('open'); }
+function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
+function saveSettings() { closeSettings(); }
+
+// ── Tabs ───────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+  });
+});
+
+document.getElementById('modalClearBtn').style.visibility = 'hidden';
+renderOutlets();
+renderItems();
+renderMiniSuppliers();
+renderSuppliers();
+renderStatsStrip();
+document.getElementById('itemModal').addEventListener('click', e => { if (e.target === document.getElementById('itemModal')) closeItemModal(); });
+document.getElementById('manageModal').addEventListener('click', e => { if (e.target === document.getElementById('manageModal')) closeManageModal(); });
+</script>
+</body>
+</html>

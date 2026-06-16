@@ -430,6 +430,12 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- ZM Admin — Chargrill Outlets · Settings: ZM Admin - Outlet Group Settings.html
+- ZM Admin — Garden Cuisine HQ: ZM Admin - HQ Settings.html
+- ZM Admin — Chargrill Outlets: ZM Admin - Edit Outlet Group.html
+- ZM Admin — Edit HQ: ZM Admin - Edit HQ.html
+- ZM Admin — Create Outlet: ZM Admin - Create Outlet.html
+- ZM Admin — Create HQ: ZM Admin - Create HQ.html
 - ZM Admin — Create Outlet Group: ZM Admin - Create Outlet Group.html
 - ZM Admin — Buyers: ZM Admin - Buyers.html
 - Log in — Nomni Supply: Supply - Login.html

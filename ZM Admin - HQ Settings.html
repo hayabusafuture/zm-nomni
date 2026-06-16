@@ -1,0 +1,1499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ZM Admin — Garden Cuisine HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+:root {
+  --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
+  --ink: #1a1f2b; --ink-2: #4a4f5a; --ink-mute: #8a8f98; --ink-soft: #c7c9cf;
+  --rule: #e7e8ec; --row-hover: #f7f8fa; --primary: #2AC864;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; background: #fff; }
+.app { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+/* Topbar */
+.topbar { grid-column: 1/-1; grid-row: 1; background: #1F2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-right { display: flex; align-items: center; gap: 4px; }
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-logo-img { height: 26px; }
+.brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+.topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+.user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+.chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+.help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+.help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+.user-wrap { position: relative; }
+.user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+.user-menu.open { display: block; }
+.user-menu-header { padding: 14px 16px 12px; }
+.user-menu-name { font-size: 14px; font-weight: 600; }
+.user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+.user-menu-divider { height: 1px; background: var(--rule); }
+.user-menu-section { padding: 6px 0; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; }
+.user-menu-item:hover { background: #f3f4f6; }
+.user-menu-item.logout { color: #e53535; }
+
+/* Sidebar */
+.sidebar { grid-column: 1; grid-row: 2; background: var(--seaweed); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+.nav { padding: 8px 0; flex: 1; }
+.nav a { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: rgba(255,255,255,.55); text-decoration: none; font-size: 13px; font-weight: 400; transition: background .15s, color .15s; border-left: 2px solid transparent; white-space: nowrap; }
+.nav a svg { flex-shrink: 0; color: rgba(255,255,255,.3); transition: color .15s; }
+.nav a:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
+.nav a:hover svg { color: rgba(255,255,255,.6); }
+.nav a.active { color: #fff; background: rgba(42,200,100,.12); border-left-color: var(--nomni-green); font-weight: 500; padding-left: 14px; }
+.nav a.active svg { color: var(--nomni-green); }
+.nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* Main */
+.main { grid-column: 2; grid-row: 2; padding: 28px 40px 80px; min-width: 0; background: #fff; }
+
+/* Back link */
+.back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; margin-bottom: 14px; }
+.back-link:hover { color: var(--seaweed); }
+
+/* Page head */
+.page-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; gap: 16px; }
+.page-title-wrap { display: flex; align-items: center; gap: 10px; }
+.page-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+.page-meta { font-size: 13px; color: var(--ink-mute); margin-bottom: 24px; }
+.head-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-top: 3px; }
+
+/* Status chips */
+.chip { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 4px; padding: 3px 10px; }
+.chip-active { background: #D9F5E4; color: #1A8040; }
+.chip-inactive { background: #F0F0F2; color: #555555; }
+
+/* Buttons */
+.btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
+.btn-primary:hover { background: #22b055; }
+.btn-outline { background: none; border: 1px solid #d0d2d8; color: var(--ink); border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .13s; }
+.btn-outline:hover { background: #f3f4f6; }
+.btn-ghost-danger { background: none; border: none; color: #c02020; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 12px; cursor: pointer; border-radius: 6px; transition: background .13s; }
+.btn-ghost-danger:hover { background: #fff0f0; }
+
+/* Stats strip */
+.stats-strip { display: flex; gap: 10px; margin-bottom: 32px; }
+.stat-chip { flex: 1; display: flex; align-items: center; gap: 14px; background: #F7F8FA; border: 1px solid #EEEFF2; border-radius: 10px; padding: 16px 20px; }
+.stat-chip-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stat-chip-num { font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.03em; line-height: 1.1; }
+.stat-chip-label { font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px; }
+
+/* Tabs */
+.tabs { display: flex; border-bottom: 1px solid var(--rule); margin-bottom: 28px; }
+.tab { position: relative; padding: 12px 18px 14px; color: var(--ink-mute); font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; user-select: none; transition: color .13s; }
+.tab.active { color: var(--ink); }
+.tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--nomni-green); border-radius: 2px; }
+.tab:first-child { padding-left: 0; }
+.tab:hover:not(.active) { color: var(--ink); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Panel label row */
+.panel-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.panel-label-text { font-size: 21px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
+.panel-label-count { font-size: 14px; font-weight: 400; color: var(--ink-mute); }
+
+/* Overview two-column layout */
+.overview-grid { display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: start; }
+
+/* Module cards */
+.module-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.module-cards { display: flex; flex-direction: column; gap: 14px; }
+.module-card { border: 1px solid var(--rule); border-radius: 10px; overflow: clip; }
+.module-card-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--rule); }
+.module-card-head-text { flex: 1; min-width: 0; }
+.module-card-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+.module-card-master { font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.03em; margin-top: 2px; line-height: 1.1; }
+.module-card-master-sub { font-size: 11px; color: var(--ink-mute); margin-top: 1px; }
+.module-card-link { font-size: 12px; font-weight: 600; color: var(--spinach); text-decoration: none; white-space: nowrap; flex-shrink: 0; align-self: flex-start; margin-top: 2px; }
+.module-card-link:hover { text-decoration: underline; }
+.module-card-rows { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 10px; background: #fafafa; }
+.module-card-row { display: flex; align-items: center; gap: 10px; }
+.module-card-group { font-size: 12px; color: var(--ink); font-weight: 500; width: 130px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-wrap { flex: 1; height: 5px; background: #e7e8ec; border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+.module-card-count { font-size: 11px; color: var(--ink-mute); width: 56px; text-align: right; flex-shrink: 0; }
+.module-card-count .diff { color: var(--spinach); font-weight: 600; }
+.module-card-empty { padding: 14px 16px; font-size: 13px; color: var(--ink-soft); font-style: italic; background: #fafafa; }
+
+/* Activity feed */
+.activity-feed { border: 1px solid var(--rule); border-radius: 10px; overflow: clip; }
+.activity-item { display: flex; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--rule); align-items: flex-start; }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.activity-body { flex: 1; min-width: 0; }
+.activity-text { font-size: 13px; color: var(--ink); line-height: 1.4; }
+.activity-text strong { font-weight: 600; }
+.activity-time { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+
+/* Info card */
+.info-card { border: 1px solid var(--rule); border-radius: 10px; padding: 0 18px; }
+.info-row { display: flex; flex-direction: column; gap: 2px; padding: 11px 0; border-bottom: 1px solid var(--rule); }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; }
+.info-val { font-size: 13px; font-weight: 500; color: var(--ink); margin-top: 2px; line-height: 1.4; }
+.info-val a { color: var(--spinach); text-decoration: none; }
+.info-val a:hover { text-decoration: underline; }
+
+/* Outlet groups table */
+.og-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.og-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 10px 14px; background: #fff; white-space: nowrap; position: sticky; top: 56px; z-index: 2; box-shadow: 0 1px 0 var(--rule), 0 -1px 0 var(--rule); }
+.og-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.og-table tbody tr:last-child td { border-bottom: none; }
+.og-table tbody tr:nth-child(even) td { background: #f9fafb; }
+.og-table tbody tr:hover td { background: var(--row-hover) !important; }
+.og-name { font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none; }
+.og-name:hover { color: var(--spinach); text-decoration: underline; }
+.og-expand-btn { background: none; border: none; cursor: pointer; padding: 0; display: inline-flex; align-items: center; color: var(--ink-mute); transition: color .13s; flex-shrink: 0; margin-right: 6px; }
+.og-expand-btn:hover { color: var(--ink); }
+.og-expand-btn svg { transition: transform .18s; }
+.og-expand-btn.open svg { transform: rotate(90deg); }
+.og-name-cell { display: flex; align-items: center; }
+.og-outlet-sub-row { display: none; }
+.og-outlet-sub-row.open { display: table-row; }
+.og-outlet-sub-row td { background: #f7f8fa !important; padding: 0 14px 0 36px !important; }
+.outlet-list { max-height: 180px; overflow-y: auto; padding: 10px 0 12px; display: flex; flex-direction: column; gap: 1px; }
+.outlet-list-item { font-size: 13px; color: var(--ink); padding: 5px 8px; border-radius: 4px; }
+.outlet-list-item:hover { background: #eef0f3; }
+.og-count { font-weight: 600; color: var(--ink); }
+
+/* Market list filter row */
+.ml-filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.ml-search-wrap { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; min-width: 220px; }
+.ml-search-wrap:focus-within { border-color: var(--nomni-green); }
+.ml-search-input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
+.ml-search-input::placeholder { color: var(--ink-mute); }
+.ml-filter-select { height: 36px; padding: 0 28px 0 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 13px; color: var(--ink); background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; appearance: none; outline: none; cursor: pointer; }
+.ml-filter-select:focus { border-color: var(--nomni-green); }
+.ml-filter-right { margin-left: auto; }
+
+/* Market list table */
+.ml-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.ml-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 10px 14px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fff; white-space: nowrap; position: sticky; top: 56px; z-index: 2; box-shadow: 0 1px 0 var(--rule); border-top: none; border-bottom: none; }
+.ml-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.ml-table tbody tr:last-child td { border-bottom: none; }
+.ml-table tbody tr:nth-child(even) td { background: #f9fafb; }
+.ml-table tbody tr:hover td { background: var(--row-hover) !important; }
+.ml-item-name { font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
+.ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #f0f1f3; border-radius: 4px; padding: 1px 7px; margin-top: 3px; }
+.uom-text { font-size: 13px; color: var(--ink); }
+.uom-options-btn { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: inherit; transition: background .12s; margin-top: 2px; }
+.uom-options-btn:hover { background: #c6f2ce; }
+
+/* Sort headers */
+.sort-th { cursor: pointer; user-select: none; transition: background .1s; }
+.sort-th:hover { background: #f3f4f6; }
+.sort-ind::after { content: ' ⇅'; font-size: 10px; opacity: 0.3; }
+.sort-th.sort-asc .sort-ind::after { content: ' ↑'; opacity: 1; color: var(--spinach); }
+.sort-th.sort-desc .sort-ind::after { content: ' ↓'; opacity: 1; color: var(--spinach); }
+
+/* Pagination */
+.ml-pager-wrap { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--rule); }
+.pager-info { font-size: 12px; color: var(--ink-mute); }
+.pager-btns { display: flex; align-items: center; gap: 3px; }
+.pager-btn { min-width: 28px; height: 28px; padding: 0 6px; border-radius: 5px; border: 1px solid var(--rule); background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--ink); font-family: inherit; transition: background .1s; }
+.pager-btn:hover:not([disabled]) { background: var(--row-hover); }
+.pager-btn.active { background: var(--seaweed); color: #fff; border-color: var(--seaweed); }
+.pager-btn[disabled] { opacity: 0.35; cursor: default; }
+
+/* Row actions */
+.row-actions-wrap { position: relative; display: inline-block; }
+.btn-row-actions { background: none; border: none; color: var(--ink-mute); cursor: pointer; padding: 4px 8px; border-radius: 4px; font-size: 18px; line-height: 1; letter-spacing: 1px; display: flex; align-items: center; transition: background .1s, color .1s; }
+.btn-row-actions:hover { background: #f0f1f3; color: var(--ink); }
+.row-actions-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 300; overflow: hidden; min-width: 160px; }
+.row-actions-menu.open { display: block; }
+.row-action-item { padding: 10px 16px; font-size: 13px; color: var(--ink); cursor: pointer; transition: background .1s; white-space: nowrap; }
+.row-action-item:hover { background: var(--mint); }
+.row-action-item.danger { color: #D0291E; }
+.row-action-item.danger:hover { background: #FDD6DC; }
+
+/* UOM modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: center; justify-content: center; padding: 24px; }
+.modal-overlay.open { display: flex; }
+.modal-card { background: #fff; border-radius: 12px; width: 520px; max-width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,.22); overflow: hidden; }
+.modal-header { padding: 18px 24px; border-bottom: 1px solid var(--rule); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.modal-title { font-size: 16px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+.modal-close { background: none; border: none; cursor: pointer; color: var(--ink-mute); padding: 4px; border-radius: 4px; display: flex; align-items: center; transition: color .13s; flex-shrink: 0; }
+.modal-close:hover { color: var(--ink); }
+.modal-body { padding: 20px 24px; }
+.uom-breakdown-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.uom-breakdown-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; padding: 8px 14px; background: #f9fafb; border-bottom: 1px solid var(--rule); }
+.uom-breakdown-table td { padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.uom-breakdown-table tr:last-child td { border-bottom: none; }
+
+/* Placeholder */
+.placeholder-panel { border: 1.5px dashed var(--rule); border-radius: 10px; padding: 56px 24px; text-align: center; }
+.placeholder-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.placeholder-desc { font-size: 13px; color: var(--ink-mute); line-height: 1.5; }
+
+/* Info banner */
+.info-banner { background: var(--mint); border: 1px solid #B9F0C5; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--seaweed); margin-bottom: 16px; }
+.info-banner a { color: var(--spinach); font-weight: 600; }
+
+/* Responsive */
+@media (max-width: 1280px) {
+  .app { grid-template-columns: 56px 1fr; }
+  .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+  .sidebar:hover { width: 220px; box-shadow: 2px 0 16px rgba(0,0,0,.25); }
+  .nav a span { display: none; }
+  .sidebar:hover .nav a span { display: inline; }
+  .overview-grid { grid-template-columns: 1fr; }
+}
+.act-filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.act-entry { display: flex; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--rule); align-items: flex-start; }
+.act-entry:last-child { border-bottom: none; }
+.act-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.act-body { flex: 1; min-width: 0; }
+.act-text { font-size: 13px; color: var(--ink); line-height: 1.5; }
+.act-text strong { font-weight: 600; }
+.act-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; flex-wrap: wrap; }
+.act-time { font-size: 11px; color: var(--ink-mute); }
+.act-module-tag { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 3px; padding: 1px 6px; }
+.act-scope-tag { font-size: 11px; color: var(--ink-mute); background: #f0f1f3; border-radius: 4px; padding: 1px 7px; }
+.act-user { font-size: 11px; color: var(--ink-mute); }
+.act-empty { padding: 48px 16px; text-align: center; font-size: 13px; color: var(--ink-mute); }
+.act-entry-link { cursor: pointer; transition: background .12s; }
+.act-entry-link:hover { background: var(--row-hover); }
+.act-date-input { height: 36px; padding: 0 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 13px; color: var(--ink); background: #fff; outline: none; cursor: pointer; }
+.act-date-input:focus { border-color: var(--nomni-green); }
+.act-date-sep { font-size: 12px; color: var(--ink-mute); flex-shrink: 0; }
+.act-custom-range { display: none; align-items: center; gap: 6px; }
+.act-custom-range.visible { display: flex; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="topbar-avt">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item">Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span>Orders</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg><span>Invoices</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg><span>Reports</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><span>Promotions</span></a>
+      <a href="ZM Admin - Buyers.html" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Buyers</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg><span>Suppliers</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>Notifications</span><span class="badge">4</span></a>
+      <a href="ZM Admin - Buyer User.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Users</span></a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <a href="ZM Admin - Buyers.html#outlet-groups" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      HQ &amp; Outlet groups
+    </a>
+
+    <div class="page-head">
+      <div>
+        <div class="page-title-wrap">
+          <h1 class="page-title">Garden Cuisine HQ</h1>
+          <span class="chip chip-active">Active</span>
+        </div>
+      </div>
+      <div class="head-actions">
+        <button class="btn-ghost-danger">Disable HQ</button>
+        <button class="btn-outline" onclick="window.location.href='ZM Admin - Edit HQ.html'">Edit details</button>
+      </div>
+    </div>
+    <div class="page-meta">Garden Cuisine Pte Ltd &nbsp;·&nbsp; Created 05 Sep 2019 &nbsp;·&nbsp; Last updated 10 Jun 2026</div>
+
+    <div class="stats-strip" id="statsStrip"></div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="overview">Overview</div>
+      <div class="tab" data-tab="outlet-groups">Outlet Groups</div>
+      <div class="tab" data-tab="market-list">Market List</div>
+      <div class="tab" data-tab="recipes">Recipes</div>
+      <div class="tab" data-tab="users">Users</div>
+      <div class="tab" data-tab="suppliers">Suppliers</div>
+      <div class="tab" data-tab="settings">Settings</div>
+      <div class="tab" data-tab="activity">Activity</div>
+    </div>
+
+    <!-- ── Overview ── -->
+    <div class="tab-panel active" id="panel-overview">
+      <div class="overview-grid">
+        <div>
+          <div class="panel-label-row">
+            <span class="panel-label-text">Data overview</span>
+          </div>
+          <div class="module-cards">
+
+            <!-- Market List -->
+            <div class="module-card">
+              <div class="module-card-head">
+                <div class="module-icon" style="background:#E2FFE6;color:#1A8040"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></div>
+                <div class="module-card-head-text">
+                  <div class="module-card-title">Market List</div>
+                  <div class="module-card-master">100 <span style="font-size:13px;font-weight:400;color:var(--ink-mute)">items</span></div>
+                  <div class="module-card-master-sub">14 suppliers</div>
+                </div>
+                <a class="module-card-link" onclick="document.querySelector('.tab[data-tab=market-list]').click();return false;" href="#">View →</a>
+              </div>
+              <div class="module-card-rows">
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill Outlets</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#2AC864"></div></div>
+                  <span class="module-card-count">100 / 100</span>
+                </div>
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill Takeaway</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:87%;background:#2AC864"></div></div>
+                  <span class="module-card-count"><span class="diff">87</span> / 100</span>
+                </div>
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill VIP</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:45%;background:#2AC864"></div></div>
+                  <span class="module-card-count"><span class="diff">45</span> / 100</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inventory -->
+            <div class="module-card">
+              <div class="module-card-head">
+                <div class="module-icon" style="background:#EFF6FF;color:#2563EB"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+                <div class="module-card-head-text">
+                  <div class="module-card-title">Inventory</div>
+                  <div class="module-card-master">100 <span style="font-size:13px;font-weight:400;color:var(--ink-mute)">items tracked</span></div>
+                  <div class="module-card-master-sub">Par levels set per outlet</div>
+                </div>
+              </div>
+              <div class="module-card-rows">
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill Outlets</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#2563EB"></div></div>
+                  <span class="module-card-count">4 outlets</span>
+                </div>
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill Takeaway</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#2563EB"></div></div>
+                  <span class="module-card-count">2 outlets</span>
+                </div>
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill VIP</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#2563EB"></div></div>
+                  <span class="module-card-count">1 outlet</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recipes -->
+            <div class="module-card">
+              <div class="module-card-head">
+                <div class="module-icon" style="background:#FEF3C7;color:#D97706"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                <div class="module-card-head-text">
+                  <div class="module-card-title">Recipes</div>
+                  <div class="module-card-master">48 <span style="font-size:13px;font-weight:400;color:var(--ink-mute)">recipes</span></div>
+                  <div class="module-card-master-sub">In master library</div>
+                </div>
+                <a class="module-card-link" onclick="document.querySelector('.tab[data-tab=recipes]').click();return false;" href="#">View →</a>
+              </div>
+              <div class="module-card-rows">
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill Outlets</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#D97706"></div></div>
+                  <span class="module-card-count">48 / 48</span>
+                </div>
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill Takeaway</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:79%;background:#D97706"></div></div>
+                  <span class="module-card-count"><span class="diff">38</span> / 48</span>
+                </div>
+                <div class="module-card-row">
+                  <span class="module-card-group">Chargrill VIP</span>
+                  <div class="bar-wrap"><div class="bar-fill" style="width:46%;background:#D97706"></div></div>
+                  <span class="module-card-count"><span class="diff">22</span> / 48</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- POS Mapping -->
+            <div class="module-card">
+              <div class="module-card-head">
+                <div class="module-icon" style="background:#F3F0FF;color:#6c4df2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+                <div class="module-card-head-text">
+                  <div class="module-card-title">POS Mapping</div>
+                  <div class="module-card-master" style="font-size:13px;font-weight:400;color:var(--ink-soft);margin-top:3px">Not connected</div>
+                </div>
+                <a class="module-card-link" href="#">Set up →</a>
+              </div>
+              <div class="module-card-empty">Connect Nomni POS to map menu items to recipes across all outlets.</div>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <div>
+            <div class="panel-label-row">
+              <span class="panel-label-text">HQ Info</span>
+            </div>
+            <div class="info-card">
+              <div class="info-row">
+                <div class="info-label">Company</div>
+                <div class="info-val">Garden Cuisine Pte Ltd</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Created</div>
+                <div class="info-val">05 Sep 2019</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Last updated</div>
+                <div class="info-val">10 Jun 2026</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel-label-row">
+              <span class="panel-label-text">Recent activity</span>
+              <button onclick="navigateToTab('activity')" style="font-size:13px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View all →</button>
+            </div>
+            <div class="activity-feed">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#2AC864"></div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>3 items added</strong> to master market list</div>
+                  <div class="activity-time">10 Jun 2026 · William Arya</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#2AC864"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Chargrill VIP market list <strong>updated</strong> — 45 items</div>
+                  <div class="activity-time">08 Jun 2026 · James Tan</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#D97706"></div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>Char Siu Chicken</strong> recipe added to master library</div>
+                  <div class="activity-time">05 Jun 2026 · William Arya</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#2563EB"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Chargrill Takeaway market list <strong>updated</strong> — 87 items</div>
+                  <div class="activity-time">03 Jun 2026 · James Tan</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#8a8f98"></div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>Chargrill VIP</strong> outlet group created</div>
+                  <div class="activity-time">15 Jan 2026 · William Arya</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Outlet Groups ── -->
+    <div class="tab-panel" id="panel-outlet-groups">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Outlet Groups <span class="panel-label-count">3</span></span>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          New group
+        </button>
+      </div>
+      <div style="overflow:clip">
+      <table class="og-table">
+        <thead>
+          <tr>
+            <th>Group</th>
+            <th style="width:80px;text-align:center">Outlets</th>
+            <th style="width:80px;text-align:center">Items</th>
+            <th style="width:90px;text-align:center">Suppliers</th>
+            <th style="width:130px">Last updated</th>
+            <th style="width:90px">Status</th>
+            <th style="width:48px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="og-name-cell">
+                <button class="og-expand-btn" onclick="toggleOgExpand(this,'og-sub-1')">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <a href="ZM Admin - Edit Outlet Group.html" class="og-name">Chargrill Outlets</a>
+              </div>
+            </td>
+            <td style="text-align:center"><span class="og-count">4</span></td>
+            <td style="text-align:center"><span class="og-count">100</span></td>
+            <td style="text-align:center"><span class="og-count">14</span></td>
+            <td style="color:var(--ink-mute)">10 Jun 2026</td>
+            <td><span class="chip chip-active">Active</span></td>
+            <td>
+              <div class="row-actions-wrap">
+                <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>
+                <div class="row-actions-menu">
+                  <div class="row-action-item" onclick="location.href='ZM Admin - Edit Outlet Group.html'">Edit group</div>
+                  <div class="row-action-item" onclick="location.href='ZM Admin - Outlet Group Settings.html'">Settings</div>
+                  <div class="row-action-item danger">Disable group</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr class="og-outlet-sub-row" id="og-sub-1">
+            <td colspan="7">
+              <div class="outlet-list">
+                <div class="outlet-list-item">(WF 301) Chargrill @ 301 Punggol</div>
+                <div class="outlet-list-item">(WF 107) Chargrill @ 107 Serangoon</div>
+                <div class="outlet-list-item">(WF 259) Chargrill @ 259 Bukit Panjang</div>
+                <div class="outlet-list-item">(WF 280) Chargrill @ 280 Bishan</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="og-name-cell">
+                <button class="og-expand-btn" onclick="toggleOgExpand(this,'og-sub-2')">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <a href="#" class="og-name">Chargrill Takeaway</a>
+              </div>
+            </td>
+            <td style="text-align:center"><span class="og-count">2</span></td>
+            <td style="text-align:center"><span class="og-count">87</span></td>
+            <td style="text-align:center"><span class="og-count">11</span></td>
+            <td style="color:var(--ink-mute)">03 Jun 2026</td>
+            <td><span class="chip chip-active">Active</span></td>
+            <td>
+              <div class="row-actions-wrap">
+                <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>
+                <div class="row-actions-menu">
+                  <div class="row-action-item">Edit group</div>
+                  <div class="row-action-item">Settings</div>
+                  <div class="row-action-item danger">Disable group</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr class="og-outlet-sub-row" id="og-sub-2">
+            <td colspan="7">
+              <div class="outlet-list">
+                <div class="outlet-list-item">(WF 139) Chargrill @ 139 Tampines</div>
+                <div class="outlet-list-item">(WF 290) Garden Express @ 290 Sengkang</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="og-name-cell">
+                <button class="og-expand-btn" onclick="toggleOgExpand(this,'og-sub-3')">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+                <a href="#" class="og-name">Chargrill VIP</a>
+              </div>
+            </td>
+            <td style="text-align:center"><span class="og-count">1</span></td>
+            <td style="text-align:center"><span class="og-count">45</span></td>
+            <td style="text-align:center"><span class="og-count">8</span></td>
+            <td style="color:var(--ink-mute)">15 Jan 2026</td>
+            <td><span class="chip chip-active">Active</span></td>
+            <td>
+              <div class="row-actions-wrap">
+                <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>
+                <div class="row-actions-menu">
+                  <div class="row-action-item">Edit group</div>
+                  <div class="row-action-item">Settings</div>
+                  <div class="row-action-item danger">Disable group</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr class="og-outlet-sub-row" id="og-sub-3">
+            <td colspan="7">
+              <div class="outlet-list">
+                <div class="outlet-list-item">(WF 001) Chargrill VIP @ Marina Bay Sands</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- ── Market List ── -->
+    <div class="tab-panel" id="panel-market-list">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Master Market List <span class="panel-label-count" id="mlCount"></span></span>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add item
+        </button>
+      </div>
+      <div class="ml-filter-row">
+        <div class="ml-search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="ml-search-input" id="mlSearch" placeholder="Search items or suppliers…" oninput="setMlSearch(this.value)" />
+        </div>
+        <select class="ml-filter-select" id="mlCatFilter" onchange="setMlCatFilter(this.value)">
+          <option value="">All categories</option>
+          <option>Poultry</option><option>Beef</option><option>Pork</option><option>Lamb</option>
+          <option>Seafood</option><option>Produce</option><option>Dry Goods</option><option>Sauces</option>
+          <option>Dairy &amp; Eggs</option><option>Frozen</option><option>Beverages</option><option>Supplies</option>
+        </select>
+        <select class="ml-filter-select" id="mlSupplierFilter" onchange="setMlSupplierFilter(this.value)">
+          <option value="">All suppliers</option>
+        </select>
+        <select class="ml-filter-select" id="mlStatusFilter" onchange="setMlStatusFilter(this.value)">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div style="overflow:clip">
+        <table class="ml-table">
+          <thead>
+            <tr>
+              <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">Item name <span class="sort-ind"></span></th>
+              <th style="width:160px">Supplier</th>
+              <th class="sort-th" id="mlSortTh-price" onclick="setMlSort('price')" style="width:160px">UOM / Price <span class="sort-ind"></span></th>
+              <th style="width:120px">Outlet groups</th>
+              <th style="width:90px">Status</th>
+              <th style="width:48px"></th>
+            </tr>
+          </thead>
+          <tbody id="mlBody"></tbody>
+        </table>
+        <div id="mlPager" class="ml-pager-wrap"></div>
+      </div>
+    </div>
+
+    <!-- ── Recipes ── -->
+    <div class="tab-panel" id="panel-recipes">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Master Recipe Library <span class="panel-label-count" id="recCount"></span></span>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add recipe
+        </button>
+      </div>
+      <div class="ml-filter-row">
+        <div class="ml-search-wrap" style="min-width:220px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="ml-search-input" id="recSearch" placeholder="Search recipes…" oninput="setRecSearch(this.value)" />
+        </div>
+        <select class="ml-filter-select" id="recCatFilter" onchange="setRecCatFilter(this.value)">
+          <option value="">All categories</option>
+          <option>Mains</option>
+          <option>Starters</option>
+          <option>Sides</option>
+          <option>Sauces &amp; Marinades</option>
+          <option>Desserts</option>
+          <option>Beverages</option>
+        </select>
+        <select class="ml-filter-select" id="recStatusFilter" onchange="setRecStatusFilter(this.value)">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div style="overflow:clip">
+        <table class="ml-table">
+          <thead>
+            <tr>
+              <th class="sort-th" id="recSortTh-name" onclick="setRecSort('name')">Recipe <span class="sort-ind"></span></th>
+              <th style="width:120px">Portions</th>
+              <th class="sort-th" id="recSortTh-cost" onclick="setRecSort('cost')" style="width:130px">Food cost / portion <span class="sort-ind"></span></th>
+              <th style="width:120px">Outlet groups</th>
+              <th style="width:90px">Status</th>
+              <th style="width:48px"></th>
+            </tr>
+          </thead>
+          <tbody id="recBody"></tbody>
+        </table>
+        <div id="recPager" class="ml-pager-wrap"></div>
+      </div>
+    </div>
+
+    <!-- ── Users (placeholder) ── -->
+    <div class="tab-panel" id="panel-users">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Users <span class="panel-label-count">3</span></span>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add user
+        </button>
+      </div>
+      <div class="placeholder-panel">
+        <div class="placeholder-title">User management coming soon</div>
+        <div class="placeholder-desc">HQ Admin accounts provisioned for Garden Cuisine HQ will appear here.</div>
+      </div>
+    </div>
+
+    <!-- ── Suppliers (placeholder) ── -->
+    <div class="tab-panel" id="panel-suppliers">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Suppliers <span class="panel-label-count">14</span></span>
+      </div>
+      <div class="info-banner">
+        Suppliers are linked to this HQ by the Nomni team. Contact <a href="mailto:support@nomni.co">support@nomni.co</a> to add or remove a supplier.
+      </div>
+      <div class="placeholder-panel">
+        <div class="placeholder-title">Supplier list coming soon</div>
+        <div class="placeholder-desc">All suppliers linked to Garden Cuisine HQ will appear here.</div>
+      </div>
+    </div>
+
+    <!-- ── Settings (placeholder) ── -->
+    <div class="tab-panel" id="panel-settings">
+      <div class="placeholder-panel">
+        <div class="placeholder-title">Settings coming soon</div>
+        <div class="placeholder-desc">HQ-level configuration options will appear here.</div>
+      </div>
+    </div>
+
+    <!-- ── Activity ── -->
+    <div class="tab-panel" id="panel-activity">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Activity log</span>
+      </div>
+      <div class="act-filter-row">
+        <div class="ml-search-wrap" style="min-width:200px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="ml-search-input" id="actSearch" placeholder="Search activity…" oninput="renderActivity()" />
+        </div>
+        <select class="ml-filter-select" id="actModuleFilter" onchange="renderActivity()">
+          <option value="">All modules</option>
+          <option value="market-list">Market List</option>
+          <option value="recipes">Recipes</option>
+          <option value="inventory">Inventory</option>
+          <option value="outlet-groups">Outlet Groups</option>
+          <option value="hq">HQ</option>
+        </select>
+        <select class="ml-filter-select" id="actUserFilter" onchange="renderActivity()">
+          <option value="">All users</option>
+          <option>William Arya</option>
+          <option>James Tan</option>
+        </select>
+        <select class="ml-filter-select" id="actScopeFilter" onchange="renderActivity()">
+          <option value="">All scopes</option>
+          <option>Master</option>
+          <option>Chargrill Outlets</option>
+          <option>Chargrill Takeaway</option>
+          <option>Chargrill VIP</option>
+        </select>
+        <select class="ml-filter-select" id="actRangePreset" onchange="onActRangeChange()">
+          <option value="90">Last 90 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="180">Last 6 months</option>
+          <option value="365">Last year</option>
+          <option value="0">All time</option>
+          <option value="custom">Custom…</option>
+        </select>
+        <div class="act-custom-range" id="actCustomRange">
+          <input type="date" class="act-date-input" id="actDateFrom" onchange="renderActivity()" />
+          <span class="act-date-sep">→</span>
+          <input type="date" class="act-date-input" id="actDateTo" onchange="renderActivity()" />
+        </div>
+      </div>
+      <div class="activity-feed" id="actFeed"></div>
+      <div id="actPager" class="ml-pager-wrap"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- UOM modal -->
+<div class="modal-overlay" id="uomModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div style="flex:1;min-width:0">
+        <div class="modal-title" id="uomModalTitle"></div>
+        <div style="font-size:12px;color:var(--ink-mute);margin-top:4px" id="uomModalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeUomModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <table class="uom-breakdown-table">
+        <thead><tr><th>UOM</th><th>Unit price</th></tr></thead>
+        <tbody id="uomBreakdownBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    const p = document.getElementById('panel-' + tab.dataset.tab);
+    if (p) p.classList.add('active');
+  });
+});
+
+// User menu
+document.getElementById('userMenuBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('userMenu').classList.toggle('open');
+});
+document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+// Row actions
+function toggleRowActions(btn) {
+  const menu = btn.nextElementSibling;
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
+  if (!isOpen) menu.classList.add('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('[data-actions-btn]'))
+    document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
+});
+
+// Stats strip
+(function() {
+  const strip = document.getElementById('statsStrip');
+  const sc = (icon, num, label, bg, col) =>
+    '<div class="stat-chip"><div class="stat-chip-icon" style="background:' + bg + ';color:' + col + '">' + icon + '</div>' +
+    '<div><div class="stat-chip-num">' + num + '</div><div class="stat-chip-label">' + label + '</div></div></div>';
+  strip.innerHTML =
+    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', 7, 'Outlets', '#E2FFE6', '#1A8040') +
+    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>', 3, 'Groups', '#EFF6FF', '#2563EB') +
+    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', 3, 'Users', '#F3F0FF', '#6c4df2') +
+    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg>', 14, 'Suppliers', '#FEF3C7', '#D97706');
+})();
+
+// Items data
+const ITEMS = [
+  { name: "Chilled Chicken Thigh Fillet Skinless Boneless IVP 500g", cat: "Poultry", supplier: "Kee Song Group", price: 7.50, uom: "per kg" },
+  { name: "Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray", cat: "Poultry", supplier: "Kee Song Group", price: 8.20, uom: ["per kg", "per tray"] },
+  { name: "Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack", cat: "Poultry", supplier: "Kee Song Group", price: 4.80, uom: "per kg" },
+  { name: "Chilled Chicken Drumstick Grade A Fresh 1kg Pack", cat: "Poultry", supplier: "Kee Song Group", price: 4.50, uom: "per kg" },
+  { name: "Chilled Chicken Liver Fresh Singapore Standard Grade 500g", cat: "Poultry", supplier: "Kee Song Group", price: 3.20, uom: "per kg" },
+  { name: "Chilled Boneless Duck Breast with Skin French Origin 200g Each", cat: "Poultry", supplier: "Kee Song Group", price: 18.00, uom: "per pc" },
+  { name: "Chilled Whole Quail Farm Fresh Halal Certified 500g", cat: "Poultry", supplier: "Sustenir Agriculture", price: 6.50, uom: "per pc" },
+  { name: "Chilled Chicken Mince 80/20 Lean-to-Fat Ratio 1kg Vacuum", cat: "Poultry", supplier: "Kee Song Group", price: 6.80, uom: "per kg" },
+  { name: "Chilled Australian Grain-Fed Beef Chuck Roll BMS3+ 2kg Vacuum Pack", cat: "Beef", supplier: "Meat King", price: 22.50, uom: ["per kg", "per pack (2kg)"] },
+  { name: "Chilled Australian Wagyu Beef Ribeye Marbling Score 4 500g Portioned", cat: "Beef", supplier: "NH Foods", price: 85.00, uom: "per kg" },
+  { name: "Chilled USDA Choice Beef Short Rib Bone-In 2.5kg Slab", cat: "Beef", supplier: "Meat King", price: 38.00, uom: "per kg" },
+  { name: "Chilled NZ Grass-Fed Beef Striploin MB2 500g Portioned Vacuum Sealed", cat: "Beef", supplier: "NH Foods", price: 45.00, uom: ["per kg", "per portion (500g)"] },
+  { name: "Chilled Australian Beef Tenderloin Centre-Cut Trimmed 500g Vacuum", cat: "Beef", supplier: "Provenir", price: 68.00, uom: "per kg" },
+  { name: "Frozen Wagyu-Blend Beef Burger Patty 180g x 6pcs Retail Sleeve", cat: "Beef", supplier: "Meat King", price: 12.00, uom: "per pc" },
+  { name: "Chilled US Black Angus Beef Brisket Flat Cut Bone-In 2kg", cat: "Beef", supplier: "NH Foods", price: 28.00, uom: "per kg" },
+  { name: "Chilled Australian Beef Mince 80/20 Fat Content Fresh 1kg Tray", cat: "Beef", supplier: "Meat King", price: 18.00, uom: "per kg" },
+  { name: "Chilled Pork Belly Slab Skin-On Bone-Out Australia Origin 2kg", cat: "Pork", supplier: "Prima Deli", price: 15.00, uom: ["per kg", "per slab (2kg)"] },
+  { name: "Chilled Boneless Pork Collar Shoulder Butt 1.5kg Vacuum Sealed", cat: "Pork", supplier: "Prima Deli", price: 16.50, uom: "per kg" },
+  { name: "Chilled Pork Loin Eye Fillet Skinless Boneless 1kg Vacuum Pack", cat: "Pork", supplier: "Prima Deli", price: 18.00, uom: "per kg" },
+  { name: "Chilled Pork Shoulder Bone-In Picnic Cut USA Origin 2kg", cat: "Pork", supplier: "Prima Deli", price: 12.00, uom: "per kg" },
+  { name: "Chilled Baby Back Pork Ribs St Louis Cut 1.2kg Half Rack Vacuum", cat: "Pork", supplier: "Prima Deli", price: 28.00, uom: "per rack" },
+  { name: "Chilled Pork Mince Lean-to-Fat 70/30 Fresh 1kg Tray", cat: "Pork", supplier: "Prima Deli", price: 9.50, uom: "per kg" },
+  { name: "Chilled NZ Lamb Rack Frenched 8-Rib French Trimmed 400g Vacuum Pack", cat: "Lamb", supplier: "Provenir", price: 55.00, uom: "per rack" },
+  { name: "Frozen Australian Lamb Leg Bone-Out Butterflied 2kg Vacuum Sealed", cat: "Lamb", supplier: "Provenir", price: 38.00, uom: "per kg" },
+  { name: "Frozen Australian Lamb Shoulder Rolled Boneless 1.5kg Vacuum", cat: "Lamb", supplier: "Meat King", price: 32.00, uom: "per kg" },
+  { name: "Frozen New Zealand Lamb Mince 80/20 Fresh Frozen 500g Vacuum Bag", cat: "Lamb", supplier: "Provenir", price: 22.00, uom: "per pkg" },
+  { name: "Frozen Black Tiger Prawn HLSO Head-On Shell-On 16/20 IQF 500g Net", cat: "Seafood", supplier: "Ocean Fresh", price: 28.00, uom: ["per kg", "per carton (5kg)"] },
+  { name: "Fresh Local Squid Whole Medium Size 500g to 800g Per Piece", cat: "Seafood", supplier: "Ocean Fresh", price: 18.00, uom: "per kg" },
+  { name: "Chilled Asian Sea Bass Fillet Skin-On 300g to 400g Per Piece", cat: "Seafood", supplier: "Deli Hub", price: 32.00, uom: "per kg" },
+  { name: "Chilled Norwegian Atlantic Salmon Fillet Skin-On 200g Portioned", cat: "Seafood", supplier: "Deli Hub", price: 48.00, uom: ["per kg", "per portion (200g)"] },
+  { name: "Chilled Australian Barramundi Fillet Skin-On Boneless 300g Each", cat: "Seafood", supplier: "Ocean Fresh", price: 35.00, uom: "per kg" },
+  { name: "Frozen Pacific Scallop Meat Size 30/40 IQF 1kg Retail Bag", cat: "Seafood", supplier: "Ocean Fresh", price: 58.00, uom: "per kg" },
+  { name: "Fresh Local Manila Clam Medium Grade Live 1kg Bag", cat: "Seafood", supplier: "Song Fish Dealer", price: 8.50, uom: "per kg" },
+  { name: "Live Mud Crab Sri Lankan Origin Grade A 600g to 800g Per Crab", cat: "Seafood", supplier: "Song Fish Dealer", price: 38.00, uom: "per kg" },
+  { name: "Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag", cat: "Produce", supplier: "FairPrice Finest", price: 4.20, uom: "per kg" },
+  { name: "Fresh Yellow Brown Onion Standard Grade A Loose 1kg Bag", cat: "Produce", supplier: "FairPrice Finest", price: 1.80, uom: "per kg" },
+  { name: "Fresh Local Spring Onion Scallion Bunch Rubber Banded 500g", cat: "Produce", supplier: "Sustenir Agriculture", price: 2.50, uom: "per bag" },
+  { name: "Fresh Thai Red Bird's Eye Chilli Prik Kee Noo Grade A 500g Bag", cat: "Produce", supplier: "Sustenir Agriculture", price: 3.80, uom: "per bag" },
+  { name: "Fresh Lemongrass Stalks Local Hydroponic Farm Bundle 200g", cat: "Produce", supplier: "FairPrice Finest", price: 1.50, uom: "per bag" },
+  { name: "Fresh Young Ginger Root Thai Origin Unpeeled Loose 1kg", cat: "Produce", supplier: "FairPrice Finest", price: 3.20, uom: "per kg" },
+  { name: "Fresh Coriander with Root Hydroponic Local Grown 100g Bunch", cat: "Produce", supplier: "Sustenir Agriculture", price: 2.20, uom: "per bunch" },
+  { name: "Fresh Kaffir Lime Whole Imported Thailand Grade A 10 Pieces Bag", cat: "Produce", supplier: "FairPrice Finest", price: 4.50, uom: "per bag" },
+  { name: "Fresh Sweet Corn on Cob Premium Grade Unwrapped 4 Pieces Pack", cat: "Produce", supplier: "Sustenir Agriculture", price: 3.80, uom: "per pack" },
+  { name: "Fresh Cherry Tomatoes Mixed Red Yellow Heirloom 250g Punnet", cat: "Produce", supplier: "Sustenir Agriculture", price: 3.20, uom: "per punnet" },
+  { name: "Fresh Mesclun Salad Leaves Ready-to-Eat Triple Washed 200g Bag", cat: "Produce", supplier: "Sustenir Agriculture", price: 2.80, uom: "per bag" },
+  { name: "Fresh Baby Spinach Leaves Triple Washed Ready-to-Eat 150g Bag", cat: "Produce", supplier: "Sustenir Agriculture", price: 2.50, uom: "per bag" },
+  { name: "Thai Hom Mali Jasmine Rice Grade A Premium Long Grain 25kg Woven Sack", cat: "Dry Goods", supplier: "Tee Yih Jia Food", price: 68.00, uom: ["per sack (25kg)", "per kg"] },
+  { name: "RBD Palm Olein Cooking Oil Refined Bleached Deodorised 5L PET Bottle", cat: "Dry Goods", supplier: "Lam Soon", price: 12.50, uom: ["per btl", "per ctn of 6"] },
+  { name: "Coarse Sea Salt Unrefined Non-Iodised Food Grade 1kg Bag", cat: "Dry Goods", supplier: "Olam Food", price: 2.20, uom: "per bag" },
+  { name: "Tellicherry Black Pepper Ground Fine Grade Food Service 500g Tub", cat: "Dry Goods", supplier: "Olam Food", price: 8.50, uom: "per tub" },
+  { name: "Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub", cat: "Dry Goods", supplier: "Olam Food", price: 9.80, uom: "per tub" },
+  { name: "Ground Cumin Powder Premium Spice Food Service Grade 500g Bag", cat: "Dry Goods", supplier: "Olam Food", price: 8.50, uom: "per bag" },
+  { name: "Dehydrated Garlic Powder Fine Grade A Food Service 500g Tub", cat: "Dry Goods", supplier: "Olam Food", price: 7.20, uom: "per tub" },
+  { name: "Dehydrated Onion Powder Fine Grade A Food Service 500g Tub", cat: "Dry Goods", supplier: "Olam Food", price: 7.20, uom: "per tub" },
+  { name: "Dried Crushed Chilli Flakes Medium Heat Level 500g Resealable Bag", cat: "Dry Goods", supplier: "Olam Food", price: 6.80, uom: "per bag" },
+  { name: "Maize Cornstarch Thickener Food Grade White Powder 1kg Foil Bag", cat: "Dry Goods", supplier: "Tee Yih Jia Food", price: 3.50, uom: "per bag" },
+  { name: "Bleached All-Purpose Plain Wheat Flour Protein 10.5% 5kg Bag", cat: "Dry Goods", supplier: "Tee Yih Jia Food", price: 8.80, uom: "per bag" },
+  { name: "Light Soft Brown Cane Sugar Fine Grain Food Service Grade 1kg Bag", cat: "Dry Goods", supplier: "Olam Food", price: 2.80, uom: "per bag" },
+  { name: "Lee Kum Kee Premium Oyster Sauce Extra Oyster Flavour 2.55kg Catering Tin", cat: "Sauces", supplier: "Lee Kum Kee", price: 18.50, uom: ["per tin", "per case of 6"] },
+  { name: "Lee Kum Kee Premium Dark Soy Sauce Aged Brewed 3 Years 1.1L Glass Bottle", cat: "Sauces", supplier: "Lee Kum Kee", price: 12.80, uom: ["per btl", "per case of 12"] },
+  { name: "Lee Kum Kee Premium Light Soy Sauce Less Sodium 1.1L Glass Bottle", cat: "Sauces", supplier: "Lee Kum Kee", price: 11.50, uom: ["per btl", "per case of 12"] },
+  { name: "Knorr Liquid Seasoning BBQ Marinade Original Recipe 5L Catering Drum", cat: "Sauces", supplier: "AmoyFoods", price: 68.00, uom: "per drum" },
+  { name: "Tiparos Fish Sauce Premium Grade Original Thai Recipe 700mL Glass Bottle", cat: "Sauces", supplier: "AmoyFoods", price: 4.80, uom: "per btl" },
+  { name: "Lee Kum Kee Pure Sesame Oil 100% Cold Pressed Dark Roasted 750mL Bottle", cat: "Sauces", supplier: "Lee Kum Kee", price: 9.50, uom: "per btl" },
+  { name: "Mizkan Genuine Brewed White Rice Vinegar Natural Fermented 2L PET Bottle", cat: "Sauces", supplier: "Kikkoman", price: 6.80, uom: "per btl" },
+  { name: "Lee Kum Kee Hoisin Sauce Sweet Savoury Premium Catering Size 2.5kg Tub", cat: "Sauces", supplier: "Lee Kum Kee", price: 22.00, uom: "per tub" },
+  { name: "AmoyFoods Chilli Garlic Sauce Sichuan Style Catering Size 3kg Plastic Tub", cat: "Sauces", supplier: "AmoyFoods", price: 45.00, uom: "per tub" },
+  { name: "Kikkoman Takumi Teriyaki Sauce Original Japanese Recipe 1.9L PET Bottle", cat: "Sauces", supplier: "Kikkoman", price: 14.50, uom: ["per btl", "per case of 6"] },
+  { name: "Seng Choon Free Range Chicken Eggs Singapore Grade A Large 30pcs Flat", cat: "Dairy & Eggs", supplier: "Seng Choon Farm", price: 8.50, uom: ["per flat (30)", "per pc"] },
+  { name: "Anchor Unsalted Butter Blocks New Zealand Pasteurised 1kg Carton", cat: "Dairy & Eggs", supplier: "Fonterra", price: 18.80, uom: ["per block", "per ctn of 12"] },
+  { name: "Bulla Thickened Cream Full Fat 35% Butterfat Homogenised 1L Bottle", cat: "Dairy & Eggs", supplier: "Fonterra", price: 7.20, uom: "per L" },
+  { name: "Perfect Italiano Shredded Mozzarella Cheese Low Moisture 2kg Catering Bag", cat: "Dairy & Eggs", supplier: "Dairy Farm", price: 28.00, uom: "per bag" },
+  { name: "Mainland Grated Parmesan Cheese Premium Aged 12 Months 1kg Catering Pouch", cat: "Dairy & Eggs", supplier: "Fonterra", price: 22.00, uom: "per pouch" },
+  { name: "Farmer's Union Sour Cream Natural Full Fat 35% Butterfat 1kg Tub", cat: "Dairy & Eggs", supplier: "Dairy Farm", price: 8.50, uom: "per tub" },
+  { name: "McCain IQF Mixed Vegetables Carrot Corn Pea Green Bean Blend 1kg Bag", cat: "Frozen", supplier: "Rich Products", price: 4.20, uom: "per bag" },
+  { name: "J-Basket Frozen Edamame Beans Shelled Lightly Salted IQF 500g Bag", cat: "Frozen", supplier: "McCain Foods", price: 3.80, uom: "per bag" },
+  { name: "McCain IQF Whole Sweet Corn Kernel Yellow Frozen 1kg Retail Bag", cat: "Frozen", supplier: "McCain Foods", price: 3.50, uom: "per bag" },
+  { name: "Birds Eye Garden Peas Petite Sweet Frozen IQF 1kg Retail Bag", cat: "Frozen", supplier: "Rich Products", price: 3.20, uom: "per bag" },
+  { name: "Ocean Treasure Squid Rings Breaded Frozen Ready-to-Fry 1kg Bag", cat: "Frozen", supplier: "Ocean Fresh", price: 8.50, uom: "per bag" },
+  { name: "Fong's Premium Prawn Crackers Uncooked Dried White Flat 1kg Bag", cat: "Frozen", supplier: "Rich Products", price: 6.80, uom: "per bag" },
+  { name: "Stockyard Gold Wagyu-Blend Beef Burger Patty 150g x 10pcs Frozen Pack", cat: "Frozen", supplier: "NH Foods", price: 22.00, uom: "per pack" },
+  { name: "Spring Home Vegetable Spring Roll Mini Halal Certified Frozen 400g 20pcs", cat: "Frozen", supplier: "Tee Yih Jia Food", price: 4.50, uom: "per pack" },
+  { name: "Evian Natural Spring Still Mineral Water 1.5L x 12 Bottles Shrink Pack", cat: "Beverages", supplier: "Danone", price: 28.00, uom: ["per pack (12)", "per btl"] },
+  { name: "San Pellegrino Sparkling Natural Mineral Water 750mL x 12 Glass Bottles", cat: "Beverages", supplier: "Danone", price: 42.00, uom: "per pack" },
+  { name: "Tiger Crystal Lager Beer Can 330mL x 24 Cans Refrigerated Shrink Pack", cat: "Beverages", supplier: "Tiger Beer", price: 38.00, uom: ["per pack (24)", "per can"] },
+  { name: "Jacob's Creek Classic Shiraz Cabernet Sauvignon Red Wine 750mL x 6 Case", cat: "Beverages", supplier: "Moet Hennessy", price: 85.00, uom: "per case" },
+  { name: "Oyster Bay Marlborough Sauvignon Blanc White Wine 750mL x 6 Bottles Case", cat: "Beverages", supplier: "Moet Hennessy", price: 95.00, uom: "per case" },
+  { name: "Coca-Cola Original Taste Carbonated Soft Drink 330mL x 24 Cans Pack", cat: "Beverages", supplier: "F&N", price: 22.00, uom: ["per pack (24)", "per can"] },
+  { name: "Coconut Shell Charcoal Briquettes Restaurant Grade Hexagonal 5kg Sack", cat: "Supplies", supplier: "Grill Master SG", price: 12.50, uom: ["per sack (5kg)", "per kg"] },
+  { name: "Aluminised Extra Heavy-Duty Aluminium Foil 30cm Width x 100m Length Roll", cat: "Supplies", supplier: "Grill Master SG", price: 8.80, uom: ["per roll", "per case of 12"] },
+  { name: "PVC Cling Wrap Food Grade BPA-Free Clear Film 30cm x 300m Roll", cat: "Supplies", supplier: "Globe Pack", price: 6.50, uom: ["per roll", "per case of 12"] },
+  { name: "Latex-Free Disposable Vinyl Food-Safe Gloves Powder-Free Large 100pcs Box", cat: "Supplies", supplier: "Globe Pack", price: 12.00, uom: "per box" },
+  { name: "Scott Performance Tissue Kitchen Paper Towel 2-Ply Embossed 12 Rolls Pack", cat: "Supplies", supplier: "Globe Pack", price: 18.00, uom: ["per pack (12)", "per roll"] },
+  { name: "PackAway Hinged Lid Kraft Pulp Takeaway Box 17cm Square 500ml 50pcs Sleeve", cat: "Supplies", supplier: "Globe Pack", price: 22.00, uom: "per sleeve" },
+  { name: "Kraft Brown SOS Paper Bag with Flat Handle Medium 26x12x35cm 100pcs", cat: "Supplies", supplier: "Globe Pack", price: 28.00, uom: "per bundle" },
+  { name: "Bamboo Individual Wrapped Chopsticks Premium Round 23cm 100 Pairs Sleeve", cat: "Supplies", supplier: "Globe Pack", price: 12.00, uom: "per sleeve" },
+  { name: "Natural Bamboo BBQ Grill Skewer Flat Blade 30cm Length 100pcs Bag", cat: "Supplies", supplier: "Grill Master SG", price: 4.50, uom: "per bag" },
+  { name: "Stainless Steel BBQ Grill Brush Wide Face Replacement Head Heavy Duty", cat: "Supplies", supplier: "Grill Master SG", price: 18.00, uom: "per pc" },
+  { name: "Pam Professional Non-Stick Canola Oil Cooking Spray Zero Trans-Fat 500mL", cat: "Supplies", supplier: "Grill Master SG", price: 8.80, uom: "per can" },
+  { name: "Taylor Precision Digital Instant-Read Probe Meat Thermometer NSF Certified", cat: "Supplies", supplier: "Grill Master SG", price: 35.00, uom: "per pc" },
+];
+
+const TOTAL_GROUPS = 3;
+const CAT_ORDER = ["Poultry","Beef","Pork","Lamb","Seafood","Produce","Dry Goods","Sauces","Dairy & Eggs","Frozen","Beverages","Supplies"];
+const UOM_MULT = {
+  'per kg':1,'per g':0.001,'per btl':1,'per can':1,'per pc':1,'per roll':1,'per rack':1,
+  'per tray':2,'per bag':1,'per pack':1,'per bunch':1,'per punnet':1,'per pkg':1,'per unit':1,
+  'per block':1,'per L':1,'per drum':1,'per tub':1,'per tin':1,'per sleeve':1,'per bundle':1,
+  'per case':1,'per pouch':1,'per box':1,'per carton (5kg)':5,'per sack (25kg)':25,
+  'per pack (2kg)':2,'per slab (2kg)':2,'per portion (500g)':0.5,'per portion (200g)':0.2,
+  'per case of 6':6,'per case of 12':12,'per ctn of 6':6,'per ctn of 12':12,
+  'per pack (10)':10,'per pack (12)':12,'per pack (24)':24,'per flat (30)':30,'per sack (5kg)':5,
+};
+
+ITEMS.forEach((item, i) => {
+  item.groups = (i % 7 === 0) ? 1 : (i % 3 === 0) ? 2 : 3;
+  item.active = (i % 11 !== 0);
+});
+
+// Populate supplier filter
+(function() {
+  const suppliers = [...new Set(ITEMS.map(i => i.supplier))].sort();
+  const sel = document.getElementById('mlSupplierFilter');
+  suppliers.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s;
+    sel.appendChild(o);
+  });
+})();
+
+let mlPage = 1;
+const ML_PER_PAGE = 20;
+let mlSearch = '', mlCatFilter = '', mlSupplierFilter = '', mlStatusFilter = '', mlSortKey = 'default';
+
+function setMlSearch(v) { mlSearch = v; mlPage = 1; renderMl(); }
+function setMlCatFilter(v) { mlCatFilter = v; mlPage = 1; renderMl(); }
+function setMlSupplierFilter(v) { mlSupplierFilter = v; mlPage = 1; renderMl(); }
+function setMlStatusFilter(v) { mlStatusFilter = v; mlPage = 1; renderMl(); }
+
+function setMlSort(key) {
+  mlSortKey = mlSortKey === key + '-asc' ? key + '-desc' : key + '-asc';
+  ['name','price'].forEach(k => {
+    const th = document.getElementById('mlSortTh-' + k);
+    if (th) th.className = th.className.replace(/\bsort-(asc|desc)\b/g, '').trim();
+  });
+  const th = document.getElementById('mlSortTh-' + key);
+  if (th) th.classList.add(mlSortKey.endsWith('-asc') ? 'sort-asc' : 'sort-desc');
+  renderMl();
+}
+
+function getMlItems() {
+  let items = ITEMS.slice();
+  if (mlCatFilter) items = items.filter(i => i.cat === mlCatFilter);
+  if (mlSupplierFilter) items = items.filter(i => i.supplier === mlSupplierFilter);
+  if (mlStatusFilter === 'active') items = items.filter(i => i.active);
+  else if (mlStatusFilter === 'inactive') items = items.filter(i => !i.active);
+  if (mlSearch) {
+    const q = mlSearch.toLowerCase();
+    items = items.filter(i => i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q));
+  }
+  if (mlSortKey === 'name-asc') items.sort((a,b) => a.name.localeCompare(b.name));
+  else if (mlSortKey === 'name-desc') items.sort((a,b) => b.name.localeCompare(a.name));
+  else if (mlSortKey === 'price-asc') items.sort((a,b) => a.price - b.price);
+  else if (mlSortKey === 'price-desc') items.sort((a,b) => b.price - a.price);
+  else items.sort((a,b) => {
+    const ci = CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat);
+    return ci !== 0 ? ci : a.name.localeCompare(b.name);
+  });
+  return items;
+}
+
+function openUomModal(idx) {
+  const item = ITEMS[idx];
+  document.getElementById('uomModalTitle').textContent = item.name;
+  document.getElementById('uomModalSub').textContent = item.cat + ' · ' + item.supplier;
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  const primaryMult = UOM_MULT[uoms[0]] || 1;
+  const unitPrice = item.price / primaryMult;
+  document.getElementById('uomBreakdownBody').innerHTML = uoms.map(u =>
+    '<tr><td>' + u + '</td><td style="font-weight:600">$' + (unitPrice * (UOM_MULT[u] || 1)).toFixed(2) + '</td></tr>'
+  ).join('');
+  document.getElementById('uomModal').classList.add('open');
+}
+function closeUomModal() { document.getElementById('uomModal').classList.remove('open'); }
+document.getElementById('uomModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeUomModal(); });
+
+function renderMl() {
+  const items = getMlItems();
+  const total = items.length;
+  const start = (mlPage - 1) * ML_PER_PAGE;
+  const page = items.slice(start, start + ML_PER_PAGE);
+
+  document.getElementById('mlCount').textContent = total;
+
+  document.getElementById('mlBody').innerHTML = page.map(item => {
+    const rawIdx = ITEMS.indexOf(item);
+    const isMulti = Array.isArray(item.uom);
+    const firstUom = isMulti ? item.uom[0] : item.uom;
+    const uomCell = '<div class="uom-text">$' + item.price.toFixed(2) +
+      ' <span style="color:var(--ink-mute);font-size:12px">' + firstUom + '</span></div>' +
+      (isMulti ? '<button class="uom-options-btn" onclick="openUomModal(' + rawIdx + ')">' + item.uom.length + ' options</button>' : '');
+
+    const grpText = item.groups === TOTAL_GROUPS ? 'All ' + TOTAL_GROUPS + ' groups' : item.groups + ' of ' + TOTAL_GROUPS;
+    const status = item.active
+      ? '<span class="chip chip-active">Active</span>'
+      : '<span class="chip chip-inactive">Inactive</span>';
+
+    return '<tr>' +
+      '<td><div class="ml-item-name">' + item.name + '</div><span class="ml-cat-tag">' + item.cat + '</span></td>' +
+      '<td style="color:var(--ink-mute);font-size:13px">' + item.supplier + '</td>' +
+      '<td>' + uomCell + '</td>' +
+      '<td style="font-size:13px;color:var(--ink-mute)">' + grpText + '</td>' +
+      '<td>' + status + '</td>' +
+      '<td><div class="row-actions-wrap">' +
+        '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>' +
+        '<div class="row-actions-menu">' +
+          '<div class="row-action-item">Edit pricing</div>' +
+          '<div class="row-action-item">Manage UOM</div>' +
+          '<div class="row-action-item danger">' + (item.active ? 'Deactivate' : 'Activate') + '</div>' +
+        '</div></div></td>' +
+    '</tr>';
+  }).join('');
+
+  const totalPages = Math.max(1, Math.ceil(total / ML_PER_PAGE));
+  const pager = document.getElementById('mlPager');
+  if (!total) { pager.innerHTML = '<span class="pager-info">No items found</span>'; return; }
+  const from = start + 1, to = Math.min(start + ML_PER_PAGE, total);
+  let btns = '<button class="pager-btn" ' + (mlPage===1?'disabled':'') + ' onclick="setMlPage(' + (mlPage-1) + ')">‹</button>';
+  for (let p = 1; p <= totalPages; p++) {
+    if (totalPages > 7 && Math.abs(p - mlPage) > 2 && p !== 1 && p !== totalPages) {
+      if (p === mlPage - 3 || p === mlPage + 3) btns += '<button class="pager-btn" disabled style="border:none">…</button>';
+      continue;
+    }
+    btns += '<button class="pager-btn' + (p===mlPage?' active':'') + '" onclick="setMlPage(' + p + ')">' + p + '</button>';
+  }
+  btns += '<button class="pager-btn" ' + (mlPage===totalPages?'disabled':'') + ' onclick="setMlPage(' + (mlPage+1) + ')">›</button>';
+  pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + ' items</span><div class="pager-btns">' + btns + '</div>';
+}
+
+function setMlPage(p) { mlPage = p; renderMl(); window.scrollTo(0,0); }
+
+function toggleOgExpand(btn, subRowId) {
+  var sub = document.getElementById(subRowId);
+  var isOpen = sub.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+}
+
+renderMl();
+
+// ── Recipes ──
+const RECIPES = [
+  // Mains
+  { name: 'Chargrill Chicken Thigh with Herb & Garlic Marinade', cat: 'Mains', portions: 1, cost: 8.40 },
+  { name: 'Wagyu Beef Burger with Caramelised Onion Relish', cat: 'Mains', portions: 1, cost: 22.50 },
+  { name: 'BBQ Baby Back Pork Ribs with House Sauce — Half Rack', cat: 'Mains', portions: 1, cost: 18.20 },
+  { name: 'Chargrill NZ Lamb Rack Frenched with Rosemary Jus', cat: 'Mains', portions: 1, cost: 32.00 },
+  { name: 'Crispy Pork Belly with Apple & Fennel Slaw', cat: 'Mains', portions: 1, cost: 14.80 },
+  { name: 'Char Siu Chicken Thigh Fillet — Cantonese Style', cat: 'Mains', portions: 1, cost: 9.20 },
+  { name: 'Chargrill Barramundi Fillet with Lemon Butter Sauce', cat: 'Mains', portions: 1, cost: 16.50 },
+  { name: 'Chargrill Salmon Fillet with Dill Cream & Capers', cat: 'Mains', portions: 1, cost: 19.80 },
+  { name: 'Beef Chuck Roll 6hr Slow Braise with Red Wine Jus', cat: 'Mains', portions: 1, cost: 15.60 },
+  { name: 'Pork Collar Char Siu Style — Whole Roast Sliced', cat: 'Mains', portions: 6, cost: 11.40 },
+  { name: 'Lamb Shoulder Slow Roast 4hr with Harissa & Yoghurt', cat: 'Mains', portions: 4, cost: 24.00 },
+  { name: 'Wagyu Striploin MB4 200g with Chimichurri', cat: 'Mains', portions: 1, cost: 38.50 },
+  { name: 'Teriyaki Chicken Thigh Skewers — 3pcs per serve', cat: 'Mains', portions: 1, cost: 7.80 },
+  { name: 'Chargrill Duck Breast with Cherry & Port Reduction', cat: 'Mains', portions: 1, cost: 28.00 },
+  { name: 'Black Tiger Prawn Skewers with Garlic Butter — 4pcs', cat: 'Mains', portions: 1, cost: 14.20 },
+  // Starters
+  { name: 'BBQ Chicken Mid-Joint Wings with House Dry Rub — 6pcs', cat: 'Starters', portions: 1, cost: 5.80 },
+  { name: 'Crispy Squid Rings Breaded with Sriracha Aioli', cat: 'Starters', portions: 1, cost: 6.40 },
+  { name: 'Prawn Crackers Fried with Nam Jim Dipping Sauce', cat: 'Starters', portions: 4, cost: 1.20 },
+  { name: 'Smoked Edamame with Maldon Sea Salt & Chilli Flakes', cat: 'Starters', portions: 1, cost: 2.80 },
+  { name: 'Chicken Liver Pâté on Grilled Sourdough — 2pcs', cat: 'Starters', portions: 1, cost: 4.60 },
+  { name: 'Beef Satay Skewers with Peanut Sauce — 4pcs', cat: 'Starters', portions: 1, cost: 7.20 },
+  { name: 'Charred Corn on Cob with Chilli Butter & Coriander', cat: 'Starters', portions: 1, cost: 2.20 },
+  { name: 'Manila Clam Chowder with Grilled Bread Roll', cat: 'Starters', portions: 1, cost: 5.50 },
+  // Sides
+  { name: 'Steamed Hom Mali Jasmine Rice — Individual Bowl', cat: 'Sides', portions: 1, cost: 0.80 },
+  { name: 'Garlic Herb Butter Charred Corn Half Cob', cat: 'Sides', portions: 1, cost: 1.60 },
+  { name: 'Chargrill Seasonal Vegetable Medley with Olive Oil', cat: 'Sides', portions: 1, cost: 2.40 },
+  { name: 'House Coleslaw with Toasted Sesame Dressing', cat: 'Sides', portions: 1, cost: 1.80 },
+  { name: 'Chargrill Spring Onion Bunches with Soy & Sesame', cat: 'Sides', portions: 1, cost: 1.20 },
+  { name: 'Crispy Shoestring Fries with House Seasoning', cat: 'Sides', portions: 1, cost: 1.40 },
+  { name: 'Steamed Bok Choy with Oyster Sauce & Crispy Garlic', cat: 'Sides', portions: 1, cost: 1.60 },
+  { name: 'Mixed Leaf Salad with Citrus Vinaigrette', cat: 'Sides', portions: 1, cost: 2.00 },
+  // Sauces & Marinades
+  { name: 'House BBQ Sauce — Smoked Tomato & Molasses Base', cat: 'Sauces & Marinades', portions: 20, cost: 0.60 },
+  { name: 'Char Siu Marinade — Hoisin Honey 5-Spice', cat: 'Sauces & Marinades', portions: 10, cost: 0.80 },
+  { name: 'Herb & Garlic Marinade — Lemon Thyme Rosemary', cat: 'Sauces & Marinades', portions: 10, cost: 0.70 },
+  { name: 'Teriyaki Glaze — Kikkoman Takumi Reduction', cat: 'Sauces & Marinades', portions: 12, cost: 0.90 },
+  { name: 'Chimichurri — Fresh Parsley Coriander with Red Chilli', cat: 'Sauces & Marinades', portions: 10, cost: 0.50 },
+  { name: 'Nam Jim Dipping Sauce — Thai Bird\'s Eye & Palm Sugar', cat: 'Sauces & Marinades', portions: 8, cost: 0.40 },
+  { name: 'Satay Peanut Sauce — Coconut Milk & Lemongrass', cat: 'Sauces & Marinades', portions: 10, cost: 0.75 },
+  { name: 'Rosemary Red Wine Jus — Lamb Bone Stock Base', cat: 'Sauces & Marinades', portions: 8, cost: 1.20 },
+  // Desserts
+  { name: 'Chargrill Caramelised Pineapple with Coconut Ice Cream', cat: 'Desserts', portions: 1, cost: 3.20 },
+  { name: 'Basque Burnt Cheesecake — Individual Portion', cat: 'Desserts', portions: 1, cost: 4.80 },
+  { name: 'Dark Chocolate Lava Cake with Vanilla Bean Ice Cream', cat: 'Desserts', portions: 1, cost: 4.20 },
+  { name: 'Alphonso Mango Sorbet — 2 Scoops', cat: 'Desserts', portions: 1, cost: 2.40 },
+  { name: 'Affogato — Double Espresso over Vanilla Ice Cream', cat: 'Desserts', portions: 1, cost: 2.80 },
+  // Beverages
+  { name: 'House Lemonade — Fresh Squeezed with Mint', cat: 'Beverages', portions: 1, cost: 0.80 },
+  { name: 'Iced Kopi-O Kosong — Local Cold Brew', cat: 'Beverages', portions: 1, cost: 0.60 },
+  { name: 'Lime Soda with Himalayan Salt', cat: 'Beverages', portions: 1, cost: 0.50 },
+  { name: 'Fresh Watermelon Juice — No Sugar Added', cat: 'Beverages', portions: 1, cost: 1.20 },
+];
+
+const REC_CAT_ORDER = ['Mains','Starters','Sides','Sauces & Marinades','Desserts','Beverages'];
+RECIPES.forEach((r, i) => {
+  r.groups = (i % 7 === 0) ? 1 : (i % 3 === 0) ? 2 : 3;
+  r.active = (i % 9 !== 0);
+});
+
+let recPage = 1;
+const REC_PER_PAGE = 20;
+let recSearch = '', recCatFilter = '', recStatusFilter = '', recSortKey = 'default';
+
+function setRecSearch(v) { recSearch = v; recPage = 1; renderRec(); }
+function setRecCatFilter(v) { recCatFilter = v; recPage = 1; renderRec(); }
+function setRecStatusFilter(v) { recStatusFilter = v; recPage = 1; renderRec(); }
+
+function setRecSort(key) {
+  recSortKey = recSortKey === key + '-asc' ? key + '-desc' : key + '-asc';
+  ['name','cost'].forEach(k => {
+    const th = document.getElementById('recSortTh-' + k);
+    if (th) th.className = th.className.replace(/\bsort-(asc|desc)\b/g, '').trim();
+  });
+  const th = document.getElementById('recSortTh-' + key);
+  if (th) th.classList.add(recSortKey.endsWith('-asc') ? 'sort-asc' : 'sort-desc');
+  renderRec();
+}
+
+function getRecItems() {
+  let items = RECIPES.slice();
+  if (recCatFilter) items = items.filter(r => r.cat === recCatFilter);
+  if (recStatusFilter === 'active') items = items.filter(r => r.active);
+  else if (recStatusFilter === 'inactive') items = items.filter(r => !r.active);
+  if (recSearch) {
+    const q = recSearch.toLowerCase();
+    items = items.filter(r => r.name.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q));
+  }
+  if (recSortKey === 'name-asc') items.sort((a,b) => a.name.localeCompare(b.name));
+  else if (recSortKey === 'name-desc') items.sort((a,b) => b.name.localeCompare(a.name));
+  else if (recSortKey === 'cost-asc') items.sort((a,b) => a.cost - b.cost);
+  else if (recSortKey === 'cost-desc') items.sort((a,b) => b.cost - a.cost);
+  else items.sort((a,b) => {
+    const ci = REC_CAT_ORDER.indexOf(a.cat) - REC_CAT_ORDER.indexOf(b.cat);
+    return ci !== 0 ? ci : a.name.localeCompare(b.name);
+  });
+  return items;
+}
+
+function renderRec() {
+  const items = getRecItems();
+  const total = items.length;
+  const start = (recPage - 1) * REC_PER_PAGE;
+  const page = items.slice(start, start + REC_PER_PAGE);
+
+  document.getElementById('recCount').textContent = total;
+
+  document.getElementById('recBody').innerHTML = page.map(r => {
+    const grpText = r.groups === 3 ? 'All 3 groups' : r.groups + ' of 3';
+    const status = r.active
+      ? '<span class="chip chip-active">Active</span>'
+      : '<span class="chip chip-inactive">Inactive</span>';
+    const portionsText = r.portions === 1 ? 'Single' : r.portions + ' portions';
+    return '<tr>' +
+      '<td><div class="ml-item-name">' + r.name + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
+      '<td style="font-size:13px;color:var(--ink-mute)">' + portionsText + '</td>' +
+      '<td style="font-size:13px;color:var(--ink);font-weight:500">$' + r.cost.toFixed(2) + ' <span style="font-weight:400;color:var(--ink-mute);font-size:12px">/ portion</span></td>' +
+      '<td style="font-size:13px;color:var(--ink-mute)">' + grpText + '</td>' +
+      '<td>' + status + '</td>' +
+      '<td><div class="row-actions-wrap">' +
+        '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>' +
+        '<div class="row-actions-menu">' +
+          '<div class="row-action-item">Edit recipe</div>' +
+          '<div class="row-action-item">Manage groups</div>' +
+          '<div class="row-action-item danger">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
+        '</div></div></td>' +
+    '</tr>';
+  }).join('');
+
+  const totalPages = Math.max(1, Math.ceil(total / REC_PER_PAGE));
+  const pager = document.getElementById('recPager');
+  if (!total) { pager.innerHTML = '<span class="pager-info">No recipes found</span>'; return; }
+  const from = start + 1, to = Math.min(start + REC_PER_PAGE, total);
+  let btns = '<button class="pager-btn" ' + (recPage===1?'disabled':'') + ' onclick="setRecPage(' + (recPage-1) + ')">‹</button>';
+  for (let p = 1; p <= totalPages; p++) {
+    btns += '<button class="pager-btn' + (p===recPage?' active':'') + '" onclick="setRecPage(' + p + ')">' + p + '</button>';
+  }
+  btns += '<button class="pager-btn" ' + (recPage===totalPages?'disabled':'') + ' onclick="setRecPage(' + (recPage+1) + ')">›</button>';
+  pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + ' recipes</span><div class="pager-btns">' + btns + '</div>';
+}
+
+function setRecPage(p) { recPage = p; renderRec(); window.scrollTo(0,0); }
+
+renderRec();
+
+// ── Activity log ──
+const ACT_MODULE = {
+  'market-list': { label: 'Market List', color: '#2AC864', bg: '#D9F5E4' },
+  'recipes':     { label: 'Recipes',     color: '#D97706', bg: '#FEF3C7' },
+  'inventory':   { label: 'Inventory',   color: '#2563EB', bg: '#EFF6FF' },
+  'outlet-groups':{ label: 'Outlet Groups', color: '#8a8f98', bg: '#F0F0F2' },
+  'hq':          { label: 'HQ',          color: '#6c4df2', bg: '#F3F0FF' },
+};
+
+const ACTIVITY_LOG = [
+  // Market List — items added to master (large batch, count only)
+  { date: '10 Jun 2026', time: '14:32', user: 'William Arya', module: 'market-list', text: '<strong>75 items added</strong> to master market list', scope: 'Master', tab: 'market-list' },
+  // Market List — items added to master (≤3, names shown)
+  { date: '09 Jun 2026', time: '10:18', user: 'William Arya', module: 'market-list', text: '<strong>3 items added</strong> to master market list — Chilled Australian Wagyu Beef Ribeye MS4 500g Vacuum, Chilled NZ Lamb Rack Frenched 8-Rib 400g Vacuum, Frozen Black Tiger Prawn HLSO 16/20 IQF 500g', scope: 'Master', tab: 'market-list' },
+  // Market List — items removed from master
+  { date: '08 Jun 2026', time: '11:05', user: 'James Tan',    module: 'market-list', text: '<strong>2 items removed</strong> from master market list — Chilled Pork Belly Slab Skin-On Bone-Out AU 2kg, J-Basket Frozen Edamame Beans Shelled IQF 500g', scope: 'Master', tab: 'market-list' },
+  // Market List — pricing updated
+  { date: '15 May 2026', time: '09:30', user: 'William Arya', module: 'market-list', text: 'Pricing updated for <strong>12 items</strong> in master list', scope: 'Master', tab: 'market-list' },
+  // Market List — item deactivated
+  { date: '28 Feb 2026', time: '09:00', user: 'James Tan',    module: 'market-list', text: '<strong>Natural Bamboo BBQ Grill Skewer Flat Blade 30cm 100pcs Bag</strong> deactivated in master list', scope: 'Master', tab: 'market-list' },
+  // Market List — supplier linked
+  { date: '02 May 2026', time: '11:20', user: 'William Arya', module: 'market-list', text: '<strong>Ocean Fresh</strong> linked as supplier', scope: 'Master', tab: 'suppliers' },
+  // Market List — group list customised
+  { date: '10 Apr 2026', time: '10:15', user: 'James Tan',    module: 'market-list', text: 'Chargrill VIP market list customised — <strong>8 items removed</strong>', scope: 'Chargrill VIP', tab: 'outlet-groups' },
+  // Recipes — recipe added to master
+  { date: '05 Jun 2026', time: '11:44', user: 'William Arya', module: 'recipes',     text: '<strong>Char Siu Chicken</strong> recipe added to master library', scope: 'Master', tab: 'recipes' },
+  // Recipes — recipe updated
+  { date: '24 Apr 2026', time: '09:55', user: 'James Tan',    module: 'recipes',     text: '<strong>BBQ Pork Ribs</strong> recipe updated — portion size revised', scope: 'Master', tab: 'recipes' },
+  // Recipes — group recipe list customised
+  { date: '20 May 2026', time: '14:11', user: 'James Tan',    module: 'recipes',     text: 'Chargrill Takeaway recipe list customised — <strong>38 of 48 recipes</strong> enabled', scope: 'Chargrill Takeaway', tab: 'outlet-groups' },
+  // Inventory — structure updated
+  { date: '10 May 2026', time: '15:45', user: 'James Tan',    module: 'inventory',   text: 'Master inventory structure updated — <strong>5 items added</strong>', scope: 'Master', tab: 'overview' },
+  // Inventory — group inventory initialised
+  { date: '02 Feb 2026', time: '09:10', user: 'James Tan',    module: 'inventory',   text: '<strong>Chargrill Takeaway</strong> inventory initialised from master structure', scope: 'Chargrill Takeaway', tab: 'outlet-groups' },
+  // Inventory — par level template updated
+  { date: '01 Apr 2026', time: '16:00', user: 'William Arya', module: 'inventory',   text: 'Par level template updated for <strong>Chargrill Outlets</strong>', scope: 'Chargrill Outlets', tab: 'outlet-groups' },
+  // Outlet Groups — group created
+  { date: '18 Apr 2026', time: '14:30', user: 'William Arya', module: 'outlet-groups', text: '<strong>Chargrill Takeaway</strong> outlet group created', scope: 'Chargrill Takeaway', tab: 'outlet-groups' },
+  // Outlet Groups — outlet added to group
+  { date: '28 May 2026', time: '10:05', user: 'William Arya', module: 'outlet-groups', text: '<strong>2 outlets added</strong> to Chargrill Outlets group', scope: 'Chargrill Outlets', tab: 'outlet-groups' },
+  // Outlet Groups — group renamed
+  { date: '10 Mar 2026', time: '13:20', user: 'James Tan',    module: 'outlet-groups', text: 'Outlet group renamed <strong>Chargrill Main → Chargrill Outlets</strong>', scope: 'Chargrill Outlets', tab: 'outlet-groups' },
+  // HQ — details updated
+  { date: '10 Mar 2026', time: '09:45', user: 'William Arya', module: 'hq',          text: 'HQ details updated — company name corrected', scope: 'HQ', tab: 'overview' },
+  // HQ — user added
+  { date: '20 Jan 2026', time: '11:00', user: 'William Arya', module: 'hq',          text: '<strong>James Tan</strong> added as HQ Admin', scope: 'HQ', tab: 'users' },
+  // HQ — created
+  { date: '15 Jan 2026', time: '14:00', user: 'William Arya', module: 'outlet-groups', text: '<strong>Chargrill VIP</strong> outlet group created', scope: 'Chargrill VIP', tab: 'outlet-groups' },
+  { date: '10 Jan 2026', time: '10:30', user: 'James Tan',    module: 'market-list', text: 'Master market list initialised — <strong>100 items</strong> · 14 suppliers', scope: 'Master', tab: 'market-list' },
+  { date: '05 Jan 2026', time: '09:15', user: 'William Arya', module: 'recipes',     text: 'Master recipe library initialised — <strong>43 recipes</strong>', scope: 'Master', tab: 'recipes' },
+  { date: '05 Sep 2019', time: '08:00', user: 'William Arya', module: 'hq',          text: '<strong>Garden Cuisine HQ</strong> created', scope: 'HQ', tab: 'overview' },
+];
+
+const ACT_PER_PAGE = 10;
+let actPage = 1;
+
+const ACT_MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function parseActDate(str) {
+  const p = str.split(' ');
+  return new Date(+p[2], ACT_MONTHS[p[1]], +p[0]);
+}
+function toIso(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function onActRangeChange() {
+  const preset = document.getElementById('actRangePreset').value;
+  const customWrap = document.getElementById('actCustomRange');
+  if (preset === 'custom') {
+    customWrap.classList.add('visible');
+  } else {
+    customWrap.classList.remove('visible');
+  }
+  renderActivity();
+}
+
+function getActDateRange() {
+  const preset = document.getElementById('actRangePreset').value;
+  const today = new Date(2026, 5, 16); // prototype fixed date
+  if (preset === '0') return { from: null, to: null };
+  if (preset === 'custom') {
+    const f = document.getElementById('actDateFrom').value;
+    const t = document.getElementById('actDateTo').value;
+    return { from: f ? new Date(f) : null, to: t ? new Date(t) : null };
+  }
+  const from = new Date(today);
+  from.setDate(from.getDate() - parseInt(preset));
+  return { from, to: today };
+}
+
+function getFilteredActivity() {
+  const q = (document.getElementById('actSearch').value || '').toLowerCase();
+  const mod = document.getElementById('actModuleFilter').value;
+  const user = document.getElementById('actUserFilter').value;
+  const scope = document.getElementById('actScopeFilter').value;
+  const { from, to } = getActDateRange();
+  return ACTIVITY_LOG.filter(a => {
+    if (mod && a.module !== mod) return false;
+    if (user && a.user !== user) return false;
+    if (scope && a.scope !== scope) return false;
+    if (q && !a.text.toLowerCase().includes(q) && !a.user.toLowerCase().includes(q) && !a.date.toLowerCase().includes(q)) return false;
+    if (from || to) {
+      const d = parseActDate(a.date);
+      if (from && d < from) return false;
+      if (to && d > to) return false;
+    }
+    return true;
+  });
+}
+
+function renderActivity() {
+  actPage = 1;
+  renderActivityPage();
+}
+
+// Initialise custom date inputs to current preset range
+(function initActDates() {
+  const today = new Date(2026, 5, 16);
+  const from = new Date(today); from.setDate(from.getDate() - 90);
+  document.getElementById('actDateFrom').value = toIso(from);
+  document.getElementById('actDateTo').value = toIso(today);
+})();
+
+function renderActivityPage() {
+  const items = getFilteredActivity();
+  const total = items.length;
+  const start = (actPage - 1) * ACT_PER_PAGE;
+  const page = items.slice(start, start + ACT_PER_PAGE);
+  const feed = document.getElementById('actFeed');
+  const pager = document.getElementById('actPager');
+
+  if (!total) {
+    feed.innerHTML = '<div class="act-empty">No activity found</div>';
+    pager.innerHTML = '';
+    return;
+  }
+
+  feed.innerHTML = page.map(a => {
+    const m = ACT_MODULE[a.module];
+    return '<div class="act-entry act-entry-link" onclick="navigateToTab(\'' + a.tab + '\')">' +
+      '<div class="act-dot" style="background:' + m.color + '"></div>' +
+      '<div class="act-body">' +
+        '<div class="act-text">' + a.text + '</div>' +
+        '<div class="act-meta">' +
+          '<span class="act-time">' + a.date + ' · ' + a.time + '</span>' +
+          '<span class="act-module-tag" style="background:' + m.bg + ';color:' + m.color + '">' + m.label + '</span>' +
+          '<span class="act-scope-tag">' + a.scope + '</span>' +
+          '<span class="act-user">' + a.user + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<svg style="flex-shrink:0;color:var(--ink-soft)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>' +
+    '</div>';
+  }).join('');
+
+  const totalPages = Math.max(1, Math.ceil(total / ACT_PER_PAGE));
+  const from = start + 1, to = Math.min(start + ACT_PER_PAGE, total);
+  let btns = '<button class="pager-btn" ' + (actPage===1?'disabled':'') + ' onclick="setActPage(' + (actPage-1) + ')">‹</button>';
+  for (let p = 1; p <= totalPages; p++) {
+    btns += '<button class="pager-btn' + (p===actPage?' active':'') + '" onclick="setActPage(' + p + ')">' + p + '</button>';
+  }
+  btns += '<button class="pager-btn" ' + (actPage===totalPages?'disabled':'') + ' onclick="setActPage(' + (actPage+1) + ')">›</button>';
+  pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + ' entries</span><div class="pager-btns">' + btns + '</div>';
+}
+
+function setActPage(p) { actPage = p; renderActivityPage(); window.scrollTo(0,0); }
+
+function navigateToTab(tab) {
+  var t = document.querySelector('.tab[data-tab="' + tab + '"]');
+  if (t) t.click();
+  window.scrollTo(0, 0);
+}
+
+renderActivity();
+</script>
+</body>
+</html>
