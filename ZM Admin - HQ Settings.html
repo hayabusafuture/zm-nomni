@@ -77,19 +77,26 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .chip-inactive { background: #F0F0F2; color: #555555; }
 
 /* Buttons */
-.btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
+.btn, .btn-primary, .btn-secondary, .btn-tertiary { font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 6px; padding: 10px 16px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; line-height: 1; white-space: nowrap; transition: background-color .18s ease, color .18s ease, border-color .18s ease; }
+.btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; }
 .btn-primary:hover { background: #22b055; }
+.btn-secondary { background: #E2FFE6; color: var(--seaweed); border: none; }
+.btn-secondary:hover { background: #C6F2CE; }
+.btn-tertiary { background: #F3F4F6; color: var(--ink-2); border: none; }
+.btn-tertiary:hover { background: #E6E8EC; }
 .btn-outline { background: none; border: 1px solid #d0d2d8; color: var(--ink); border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .13s; }
 .btn-outline:hover { background: #f3f4f6; }
 .btn-ghost-danger { background: none; border: none; color: #c02020; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 12px; cursor: pointer; border-radius: 6px; transition: background .13s; }
 .btn-ghost-danger:hover { background: #fff0f0; }
 
 /* Stats strip */
-.stats-strip { display: flex; gap: 10px; margin-bottom: 32px; }
-.stat-chip { flex: 1; display: flex; align-items: center; gap: 14px; background: #F7F8FA; border: 1px solid #EEEFF2; border-radius: 10px; padding: 16px 20px; }
-.stat-chip-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.stat-chip-num { font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.03em; line-height: 1.1; }
-.stat-chip-label { font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px; }
+.hq-summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
+.hq-summary-cell { position: relative; padding: 1.1rem 1.4rem 1rem; background: color-mix(in srgb, var(--accent-bar, #2AC864) 7%, #fff); }
+.hq-summary-cell + .hq-summary-cell { border-left: 1px solid var(--rule); }
+.hq-summary-cell.accent::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent-bar, #2AC864); }
+.hq-summary-icon { display: flex; margin-bottom: 10px; }
+.hq-summary-value { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+.hq-summary-label { font-size: 13px; color: var(--ink); margin-top: 2px; }
 
 /* Tabs */
 .tabs { display: flex; border-bottom: 1px solid var(--rule); margin-bottom: 28px; }
@@ -162,6 +169,11 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-expand-btn svg { transition: transform .18s; }
 .og-expand-btn.open svg { transform: rotate(90deg); }
 .og-name-cell { display: flex; align-items: center; }
+.og-name-cell-inner { display: flex; flex-direction: column; }
+.og-outlet-count { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+.og-row-inactive .og-name { color: var(--ink-mute); }
+.og-row-inactive .og-outlet-count { color: var(--ink-soft); }
+.og-row-inactive .og-count { color: var(--ink-soft); }
 .og-outlet-sub-row { display: none; }
 .og-outlet-sub-row.open { display: table-row; }
 .og-outlet-sub-row td { background: #f7f8fa !important; padding: 0 14px 0 36px !important; }
@@ -187,6 +199,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .ml-table tbody tr:last-child td { border-bottom: none; }
 .ml-table tbody tr:nth-child(even) td { background: #f9fafb; }
 .ml-table tbody tr:hover td { background: var(--row-hover) !important; }
+.ml-inactive { opacity: 0.45; }
 .ml-item-name { font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
 .ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #f0f1f3; border-radius: 4px; padding: 1px 7px; margin-top: 3px; }
 .uom-text { font-size: 13px; color: var(--ink); }
@@ -223,6 +236,17 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 /* UOM modal */
 .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: center; justify-content: center; padding: 24px; }
 .modal-overlay.open { display: flex; }
+.confirm-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 1000; display: none; align-items: center; justify-content: center; }
+.confirm-overlay.open { display: flex; }
+.confirm-card { background: #fff; border-radius: 10px; width: 420px; max-width: calc(100vw - 32px); padding: 24px; box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+.confirm-title { font-size: 17px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 10px; }
+.confirm-body { font-size: 14px; color: var(--ink-2); line-height: 1.5; margin-bottom: 22px; }
+.confirm-body strong { color: var(--ink); font-weight: 600; }
+.confirm-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.modal-cancel { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; transition: color .13s; }
+.modal-cancel:hover { color: var(--ink); }
+.btn-danger { background: #D0291E; color: #fff; border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 18px; cursor: pointer; transition: background .15s; }
+.btn-danger:hover { background: #b8220f; }
 .modal-card { background: #fff; border-radius: 12px; width: 520px; max-width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,.22); overflow: hidden; }
 .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--rule); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .modal-title { font-size: 16px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
@@ -233,6 +257,22 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .uom-breakdown-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; padding: 8px 14px; background: #f9fafb; border-bottom: 1px solid var(--rule); }
 .uom-breakdown-table td { padding: 10px 14px; border-bottom: 1px solid var(--rule); }
 .uom-breakdown-table tr:last-child td { border-bottom: none; }
+
+.modal-card { display: flex; flex-direction: column; max-height: calc(100vh - 80px); }
+.modal-body { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+.modal-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+.modal-field { display: flex; flex-direction: column; gap: 5px; }
+.modal-field label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; }
+.modal-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.modal-field-input { background: #fff; border: 1px solid #DCDEE3; border-radius: 6px; padding: 9px 12px; font-size: 14px; color: var(--ink); font-family: inherit; outline: none; transition: border-color .13s; width: 100%; box-sizing: border-box; }
+.modal-field-input:focus { border-color: var(--nomni-green); }
+.modal-field-input:disabled { background: #F3F4F6; color: var(--ink-mute); cursor: not-allowed; }
+.modal-info-banner { display: flex; align-items: flex-start; gap: 10px; background: #FEF3C7; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #92400E; line-height: 1.5; }
+.modal-field-hint { font-size: 12px; color: var(--ink-mute); }
+.modal-section-label { font-size: 12px; font-weight: 700; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.hq-item-cat { display: inline-block; font-size: 11px; font-weight: 700; background: #F0F0F2; color: #555; border-radius: 4px; padding: 2px 8px; text-transform: uppercase; letter-spacing: .04em; }
+.modal-group-row { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; background: #F9FAFB; border-radius: 6px; color: var(--ink); }
+.modal-group-row + .modal-group-row { margin-top: 4px; }
 
 /* Placeholder */
 .placeholder-panel { border: 1.5px dashed var(--rule); border-radius: 10px; padding: 56px 24px; text-align: center; }
@@ -353,204 +393,22 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
     <div class="stats-strip" id="statsStrip"></div>
 
     <div class="tabs">
-      <div class="tab active" data-tab="overview">Overview</div>
-      <div class="tab" data-tab="outlet-groups">Outlet Groups</div>
-      <div class="tab" data-tab="market-list">Market List</div>
+      <div class="tab active" data-tab="outlet-groups">Overview</div>
+      <div class="tab" data-tab="market-list">Items</div>
       <div class="tab" data-tab="recipes">Recipes</div>
-      <div class="tab" data-tab="users">Users</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
-      <div class="tab" data-tab="settings">Settings</div>
       <div class="tab" data-tab="activity">Activity</div>
     </div>
 
-    <!-- ── Overview ── -->
-    <div class="tab-panel active" id="panel-overview">
-      <div class="overview-grid">
+    <!-- ── Outlet Groups ── -->
+    <div class="tab-panel active" id="panel-outlet-groups">
+      <div style="display:grid;grid-template-columns:1fr 272px;gap:32px;align-items:start">
+
+        <!-- Left: groups + outlets table -->
         <div>
           <div class="panel-label-row">
-            <span class="panel-label-text">Data overview</span>
-          </div>
-          <div class="module-cards">
-
-            <!-- Market List -->
-            <div class="module-card">
-              <div class="module-card-head">
-                <div class="module-icon" style="background:#E2FFE6;color:#1A8040"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></div>
-                <div class="module-card-head-text">
-                  <div class="module-card-title">Market List</div>
-                  <div class="module-card-master">100 <span style="font-size:13px;font-weight:400;color:var(--ink-mute)">items</span></div>
-                  <div class="module-card-master-sub">14 suppliers</div>
-                </div>
-                <a class="module-card-link" onclick="document.querySelector('.tab[data-tab=market-list]').click();return false;" href="#">View →</a>
-              </div>
-              <div class="module-card-rows">
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill Outlets</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#2AC864"></div></div>
-                  <span class="module-card-count">100 / 100</span>
-                </div>
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill Takeaway</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:87%;background:#2AC864"></div></div>
-                  <span class="module-card-count"><span class="diff">87</span> / 100</span>
-                </div>
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill VIP</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:45%;background:#2AC864"></div></div>
-                  <span class="module-card-count"><span class="diff">45</span> / 100</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Inventory -->
-            <div class="module-card">
-              <div class="module-card-head">
-                <div class="module-icon" style="background:#EFF6FF;color:#2563EB"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
-                <div class="module-card-head-text">
-                  <div class="module-card-title">Inventory</div>
-                  <div class="module-card-master">100 <span style="font-size:13px;font-weight:400;color:var(--ink-mute)">items tracked</span></div>
-                  <div class="module-card-master-sub">Par levels set per outlet</div>
-                </div>
-              </div>
-              <div class="module-card-rows">
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill Outlets</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#2563EB"></div></div>
-                  <span class="module-card-count">4 outlets</span>
-                </div>
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill Takeaway</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#2563EB"></div></div>
-                  <span class="module-card-count">2 outlets</span>
-                </div>
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill VIP</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#2563EB"></div></div>
-                  <span class="module-card-count">1 outlet</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Recipes -->
-            <div class="module-card">
-              <div class="module-card-head">
-                <div class="module-icon" style="background:#FEF3C7;color:#D97706"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-                <div class="module-card-head-text">
-                  <div class="module-card-title">Recipes</div>
-                  <div class="module-card-master">48 <span style="font-size:13px;font-weight:400;color:var(--ink-mute)">recipes</span></div>
-                  <div class="module-card-master-sub">In master library</div>
-                </div>
-                <a class="module-card-link" onclick="document.querySelector('.tab[data-tab=recipes]').click();return false;" href="#">View →</a>
-              </div>
-              <div class="module-card-rows">
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill Outlets</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#D97706"></div></div>
-                  <span class="module-card-count">48 / 48</span>
-                </div>
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill Takeaway</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:79%;background:#D97706"></div></div>
-                  <span class="module-card-count"><span class="diff">38</span> / 48</span>
-                </div>
-                <div class="module-card-row">
-                  <span class="module-card-group">Chargrill VIP</span>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:46%;background:#D97706"></div></div>
-                  <span class="module-card-count"><span class="diff">22</span> / 48</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- POS Mapping -->
-            <div class="module-card">
-              <div class="module-card-head">
-                <div class="module-icon" style="background:#F3F0FF;color:#6c4df2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-                <div class="module-card-head-text">
-                  <div class="module-card-title">POS Mapping</div>
-                  <div class="module-card-master" style="font-size:13px;font-weight:400;color:var(--ink-soft);margin-top:3px">Not connected</div>
-                </div>
-                <a class="module-card-link" href="#">Set up →</a>
-              </div>
-              <div class="module-card-empty">Connect Nomni POS to map menu items to recipes across all outlets.</div>
-            </div>
-
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:24px;">
-          <div>
-            <div class="panel-label-row">
-              <span class="panel-label-text">HQ Info</span>
-            </div>
-            <div class="info-card">
-              <div class="info-row">
-                <div class="info-label">Company</div>
-                <div class="info-val">Garden Cuisine Pte Ltd</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Created</div>
-                <div class="info-val">05 Sep 2019</div>
-              </div>
-              <div class="info-row">
-                <div class="info-label">Last updated</div>
-                <div class="info-val">10 Jun 2026</div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="panel-label-row">
-              <span class="panel-label-text">Recent activity</span>
-              <button onclick="navigateToTab('activity')" style="font-size:13px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View all →</button>
-            </div>
-            <div class="activity-feed">
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#2AC864"></div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>3 items added</strong> to master market list</div>
-                  <div class="activity-time">10 Jun 2026 · William Arya</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#2AC864"></div>
-                <div class="activity-body">
-                  <div class="activity-text">Chargrill VIP market list <strong>updated</strong> — 45 items</div>
-                  <div class="activity-time">08 Jun 2026 · James Tan</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#D97706"></div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>Char Siu Chicken</strong> recipe added to master library</div>
-                  <div class="activity-time">05 Jun 2026 · William Arya</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#2563EB"></div>
-                <div class="activity-body">
-                  <div class="activity-text">Chargrill Takeaway market list <strong>updated</strong> — 87 items</div>
-                  <div class="activity-time">03 Jun 2026 · James Tan</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#8a8f98"></div>
-                <div class="activity-body">
-                  <div class="activity-text"><strong>Chargrill VIP</strong> outlet group created</div>
-                  <div class="activity-time">15 Jan 2026 · William Arya</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ── Outlet Groups ── -->
-    <div class="tab-panel" id="panel-outlet-groups">
-      <div class="panel-label-row">
-        <span class="panel-label-text">Outlet Groups <span class="panel-label-count">3</span></span>
-        <button class="btn-primary">
+            <span class="panel-label-text">Outlet groups <span class="panel-label-count">2</span></span>
+        <button class="btn-primary" onclick="window.location.href='ZM Admin - Create Outlet Group.html?hq=Garden+Cuisine+HQ'">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
           New group
         </button>
@@ -560,11 +418,10 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
         <thead>
           <tr>
             <th>Group</th>
-            <th style="width:80px;text-align:center">Outlets</th>
             <th style="width:80px;text-align:center">Items</th>
+            <th style="width:80px;text-align:center">Recipes</th>
             <th style="width:90px;text-align:center">Suppliers</th>
             <th style="width:130px">Last updated</th>
-            <th style="width:90px">Status</th>
             <th style="width:48px"></th>
           </tr>
         </thead>
@@ -575,27 +432,29 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
                 <button class="og-expand-btn" onclick="toggleOgExpand(this,'og-sub-1')">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
-                <a href="ZM Admin - Edit Outlet Group.html" class="og-name">Chargrill Outlets</a>
+                <div class="og-name-cell-inner">
+                  <a href="ZM Admin - Edit Outlet Group.html" class="og-name">Chargrill Outlets</a>
+                  <span class="og-outlet-count">4 outlets</span>
+                </div>
               </div>
             </td>
-            <td style="text-align:center"><span class="og-count">4</span></td>
             <td style="text-align:center"><span class="og-count">100</span></td>
+            <td style="text-align:center"><span class="og-count">48</span></td>
             <td style="text-align:center"><span class="og-count">14</span></td>
             <td style="color:var(--ink-mute)">10 Jun 2026</td>
-            <td><span class="chip chip-active">Active</span></td>
             <td>
               <div class="row-actions-wrap">
                 <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>
                 <div class="row-actions-menu">
                   <div class="row-action-item" onclick="location.href='ZM Admin - Edit Outlet Group.html'">Edit group</div>
-                  <div class="row-action-item" onclick="location.href='ZM Admin - Outlet Group Settings.html'">Settings</div>
-                  <div class="row-action-item danger">Disable group</div>
+                  <div class="row-action-item" onclick="openGroupSettings('Chargrill Outlets','Garden Cuisine Chargrill chain locations')">Settings</div>
+                  <div class="row-action-item danger" onclick="toggleGroupDisabled(this)">Disable group</div>
                 </div>
               </div>
             </td>
           </tr>
           <tr class="og-outlet-sub-row" id="og-sub-1">
-            <td colspan="7">
+            <td colspan="6">
               <div class="outlet-list">
                 <div class="outlet-list-item">(WF 301) Chargrill @ 301 Punggol</div>
                 <div class="outlet-list-item">(WF 107) Chargrill @ 107 Serangoon</div>
@@ -610,74 +469,139 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
                 <button class="og-expand-btn" onclick="toggleOgExpand(this,'og-sub-2')">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
-                <a href="#" class="og-name">Chargrill Takeaway</a>
+                <div class="og-name-cell-inner">
+                  <a href="#" class="og-name">Family Dining Express</a>
+                  <span class="og-outlet-count">6 outlets</span>
+                </div>
               </div>
             </td>
-            <td style="text-align:center"><span class="og-count">2</span></td>
-            <td style="text-align:center"><span class="og-count">87</span></td>
-            <td style="text-align:center"><span class="og-count">11</span></td>
-            <td style="color:var(--ink-mute)">03 Jun 2026</td>
-            <td><span class="chip chip-active">Active</span></td>
+            <td style="text-align:center"><span class="og-count">92</span></td>
+            <td style="text-align:center"><span class="og-count">18</span></td>
+            <td style="text-align:center"><span class="og-count">13</span></td>
+            <td style="color:var(--ink-mute)">28 May 2026</td>
             <td>
               <div class="row-actions-wrap">
                 <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>
                 <div class="row-actions-menu">
                   <div class="row-action-item">Edit group</div>
-                  <div class="row-action-item">Settings</div>
-                  <div class="row-action-item danger">Disable group</div>
+                  <div class="row-action-item" onclick="openGroupSettings('Family Dining Express','')">Settings</div>
+                  <div class="row-action-item danger" onclick="toggleGroupDisabled(this)">Disable group</div>
                 </div>
               </div>
             </td>
           </tr>
           <tr class="og-outlet-sub-row" id="og-sub-2">
-            <td colspan="7">
+            <td colspan="6">
               <div class="outlet-list">
-                <div class="outlet-list-item">(WF 139) Chargrill @ 139 Tampines</div>
-                <div class="outlet-list-item">(WF 290) Garden Express @ 290 Sengkang</div>
+                <div class="outlet-list-item">(WF 055) Garden Express @ 055 Jurong East</div>
+                <div class="outlet-list-item">(WF 088) Garden Express @ 088 Clementi</div>
+                <div class="outlet-list-item">(WF 112) Garden Bistro @ 112 Novena</div>
+                <div class="outlet-list-item">(WF 167) Garden Bistro @ 167 Ang Mo Kio</div>
+                <div class="outlet-list-item">(WF 203) Garden Café @ 203 Bedok</div>
+                <div class="outlet-list-item">(WF 244) Garden Café @ 244 Woodlands</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="6" style="padding:0;background:#F9FAFB;border-bottom:1px solid var(--rule);border-top:2px solid var(--rule)">
+              <div style="padding:10px 14px;display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.04em">Ungrouped</span>
+                <span style="font-size:11px;font-weight:700;background:#F0F0F2;color:#555;border-radius:10px;padding:1px 8px">2</span>
               </div>
             </td>
           </tr>
           <tr>
             <td>
-              <div class="og-name-cell">
-                <button class="og-expand-btn" onclick="toggleOgExpand(this,'og-sub-3')">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-                </button>
-                <a href="#" class="og-name">Chargrill VIP</a>
-              </div>
+              <div style="padding-left:12px;font-size:14px;color:var(--ink)">(WF 139) Chargrill @ 139 Tampines</div>
             </td>
-            <td style="text-align:center"><span class="og-count">1</span></td>
-            <td style="text-align:center"><span class="og-count">45</span></td>
-            <td style="text-align:center"><span class="og-count">8</span></td>
-            <td style="color:var(--ink-mute)">15 Jan 2026</td>
-            <td><span class="chip chip-active">Active</span></td>
-            <td>
-              <div class="row-actions-wrap">
-                <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>
-                <div class="row-actions-menu">
-                  <div class="row-action-item">Edit group</div>
-                  <div class="row-action-item">Settings</div>
-                  <div class="row-action-item danger">Disable group</div>
-                </div>
-              </div>
-            </td>
+            <td style="text-align:center"><span class="og-count">74</span></td>
+            <td style="text-align:center"><span class="og-count">5</span></td>
+            <td style="text-align:center"><span class="og-count">9</span></td>
+            <td style="color:var(--ink-mute)">01 Jun 2026</td>
+            <td></td>
           </tr>
-          <tr class="og-outlet-sub-row" id="og-sub-3">
-            <td colspan="7">
-              <div class="outlet-list">
-                <div class="outlet-list-item">(WF 001) Chargrill VIP @ Marina Bay Sands</div>
-              </div>
+          <tr>
+            <td>
+              <div style="padding-left:12px;font-size:14px;color:var(--ink)">(WF 290) Garden Express @ 290 Sengkang</div>
             </td>
+            <td style="text-align:center"><span class="og-count">81</span></td>
+            <td style="text-align:center"><span class="og-count">7</span></td>
+            <td style="text-align:center"><span class="og-count">10</span></td>
+            <td style="color:var(--ink-mute)">28 May 2026</td>
+            <td></td>
           </tr>
         </tbody>
       </table>
       </div>
+        </div><!-- /left col -->
+
+        <!-- Right: health check + activity + HQ meta -->
+        <div style="display:flex;flex-direction:column;gap:20px;position:sticky;top:72px">
+
+          <!-- Health check -->
+          <div>
+            <div class="panel-label-row" style="margin-bottom:12px">
+              <span class="panel-label-text">Health check</span>
+            </div>
+            <div style="border:1px solid var(--rule);border-radius:10px;overflow:hidden">
+              <div style="padding:8px 4px;display:flex;flex-direction:column" id="healthCheck"></div>
+            </div>
+          </div>
+
+          <!-- Recent activity -->
+          <div>
+            <div class="panel-label-row" style="margin-bottom:12px">
+              <span class="panel-label-text">Recent activity</span>
+              <button onclick="navigateToTab('activity')" style="font-size:13px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View all →</button>
+            </div>
+            <div class="activity-feed">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#2AC864"></div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>3 items added</strong> to master market list</div>
+                  <div class="activity-time">10 Jun 2026 · William Arya</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#2AC864"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Family Dining Express market list <strong>updated</strong> — 92 items</div>
+                  <div class="activity-time">08 Jun 2026 · James Tan</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#D97706"></div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>Char Siu Chicken</strong> recipe added to master library</div>
+                  <div class="activity-time">05 Jun 2026 · William Arya</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#2563EB"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Family Dining Express market list <strong>updated</strong> — 92 items</div>
+                  <div class="activity-time">03 Jun 2026 · James Tan</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#8a8f98"></div>
+                <div class="activity-body">
+                  <div class="activity-text"><strong>Family Dining Express</strong> outlet group created</div>
+                  <div class="activity-time">02 Feb 2026 · William Arya</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /right col -->
+
+      </div><!-- /two-panel grid -->
     </div>
 
     <!-- ── Market List ── -->
     <div class="tab-panel" id="panel-market-list">
       <div class="panel-label-row">
-        <span class="panel-label-text">Master Market List <span class="panel-label-count" id="mlCount"></span></span>
+        <span class="panel-label-text">Items <span class="panel-label-count" id="mlCount"></span></span>
         <button class="btn-primary">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
           Add item
@@ -710,8 +634,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
               <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">Item name <span class="sort-ind"></span></th>
               <th style="width:160px">Supplier</th>
               <th class="sort-th" id="mlSortTh-price" onclick="setMlSort('price')" style="width:160px">UOM / Price <span class="sort-ind"></span></th>
-              <th style="width:120px">Outlet groups</th>
-              <th style="width:90px">Status</th>
+              <th style="width:120px">Groups with access</th>
               <th style="width:48px"></th>
             </tr>
           </thead>
@@ -724,7 +647,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
     <!-- ── Recipes ── -->
     <div class="tab-panel" id="panel-recipes">
       <div class="panel-label-row">
-        <span class="panel-label-text">Master Recipe Library <span class="panel-label-count" id="recCount"></span></span>
+        <span class="panel-label-text">Recipes <span class="panel-label-count" id="recCount"></span></span>
         <button class="btn-primary">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
           Add recipe
@@ -736,7 +659,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           <input type="text" class="ml-search-input" id="recSearch" placeholder="Search recipes…" oninput="setRecSearch(this.value)" />
         </div>
         <select class="ml-filter-select" id="recCatFilter" onchange="setRecCatFilter(this.value)">
-          <option value="">All categories</option>
+          <option value="">All tags</option>
           <option>Mains</option>
           <option>Starters</option>
           <option>Sides</option>
@@ -755,10 +678,9 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           <thead>
             <tr>
               <th class="sort-th" id="recSortTh-name" onclick="setRecSort('name')">Recipe <span class="sort-ind"></span></th>
-              <th style="width:120px">Portions</th>
-              <th class="sort-th" id="recSortTh-cost" onclick="setRecSort('cost')" style="width:130px">Food cost / portion <span class="sort-ind"></span></th>
-              <th style="width:120px">Outlet groups</th>
-              <th style="width:90px">Status</th>
+              <th class="sort-th" id="recSortTh-cost" onclick="setRecSort('cost')" style="width:120px">Food cost % <span class="sort-ind"></span></th>
+              <th style="width:160px">Groups with access</th>
+              <th style="width:120px">Last updated</th>
               <th style="width:48px"></th>
             </tr>
           </thead>
@@ -783,17 +705,35 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
       </div>
     </div>
 
-    <!-- ── Suppliers (placeholder) ── -->
+    <!-- ── Suppliers ── -->
     <div class="tab-panel" id="panel-suppliers">
       <div class="panel-label-row">
-        <span class="panel-label-text">Suppliers <span class="panel-label-count">14</span></span>
+        <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supCount"></span></span>
+        <button class="btn-primary" style="display:inline-flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Link supplier
+        </button>
       </div>
-      <div class="info-banner">
-        Suppliers are linked to this HQ by the Nomni team. Contact <a href="mailto:support@nomni.co">support@nomni.co</a> to add or remove a supplier.
+      <div class="ml-filter-row">
+        <div class="ml-search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="ml-search-input" id="supSearch" placeholder="Search suppliers…" oninput="renderSuppliers()" />
+        </div>
       </div>
-      <div class="placeholder-panel">
-        <div class="placeholder-title">Supplier list coming soon</div>
-        <div class="placeholder-desc">All suppliers linked to Garden Cuisine HQ will appear here.</div>
+      <div style="overflow:clip">
+        <table class="ml-table">
+          <thead>
+            <tr>
+              <th>Supplier</th>
+              <th style="width:80px;text-align:center">Items</th>
+              <th style="width:200px">Contact</th>
+              <th style="width:110px">Type</th>
+              <th style="width:120px">Groups with access</th>
+              <th style="width:48px"></th>
+            </tr>
+          </thead>
+          <tbody id="supBody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -832,8 +772,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           <option value="">All scopes</option>
           <option>Master</option>
           <option>Chargrill Outlets</option>
-          <option>Chargrill Takeaway</option>
-          <option>Chargrill VIP</option>
+          <option>Family Dining Express</option>
         </select>
         <select class="ml-filter-select" id="actRangePreset" onchange="onActRangeChange()">
           <option value="90">Last 90 days</option>
@@ -856,23 +795,37 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
   </main>
 </div>
 
-<!-- UOM modal -->
-<div class="modal-overlay" id="uomModal">
-  <div class="modal-card">
+<!-- Unified item detail modal -->
+<div class="modal-overlay" id="hqItemModal" onclick="if(event.target===this)closeHqItemModal()">
+  <div class="modal-card" style="width:540px">
     <div class="modal-header">
       <div style="flex:1;min-width:0">
-        <div class="modal-title" id="uomModalTitle"></div>
-        <div style="font-size:12px;color:var(--ink-mute);margin-top:4px" id="uomModalSub"></div>
+        <div class="modal-title" id="hqItemModalTitle" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+          <span class="hq-item-cat" id="hqItemModalCat"></span>
+          <span style="font-size:13px;color:var(--ink-mute)" id="hqItemModalSupplier"></span>
+        </div>
       </div>
-      <button class="modal-close" onclick="closeUomModal()">
+      <button class="modal-close" onclick="closeHqItemModal()" style="flex-shrink:0;margin-left:12px">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
     <div class="modal-body">
-      <table class="uom-breakdown-table">
-        <thead><tr><th>UOM</th><th>Unit price</th></tr></thead>
-        <tbody id="uomBreakdownBody"></tbody>
-      </table>
+      <div id="hqItemBanner" style="display:none"></div>
+      <div class="modal-field">
+        <label>Custom name <span style="font-weight:400;text-transform:none;color:var(--ink-mute)">(optional)</span></label>
+        <input id="hqItemCustomName" class="modal-field-input" type="text" placeholder="Leave blank to use the catalogue name" />
+        <div class="modal-field-hint">Overrides how this item appears on orders</div>
+      </div>
+      <div id="hqItemPriceSection"></div>
+      <div>
+        <div class="modal-section-label">Groups with access</div>
+        <div id="hqItemGroupsList"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-tertiary" onclick="closeHqItemModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="closeHqItemModal()">Save changes</button>
     </div>
   </div>
 </div>
@@ -897,6 +850,14 @@ document.getElementById('userMenuBtn').addEventListener('click', e => {
 document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
 
 // Row actions
+function toggleGroupDisabled(item) {
+  const row = item.closest('tr');
+  const isDisabled = row.classList.toggle('og-row-inactive');
+  item.textContent = isDisabled ? 'Enable group' : 'Disable group';
+  item.classList.toggle('danger', !isDisabled);
+  document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
+}
+
 function toggleRowActions(btn) {
   const menu = btn.nextElementSibling;
   const isOpen = menu.classList.contains('open');
@@ -908,17 +869,52 @@ document.addEventListener('click', e => {
     document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
 });
 
+// Health check
+(function() {
+  const issues = [];
+  const infos = [];
+
+  // Ungrouped outlets
+  const UNGROUPED = ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'];
+  if (UNGROUPED.length) issues.push({ icon: '⚠', text: UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + ' not assigned to any group', color: '#92400E', bg: '#FEF3C7' });
+
+  // POS not connected
+  infos.push({ icon: '○', text: 'POS mapping not connected', color: '#6B7280', bg: '#F3F4F6' });
+
+  const el = document.getElementById('healthCheck');
+  if (!el) return;
+  const all = [...issues, ...infos];
+  el.innerHTML = all.map(i =>
+    '<div style="display:flex;align-items:center;gap:8px;font-size:13px">' +
+    '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:' + i.bg + ';color:' + i.color + ';font-size:10px;font-weight:700;flex-shrink:0">' + i.icon + '</span>' +
+    '<span style="color:' + i.color + ';font-weight:500">' + i.text + '</span>' +
+    '</div>'
+  ).join('');
+})();
+
 // Stats strip
 (function() {
   const strip = document.getElementById('statsStrip');
-  const sc = (icon, num, label, bg, col) =>
-    '<div class="stat-chip"><div class="stat-chip-icon" style="background:' + bg + ';color:' + col + '">' + icon + '</div>' +
-    '<div><div class="stat-chip-num">' + num + '</div><div class="stat-chip-label">' + label + '</div></div></div>';
-  strip.innerHTML =
-    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', 7, 'Outlets', '#E2FFE6', '#1A8040') +
-    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>', 3, 'Groups', '#EFF6FF', '#2563EB') +
-    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', 3, 'Users', '#F3F0FF', '#6c4df2') +
-    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg>', 14, 'Suppliers', '#FEF3C7', '#D97706');
+  strip.className = 'hq-summary-strip';
+  const ICONS = {
+    home: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'layout-grid': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>',
+    star: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+    briefcase: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>'
+  };
+  const stats = [
+    { icon: 'home',        value: 7,   label: 'Outlets',   accent: true, iconColor: '#1A8040', accentColor: '#2AC864' },
+    { icon: 'layout-grid', value: 100, label: 'Items',    accent: true, iconColor: '#185FA5', accentColor: '#3B82F6' },
+    { icon: 'star',        value: 48,  label: 'Recipes',  accent: true, iconColor: '#854F0B', accentColor: '#F59E0B' },
+    { icon: 'briefcase',   value: 14,  label: 'Suppliers', accent: true, iconColor: '#6D28D9', accentColor: '#8B5CF6' },
+  ];
+  strip.innerHTML = stats.map(s =>
+    '<div class="hq-summary-cell' + (s.accent ? ' accent' : '') + '"' + (s.accentColor ? ' style="--accent-bar:' + s.accentColor + '"' : '') + '>' +
+    '<div class="hq-summary-icon" style="color:' + (s.iconColor || 'var(--ink-mute)') + '">' + ICONS[s.icon] + '</div>' +
+    '<div class="hq-summary-value">' + s.value + '</div>' +
+    '<div class="hq-summary-label">' + s.label + '</div>' +
+    '</div>'
+  ).join('');
 })();
 
 // Items data
@@ -1025,7 +1021,7 @@ const ITEMS = [
   { name: "Taylor Precision Digital Instant-Read Probe Meat Thermometer NSF Certified", cat: "Supplies", supplier: "Grill Master SG", price: 35.00, uom: "per pc" },
 ];
 
-const TOTAL_GROUPS = 3;
+const TOTAL_GROUPS = 2;
 const CAT_ORDER = ["Poultry","Beef","Pork","Lamb","Seafood","Produce","Dry Goods","Sauces","Dairy & Eggs","Frozen","Beverages","Supplies"];
 const UOM_MULT = {
   'per kg':1,'per g':0.001,'per btl':1,'per can':1,'per pc':1,'per roll':1,'per rack':1,
@@ -1037,9 +1033,15 @@ const UOM_MULT = {
   'per pack (10)':10,'per pack (12)':12,'per pack (24)':24,'per flat (30)':30,'per sack (5kg)':5,
 };
 
+const ML_GROUPS = ['Chargrill Outlets', 'Family Dining Express'];
+const ML_OUTLETS = ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'];
 ITEMS.forEach((item, i) => {
-  item.groups = (i % 7 === 0) ? 1 : (i % 3 === 0) ? 2 : 3;
+  item.groupList = (i % 5 === 0) ? [ML_GROUPS[0]] : (i % 5 === 3) ? [ML_GROUPS[1]] : ML_GROUPS.slice();
+  item.outletList = (i % 7 === 2) ? ML_OUTLETS.slice() : (i % 7 === 5) ? [ML_OUTLETS[0]] : [];
   item.active = (i % 11 !== 0);
+  const uomStr = Array.isArray(item.uom) ? item.uom[0] : item.uom;
+  const uomUnit = uomStr.replace('per ', '');
+  item.moq = ['5', '2', '10', '1'][i % 4] + ' ' + uomUnit;
 });
 
 // Populate supplier filter
@@ -1094,20 +1096,66 @@ function getMlItems() {
   return items;
 }
 
-function openUomModal(idx) {
+function openHqItemModal(idx) {
   const item = ITEMS[idx];
-  document.getElementById('uomModalTitle').textContent = item.name;
-  document.getElementById('uomModalSub').textContent = item.cat + ' · ' + item.supplier;
+  document.getElementById('hqItemModalTitle').textContent = item.name;
+  document.getElementById('hqItemModalCat').textContent = item.cat;
+  document.getElementById('hqItemModalSupplier').textContent = item.supplier;
+  document.getElementById('hqItemCustomName').value = '';
+
+  const supplierRecord = SUPPLIERS.find(s => s.name === item.supplier);
+  const isActiveSup = supplierRecord && supplierRecord.type === 'active';
+
+  const banner = document.getElementById('hqItemBanner');
+  if (isActiveSup) {
+    banner.className = 'modal-info-banner';
+    banner.style.display = 'flex';
+    banner.innerHTML =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      '<span>Prices and MOQ for items from <strong>' + item.supplier + '</strong> are managed by the supplier and cannot be edited here.</span>';
+  } else {
+    banner.style.display = 'none';
+  }
+
+  const section = document.getElementById('hqItemPriceSection');
   const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
-  const primaryMult = UOM_MULT[uoms[0]] || 1;
-  const unitPrice = item.price / primaryMult;
-  document.getElementById('uomBreakdownBody').innerHTML = uoms.map(u =>
-    '<tr><td>' + u + '</td><td style="font-weight:600">$' + (unitPrice * (UOM_MULT[u] || 1)).toFixed(2) + '</td></tr>'
-  ).join('');
-  document.getElementById('uomModal').classList.add('open');
+  if (uoms.length > 1) {
+    section.innerHTML =
+      '<div class="modal-field"><label>UOM pricing</label>' +
+      '<table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th></tr></thead><tbody>' +
+      uoms.map(u => '<tr><td>' + u + '</td><td><input class="modal-field-input" type="text" value="' + item.price.toFixed(2) + '" style="padding:6px 10px" /></td></tr>').join('') +
+      '</tbody></table></div>' +
+      '<div class="modal-field-row"><div class="modal-field"><label>MOQ</label><input class="modal-field-input" type="text" value="' + item.moq + '" /></div></div>';
+  } else {
+    section.innerHTML =
+      '<div class="modal-field-row">' +
+      '<div class="modal-field"><label>Unit price (S$)</label><input class="modal-field-input" type="text" value="' + item.price.toFixed(2) + '" /><div class="modal-field-hint">' + item.uom + '</div></div>' +
+      '<div class="modal-field"><label>MOQ</label><input class="modal-field-input" type="text" value="' + item.moq + '" /></div>' +
+      '</div>';
+  }
+
+  if (isActiveSup) {
+    section.querySelectorAll('input').forEach(inp => { inp.disabled = true; });
+  }
+
+  const groupsList = document.getElementById('hqItemGroupsList');
+  const allGroups = item.groupList.length === ML_GROUPS.length && item.outletList.length === 0;
+  if (allGroups) {
+    groupsList.innerHTML = '<p style="font-size:13px;color:var(--ink-mute);margin:0">Accessible to all groups</p>';
+  } else {
+    const groupIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>';
+    const outletIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+    groupsList.innerHTML =
+      item.groupList.map(g => '<div class="modal-group-row">' + groupIcon + '<span>' + g + '</span></div>').join('') +
+      item.outletList.map(o => '<div class="modal-group-row" style="background:#EFF6FF">' + outletIcon + '<span style="color:#185FA5">' + o + '</span></div>').join('');
+  }
+
+  document.getElementById('hqItemModal').classList.add('open');
 }
-function closeUomModal() { document.getElementById('uomModal').classList.remove('open'); }
-document.getElementById('uomModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeUomModal(); });
+
+function closeHqItemModal() {
+  document.getElementById('hqItemModal').classList.remove('open');
+}
 
 function renderMl() {
   const items = getMlItems();
@@ -1121,23 +1169,23 @@ function renderMl() {
     const rawIdx = ITEMS.indexOf(item);
     const isMulti = Array.isArray(item.uom);
     const firstUom = isMulti ? item.uom[0] : item.uom;
-    const uomCell = '<div class="uom-text">$' + item.price.toFixed(2) +
-      ' <span style="color:var(--ink-mute);font-size:12px">' + firstUom + '</span></div>' +
-      (isMulti ? '<button class="uom-options-btn" onclick="openUomModal(' + rawIdx + ')">' + item.uom.length + ' options</button>' : '');
+    const uomCell = '$' + item.price.toFixed(2) + ' <span style="color:var(--ink-mute);font-size:12px">' + firstUom + '</span>' +
+      (isMulti ? '<div style="font-size:11px;font-weight:600;color:var(--ink-mute);margin-top:2px">+' + (item.uom.length - 1) + ' more UOM</div>' : '');
 
-    const grpText = item.groups === TOTAL_GROUPS ? 'All ' + TOTAL_GROUPS + ' groups' : item.groups + ' of ' + TOTAL_GROUPS;
-    const status = item.active
-      ? '<span class="chip chip-active">Active</span>'
-      : '<span class="chip chip-inactive">Inactive</span>';
-
-    return '<tr>' +
+    const allGroups = item.groupList.length === ML_GROUPS.length && item.outletList.length === 0;
+    const mlParts = [];
+    if (item.groupList.length > 0) mlParts.push(item.groupList.length === 1 ? '1 group' : item.groupList.length + ' groups');
+    if (item.outletList.length > 0) mlParts.push(item.outletList.length === 1 ? '1 outlet' : item.outletList.length + ' outlets');
+    const grpHtml = allGroups
+      ? '<span style="font-size:12px;color:var(--ink-mute)">All groups</span>'
+      : '<span style="font-size:13px;font-weight:500;color:var(--ink)">' + mlParts.join(' · ') + '</span>';
+    return '<tr' + (item.active ? '' : ' class="ml-inactive"') + ' style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
       '<td><div class="ml-item-name">' + item.name + '</div><span class="ml-cat-tag">' + item.cat + '</span></td>' +
       '<td style="color:var(--ink-mute);font-size:13px">' + item.supplier + '</td>' +
       '<td>' + uomCell + '</td>' +
-      '<td style="font-size:13px;color:var(--ink-mute)">' + grpText + '</td>' +
-      '<td>' + status + '</td>' +
+      '<td style="text-align:left">' + grpHtml + '</td>' +
       '<td><div class="row-actions-wrap">' +
-        '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>' +
+        '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">···</button>' +
         '<div class="row-actions-menu">' +
           '<div class="row-action-item">Edit pricing</div>' +
           '<div class="row-action-item">Manage UOM</div>' +
@@ -1231,9 +1279,20 @@ const RECIPES = [
 ];
 
 const REC_CAT_ORDER = ['Mains','Starters','Sides','Sauces & Marinades','Desserts','Beverages'];
+const REC_GROUPS = ['Chargrill Outlets', 'Family Dining Express'];
+const REC_OUTLETS = ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'];
+const REC_DATES = ['10 Jun 2026','05 Jun 2026','28 May 2026','20 May 2026','15 May 2026','01 May 2026','24 Apr 2026','10 Apr 2026','01 Apr 2026','15 Mar 2026','10 Mar 2026','28 Feb 2026','15 Feb 2026','01 Feb 2026','20 Jan 2026','10 Jan 2026','05 Jan 2026','20 Dec 2025','10 Dec 2025','01 Dec 2025','15 Nov 2025','01 Nov 2025','15 Oct 2025','01 Oct 2025','15 Sep 2025'];
+const REC_FC_TARGETS = { 'Mains': 0.35, 'Starters': 0.32, 'Sides': 0.26, 'Sauces & Marinades': 0.25, 'Desserts': 0.28, 'Beverages': 0.14 };
 RECIPES.forEach((r, i) => {
-  r.groups = (i % 7 === 0) ? 1 : (i % 3 === 0) ? 2 : 3;
+  const g = (i % 5 === 0) ? 1 : 2;
+  r.groupList = g === 2 ? REC_GROUPS.slice() : [REC_GROUPS[i % 2]];
+  r.outletList = (i % 4 === 1) ? REC_OUTLETS.slice() : (i % 4 === 3) ? [REC_OUTLETS[0]] : [];
+  r.versions = (i === 2 || i === 7 || i === 15 || i === 22 || i === 35) ? 2 : 1;
+  r.lastUpdated = REC_DATES[i % REC_DATES.length];
   r.active = (i % 9 !== 0);
+  const fc = REC_FC_TARGETS[r.cat] || 0.30;
+  r.price = Math.round(r.cost / fc * 2) / 2;
+  r.foodCostPct = r.cost / r.price * 100;
 });
 
 let recPage = 1;
@@ -1266,8 +1325,8 @@ function getRecItems() {
   }
   if (recSortKey === 'name-asc') items.sort((a,b) => a.name.localeCompare(b.name));
   else if (recSortKey === 'name-desc') items.sort((a,b) => b.name.localeCompare(a.name));
-  else if (recSortKey === 'cost-asc') items.sort((a,b) => a.cost - b.cost);
-  else if (recSortKey === 'cost-desc') items.sort((a,b) => b.cost - a.cost);
+  else if (recSortKey === 'cost-asc') items.sort((a,b) => a.foodCostPct - b.foodCostPct);
+  else if (recSortKey === 'cost-desc') items.sort((a,b) => b.foodCostPct - a.foodCostPct);
   else items.sort((a,b) => {
     const ci = REC_CAT_ORDER.indexOf(a.cat) - REC_CAT_ORDER.indexOf(b.cat);
     return ci !== 0 ? ci : a.name.localeCompare(b.name);
@@ -1284,17 +1343,23 @@ function renderRec() {
   document.getElementById('recCount').textContent = total;
 
   document.getElementById('recBody').innerHTML = page.map(r => {
-    const grpText = r.groups === 3 ? 'All 3 groups' : r.groups + ' of 3';
-    const status = r.active
-      ? '<span class="chip chip-active">Active</span>'
-      : '<span class="chip chip-inactive">Inactive</span>';
-    const portionsText = r.portions === 1 ? 'Single' : r.portions + ' portions';
-    return '<tr>' +
-      '<td><div class="ml-item-name">' + r.name + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
-      '<td style="font-size:13px;color:var(--ink-mute)">' + portionsText + '</td>' +
-      '<td style="font-size:13px;color:var(--ink);font-weight:500">$' + r.cost.toFixed(2) + ' <span style="font-weight:400;color:var(--ink-mute);font-size:12px">/ portion</span></td>' +
-      '<td style="font-size:13px;color:var(--ink-mute)">' + grpText + '</td>' +
-      '<td>' + status + '</td>' +
+    const allGroups = r.groupList.length === REC_GROUPS.length && r.outletList.length === 0;
+    const parts = [];
+    if (r.groupList.length > 0) parts.push(r.groupList.length === 1 ? '1 group' : r.groupList.length + ' groups');
+    if (r.outletList.length > 0) parts.push(r.outletList.length === 1 ? '1 outlet' : r.outletList.length + ' outlets');
+    const accessLabel = parts.join(' · ');
+    const grpAttr = 'data-groups="' + r.groupList.join('|') + '" data-outlets="' + r.outletList.join('|') + '"';
+    const grpHtml = allGroups
+      ? '<span style="font-size:12px;color:var(--ink-mute)">All groups</span>'
+      : '<button onclick="openRecGroupsDialog(this)" ' + grpAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + accessLabel + '</button>';
+    const versionsHtml = r.versions > 1
+      ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' versions</span>'
+      : '';
+    return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
+      '<td><div class="ml-item-name">' + r.name + versionsHtml + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
+      '<td><span style="font-size:13px;font-weight:600;color:var(--ink)">' + r.foodCostPct.toFixed(1) + '%</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">$' + r.cost.toFixed(2) + ' cost · $' + r.price.toFixed(2) + ' sell</div></td>' +
+      '<td>' + grpHtml + '</td>' +
+      '<td style="font-size:13px;color:var(--ink-mute)">' + r.lastUpdated + '</td>' +
       '<td><div class="row-actions-wrap">' +
         '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>' +
         '<div class="row-actions-menu">' +
@@ -1344,21 +1409,21 @@ const ACTIVITY_LOG = [
   // Market List — supplier linked
   { date: '02 May 2026', time: '11:20', user: 'William Arya', module: 'market-list', text: '<strong>Ocean Fresh</strong> linked as supplier', scope: 'Master', tab: 'suppliers' },
   // Market List — group list customised
-  { date: '10 Apr 2026', time: '10:15', user: 'James Tan',    module: 'market-list', text: 'Chargrill VIP market list customised — <strong>8 items removed</strong>', scope: 'Chargrill VIP', tab: 'outlet-groups' },
+  { date: '10 Apr 2026', time: '10:15', user: 'James Tan',    module: 'market-list', text: 'Family Dining Express market list customised — <strong>8 items removed</strong>', scope: 'Family Dining Express', tab: 'outlet-groups' },
   // Recipes — recipe added to master
   { date: '05 Jun 2026', time: '11:44', user: 'William Arya', module: 'recipes',     text: '<strong>Char Siu Chicken</strong> recipe added to master library', scope: 'Master', tab: 'recipes' },
   // Recipes — recipe updated
   { date: '24 Apr 2026', time: '09:55', user: 'James Tan',    module: 'recipes',     text: '<strong>BBQ Pork Ribs</strong> recipe updated — portion size revised', scope: 'Master', tab: 'recipes' },
   // Recipes — group recipe list customised
-  { date: '20 May 2026', time: '14:11', user: 'James Tan',    module: 'recipes',     text: 'Chargrill Takeaway recipe list customised — <strong>38 of 48 recipes</strong> enabled', scope: 'Chargrill Takeaway', tab: 'outlet-groups' },
+  { date: '20 May 2026', time: '14:11', user: 'James Tan',    module: 'recipes',     text: 'Family Dining Express recipe list customised — <strong>38 of 48 recipes</strong> enabled', scope: 'Family Dining Express', tab: 'outlet-groups' },
   // Inventory — structure updated
   { date: '10 May 2026', time: '15:45', user: 'James Tan',    module: 'inventory',   text: 'Master inventory structure updated — <strong>5 items added</strong>', scope: 'Master', tab: 'overview' },
   // Inventory — group inventory initialised
-  { date: '02 Feb 2026', time: '09:10', user: 'James Tan',    module: 'inventory',   text: '<strong>Chargrill Takeaway</strong> inventory initialised from master structure', scope: 'Chargrill Takeaway', tab: 'outlet-groups' },
+  { date: '02 Feb 2026', time: '09:10', user: 'James Tan',    module: 'inventory',   text: '<strong>Family Dining Express</strong> inventory initialised from master structure', scope: 'Family Dining Express', tab: 'outlet-groups' },
   // Inventory — par level template updated
   { date: '01 Apr 2026', time: '16:00', user: 'William Arya', module: 'inventory',   text: 'Par level template updated for <strong>Chargrill Outlets</strong>', scope: 'Chargrill Outlets', tab: 'outlet-groups' },
   // Outlet Groups — group created
-  { date: '18 Apr 2026', time: '14:30', user: 'William Arya', module: 'outlet-groups', text: '<strong>Chargrill Takeaway</strong> outlet group created', scope: 'Chargrill Takeaway', tab: 'outlet-groups' },
+  { date: '18 Apr 2026', time: '14:30', user: 'William Arya', module: 'outlet-groups', text: '<strong>Family Dining Express</strong> outlet group created', scope: 'Family Dining Express', tab: 'outlet-groups' },
   // Outlet Groups — outlet added to group
   { date: '28 May 2026', time: '10:05', user: 'William Arya', module: 'outlet-groups', text: '<strong>2 outlets added</strong> to Chargrill Outlets group', scope: 'Chargrill Outlets', tab: 'outlet-groups' },
   // Outlet Groups — group renamed
@@ -1368,7 +1433,7 @@ const ACTIVITY_LOG = [
   // HQ — user added
   { date: '20 Jan 2026', time: '11:00', user: 'William Arya', module: 'hq',          text: '<strong>James Tan</strong> added as HQ Admin', scope: 'HQ', tab: 'users' },
   // HQ — created
-  { date: '15 Jan 2026', time: '14:00', user: 'William Arya', module: 'outlet-groups', text: '<strong>Chargrill VIP</strong> outlet group created', scope: 'Chargrill VIP', tab: 'outlet-groups' },
+  { date: '15 Jan 2026', time: '14:00', user: 'William Arya', module: 'outlet-groups', text: '<strong>Chargrill Outlets</strong> outlet group created', scope: 'Chargrill Outlets', tab: 'outlet-groups' },
   { date: '10 Jan 2026', time: '10:30', user: 'James Tan',    module: 'market-list', text: 'Master market list initialised — <strong>100 items</strong> · 14 suppliers', scope: 'Master', tab: 'market-list' },
   { date: '05 Jan 2026', time: '09:15', user: 'William Arya', module: 'recipes',     text: 'Master recipe library initialised — <strong>43 recipes</strong>', scope: 'Master', tab: 'recipes' },
   { date: '05 Sep 2019', time: '08:00', user: 'William Arya', module: 'hq',          text: '<strong>Garden Cuisine HQ</strong> created', scope: 'HQ', tab: 'overview' },
@@ -1428,7 +1493,7 @@ function getFilteredActivity() {
       if (to && d > to) return false;
     }
     return true;
-  });
+  }).sort((a, b) => parseActDate(b.date) - parseActDate(a.date));
 }
 
 function renderActivity() {
@@ -1494,6 +1559,242 @@ function navigateToTab(tab) {
 }
 
 renderActivity();
+
+// ── Suppliers ──
+const SUPPLIERS = [
+  { name: 'Kee Song Group',        cat: 'Poultry',               contact: 'sales@keesong.com.sg',       phone: '+65 6268 2828', active: true,  type: 'active'  },
+  { name: 'NH Foods',              cat: 'Beef & Lamb',           contact: 'sg@nhfoods.com',             phone: '+65 6511 0200', active: true,  type: 'active'  },
+  { name: 'Provenir',              cat: 'Beef & Lamb',           contact: 'orders@provenir.com.au',     phone: '+61 3 9001 0200', active: true, type: 'passive' },
+  { name: 'Meat King',             cat: 'Beef & Lamb',           contact: 'orders@meatking.com.sg',     phone: '+65 2251 0988', active: true,  type: 'active'  },
+  { name: 'Ocean Fresh',           cat: 'Seafood',               contact: 'ops@oceanfresh.com.sg',      phone: '+65 6570 8833', active: true,  type: 'active'  },
+  { name: 'Song Fish Dealer',      cat: 'Seafood',               contact: 'song@songfish.com.sg',       phone: '+65 6536 1100', active: true,  type: 'passive' },
+  { name: 'Deli Hub',              cat: 'Seafood',               contact: 'orders@delihub.com.sg',      phone: '+65 6742 2828', active: true,  type: 'passive' },
+  { name: 'Sustenir Agriculture',  cat: 'Produce',               contact: 'b2b@sustenir.com',           phone: '+65 6904 5130', active: true,  type: 'active'  },
+  { name: 'Lee Kum Kee',           cat: 'Sauces & Condiments',   contact: 'sg@leekumkee.com',           phone: '+65 6274 7788', active: true,  type: 'active'  },
+  { name: 'AmoyFoods',             cat: 'Sauces & Condiments',   contact: 'trade@amoyfoods.com.sg',     phone: '+65 6365 5411', active: true,  type: 'passive' },
+  { name: 'Kikkoman',              cat: 'Sauces & Condiments',   contact: 'sg@kikkoman.com',            phone: '+65 6270 9000', active: false, type: 'passive' },
+  { name: 'Fonterra',              cat: 'Dairy & Eggs',          contact: 'orders.sg@fonterra.com',     phone: '+65 6225 9988', active: true,  type: 'active'  },
+  { name: 'Seng Choon Farm',       cat: 'Dairy & Eggs',          contact: 'wholesale@sengchoon.com.sg', phone: '+65 6769 7111', active: true,  type: 'active'  },
+  { name: 'Grill Master SG',       cat: 'Supplies',              contact: 'orders@grillmaster.com.sg',  phone: '+65 6747 1133', active: true,  type: 'passive' },
+];
+
+(function() {
+  const SUP_GROUPS = ['Chargrill Outlets', 'Family Dining Express'];
+  const SUP_OUTLETS = ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'];
+  SUPPLIERS.forEach((s, i) => {
+    s.itemCount = ITEMS.filter(item => item.supplier === s.name).length;
+    s.groupList = (i % 5 === 0) ? [SUP_GROUPS[0]] : (i % 5 === 3) ? [SUP_GROUPS[1]] : SUP_GROUPS.slice();
+    s.outletList = (i % 7 === 2) ? SUP_OUTLETS.slice() : (i % 7 === 5) ? [SUP_OUTLETS[1]] : [];
+  });
+  document.getElementById('supCount').textContent = SUPPLIERS.length;
+})();
+
+let pendingSupDisableName = null;
+let pendingSupReactivateName = null;
+
+function openSupDisableWarning(name) {
+  pendingSupDisableName = name;
+  document.getElementById('supDisableName').textContent = name;
+  document.getElementById('supDisableOverlay').classList.add('open');
+}
+function closeSupDisableWarning() {
+  pendingSupDisableName = null;
+  document.getElementById('supDisableOverlay').classList.remove('open');
+}
+function confirmSupDisable() {
+  if (!pendingSupDisableName) return;
+  const s = SUPPLIERS.find(s => s.name === pendingSupDisableName);
+  if (s) {
+    s.active = false;
+    ITEMS.forEach(item => { if (item.supplier === pendingSupDisableName) item.active = false; });
+  }
+  closeSupDisableWarning();
+  renderSuppliers();
+  renderMl();
+}
+
+function toggleSupActive(name) {
+  const s = SUPPLIERS.find(s => s.name === name);
+  if (!s) return;
+  if (s.active) {
+    openSupDisableWarning(name);
+  } else {
+    const disabledItems = ITEMS.filter(item => item.supplier === name && !item.active);
+    if (disabledItems.length > 0) {
+      pendingSupReactivateName = name;
+      document.getElementById('supReactivateName').textContent = name;
+      document.getElementById('supReactivateCount').textContent = disabledItems.length;
+      document.getElementById('supReactivateOverlay').classList.add('open');
+    } else {
+      s.active = true;
+      renderSuppliers();
+    }
+  }
+}
+function closeSupReactivateOverlay() {
+  pendingSupReactivateName = null;
+  document.getElementById('supReactivateOverlay').classList.remove('open');
+}
+function confirmSupReactivate(alsoItems) {
+  if (!pendingSupReactivateName) return;
+  const s = SUPPLIERS.find(s => s.name === pendingSupReactivateName);
+  if (s) {
+    s.active = true;
+    if (alsoItems) ITEMS.forEach(item => { if (item.supplier === pendingSupReactivateName) item.active = true; });
+  }
+  closeSupReactivateOverlay();
+  renderSuppliers();
+  renderMl();
+}
+
+function renderSuppliers() {
+  const q = (document.getElementById('supSearch').value || '').toLowerCase();
+  const rows = SUPPLIERS.filter(s => {
+    if (q && !s.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('supBody').innerHTML = rows.map(s => {
+    const allGroups = s.groupList.length === 2 && s.outletList.length === 0;
+    const supParts = [];
+    if (s.groupList.length > 0) supParts.push(s.groupList.length === 1 ? '1 group' : s.groupList.length + ' groups');
+    if (s.outletList.length > 0) supParts.push(s.outletList.length === 1 ? '1 outlet' : s.outletList.length + ' outlets');
+    const grpHtml = allGroups
+      ? '<span style="font-size:12px;color:var(--ink-mute)">All groups</span>'
+      : '<button onclick="openRecGroupsDialog(this)" data-groups="' + s.groupList.join('|') + '" data-outlets="' + s.outletList.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + supParts.join(' · ') + '</button>';
+    return '<tr' + (s.active ? '' : ' class="ml-inactive"') + '>' +
+    '<td><div class="ml-item-name">' + s.name + '</div></td>' +
+    '<td style="text-align:center;font-size:13px;color:var(--ink)">' + (s.itemCount || '—') + '</td>' +
+    '<td style="font-size:13px"><div style="color:var(--ink)">' + s.contact + '</div><div style="color:var(--ink-mute);margin-top:2px">' + s.phone + '</div></td>' +
+    '<td><span class="ml-cat-tag" style="' + (s.type === 'active' ? 'background:#D9F5E4;color:#1A8040' : 'background:#F0F0F2;color:#555') + '">' + (s.type === 'active' ? 'Active' : 'Passive') + '</span></td>' +
+    '<td style="text-align:left">' + grpHtml + '</td>' +
+    '<td><div class="row-actions-wrap">' +
+      '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>' +
+      '<div class="row-actions-menu">' +
+        '<div class="row-action-item">View items</div>' +
+        '<div class="row-action-item' + (s.active ? ' danger' : '') + '" onclick="toggleSupActive(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (s.active ? 'Disable supplier' : 'Enable supplier') + '</div>' +
+        '<div class="row-action-item danger">Unlink supplier</div>' +
+      '</div></div></td>' +
+    '</tr>';
+  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--ink-mute)">No suppliers found</td></tr>';
+}
+renderSuppliers();
+
+function openRecGroupsDialog(btn) {
+  const groups = btn.dataset.groups ? btn.dataset.groups.split('|').filter(Boolean) : [];
+  const outlets = btn.dataset.outlets ? btn.dataset.outlets.split('|').filter(Boolean) : [];
+  const groupIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--spinach)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>';
+  const outletIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+  const row = (icon, label, last) =>
+    '<div style="padding:10px 0;' + (last ? '' : 'border-bottom:1px solid var(--rule);') + 'font-size:14px;color:var(--ink);display:flex;align-items:center;gap:8px">' + icon + label + '</div>';
+  let html = '';
+  if (groups.length) {
+    if (outlets.length) html += '<div style="font-size:11px;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.06em;padding:12px 0 2px">Outlet groups</div>';
+    html += groups.map((g, i) => row(groupIcon, g, !outlets.length && i === groups.length - 1)).join('');
+  }
+  if (outlets.length) {
+    if (groups.length) html += '<div style="font-size:11px;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.06em;padding:12px 0 2px">Individual outlets</div>';
+    html += outlets.map((o, i) => row(outletIcon, o, i === outlets.length - 1)).join('');
+  }
+  const parts = [];
+  if (groups.length) parts.push(groups.length === 1 ? '1 group' : groups.length + ' groups');
+  if (outlets.length) parts.push(outlets.length === 1 ? '1 outlet' : outlets.length + ' outlets');
+  document.getElementById('recGroupsList').innerHTML = html;
+  document.getElementById('recGroupsCount').textContent = parts.join(' · ');
+  document.getElementById('recGroupsOverlay').style.display = 'flex';
+}
+function closeRecGroupsDialog() {
+  document.getElementById('recGroupsOverlay').style.display = 'none';
+}
+
+function openGroupSettings(name, description) {
+  document.getElementById('gsModalTitle').textContent = name;
+  document.getElementById('gsGroupName').value = name;
+  document.getElementById('gsDescription').value = description || '';
+  document.getElementById('gsOverlay').style.display = 'flex';
+}
+function closeGroupSettings() {
+  document.getElementById('gsOverlay').style.display = 'none';
+}
+function saveGroupSettings() {
+  closeGroupSettings();
+}
 </script>
+
+<!-- Recipe Groups Dialog -->
+<div id="recGroupsOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,20,15,.46);z-index:900;align-items:flex-start;justify-content:center;padding-top:72px" onclick="if(event.target===this)closeRecGroupsDialog()">
+  <div style="background:#fff;border-radius:12px;width:400px;max-width:calc(100vw - 32px);box-shadow:0 24px 64px rgba(0,0,0,.22);overflow:hidden">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--ink)">Groups with access</div>
+        <div style="font-size:13px;color:var(--ink-mute);margin-top:2px" id="recGroupsCount"></div>
+      </div>
+      <button onclick="closeRecGroupsDialog()" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--rule);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-mute)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="padding:4px 24px 20px" id="recGroupsList"></div>
+  </div>
+</div>
+
+<!-- Group Settings Modal -->
+<div id="gsOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,20,15,.46);z-index:900;align-items:flex-start;justify-content:center;padding-top:72px" onclick="if(event.target===this)closeGroupSettings()">
+  <div style="background:#fff;border-radius:12px;width:480px;max-width:calc(100vw - 32px);box-shadow:0 24px 64px rgba(0,0,0,.22);display:flex;flex-direction:column;overflow:hidden">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--ink)" id="gsModalTitle">Group settings</div>
+        <div style="font-size:13px;color:var(--ink-mute);margin-top:2px">Basic information about this group</div>
+      </div>
+      <button onclick="closeGroupSettings()" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--rule);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-mute)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px">
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px">Group name</label>
+        <input id="gsGroupName" type="text" style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'" />
+      </div>
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px">Description <span style="font-weight:400;color:var(--ink-mute);font-size:13px">Optional</span></label>
+        <textarea id="gsDescription" rows="3" style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none;resize:vertical;box-sizing:border-box;line-height:1.5" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'"></textarea>
+        <span style="font-size:12px;color:var(--ink-mute);margin-top:4px;display:block">Used as internal notes only. Not visible to buyers.</span>
+      </div>
+    </div>
+    <div style="padding:14px 24px 18px;border-top:1px solid var(--rule);display:flex;align-items:center;justify-content:flex-end;gap:10px">
+      <button onclick="closeGroupSettings()" style="padding:9px 16px;border-radius:6px;border:none;background:#F3F4F6;color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
+      <button onclick="saveGroupSettings()" style="padding:9px 16px;border-radius:6px;border:none;background:var(--nomni-green);color:var(--seaweed);font:inherit;font-size:14px;font-weight:600;cursor:pointer">Save changes</button>
+    </div>
+  </div>
+</div>
+<!-- Supplier re-activate with items option (HQ level) -->
+<div class="confirm-overlay" id="supReactivateOverlay" onclick="if(event.target===this)closeSupReactivateOverlay()">
+  <div class="confirm-card">
+    <div class="confirm-title">Re-enable supplier?</div>
+    <div class="confirm-body"><strong id="supReactivateName"></strong> will be re-enabled. There are <strong id="supReactivateCount"></strong> items from this supplier that were disabled when the supplier was deactivated. Would you like to re-activate them as well?</div>
+    <div class="confirm-foot" style="justify-content:space-between">
+      <button class="modal-cancel" onclick="closeSupReactivateOverlay()">Cancel</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-tertiary" onclick="confirmSupReactivate(false)">Keep items disabled</button>
+        <button class="btn btn-primary" onclick="confirmSupReactivate(true)">Re-activate items</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Supplier disable warning (HQ level) -->
+<div class="confirm-overlay" id="supDisableOverlay" onclick="if(event.target===this)closeSupDisableWarning()">
+  <div class="confirm-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="width:36px;height:36px;border-radius:8px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="confirm-title" style="margin:0">Disable supplier?</div>
+    </div>
+    <div class="confirm-body">Disabling <strong id="supDisableName"></strong> at the HQ level will remove it from <em>all</em> outlet groups immediately. Buyers will no longer be able to order from this supplier. This can be reversed at any time.</div>
+    <div class="confirm-foot">
+      <button class="modal-cancel" onclick="closeSupDisableWarning()">Cancel</button>
+      <button class="btn-danger" onclick="confirmSupDisable()">Disable supplier</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

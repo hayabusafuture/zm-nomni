@@ -102,7 +102,7 @@
   .outlet-row:hover { background: var(--row-hover); }
   .outlet-avatar { width: 30px; height: 30px; border-radius: 50%; background: #ede9fb; color: #6c4df2; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .outlet-info { flex: 1; min-width: 0; }
-  .outlet-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .outlet-name { font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .outlet-company { font-size: 12px; color: var(--ink-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Per-row ··· actions */
@@ -240,6 +240,7 @@
   .item-row { cursor: pointer; }
   /* .item-name-cell moved to beautification block below */
   .item-custom-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--spinach); background: var(--mint); border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
+  .item-override-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #185FA5; background: #EFF6FF; border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
 
   /* ── Inventory status in item modal ── */
   .inv-status-card { background: var(--row-hover); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -253,7 +254,10 @@
   .modal-field label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; }
   .modal-field-input { background: #fff; border: 1px solid #DCDEE3; border-radius: 6px; padding: 9px 12px; font-size: 14px; color: var(--ink); font-family: inherit; outline: none; transition: border-color .13s; width: 100%; box-sizing: border-box; }
   .modal-field-input:focus { border-color: var(--nomni-green); }
+  .modal-field-input:disabled { background: #F3F4F6; color: var(--ink-mute); cursor: not-allowed; }
   .modal-field-hint { font-size: 12px; color: var(--ink-mute); }
+  .modal-info-banner { display: flex; align-items: flex-start; gap: 10px; background: #FEF3C7; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #92400E; line-height: 1.5; }
+  .modal-override-banner { display: flex; align-items: flex-start; gap: 10px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #1E40AF; line-height: 1.5; }
   .inv-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-mute); margin-bottom: 8px; }
 
   /* ── User menu ── */
@@ -275,12 +279,13 @@
   .panel-label-count { font-size: 14px; font-weight: 400; color: var(--ink-mute); }
 
   /* Stats strip */
-  .stats-strip { display: flex; gap: 10px; margin-bottom: 32px; }
-  .stat-chip { flex: 1; display: flex; align-items: center; gap: 14px; background: #F7F8FA; border: 1px solid #EEEFF2; border-radius: 10px; padding: 16px 20px; }
-  .stat-chip-icon { width: 40px; height: 40px; background: #ECEEF2; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #6B7280; }
-  .stat-chip-body { display: flex; flex-direction: column; }
-  .stat-chip-num { font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.03em; line-height: 1.1; }
-  .stat-chip-label { font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px; }
+  .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
+  .stat-cell { position: relative; padding: 1.1rem 1.4rem 1rem; background: color-mix(in srgb, var(--accent-bar, #2AC864) 7%, #fff); }
+  .stat-cell + .stat-cell { border-left: 1px solid var(--rule); }
+  .stat-cell::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent-bar, #2AC864); }
+  .stat-cell-icon { display: flex; margin-bottom: 10px; }
+  .stat-cell-value { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .stat-cell-label { font-size: 13px; color: var(--ink); margin-top: 2px; }
 
   /* Sticky items table header */
   .items-table thead th { position: sticky; top: 56px; z-index: 2; background: #fff; box-shadow: 0 1px 0 var(--rule); border-top: none; border-bottom: none; }
@@ -291,7 +296,7 @@
 
   /* Item name with supplier sub-line */
   .item-name-cell { max-width: 0; width: 100%; }
-  .item-name-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+  .item-name-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; font-weight: 500; }
   .item-supplier-text { font-size: 12px; color: var(--ink-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Items filter row */
@@ -314,6 +319,24 @@
   .uom-options-btn { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: inherit; transition: background .12s; }
   .uom-options-btn:hover { background: #c6f2ce; }
 
+  /* Recipes tab — shared table/filter styles */
+  .ml-filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .ml-search-wrap { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; min-width: 220px; }
+  .ml-search-input { border: none; outline: none; font-size: 14px; font-family: inherit; color: var(--ink); background: transparent; width: 100%; }
+  .ml-filter-select { height: 36px; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 10px; font-size: 14px; font-family: inherit; color: var(--ink); background: #fff; outline: none; cursor: pointer; }
+  .ml-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  .ml-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 12px 14px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fff; white-space: nowrap; }
+  .ml-table tbody td { padding: 14px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .ml-table tbody tr:hover td { background: var(--row-hover); }
+  .ml-item-name { font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+  .ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 700; background: #F0F0F2; color: #555; border-radius: 4px; padding: 2px 8px; text-transform: uppercase; letter-spacing: .04em; }
+  .ml-inactive { opacity: 0.45; }
+  .ml-pager-wrap { display: flex; align-items: center; justify-content: space-between; padding: 14px 2px 4px; font-size: 12px; color: var(--ink-mute); }
+  .pager-btn { min-width: 28px; height: 28px; padding: 0 6px; border-radius: 5px; border: 1px solid var(--rule); background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--ink); font-family: inherit; transition: background .1s; }
+  .pager-btn:hover:not([disabled]) { background: var(--row-hover); }
+  .pager-btn.active { background: var(--seaweed); color: #fff; border-color: var(--seaweed); }
+  .pager-btn[disabled] { opacity: 0.35; cursor: default; }
+
   /* UOM breakdown table in modal */
   .uom-breakdown-table { width: 100%; border-collapse: collapse; font-size: 14px; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
   .uom-breakdown-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; padding: 8px 14px; background: #f9fafb; border-bottom: 1px solid var(--rule); }
@@ -334,6 +357,15 @@
   .manage-toggle input:not(:checked) + .manage-toggle-track { background: #dcdee3; }
   .manage-toggle-track::after { content: ''; position: absolute; width: 15px; height: 15px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
   .manage-toggle input:checked + .manage-toggle-track::after { transform: translateX(15px); }
+  .override-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--rule); margin-bottom: 4px; }
+  .override-toggle-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .override-toggle-sub { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .override-toggle-btn { width: 36px; height: 20px; border-radius: 10px; border: none; cursor: pointer; position: relative; flex-shrink: 0; transition: background .15s; padding: 0; background: #dcdee3; }
+  .override-toggle-btn.on { background: var(--nomni-green); }
+  .override-toggle-btn::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .override-toggle-btn.on::after { transform: translateX(16px); }
+  .override-fields { transition: opacity .15s; }
+  .override-fields.locked { opacity: 0.5; pointer-events: none; }
 
   @media (max-width: 1280px) {
     .app { grid-template-columns: 56px 1fr; }
@@ -412,7 +444,7 @@
         <h1 class="page-title">Chargrill Outlets</h1>
         <div class="page-hq">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          <a href="ZM Admin - Buyers.html">Garden Cuisine HQ</a>
+          <a href="ZM Admin - HQ Settings.html">Garden Cuisine HQ</a>
           <span style="color:var(--rule);margin:0 2px">·</span>
           <span>Last updated 10 Jun 2026</span>
         </div>
@@ -430,15 +462,17 @@
       </div>
     </div>
 
+    <div id="statsStrip" class="stats-strip"></div>
+
     <div class="tabs">
       <div class="tab active" data-tab="overview">Overview</div>
       <div class="tab" data-tab="outlets">Outlets</div>
+      <div class="tab" data-tab="recipes">Recipes</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
     </div>
 
     <!-- Overview tab -->
     <div class="tab-panel active" id="panel-overview">
-      <div id="statsStrip" class="stats-strip"></div>
       <div class="overview-grid">
 
         <!-- Left: items -->
@@ -537,9 +571,16 @@
         <span class="panel-label-text">Outlets <span class="panel-label-count" id="outletCountLabel">4</span></span>
         <button class="section-action" onclick="openPickerModal()">Add outlets</button>
       </div>
-      <div class="section-card">
-        <div class="outlet-list" id="outletsBody"></div>
-      </div>
+      <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:14px">
+        <thead>
+          <tr>
+            <th style="text-align:left;font-weight:600;font-size:12px;color:var(--ink-mute);padding:12px 14px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);white-space:nowrap">Outlet</th>
+            <th style="text-align:left;font-weight:600;font-size:12px;color:var(--ink-mute);padding:12px 14px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);white-space:nowrap">Company</th>
+            <th style="width:48px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)"></th>
+          </tr>
+        </thead>
+        <tbody id="outletsBody"></tbody>
+      </table>
     </div>
 
     <!-- Suppliers tab -->
@@ -547,8 +588,42 @@
       <div class="panel-label-row">
         <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supplierCountLabel">0</span></span>
       </div>
-      <div class="section-card">
-        <div id="suppliersBody" class="outlet-list"></div>
+      <div id="suppliersBody"></div>
+    </div>
+
+    <!-- Recipes tab -->
+    <div class="tab-panel" id="panel-recipes">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Recipes <span class="panel-label-count" id="ogRecCount"></span></span>
+      </div>
+      <div class="ml-filter-row">
+        <div class="ml-search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="ml-search-input" id="ogRecSearch" placeholder="Search recipes…" oninput="setOgRecSearch(this.value)" />
+        </div>
+        <select class="ml-filter-select" id="ogRecCatFilter" onchange="setOgRecCatFilter(this.value)">
+          <option value="">All tags</option>
+          <option>Mains</option>
+          <option>Starters</option>
+          <option>Sides</option>
+          <option>Sauces &amp; Marinades</option>
+          <option>Desserts</option>
+          <option>Beverages</option>
+        </select>
+      </div>
+      <div style="overflow:clip">
+        <table class="ml-table">
+          <thead>
+            <tr>
+              <th class="sort-th" id="ogRecSortTh-name" onclick="setOgRecSort('name')">Recipe <span class="sort-ind"></span></th>
+              <th class="sort-th" id="ogRecSortTh-cost" onclick="setOgRecSort('cost')" style="width:120px">Food cost % <span class="sort-ind"></span></th>
+              <th style="width:140px">Last updated</th>
+              <th style="width:48px"></th>
+            </tr>
+          </thead>
+          <tbody id="ogRecBody"></tbody>
+        </table>
+        <div id="ogRecPager" class="ml-pager-wrap"></div>
       </div>
     </div>
 
@@ -571,6 +646,7 @@
       </button>
     </div>
     <div class="modal-body">
+      <div id="itemBanner" style="display:none"></div>
       <div class="modal-field">
         <label>Custom name <span style="font-weight:400; text-transform:none; color:var(--ink-mute)">(optional)</span></label>
         <input id="itemCustomName" class="modal-field-input" type="text" placeholder="Leave blank to use the catalogue name" />
@@ -582,9 +658,12 @@
         <div class="inv-status-card" id="invStatusCard"></div>
       </div>
     </div>
-    <div class="modal-foot" style="display:flex; justify-content:flex-end; gap:8px">
-      <button class="btn btn-tertiary" onclick="closeItemModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveItemModal()">Save changes</button>
+    <div class="modal-foot" style="display:flex; align-items:center; justify-content:space-between; gap:8px">
+      <button id="itemResetBtn" class="btn btn-ghost" style="display:none;color:#D0291E;font-size:13px" onclick="resetItemOverrides()">Clear override</button>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button class="btn btn-tertiary" onclick="closeItemModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveItemModal()">Save changes</button>
+      </div>
     </div>
   </div>
 </div>
@@ -736,9 +815,9 @@
 const OUTLETS = [
   { id:  1, name: "(WF 301) Chargrill @ 301 Punggol",       company: "Garden Cuisine Pte Ltd" },
   { id:  2, name: "(WF 107) Chargrill @ 107 Serangoon",     company: "Garden Cuisine Pte Ltd" },
-  { id:  3, name: "(WF 259) Chargrill @ 259 Bukit Panjang", company: "Garden Cuisine Pte Ltd" },
+  { id:  3, name: "(WF 259) Chargrill @ 259 Bukit Panjang", company: "GC West Holdings Pte Ltd" },
   { id:  4, name: "(WF 280) Chargrill @ 280 Bishan",        company: "Garden Cuisine Pte Ltd" },
-  { id:  5, name: "(WF 139) Chargrill @ 139 Tampines",      company: "Garden Cuisine Pte Ltd" },
+  { id:  5, name: "(WF 139) Chargrill @ 139 Tampines",      company: "GC East Operations Pte Ltd" },
   { id:  6, name: "1-Alfaro - Bar",                          company: "1-Alfaro Pte Ltd" },
   { id:  7, name: "1-Arden - Bar",                           company: "1-Spring Pte Ltd" },
   { id:  8, name: "1-Arden - Culinary",                      company: "1-Spring Pte Ltd" },
@@ -752,30 +831,30 @@ const OUTLETS = [
   { id: 16, name: "Da Paolo Cicchetti",                      company: "Da Paolo Pte Ltd" },
   { id: 17, name: "Paradise Dynasty Marina",                 company: "Paradise Group" },
   { id: 18, name: "Paradise Classic Bedok",                  company: "Paradise Group" },
-  { id: 19, name: "Soup Restaurant Tampines",               company: "Soup Restaurant Group" },
-  { id: 20, name: "(WF 412) Chargrill @ 412 Jurong West",   company: "Garden Cuisine Pte Ltd" },
-  { id: 21, name: "(WF 345) Chargrill @ 345 Woodlands",     company: "Garden Cuisine Pte Ltd" },
-  { id: 22, name: "(WF 217) Chargrill @ 217 Clementi",      company: "Garden Cuisine Pte Ltd" },
-  { id: 23, name: "(WF 508) Chargrill @ 508 Pasir Ris",     company: "Garden Cuisine Pte Ltd" },
+  { id: 19, name: "Soup Restaurant Tampines",                company: "Soup Restaurant Group" },
+  { id: 20, name: "(WF 412) Chargrill @ 412 Jurong West",   company: "GC West Holdings Pte Ltd" },
+  { id: 21, name: "(WF 345) Chargrill @ 345 Woodlands",     company: "GC West Holdings Pte Ltd" },
+  { id: 22, name: "(WF 217) Chargrill @ 217 Clementi",      company: "GC West Holdings Pte Ltd" },
+  { id: 23, name: "(WF 508) Chargrill @ 508 Pasir Ris",     company: "GC East Operations Pte Ltd" },
   { id: 24, name: "(WF 163) Chargrill @ 163 Buona Vista",   company: "Garden Cuisine Pte Ltd" },
   { id: 25, name: "(WF 331) Chargrill @ 331 Toa Payoh",     company: "Garden Cuisine Pte Ltd" },
-  { id: 26, name: "(WF 489) Chargrill @ 489 Yishun",        company: "Garden Cuisine Pte Ltd" },
-  { id: 27, name: "(WF 274) Chargrill @ 274 Ang Mo Kio",    company: "Garden Cuisine Pte Ltd" },
-  { id: 28, name: "(WF 622) Chargrill @ 622 Bedok",         company: "Garden Cuisine Pte Ltd" },
+  { id: 26, name: "(WF 489) Chargrill @ 489 Yishun",        company: "GC North Franchise Pte Ltd" },
+  { id: 27, name: "(WF 274) Chargrill @ 274 Ang Mo Kio",    company: "GC North Franchise Pte Ltd" },
+  { id: 28, name: "(WF 622) Chargrill @ 622 Bedok",         company: "GC East Operations Pte Ltd" },
   { id: 29, name: "(WF 155) Chargrill @ 155 Queenstown",    company: "Garden Cuisine Pte Ltd" },
-  { id: 30, name: "(WF 338) Chargrill @ 338 Hougang",       company: "Garden Cuisine Pte Ltd" },
-  { id: 31, name: "(WF 447) Chargrill @ 447 Sengkang",      company: "Garden Cuisine Pte Ltd" },
+  { id: 30, name: "(WF 338) Chargrill @ 338 Hougang",       company: "GC East Operations Pte Ltd" },
+  { id: 31, name: "(WF 447) Chargrill @ 447 Sengkang",      company: "GC East Operations Pte Ltd" },
   { id: 32, name: "(WF 191) Chargrill @ 191 Bukit Timah",   company: "Garden Cuisine Pte Ltd" },
-  { id: 33, name: "(WF 563) Chargrill @ 563 Punggol East",  company: "Garden Cuisine Pte Ltd" },
+  { id: 33, name: "(WF 563) Chargrill @ 563 Punggol East",  company: "GC North Franchise Pte Ltd" },
   { id: 34, name: "(WF 229) Chargrill @ 229 Redhill",       company: "Garden Cuisine Pte Ltd" },
-  { id: 35, name: "(WF 774) Chargrill @ 774 Tampines West", company: "Garden Cuisine Pte Ltd" },
+  { id: 35, name: "(WF 774) Chargrill @ 774 Tampines West", company: "GC East Operations Pte Ltd" },
   { id: 36, name: "(WF 103) Chargrill @ 103 Novena",        company: "Garden Cuisine Pte Ltd" },
-  { id: 37, name: "(WF 419) Chargrill @ 419 Geylang",       company: "Garden Cuisine Pte Ltd" },
-  { id: 38, name: "(WF 286) Chargrill @ 286 Simei",         company: "Garden Cuisine Pte Ltd" },
-  { id: 39, name: "(WF 551) Chargrill @ 551 Choa Chu Kang", company: "Garden Cuisine Pte Ltd" },
+  { id: 37, name: "(WF 419) Chargrill @ 419 Geylang",       company: "GC East Operations Pte Ltd" },
+  { id: 38, name: "(WF 286) Chargrill @ 286 Simei",         company: "GC East Operations Pte Ltd" },
+  { id: 39, name: "(WF 551) Chargrill @ 551 Choa Chu Kang", company: "GC West Holdings Pte Ltd" },
 ];
 
-const currentGroup = new Set([1,2,3,4,5,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39]);
+const currentGroup = new Set([1, 2, 3, 4]);
 const pendingAdd   = new Set();
 let   pendingRemoveId = null;
 
@@ -792,19 +871,18 @@ function renderOutlets() {
   if (ov) ov.textContent = count;
 
   body.innerHTML = items.map(o => `
-    <div class="outlet-row">
-      <div class="outlet-avatar">${initials(o.name)}</div>
-      <div class="outlet-info">
-        <div class="outlet-name">${o.name}</div>
-        <div class="outlet-company">${o.company}</div>
-      </div>
-      <div class="row-actions-wrap">
-        <button class="btn-row-actions" onclick="toggleRowMenu(this)" title="Actions">•••</button>
-        <div class="row-actions-menu">
-          <div class="row-action-item danger" onclick="openConfirm(${o.id}, '${o.name.replace(/'/g,"\\'")}')">Remove from group</div>
+    <tr style="cursor:default">
+      <td style="padding:14px 14px;border-bottom:1px solid var(--rule);font-weight:500">${o.name}</td>
+      <td style="padding:14px 14px;border-bottom:1px solid var(--rule);color:var(--ink-mute);font-size:13px">${o.company}</td>
+      <td style="padding:14px 14px;border-bottom:1px solid var(--rule)">
+        <div class="row-actions-wrap">
+          <button class="btn-row-actions" onclick="toggleRowMenu(this)" title="Actions">•••</button>
+          <div class="row-actions-menu">
+            <div class="row-action-item danger" onclick="openConfirm(${o.id}, '${o.name.replace(/'/g,"\\'")}')">Remove from group</div>
+          </div>
         </div>
-      </div>
-    </div>
+      </td>
+    </tr>
   `).join('');
   renderMiniOutlets();
   renderStatsStrip();
@@ -967,6 +1045,7 @@ let itemSearch = '';
 let itemCatFilter = '';
 let itemSortKey = 'default';
 let currentItemIdx = null;
+let overrideEnabled = false;
 const itemOverrides = {};
 
 const UOM_MULTIPLIER = {
@@ -982,6 +1061,29 @@ const UOM_MULTIPLIER = {
   'per flat (30)': 30,
 };
 
+// ── Supplier inheritance ────────────────────────────────────
+// Mirrors the HQ supplier list; only HQ-active suppliers are inherited.
+const HQ_SUPPLIERS = [
+  { name: 'Kee Song Group',       cat: 'Poultry',             type: 'active'  },
+  { name: 'NH Foods',             cat: 'Beef & Lamb',         type: 'active'  },
+  { name: 'Provenir',             cat: 'Beef & Lamb',         type: 'passive' },
+  { name: 'Meat King',            cat: 'Beef & Lamb',         type: 'active'  },
+  { name: 'Ocean Fresh',          cat: 'Seafood',             type: 'active'  },
+  { name: 'Song Fish Dealer',     cat: 'Seafood',             type: 'passive' },
+  { name: 'Deli Hub',             cat: 'Seafood',             type: 'passive' },
+  { name: 'Sustenir Agriculture', cat: 'Produce',             type: 'active'  },
+  { name: 'Lee Kum Kee',          cat: 'Sauces & Condiments', type: 'active'  },
+  { name: 'AmoyFoods',            cat: 'Sauces & Condiments', type: 'passive' },
+  { name: 'Fonterra',             cat: 'Dairy & Eggs',        type: 'active'  },
+  { name: 'Seng Choon Farm',      cat: 'Dairy & Eggs',        type: 'active'  },
+  { name: 'Grill Master SG',      cat: 'Supplies',            type: 'passive' },
+  { name: 'Kikkoman',             cat: 'Sauces & Condiments', type: 'active',  hqDisabled: true },
+];
+HQ_SUPPLIERS.forEach(s => { s.itemCount = ITEMS.filter(item => item.supplier === s.name).length; });
+
+const groupDisabledSuppliers = new Set(); // supplier names disabled at group level
+const groupDisabledItems = new Set();     // item indices auto-disabled due to supplier disable
+
 function getUOMBreakdown(item) {
   if (!Array.isArray(item.uom)) return null;
   const primaryMult = UOM_MULTIPLIER[item.uom[0]] || 1;
@@ -992,14 +1094,20 @@ function getUOMBreakdown(item) {
   }));
 }
 
+const SUPPLIER_TYPES = {
+  'Kee Song Group': 'active', 'NH Foods': 'active', 'Meat King': 'active',
+  'Ocean Fresh': 'active', 'Sustenir Agriculture': 'active', 'Lee Kum Kee': 'active',
+  'Fonterra': 'active', 'Seng Choon Farm': 'active',
+  'Provenir': 'passive', 'Song Fish Dealer': 'passive', 'Deli Hub': 'passive',
+  'AmoyFoods': 'passive', 'Kikkoman': 'passive', 'Grill Master SG': 'passive',
+  'Prima Deli': 'passive', 'FairPrice Finest': 'passive',
+};
+
 function getGroupedSuppliers() {
-  const map = {};
-  ITEMS.forEach(item => {
-    map[item.supplier] = (map[item.supplier] || 0) + 1;
-  });
-  return Object.entries(map)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  return HQ_SUPPLIERS.map(s => ({
+    ...s,
+    groupDisabled: !s.hqDisabled && groupDisabledSuppliers.has(s.name),
+  })).sort((a, b) => (a.hqDisabled ? 1 : 0) - (b.hqDisabled ? 1 : 0) || a.groupDisabled - b.groupDisabled || b.itemCount - a.itemCount || a.name.localeCompare(b.name));
 }
 
 const MINI_SUPPLIERS_MAX = 5;
@@ -1007,19 +1115,20 @@ function renderMiniSuppliers() {
   const mini = document.getElementById('miniSupplierList');
   if (!mini) return;
   const suppliers = getGroupedSuppliers();
+  const activeSuppliers = suppliers.filter(s => !s.groupDisabled && !s.hqDisabled);
   const badge = document.getElementById('supplierCountOverview');
-  if (badge) badge.textContent = suppliers.length;
-  const show = suppliers.slice(0, MINI_SUPPLIERS_MAX);
+  if (badge) badge.textContent = activeSuppliers.length + ' of ' + suppliers.length;
+  const show = activeSuppliers.slice(0, MINI_SUPPLIERS_MAX);
   mini.innerHTML = show.map(s =>
     '<div class="outlet-mini-row">' +
       '<div class="outlet-mini-name">' + s.name + '</div>' +
-      '<div class="outlet-mini-company">' + s.count + ' item' + (s.count !== 1 ? 's' : '') + '</div>' +
+      '<div class="outlet-mini-company">' + s.itemCount + ' item' + (s.itemCount !== 1 ? 's' : '') + '</div>' +
     '</div>'
   ).join('');
-  if (suppliers.length > MINI_SUPPLIERS_MAX) {
+  if (activeSuppliers.length > MINI_SUPPLIERS_MAX) {
     mini.insertAdjacentHTML('beforeend',
       '<div class="view-all-row">' +
-        '<button class="view-all-btn" data-tab="suppliers" onclick="switchToTab(this.dataset.tab)">View all ' + suppliers.length + ' suppliers →</button>' +
+        '<button class="view-all-btn" data-tab="suppliers" onclick="switchToTab(this.dataset.tab)">View all ' + activeSuppliers.length + ' suppliers →</button>' +
       '</div>'
     );
   }
@@ -1029,16 +1138,47 @@ function renderSuppliers() {
   const body = document.getElementById('suppliersBody');
   if (!body) return;
   const suppliers = getGroupedSuppliers();
+  const activeCount = suppliers.filter(s => !s.groupDisabled && !s.hqDisabled).length;
   const badge = document.getElementById('supplierCountLabel');
-  if (badge) badge.textContent = suppliers.length;
-  body.innerHTML = suppliers.map(s =>
-    '<div class="outlet-row" style="cursor:default">' +
-      '<div class="outlet-info">' +
-        '<div class="outlet-name">' + s.name + '</div>' +
-        '<div class="outlet-company">' + s.count + ' item' + (s.count !== 1 ? 's' : '') + ' in this group</div>' +
-      '</div>' +
-    '</div>'
-  ).join('');
+  if (badge) badge.textContent = activeCount + ' of ' + suppliers.length;
+  const tdBase = 'padding:14px 14px;border-bottom:1px solid var(--rule);';
+  body.innerHTML =
+    '<table style="width:100%;border-collapse:separate;border-spacing:0;font-size:14px">' +
+    '<thead><tr>' +
+      '<th style="text-align:left;font-weight:600;font-size:12px;color:var(--ink-mute);padding:12px 14px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);white-space:nowrap">Supplier</th>' +
+      '<th style="text-align:left;font-weight:600;font-size:12px;color:var(--ink-mute);padding:12px 14px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);white-space:nowrap">Type</th>' +
+      '<th style="text-align:left;font-weight:600;font-size:12px;color:var(--ink-mute);padding:12px 14px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);white-space:nowrap">Items</th>' +
+      '<th style="width:48px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)"></th>' +
+    '</tr></thead><tbody>' +
+    suppliers.map(s => {
+      const typeChip = s.type === 'active'
+        ? '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:3px 10px;background:#D9F5E4;color:#1A8040">Active</span>'
+        : '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:3px 10px;background:#F0F0F2;color:#555">Passive</span>';
+      const safeName = s.name.replace(/'/g, "\\'");
+      if (s.hqDisabled) {
+        return '<tr style="opacity:0.4;">' +
+          '<td style="' + tdBase + 'font-weight:500">' + s.name + ' <span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#F0F0F2;color:#555;margin-left:6px">HQ Disabled</span></td>' +
+          '<td style="' + tdBase + '">' + typeChip + '</td>' +
+          '<td style="' + tdBase + 'color:var(--ink-mute)">' + s.itemCount + '</td>' +
+          '<td style="' + tdBase + '"></td>' +
+        '</tr>';
+      }
+      const actionLabel = s.groupDisabled ? 'Enable for this group' : 'Disable for this group';
+      return '<tr style="' + (s.groupDisabled ? 'opacity:0.45;' : '') + '">' +
+        '<td style="' + tdBase + 'font-weight:500">' + s.name + (s.groupDisabled ? ' <span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#FDD6DC;color:#D0291E;margin-left:6px">Disabled</span>' : '') + '</td>' +
+        '<td style="' + tdBase + '">' + typeChip + '</td>' +
+        '<td style="' + tdBase + 'color:var(--ink-mute)">' + s.itemCount + '</td>' +
+        '<td style="' + tdBase + '">' +
+          '<div class="row-actions-wrap">' +
+            '<button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">···</button>' +
+            '<div class="row-actions-menu">' +
+              '<div class="row-action-item' + (s.groupDisabled ? '' : ' danger') + '" onclick="toggleGroupSupplier(\'' + safeName + '\')">' + actionLabel + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</td>' +
+      '</tr>';
+    }).join('') +
+    '</tbody></table>';
 }
 
 function renderStatsStrip() {
@@ -1046,14 +1186,20 @@ function renderStatsStrip() {
   if (!strip) return;
   const outletCount   = currentGroup.size;
   const itemCount     = ITEMS.length;
-  const supplierCount = getGroupedSuppliers().length;
-  const sc = (icon, num, label, iconBg, iconColor) =>
-    '<div class="stat-chip"><div class="stat-chip-icon" style="background:' + iconBg + ';color:' + iconColor + '">' + icon + '</div>' +
-    '<div class="stat-chip-body"><div class="stat-chip-num">' + num + '</div><div class="stat-chip-label">' + label + '</div></div></div>';
-  strip.innerHTML =
-    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', outletCount, 'Outlets', '#E2FFE6', '#1A8040') +
-    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>', itemCount, 'Items', '#EFF6FF', '#2563EB') +
-    sc('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>', supplierCount, 'Suppliers', '#FEF3C7', '#D97706');
+  const supplierCount = HQ_SUPPLIERS.length - groupDisabledSuppliers.size;
+  const stats = [
+    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', value: outletCount,         label: 'Outlets',   iconColor: '#1A8040', accentColor: '#2AC864' },
+    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>', value: itemCount,           label: 'Items',     iconColor: '#185FA5', accentColor: '#3B82F6' },
+    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01z"/></svg>',                                                                                                                                                                value: OG_RECIPES.length,  label: 'Recipes',   iconColor: '#854F0B', accentColor: '#F59E0B' },
+    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>', value: supplierCount,       label: 'Suppliers', iconColor: '#6D28D9', accentColor: '#8B5CF6' },
+  ];
+  strip.innerHTML = stats.map(s =>
+    '<div class="stat-cell" style="--accent-bar:' + s.accentColor + '">' +
+    '<div class="stat-cell-icon" style="color:' + s.iconColor + '">' + s.icon + '</div>' +
+    '<div class="stat-cell-value">' + s.value + '</div>' +
+    '<div class="stat-cell-label">' + s.label + '</div>' +
+    '</div>'
+  ).join('');
 }
 
 function getDisplayItems() {
@@ -1139,9 +1285,12 @@ function renderItems() {
       priceHtml = 'S$' + parseFloat(displayPrice).toFixed(2) + ' <span class="uom-text">/ ' + item.uom + '</span>';
     }
     const customTag = ov.customName ? ' <span class="item-custom-tag">custom</span>' : '';
-    return '<tr class="item-row" onclick="openItemModal(' + rawIdx + ')">' +
+    const hasOverride = SUPPLIER_TYPES[item.supplier] !== 'active' && (ov.price != null || (Array.isArray(ov.prices) && ov.prices.length) || ov.moq != null);
+    const overrideTag = hasOverride ? ' <span class="item-override-tag">overridden</span>' : '';
+    const isGroupDisabled = groupDisabledItems.has(rawIdx);
+    return '<tr class="item-row' + (isGroupDisabled ? ' ml-inactive' : '') + '" onclick="openItemModal(' + rawIdx + ')">' +
       '<td class="item-name-cell">' +
-        '<div class="item-name-text">' + displayName + customTag + '</div>' +
+        '<div class="item-name-text">' + displayName + customTag + overrideTag + '</div>' +
         '<div class="item-supplier-text">' + item.supplier + '</div>' +
       '</td>' +
       '<td class="price-cell">' + priceHtml + '</td>' +
@@ -1187,45 +1336,84 @@ function openItemModal(idx) {
   document.getElementById('itemModalSupplier').textContent = item.supplier;
   document.getElementById('itemCustomName').value = ov.customName || '';
 
-  const section = document.getElementById('itemPriceSection');
-  if (Array.isArray(item.uom)) {
-    const breakdown = getUOMBreakdown(item);
-    const rows = breakdown.map(r =>
-      '<tr><td>' + r.uom + '</td><td style="font-weight:500">S$' + r.price.toFixed(2) + '</td></tr>'
-    ).join('');
-    section.innerHTML =
-      '<div class="modal-field">' +
-        '<label>UOM Pricing</label>' +
-        '<table class="uom-breakdown-table">' +
-          '<thead><tr><th>Unit of measure</th><th>Unit price</th></tr></thead>' +
-          '<tbody>' + rows + '</tbody>' +
-        '</table>' +
-        '<div class="modal-field-hint">Prices set at catalogue level — contact your account manager to override</div>' +
-      '</div>' +
-      '<div class="modal-field-row" style="margin-top:0">' +
-        '<div class="modal-field">' +
-          '<label>MOQ</label>' +
-          '<input id="itemMOQ" class="modal-field-input" type="text" value="' + (ov.moq || item.moq) + '" />' +
-        '</div>' +
-      '</div>';
+  const isActiveSup = SUPPLIER_TYPES[item.supplier] === 'active';
+  const banner = document.getElementById('itemBanner');
+  const hasExistingOverride = !isActiveSup && (ov.price != null || (Array.isArray(ov.prices) && ov.prices.length) || ov.moq != null);
+  overrideEnabled = hasExistingOverride;
+
+  if (isActiveSup) {
+    banner.className = 'modal-info-banner';
+    banner.style.display = '';
+    banner.innerHTML =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      '<span>Prices and MOQ for items from <strong>' + item.supplier + '</strong> are managed by the supplier and cannot be edited here.</span>';
   } else {
-    const displayPrice = parseFloat((ov.price != null) ? ov.price : item.price).toFixed(2);
-    section.innerHTML =
-      '<div class="modal-field-row">' +
-        '<div class="modal-field">' +
-          '<label>Unit price (S$)</label>' +
-          '<input id="itemPrice" class="modal-field-input" type="text" value="' + displayPrice + '" />' +
-          '<div class="modal-field-hint">' + item.uom + '</div>' +
-        '</div>' +
-        '<div class="modal-field">' +
-          '<label>MOQ</label>' +
-          '<input id="itemMOQ" class="modal-field-input" type="text" value="' + (ov.moq || item.moq) + '" />' +
-        '</div>' +
-      '</div>';
+    banner.style.display = 'none';
   }
+
+  const section = document.getElementById('itemPriceSection');
+  if (isActiveSup) {
+    if (Array.isArray(item.uom)) {
+      const breakdown = getUOMBreakdown(item);
+      const rows = breakdown.map(r => '<tr><td>' + r.uom + '</td><td><input class="modal-field-input uom-price-input" type="text" value="' + r.price.toFixed(2) + '" style="padding:6px 10px" disabled /></td></tr>').join('');
+      section.innerHTML =
+        '<div class="modal-field"><label>UOM pricing</label><table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+        '<div class="modal-field-row" style="margin-top:0"><div class="modal-field"><label>MOQ</label><input id="itemMOQ" class="modal-field-input" type="text" value="' + item.moq + '" disabled /></div></div>';
+    } else {
+      section.innerHTML =
+        '<div class="modal-field-row">' +
+          '<div class="modal-field"><label>Unit price (S$)</label><input id="itemPrice" class="modal-field-input" type="text" value="' + item.price.toFixed(2) + '" disabled /><div class="modal-field-hint">' + item.uom + '</div></div>' +
+          '<div class="modal-field"><label>MOQ</label><input id="itemMOQ" class="modal-field-input" type="text" value="' + item.moq + '" disabled /></div>' +
+        '</div>';
+    }
+  } else {
+    // Passive supplier — toggle-based override
+    const toggleHtml =
+      '<div class="override-toggle-row">' +
+        '<div><div class="override-toggle-label">Override price & MOQ</div><div class="override-toggle-sub">Set a custom price for this outlet group only</div></div>' +
+        '<button class="override-toggle-btn' + (overrideEnabled ? ' on' : '') + '" id="overrideToggleBtn" onclick="togglePriceOverride()" type="button"></button>' +
+      '</div>';
+    let fieldsHtml;
+    if (Array.isArray(item.uom)) {
+      const breakdown = getUOMBreakdown(item);
+      const ovPrices = Array.isArray(ov.prices) ? ov.prices : [];
+      const rows = breakdown.map((r, i) => {
+        const val = (ovPrices[i] != null ? ovPrices[i] : r.price).toFixed(2);
+        return '<tr><td>' + r.uom + '</td><td><input class="modal-field-input uom-price-input" type="text" value="' + val + '" style="padding:6px 10px" /></td></tr>';
+      }).join('');
+      fieldsHtml =
+        '<div class="modal-field"><label>UOM pricing</label><table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+        '<div class="modal-field-row" style="margin-top:0"><div class="modal-field"><label>MOQ</label><input id="itemMOQ" class="modal-field-input" type="text" value="' + (ov.moq || item.moq) + '" /></div></div>';
+    } else {
+      const displayPrice = parseFloat(ov.price != null ? ov.price : item.price).toFixed(2);
+      fieldsHtml =
+        '<div class="modal-field-row">' +
+          '<div class="modal-field"><label>Unit price (S$)</label><input id="itemPrice" class="modal-field-input" type="text" value="' + displayPrice + '" /><div class="modal-field-hint">' + item.uom + '</div></div>' +
+          '<div class="modal-field"><label>MOQ</label><input id="itemMOQ" class="modal-field-input" type="text" value="' + (ov.moq || item.moq) + '" /></div>' +
+        '</div>';
+    }
+    section.innerHTML = toggleHtml + '<div class="override-fields' + (overrideEnabled ? '' : ' locked') + '" id="overrideFields">' + fieldsHtml + '</div>';
+  }
+
+  const resetBtn = document.getElementById('itemResetBtn');
+  if (resetBtn) resetBtn.style.display = (!isActiveSup && hasExistingOverride) ? 'inline-flex' : 'none';
 
   renderInvStatus(idx % 4 !== 0);
   document.getElementById('itemModal').classList.add('open');
+}
+
+function togglePriceOverride() {
+  overrideEnabled = !overrideEnabled;
+  const btn = document.getElementById('overrideToggleBtn');
+  const fields = document.getElementById('overrideFields');
+  if (btn) btn.classList.toggle('on', overrideEnabled);
+  if (fields) fields.classList.toggle('locked', !overrideEnabled);
+  const resetBtn = document.getElementById('itemResetBtn');
+  if (resetBtn) {
+    const ov = itemOverrides[currentItemIdx] || {};
+    const hadOverride = ov.price != null || (Array.isArray(ov.prices) && ov.prices.length) || ov.moq != null;
+    resetBtn.style.display = (overrideEnabled && hadOverride) ? 'inline-flex' : 'none';
+  }
 }
 
 function renderInvStatus(inInv) {
@@ -1259,15 +1447,52 @@ function closeItemModal() {
 
 function saveItemModal() {
   if (currentItemIdx === null) return;
-  const priceEl = document.getElementById('itemPrice');
+  const item = ITEMS[currentItemIdx];
+  const isActiveSup = SUPPLIER_TYPES[item.supplier] === 'active';
+  const customName = document.getElementById('itemCustomName').value.trim() || null;
   const moqEl = document.getElementById('itemMOQ');
-  const parsed = priceEl ? parseFloat(priceEl.value) : null;
-  itemOverrides[currentItemIdx] = {
-    customName: document.getElementById('itemCustomName').value.trim() || null,
-    price: (priceEl && !isNaN(parsed)) ? parsed : null,
-    moq: moqEl ? moqEl.value.trim() || null : null,
-  };
+
+  if (isActiveSup) {
+    itemOverrides[currentItemIdx] = { ...(itemOverrides[currentItemIdx] || {}), customName };
+  } else if (!overrideEnabled) {
+    // Toggle is OFF — clear any existing price/moq override, keep custom name
+    itemOverrides[currentItemIdx] = { customName };
+  } else if (Array.isArray(item.uom)) {
+    const priceInputs = document.querySelectorAll('#itemPriceSection .uom-price-input');
+    const breakdown = getUOMBreakdown(item);
+    const rawPrices = Array.from(priceInputs).map(inp => parseFloat(inp.value));
+    const anyPriceChanged = rawPrices.some((p, i) => !isNaN(p) && Math.abs(p - breakdown[i].price) > 0.001);
+    const prices = anyPriceChanged ? rawPrices.map(v => (isNaN(v) ? null : v)) : [];
+    const moqVal = moqEl ? moqEl.value.trim() || null : null;
+    const moq = moqVal !== item.moq ? moqVal : null;
+    itemOverrides[currentItemIdx] = { customName, prices, moq };
+  } else {
+    const priceEl = document.getElementById('itemPrice');
+    const parsed = priceEl ? parseFloat(priceEl.value) : NaN;
+    const priceChanged = !isNaN(parsed) && Math.abs(parsed - item.price) > 0.001;
+    const moqVal = moqEl ? moqEl.value.trim() || null : null;
+    const moqChanged = moqVal !== item.moq;
+    itemOverrides[currentItemIdx] = {
+      customName,
+      price: priceChanged ? parsed : null,
+      moq: moqChanged ? moqVal : null,
+    };
+  }
   closeItemModal();
+  renderItems();
+}
+
+function resetItemOverrides() {
+  if (currentItemIdx === null) return;
+  const ov = itemOverrides[currentItemIdx] || {};
+  itemOverrides[currentItemIdx] = { customName: ov.customName };
+  overrideEnabled = false;
+  const btn = document.getElementById('overrideToggleBtn');
+  const fields = document.getElementById('overrideFields');
+  if (btn) btn.classList.remove('on');
+  if (fields) fields.classList.add('locked');
+  const resetBtn = document.getElementById('itemResetBtn');
+  if (resetBtn) resetBtn.style.display = 'none';
   renderItems();
 }
 
@@ -1456,6 +1681,135 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
+// ── Recipes tab ────────────────────────────────────────────
+const OG_RECIPES = [
+  // Mains
+  { name: 'Chargrill Chicken Thigh with Herb & Garlic Marinade',   cat: 'Mains',              cost: 8.40  },
+  { name: 'Wagyu Beef Burger with Caramelised Onion Relish',        cat: 'Mains',              cost: 22.50 },
+  { name: 'BBQ Baby Back Pork Ribs with House Sauce — Half Rack',   cat: 'Mains',              cost: 18.20 },
+  { name: 'Chargrill NZ Lamb Rack Frenched with Rosemary Jus',      cat: 'Mains',              cost: 32.00 },
+  { name: 'Crispy Pork Belly with Apple & Fennel Slaw',             cat: 'Mains',              cost: 14.80 },
+  { name: 'Char Siu Chicken Thigh Fillet — Cantonese Style',        cat: 'Mains',              cost: 9.20  },
+  { name: 'Chargrill Barramundi Fillet with Lemon Butter Sauce',    cat: 'Mains',              cost: 16.50 },
+  { name: 'Chargrill Salmon Fillet with Dill Cream & Capers',       cat: 'Mains',              cost: 19.80 },
+  { name: 'Beef Chuck Roll 6hr Slow Braise with Red Wine Jus',      cat: 'Mains',              cost: 15.60 },
+  { name: 'Pork Collar Char Siu Style — Whole Roast Sliced',        cat: 'Mains',              cost: 11.40 },
+  { name: 'Lamb Shoulder Slow Roast 4hr with Harissa & Yoghurt',    cat: 'Mains',              cost: 24.00 },
+  { name: 'Wagyu Striploin MB4 200g with Chimichurri',              cat: 'Mains',              cost: 38.50 },
+  { name: 'Teriyaki Chicken Thigh Skewers — 3pcs per serve',        cat: 'Mains',              cost: 7.80  },
+  { name: 'Chargrill Duck Breast with Cherry & Port Reduction',     cat: 'Mains',              cost: 28.00 },
+  { name: 'Black Tiger Prawn Skewers with Garlic Butter — 4pcs',    cat: 'Mains',              cost: 14.20 },
+  // Starters
+  { name: 'BBQ Chicken Mid-Joint Wings with House Dry Rub — 6pcs',  cat: 'Starters',           cost: 5.80  },
+  { name: 'Crispy Squid Rings Breaded with Sriracha Aioli',         cat: 'Starters',           cost: 6.40  },
+  { name: 'Prawn Crackers Fried with Nam Jim Dipping Sauce',        cat: 'Starters',           cost: 1.20  },
+  { name: 'Smoked Edamame with Maldon Sea Salt & Chilli Flakes',    cat: 'Starters',           cost: 2.80  },
+  { name: 'Chicken Liver Pâté on Grilled Sourdough — 2pcs',        cat: 'Starters',           cost: 4.60  },
+  { name: 'Beef Satay Skewers with Peanut Sauce — 4pcs',            cat: 'Starters',           cost: 7.20  },
+  { name: 'Charred Corn on Cob with Chilli Butter & Coriander',     cat: 'Starters',           cost: 2.20  },
+  { name: 'Manila Clam Chowder with Grilled Bread Roll',            cat: 'Starters',           cost: 5.50  },
+  // Sides
+  { name: 'Steamed Hom Mali Jasmine Rice — Individual Bowl',        cat: 'Sides',              cost: 0.80  },
+  { name: 'Garlic Herb Butter Charred Corn Half Cob',               cat: 'Sides',              cost: 1.60  },
+  { name: 'Chargrill Seasonal Vegetable Medley with Olive Oil',     cat: 'Sides',              cost: 2.40  },
+  { name: 'House Coleslaw with Toasted Sesame Dressing',            cat: 'Sides',              cost: 1.80  },
+  { name: 'Chargrill Spring Onion Bunches with Soy & Sesame',       cat: 'Sides',              cost: 1.20  },
+  { name: 'Crispy Shoestring Fries with House Seasoning',           cat: 'Sides',              cost: 1.40  },
+  { name: 'Steamed Bok Choy with Oyster Sauce & Crispy Garlic',     cat: 'Sides',              cost: 1.60  },
+  { name: 'Mixed Leaf Salad with Citrus Vinaigrette',               cat: 'Sides',              cost: 2.00  },
+  // Sauces & Marinades
+  { name: 'House BBQ Sauce — Smoked Tomato & Molasses Base',        cat: 'Sauces & Marinades', cost: 0.60  },
+  { name: 'Char Siu Marinade — Hoisin Honey 5-Spice',              cat: 'Sauces & Marinades', cost: 0.80  },
+  { name: 'Herb & Garlic Marinade — Lemon Thyme Rosemary',          cat: 'Sauces & Marinades', cost: 0.70  },
+  { name: 'Teriyaki Glaze — Kikkoman Takumi Reduction',             cat: 'Sauces & Marinades', cost: 0.90  },
+  { name: 'Chimichurri — Fresh Parsley Coriander with Red Chilli',  cat: 'Sauces & Marinades', cost: 0.50  },
+  { name: 'Nam Jim Dipping Sauce — Thai Bird\'s Eye & Palm Sugar',  cat: 'Sauces & Marinades', cost: 0.40  },
+  { name: 'Satay Peanut Sauce — Coconut Milk & Lemongrass',         cat: 'Sauces & Marinades', cost: 0.75  },
+  { name: 'Rosemary Red Wine Jus — Lamb Bone Stock Base',           cat: 'Sauces & Marinades', cost: 1.20  },
+  // Desserts
+  { name: 'Chargrill Caramelised Pineapple with Coconut Ice Cream', cat: 'Desserts',           cost: 3.20  },
+  { name: 'Basque Burnt Cheesecake — Individual Portion',           cat: 'Desserts',           cost: 4.80  },
+  { name: 'Dark Chocolate Lava Cake with Vanilla Bean Ice Cream',   cat: 'Desserts',           cost: 4.20  },
+  { name: 'Alphonso Mango Sorbet — 2 Scoops',                       cat: 'Desserts',           cost: 2.40  },
+  { name: 'Affogato — Double Espresso over Vanilla Ice Cream',      cat: 'Desserts',           cost: 2.80  },
+  // Beverages
+  { name: 'House Lemonade — Fresh Squeezed with Mint',              cat: 'Beverages',          cost: 0.80  },
+  { name: 'Iced Kopi-O Kosong — Local Cold Brew',                   cat: 'Beverages',          cost: 0.60  },
+  { name: 'Lime Soda with Himalayan Salt',                          cat: 'Beverages',          cost: 0.50  },
+  { name: 'Fresh Watermelon Juice — No Sugar Added',                cat: 'Beverages',          cost: 1.20  },
+];
+const OG_REC_DATES = ['10 Jun 2026','05 Jun 2026','28 May 2026','20 May 2026','15 May 2026','01 May 2026','24 Apr 2026','10 Apr 2026','01 Apr 2026','15 Mar 2026','10 Mar 2026','28 Feb 2026'];
+const OG_REC_CAT_ORDER = ['Mains','Starters','Sides','Sauces & Marinades','Desserts','Beverages'];
+const OG_REC_FC_TARGETS = { 'Mains': 0.35, 'Starters': 0.32, 'Sides': 0.26, 'Sauces & Marinades': 0.25, 'Desserts': 0.28, 'Beverages': 0.14 };
+OG_RECIPES.forEach((r, i) => {
+  r.versions = (i === 2 || i === 7 || i === 15) ? 2 : 1;
+  r.lastUpdated = OG_REC_DATES[i % OG_REC_DATES.length];
+  r.active = (i % 9 !== 0);
+  const fc = OG_REC_FC_TARGETS[r.cat] || 0.30;
+  r.price = Math.round(r.cost / fc * 2) / 2;
+  r.foodCostPct = r.cost / r.price * 100;
+});
+
+let ogRecPage = 1, ogRecSearch = '', ogRecCatFilter = '', ogRecSortKey = 'default';
+const OG_REC_PER_PAGE = 20;
+
+function setOgRecSearch(v) { ogRecSearch = v; ogRecPage = 1; renderOgRec(); }
+function setOgRecCatFilter(v) { ogRecCatFilter = v; ogRecPage = 1; renderOgRec(); }
+function setOgRecSort(key) {
+  ogRecSortKey = ogRecSortKey === key + '-asc' ? key + '-desc' : key + '-asc';
+  ['name','cost'].forEach(k => {
+    const th = document.getElementById('ogRecSortTh-' + k);
+    if (th) th.classList.remove('sort-asc','sort-desc');
+  });
+  const th = document.getElementById('ogRecSortTh-' + key);
+  if (th) th.classList.add(ogRecSortKey.endsWith('-asc') ? 'sort-asc' : 'sort-desc');
+  renderOgRec();
+}
+function getOgRecItems() {
+  let items = OG_RECIPES.slice();
+  if (ogRecCatFilter) items = items.filter(r => r.cat === ogRecCatFilter);
+  if (ogRecSearch) { const q = ogRecSearch.toLowerCase(); items = items.filter(r => r.name.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q)); }
+  if (ogRecSortKey === 'name-asc') items.sort((a,b) => a.name.localeCompare(b.name));
+  else if (ogRecSortKey === 'name-desc') items.sort((a,b) => b.name.localeCompare(a.name));
+  else if (ogRecSortKey === 'cost-asc') items.sort((a,b) => a.foodCostPct - b.foodCostPct);
+  else if (ogRecSortKey === 'cost-desc') items.sort((a,b) => b.foodCostPct - a.foodCostPct);
+  else items.sort((a,b) => { const ci = OG_REC_CAT_ORDER.indexOf(a.cat) - OG_REC_CAT_ORDER.indexOf(b.cat); return ci !== 0 ? ci : a.name.localeCompare(b.name); });
+  return items;
+}
+function renderOgRec() {
+  const items = getOgRecItems();
+  const total = items.length;
+  const start = (ogRecPage - 1) * OG_REC_PER_PAGE;
+  const page = items.slice(start, start + OG_REC_PER_PAGE);
+  document.getElementById('ogRecCount').textContent = total;
+  document.getElementById('ogRecBody').innerHTML = page.map(r => {
+    const versionsHtml = r.versions > 1
+      ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' versions</span>'
+      : '';
+    return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
+      '<td><div class="ml-item-name">' + r.name + versionsHtml + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
+      '<td><span style="font-size:13px;font-weight:600;color:var(--ink)">' + r.foodCostPct.toFixed(1) + '%</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">$' + r.cost.toFixed(2) + ' cost · $' + r.price.toFixed(2) + ' sell</div></td>' +
+      '<td style="font-size:13px;color:var(--ink-mute)">' + r.lastUpdated + '</td>' +
+      '<td><div class="row-actions-wrap">' +
+        '<button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">···</button>' +
+        '<div class="row-actions-menu">' +
+          '<div class="row-action-item">Edit recipe</div>' +
+          '<div class="row-action-item danger">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
+        '</div></div></td>' +
+    '</tr>';
+  }).join('');
+  const totalPages = Math.max(1, Math.ceil(total / OG_REC_PER_PAGE));
+  const pager = document.getElementById('ogRecPager');
+  if (!total) { pager.innerHTML = '<span>No recipes found</span>'; return; }
+  const from = start + 1, to = Math.min(start + OG_REC_PER_PAGE, total);
+  let btns = '<button class="pager-btn" ' + (ogRecPage===1?'disabled':'') + ' onclick="setOgRecPage(' + (ogRecPage-1) + ')">‹</button>';
+  for (let p = 1; p <= totalPages; p++) btns += '<button class="pager-btn' + (p===ogRecPage?' active':'') + '" onclick="setOgRecPage(' + p + ')">' + p + '</button>';
+  btns += '<button class="pager-btn" ' + (ogRecPage===totalPages?'disabled':'') + ' onclick="setOgRecPage(' + (ogRecPage+1) + ')">›</button>';
+  pager.innerHTML = '<span>Showing ' + from + '–' + to + ' of ' + total + ' recipes</span><div style="display:flex;align-items:center;gap:3px">' + btns + '</div>';
+}
+function setOgRecPage(p) { ogRecPage = p; renderOgRec(); window.scrollTo(0,0); }
+renderOgRec();
+
 document.getElementById('modalClearBtn').style.visibility = 'hidden';
 renderOutlets();
 renderItems();
@@ -1464,6 +1818,93 @@ renderSuppliers();
 renderStatsStrip();
 document.getElementById('itemModal').addEventListener('click', e => { if (e.target === document.getElementById('itemModal')) closeItemModal(); });
 document.getElementById('manageModal').addEventListener('click', e => { if (e.target === document.getElementById('manageModal')) closeManageModal(); });
+
+let pendingGroupSupName = null;
+
+function toggleGroupSupplier(name) {
+  if (groupDisabledSuppliers.has(name)) {
+    // Re-enabling — check if any items from this supplier were auto-disabled
+    const affectedIdxs = ITEMS.reduce((acc, item, i) => { if (item.supplier === name && groupDisabledItems.has(i)) acc.push(i); return acc; }, []);
+    if (affectedIdxs.length > 0) {
+      pendingGroupSupName = name;
+      document.getElementById('groupSupReactivateName').textContent = name;
+      document.getElementById('groupSupReactivateCount').textContent = affectedIdxs.length;
+      document.getElementById('groupSupReactivateOverlay').classList.add('open');
+    } else {
+      groupDisabledSuppliers.delete(name);
+      renderSuppliers();
+      renderItems();
+      renderStatsStrip();
+    }
+  } else {
+    pendingGroupSupName = name;
+    document.getElementById('groupSupDisableName').textContent = name;
+    document.getElementById('groupSupDisableOverlay').classList.add('open');
+  }
+}
+function closeGroupSupDisableWarning() {
+  pendingGroupSupName = null;
+  document.getElementById('groupSupDisableOverlay').classList.remove('open');
+}
+function confirmGroupSupDisable() {
+  if (!pendingGroupSupName) return;
+  groupDisabledSuppliers.add(pendingGroupSupName);
+  // Auto-disable all items from this supplier
+  ITEMS.forEach((item, i) => { if (item.supplier === pendingGroupSupName) groupDisabledItems.add(i); });
+  closeGroupSupDisableWarning();
+  renderSuppliers();
+  renderItems();
+  renderStatsStrip();
+}
+function closeGroupSupReactivateOverlay() {
+  pendingGroupSupName = null;
+  document.getElementById('groupSupReactivateOverlay').classList.remove('open');
+}
+function confirmGroupSupReactivate(alsoItems) {
+  if (!pendingGroupSupName) return;
+  groupDisabledSuppliers.delete(pendingGroupSupName);
+  if (alsoItems) {
+    ITEMS.forEach((item, i) => { if (item.supplier === pendingGroupSupName) groupDisabledItems.delete(i); });
+  }
+  closeGroupSupReactivateOverlay();
+  renderSuppliers();
+  renderItems();
+  renderStatsStrip();
+}
+document.getElementById('groupSupDisableOverlay').addEventListener('click', e => { if (e.target === document.getElementById('groupSupDisableOverlay')) closeGroupSupDisableWarning(); });
+document.getElementById('groupSupReactivateOverlay').addEventListener('click', e => { if (e.target === document.getElementById('groupSupReactivateOverlay')) closeGroupSupReactivateOverlay(); });
 </script>
+
+<!-- Group-level supplier re-activate with items option -->
+<div class="confirm-overlay" id="groupSupReactivateOverlay" onclick="if(event.target===this)closeGroupSupReactivateOverlay()">
+  <div class="confirm-card">
+    <div class="confirm-title">Re-enable supplier?</div>
+    <div class="confirm-body"><strong id="groupSupReactivateName"></strong> will be re-enabled for <strong>Chargrill Outlets</strong>. There are <strong id="groupSupReactivateCount"></strong> items from this supplier that were disabled. Would you like to re-activate them as well?</div>
+    <div class="confirm-foot" style="justify-content:space-between">
+      <button class="modal-cancel" onclick="closeGroupSupReactivateOverlay()">Cancel</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-tertiary" onclick="confirmGroupSupReactivate(false)">Keep items disabled</button>
+        <button class="btn btn-primary" onclick="confirmGroupSupReactivate(true)">Re-activate items</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Group-level supplier disable warning -->
+<div class="confirm-overlay" id="groupSupDisableOverlay">
+  <div class="confirm-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="width:36px;height:36px;border-radius:8px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="confirm-title" style="margin:0">Disable supplier for this group?</div>
+    </div>
+    <div class="confirm-body">Disabling <strong id="groupSupDisableName"></strong> for <strong>Chargrill Outlets</strong> means buyers in this group will no longer be able to order from this supplier. Other groups are not affected. This can be reversed at any time.</div>
+    <div class="confirm-foot">
+      <button class="modal-cancel" onclick="closeGroupSupDisableWarning()">Cancel</button>
+      <button class="btn-danger" onclick="confirmGroupSupDisable()">Disable for this group</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
