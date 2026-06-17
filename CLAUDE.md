@@ -4,6 +4,137 @@
 
 This repo contains **Nomni Procure** HTML prototypes — a web-based procurement platform for restaurant/hospitality groups. Prototypes cover the full Procure module (login, orders, items, inventory, recipes, HQ management) and stubs for Supply and POS modules. Each file is a static, self-contained interactive prototype used for design review and developer handoff.
 
+---
+
+## Support Documentation
+
+Full product documentation is at **https://support.zeemart.co/**
+
+### For Restaurants (Nomni Procure) — https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure
+
+#### Getting Started
+- [Installing the Nomni Procure app](https://support.zeemart.co/en/articles/9418184-installing-the-nomni-procure-app)
+- [Navigating the Nomni Procure app](https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app)
+- [Changing password](https://support.zeemart.co/en/articles/9418167-changing-password)
+
+#### Sending Orders and Receiving
+- [Creating an order](https://support.zeemart.co/en/articles/9418149-creating-an-order)
+- [Fill orders to par (with POS Integration)](https://support.zeemart.co/en/articles/9417997-fill-orders-to-par-with-pos-integration)
+- [Approving orders](https://support.zeemart.co/en/articles/9418069-approving-orders)
+- [How do I approve multiple orders at once?](https://support.zeemart.co/en/articles/9418101-how-do-i-approve-multiple-orders-at-once)
+- [Set up approval](https://support.zeemart.co/en/articles/9418066-set-up-approval)
+- [Recording shortage of items](https://support.zeemart.co/en/articles/9418074-recording-shortage-of-items)
+- [Creating Goods Received Note (GRN)](https://support.zeemart.co/en/articles/9418029-creating-goods-received-note-grn)
+- [Downloading the Receiving List](https://support.zeemart.co/en/articles/9418093-downloading-the-receiving-list)
+- [Notifying suppliers of incomplete or wrong deliveries](https://support.zeemart.co/en/articles/9418018-notifying-suppliers-of-incomplete-or-wrong-deliveries)
+- [Using promo codes in orders](https://support.zeemart.co/en/articles/9418071-using-promo-codes-in-orders)
+
+#### Uploading and Managing Invoices
+- [How to upload invoices](https://support.zeemart.co/en/articles/9418159-how-to-upload-invoices)
+- [Uploading invoices for non-Nomni Procure orders](https://support.zeemart.co/en/articles/9418015-uploading-invoices-for-non-nomni-procure-orders)
+- [Uploading invoices using email](https://support.zeemart.co/en/articles/9417990-uploading-invoices-using-email)
+- [How to digitise invoices](https://support.zeemart.co/en/articles/10598144-how-to-digitise-invoices)
+- [Downloading invoices](https://support.zeemart.co/en/articles/9418075-downloading-invoices)
+- [Deleting uploaded invoices](https://support.zeemart.co/en/articles/9418165-deleting-uploaded-invoices)
+- [Rectifying rejected invoices](https://support.zeemart.co/en/articles/9418014-rectifying-rejected-invoices)
+- [Skip invoice uploads for orders not requiring invoices](https://support.zeemart.co/en/articles/9418000-skip-invoice-uploads-for-orders-not-requiring-invoices)
+- [Marking invoices as approved or rejected](https://support.zeemart.co/en/articles/10005890-marking-invoices-as-approved-or-rejected)
+- [Assigning expense categories to items](https://support.zeemart.co/en/articles/9418003-assigning-expense-categories-to-items)
+- [Receive PEPPOL e-invoices in Buyer Hub](https://support.zeemart.co/en/articles/9418044-receive-peppol-e-invoices-in-buyer-hub)
+- [Identify PEPPOL-compliant e-invoices in Buyer Hub](https://support.zeemart.co/en/articles/9418046-identify-peppol-compliant-e-invoices-in-buyer-hub)
+- [Register for a PEPPOL ID in Buyer Hub](https://support.zeemart.co/en/articles/9418049-register-for-a-peppol-id-in-buyer-hub)
+
+#### Managing Items, Suppliers and Recipes
+- [Adding or removing items in the market lists](https://support.zeemart.co/en/articles/9418027-adding-or-removing-items-in-the-market-lists)
+- [Receive notifications of price changes](https://support.zeemart.co/en/articles/9417991-receive-notifications-of-price-changes)
+- [Disabling automatic price updates](https://support.zeemart.co/en/articles/11186482-disabling-automatic-price-updates)
+- [Updating incorrect item prices](https://support.zeemart.co/en/articles/9418133-updating-incorrect-item-prices)
+- [Using the 'Group SKU' feature](https://support.zeemart.co/en/articles/9417978-using-the-group-sku-feature)
+- [Adding suppliers](https://support.zeemart.co/en/articles/9417996-adding-suppliers)
+- [Editing supplier details](https://support.zeemart.co/en/articles/9418013-editing-supplier-details)
+- [Using the Recipes feature](https://support.zeemart.co/en/articles/9418004-using-the-recipes-feature)
+- [Tracking inventory of recipes](https://support.zeemart.co/en/articles/10005932-tracking-inventory-of-recipes)
+
+#### Inventory Setup and Stock Taking
+- [Inventory overview (desktop)](https://support.zeemart.co/en/articles/9418083-inventory-overview-desktop)
+- [Inventory overview (mobile)](https://support.zeemart.co/en/articles/9418081-inventory-overview-mobile)
+- [Managing inventory lists](https://support.zeemart.co/en/articles/9418088-managing-inventory-lists)
+- [Managing items in inventory lists](https://support.zeemart.co/en/articles/9418087-managing-items-in-inventory-lists)
+- [Managing an item's inventory UOM](https://support.zeemart.co/en/articles/9418059-managing-an-item-s-inventory-uom)
+- [Reviewing UOM conversion rates in Inventory](https://support.zeemart.co/en/articles/9418028-reviewing-uom-conversion-rates-in-inventory)
+- [Performing a stock count/stocktake](https://support.zeemart.co/en/articles/9418086-performing-a-stock-count-stocktake)
+- [Record inventory with multiple units](https://support.zeemart.co/en/articles/9418002-record-inventory-with-multiple-units)
+- [Save an incomplete stock count as a draft](https://support.zeemart.co/en/articles/9417999-save-an-incomplete-stock-count-as-a-draft)
+- [Recording or deleting inventory adjustments](https://support.zeemart.co/en/articles/9418084-recording-or-deleting-inventory-adjustments)
+- [Using Invoice data to update stock quantities in Inventory](https://support.zeemart.co/en/articles/10005949-using-invoice-data-to-update-stock-quantities-in-inventory)
+- [Transfer or move stock to another list or outlet](https://support.zeemart.co/en/articles/9418011-transfer-or-move-stock-to-another-list-or-outlet)
+
+#### Reports and Data
+- [Spending reports (desktop)](https://support.zeemart.co/en/articles/9418096-spending-reports-desktop)
+- [Reports in the mobile app](https://support.zeemart.co/en/articles/10005971-reports-in-the-mobile-app)
+- [Using the Spending Tracker feature](https://support.zeemart.co/en/articles/10005983-using-the-spending-tracker-feature)
+- [2-Way Match Report](https://support.zeemart.co/en/articles/9418017-2-way-match-report)
+- [3-Way Match Report](https://support.zeemart.co/en/articles/9417980-3-way-match-report)
+- [Price Changes Report](https://support.zeemart.co/en/articles/11424118-price-changes-report)
+- [Order Receiving Report](https://support.zeemart.co/en/articles/9418016-order-receiving-report)
+- [Cost of Goods Sold (COGS) Report](https://support.zeemart.co/en/articles/9418025-cost-of-goods-sold-cogs-report)
+- [Theoretical Cost of Goods Sold (COGS) Report](https://support.zeemart.co/en/articles/10006026-theoretical-cost-of-goods-sold-cogs-report)
+- [Inventory On Hand Report](https://support.zeemart.co/en/articles/9417986-inventory-on-hand-report)
+- [Exporting supplier contact details and order settings](https://support.zeemart.co/en/articles/9417993-exporting-supplier-contact-details-and-order-settings)
+- [AI features on Nomni Procure](https://support.zeemart.co/en/articles/11507660-ai-features-on-nomni-procure)
+
+#### Integrations (POS/Accounting)
+- [Integration - Nomni POS](https://support.zeemart.co/en/articles/9417998-integration-nomni-pos)
+- [Mapping POS Variants (Nomni POS)](https://support.zeemart.co/en/articles/11514152-mapping-pos-variants-nomni-pos)
+- [Connecting to accounting software](https://support.zeemart.co/en/articles/9418091-connecting-to-accounting-software)
+- [Integration - Xero (Buyers)](https://support.zeemart.co/en/articles/9418100-integration-xero-buyers)
+- [Integration - Quickbooks Online (QBO)](https://support.zeemart.co/en/articles/9418097-integration-quickbooks-online-qbo)
+- [Integration - MYOB Business](https://support.zeemart.co/en/articles/9417988-integration-myob-business)
+
+#### Managing Accounts and Settings
+- [Manage your users](https://support.zeemart.co/en/articles/9418095-manage-your-users)
+- [Using Fingerprint or Face Unlock for added security](https://support.zeemart.co/en/articles/9418024-using-fingerprint-or-face-unlock-for-added-security)
+- [Company verification](https://support.zeemart.co/en/articles/9418043-company-verification)
+- [How to view my App version?](https://support.zeemart.co/en/articles/9418090-how-to-view-my-app-version)
+
+### For Suppliers (Nomni Supply) — https://support.zeemart.co/en/collections/9530793-for-suppliers-nomni-supply
+
+- [Using Nomni Supply as a supplier](https://support.zeemart.co/en/articles/9418033-using-nomni-supply-as-a-supplier)
+- [Can I integrate my Nomni Supply account to my ERP or an accounting software?](https://support.zeemart.co/en/articles/9418036-can-i-integrate-my-nomni-supply-account-to-my-erp-or-an-accounting-software)
+
+#### Managing Orders
+- [Setting up ordering rules](https://support.zeemart.co/en/articles/9417981-setting-up-ordering-rules)
+- [How do I acknowledge orders?](https://support.zeemart.co/en/articles/9418039-how-do-i-acknowledge-orders)
+- [Downloading pick lists, picking slips, and packing lists](https://support.zeemart.co/en/articles/9417994-downloading-pick-lists-picking-slips-and-packing-lists)
+- [How do I cancel or reject orders from my customers?](https://support.zeemart.co/en/articles/9418037-how-do-i-cancel-or-reject-orders-from-my-customers)
+- [Creating orders in the supplier app](https://support.zeemart.co/en/articles/9418040-creating-orders-in-the-supplier-app)
+
+#### Managing Items
+- [Adding and managing items for sale](https://support.zeemart.co/en/articles/9417983-adding-and-managing-items-for-sale)
+- [Using the Inventory on Nomni Supply](https://support.zeemart.co/en/articles/9417979-using-the-inventory-on-nomni-supply)
+- [Setting tax rates](https://support.zeemart.co/en/articles/9417992-setting-tax-rates)
+
+#### Creating and Managing Invoices
+- [Creating invoices on the desktop](https://support.zeemart.co/en/articles/9418070-creating-invoices-on-the-desktop)
+- [Customising invoice numbering or template](https://support.zeemart.co/en/articles/9417982-customising-invoice-numbering-or-template)
+- [Export data to Quickbooks Online (Suppliers)](https://support.zeemart.co/en/articles/9418006-export-data-to-quickbooks-online-suppliers)
+- [Export data to Xero (Suppliers)](https://support.zeemart.co/en/articles/9418008-export-data-to-xero-suppliers)
+- [How do I identify PEPPOL-compliant e-invoices in Nomni Supply?](https://support.zeemart.co/en/articles/9418041-how-do-i-identify-peppol-compliant-e-invoices-in-nomni-supply)
+- [How do I register for a PEPPOL ID in Nomni Supply?](https://support.zeemart.co/en/articles/9418042-how-do-i-register-for-a-peppol-id-in-nomni-supply)
+- [Using Nomni Supply to issue PEPPOL e-invoices](https://support.zeemart.co/en/articles/9418047-using-nomni-supply-to-issue-peppol-e-invoices)
+- [How do I save my customer's PEPPOL ID? (for Suppliers)](https://support.zeemart.co/en/articles/9418048-how-do-i-save-my-customer-s-peppol-id-for-suppliers)
+
+#### Reports
+- [Orders Received Report](https://support.zeemart.co/en/articles/9417984-orders-received-report)
+- [Sales Report](https://support.zeemart.co/en/articles/9417985-sales-report)
+
+#### Supplier Mobile App
+- [Setting a sales goal on the Dashboard](https://support.zeemart.co/en/articles/9418031-setting-a-sales-goal-on-the-dashboard)
+- [Get help or support using the supplier app](https://support.zeemart.co/en/articles/9418032-get-help-or-support-using-the-supplier-app)
+- [Overview of the Nomni Supply app](https://support.zeemart.co/en/articles/9418035-overview-of-the-nomni-supply-app)
+
+---
+
 The Nomni design system uses a green-on-dark brand identity with Inter as the workhorse typeface and Hanken Grotesk for brand/display moments.
 
 ---
