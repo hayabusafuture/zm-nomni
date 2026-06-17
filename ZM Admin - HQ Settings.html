@@ -178,8 +178,15 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-outlet-sub-row.open { display: table-row; }
 .og-outlet-sub-row td { background: #f7f8fa !important; padding: 0 14px 0 36px !important; }
 .outlet-list { max-height: 180px; overflow-y: auto; padding: 10px 0 12px; display: flex; flex-direction: column; gap: 1px; }
-.outlet-list-item { font-size: 13px; color: var(--ink); padding: 5px 8px; border-radius: 4px; }
+.outlet-list-item { font-size: 13px; color: var(--ink); padding: 5px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px; }
 .outlet-list-item:hover { background: #eef0f3; }
+.outlet-chips { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.outlet-status-chip { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 4px; padding: 2px 7px; }
+.outlet-status-chip.active { background: #D9F5E4; color: #1A8040; }
+.outlet-status-chip.inactive { background: #F0F0F2; color: #555555; }
+.pos-chip { font-size: 10px; font-weight: 700; letter-spacing: .03em; border-radius: 3px; padding: 1px 6px; flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px; }
+.pos-chip.ok { background: #D9F5E4; color: #1A8040; }
+.pos-chip.off { background: #F3F4F6; color: #9CA3AF; }
 .og-count { font-weight: 600; color: var(--ink); }
 
 /* Market list filter row */
@@ -200,7 +207,9 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .ml-table tbody tr:nth-child(even) td { background: #f9fafb; }
 .ml-table tbody tr:hover td { background: var(--row-hover) !important; }
 .ml-inactive { opacity: 0.45; }
-.ml-item-name { font-size: 14px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
+tr.ml-inactive { opacity: 1; }
+tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
+.ml-item-name { font-size: 14px; font-weight: 500; color: var(--ink); }
 .ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #f0f1f3; border-radius: 4px; padding: 1px 7px; margin-top: 3px; }
 .uom-text { font-size: 13px; color: var(--ink); }
 .uom-options-btn { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: inherit; transition: background .12s; margin-top: 2px; }
@@ -396,6 +405,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
       <div class="tab active" data-tab="outlet-groups">Overview</div>
       <div class="tab" data-tab="market-list">Items</div>
       <div class="tab" data-tab="recipes">Recipes</div>
+      <div class="tab" data-tab="inventory">Inventory</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
       <div class="tab" data-tab="activity">Activity</div>
     </div>
@@ -444,7 +454,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
             <td style="color:var(--ink-mute)">10 Jun 2026</td>
             <td>
               <div class="row-actions-wrap">
-                <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>
+                <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>
                 <div class="row-actions-menu">
                   <div class="row-action-item" onclick="location.href='ZM Admin - Edit Outlet Group.html'">Edit group</div>
                   <div class="row-action-item" onclick="openGroupSettings('Chargrill Outlets','Garden Cuisine Chargrill chain locations')">Settings</div>
@@ -456,10 +466,10 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           <tr class="og-outlet-sub-row" id="og-sub-1">
             <td colspan="6">
               <div class="outlet-list">
-                <div class="outlet-list-item">(WF 301) Chargrill @ 301 Punggol</div>
-                <div class="outlet-list-item">(WF 107) Chargrill @ 107 Serangoon</div>
-                <div class="outlet-list-item">(WF 259) Chargrill @ 259 Bukit Panjang</div>
-                <div class="outlet-list-item">(WF 280) Chargrill @ 280 Bishan</div>
+                <div class="outlet-list-item">(WF 301) Chargrill @ 301 Punggol <span class="pos-chip off">POS ✕</span></div>
+                <div class="outlet-list-item">(WF 107) Chargrill @ 107 Serangoon <span class="pos-chip off">POS ✕</span></div>
+                <div class="outlet-list-item">(WF 259) Chargrill @ 259 Bukit Panjang <span class="pos-chip off">POS ✕</span></div>
+                <div class="outlet-list-item">(WF 280) Chargrill @ 280 Bishan <span class="pos-chip off">POS ✕</span></div>
               </div>
             </td>
           </tr>
@@ -481,7 +491,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
             <td style="color:var(--ink-mute)">28 May 2026</td>
             <td>
               <div class="row-actions-wrap">
-                <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>
+                <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>
                 <div class="row-actions-menu">
                   <div class="row-action-item">Edit group</div>
                   <div class="row-action-item" onclick="openGroupSettings('Family Dining Express','')">Settings</div>
@@ -493,12 +503,12 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           <tr class="og-outlet-sub-row" id="og-sub-2">
             <td colspan="6">
               <div class="outlet-list">
-                <div class="outlet-list-item">(WF 055) Garden Express @ 055 Jurong East</div>
-                <div class="outlet-list-item">(WF 088) Garden Express @ 088 Clementi</div>
-                <div class="outlet-list-item">(WF 112) Garden Bistro @ 112 Novena</div>
-                <div class="outlet-list-item">(WF 167) Garden Bistro @ 167 Ang Mo Kio</div>
-                <div class="outlet-list-item">(WF 203) Garden Café @ 203 Bedok</div>
-                <div class="outlet-list-item">(WF 244) Garden Café @ 244 Woodlands</div>
+                <div class="outlet-list-item">(WF 055) Garden Express @ 055 Jurong East <span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-list-item">(WF 088) Garden Express @ 088 Clementi <span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-list-item">(WF 112) Garden Bistro @ 112 Novena <span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-list-item">(WF 167) Garden Bistro @ 167 Ang Mo Kio <span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-list-item">(WF 203) Garden Café @ 203 Bedok <span class="pos-chip off">POS ✕</span></div>
+                <div class="outlet-list-item" style="opacity:0.45">(WF 244) Garden Café @ 244 Woodlands <span class="pos-chip ok">POS ✓</span></div>
               </div>
             </td>
           </tr>
@@ -512,7 +522,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           </tr>
           <tr>
             <td>
-              <div style="padding-left:12px;font-size:14px;color:var(--ink)">(WF 139) Chargrill @ 139 Tampines</div>
+              <div style="padding-left:12px;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:8px">(WF 139) Chargrill @ 139 Tampines <span class="pos-chip off">POS ✕</span></div>
             </td>
             <td style="text-align:center"><span class="og-count">74</span></td>
             <td style="text-align:center"><span class="og-count">5</span></td>
@@ -522,7 +532,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           </tr>
           <tr>
             <td>
-              <div style="padding-left:12px;font-size:14px;color:var(--ink)">(WF 290) Garden Express @ 290 Sengkang</div>
+              <div style="padding-left:12px;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:8px">(WF 290) Garden Express @ 290 Sengkang <span class="pos-chip off">POS ✕</span></div>
             </td>
             <td style="text-align:center"><span class="og-count">81</span></td>
             <td style="text-align:center"><span class="og-count">7</span></td>
@@ -544,7 +554,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
               <span class="panel-label-text">Health check</span>
             </div>
             <div style="border:1px solid var(--rule);border-radius:10px;overflow:hidden">
-              <div style="padding:8px 4px;display:flex;flex-direction:column" id="healthCheck"></div>
+              <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px" id="healthCheck"></div>
             </div>
           </div>
 
@@ -648,10 +658,25 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
     <div class="tab-panel" id="panel-recipes">
       <div class="panel-label-row">
         <span class="panel-label-text">Recipes <span class="panel-label-count" id="recCount"></span></span>
-        <button class="btn-primary">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          Add recipe
-        </button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="recFcThresholdWidget" style="display:flex;align-items:center;gap:6px">
+            <button id="recFcEditBtn" onclick="editRecFcThreshold()" class="btn-tertiary" style="font-size:13px;padding:8px 12px;display:inline-flex;align-items:center;gap:6px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+              FC% target: <span id="recFcThresholdDisplay" style="font-weight:700">25%</span>
+            </button>
+          </div>
+          <span id="recFcEditInline" style="display:none;align-items:center;gap:6px;background:#F9FAFB;border:1px solid var(--rule);border-radius:7px;padding:5px 10px">
+            <span style="font-size:13px;color:var(--ink-mute)">FC% target:</span>
+            <input type="number" id="recFcInput" min="1" max="100" value="25" style="width:52px;padding:4px 8px;border:1px solid var(--rule);border-radius:5px;font-size:13px;font-family:inherit;color:var(--ink);text-align:center">
+            <span style="font-size:13px;color:var(--ink-mute)">%</span>
+            <button onclick="saveRecFcThreshold()" style="font-size:12px;font-weight:600;color:#fff;background:var(--seaweed);border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-family:inherit">Save</button>
+            <button onclick="cancelRecFcThreshold()" style="font-size:12px;font-weight:600;color:var(--ink);background:#F3F4F6;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-family:inherit">Cancel</button>
+          </span>
+          <button class="btn-primary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add recipe
+          </button>
+        </div>
       </div>
       <div class="ml-filter-row">
         <div class="ml-search-wrap" style="min-width:220px">
@@ -678,7 +703,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           <thead>
             <tr>
               <th class="sort-th" id="recSortTh-name" onclick="setRecSort('name')">Recipe <span class="sort-ind"></span></th>
-              <th class="sort-th" id="recSortTh-cost" onclick="setRecSort('cost')" style="width:120px">Food cost % <span class="sort-ind"></span></th>
+              <th class="sort-th" id="recSortTh-cost" onclick="setRecSort('cost')" style="width:100px">Cost <span class="sort-ind"></span></th>
+              <th style="width:110px">Food cost %</th>
               <th style="width:160px">Groups with access</th>
               <th style="width:120px">Last updated</th>
               <th style="width:48px"></th>
@@ -742,6 +768,58 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
       <div class="placeholder-panel">
         <div class="placeholder-title">Settings coming soon</div>
         <div class="placeholder-desc">HQ-level configuration options will appear here.</div>
+      </div>
+    </div>
+
+    <!-- ── Inventory ── -->
+    <div class="tab-panel" id="panel-inventory">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Inventory <span class="panel-label-count" id="invCount"></span></span>
+        <div style="position:relative">
+          <button class="btn-primary" id="invAddBtn" onclick="toggleInvAddMenu(event)" style="font-size:14px;padding:9px 14px;gap:8px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add to inventory
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="invAddMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:200px;overflow:hidden">
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none'">Add SKU</div>
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none'">Add recipe / sub-recipe</div>
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none'">Add Group SKU</div>
+          </div>
+        </div>
+      </div>
+      <div class="ml-filter-row">
+        <div class="ml-search-wrap" style="min-width:220px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="ml-search-input" id="invSearch" placeholder="Search inventory…" oninput="setInvSearch(this.value)" />
+        </div>
+        <select class="ml-filter-select" id="invTypeFilter" onchange="setInvTypeFilter(this.value)">
+          <option value="">All types</option>
+          <option value="sku">SKU</option>
+          <option value="recipe">Recipe</option>
+          <option value="sub-recipe">Sub-recipe</option>
+          <option value="group">Group SKU</option>
+        </select>
+        <select class="ml-filter-select" id="invStatusFilter" onchange="setInvStatusFilter(this.value)">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div style="overflow:clip">
+        <table class="ml-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th style="width:70px">UOM</th>
+              <th style="width:110px">Unit cost</th>
+              <th style="width:160px">Groups with access</th>
+              <th style="width:48px"></th>
+            </tr>
+          </thead>
+          <tbody id="invBody"></tbody>
+        </table>
+        <div id="invPager" class="ml-pager-wrap"></div>
       </div>
     </div>
 
@@ -870,28 +948,78 @@ document.addEventListener('click', e => {
 });
 
 // Health check
-(function() {
+const UNGROUPED = ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'];
+
+function renderHealthCheck() {
   const issues = [];
   const infos = [];
 
-  // Ungrouped outlets
-  const UNGROUPED = ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'];
-  if (UNGROUPED.length) issues.push({ icon: '⚠', text: UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + ' not assigned to any group', color: '#92400E', bg: '#FEF3C7' });
+  if (UNGROUPED.length) issues.push({ type: 'ungrouped', icon: '⚠', text: UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + ' not assigned to any group', color: '#92400E', bg: '#FEF3C7' });
 
-  // POS not connected
-  infos.push({ icon: '○', text: 'POS mapping not connected', color: '#6B7280', bg: '#F3F4F6' });
+  const highFcRecipes = RECIPES.filter(r => r.foodCostPct > recFcThreshold);
+  if (highFcRecipes.length) issues.push({ type: 'highfc', icon: '⚠', text: highFcRecipes.length + ' recipe' + (highFcRecipes.length > 1 ? 's' : '') + ' above ' + recFcThreshold + '% food cost target', color: '#92400E', bg: '#FEF3C7', items: highFcRecipes });
+
+  // POS not connected — outlets missing API key mapping
+  const POS_UNCONNECTED = [
+    '(WF 301) Chargrill @ 301 Punggol',
+    '(WF 107) Chargrill @ 107 Serangoon',
+    '(WF 259) Chargrill @ 259 Bukit Panjang',
+    '(WF 280) Chargrill @ 280 Bishan',
+    '(WF 139) Chargrill @ 139 Tampines',
+    '(WF 290) Garden Express @ 290 Sengkang',
+    '(WF 203) Garden Café @ 203 Bedok',
+  ];
+  infos.push({ type: 'pos', icon: '○', text: POS_UNCONNECTED.length + ' outlet' + (POS_UNCONNECTED.length > 1 ? 's' : '') + ' not connected to POS', color: '#6B7280', bg: '#F3F4F6', items: POS_UNCONNECTED });
 
   const el = document.getElementById('healthCheck');
   if (!el) return;
-  const all = [...issues, ...infos];
-  el.innerHTML = all.map(i =>
-    '<div style="display:flex;align-items:center;gap:8px;font-size:13px">' +
-    '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:' + i.bg + ';color:' + i.color + ';font-size:10px;font-weight:700;flex-shrink:0">' + i.icon + '</span>' +
-    '<span style="color:' + i.color + ';font-weight:500">' + i.text + '</span>' +
-    '</div>'
-  ).join('');
-})();
 
+  function makeExpandable(i, listItems, listBg, listBorder, dotColor, uid, maxHeight) {
+    var scrollStyle = maxHeight ? 'max-height:' + maxHeight + ';overflow-y:auto;' : '';
+    return '<div>' +
+      '<div onclick="(function(row){var list=row.parentNode.querySelector(\'[data-hclist=\\\'' + uid + '\\\']\');var open=list.style.display!==\'none\';list.style.display=open?\'none\':\'\';row.querySelector(\'.hc-chevron\').style.transform=open?\'\':\' rotate(180deg)\';})(this)" style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;user-select:none">' +
+      '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:' + i.bg + ';color:' + i.color + ';font-size:10px;font-weight:700;flex-shrink:0">' + i.icon + '</span>' +
+      '<span style="color:' + i.color + ';font-weight:500;flex:1">' + i.text + '</span>' +
+      '<svg class="hc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0;transition:transform .15s"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>' +
+      '<div data-hclist="' + uid + '" style="display:none;margin-top:6px;padding:6px 8px;background:' + listBg + ';border-radius:6px;border:1px solid ' + listBorder + '">' +
+      '<div style="' + scrollStyle + '">' + listItems + '</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function dotItem(name, color) {
+    return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:12px;color:' + color + '">' +
+      '<span style="width:4px;height:4px;border-radius:50%;background:' + color + ';flex-shrink:0;margin-left:4px"></span>' + name + '</div>';
+  }
+
+  const issueHtmlParts = issues.map(function(i, idx) {
+    if (i.type === 'ungrouped') {
+      return makeExpandable(i, UNGROUPED.map(function(n){ return dotItem(n, '#92400E'); }).join(''), '#FEF9ED', '#FDE68A', '#92400E', 'ug');
+    }
+    if (i.type === 'highfc') {
+      const rows = i.items.map(function(r){ return dotItem(r.name + ' — ' + r.foodCostPct.toFixed(1) + '%', '#92400E'); }).join('');
+      return makeExpandable(i, rows, '#FEF9ED', '#FDE68A', '#92400E', 'hfc' + idx, '160px');
+    }
+    return '';
+  });
+
+  const infoHtmlParts = infos.map(function(i, idx) {
+    if (i.type === 'pos') {
+      const rows = i.items.map(function(n){ return dotItem(n, '#6B7280'); }).join('');
+      const note = '<div style="margin-top:8px;padding-top:7px;border-top:1px solid #E5E7EB;font-size:11px;color:#9CA3AF">Each outlet requires a POS API key to be configured individually.</div>';
+      const posItem = { bg: i.bg, color: i.color, icon: i.icon, text: i.text };
+      return makeExpandable(posItem, rows + note, '#F9FAFB', '#E5E7EB', '#6B7280', 'pos' + idx, '160px');
+    }
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:13px">' +
+      '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:' + i.bg + ';color:' + i.color + ';font-size:10px;font-weight:700;flex-shrink:0">' + i.icon + '</span>' +
+      '<span style="color:' + i.color + ';font-weight:500">' + i.text + '</span>' +
+      '</div>';
+  });
+
+  const allParts = issueHtmlParts.concat(infoHtmlParts);
+  el.innerHTML = allParts.join('<div style="height:1px;background:var(--rule);margin:2px 0"></div>');
+}
 // Stats strip
 (function() {
   const strip = document.getElementById('statsStrip');
@@ -1185,7 +1313,7 @@ function renderMl() {
       '<td>' + uomCell + '</td>' +
       '<td style="text-align:left">' + grpHtml + '</td>' +
       '<td><div class="row-actions-wrap">' +
-        '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">···</button>' +
+        '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
         '<div class="row-actions-menu">' +
           '<div class="row-action-item">Edit pricing</div>' +
           '<div class="row-action-item">Manage UOM</div>' +
@@ -1298,6 +1426,26 @@ RECIPES.forEach((r, i) => {
 let recPage = 1;
 const REC_PER_PAGE = 20;
 let recSearch = '', recCatFilter = '', recStatusFilter = '', recSortKey = 'default';
+let recFcThreshold = 25;
+
+function editRecFcThreshold() {
+  document.getElementById('recFcInput').value = recFcThreshold;
+  document.getElementById('recFcThresholdWidget').style.display = 'none';
+  document.getElementById('recFcEditInline').style.display = 'inline-flex';
+  document.getElementById('recFcInput').focus();
+}
+function cancelRecFcThreshold() {
+  document.getElementById('recFcThresholdWidget').style.display = '';
+  document.getElementById('recFcEditInline').style.display = 'none';
+}
+function saveRecFcThreshold() {
+  const v = parseInt(document.getElementById('recFcInput').value, 10);
+  if (!isNaN(v) && v >= 1 && v <= 100) recFcThreshold = v;
+  document.getElementById('recFcThresholdDisplay').textContent = recFcThreshold + '%';
+  cancelRecFcThreshold();
+  renderRec();
+  renderHealthCheck();
+}
 
 function setRecSearch(v) { recSearch = v; recPage = 1; renderRec(); }
 function setRecCatFilter(v) { recCatFilter = v; recPage = 1; renderRec(); }
@@ -1357,11 +1505,12 @@ function renderRec() {
       : '';
     return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
       '<td><div class="ml-item-name">' + r.name + versionsHtml + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
-      '<td><span style="font-size:13px;font-weight:600;color:var(--ink)">' + r.foodCostPct.toFixed(1) + '%</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">$' + r.cost.toFixed(2) + ' cost · $' + r.price.toFixed(2) + ' sell</div></td>' +
+      '<td><span style="font-size:13px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">sell $' + r.price.toFixed(2) + '</div></td>' +
+      '<td><span style="font-size:13px;font-weight:700;color:' + (r.foodCostPct > recFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
       '<td>' + grpHtml + '</td>' +
       '<td style="font-size:13px;color:var(--ink-mute)">' + r.lastUpdated + '</td>' +
       '<td><div class="row-actions-wrap">' +
-        '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>' +
+        '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
         '<div class="row-actions-menu">' +
           '<div class="row-action-item">Edit recipe</div>' +
           '<div class="row-action-item">Manage groups</div>' +
@@ -1385,6 +1534,7 @@ function renderRec() {
 function setRecPage(p) { recPage = p; renderRec(); window.scrollTo(0,0); }
 
 renderRec();
+renderHealthCheck();
 
 // ── Activity log ──
 const ACT_MODULE = {
@@ -1668,7 +1818,7 @@ function renderSuppliers() {
     '<td><span class="ml-cat-tag" style="' + (s.type === 'active' ? 'background:#D9F5E4;color:#1A8040' : 'background:#F0F0F2;color:#555') + '">' + (s.type === 'active' ? 'Active' : 'Passive') + '</span></td>' +
     '<td style="text-align:left">' + grpHtml + '</td>' +
     '<td><div class="row-actions-wrap">' +
-      '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">···</button>' +
+      '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
       '<div class="row-actions-menu">' +
         '<div class="row-action-item">View items</div>' +
         '<div class="row-action-item' + (s.active ? ' danger' : '') + '" onclick="toggleSupActive(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (s.active ? 'Disable supplier' : 'Enable supplier') + '</div>' +
@@ -1718,6 +1868,160 @@ function closeGroupSettings() {
 function saveGroupSettings() {
   closeGroupSettings();
 }
+
+// ── Inventory ──
+const INV_GROUPS = ['Chargrill Outlets', 'Family Dining Express'];
+
+const INV_ITEMS = [
+  // SKUs
+  { type:'sku', name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg Vac Pk', detail:'Kee Song Group', uom:'kg', cost:6.80, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Kee Song Chilled Chicken Breast Fillet IQF 2kg Vac Pk', detail:'Kee Song Group', uom:'kg', cost:7.20, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Chilled Pork Belly Skin-On 1.5kg Vac Pk', detail:'Meat Masters SG', uom:'kg', cost:12.40, active:true, groups:['Chargrill Outlets'] },
+  { type:'sku', name:'Chilled Wagyu Striploin MS3 Grain-Fed BLK 4/5kg', detail:'Premium Meats Pte Ltd', uom:'kg', cost:48.50, active:true, groups:['Chargrill Outlets'] },
+  { type:'sku', name:'Chilled Lamb Rack Frenched 8-Rib Cap-Off 1.2kg', detail:'Premium Meats Pte Ltd', uom:'kg', cost:32.80, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Thai Hom Mali Jasmine Rice AA Grade 25kg PP Bag', detail:'Rice & Grain Co', uom:'kg', cost:1.20, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Sime Darby Canola Oil RBD 20L Jerry Can', detail:'Sunny Gold F&B Supplies', uom:'L', cost:3.20, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Fresh Garlic Peeled 10kg Vac Bag', detail:'Veggie Fresh Pte Ltd', uom:'kg', cost:4.80, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Fresh Lemongrass Trimmed 1kg Bunch', detail:'Veggie Fresh Pte Ltd', uom:'kg', cost:8.20, active:true, groups:['Chargrill Outlets'] },
+  { type:'sku', name:'Kikkoman Naturally Brewed Soy Sauce 1.8L x 6', detail:'Kikkoman', uom:'btl', cost:12.40, active:false, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Chaokoh UHT Coconut Milk 400ml x 24 Ctn', detail:'Chaokoh F&B', uom:'tin', cost:1.80, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Thai Palm Sugar Block 450g x 24 Ctn', detail:'Asian Dry Goods', uom:'pkt', cost:3.60, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Fresh Bird\'s Eye Chilli 1kg Punnet', detail:'Veggie Fresh Pte Ltd', uom:'kg', cost:9.40, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Fresh Rosemary Sprig 100g Bunch', detail:'Veggie Fresh Pte Ltd', uom:'kg', cost:18.00, active:true, groups:['Chargrill Outlets'] },
+  { type:'sku', name:'Binchotan White Charcoal Premium 15kg Bag', detail:'Grill Master SG', uom:'kg', cost:14.20, active:true, groups:['Chargrill Outlets'] },
+  { type:'sku', name:'Anchor Unsalted Butter 25kg Bulk Block', detail:'Fonterra Brands', uom:'kg', cost:11.80, active:true, groups:INV_GROUPS.slice() },
+  // Group SKUs
+  { type:'group', name:'Chicken Thigh Boneless', detail:'2 SKUs', uom:'kg', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
+    { name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier:'Kee Song Group', cost:6.80 },
+    { name:'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier:'Poultry Masters SG', cost:6.40 },
+  ]},
+  { type:'group', name:'Dark Soy Sauce', detail:'2 SKUs', uom:'L', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
+    { name:'Kikkoman Dark Soy Sauce 2L', supplier:'Kikkoman', cost:8.80 },
+    { name:'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier:'Asian Dry Goods', cost:6.90 },
+  ]},
+  { type:'group', name:'Cooking Oil', detail:'3 SKUs', uom:'L', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
+    { name:'Sime Darby Canola Oil RBD 20L', supplier:'Sunny Gold F&B Supplies', cost:3.20 },
+    { name:'Blended Vegetable Cooking Oil 20L', supplier:'Sunny Gold F&B Supplies', cost:2.80 },
+    { name:'Golden Chef Rice Bran Oil 18L', supplier:'Asian Dry Goods', cost:3.60 },
+  ]},
+  // Sub-recipes
+  { type:'sub-recipe', name:'House BBQ Sauce', detail:'Sub-recipe · Batch 2 L', uom:'L', cost:4.20, active:true, groups:['Chargrill Outlets'] },
+  { type:'sub-recipe', name:'Char Siu Marinade', detail:'Sub-recipe · Batch 1 L', uom:'L', cost:3.60, active:true, groups:['Chargrill Outlets'] },
+  { type:'sub-recipe', name:'Chimichurri', detail:'Sub-recipe · Batch 500 ml', uom:'ml', cost:1.80, active:true, groups:['Chargrill Outlets'] },
+  { type:'sub-recipe', name:'Satay Peanut Sauce', detail:'Sub-recipe · Batch 1.5 L', uom:'L', cost:5.20, active:true, groups:INV_GROUPS.slice() },
+  { type:'sub-recipe', name:'Nam Jim Dipping Sauce', detail:'Sub-recipe · Batch 500 ml', uom:'ml', cost:1.40, active:true, groups:INV_GROUPS.slice() },
+  // Recipes
+  { type:'recipe', name:'Chargrill Half Chicken with Garlic Herb Butter', detail:'Recipe', uom:'ptn', cost:8.40, active:true, groups:['Chargrill Outlets'] },
+  { type:'recipe', name:'Wagyu Beef Striploin 200g', detail:'Recipe', uom:'ptn', cost:18.50, active:true, groups:['Chargrill Outlets'] },
+  { type:'recipe', name:'Pork Belly Burnt Ends', detail:'Recipe', uom:'ptn', cost:10.20, active:true, groups:['Chargrill Outlets'] },
+  { type:'recipe', name:'Chargrill Spring Onion Bunches with Soy & Sesame', detail:'Recipe', uom:'ptn', cost:1.20, active:true, groups:['Chargrill Outlets'] },
+];
+
+let invPage = 1, invSearch = '', invTypeFilter = '', invStatusFilter = '';
+const INV_PER_PAGE = 20;
+const invExpanded = new Set();
+
+function setInvSearch(v) { invSearch = v; invPage = 1; renderInv(); }
+function setInvTypeFilter(v) { invTypeFilter = v; invPage = 1; renderInv(); }
+function setInvStatusFilter(v) { invStatusFilter = v; invPage = 1; renderInv(); }
+function setInvPage(p) { invPage = p; renderInv(); window.scrollTo(0,0); }
+function toggleInvExpand(idx) { invExpanded.has(idx) ? invExpanded.delete(idx) : invExpanded.add(idx); renderInv(); }
+function toggleInvAddMenu(e) {
+  e.stopPropagation();
+  var m = document.getElementById('invAddMenu');
+  m.style.display = m.style.display === 'none' ? '' : 'none';
+}
+document.addEventListener('click', function() {
+  var m = document.getElementById('invAddMenu');
+  if (m) m.style.display = 'none';
+});
+
+function renderInv() {
+  var items = INV_ITEMS.slice();
+  if (invSearch) { var q = invSearch.toLowerCase(); items = items.filter(function(r){ return r.name.toLowerCase().includes(q) || (r.detail||'').toLowerCase().includes(q); }); }
+  if (invTypeFilter) items = items.filter(function(r){ return r.type === invTypeFilter; });
+  if (invStatusFilter === 'active') items = items.filter(function(r){ return r.active; });
+  else if (invStatusFilter === 'inactive') items = items.filter(function(r){ return !r.active; });
+  items.sort(function(a, b){ return a.name.localeCompare(b.name); });
+
+  var total = items.length;
+  document.getElementById('invCount').textContent = total;
+  var start = (invPage - 1) * INV_PER_PAGE;
+  var page = items.slice(start, start + INV_PER_PAGE);
+
+  var td = 'padding:13px 14px;border-bottom:1px solid var(--rule);vertical-align:middle;';
+  var rows = [];
+
+  page.forEach(function(r) {
+    var globalIdx = INV_ITEMS.indexOf(r);
+    var inactiveClass = r.active ? '' : ' class="ml-inactive"';
+
+    var expandBtn = r.type === 'group'
+      ? '<button onclick="event.stopPropagation();toggleInvExpand(' + globalIdx + ')" style="width:22px;height:22px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:#F3F4F6;border:none;border-radius:4px;cursor:pointer"><svg style="transition:transform .15s;transform:' + (invExpanded.has(globalIdx) ? 'rotate(90deg)' : '') + '" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 6 15 12 9 18"/></svg></button>'
+      : '<span style="width:22px;flex-shrink:0;display:inline-block"></span>';
+
+    var detail = r.detail || '';
+
+    var costCell = r.cost !== null
+      ? '<td style="' + td + 'font-size:13px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '<span style="font-size:11px;font-weight:400;color:var(--ink-mute)"> /' + r.uom + '</span></td>'
+      : '<td style="' + td + 'font-size:13px;color:var(--ink-mute)">varies</td>';
+
+    var allGroups = r.groups && r.groups.length === INV_GROUPS.length;
+    var grpHtml = !r.groups || r.groups.length === 0
+      ? '<span style="font-size:12px;color:var(--ink-mute)">—</span>'
+      : allGroups
+        ? '<span style="font-size:12px;color:var(--ink-mute)">All groups</span>'
+        : '<span style="font-size:13px;font-weight:600;color:var(--spinach)">' + (r.groups.length === 1 ? '1 group' : r.groups.length + ' groups') + '</span>';
+
+    rows.push('<tr' + inactiveClass + '>' +
+      '<td style="' + td + '">' +
+        '<div style="display:flex;align-items:center;gap:8px">' + expandBtn +
+        '<div>' +
+          '<div style="font-size:14px;font-weight:500;color:var(--ink);margin-bottom:2px">' + r.name + '</div>' +
+          (detail ? '<div style="font-size:12px;color:var(--ink-mute)">' + detail + '</div>' : '') +
+        '</div></div>' +
+      '</td>' +
+      '<td style="' + td + 'font-size:13px;color:var(--ink-mute)">' + r.uom + '</td>' +
+      costCell +
+      '<td style="' + td + '">' + grpHtml + '</td>' +
+      '<td style="' + td + 'text-align:center">' +
+        '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
+        '<div class="row-actions-menu">' +
+          '<div class="row-action-item">Edit</div>' +
+          (r.type === 'recipe' || r.type === 'sub-recipe' ? '<div class="row-action-item">Produce</div>' : '') +
+          '<div class="row-action-item">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
+          '<div class="row-action-item danger">Remove from inventory</div>' +
+        '</div></div>' +
+      '</td>' +
+    '</tr>');
+
+    if (r.type === 'group' && invExpanded.has(globalIdx) && r.constituents) {
+      r.constituents.forEach(function(c) {
+        rows.push('<tr style="background:#F9FAFB">' +
+          '<td style="' + td + 'padding-left:52px">' +
+            '<div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px">' + c.name + '</div>' +
+            '<div style="font-size:12px;color:var(--ink-mute)">' + c.supplier + '</div>' +
+          '</td>' +
+          '<td style="' + td + 'font-size:13px;color:var(--ink-mute)">' + r.uom + '</td>' +
+          '<td style="' + td + 'font-size:13px;font-weight:600;color:var(--ink)">$' + c.cost.toFixed(2) + '<span style="font-size:11px;font-weight:400;color:var(--ink-mute)"> /' + r.uom + '</span></td>' +
+          '<td style="' + td + '"></td><td style="' + td + '"></td>' +
+        '</tr>');
+      });
+    }
+  });
+
+  document.getElementById('invBody').innerHTML = rows.join('');
+
+  var totalPages = Math.max(1, Math.ceil(total / INV_PER_PAGE));
+  var pager = document.getElementById('invPager');
+  if (!total) { pager.innerHTML = '<span class="pager-info">No items found</span>'; return; }
+  var from = start + 1, to = Math.min(start + INV_PER_PAGE, total);
+  var btns = '<button class="pager-btn" ' + (invPage===1?'disabled':'') + ' onclick="setInvPage(' + (invPage-1) + ')">‹</button>';
+  for (var p = 1; p <= totalPages; p++) btns += '<button class="pager-btn' + (p===invPage?' active':'') + '" onclick="setInvPage(' + p + ')">' + p + '</button>';
+  btns += '<button class="pager-btn" ' + (invPage===totalPages?'disabled':'') + ' onclick="setInvPage(' + (invPage+1) + ')">›</button>';
+  pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + '</span><div class="pager-btns">' + btns + '</div>';
+}
+renderInv();
 </script>
 
 <!-- Recipe Groups Dialog -->
