@@ -73,6 +73,13 @@
   .btn-outline:hover { background: #f3f4f6; }
   .btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 8px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
   .btn-primary:hover { background: #22b055; }
+  .btn { font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 6px; padding: 9px 16px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; line-height: 1; white-space: nowrap; transition: background .18s, color .18s; text-decoration: none; }
+  .btn-secondary { background: #E2FFE6; color: var(--seaweed); }
+  .btn-secondary:hover { background: #C6F2CE; }
+  .btn-tertiary { background: #F3F4F6; color: var(--ink); }
+  .btn-tertiary:hover { background: #E6E8EC; }
+  .btn-ghost { background: none; border-color: transparent; color: var(--ink-mute); }
+  .btn-ghost:hover { color: var(--ink); background: #f3f4f6; }
 
   /* ── Tabs ── */
   .tabs { display: flex; border-bottom: 1px solid var(--rule); margin-bottom: 24px; }
@@ -134,7 +141,7 @@
   .modal-title { font-size: 17px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
   .modal-close { background: none; border: none; cursor: pointer; color: var(--ink-mute); padding: 4px; border-radius: 4px; display: flex; align-items: center; transition: color .13s; }
   .modal-close:hover { color: var(--ink); }
-  .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+  .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
   .modal-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
   .modal-cancel { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; transition: color .13s; }
   .modal-cancel:hover { color: var(--ink); }
@@ -359,15 +366,11 @@
   .manage-toggle input:not(:checked) + .manage-toggle-track { background: #dcdee3; }
   .manage-toggle-track::after { content: ''; position: absolute; width: 15px; height: 15px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
   .manage-toggle input:checked + .manage-toggle-track::after { transform: translateX(15px); }
-  .override-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--rule); margin-bottom: 4px; }
-  .override-toggle-label { font-size: 14px; font-weight: 600; color: var(--ink); }
-  .override-toggle-sub { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
-  .override-toggle-btn { width: 36px; height: 20px; border-radius: 10px; border: none; cursor: pointer; position: relative; flex-shrink: 0; transition: background .15s; padding: 0; background: #dcdee3; }
-  .override-toggle-btn.on { background: var(--nomni-green); }
-  .override-toggle-btn::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
-  .override-toggle-btn.on::after { transform: translateX(16px); }
-  .override-fields { transition: opacity .15s; }
-  .override-fields.locked { opacity: 0.5; pointer-events: none; }
+  /* HQ reference hint */
+  .cell-override-wrap { display: flex; flex-direction: column; }
+  .cell-hq-hint { font-size: 11px; color: var(--ink-mute); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+  .revert-link { background: none; border: none; font: inherit; font-size: 11px; color: var(--spinach); cursor: pointer; padding: 0; text-decoration: underline; font-weight: 600; line-height: 1; }
+  .revert-link:hover { color: var(--seaweed); }
 
   @media (max-width: 1280px) {
     .app { grid-template-columns: 56px 1fr; }
@@ -639,9 +642,8 @@
   <div class="modal-card" style="width:540px">
     <div class="modal-header">
       <div style="flex:1; min-width:0">
-        <div class="modal-title" id="itemModalTitle" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:16px"></div>
-        <div style="margin-top:6px; display:flex; align-items:center; gap:8px">
-          <span class="item-cat" id="itemModalCat"></span>
+        <div class="modal-title" id="itemModalTitle" style="font-size:16px; line-height:1.35"></div>
+        <div style="margin-top:4px">
           <span style="font-size:13px; color:var(--ink-mute)" id="itemModalSupplier"></span>
         </div>
       </div>
@@ -1352,19 +1354,31 @@ function goItemsPage(n) {
   renderItems();
 }
 
+function onCellInput(input) {
+  const wrap = input.closest('.cell-override-wrap');
+  if (!wrap) return;
+  const revertBtn = wrap.querySelector('.revert-link');
+  if (revertBtn) revertBtn.style.display = input.value.trim() !== wrap.dataset.hqVal ? '' : 'none';
+}
+
+function revertCell(btn) {
+  const wrap = btn.closest('.cell-override-wrap');
+  const input = wrap.querySelector('input');
+  input.value = wrap.dataset.hqVal;
+  btn.style.display = 'none';
+}
+
 function openItemModal(idx) {
   currentItemIdx = idx;
   const item = ITEMS[idx];
   const ov = itemOverrides[idx] || {};
   document.getElementById('itemModalTitle').textContent = item.name;
-  document.getElementById('itemModalCat').textContent = item.cat;
   document.getElementById('itemModalSupplier').textContent = item.supplier;
   document.getElementById('itemCustomName').value = ov.customName || '';
 
   const isActiveSup = SUPPLIER_TYPES[item.supplier] === 'active';
   const banner = document.getElementById('itemBanner');
-  const hasExistingOverride = !isActiveSup && (ov.price != null || (Array.isArray(ov.prices) && ov.prices.length) || ov.moq != null);
-  overrideEnabled = hasExistingOverride;
+  const hasExistingOverride = !isActiveSup && (ov.price != null || (Array.isArray(ov.prices) && ov.prices.length) || ov.moq != null || (Array.isArray(ov.moqs) && ov.moqs.length));
 
   if (isActiveSup) {
     banner.className = 'modal-info-banner';
@@ -1380,44 +1394,75 @@ function openItemModal(idx) {
   if (isActiveSup) {
     if (Array.isArray(item.uom)) {
       const breakdown = getUOMBreakdown(item);
-      const rows = breakdown.map(r => '<tr><td>' + r.uom + '</td><td><input class="modal-field-input uom-price-input" type="text" value="' + r.price.toFixed(2) + '" style="padding:6px 10px" disabled /></td></tr>').join('');
+      const rows = breakdown.map(r => '<tr><td>' + r.uom + '</td><td><input class="modal-field-input uom-price-input" type="text" value="' + r.price.toFixed(2) + '" style="padding:6px 10px" disabled /></td><td><input class="modal-field-input uom-moq-input" type="text" value="' + item.moq + '" style="padding:6px 10px" disabled /></td></tr>').join('');
       section.innerHTML =
-        '<div class="modal-field"><label>UOM pricing</label><table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
-        '<div class="modal-field-row" style="margin-top:0"><div class="modal-field"><label>MOQ</label><input id="itemMOQ" class="modal-field-input" type="text" value="' + item.moq + '" disabled /></div></div>';
+        '<div class="modal-field"><label>UOM pricing</label><table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th><th style="width:120px">MOQ</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
     } else {
       section.innerHTML =
-        '<div class="modal-field-row">' +
-          '<div class="modal-field"><label>Unit price (S$)</label><input id="itemPrice" class="modal-field-input" type="text" value="' + item.price.toFixed(2) + '" disabled /><div class="modal-field-hint">' + item.uom + '</div></div>' +
-          '<div class="modal-field"><label>MOQ</label><input id="itemMOQ" class="modal-field-input" type="text" value="' + item.moq + '" disabled /></div>' +
-        '</div>';
+        '<div class="modal-field"><label>UOM pricing</label><table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th><th style="width:120px">MOQ</th></tr></thead><tbody>' +
+        '<tr><td>' + item.uom + '</td><td><input id="itemPrice" class="modal-field-input uom-price-input" type="text" value="' + item.price.toFixed(2) + '" style="padding:6px 10px" disabled /></td><td><input id="itemMOQ" class="modal-field-input uom-moq-input" type="text" value="' + item.moq + '" style="padding:6px 10px" disabled /></td></tr>' +
+        '</tbody></table></div>';
     }
   } else {
-    // Passive supplier — toggle-based override
-    const toggleHtml =
-      '<div class="override-toggle-row">' +
-        '<div><div class="override-toggle-label">Override price & MOQ</div><div class="override-toggle-sub">Set a custom price for this outlet group only</div></div>' +
-        '<button class="override-toggle-btn' + (overrideEnabled ? ' on' : '') + '" id="overrideToggleBtn" onclick="togglePriceOverride()" type="button"></button>' +
-      '</div>';
-    let fieldsHtml;
+    // Passive supplier — always-editable with HQ reference hint + Revert link
     if (Array.isArray(item.uom)) {
       const breakdown = getUOMBreakdown(item);
-      const ovPrices = Array.isArray(ov.prices) ? ov.prices : [];
+      const ovPrices = (ov.prices && ov.prices.length) ? ov.prices : item.uom.map(() => null);
+      const ovMoqs = (ov.moqs && ov.moqs.length) ? ov.moqs : item.uom.map(() => null);
+
       const rows = breakdown.map((r, i) => {
-        const val = (ovPrices[i] != null ? ovPrices[i] : r.price).toFixed(2);
-        return '<tr><td>' + r.uom + '</td><td><input class="modal-field-input uom-price-input" type="text" value="' + val + '" style="padding:6px 10px" /></td></tr>';
+        const hqPrice = r.price.toFixed(2);
+        const hqMoq = item.moq;
+        const effPrice = ovPrices[i] != null ? parseFloat(ovPrices[i]).toFixed(2) : hqPrice;
+        const effMoq = ovMoqs[i] != null ? ovMoqs[i] : hqMoq;
+
+        return '<tr>' +
+          '<td>' + r.uom + '</td>' +
+          '<td><div class="cell-override-wrap" data-hq-val="' + hqPrice + '">' +
+            '<input class="modal-field-input uom-price-input" type="text" value="' + effPrice + '" style="padding:6px 10px" oninput="onCellInput(this)" />' +
+            '<div class="cell-hq-hint">HQ: $' + hqPrice +
+              ' <button class="revert-link"' + (effPrice !== hqPrice ? '' : ' style="display:none"') + ' onclick="revertCell(this)">Revert</button>' +
+            '</div>' +
+          '</div></td>' +
+          '<td><div class="cell-override-wrap" data-hq-val="' + hqMoq + '">' +
+            '<input class="modal-field-input uom-moq-input" type="text" value="' + effMoq + '" style="padding:6px 10px" oninput="onCellInput(this)" />' +
+            '<div class="cell-hq-hint">HQ: ' + hqMoq +
+              ' <button class="revert-link"' + (effMoq !== hqMoq ? '' : ' style="display:none"') + ' onclick="revertCell(this)">Revert</button>' +
+            '</div>' +
+          '</div></td>' +
+        '</tr>';
       }).join('');
-      fieldsHtml =
-        '<div class="modal-field"><label>UOM pricing</label><table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
-        '<div class="modal-field-row" style="margin-top:0"><div class="modal-field"><label>MOQ</label><input id="itemMOQ" class="modal-field-input" type="text" value="' + (ov.moq || item.moq) + '" /></div></div>';
+
+      section.innerHTML =
+        '<div class="modal-field"><label>UOM pricing</label>' +
+        '<table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:160px">Unit price (S$)</th><th style="width:140px">MOQ</th></tr></thead><tbody>' +
+        rows + '</tbody></table></div>';
     } else {
-      const displayPrice = parseFloat(ov.price != null ? ov.price : item.price).toFixed(2);
-      fieldsHtml =
-        '<div class="modal-field-row">' +
-          '<div class="modal-field"><label>Unit price (S$)</label><input id="itemPrice" class="modal-field-input" type="text" value="' + displayPrice + '" /><div class="modal-field-hint">' + item.uom + '</div></div>' +
-          '<div class="modal-field"><label>MOQ</label><input id="itemMOQ" class="modal-field-input" type="text" value="' + (ov.moq || item.moq) + '" /></div>' +
-        '</div>';
+      const hqPrice = item.price.toFixed(2);
+      const hqMoq = item.moq;
+      const effPrice = ov.price != null ? parseFloat(ov.price).toFixed(2) : hqPrice;
+      const effMoq = ov.moq != null ? ov.moq : hqMoq;
+
+      section.innerHTML =
+        '<div class="modal-field"><label>UOM pricing</label>' +
+        '<table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:160px">Unit price (S$)</th><th style="width:140px">MOQ</th></tr></thead><tbody>' +
+        '<tr>' +
+          '<td>' + item.uom + '</td>' +
+          '<td><div class="cell-override-wrap" data-hq-val="' + hqPrice + '">' +
+            '<input id="itemPrice" class="modal-field-input uom-price-input" type="text" value="' + effPrice + '" style="padding:6px 10px" oninput="onCellInput(this)" />' +
+            '<div class="cell-hq-hint">HQ: $' + hqPrice +
+              ' <button class="revert-link"' + (effPrice !== hqPrice ? '' : ' style="display:none"') + ' onclick="revertCell(this)">Revert</button>' +
+            '</div>' +
+          '</div></td>' +
+          '<td><div class="cell-override-wrap" data-hq-val="' + hqMoq + '">' +
+            '<input id="itemMOQ" class="modal-field-input uom-moq-input" type="text" value="' + effMoq + '" style="padding:6px 10px" oninput="onCellInput(this)" />' +
+            '<div class="cell-hq-hint">HQ: ' + hqMoq +
+              ' <button class="revert-link"' + (effMoq !== hqMoq ? '' : ' style="display:none"') + ' onclick="revertCell(this)">Revert</button>' +
+            '</div>' +
+          '</div></td>' +
+        '</tr>' +
+        '</tbody></table></div>';
     }
-    section.innerHTML = toggleHtml + '<div class="override-fields' + (overrideEnabled ? '' : ' locked') + '" id="overrideFields">' + fieldsHtml + '</div>';
   }
 
   const resetBtn = document.getElementById('itemResetBtn');
@@ -1427,19 +1472,6 @@ function openItemModal(idx) {
   document.getElementById('itemModal').classList.add('open');
 }
 
-function togglePriceOverride() {
-  overrideEnabled = !overrideEnabled;
-  const btn = document.getElementById('overrideToggleBtn');
-  const fields = document.getElementById('overrideFields');
-  if (btn) btn.classList.toggle('on', overrideEnabled);
-  if (fields) fields.classList.toggle('locked', !overrideEnabled);
-  const resetBtn = document.getElementById('itemResetBtn');
-  if (resetBtn) {
-    const ov = itemOverrides[currentItemIdx] || {};
-    const hadOverride = ov.price != null || (Array.isArray(ov.prices) && ov.prices.length) || ov.moq != null;
-    resetBtn.style.display = (overrideEnabled && hadOverride) ? 'inline-flex' : 'none';
-  }
-}
 
 function renderInvStatus(inInv) {
   const card = document.getElementById('invStatusCard');
@@ -1475,33 +1507,29 @@ function saveItemModal() {
   const item = ITEMS[currentItemIdx];
   const isActiveSup = SUPPLIER_TYPES[item.supplier] === 'active';
   const customName = document.getElementById('itemCustomName').value.trim() || null;
-  const moqEl = document.getElementById('itemMOQ');
 
   if (isActiveSup) {
     itemOverrides[currentItemIdx] = { ...(itemOverrides[currentItemIdx] || {}), customName };
-  } else if (!overrideEnabled) {
-    // Toggle is OFF — clear any existing price/moq override, keep custom name
-    itemOverrides[currentItemIdx] = { customName };
   } else if (Array.isArray(item.uom)) {
     const priceInputs = document.querySelectorAll('#itemPriceSection .uom-price-input');
-    const breakdown = getUOMBreakdown(item);
-    const rawPrices = Array.from(priceInputs).map(inp => parseFloat(inp.value));
-    const anyPriceChanged = rawPrices.some((p, i) => !isNaN(p) && Math.abs(p - breakdown[i].price) > 0.001);
-    const prices = anyPriceChanged ? rawPrices.map(v => (isNaN(v) ? null : v)) : [];
-    const moqVal = moqEl ? moqEl.value.trim() || null : null;
-    const moq = moqVal !== item.moq ? moqVal : null;
-    itemOverrides[currentItemIdx] = { customName, prices, moq };
+    const moqInputs = document.querySelectorAll('#itemPriceSection .uom-moq-input');
+    const ovPrices = Array.from(priceInputs).map(inp => {
+      const wrap = inp.closest('.cell-override-wrap');
+      return wrap && inp.value.trim() !== wrap.dataset.hqVal ? parseFloat(inp.value) : null;
+    });
+    const ovMoqs = Array.from(moqInputs).map(inp => {
+      const wrap = inp.closest('.cell-override-wrap');
+      return wrap && inp.value.trim() !== wrap.dataset.hqVal ? inp.value.trim() || null : null;
+    });
+    itemOverrides[currentItemIdx] = { customName, prices: ovPrices, moqs: ovMoqs };
   } else {
     const priceEl = document.getElementById('itemPrice');
-    const parsed = priceEl ? parseFloat(priceEl.value) : NaN;
-    const priceChanged = !isNaN(parsed) && Math.abs(parsed - item.price) > 0.001;
-    const moqVal = moqEl ? moqEl.value.trim() || null : null;
-    const moqChanged = moqVal !== item.moq;
-    itemOverrides[currentItemIdx] = {
-      customName,
-      price: priceChanged ? parsed : null,
-      moq: moqChanged ? moqVal : null,
-    };
+    const moqEl = document.getElementById('itemMOQ');
+    const priceWrap = priceEl && priceEl.closest('.cell-override-wrap');
+    const moqWrap = moqEl && moqEl.closest('.cell-override-wrap');
+    const overridePrice = priceEl && priceWrap && priceEl.value.trim() !== priceWrap.dataset.hqVal ? parseFloat(priceEl.value) : null;
+    const overrideMoq = moqEl && moqWrap && moqEl.value.trim() !== moqWrap.dataset.hqVal ? moqEl.value.trim() || null : null;
+    itemOverrides[currentItemIdx] = { customName, price: overridePrice, moq: overrideMoq };
   }
   closeItemModal();
   renderItems();
@@ -1511,13 +1539,7 @@ function resetItemOverrides() {
   if (currentItemIdx === null) return;
   const ov = itemOverrides[currentItemIdx] || {};
   itemOverrides[currentItemIdx] = { customName: ov.customName };
-  overrideEnabled = false;
-  const btn = document.getElementById('overrideToggleBtn');
-  const fields = document.getElementById('overrideFields');
-  if (btn) btn.classList.remove('on');
-  if (fields) fields.classList.add('locked');
-  const resetBtn = document.getElementById('itemResetBtn');
-  if (resetBtn) resetBtn.style.display = 'none';
+  openItemModal(currentItemIdx);
   renderItems();
 }
 
