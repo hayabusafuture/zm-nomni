@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin — Create Item</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
+    --ink: #1a1f2b; --ink-2: #4a4f5a; --ink-mute: #8a8f98; --ink-soft: #c7c9cf;
+    --rule: #e7e8ec; --primary: #2AC864;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; background: #fff; }
+  .app { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* Topbar */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1F2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+
+  /* Sidebar */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--seaweed); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .nav { padding: 8px 0; flex: 1; }
+  .nav a { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: rgba(255,255,255,.55); text-decoration: none; font-size: 13px; font-weight: 400; transition: background .15s, color .15s; border-left: 2px solid transparent; white-space: nowrap; }
+  .nav a svg { flex-shrink: 0; transition: color .15s; color: rgba(255,255,255,.3); }
+  .nav a:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
+  .nav a:hover svg { color: rgba(255,255,255,.6); }
+  .nav a.active { color: #fff; background: rgba(42,200,100,.12); border-left-color: var(--nomni-green); font-weight: 500; padding-left: 14px; }
+  .nav a.active svg { color: var(--nomni-green); }
+  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* Main */
+  .main { grid-column: 2; grid-row: 2; padding: 28px 40px 100px; min-width: 0; background: #fff; }
+
+  /* Breadcrumb */
+  .breadcrumb { margin-bottom: 10px; }
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; }
+  .back-link:hover { color: var(--seaweed); }
+
+  /* Page title */
+  .page-title { font-size: 26px; font-weight: 800; margin: 0 0 16px; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .title-divider { height: 1px; background: var(--rule); margin: 0 0 28px; }
+
+  /* Info banner */
+  .info-banner { background: var(--mint); border: 1px solid #B9F0C5; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--seaweed); margin-bottom: 28px; display: flex; align-items: flex-start; gap: 10px; }
+  .info-banner svg { flex-shrink: 0; margin-top: 1px; color: var(--spinach); }
+
+  /* Form */
+  .form-body { max-width: 680px; margin: 0 auto; }
+  .section-heading { font-size: 17px; font-weight: 700; margin: 0 0 18px; letter-spacing: -0.02em; color: var(--ink); }
+  .section-divider { height: 1px; background: var(--rule); margin: 28px 0; }
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+  .form-row .field-group { flex: 1; margin-bottom: 0; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .field-label .opt { font-size: 12px; font-weight: 400; color: var(--ink-mute); margin-left: 4px; }
+  .field-label .req { color: #D0291E; }
+  .field-input { width: 100%; padding: 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; background: #fff; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input::placeholder { color: var(--ink-mute); }
+  .field-hint { font-size: 12px; color: var(--ink-mute); margin-top: 4px; display: block; }
+  .field-select { width: 100%; padding: 8px 28px 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; transition: border-color .13s; }
+  .field-select:focus { border-color: var(--nomni-green); }
+
+  /* UOM pricing table */
+  .pricing-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+  .pricing-table th { text-align: left; font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; padding: 0 0 8px; }
+  .pricing-table th:last-child { width: 36px; }
+  .pricing-table td { padding: 4px 12px 4px 0; vertical-align: top; }
+  .pricing-table td:last-child { padding-right: 0; width: 36px; vertical-align: middle; }
+  .pricing-table td:first-child { padding-left: 0; }
+  .pricing-table .col-uom { width: 130px; }
+  .pricing-table .col-price { width: 160px; }
+  .pricing-table .col-moq { }
+  .pricing-input { width: 100%; padding: 8px 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 13px; color: var(--ink); outline: none; background: #fff; }
+  .pricing-input:focus { border-color: var(--nomni-green); }
+  .pricing-input::placeholder { color: var(--ink-mute); }
+  .uom-select { width: 100%; padding: 8px 24px 8px 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 13px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 6px center; }
+  .uom-select:focus { border-color: var(--nomni-green); }
+  .remove-row-btn { width: 28px; height: 28px; border: none; background: none; cursor: pointer; color: var(--ink-mute); border-radius: 4px; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .remove-row-btn:hover { background: #fee2e2; color: #D0291E; }
+  .add-uom-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: 1px dashed #ccd0d8; border-radius: 6px; padding: 7px 14px; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink-mute); cursor: pointer; transition: border-color .13s, color .13s; margin-top: 6px; }
+  .add-uom-btn:hover { border-color: var(--spinach); color: var(--spinach); }
+
+  /* Tax radio */
+  .radio-group { display: flex; flex-direction: column; gap: 10px; }
+  .radio-label { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+  .radio-label input[type=radio] { width: 16px; height: 16px; accent-color: var(--seaweed); cursor: pointer; flex-shrink: 0; }
+  .tax-custom-row { display: flex; align-items: center; gap: 10px; }
+  .tax-custom-input { width: 80px; padding: 8px 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; }
+  .tax-custom-input:focus { border-color: var(--nomni-green); }
+  .tax-custom-input:disabled { background: #f3f4f6; color: var(--ink-mute); }
+
+  /* Inventory toggle section */
+  .inv-toggle-row { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; transition: background .1s; }
+  .inv-toggle-row:hover { background: #f7f8fa; }
+  .inv-toggle-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--seaweed); cursor: pointer; flex-shrink: 0; }
+  .inv-toggle-label { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .inv-fields { display: none; border: 1px solid var(--rule); border-top: none; border-radius: 0 0 8px 8px; padding: 16px 16px 4px; background: #fafbfc; }
+  .inv-fields.open { display: block; }
+
+  /* Inventory UOM conversion row */
+  .inv-uom-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .inv-uom-select { padding: 8px 24px 8px 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center; min-width: 80px; }
+  .inv-uom-select:focus { border-color: var(--nomni-green); }
+  .inv-conv-eq { font-size: 13px; color: var(--ink-mute); white-space: nowrap; }
+  .inv-conv-val { width: 72px; padding: 8px 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; text-align: center; }
+  .inv-conv-val:focus { border-color: var(--nomni-green); }
+  .flip-btn { display: inline-flex; align-items: center; gap: 5px; background: none; border: 1px solid #dcdee3; border-radius: 6px; padding: 7px 11px; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink-mute); cursor: pointer; white-space: nowrap; transition: border-color .13s, color .13s; }
+  .flip-btn:hover { border-color: var(--spinach); color: var(--spinach); }
+
+  /* Groups section */
+  .groups-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+  .group-item { border-bottom: 1px solid var(--rule); }
+  .group-item:last-child { border-bottom: none; }
+  .group-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: background .1s; }
+  .group-row:hover { background: var(--row-hover); }
+  .group-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--seaweed); cursor: pointer; flex-shrink: 0; }
+  .group-row-info { flex: 1; }
+  .group-row-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .group-row-sub { font-size: 12px; color: var(--ink-mute); margin-top: 1px; }
+  /* UOM chips per group */
+  .group-uom-row { display: none; padding: 0 16px 12px 44px; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .group-uom-row.visible { display: flex; }
+  .group-uom-label { font-size: 12px; color: var(--ink-mute); margin-right: 2px; }
+  .uom-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; border: 1px solid #dcdee3; font-size: 12px; font-weight: 500; color: var(--ink-mute); cursor: pointer; transition: background .1s, border-color .1s, color .1s; user-select: none; }
+  .uom-chip.on { background: #E2FFE6; border-color: var(--spinach); color: var(--spinach); }
+  .uom-chip input { display: none; }
+
+  /* Sticky footer */
+  .sticky-footer { position: fixed; bottom: 0; left: 220px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .cancel-link { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: none; transition: color .13s; padding: 0; }
+  .cancel-link:hover { color: var(--ink); }
+  .footer-right { display: flex; align-items: center; gap: 10px; }
+  .save-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 24px; cursor: pointer; transition: background .15s; }
+  .save-btn:hover { background: #22b055; }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 56px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 220px; box-shadow: 2px 0 16px rgba(0,0,0,.25); }
+    .nav a span { display: none; }
+    .nav a.active { padding-left: 16px; border-left-width: 0; }
+    .sidebar:hover .nav a span { display: inline; }
+    .sidebar:hover .nav a.active { padding-left: 14px; border-left-width: 2px; }
+    .sticky-footer { left: 56px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Admin</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn" onclick="document.getElementById('userMenu').classList.toggle('open');event.stopPropagation()">
+          <div class="topbar-avt">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item">Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Overview</span>
+      </a>
+      <a href="Admin - Buyers.html" class="active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Buyers</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        <span>Suppliers</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg>
+        <span>Reports</span>
+      </a>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+        <span>Users</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="breadcrumb">
+      <a href="Admin - HQ Settings.html" class="back-link" onclick="history.back();return false;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Items
+      </a>
+    </div>
+
+    <h1 class="page-title">Create item</h1>
+    <div class="title-divider"></div>
+
+    <div class="form-body">
+
+      <!-- ── Item details ── -->
+      <h2 class="section-heading" style="margin-top:0">Item details</h2>
+
+      <div class="field-group">
+        <label class="field-label">SKU name <span class="req">*</span></label>
+        <input type="text" class="field-input" id="skuName" placeholder="e.g. CHILLED CHICKEN BREAST FILLET SKINLESS ~180G" maxlength="100" oninput="updateCharCount(this)" />
+        <span class="field-hint" id="skuNameHint">0/100 characters · Use the name as it appears on supplier invoices</span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Supplier <span class="req">*</span></label>
+        <select class="field-select" id="supplierSelect">
+          <option value="">Select supplier</option>
+          <option>Kee Song Group</option>
+          <option>Meat King</option>
+          <option>Provenir</option>
+          <option>Deli Hub</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Supplier product code <span class="opt">(optional)</span></label>
+          <input type="text" class="field-input" placeholder="e.g. KSG-CB-180" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">My product code <span class="opt">(optional)</span></label>
+          <input type="text" class="field-input" placeholder="e.g. SKU-0042" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" style="margin-bottom:10px">Tax / GST / VAT %</label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="taxRate" value="default" checked onchange="onTaxRadioChange(this)" />
+            Use default rate (9%)
+          </label>
+          <div class="tax-custom-row">
+            <label class="radio-label">
+              <input type="radio" name="taxRate" value="custom" onchange="onTaxRadioChange(this)" />
+              Enter a different rate (%):
+            </label>
+            <input type="number" class="tax-custom-input" id="taxCustomInput" min="0" max="100" step="0.1" value="0" disabled />
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── UOM & Pricing ── -->
+      <h2 class="section-heading">UOM &amp; pricing</h2>
+
+      <table class="pricing-table">
+        <thead>
+          <tr>
+            <th class="col-uom">Unit of measure</th>
+            <th class="col-price">Unit price (S$) <span style="color:#D0291E">*</span></th>
+            <th class="col-moq">Min. order qty <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-mute)">(optional)</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="pricingRows">
+          <!-- rows inserted by JS -->
+        </tbody>
+      </table>
+      <button class="add-uom-btn" onclick="addPricingRow()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Add UOM
+      </button>
+      <span class="field-hint" style="display:block;margin-top:8px">Add multiple rows if this item is sold in different units (e.g. per kg and per carton).</span>
+
+      <div class="section-divider"></div>
+
+      <!-- ── Add to Inventory ── -->
+      <h2 class="section-heading">Inventory</h2>
+
+      <label class="inv-toggle-row" style="border-radius:8px" id="invToggleRow">
+        <input type="checkbox" id="addToInvChk" onchange="onInvToggle(this)" />
+        <div>
+          <div class="inv-toggle-label">Add to inventory</div>
+          <div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Track stock quantities for this item</div>
+        </div>
+      </label>
+      <div class="inv-fields" id="invFields">
+        <div class="field-group">
+          <label class="field-label">Inventory list <span class="opt">(optional)</span></label>
+          <select class="field-select">
+            <option value="">Uncategorised</option>
+            <option>Cold Storage</option>
+            <option>Dry Store</option>
+            <option>Freezer</option>
+          </select>
+          <span class="field-hint">If no list is selected, the item will be added to the 'Uncategorised' list.</span>
+        </div>
+        <div class="field-group">
+          <label class="field-label" style="margin-bottom:8px">Inventory UOM <span class="req">*</span></label>
+          <div class="inv-uom-row">
+            <select class="inv-uom-select" id="invUomSelect" onchange="onInvUomChange()">
+              <option value="">Select</option>
+              <option value="g">g</option>
+              <option value="kg">kg</option>
+              <option value="mL">mL</option>
+              <option value="L">L</option>
+              <option value="each">each</option>
+              <option value="piece">piece</option>
+              <option value="portion">portion</option>
+              <option value="pack">pack</option>
+              <option value="bag">bag</option>
+              <option value="box">box</option>
+              <option value="carton">carton</option>
+              <option value="tray">tray</option>
+            </select>
+            <span class="inv-conv-eq" id="invConvEq" style="display:none">1 <strong id="invUomLabel">kg</strong> =</span>
+            <input type="number" class="inv-conv-val" id="invConvVal" value="1" min="0" step="any" style="display:none" />
+            <select class="inv-uom-select" id="invConvRhs" style="display:none">
+              <option value="g">g</option>
+              <option value="kg">kg</option>
+              <option value="mL">mL</option>
+              <option value="L">L</option>
+              <option value="each">each</option>
+              <option value="piece">piece</option>
+              <option value="portion">portion</option>
+              <option value="pack">pack</option>
+              <option value="bag">bag</option>
+              <option value="box">box</option>
+              <option value="carton">carton</option>
+              <option value="tray">tray</option>
+            </select>
+            <button type="button" class="flip-btn" id="invFlipBtn" style="display:none" onclick="flipInvConv()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11A8 8 0 1 0 4.07 14"/><path d="M4 6v8h8"/></svg>
+              Flip units
+            </button>
+          </div>
+          <span class="field-hint" style="margin-top:6px;display:block">UOM used for stock counting. Only shown if it differs from the ordering UOM.</span>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Inventory par <span class="opt">(optional)</span></label>
+          <input type="number" class="field-input" placeholder="e.g. 10" min="0" step="any" style="max-width:160px" />
+          <span class="field-hint">Minimum stock level. Used for reorder alerts.</span>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── Groups with access ── -->
+      <h2 class="section-heading">Groups with access</h2>
+      <span class="field-hint" style="display:block;margin-bottom:14px">Select which outlet groups can see and order this item. You can change this later from the Items tab.</span>
+
+      <div class="groups-grid" id="groupsGrid">
+        <!-- Chargrill Outlets -->
+        <div class="group-item">
+          <label class="group-row">
+            <input type="checkbox" id="chkChargrill" checked onchange="document.getElementById('uomChargrill').classList.toggle('visible',this.checked)" />
+            <div class="group-row-info">
+              <div class="group-row-name">Chargrill Outlets</div>
+              <div class="group-row-sub">4 outlets</div>
+            </div>
+          </label>
+          <div class="group-uom-row visible" id="uomChargrill">
+            <span class="group-uom-label">UOM:</span>
+            <label class="uom-chip on"><input type="checkbox" checked />kg</label>
+            <label class="uom-chip on"><input type="checkbox" checked />carton</label>
+          </div>
+        </div>
+        <!-- Family Dining Express -->
+        <div class="group-item">
+          <label class="group-row">
+            <input type="checkbox" id="chkFamily" checked onchange="document.getElementById('uomFamily').classList.toggle('visible',this.checked)" />
+            <div class="group-row-info">
+              <div class="group-row-name">Family Dining Express</div>
+              <div class="group-row-sub">3 outlets</div>
+            </div>
+          </label>
+          <div class="group-uom-row visible" id="uomFamily">
+            <span class="group-uom-label">UOM:</span>
+            <label class="uom-chip on"><input type="checkbox" checked />kg</label>
+            <label class="uom-chip on"><input type="checkbox" checked />carton</label>
+          </div>
+        </div>
+        <!-- Individual outlets -->
+        <div class="group-item">
+          <label class="group-row">
+            <input type="checkbox" id="chkUngroup" onchange="document.getElementById('outletSubRows').style.display=this.checked?'block':'none'" />
+            <div class="group-row-info">
+              <div class="group-row-name">Individual outlets</div>
+              <div class="group-row-sub">Apply to specific outlets not in a group</div>
+            </div>
+          </label>
+          <div id="outletSubRows" style="display:none">
+            <div class="group-item" style="border-bottom:none">
+              <label class="group-row" style="padding-left:40px">
+                <input type="checkbox" id="chkO139" onchange="document.getElementById('uomO139').classList.toggle('visible',this.checked)" />
+                <div class="group-row-info"><div class="group-row-name" style="font-weight:400">(WF 139) Chargrill @ 139 Tampines</div></div>
+              </label>
+              <div class="group-uom-row" id="uomO139" style="padding-left:72px">
+                <span class="group-uom-label">UOM:</span>
+                <label class="uom-chip on"><input type="checkbox" checked />kg</label>
+                <label class="uom-chip on"><input type="checkbox" checked />carton</label>
+              </div>
+            </div>
+            <div class="group-item" style="border-bottom:none">
+              <label class="group-row" style="padding-left:40px">
+                <input type="checkbox" id="chkO140" onchange="document.getElementById('uomO140').classList.toggle('visible',this.checked)" />
+                <div class="group-row-info"><div class="group-row-name" style="font-weight:400">(WF 140) Chargrill @ Bedok</div></div>
+              </label>
+              <div class="group-uom-row" id="uomO140" style="padding-left:72px">
+                <span class="group-uom-label">UOM:</span>
+                <label class="uom-chip on"><input type="checkbox" checked />kg</label>
+                <label class="uom-chip on"><input type="checkbox" checked />carton</label>
+              </div>
+            </div>
+            <div class="group-item" style="border-bottom:none">
+              <label class="group-row" style="padding-left:40px">
+                <input type="checkbox" id="chkO141" onchange="document.getElementById('uomO141').classList.toggle('visible',this.checked)" />
+                <div class="group-row-info"><div class="group-row-name" style="font-weight:400">(WF 141) Chargrill @ Jurong</div></div>
+              </label>
+              <div class="group-uom-row" id="uomO141" style="padding-left:72px">
+                <span class="group-uom-label">UOM:</span>
+                <label class="uom-chip on"><input type="checkbox" checked />kg</label>
+                <label class="uom-chip on"><input type="checkbox" checked />carton</label>
+              </div>
+            </div>
+            <div class="group-item" style="border-bottom:none">
+              <label class="group-row" style="padding-left:40px">
+                <input type="checkbox" id="chkO142" onchange="document.getElementById('uomO142').classList.toggle('visible',this.checked)" />
+                <div class="group-row-info"><div class="group-row-name" style="font-weight:400">(WF 142) Chargrill @ Orchard</div></div>
+              </label>
+              <div class="group-uom-row" id="uomO142" style="padding-left:72px">
+                <span class="group-uom-label">UOM:</span>
+                <label class="uom-chip on"><input type="checkbox" checked />kg</label>
+                <label class="uom-chip on"><input type="checkbox" checked />carton</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-body -->
+  </main>
+
+</div><!-- /app -->
+
+<!-- Sticky footer -->
+<div class="sticky-footer">
+  <button class="cancel-link" onclick="history.back()">Cancel</button>
+  <div class="footer-right">
+    <button class="save-btn" onclick="history.back()">Save item</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+const UOM_OPTS = ['bag','block','bottle','box','bunch','can','carton','case','cup','dozen','each','fillet','g','jar','kg','L','litre','mL','pack','packet','pail','piece','portion','pouch','punnet','roll','sachet','set','tray','tin','tub'];
+
+function uomSelectHtml(val) {
+  return '<select class="uom-select">' +
+    UOM_OPTS.map(u => '<option value="' + u + '"' + (u===val?' selected':'') + '>' + u + '</option>').join('') +
+  '</select>';
+}
+
+let rowCount = 0;
+function addPricingRow(uom, price, moq) {
+  rowCount++;
+  const id = 'row' + rowCount;
+  const isFirst = document.getElementById('pricingRows').children.length === 0;
+  const tr = document.createElement('tr');
+  tr.id = id;
+  tr.innerHTML =
+    '<td class="col-uom">' + uomSelectHtml(uom || 'kg') + '</td>' +
+    '<td class="col-price"><div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-mute);font-size:13px;pointer-events:none">$</span><input class="pricing-input" type="number" step="0.01" min="0" placeholder="0.00" value="' + (price||'') + '" style="padding-left:22px" /></div></td>' +
+    '<td class="col-moq"><input class="pricing-input" type="text" placeholder="e.g. 5 kg" value="' + (moq||'') + '" /></td>' +
+    '<td><button class="remove-row-btn" onclick="removeRow(\'' + id + '\')" title="Remove">' +
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+    '</button></td>';
+  document.getElementById('pricingRows').appendChild(tr);
+  updateRemoveButtons();
+}
+function removeRow(id) {
+  document.getElementById(id).remove();
+  updateRemoveButtons();
+}
+function updateRemoveButtons() {
+  const rows = document.getElementById('pricingRows').querySelectorAll('tr');
+  rows.forEach(r => {
+    const btn = r.querySelector('.remove-row-btn');
+    if (btn) btn.style.visibility = rows.length > 1 ? 'visible' : 'hidden';
+  });
+}
+
+function updateCharCount(inp) {
+  const hint = document.getElementById('skuNameHint');
+  hint.textContent = inp.value.length + '/100 characters · Use the name as it appears on supplier invoices';
+}
+
+function onTaxRadioChange(radio) {
+  const inp = document.getElementById('taxCustomInput');
+  inp.disabled = radio.value !== 'custom';
+  if (radio.value === 'custom') inp.focus();
+}
+
+function onInvToggle(chk) {
+  const fields = document.getElementById('invFields');
+  const row = document.getElementById('invToggleRow');
+  const open = chk.checked;
+  fields.classList.toggle('open', open);
+  row.style.borderRadius = open ? '8px 8px 0 0' : '8px';
+}
+
+function onInvUomChange() {
+  const sel = document.getElementById('invUomSelect');
+  const eq = document.getElementById('invConvEq');
+  const val = document.getElementById('invConvVal');
+  const rhs = document.getElementById('invConvRhs');
+  const flipBtn = document.getElementById('invFlipBtn');
+  const label = document.getElementById('invUomLabel');
+  const show = sel.value !== '';
+  [eq, val, rhs, flipBtn].forEach(el => el.style.display = show ? '' : 'none');
+  if (show) label.textContent = sel.value;
+}
+
+function flipInvConv() {
+  const lhsSel = document.getElementById('invUomSelect');
+  const rhsSel = document.getElementById('invConvRhs');
+  const val = document.getElementById('invConvVal');
+  const label = document.getElementById('invUomLabel');
+  const lhsVal = lhsSel.value;
+  const rhsVal = rhsSel.value;
+  const numVal = parseFloat(val.value) || 1;
+  lhsSel.value = rhsVal;
+  rhsSel.value = lhsVal;
+  val.value = numVal !== 0 ? (1 / numVal).toFixed(4).replace(/\.?0+$/, '') : 1;
+  label.textContent = rhsVal;
+}
+
+// UOM chip toggle
+document.addEventListener('click', function(e) {
+  const chip = e.target.closest('.uom-chip');
+  if (!chip) return;
+  e.preventDefault();
+  e.stopPropagation();
+  chip.classList.toggle('on');
+  const inp = chip.querySelector('input[type=checkbox]');
+  if (inp) inp.checked = chip.classList.contains('on');
+});
+
+// Seed one default pricing row
+addPricingRow();
+</script>
+</body>
+</html>

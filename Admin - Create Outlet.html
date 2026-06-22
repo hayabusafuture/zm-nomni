@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ZM Admin — Edit HQ</title>
+<title>Admin — Create Outlet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
@@ -66,7 +66,7 @@
   .title-divider { height: 1px; background: var(--rule); margin: 0 0 28px; }
 
   /* Form body */
-  .form-body { max-width: 640px; margin: 0 auto; }
+  .form-body { max-width: 640px; }
 
   /* Section headings */
   .section-heading { font-size: 18px; font-weight: 700; margin: 0 0 16px; letter-spacing: -0.02em; color: var(--ink); }
@@ -221,11 +221,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg>
         <span>Reports</span>
       </a>
-      <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-        <span>Promotions</span>
-      </a>
-      <a href="ZM Admin - Buyers.html" class="active">
+      <a href="Admin - Buyers.html" class="active">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span>Buyers</span>
       </a>
@@ -248,12 +244,12 @@
   <main class="main">
 
     <div class="breadcrumb">
-      <a href="ZM Admin - HQ Settings.html" class="back-link">
+      <a href="Admin - Buyers.html" class="back-link">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Garden Cuisine HQ
+        Buyers
       </a>
     </div>
-    <h1 class="page-title">Edit HQ</h1>
+    <h1 class="page-title">Create outlet</h1>
     <div class="title-divider"></div>
 
     <div class="form-body">
@@ -263,37 +259,76 @@
 
       <div class="field-group">
         <label class="field-label">Company</label>
-        <select class="field-select">
-          <option value="">Select company</option>
-          <option selected>Garden Cuisine Pte Ltd</option>
-          <option>Wok &amp; Roll Pte Ltd</option>
-          <option>Spice Garden Group Pte Ltd</option>
-          <option>Harbour Eats Holdings Pte Ltd</option>
-          <option>Noodle Republic Pte Ltd</option>
+        <select class="field-select" disabled>
+          <option>Garden Cuisine Pte Ltd</option>
         </select>
+        <span class="field-hint">Company is set at the group level and cannot be changed here</span>
       </div>
 
       <div class="field-group">
-        <label class="field-label">HQ name</label>
-        <input type="text" class="field-input" value="Garden Cuisine HQ" />
-        <span class="field-hint">Typically the brand or group name followed by "HQ"</span>
+        <label class="field-label">Outlet name</label>
+        <input type="text" class="field-input" placeholder="e.g. Garden Cuisine (Toa Payoh)" />
+        <span class="field-hint">Use "Brand Name (Outlet Name)" format when the brand has multiple outlets</span>
       </div>
 
       <div class="field-group">
-        <label class="field-label">Address <span class="optional">(optional)</span></label>
-        <input type="text" class="field-input" value="7 Jalan Besar" style="margin-bottom:8px" />
+        <label class="field-label">Type</label>
+        <div class="radio-group" id="typeRadioGroup">
+          <label class="radio-row">
+            <input type="radio" name="outletType" value="regular" checked onchange="onTypeChange(this.value)" />
+            <div class="radio-row-text">
+              <div class="radio-row-label">Regular outlet</div>
+            </div>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="outletType" value="ck" onchange="onTypeChange(this.value)" />
+            <div class="radio-row-text">
+              <div class="radio-row-label">Central Kitchen</div>
+              <div class="radio-row-warning">Creates a supplier account with the same name as this outlet</div>
+            </div>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="outletType" value="hq" onchange="onTypeChange(this.value)" />
+            <div class="radio-row-text">
+              <div class="radio-row-label">HQ</div>
+              <div class="radio-row-desc">This outlet acts as the HQ for a group of outlets</div>
+            </div>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="outletType" value="managed" onchange="onTypeChange(this.value)" />
+            <div class="radio-row-text">
+              <div class="radio-row-label">Managed by HQ</div>
+              <div class="radio-row-desc">This outlet is governed by an existing HQ</div>
+            </div>
+          </label>
+        </div>
+        <!-- Conditional: shown when "Managed by HQ" is selected -->
+        <div class="radio-indent conditional-panel" id="selectHqPanel">
+          <label class="field-label" style="margin-bottom:6px">Select HQ</label>
+          <select class="field-select" style="max-width:360px">
+            <option value="">Select HQ</option>
+            <option>Garden Cuisine HQ</option>
+            <option>Wok &amp; Roll HQ</option>
+            <option>Spice Garden HQ</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Address</label>
+        <input type="text" class="field-input" placeholder="Address Line 1" style="margin-bottom:8px" />
         <input type="text" class="field-input" placeholder="Address Line 2 (optional)" style="margin-bottom:8px" />
         <div class="form-row" style="margin-bottom:0">
           <div class="field-group" style="margin-bottom:0">
-            <input type="text" class="field-input" value="Singapore" />
+            <input type="text" class="field-input" placeholder="City / State" />
           </div>
           <div class="field-group" style="margin-bottom:0">
-            <input type="text" class="field-input" value="208837" />
+            <input type="text" class="field-input" placeholder="Postal code" />
           </div>
         </div>
         <div style="margin-top:8px">
           <select class="field-select">
-            <option selected>Singapore</option>
+            <option>Singapore</option>
             <option>Australia</option>
             <option>Malaysia</option>
             <option>Indonesia</option>
@@ -314,13 +349,13 @@
       </div>
 
       <div class="field-group">
-        <label class="field-label">HQ email</label>
-        <input type="email" class="field-input" value="accounts@gardencuisine.com.sg" />
+        <label class="field-label">Outlet email</label>
+        <input type="email" class="field-input" placeholder="outlet@company.com" />
       </div>
 
       <div class="field-group">
         <label class="field-label">Mobile phone <span class="optional">(optional)</span></label>
-        <input type="tel" class="field-input" value="+6562345678" />
+        <input type="tel" class="field-input" placeholder="+6591234567" />
         <span class="field-hint">Include country code, e.g. +6591234567</span>
       </div>
 
@@ -328,6 +363,56 @@
 
       <!-- ── Subscription information ── -->
       <h2 class="section-heading" style="margin-top:0">Subscription information</h2>
+
+      <div class="field-group">
+        <label class="check-item">
+          <input type="checkbox" />
+          <div class="check-item-text">
+            <div class="check-item-label">Has used SG government grant</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Subscription plan</label>
+        <div class="plan-cards">
+          <label class="plan-card">
+            <input type="radio" name="plan" value="starter" checked />
+            <div class="plan-card-body">
+              <div class="plan-card-name">Starter <span class="plan-badge plan-badge-free">Free</span></div>
+              <div class="plan-card-desc">Basic ordering and supplier management</div>
+            </div>
+          </label>
+          <label class="plan-card">
+            <input type="radio" name="plan" value="growth" />
+            <div class="plan-card-body">
+              <div class="plan-card-name">Growth</div>
+              <div class="plan-card-desc">Advanced reporting, invoice processing, and market lists</div>
+              <div class="plan-card-billing">
+                <label style="font-size:13px;color:var(--ink-mute)">Billed</label>
+                <select>
+                  <option>annually</option>
+                  <option>monthly</option>
+                </select>
+              </div>
+            </div>
+          </label>
+          <label class="plan-card">
+            <input type="radio" name="plan" value="premium" />
+            <div class="plan-card-body">
+              <div class="plan-card-name">Premium</div>
+              <div class="plan-card-desc">Full suite — inventory, recipes, HQ management, and AI features</div>
+              <div class="plan-card-billing">
+                <label style="font-size:13px;color:var(--ink-mute)">Billed</label>
+                <select>
+                  <option>annually</option>
+                  <option>monthly</option>
+                </select>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
 
       <div class="field-group">
         <label class="field-label">Add-ons</label>
@@ -361,6 +446,12 @@
           <label class="check-item">
             <input type="checkbox" />
             <div class="check-item-text">
+              <div class="check-item-label">Price changes from invoice processing require buyer approval</div>
+            </div>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" />
+            <div class="check-item-text">
               <div class="check-item-label">AI features</div>
             </div>
           </label>
@@ -379,8 +470,59 @@
 
       <div class="field-group">
         <label class="field-label">Invoice email</label>
-        <input type="email" class="field-input" value="billing@gardencuisine.com.sg" />
+        <input type="email" class="field-input" placeholder="billing@company.com" />
         <span class="field-hint">Separate multiple addresses with commas</span>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ── Additional details ── -->
+      <h2 class="section-heading" style="margin-top:0">Additional details</h2>
+
+      <div class="field-group">
+        <label class="field-label">Type of business <span class="optional">(optional)</span></label>
+        <select class="field-select">
+          <option value="">Select</option>
+          <option>Restaurant</option>
+          <option>Café</option>
+          <option>Bar &amp; Nightlife</option>
+          <option>Hotel &amp; Hospitality</option>
+          <option>Catering</option>
+          <option>Food court stall</option>
+          <option>Quick service / Fast food</option>
+          <option>Franchise</option>
+          <option>Cloud kitchen</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Type of cuisine <span class="optional">(optional)</span></label>
+        <div class="cuisine-grid">
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Asian</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Western</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Chinese</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Mediterranean</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Japanese</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Middle Eastern</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Korean</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Pizza &amp; Pasta</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Thai</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Burgers &amp; Sandwiches</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Vietnamese</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Seafood</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Indian</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Vegetarian &amp; Vegan</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Desserts &amp; Bakery</div></div></label>
+          <label class="check-item"><input type="checkbox" /><div class="check-item-text"><div class="check-item-label">Beverages</div></div></label>
+          <label class="check-item" style="grid-column:1/-1">
+            <input type="checkbox" id="cuisineOtherCheck" onchange="document.getElementById('cuisineOtherInput').style.display=this.checked?'block':'none'" />
+            <div class="check-item-text">
+              <div class="check-item-label">Others</div>
+              <input type="text" class="field-input" id="cuisineOtherInput" placeholder="Specify…" style="display:none;margin-top:6px;max-width:280px" />
+            </div>
+          </label>
+        </div>
       </div>
 
     </div><!-- /form-body -->
@@ -389,8 +531,8 @@
 
 <!-- Sticky footer -->
 <div class="sticky-footer">
-  <a href="ZM Admin - HQ Settings.html" class="cancel-link">Cancel</a>
-  <button class="save-btn" onclick="window.location.href='ZM Admin - HQ Settings.html'">Save changes</button>
+  <a href="Admin - Buyers.html" class="cancel-link">Cancel</a>
+  <button class="save-btn">Create outlet</button>
 </div>
 
 <script>
@@ -403,6 +545,15 @@
     document.getElementById('userMenu').classList.remove('open');
   });
 
+  // Outlet type radio — show/hide "Select HQ" conditional panel
+  function onTypeChange(val) {
+    var panel = document.getElementById('selectHqPanel');
+    if (val === 'managed') {
+      panel.classList.add('visible');
+    } else {
+      panel.classList.remove('visible');
+    }
+  }
 </script>
 </body>
 </html>

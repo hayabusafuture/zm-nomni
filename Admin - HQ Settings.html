@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ZM Admin — Garden Cuisine HQ</title>
+<title>Admin — Garden Cuisine HQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -97,6 +97,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .hq-summary-icon { display: flex; margin-bottom: 10px; }
 .hq-summary-value { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; font-family: "Hanken Grotesk", system-ui, sans-serif; }
 .hq-summary-label { font-size: 13px; color: var(--ink); margin-top: 2px; }
+.hq-summary-label span { font-weight: 600; }
 
 /* Tabs */
 .tabs { display: flex; border-bottom: 1px solid var(--rule); margin-bottom: 28px; }
@@ -177,9 +178,36 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-outlet-sub-row { display: none; }
 .og-outlet-sub-row.open { display: table-row; }
 .og-outlet-sub-row td { background: #f7f8fa !important; padding: 0 14px 0 36px !important; }
-.outlet-list { max-height: 180px; overflow-y: auto; padding: 10px 0 12px; display: flex; flex-direction: column; gap: 1px; }
+.outlet-list { padding: 10px 0 12px; display: flex; flex-direction: column; gap: 1px; overflow: visible; }
 .outlet-list-item { font-size: 13px; color: var(--ink); padding: 5px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px; }
 .outlet-list-item:hover { background: #eef0f3; }
+.outlet-item-name { flex: 1; min-width: 0; }
+.outlet-item-actions { margin-left: auto; flex-shrink: 0; }
+.outlet-item-actions .btn-row-actions { font-size: 12px; padding: 2px 7px; height: 24px; }
+/* Outlet table search */
+.og-search-wrap { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; margin-bottom: 12px; }
+.og-search-wrap svg { flex-shrink: 0; color: var(--ink-mute); }
+.og-search-wrap input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
+.og-search-wrap input::placeholder { color: var(--ink-mute); }
+/* Add-to-group modal */
+.modal-warning { background: #FFF8EC; border: 1px solid #F5D87A; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #7A5C00; line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
+.modal-warning svg { flex-shrink: 0; margin-top: 1px; color: #C47B00; }
+.group-radio-list { display: flex; flex-direction: column; gap: 8px; }
+.group-radio-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; transition: border-color .15s; }
+.group-radio-item:has(input:checked) { border-color: var(--nomni-green); background: #F6FFF9; }
+.group-radio-item input[type="radio"] { accent-color: var(--nomni-green); width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; }
+.group-radio-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+.group-radio-meta { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+/* Remove-from-group confirm */
+.danger-confirm-card { background: #fff; border-radius: 12px; width: 440px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); padding: 24px; }
+.danger-confirm-title { font-size: 16px; font-weight: 700; margin: 0 0 10px; letter-spacing: -.02em; }
+.danger-confirm-body { font-size: 14px; color: var(--ink-2,#4a4f5a); line-height: 1.6; margin: 0 0 20px; }
+.danger-confirm-notice { background: #f9fafb; border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--ink-mute); line-height: 1.5; margin-bottom: 20px; }
+.danger-confirm-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.btn-danger-confirm { background: #D0291E; color: #fff; border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 18px; cursor: pointer; transition: background .15s; }
+.btn-danger-confirm:hover { background: #b02016; }
+.btn-cancel-plain { background: none; border: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink-mute); padding: 9px 14px; cursor: pointer; border-radius: 6px; transition: color .13s; }
+.btn-cancel-plain:hover { color: var(--ink); }
 .outlet-chips { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
 .outlet-status-chip { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 4px; padding: 2px 7px; }
 .outlet-status-chip.active { background: #D9F5E4; color: #1A8040; }
@@ -364,6 +392,114 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .act-date-sep { font-size: 12px; color: var(--ink-mute); flex-shrink: 0; }
 .act-custom-range { display: none; align-items: center; gap: 6px; }
 .act-custom-range.visible { display: flex; }
+
+/* ── Picker modals (Flow 1 & 2) ── */
+.picker-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: flex-start; justify-content: center; padding-top: 60px; }
+.picker-overlay.open { display: flex; }
+.picker-card { background: #fff; border-radius: 12px; width: 700px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); max-height: calc(100vh - 88px); display: flex; flex-direction: column; overflow: hidden; }
+.picker-head { padding: 20px 24px 14px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+.picker-head-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.picker-title { font-size: 18px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+.picker-close-btn { background: none; border: none; cursor: pointer; color: var(--ink-mute); padding: 2px; border-radius: 4px; display: flex; align-items: center; }
+.picker-close-btn:hover { background: #f3f4f6; color: var(--ink); }
+.picker-steps { display: flex; align-items: center; }
+.picker-step-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-mute); }
+.picker-step-item.active { color: var(--ink); }
+.picker-step-item.done { color: var(--spinach); }
+.picker-step-num { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #ccd0d8; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--ink-mute); }
+.picker-step-item.active .picker-step-num { background: var(--seaweed); color: #fff; border-color: var(--seaweed); }
+.picker-step-item.done .picker-step-num { background: var(--spinach); color: #fff; border-color: var(--spinach); }
+.picker-step-sep { width: 20px; height: 1px; background: var(--rule); margin: 0 8px; }
+.picker-search-row { display: flex; gap: 8px; padding: 12px 24px 0; flex-shrink: 0; }
+.picker-search-wrap { display: flex; align-items: center; gap: 8px; flex: 1; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; }
+.picker-search-wrap input { border: none; outline: none; font: inherit; font-size: 14px; flex: 1; color: var(--ink); background: transparent; }
+.picker-select { height: 36px; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 10px; font: inherit; font-size: 13px; color: var(--ink); background: #fff; cursor: pointer; }
+.picker-info-bar { padding: 10px 24px 0; font-size: 12px; color: var(--ink-mute); flex-shrink: 0; }
+.picker-list { flex: 1; overflow-y: auto; padding: 6px 0; min-height: 0; }
+.picker-row { display: flex; align-items: center; gap: 12px; padding: 10px 24px; cursor: pointer; transition: background .1s; user-select: none; }
+.picker-row:hover { background: var(--row-hover); }
+.picker-row.sel { background: rgba(42,200,100,.07); }
+.picker-chk { width: 18px; height: 18px; border: 1.5px solid #ccd0d8; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .13s; }
+.picker-row.sel .picker-chk { background: var(--seaweed); border-color: var(--seaweed); }
+.picker-row-info { flex: 1; min-width: 0; }
+.picker-row-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+.picker-row-sub { font-size: 12px; color: var(--ink-mute); margin-top: 1px; }
+.picker-row-meta { text-align: right; flex-shrink: 0; }
+.picker-row-price { font-size: 13px; font-weight: 600; color: var(--ink); }
+.picker-row-uom { font-size: 11px; color: var(--ink-mute); }
+.picker-row-badge { font-size: 11px; font-weight: 600; background: #EFF6FF; color: #2563EB; border-radius: 4px; padding: 2px 7px; }
+.picker-empty { padding: 48px 24px; text-align: center; color: var(--ink-mute); font-size: 13px; }
+.picker-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.picker-sel-label { font-size: 13px; color: var(--ink-mute); }
+.picker-sel-label strong { color: var(--ink); font-weight: 600; }
+/* Config step */
+.config-list { flex: 1; overflow-y: auto; min-height: 0; }
+.config-row { padding: 16px 24px; border-bottom: 1px solid var(--rule); }
+.config-row:last-child { border-bottom: none; }
+.config-row-name { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.config-row-sub { font-size: 12px; color: var(--ink-mute); margin-bottom: 10px; }
+.config-fields { display: grid; gap: 10px; }
+.config-fields.cols2 { grid-template-columns: 1fr 1fr; }
+.config-fields.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+.config-field label { font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 4px; }
+.config-field input, .config-field select { width: 100%; border: 1px solid #dcdee3; border-radius: 6px; padding: 7px 10px; font: inherit; font-size: 13px; color: var(--ink); background: #fff; }
+.config-field input:focus, .config-field select:focus { outline: none; border-color: var(--nomni-green); }
+.config-field .config-readonly { background: #f9fafb; color: var(--ink-mute); padding: 7px 10px; border: 1px solid #eef0f3; border-radius: 6px; font-size: 13px; display: block; }
+.config-price-tbl { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.config-price-tbl th { text-align: left; font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; padding: 0 10px 6px 0; white-space: nowrap; }
+.config-price-tbl th:last-child { padding-right: 0; }
+.config-price-tbl td { padding: 4px 10px 4px 0; vertical-align: middle; }
+.config-price-tbl td:last-child { padding-right: 0; }
+.config-price-tbl .col-uom { width: 80px; }
+.config-price-tbl .col-price { width: 150px; }
+.config-price-tbl input { width: 100%; border: 1px solid #dcdee3; border-radius: 6px; padding: 7px 10px; font: inherit; font-size: 13px; color: var(--ink); background: #fff; }
+.config-price-tbl input:focus { outline: none; border-color: var(--nomni-green); }
+.config-price-tbl .uom-tag { display: inline-block; background: #f0f1f3; border-radius: 4px; padding: 5px 10px; font-size: 13px; font-weight: 600; color: var(--ink-mute); }
+.conv-hint { margin-top: 8px; padding: 10px 12px; background: #f9fafb; border-radius: 6px; font-size: 12px; color: var(--ink-mute); display: flex; align-items: center; gap: 8px; }
+.conv-hint input { width: 56px; border: 1px solid #dcdee3; border-radius: 5px; padding: 4px 8px; font: inherit; font-size: 13px; color: var(--ink); text-align: center; background: #fff; }
+.conv-hint input:focus { outline: none; border-color: var(--nomni-green); }
+.config-groups { padding: 14px 24px 16px; border-top: 1px solid var(--rule); flex-shrink: 0; }
+.config-groups-lbl { font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+.config-grp-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.config-grp-row:not(:last-child) { border-bottom: 1px solid var(--rule); }
+.config-grp-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--seaweed); cursor: pointer; flex-shrink: 0; }
+.config-grp-row label { font-size: 14px; cursor: pointer; }
+/* Step 2 compact price table */
+.ai-price-tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
+.ai-price-tbl thead th { position: sticky; top: 0; background: #fff; text-align: left; font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; padding: 12px 8px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; z-index: 1; }
+.ai-price-tbl thead th:first-child { padding-left: 24px; }
+.ai-price-tbl thead th:last-child { padding-right: 24px; }
+.ai-price-tbl tbody td { padding: 8px 8px; border-bottom: 1px solid var(--rule); vertical-align: middle; font-size: 13px; }
+.ai-price-tbl tbody td:first-child { padding-left: 24px; }
+.ai-price-tbl tbody td:last-child { padding-right: 24px; }
+.ai-price-tbl tbody tr:last-child td { border-bottom: none; }
+.ai-price-tbl .col-name { width: 200px; }
+.ai-price-tbl .col-name-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; font-weight: 500; color: var(--ink); }
+.ai-price-tbl .col-name-sub { font-size: 11px; color: var(--ink-mute); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.ai-price-tbl .col-uom { width: 64px; }
+.ai-price-tbl .col-price { width: 140px; }
+.ai-price-tbl .col-moq { }
+.ai-price-tbl .uom-badge { display: inline-block; background: #f0f1f3; border-radius: 4px; padding: 3px 8px; font-size: 12px; font-weight: 600; color: var(--ink-mute); }
+.ai-price-tbl input { width: 100%; border: 1px solid #dcdee3; border-radius: 6px; padding: 6px 9px; font: inherit; font-size: 13px; color: var(--ink); background: #fff; }
+.ai-price-tbl input:focus { outline: none; border-color: var(--nomni-green); }
+.ai-price-tbl .price-wrap { position: relative; }
+.ai-price-tbl .price-wrap span { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--ink-mute); font-size: 13px; pointer-events: none; }
+.ai-price-tbl .price-wrap input { padding-left: 20px; }
+.ai-price-tbl tr.item-first td { border-top: 1px solid #d0d2d8; }
+.ai-price-tbl tr.item-first:first-child td { border-top: none; }
+/* Step 3 groups panel */
+.step3-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 0; }
+.step3-intro { font-size: 13px; color: var(--ink-mute); margin-bottom: 16px; }
+.step3-group { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+.step3-grp-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: background .1s; }
+.step3-grp-row:hover { background: #f7f8fa; }
+.step3-grp-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--seaweed); cursor: pointer; flex-shrink: 0; }
+.step3-grp-info { flex: 1; }
+.step3-grp-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+.step3-grp-sub { font-size: 12px; color: var(--ink-mute); margin-top: 1px; }
+/* Toast */
+#hqToast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--seaweed); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 1100; opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; }
+#hqToast.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -413,18 +549,18 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg><span>Invoices</span></a>
       <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg><span>Reports</span></a>
       <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><span>Promotions</span></a>
-      <a href="ZM Admin - Buyers.html" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Buyers</span></a>
+      <a href="Admin - Buyers.html" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Buyers</span></a>
       <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg><span>Suppliers</span></a>
       <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>Notifications</span><span class="badge">4</span></a>
-      <a href="ZM Admin - Buyer User.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Users</span></a>
+      <a href="Admin - Buyer User.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Users</span></a>
     </nav>
   </aside>
 
   <!-- Main -->
   <main class="main">
 
-    <a href="ZM Admin - Buyers.html#outlet-groups" class="back-link">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+    <a href="Admin - Buyers.html#outlet-groups" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
       HQ &amp; Outlet groups
     </a>
 
@@ -437,7 +573,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </div>
       <div class="head-actions">
         <button class="btn-ghost-danger">Disable HQ</button>
-        <button class="btn-outline" onclick="window.location.href='ZM Admin - Edit HQ.html'">Edit details</button>
+        <button class="btn-outline" onclick="window.location.href='Admin - Edit HQ.html'">Edit details</button>
       </div>
     </div>
     <div class="page-meta">Garden Cuisine Pte Ltd &nbsp;·&nbsp; Created 05 Sep 2019 &nbsp;·&nbsp; Last updated 10 Jun 2026</div>
@@ -446,10 +582,10 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
     <div class="tabs">
       <div class="tab active" data-tab="outlet-groups">Overview</div>
-      <div class="tab" data-tab="market-list">Items</div>
-      <div class="tab" data-tab="recipes">Recipes</div>
-      <div class="tab" data-tab="inventory">Inventory</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
+      <div class="tab" data-tab="market-list">Items</div>
+      <div class="tab" data-tab="inventory">Inventory</div>
+      <div class="tab" data-tab="recipes">Recipes</div>
       <div class="tab" data-tab="activity">Activity</div>
     </div>
 
@@ -461,13 +597,17 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <div>
           <div class="panel-label-row">
             <span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">4</span></span>
-        <button class="btn-primary" onclick="window.location.href='ZM Admin - Create Outlet Group.html?hq=Garden+Cuisine+HQ'">
+        <button class="btn-primary" onclick="window.location.href='Admin - Create Outlet Group.html?hq=Garden+Cuisine+HQ'">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
           New group
         </button>
       </div>
+      <div class="og-search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="ogSearch" placeholder="Search outlets or groups…" oninput="filterOgTable(this.value)" />
+      </div>
       <div style="overflow:clip">
-      <table class="og-table">
+      <table class="og-table" id="ogTable">
         <thead>
           <tr>
             <th>Outlet / Group</th>
@@ -479,14 +619,14 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr data-group-name="chargrill outlets" data-group-outlets="wf 301 chargrill punggol|wf 107 chargrill serangoon|wf 259 chargrill bukit panjang|wf 280 chargrill bishan">
             <td>
               <div class="og-name-cell">
                 <button class="og-expand-btn" onclick="toggleOgExpand(this,'og-sub-1')">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
                 <div class="og-name-cell-inner">
-                  <a href="ZM Admin - Edit Outlet Group.html" class="og-name">Chargrill Outlets</a>
+                  <a href="Admin - Edit Outlet Group.html?from=hq" class="og-name">Chargrill Outlets</a>
                   <span class="og-outlet-count">4 outlets</span>
                 </div>
               </div>
@@ -499,7 +639,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <div class="row-actions-wrap">
                 <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>
                 <div class="row-actions-menu">
-                  <div class="row-action-item" onclick="location.href='ZM Admin - Edit Outlet Group.html'">Edit group</div>
+                  <div class="row-action-item" onclick="location.href='Admin - Edit Outlet Group.html'">Edit group</div>
                   <div class="row-action-item" onclick="openGroupSettings('Chargrill Outlets','Garden Cuisine Chargrill chain locations')">Settings</div>
                   <div class="row-action-item danger" onclick="toggleGroupDisabled(this)">Disable group</div>
                 </div>
@@ -509,14 +649,14 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <tr class="og-outlet-sub-row" id="og-sub-1">
             <td colspan="6">
               <div class="outlet-list">
-                <div class="outlet-list-item">(WF 301) Chargrill @ 301 Punggol <span class="pos-chip off">POS ✕</span></div>
-                <div class="outlet-list-item">(WF 107) Chargrill @ 107 Serangoon <span class="pos-chip off">POS ✕</span></div>
-                <div class="outlet-list-item">(WF 259) Chargrill @ 259 Bukit Panjang <span class="pos-chip off">POS ✕</span></div>
-                <div class="outlet-list-item">(WF 280) Chargrill @ 280 Bishan <span class="pos-chip off">POS ✕</span></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 301) chargrill @ 301 punggol"><span class="outlet-item-name">(WF 301) Chargrill @ 301 Punggol</span><span class="pos-chip off">POS ✕</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 301) Chargrill @ 301 Punggol','Chargrill Outlets')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 301) Chargrill @ 301 Punggol')">Remove from HQ</div></div></div></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 107) chargrill @ 107 serangoon"><span class="outlet-item-name">(WF 107) Chargrill @ 107 Serangoon</span><span class="pos-chip off">POS ✕</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 107) Chargrill @ 107 Serangoon','Chargrill Outlets')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 107) Chargrill @ 107 Serangoon')">Remove from HQ</div></div></div></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 259) chargrill @ 259 bukit panjang"><span class="outlet-item-name">(WF 259) Chargrill @ 259 Bukit Panjang</span><span class="pos-chip off">POS ✕</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 259) Chargrill @ 259 Bukit Panjang','Chargrill Outlets')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 259) Chargrill @ 259 Bukit Panjang')">Remove from HQ</div></div></div></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 280) chargrill @ 280 bishan"><span class="outlet-item-name">(WF 280) Chargrill @ 280 Bishan</span><span class="pos-chip off">POS ✕</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 280) Chargrill @ 280 Bishan','Chargrill Outlets')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 280) Chargrill @ 280 Bishan')">Remove from HQ</div></div></div></div>
               </div>
             </td>
           </tr>
-          <tr>
+          <tr data-group-name="family dining express" data-group-outlets="wf 055 garden express jurong east|wf 088 garden express clementi|wf 112 garden bistro novena|wf 167 garden bistro ang mo kio|wf 203 garden café bedok|wf 244 garden café woodlands">
             <td>
               <div class="og-name-cell">
                 <button class="og-expand-btn" onclick="toggleOgExpand(this,'og-sub-2')">
@@ -546,16 +686,16 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <tr class="og-outlet-sub-row" id="og-sub-2">
             <td colspan="6">
               <div class="outlet-list">
-                <div class="outlet-list-item">(WF 055) Garden Express @ 055 Jurong East <span class="pos-chip ok">POS ✓</span></div>
-                <div class="outlet-list-item">(WF 088) Garden Express @ 088 Clementi <span class="pos-chip ok">POS ✓</span></div>
-                <div class="outlet-list-item">(WF 112) Garden Bistro @ 112 Novena <span class="pos-chip ok">POS ✓</span></div>
-                <div class="outlet-list-item">(WF 167) Garden Bistro @ 167 Ang Mo Kio <span class="pos-chip ok">POS ✓</span></div>
-                <div class="outlet-list-item">(WF 203) Garden Café @ 203 Bedok <span class="pos-chip off">POS ✕</span></div>
-                <div class="outlet-list-item" style="opacity:0.45">(WF 244) Garden Café @ 244 Woodlands <span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 055) garden express @ 055 jurong east"><span class="outlet-item-name">(WF 055) Garden Express @ 055 Jurong East</span><span class="pos-chip ok">POS ✓</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 055) Garden Express @ 055 Jurong East','Family Dining Express')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 055) Garden Express @ 055 Jurong East')">Remove from HQ</div></div></div></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 088) garden express @ 088 clementi"><span class="outlet-item-name">(WF 088) Garden Express @ 088 Clementi</span><span class="pos-chip ok">POS ✓</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 088) Garden Express @ 088 Clementi','Family Dining Express')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 088) Garden Express @ 088 Clementi')">Remove from HQ</div></div></div></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 112) garden bistro @ 112 novena"><span class="outlet-item-name">(WF 112) Garden Bistro @ 112 Novena</span><span class="pos-chip ok">POS ✓</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 112) Garden Bistro @ 112 Novena','Family Dining Express')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 112) Garden Bistro @ 112 Novena')">Remove from HQ</div></div></div></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 167) garden bistro @ 167 ang mo kio"><span class="outlet-item-name">(WF 167) Garden Bistro @ 167 Ang Mo Kio</span><span class="pos-chip ok">POS ✓</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 167) Garden Bistro @ 167 Ang Mo Kio','Family Dining Express')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 167) Garden Bistro @ 167 Ang Mo Kio')">Remove from HQ</div></div></div></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 203) garden café @ 203 bedok"><span class="outlet-item-name">(WF 203) Garden Café @ 203 Bedok</span><span class="pos-chip off">POS ✕</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 203) Garden Café @ 203 Bedok','Family Dining Express')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 203) Garden Café @ 203 Bedok')">Remove from HQ</div></div></div></div>
+                <div class="outlet-list-item" data-outlet-name="(wf 244) garden café @ 244 woodlands"><span class="outlet-item-name">(WF 244) Garden Café @ 244 Woodlands</span><span class="pos-chip ok">POS ✓</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal('(WF 244) Garden Café @ 244 Woodlands','Family Dining Express')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal('(WF 244) Garden Café @ 244 Woodlands')">Remove from HQ</div></div></div></div>
               </div>
             </td>
           </tr>
-          <tr>
+          <tr data-ungrouped-name="(wf 139) chargrill @ 139 tampines">
             <td>
               <div class="og-name-cell">
                 <div style="width:18px;flex-shrink:0"></div>
@@ -573,13 +713,13 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <div class="row-actions-wrap">
                 <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>
                 <div class="row-actions-menu">
-                  <div class="row-action-item">Add to group</div>
-                  <div class="row-action-item danger">Remove outlet</div>
+                  <div class="row-action-item" onclick="openAddToGroupModal('(WF 139) Chargrill @ 139 Tampines')">Add to group</div>
+                  <div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest('tr').dataset.ungroupedName)">Remove from HQ</div>
                 </div>
               </div>
             </td>
           </tr>
-          <tr>
+          <tr data-ungrouped-name="(wf 290) garden express @ 290 sengkang">
             <td>
               <div class="og-name-cell">
                 <div style="width:18px;flex-shrink:0"></div>
@@ -597,8 +737,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <div class="row-actions-wrap">
                 <button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>
                 <div class="row-actions-menu">
-                  <div class="row-action-item">Add to group</div>
-                  <div class="row-action-item danger">Remove outlet</div>
+                  <div class="row-action-item" onclick="openAddToGroupModal('(WF 290) Garden Express @ 290 Sengkang')">Add to group</div>
+                  <div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest('tr').dataset.ungroupedName)">Remove from HQ</div>
                 </div>
               </div>
             </td>
@@ -675,14 +815,21 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="tab-panel" id="panel-market-list">
       <div class="panel-label-row">
         <span class="panel-label-text">Items <span class="panel-label-count" id="mlCount"></span></span>
-        <button class="btn-primary">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          Add item
-        </button>
+        <div style="position:relative">
+          <button class="btn-primary" id="addItemBtn" onclick="toggleAddItemMenu(event)" style="gap:8px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add item
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="addItemMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:230px;overflow:hidden">
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openAddCatalogueModal()">Add from supplier catalogue</div>
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';window.location.href='Admin - HQ Create Item.html'">Create new item</div>
+          </div>
+        </div>
       </div>
       <div class="ml-filter-row">
         <div class="ml-search-wrap">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" class="ml-search-input" id="mlSearch" placeholder="Search items or suppliers…" oninput="setMlSearch(this.value)" />
         </div>
         <select class="ml-filter-select" id="mlCatFilter" onchange="setMlCatFilter(this.value)">
@@ -743,7 +890,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </div>
       <div class="ml-filter-row">
         <div class="ml-search-wrap" style="min-width:220px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" class="ml-search-input" id="recSearch" placeholder="Search recipes…" oninput="setRecSearch(this.value)" />
         </div>
         <select class="ml-filter-select" id="recCatFilter" onchange="setRecCatFilter(this.value)">
@@ -805,7 +952,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </div>
       <div class="ml-filter-row">
         <div class="ml-search-wrap">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" class="ml-search-input" id="supSearch" placeholder="Search suppliers…" oninput="renderSuppliers()" />
         </div>
       </div>
@@ -845,15 +992,15 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div id="invAddMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:200px;overflow:hidden">
-            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none'">Add SKU</div>
-            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none'">Add recipe / sub-recipe</div>
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none';openAddInvSkuModal()">Add SKU</div>
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none';openAddInvRecipeModal()">Add recipe / sub-recipe</div>
             <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none'">Add Group SKU</div>
           </div>
         </div>
       </div>
       <div class="ml-filter-row">
         <div class="ml-search-wrap" style="min-width:220px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" class="ml-search-input" id="invSearch" placeholder="Search inventory…" oninput="setInvSearch(this.value)" />
         </div>
         <select class="ml-filter-select" id="invTypeFilter" onchange="setInvTypeFilter(this.value)">
@@ -893,7 +1040,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </div>
       <div class="act-filter-row">
         <div class="ml-search-wrap" style="min-width:200px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" class="ml-search-input" id="actSearch" placeholder="Search activity…" oninput="renderActivity()" />
         </div>
         <select class="ml-filter-select" id="actModuleFilter" onchange="renderActivity()">
@@ -1056,7 +1203,7 @@ function renderHealthCheck() {
       '<div onclick="(function(row){var list=row.parentNode.querySelector(\'[data-hclist=\\\'' + uid + '\\\']\');var open=list.style.display!==\'none\';list.style.display=open?\'none\':\'\';row.querySelector(\'.hc-chevron\').style.transform=open?\'\':\' rotate(180deg)\';})(this)" style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;user-select:none">' +
       '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:' + i.bg + ';color:' + i.color + ';font-size:10px;font-weight:700;flex-shrink:0">' + i.icon + '</span>' +
       '<span style="color:' + i.color + ';font-weight:500;flex:1">' + i.text + '</span>' +
-      '<svg class="hc-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0;transition:transform .15s"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '<svg class="hc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0;transition:transform .15s"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<div data-hclist="' + uid + '" style="display:none;margin-top:6px;padding:6px 8px;background:' + listBg + ';border-radius:6px;border:1px solid ' + listBorder + '">' +
       '<div style="' + scrollStyle + '">' + listItems + '</div>' +
@@ -1101,16 +1248,16 @@ function renderHealthCheck() {
   const strip = document.getElementById('statsStrip');
   strip.className = 'hq-summary-strip';
   const ICONS = {
-    home: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-    'layout-grid': '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>',
-    star: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
-    briefcase: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>'
+    home: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'layout-grid': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>',
+    star: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+    briefcase: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>'
   };
   const stats = [
-    { icon: 'home',        value: 7,   label: 'Outlets',   accent: true, iconColor: '#1A8040', accentColor: '#2AC864' },
-    { icon: 'layout-grid', value: 100, label: 'Items',    accent: true, iconColor: '#185FA5', accentColor: '#3B82F6' },
-    { icon: 'star',        value: 48,  label: 'Recipes',  accent: true, iconColor: '#854F0B', accentColor: '#F59E0B' },
-    { icon: 'briefcase',   value: 14,  label: 'Suppliers', accent: true, iconColor: '#6D28D9', accentColor: '#8B5CF6' },
+    { icon: 'home',        value: 7,   label: '<span>Outlets</span> in this HQ',      accent: true, iconColor: '#1A8040', accentColor: '#2AC864' },
+    { icon: 'layout-grid', value: 100, label: '<span>Items</span> in market list',    accent: true, iconColor: '#185FA5', accentColor: '#3B82F6' },
+    { icon: 'star',        value: 48,  label: '<span>Recipes</span> in library',      accent: true, iconColor: '#854F0B', accentColor: '#F59E0B' },
+    { icon: 'briefcase',   value: 14,  label: '<span>Suppliers</span> group-wide',    accent: true, iconColor: '#6D28D9', accentColor: '#8B5CF6' },
   ];
   strip.innerHTML = stats.map(s =>
     '<div class="hq-summary-cell' + (s.accent ? ' accent' : '') + '"' + (s.accentColor ? ' style="--accent-bar:' + s.accentColor + '"' : '') + '>' +
@@ -2122,7 +2269,7 @@ function renderActivityPage() {
           '<span class="act-user">' + a.user + '</span>' +
         '</div>' +
       '</div>' +
-      '<svg style="flex-shrink:0;color:var(--ink-soft)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>' +
+      '<svg style="flex-shrink:0;color:var(--ink-soft)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>' +
     '</div>';
   }).join('');
 
@@ -2268,8 +2415,8 @@ renderSuppliers();
 function openRecGroupsDialog(btn) {
   const groups = btn.dataset.groups ? btn.dataset.groups.split('|').filter(Boolean) : [];
   const outlets = btn.dataset.outlets ? btn.dataset.outlets.split('|').filter(Boolean) : [];
-  const groupIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--spinach)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>';
-  const outletIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+  const groupIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--spinach)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>';
+  const outletIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
   const row = (icon, label, last) =>
     '<div style="padding:10px 0;' + (last ? '' : 'border-bottom:1px solid var(--rule);') + 'font-size:14px;color:var(--ink);display:flex;align-items:center;gap:8px">' + icon + label + '</div>';
   let html = '';
@@ -2370,6 +2517,8 @@ function toggleInvAddMenu(e) {
 document.addEventListener('click', function() {
   var m = document.getElementById('invAddMenu');
   if (m) m.style.display = 'none';
+  var m2 = document.getElementById('addItemMenu');
+  if (m2) m2.style.display = 'none';
 });
 
 function renderInv() {
@@ -2458,6 +2607,372 @@ function renderInv() {
   pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + '</span><div class="pager-btns">' + btns + '</div>';
 }
 renderInv();
+
+// ── Toast ──
+function showHqToast(msg) {
+  const t = document.getElementById('hqToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Shared picker helpers ──
+function chkSvg() {
+  return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+}
+function setPickerSteps(st1Id, st2Id, step) {
+  const s1 = document.getElementById(st1Id), s2 = document.getElementById(st2Id);
+  if (step === 1) { s1.className = 'picker-step-item active'; s2.className = 'picker-step-item'; }
+  else { s1.className = 'picker-step-item done'; s2.className = 'picker-step-item active'; }
+}
+function showPanel(p1Id, p2Id, step) {
+  document.getElementById(p1Id).style.display = step === 1 ? 'flex' : 'none';
+  document.getElementById(p2Id).style.display = step === 2 ? 'flex' : 'none';
+}
+
+// ── Flow 1: Add from supplier catalogue ──
+const CAT_ITEMS = [
+  { id:'c1', name:'CHILLED WHOLE CHICKEN GD A 1.2-1.6KG IND PKT', supplier:'Kee Song Group', uoms:['kg','ctn'], cat:'Poultry' },
+  { id:'c2', name:'FROZ CHICKEN MARYLAND 2PC/PKT 450-500G', supplier:'Kee Song Group', uoms:['pkt'], cat:'Poultry' },
+  { id:'c3', name:'CHILLED CHICKEN BREAST FILLET SKINLESS ~180G', supplier:'Kee Song Group', uoms:['kg','pkt'], cat:'Poultry' },
+  { id:'c4', name:'CHILLED CHICKEN FEET CLEANED PKT ~500G', supplier:'Kee Song Group', uoms:['pkt'], cat:'Poultry' },
+  { id:'c5', name:'US PRIME BEEF RIBEYE BONELESS CHOICE GRADE', supplier:'Meat King', uoms:['kg','pc'], cat:'Beef' },
+  { id:'c6', name:'AUS WAGYU BEEF STRIPLOIN MB5+ PORTIONED', supplier:'Meat King', uoms:['kg'], cat:'Beef' },
+  { id:'c7', name:'FROZ PORK BELLY SKINLESS BONELESS SLAB', supplier:'Meat King', uoms:['kg'], cat:'Pork' },
+  { id:'c8', name:'CHILLED PORK SHOULDER BOSTON BUTT BONELESS', supplier:'Meat King', uoms:['kg'], cat:'Pork' },
+  { id:'c9', name:'FRESH BABY SPINACH WASHED READY 200G PKT', supplier:'Provenir', uoms:['pkt','ctn'], cat:'Produce' },
+  { id:'c10', name:'ROMA TOMATOES CLASS A FRESH', supplier:'Provenir', uoms:['kg'], cat:'Produce' },
+  { id:'c11', name:'BUTTON MUSHROOMS FRESH 500G NET', supplier:'Provenir', uoms:['pkt'], cat:'Produce' },
+  { id:'c12', name:'HOLLANDAISE SAUCE BASE READY-TO-USE 1LTR', supplier:'Deli Hub', uoms:['L','ctn'], cat:'Sauces' },
+  { id:'c13', name:'PARMIGIANO REGGIANO GRATED FINE 1KG', supplier:'Deli Hub', uoms:['kg'], cat:'Dairy & Eggs' },
+  { id:'c14', name:'ARBORIO RISOTTO RICE DRY 5KG BAG', supplier:'Deli Hub', uoms:['bag','ctn'], cat:'Dry Goods' },
+];
+let aiSel = new Set();
+function toggleAddItemMenu(e) {
+  e.stopPropagation();
+  const m = document.getElementById('addItemMenu');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+function openAddCatalogueModal() {
+  aiSel.clear();
+  document.getElementById('aiSearch').value = '';
+  document.getElementById('aiSupFilter').value = '';
+  setAiStep(1);
+  renderAiList();
+  document.getElementById('addItemModal').classList.add('open');
+}
+function closeAddItemModal() { document.getElementById('addItemModal').classList.remove('open'); }
+function setAiStep(n) {
+  ['aiPanel1','aiPanel2','aiPanel3'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.style.display = (i+1===n) ? 'flex' : 'none';
+  });
+  const nums = ['aiSt1','aiSt2','aiSt3'];
+  nums.forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('active', i+1===n);
+    el.classList.toggle('done', i+1<n);
+  });
+}
+function renderAiList() {
+  const q = document.getElementById('aiSearch').value.toLowerCase();
+  const sup = document.getElementById('aiSupFilter').value;
+  const filtered = CAT_ITEMS.filter(i =>
+    (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
+    (!sup || i.supplier === sup)
+  );
+  document.getElementById('aiList').innerHTML = filtered.length ? filtered.map(i => {
+    const s = aiSel.has(i.id);
+    const uomBadges = i.uoms.map(u => '<span style="display:inline-block;background:#f0f1f3;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600;color:var(--ink-mute);margin-left:4px">' + u + '</span>').join('');
+    return '<div class="picker-row' + (s?' sel':'') + '" onclick="toggleAiItem(\'' + i.id + '\')">' +
+      '<div class="picker-chk">' + (s ? chkSvg() : '') + '</div>' +
+      '<div class="picker-row-info"><div class="picker-row-name">' + i.name + '</div><div class="picker-row-sub" style="display:flex;align-items:center;flex-wrap:wrap;gap:2px">' + i.supplier + ' · ' + i.cat + uomBadges + '</div></div>' +
+    '</div>';
+  }).join('') : '<div class="picker-empty">No items found</div>';
+  const n = aiSel.size;
+  document.getElementById('aiSelLabel').innerHTML = n ? '<strong>' + n + '</strong> item' + (n>1?'s':'') + ' selected' : 'No items selected';
+  document.getElementById('aiNextBtn').disabled = n === 0;
+}
+function toggleAiItem(id) { aiSel.has(id) ? aiSel.delete(id) : aiSel.add(id); renderAiList(); }
+function showAiStep2() {
+  const items = CAT_ITEMS.filter(i => aiSel.has(i.id));
+  document.getElementById('aiPriceRows').innerHTML = items.map((item, idx) => {
+    return item.uoms.map((u, ui) => {
+      const isFirst = ui === 0;
+      return '<tr class="' + (isFirst ? 'item-first' : '') + '">' +
+        '<td class="col-name">' + (isFirst
+          ? '<div class="col-name-text" title="' + item.name + '">' + item.name + '</div><div class="col-name-sub">' + item.supplier + '</div>'
+          : '') + '</td>' +
+        '<td class="col-uom"><span class="uom-badge">' + u + '</span></td>' +
+        '<td class="col-price"><div class="price-wrap"><span>$</span><input type="number" placeholder="0.00" step="0.01" min="0" /></div></td>' +
+        '<td class="col-moq"><input type="text" placeholder="e.g. 5 ' + u + '" /></td>' +
+      '</tr>';
+    }).join('');
+  }).join('');
+  document.getElementById('aiAddBtn').textContent = 'Add ' + items.length + ' item' + (items.length>1?'s':'');
+  setAiStep(2);
+}
+function showAiStep3() { setAiStep(3); }
+function showAiStep2Back() { setAiStep(2); }
+function showAiStep1() { setAiStep(1); }
+function confirmAddItems() {
+  const n = aiSel.size;
+  closeAddItemModal();
+  showHqToast(n + ' item' + (n>1?'s':'') + ' added to market list');
+}
+
+// ── Flow 2a: Add SKU to Inventory ──
+const INV_AVAIL_SKUS = [
+  { id:'is1', name:'Whole Chicken Grade A', supplier:'Kee Song Group', uom:'kg', price:8.20 },
+  { id:'is2', name:'Chicken Wing Mid Joint', supplier:'Kee Song Group', uom:'kg', price:7.50 },
+  { id:'is3', name:'Beef Short Ribs', supplier:'Meat King', uom:'kg', price:28.00 },
+  { id:'is4', name:'US Prime Ribeye', supplier:'Meat King', uom:'kg', price:38.00 },
+  { id:'is5', name:'King Prawns L1', supplier:'Deli Hub', uom:'kg', price:32.00 },
+  { id:'is6', name:'Mozzarella Cheese Block', supplier:'Deli Hub', uom:'kg', price:16.50 },
+  { id:'is7', name:'Fresh Basil', supplier:'Provenir', uom:'bunch', price:2.80 },
+  { id:'is8', name:'Sweet Corn', supplier:'Provenir', uom:'piece', price:1.20 },
+  { id:'is9', name:'Extra Virgin Olive Oil', supplier:'Deli Hub', uom:'L', price:22.00 },
+  { id:'is10', name:'Sea Salt Flakes', supplier:'Deli Hub', uom:'kg', price:14.00 },
+];
+const UOM_OPTIONS = ['kg','g','L','mL','piece','portion','bottle','can','bag','box','carton','pack','bunch','roll','tray'];
+let isSel = new Set();
+function openAddInvSkuModal() {
+  isSel.clear();
+  document.getElementById('isSearch').value = '';
+  document.getElementById('isSupFilter').value = '';
+  setPickerSteps('isSt1','isSt2',1);
+  showPanel('isPanel1','isPanel2',1);
+  renderIsList();
+  document.getElementById('addInvSkuModal').classList.add('open');
+}
+function closeAddInvSkuModal() { document.getElementById('addInvSkuModal').classList.remove('open'); }
+function renderIsList() {
+  const q = document.getElementById('isSearch').value.toLowerCase();
+  const sup = document.getElementById('isSupFilter').value;
+  const filtered = INV_AVAIL_SKUS.filter(i =>
+    (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
+    (!sup || i.supplier === sup)
+  );
+  document.getElementById('isList').innerHTML = filtered.length ? filtered.map(i => {
+    const s = isSel.has(i.id);
+    return '<div class="picker-row' + (s?' sel':'') + '" onclick="toggleIsItem(\'' + i.id + '\')">' +
+      '<div class="picker-chk">' + (s ? chkSvg() : '') + '</div>' +
+      '<div class="picker-row-info"><div class="picker-row-name">' + i.name + '</div><div class="picker-row-sub">' + i.supplier + '</div></div>' +
+      '<div class="picker-row-meta"><div class="picker-row-price">$' + i.price.toFixed(2) + '</div><div class="picker-row-uom">/' + i.uom + '</div></div>' +
+    '</div>';
+  }).join('') : '<div class="picker-empty">No items found</div>';
+  const n = isSel.size;
+  document.getElementById('isSelLabel').innerHTML = n ? '<strong>' + n + '</strong> item' + (n>1?'s':'') + ' selected' : 'No items selected';
+  document.getElementById('isNextBtn').disabled = n === 0;
+}
+function toggleIsItem(id) { isSel.has(id) ? isSel.delete(id) : isSel.add(id); renderIsList(); }
+function showIsStep2() {
+  const items = INV_AVAIL_SKUS.filter(i => isSel.has(i.id));
+  document.getElementById('isConfigList').innerHTML = items.map(i => {
+    const uomOpts = [...new Set([i.uom, ...UOM_OPTIONS])].map(u =>
+      '<option value="' + u + '"' + (u===i.uom?' selected':'') + '>' + u + '</option>'
+    ).join('');
+    return '<div class="config-row">' +
+      '<div class="config-row-name">' + i.name + '</div>' +
+      '<div class="config-row-sub">' + i.supplier + '</div>' +
+      '<div class="config-fields cols2">' +
+        '<div class="config-field"><label>Ordering UOM</label><div class="config-readonly">' + i.uom + '</div></div>' +
+        '<div class="config-field"><label>Inventory UOM</label>' +
+          '<select onchange="onIsUomChange(this,\'' + i.uom + '\',\'' + i.id + '\')">' + uomOpts + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div id="isConv_' + i.id + '" style="display:none" class="conv-hint">' +
+        '1 ' + i.uom + ' = <input type="number" value="1" min="0.001" step="any" /> <span id="isConvUnit_' + i.id + '">' + i.uom + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  setPickerSteps('isSt1','isSt2',2);
+  showPanel('isPanel1','isPanel2',2);
+}
+function onIsUomChange(sel, orderingUom, id) {
+  const convRow = document.getElementById('isConv_' + id);
+  const convUnit = document.getElementById('isConvUnit_' + id);
+  convUnit.textContent = sel.value;
+  convRow.style.display = sel.value !== orderingUom ? 'flex' : 'none';
+}
+function showIsStep1() { setPickerSteps('isSt1','isSt2',1); showPanel('isPanel1','isPanel2',1); }
+function confirmAddInvSku() {
+  const n = isSel.size;
+  closeAddInvSkuModal();
+  showHqToast(n + ' SKU' + (n>1?'s':'') + ' added to inventory');
+}
+
+// ── Flow 2b: Add Recipe to Inventory ──
+const INV_AVAIL_RECIPES = [
+  { id:'ir1', name:'Chargrill BBQ Sauce', type:'sub-recipe', uom:'L', cost:8.40 },
+  { id:'ir2', name:'Signature Garlic Butter', type:'sub-recipe', uom:'kg', cost:12.20 },
+  { id:'ir3', name:'Beef Rendang', type:'recipe', uom:'portion', cost:9.80 },
+  { id:'ir4', name:'Chicken Rice Set', type:'recipe', uom:'portion', cost:5.60 },
+  { id:'ir5', name:'Lamb Shank Braised', type:'recipe', uom:'portion', cost:18.50 },
+  { id:'ir6', name:'Mushroom Cream Sauce', type:'sub-recipe', uom:'L', cost:6.20 },
+  { id:'ir7', name:'Grilled Salmon Fillet', type:'recipe', uom:'portion', cost:14.80 },
+  { id:'ir8', name:'Caesar Salad Dressing', type:'sub-recipe', uom:'L', cost:4.50 },
+];
+let irSel = new Set();
+function openAddInvRecipeModal() {
+  irSel.clear();
+  document.getElementById('irSearch').value = '';
+  document.getElementById('irTypeFilter').value = '';
+  setPickerSteps('irSt1','irSt2',1);
+  showPanel('irPanel1','irPanel2',1);
+  renderIrList();
+  document.getElementById('addInvRecipeModal').classList.add('open');
+}
+function closeAddInvRecipeModal() { document.getElementById('addInvRecipeModal').classList.remove('open'); }
+function renderIrList() {
+  const q = document.getElementById('irSearch').value.toLowerCase();
+  const type = document.getElementById('irTypeFilter').value;
+  const filtered = INV_AVAIL_RECIPES.filter(i =>
+    (!q || i.name.toLowerCase().includes(q)) && (!type || i.type === type)
+  );
+  document.getElementById('irList').innerHTML = filtered.length ? filtered.map(i => {
+    const s = irSel.has(i.id);
+    const badge = i.type === 'sub-recipe'
+      ? '<span style="font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">Sub-recipe</span>'
+      : '<span style="font-size:11px;font-weight:600;background:#F0FDF4;color:#16A34A;border-radius:4px;padding:2px 7px;margin-left:6px">Recipe</span>';
+    return '<div class="picker-row' + (s?' sel':'') + '" onclick="toggleIrItem(\'' + i.id + '\')">' +
+      '<div class="picker-chk">' + (s ? chkSvg() : '') + '</div>' +
+      '<div class="picker-row-info">' +
+        '<div class="picker-row-name">' + i.name + badge + '</div>' +
+        '<div class="picker-row-sub">UOM: ' + i.uom + ' · Cost $' + i.cost.toFixed(2) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('') : '<div class="picker-empty">No recipes found</div>';
+  const n = irSel.size;
+  document.getElementById('irSelLabel').innerHTML = n ? '<strong>' + n + '</strong> recipe' + (n>1?'s':'') + ' selected' : 'No recipes selected';
+  document.getElementById('irNextBtn').disabled = n === 0;
+}
+function toggleIrItem(id) { irSel.has(id) ? irSel.delete(id) : irSel.add(id); renderIrList(); }
+function showIrStep2() {
+  const items = INV_AVAIL_RECIPES.filter(i => irSel.has(i.id));
+  document.getElementById('irConfirmList').innerHTML = items.map(i =>
+    '<div class="config-row">' +
+      '<div class="config-row-name">' + i.name + '</div>' +
+      '<div class="config-row-sub">' + (i.type==='sub-recipe'?'Sub-recipe':'Recipe') + ' · Cost $' + i.cost.toFixed(2) + '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-top:8px">' +
+        '<span style="font-size:11px;font-weight:600;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.05em">Inventory UOM</span>' +
+        '<span style="background:#f0f1f3;border-radius:5px;padding:4px 10px;font-size:13px;font-weight:600;color:var(--ink)">' + i.uom + '</span>' +
+        '<span style="font-size:12px;color:var(--ink-mute)">Inherited from recipe</span>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+  setPickerSteps('irSt1','irSt2',2);
+  showPanel('irPanel1','irPanel2',2);
+}
+function showIrStep1() { setPickerSteps('irSt1','irSt2',1); showPanel('irPanel1','irPanel2',1); }
+function confirmAddInvRecipe() {
+  const n = irSel.size;
+  closeAddInvRecipeModal();
+  showHqToast(n + ' recipe' + (n>1?'s':'') + ' added to inventory');
+}
+
+// ── Outlet table search ──
+function filterOgTable(q) {
+  q = q.trim().toLowerCase();
+  var rows = document.querySelectorAll('#ogTable tbody tr');
+  var i = 0;
+  while (i < rows.length) {
+    var row = rows[i];
+    if (row.dataset.groupName !== undefined) {
+      // Group row
+      var subId = row.nextElementSibling && row.nextElementSibling.classList.contains('og-outlet-sub-row')
+        ? row.nextElementSibling.id : null;
+      var subRow = subId ? document.getElementById(subId) : null;
+      if (!q) {
+        row.style.display = '';
+        if (subRow) { subRow.style.display = ''; subRow.classList.remove('open'); }
+        // reset expand button
+        var btn = row.querySelector('.og-expand-btn');
+        if (btn) btn.classList.remove('open');
+        // reset outlet visibility
+        if (subRow) subRow.querySelectorAll('.outlet-list-item').forEach(function(li){ li.style.display = ''; });
+        i += subRow ? 2 : 1;
+        continue;
+      }
+      var groupMatch = row.dataset.groupName.indexOf(q) !== -1;
+      var outletItems = subRow ? subRow.querySelectorAll('.outlet-list-item') : [];
+      var anyOutletMatch = false;
+      outletItems.forEach(function(li) {
+        var match = li.dataset.outletName.indexOf(q) !== -1;
+        li.style.display = (!groupMatch && !match) ? 'none' : '';
+        if (match) anyOutletMatch = true;
+      });
+      var show = groupMatch || anyOutletMatch;
+      row.style.display = show ? '' : 'none';
+      if (subRow) {
+        subRow.style.display = show ? '' : 'none';
+        if (anyOutletMatch) {
+          subRow.classList.add('open');
+          var btn = row.querySelector('.og-expand-btn');
+          if (btn) btn.classList.add('open');
+        }
+      }
+      i += subRow ? 2 : 1;
+    } else if (row.dataset.ungroupedName !== undefined) {
+      // Ungrouped outlet row
+      if (!q) { row.style.display = ''; i++; continue; }
+      row.style.display = row.dataset.ungroupedName.indexOf(q) !== -1 ? '' : 'none';
+      i++;
+    } else {
+      i++;
+    }
+  }
+}
+
+// ── Add to group modal ──
+var _addToGroupOutlet = '';
+function openAddToGroupModal(outletName) {
+  _addToGroupOutlet = outletName;
+  document.getElementById('addToGroupOutletName').textContent = outletName;
+  document.querySelectorAll('input[name="targetGroup"]').forEach(function(r){ r.checked = false; });
+  document.getElementById('addToGroupOverlay').classList.add('open');
+}
+function closeAddToGroupModal() {
+  document.getElementById('addToGroupOverlay').classList.remove('open');
+}
+function confirmAddToGroup() {
+  var selected = document.querySelector('input[name="targetGroup"]:checked');
+  if (!selected) return;
+  closeAddToGroupModal();
+  showHqToast(_addToGroupOutlet + ' added to ' + selected.value);
+}
+
+// ── Remove from group modal ──
+var _removeOutlet = '', _removeGroup = '';
+function openRemoveModal(outletName, groupName) {
+  _removeOutlet = outletName; _removeGroup = groupName;
+  document.getElementById('removeOutletName').textContent = outletName;
+  document.getElementById('removeGroupName').textContent = groupName;
+  document.getElementById('removeFromGroupOverlay').classList.add('open');
+}
+function closeRemoveModal() {
+  document.getElementById('removeFromGroupOverlay').classList.remove('open');
+}
+function confirmRemoveFromGroup() {
+  closeRemoveModal();
+  showHqToast(_removeOutlet + ' moved to ungrouped');
+}
+
+// ── Remove from HQ modal ──
+var _removeFromHQOutlet = '';
+function openRemoveFromHQModal(outletName) {
+  _removeFromHQOutlet = outletName;
+  document.getElementById('removeFromHQOutletName').textContent = outletName;
+  document.getElementById('removeFromHQOverlay').classList.add('open');
+}
+function closeRemoveFromHQModal() {
+  document.getElementById('removeFromHQOverlay').classList.remove('open');
+}
+function confirmRemoveFromHQ() {
+  closeRemoveFromHQModal();
+  showHqToast(_removeFromHQOutlet + ' removed from HQ');
+}
 </script>
 
 <!-- Recipe Groups Dialog -->
@@ -2469,7 +2984,7 @@ renderInv();
         <div style="font-size:13px;color:var(--ink-mute);margin-top:2px" id="recGroupsCount"></div>
       </div>
       <button onclick="closeRecGroupsDialog()" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--rule);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-mute)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
     <div style="padding:4px 24px 20px" id="recGroupsList"></div>
@@ -2485,7 +3000,7 @@ renderInv();
         <div style="font-size:13px;color:var(--ink-mute);margin-top:2px">Basic information about this group</div>
       </div>
       <button onclick="closeGroupSettings()" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--rule);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-mute)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
     <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px">
@@ -2520,6 +3035,201 @@ renderInv();
   </div>
 </div>
 
+<!-- ── Toast ── -->
+<div id="hqToast"></div>
+
+<!-- ── Flow 1: Add Item modal ── -->
+<div class="picker-overlay" id="addItemModal" onclick="if(event.target===this)closeAddItemModal()">
+  <div class="picker-card">
+    <div class="picker-head">
+      <div class="picker-head-row">
+        <div class="picker-title">Add from supplier catalogue</div>
+        <button class="picker-close-btn" onclick="closeAddItemModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="picker-steps">
+        <div class="picker-step-item" id="aiSt1"><div class="picker-step-num">1</div>&nbsp;Select items</div>
+        <div class="picker-step-sep"></div>
+        <div class="picker-step-item" id="aiSt2"><div class="picker-step-num">2</div>&nbsp;Set prices</div>
+        <div class="picker-step-sep"></div>
+        <div class="picker-step-item" id="aiSt3"><div class="picker-step-num">3</div>&nbsp;Groups with access</div>
+      </div>
+    </div>
+    <!-- Step 1: Select items -->
+    <div id="aiPanel1" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div class="picker-search-row">
+        <div class="picker-search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search items or suppliers…" id="aiSearch" oninput="renderAiList()" />
+        </div>
+        <select class="picker-select" id="aiSupFilter" onchange="renderAiList()">
+          <option value="">All suppliers</option>
+          <option>Kee Song Group</option><option>Meat King</option><option>Provenir</option><option>Deli Hub</option>
+        </select>
+      </div>
+      <div class="picker-list" id="aiList"></div>
+      <div class="picker-foot">
+        <div class="picker-sel-label" id="aiSelLabel">No items selected</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-tertiary" onclick="closeAddItemModal()">Cancel</button>
+          <button class="btn btn-primary" id="aiNextBtn" onclick="showAiStep2()" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <!-- Step 2: Set prices -->
+    <div id="aiPanel2" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div style="flex:1;overflow-y:auto;min-height:0">
+        <table class="ai-price-tbl">
+          <thead>
+            <tr>
+              <th class="col-name">Item</th>
+              <th class="col-uom">UOM</th>
+              <th class="col-price">Unit price (S$) <span style="color:#D0291E;text-transform:none;letter-spacing:0;font-weight:400">*</span></th>
+              <th class="col-moq">Min. order qty <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-mute)">(optional)</span></th>
+            </tr>
+          </thead>
+          <tbody id="aiPriceRows"></tbody>
+        </table>
+      </div>
+      <div class="picker-foot">
+        <button class="btn btn-tertiary" onclick="showAiStep1()">← Back</button>
+        <button class="btn btn-primary" onclick="showAiStep3()">Next →</button>
+      </div>
+    </div>
+    <!-- Step 3: Groups with access -->
+    <div id="aiPanel3" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div class="step3-body">
+        <p class="step3-intro">Select which outlet groups can see and order these items. You can change this later from each item's settings.</p>
+        <div class="step3-group">
+          <label class="step3-grp-row">
+            <input type="checkbox" id="aiGrp0" checked />
+            <div class="step3-grp-info">
+              <div class="step3-grp-name">Chargrill Outlets</div>
+              <div class="step3-grp-sub">4 outlets</div>
+            </div>
+          </label>
+        </div>
+        <div class="step3-group">
+          <label class="step3-grp-row">
+            <input type="checkbox" id="aiGrp1" checked />
+            <div class="step3-grp-info">
+              <div class="step3-grp-name">Family Dining Express</div>
+              <div class="step3-grp-sub">3 outlets</div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="picker-foot">
+        <button class="btn btn-tertiary" onclick="showAiStep2Back()">← Back</button>
+        <button class="btn btn-primary" id="aiAddBtn" onclick="confirmAddItems()">Add items</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Flow 2a: Add SKU to Inventory modal ── -->
+<div class="picker-overlay" id="addInvSkuModal" onclick="if(event.target===this)closeAddInvSkuModal()">
+  <div class="picker-card">
+    <div class="picker-head">
+      <div class="picker-head-row">
+        <div class="picker-title">Add SKUs to inventory</div>
+        <button class="picker-close-btn" onclick="closeAddInvSkuModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="picker-steps">
+        <div class="picker-step-item" id="isSt1"><div class="picker-step-num">1</div>&nbsp;Select SKUs</div>
+        <div class="picker-step-sep"></div>
+        <div class="picker-step-item" id="isSt2"><div class="picker-step-num">2</div>&nbsp;Set inventory UOM</div>
+      </div>
+    </div>
+    <!-- Step 1 -->
+    <div id="isPanel1" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div class="picker-search-row">
+        <div class="picker-search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search items…" id="isSearch" oninput="renderIsList()" />
+        </div>
+        <select class="picker-select" id="isSupFilter" onchange="renderIsList()">
+          <option value="">All suppliers</option>
+          <option>Kee Song Group</option><option>Meat King</option><option>Provenir</option><option>Deli Hub</option>
+        </select>
+      </div>
+      <div class="picker-list" id="isList"></div>
+      <div class="picker-foot">
+        <div class="picker-sel-label" id="isSelLabel">No items selected</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-tertiary" onclick="closeAddInvSkuModal()">Cancel</button>
+          <button class="btn btn-primary" id="isNextBtn" onclick="showIsStep2()" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <!-- Step 2 -->
+    <div id="isPanel2" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div class="config-list" id="isConfigList"></div>
+      <div class="config-groups">
+        <div class="config-groups-lbl">Groups with access</div>
+        <div class="config-grp-row"><input type="checkbox" id="isGrp0" checked /><label for="isGrp0">Chargrill Outlets</label></div>
+        <div class="config-grp-row"><input type="checkbox" id="isGrp1" checked /><label for="isGrp1">Family Dining Express</label></div>
+      </div>
+      <div class="picker-foot">
+        <button class="btn btn-tertiary" onclick="showIsStep1()">← Back</button>
+        <button class="btn btn-primary" onclick="confirmAddInvSku()">Add to inventory</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Flow 2b: Add Recipe to Inventory modal ── -->
+<div class="picker-overlay" id="addInvRecipeModal" onclick="if(event.target===this)closeAddInvRecipeModal()">
+  <div class="picker-card">
+    <div class="picker-head">
+      <div class="picker-head-row">
+        <div class="picker-title">Add recipes to inventory</div>
+        <button class="picker-close-btn" onclick="closeAddInvRecipeModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="picker-steps">
+        <div class="picker-step-item" id="irSt1"><div class="picker-step-num">1</div>&nbsp;Select recipes</div>
+        <div class="picker-step-sep"></div>
+        <div class="picker-step-item" id="irSt2"><div class="picker-step-num">2</div>&nbsp;Confirm</div>
+      </div>
+    </div>
+    <!-- Step 1 -->
+    <div id="irPanel1" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div class="picker-search-row">
+        <div class="picker-search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search recipes…" id="irSearch" oninput="renderIrList()" />
+        </div>
+        <select class="picker-select" id="irTypeFilter" onchange="renderIrList()">
+          <option value="">All types</option>
+          <option value="recipe">Recipe</option>
+          <option value="sub-recipe">Sub-recipe</option>
+        </select>
+      </div>
+      <div class="picker-info-bar">Inventory UOM is inherited from the recipe definition and cannot be changed here.</div>
+      <div class="picker-list" id="irList"></div>
+      <div class="picker-foot">
+        <div class="picker-sel-label" id="irSelLabel">No recipes selected</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-tertiary" onclick="closeAddInvRecipeModal()">Cancel</button>
+          <button class="btn btn-primary" id="irNextBtn" onclick="showIrStep2()" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <!-- Step 2 -->
+    <div id="irPanel2" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div class="config-list" id="irConfirmList"></div>
+      <div class="config-groups">
+        <div class="config-groups-lbl">Groups with access</div>
+        <div class="config-grp-row"><input type="checkbox" id="irGrp0" checked /><label for="irGrp0">Chargrill Outlets</label></div>
+        <div class="config-grp-row"><input type="checkbox" id="irGrp1" checked /><label for="irGrp1">Family Dining Express</label></div>
+      </div>
+      <div class="picker-foot">
+        <button class="btn btn-tertiary" onclick="showIrStep1()">← Back</button>
+        <button class="btn btn-primary" onclick="confirmAddInvRecipe()">Add to inventory</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Supplier disable warning (HQ level) -->
 <div class="confirm-overlay" id="supDisableOverlay" onclick="if(event.target===this)closeSupDisableWarning()">
   <div class="confirm-card">
@@ -2536,5 +3246,67 @@ renderInv();
     </div>
   </div>
 </div>
+
+<!-- ── Add to group modal ── -->
+<div class="modal-overlay" id="addToGroupOverlay" onclick="if(event.target===this)closeAddToGroupModal()">
+  <div class="modal-card" style="width:480px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="addToGroupTitle">Add outlet to group</h2>
+      <button class="modal-close" onclick="closeAddToGroupModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0;font-size:14px;color:var(--ink-mute)">Select a group for <strong id="addToGroupOutletName" style="color:var(--ink)"></strong>:</p>
+      <div class="group-radio-list">
+        <label class="group-radio-item">
+          <input type="radio" name="targetGroup" value="Chargrill Outlets" />
+          <div>
+            <div class="group-radio-name">Chargrill Outlets</div>
+            <div class="group-radio-meta">4 outlets · 100 items · 48 recipes</div>
+          </div>
+        </label>
+        <label class="group-radio-item">
+          <input type="radio" name="targetGroup" value="Family Dining Express" />
+          <div>
+            <div class="group-radio-name">Family Dining Express</div>
+            <div class="group-radio-meta">6 outlets · 92 items · 18 recipes</div>
+          </div>
+        </label>
+      </div>
+      <div class="modal-warning">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Adding this outlet to a group will <strong>replace all its existing data</strong> — market list, recipes, and supplier settings — with the group's data. This cannot be undone.</span>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeAddToGroupModal()">Cancel</button>
+      <button class="btn-primary" onclick="confirmAddToGroup()">Add to group</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Remove from group confirm ── -->
+<div class="confirm-overlay" id="removeFromGroupOverlay" onclick="if(event.target===this)closeRemoveModal()">
+  <div class="danger-confirm-card">
+    <div class="danger-confirm-title">Remove from group?</div>
+    <div class="danger-confirm-body">Remove <strong id="removeOutletName"></strong> from <strong id="removeGroupName"></strong>? The outlet will remain in the HQ as ungrouped, keeping a copy of the current group settings but no longer receiving updates from the group.</div>
+    <div class="danger-confirm-actions">
+      <button class="btn-cancel-plain" onclick="closeRemoveModal()">Cancel</button>
+      <button class="btn-danger-confirm" onclick="confirmRemoveFromGroup()">Remove from group</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Remove from HQ confirm ── -->
+<div class="confirm-overlay" id="removeFromHQOverlay" onclick="if(event.target===this)closeRemoveFromHQModal()">
+  <div class="danger-confirm-card">
+    <div class="danger-confirm-title">Remove from HQ?</div>
+    <div class="danger-confirm-body">Remove <strong id="removeFromHQOutletName"></strong> from this HQ entirely? The outlet will be fully detached — all HQ-linked data will be unlinked and it will operate independently.</div>
+    <div class="danger-confirm-actions">
+      <button class="btn-cancel-plain" onclick="closeRemoveFromHQModal()">Cancel</button>
+      <button class="btn-danger-confirm" onclick="confirmRemoveFromHQ()">Remove from HQ</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

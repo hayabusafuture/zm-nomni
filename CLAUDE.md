@@ -561,14 +561,15 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
-- ZM Admin — Chargrill Outlets · Settings: ZM Admin - Outlet Group Settings.html
-- ZM Admin — Garden Cuisine HQ: ZM Admin - HQ Settings.html
-- ZM Admin — Chargrill Outlets: ZM Admin - Edit Outlet Group.html
-- ZM Admin — Edit HQ: ZM Admin - Edit HQ.html
-- ZM Admin — Create Outlet: ZM Admin - Create Outlet.html
-- ZM Admin — Create HQ: ZM Admin - Create HQ.html
-- ZM Admin — Create Outlet Group: ZM Admin - Create Outlet Group.html
-- ZM Admin — Buyers: ZM Admin - Buyers.html
+- Admin — Create Item: Admin - HQ Create Item.html
+- Admin — Chargrill Outlets · Settings: Admin - Outlet Group Settings.html
+- Admin — Garden Cuisine HQ: Admin - HQ Settings.html
+- Admin — Chargrill Outlets: Admin - Edit Outlet Group.html
+- Admin — Edit HQ: Admin - Edit HQ.html
+- Admin — Create Outlet: Admin - Create Outlet.html
+- Admin — Create HQ: Admin - Create HQ.html
+- Admin — Create Outlet Group: Admin - Create Outlet Group.html
+- Admin — Buyers: Admin - Buyers.html
 - Log in — Nomni Supply: Supply - Login.html
 - Nomni Supply — Dashboard: Supply - Dashboard.html
 - Styleguide: Styleguide.html
@@ -576,7 +577,7 @@ Copy the full `:root` variable block, topbar, and sidebar verbatim from an exist
 - POS — Table Ordering Menu: POS - Menus.html
 - Procure — POS Dashboard: POS - Dashboard.html
 - Procure — HQ · Dashboard: Procure - HQ - Dashboard.html
-- ZM Admin — Create Buyer User: ZM Admin - Buyer User.html
+- Admin — Create Buyer User: Admin - Buyer User.html
 - Procure — Users: Procure - Users.html
 - Procure — Edit User: Procure - User Detail.html
 - Procure — HQ · Market Lists: Procure - HQ - Market Lists.html
