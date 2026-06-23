@@ -487,6 +487,13 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .ai-price-tbl .price-wrap input { padding-left: 20px; }
 .ai-price-tbl tr.item-first td { border-top: 1px solid #d0d2d8; }
 .ai-price-tbl tr.item-first:first-child td { border-top: none; }
+.ai-price-tbl tr.uom-row-off td.col-price,
+.ai-price-tbl tr.uom-row-off td.col-moq { opacity: 0.35; }
+.ai-price-tbl tr.uom-row-off td.col-price input,
+.ai-price-tbl tr.uom-row-off td.col-moq input { pointer-events: none; }
+.ai-price-tbl .uom-check { width: 14px; height: 14px; accent-color: var(--seaweed); cursor: pointer; margin-right: 6px; vertical-align: middle; flex-shrink: 0; }
+.ai-price-tbl .uom-badge-off { text-decoration: line-through; opacity: 0.45; }
+.access-uom-chip.hq-disabled { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; pointer-events: none; }
 /* Step 3 groups panel */
 .step3-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 0; }
 .step3-intro { font-size: 13px; color: var(--ink-mute); margin-bottom: 16px; }
@@ -572,7 +579,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         </div>
       </div>
       <div class="head-actions">
-        <button class="btn-ghost-danger">Disable HQ</button>
         <button class="btn-outline" onclick="window.location.href='Admin - Edit HQ.html'">Edit details</button>
       </div>
     </div>
@@ -583,7 +589,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="tabs">
       <div class="tab active" data-tab="outlet-groups">Overview</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
-      <div class="tab" data-tab="market-list">Items</div>
+      <div class="tab" data-tab="market-list">Items<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#2AC864;margin-left:3px;margin-bottom:1px;vertical-align:middle;flex-shrink:0"></span></div>
       <div class="tab" data-tab="inventory">Inventory</div>
       <div class="tab" data-tab="recipes">Recipes</div>
       <div class="tab" data-tab="activity">Activity</div>
@@ -641,7 +647,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
                 <div class="row-actions-menu">
                   <div class="row-action-item" onclick="location.href='Admin - Edit Outlet Group.html'">Edit group</div>
                   <div class="row-action-item" onclick="openGroupSettings('Chargrill Outlets','Garden Cuisine Chargrill chain locations')">Settings</div>
-                  <div class="row-action-item danger" onclick="toggleGroupDisabled(this)">Disable group</div>
+                  <div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div>
                 </div>
               </div>
             </td>
@@ -678,7 +684,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
                 <div class="row-actions-menu">
                   <div class="row-action-item">Edit group</div>
                   <div class="row-action-item" onclick="openGroupSettings('Family Dining Express','')">Settings</div>
-                  <div class="row-action-item danger" onclick="toggleGroupDisabled(this)">Disable group</div>
+                  <div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div>
                 </div>
               </div>
             </td>
@@ -813,6 +819,16 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
     <!-- ── Market List ── -->
     <div class="tab-panel" id="panel-market-list">
+      <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#92400E">3 price changes pending review</div>
+            <div style="font-size:13px;color:#92400E;margin-top:2px">Invoice prices from outlets differ from current market list prices. Review and approve to update.</div>
+          </div>
+        </div>
+        <button class="btn btn-tertiary" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:13px;padding:7px 14px;white-space:nowrap">Review changes</button>
+      </div>
       <div class="panel-label-row">
         <span class="panel-label-text">Items <span class="panel-label-count" id="mlCount"></span></span>
         <div style="position:relative">
@@ -852,8 +868,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <thead>
             <tr>
               <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">Item name <span class="sort-ind"></span></th>
-              <th style="width:160px">Supplier</th>
-              <th class="sort-th" id="mlSortTh-price" onclick="setMlSort('price')" style="width:160px">UOM / Price <span class="sort-ind"></span></th>
+              <th style="width:100px">UOM</th>
+              <th class="sort-th" id="mlSortTh-price" onclick="setMlSort('price')" style="width:120px">Price <span class="sort-ind"></span></th>
               <th style="width:120px">Groups with access</th>
               <th style="width:48px"></th>
             </tr>
@@ -945,10 +961,17 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="tab-panel" id="panel-suppliers">
       <div class="panel-label-row">
         <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supCount"></span></span>
-        <button class="btn-primary" style="display:inline-flex;align-items:center;gap:6px">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          Link supplier
-        </button>
+        <div style="position:relative">
+          <button class="btn-primary" id="linkSupBtn" onclick="toggleLinkSupMenu(event)" style="display:inline-flex;align-items:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Link supplier
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="linkSupMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:240px;overflow:hidden">
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="window.location.href='Admin - Add Supplier.html'">Find existing supplier</div>
+            <div style="padding:11px 18px;font-size:14px;font-weight:500;color:var(--ink-mute);cursor:default;display:flex;align-items:center;gap:8px">Create new supplier <span style="font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#F0F0F2;color:#888;border-radius:4px;padding:2px 7px">Soon</span></div>
+          </div>
+        </div>
       </div>
       <div class="ml-filter-row">
         <div class="ml-search-wrap">
@@ -1136,6 +1159,32 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
+function goToItemsTab() {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  var t = document.querySelector('.tab[data-tab="market-list"]');
+  if (t) t.classList.add('active');
+  var p = document.getElementById('panel-market-list');
+  if (p) p.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function viewSupplierItems(supplierName) {
+  // Switch to Items tab
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const itemsTab = document.querySelector('.tab[data-tab="market-list"]');
+  if (itemsTab) itemsTab.classList.add('active');
+  const itemsPanel = document.getElementById('panel-market-list');
+  if (itemsPanel) itemsPanel.classList.add('active');
+  // Apply supplier filter
+  const sel = document.getElementById('mlSupplierFilter');
+  if (sel) { sel.value = supplierName; setMlSupplierFilter(supplierName); }
+  // Close any open row action menus
+  document.querySelectorAll('.row-actions-menu.open').forEach(m => { m.classList.remove('open'); m.removeAttribute('style'); });
+  window.scrollTo(0, 0);
+}
+
 // User menu
 document.getElementById('userMenuBtn').addEventListener('click', e => {
   e.stopPropagation();
@@ -1144,12 +1193,87 @@ document.getElementById('userMenuBtn').addEventListener('click', e => {
 document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
 
 // Row actions
-function toggleGroupDisabled(item) {
+let pendingDeleteGroupRow = null;
+let pendingDeleteGroupSubRow = null;
+
+function openDeleteGroupModal(item) {
   const row = item.closest('tr');
-  const isDisabled = row.classList.toggle('og-row-inactive');
-  item.textContent = isDisabled ? 'Enable group' : 'Disable group';
-  item.classList.toggle('danger', !isDisabled);
-  document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
+  const expandBtn = row.querySelector('.og-expand-btn');
+  const subRowIdMatch = expandBtn ? expandBtn.getAttribute('onclick').match(/'([^']+)'/) : null;
+  pendingDeleteGroupRow = row;
+  pendingDeleteGroupSubRow = subRowIdMatch ? document.getElementById(subRowIdMatch[1]) : null;
+
+  const groupName = row.querySelector('.og-name') ? row.querySelector('.og-name').textContent.trim() : 'this group';
+  const countText = row.querySelector('.og-outlet-count') ? row.querySelector('.og-outlet-count').textContent.trim() : '';
+  const count = parseInt(countText) || 0;
+
+  document.getElementById('deleteGroupModalName').textContent = groupName;
+  document.getElementById('deleteGroupModalOutlets').textContent = count > 0
+    ? 'Its ' + count + ' outlet' + (count !== 1 ? 's' : '') + ' will remain in the HQ as ungrouped.'
+    : 'The group has no outlets.';
+
+  document.querySelectorAll('.row-actions-menu.open').forEach(m => { m.classList.remove('open'); m.removeAttribute('style'); });
+  document.getElementById('deleteGroupOverlay').classList.add('open');
+}
+
+function closeDeleteGroupModal() {
+  document.getElementById('deleteGroupOverlay').classList.remove('open');
+  pendingDeleteGroupRow = null;
+  pendingDeleteGroupSubRow = null;
+}
+
+function confirmDeleteGroup() {
+  if (!pendingDeleteGroupRow) { closeDeleteGroupModal(); return; }
+  const tbody = pendingDeleteGroupRow.closest('tbody');
+
+  // Capture group-level counts to inherit
+  const counts = pendingDeleteGroupRow.querySelectorAll('.og-count');
+  const inheritItems     = counts[0] ? counts[0].textContent.trim() : '—';
+  const inheritRecipes   = counts[1] ? counts[1].textContent.trim() : '—';
+  const inheritSuppliers = counts[2] ? counts[2].textContent.trim() : '—';
+  const tds = pendingDeleteGroupRow.querySelectorAll('td');
+  const inheritDate = tds[4] ? tds[4].textContent.trim() : '—';
+
+  if (pendingDeleteGroupSubRow) {
+    pendingDeleteGroupSubRow.querySelectorAll('.outlet-list-item').forEach(function(item) {
+      const name = item.querySelector('.outlet-item-name') ? item.querySelector('.outlet-item-name').textContent.trim() : '';
+      const posOk = item.querySelector('.pos-chip.ok') !== null;
+      const posHtml = posOk ? '<span class="pos-chip ok">POS ✓</span>' : '<span class="pos-chip off">POS ✕</span>';
+      const safeName = name.replace(/'/g, "\\'");
+      const newRow = document.createElement('tr');
+      newRow.dataset.ungroupedName = name.toLowerCase();
+      newRow.innerHTML =
+        '<td><div class="og-name-cell"><div style="width:18px;flex-shrink:0"></div>' +
+        '<div class="og-name-cell-inner"><span class="og-name">' + name + '</span>' +
+        '<span class="og-outlet-count" style="display:flex;align-items:center;gap:5px">' + posHtml + '</span>' +
+        '</div></div></td>' +
+        '<td style="text-align:center"><span class="og-count">' + inheritItems + '</span></td>' +
+        '<td style="text-align:center"><span class="og-count">' + inheritRecipes + '</span></td>' +
+        '<td style="text-align:center"><span class="og-count">' + inheritSuppliers + '</span></td>' +
+        '<td style="color:var(--ink-mute)">' + inheritDate + '</td>' +
+        '<td><div class="row-actions-wrap">' +
+        '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
+        '<div class="row-actions-menu">' +
+        '<div class="row-action-item" onclick="openAddToGroupModal(\'' + safeName + '\')">Add to group</div>' +
+        '<div class="row-action-item danger" onclick="openRemoveFromHQModal(\'' + name.toLowerCase().replace(/'/g, "\\'") + '\')">Remove from HQ</div>' +
+        '</div></div></td>';
+      tbody.appendChild(newRow);
+    });
+    pendingDeleteGroupSubRow.remove();
+  }
+
+  pendingDeleteGroupRow.remove();
+
+  // Re-sort all ungrouped rows alphabetically by outlet name
+  const ungroupedRows = Array.from(tbody.querySelectorAll('tr[data-ungrouped-name]'));
+  ungroupedRows.sort(function(a, b) {
+    const nameA = (a.querySelector('.og-name') ? a.querySelector('.og-name').textContent.trim() : '').toLowerCase();
+    const nameB = (b.querySelector('.og-name') ? b.querySelector('.og-name').textContent.trim() : '').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+  ungroupedRows.forEach(function(row) { tbody.appendChild(row); });
+
+  closeDeleteGroupModal();
 }
 
 function toggleRowActions(btn) {
@@ -1173,10 +1297,17 @@ document.addEventListener('click', e => {
 // Health check
 const UNGROUPED = ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'];
 
+const PRICE_CHANGES = [
+  { item: 'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg Vac Pk', supplier: 'Kee Song Group', oldPrice: 6.80, newPrice: 7.20, outlet: '(WF 301) Chargrill @ 301 Punggol' },
+  { item: 'Chilled Wagyu Striploin MS3 Grain-Fed BLK 4/5kg',             supplier: 'Premium Meats Pte Ltd', oldPrice: 48.50, newPrice: 51.00, outlet: '(WF 107) Chargrill @ 107 Serangoon' },
+  { item: 'Thai Hom Mali Jasmine Rice AA Grade 25kg PP Bag',             supplier: 'Rice & Grain Co',       oldPrice: 1.20,  newPrice: 1.35,  outlet: '(WF 088) Garden Express @ 088 Clementi' },
+];
+
 function renderHealthCheck() {
   const issues = [];
   const infos = [];
 
+  if (PRICE_CHANGES.length) issues.push({ type: 'priceChanges', icon: '⚠', text: PRICE_CHANGES.length + ' price change' + (PRICE_CHANGES.length > 1 ? 's' : '') + ' pending review', color: '#92400E', bg: '#FEF3C7', items: PRICE_CHANGES });
   if (UNGROUPED.length) issues.push({ type: 'ungrouped', icon: '⚠', text: UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + ' not assigned to any group', color: '#92400E', bg: '#FEF3C7' });
 
   const highFcRecipes = RECIPES.filter(r => r.foodCostPct > recFcThreshold);
@@ -1217,6 +1348,13 @@ function renderHealthCheck() {
   }
 
   const issueHtmlParts = issues.map(function(i, idx) {
+    if (i.type === 'priceChanges') {
+      return '<div onclick="goToItemsTab()" style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">' +
+        '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;flex-shrink:0">⚠</span>' +
+        '<span style="color:#92400E;font-weight:500;flex:1">' + i.text + '</span>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
+      '</div>';
+    }
     if (i.type === 'ungrouped') {
       return makeExpandable(i, UNGROUPED.map(function(n){ return dotItem(n, '#92400E'); }).join(''), '#FEF9ED', '#FDE68A', '#92400E', 'ug');
     }
@@ -1412,6 +1550,8 @@ ITEMS.forEach((item, i) => {
   item.groupList = (i % 5 === 0) ? [ML_GROUPS[0]] : (i % 5 === 3) ? [ML_GROUPS[1]] : ML_GROUPS.slice();
   item.outletList = (i % 7 === 2) ? ML_OUTLETS.slice() : (i % 7 === 5) ? [ML_OUTLETS[0]] : [];
   item.active = (i % 11 !== 0);
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  item.uomEnabled = uoms.map(() => true);
   const uomStr = Array.isArray(item.uom) ? item.uom[0] : item.uom;
   const uomUnit = uomStr.replace('per ', '');
   item.moq = ['5', '2', '10', '1'][i % 4] + ' ' + uomUnit;
@@ -1479,8 +1619,24 @@ function switchHqItemTab(tab) {
   if (foot) foot.style.display = panelId === 'hqItemExcPanel' ? 'none' : '';
 }
 
+function ensureItemAccessState(idx) {
+  if (itemAccessState[idx]) return;
+  const item = ITEMS[idx];
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  itemAccessState[idx] = {};
+  ML_GROUPS.forEach(g => {
+    const enabled = item.groupList.includes(g);
+    itemAccessState[idx][g] = { enabled, uoms: uoms.map(() => true), type: 'group' };
+  });
+  ALL_OUTLETS.forEach(o => {
+    const enabled = item.outletList && item.outletList.includes(o);
+    itemAccessState[idx][o] = { enabled, uoms: uoms.map(() => true), type: 'outlet' };
+  });
+}
+
 function openHqItemModal(idx, initialTab) {
   const item = ITEMS[idx];
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
   document.getElementById('hqItemModalTitle').textContent = item.name;
   document.getElementById('hqItemModalSupplier').textContent = item.supplier;
   document.getElementById('hqItemCustomName').value = '';
@@ -1490,19 +1646,7 @@ function openHqItemModal(idx, initialTab) {
   const foot = document.getElementById('hqItemModalFoot');
   if (foot) foot.style.display = '';
 
-  // Initialize access state for this item
-  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
-  if (!itemAccessState[idx]) {
-    itemAccessState[idx] = {};
-    ML_GROUPS.forEach(g => {
-      const enabled = item.groupList.includes(g);
-      itemAccessState[idx][g] = { enabled, uoms: uoms.map(() => true), type: 'group' };
-    });
-    ALL_OUTLETS.forEach(o => {
-      const enabled = item.outletList && item.outletList.includes(o);
-      itemAccessState[idx][o] = { enabled, uoms: uoms.map(() => true), type: 'outlet' };
-    });
-  }
+  ensureItemAccessState(idx);
 
   // Update Exceptions badge
   const excCount = (GROUP_EXCEPTIONS[idx] || []).length;
@@ -1532,9 +1676,19 @@ function openHqItemModal(idx, initialTab) {
   if (uoms.length > 1) {
     section.innerHTML =
       '<div class="modal-field"><label>UOM pricing</label>' +
-      '<table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th><th style="width:120px">MOQ</th></tr></thead><tbody>' +
-      uoms.map(u => '<tr><td>' + u + '</td><td><input class="modal-field-input" type="text" value="' + item.price.toFixed(2) + '" style="padding:6px 10px" /></td><td><input class="modal-field-input" type="text" value="' + item.moq + '" style="padding:6px 10px" /></td></tr>').join('') +
-      '</tbody></table></div>';
+      '<table class="uom-breakdown-table"><thead><tr><th style="width:28px"></th><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th><th style="width:120px">MOQ</th></tr></thead><tbody>' +
+      uoms.map((u, ui) => {
+        const on = item.uomEnabled[ui];
+        return '<tr id="hqUomRow_' + idx + '_' + ui + '"' + (on ? '' : ' style="opacity:0.38"') + '>' +
+          '<td style="padding-right:4px"><button class="access-toggle' + (on ? ' on' : '') + '" onclick="toggleHqUomEnabled(' + idx + ',' + ui + ')" title="' + (on ? 'Disable this UOM' : 'Enable this UOM') + '"></button></td>' +
+          '<td>' + u + '</td>' +
+          '<td><input class="modal-field-input" type="text" value="' + item.price.toFixed(2) + '"' + (on ? '' : ' disabled') + ' style="padding:6px 10px" /></td>' +
+          '<td><input class="modal-field-input" type="text" value="' + item.moq + '"' + (on ? '' : ' disabled') + ' style="padding:6px 10px" /></td>' +
+        '</tr>';
+      }).join('') +
+      '</tbody></table>' +
+      '<p style="font-size:12px;color:var(--ink-mute);margin:8px 0 0">At least one UOM must remain enabled.</p>' +
+      '</div>';
   } else {
     section.innerHTML =
       '<div class="modal-field"><label>UOM pricing</label>' +
@@ -1559,6 +1713,23 @@ function openHqItemModal(idx, initialTab) {
   }
 
   document.getElementById('hqItemModal').classList.add('open');
+}
+
+function toggleHqUomEnabled(itemIdx, uomIdx) {
+  const item = ITEMS[itemIdx];
+  const enabledCount = item.uomEnabled.filter(Boolean).length;
+  if (item.uomEnabled[uomIdx] && enabledCount <= 1) return;
+  item.uomEnabled[uomIdx] = !item.uomEnabled[uomIdx];
+  const on = item.uomEnabled[uomIdx];
+  const row = document.getElementById('hqUomRow_' + itemIdx + '_' + uomIdx);
+  if (row) {
+    row.style.opacity = on ? '' : '0.38';
+    row.querySelectorAll('input').forEach(inp => { inp.disabled = !on; });
+    const btn = row.querySelector('.access-toggle');
+    if (btn) { btn.classList.toggle('on', on); btn.title = on ? 'Disable this UOM' : 'Enable this UOM'; }
+  }
+  // Keep Access tab in sync if visible
+  renderAccessPanel(itemIdx);
 }
 
 let editingExcEntry = null;
@@ -1795,13 +1966,14 @@ function renderAccessPanel(itemIdx) {
     groupNames.forEach(name => {
       const s = state[name];
       const enabled = s.enabled;
-      const uomEnabledCount = s.uoms.filter(u => u).length;
+      const hqEnabledUoms = uoms.filter((_, ui) => item.uomEnabled[ui]);
+      const uomEnabledCount = s.uoms.filter((on, ui) => on && item.uomEnabled[ui]).length;
       html += '<div class="access-row' + (!enabled ? ' access-row-off' : '') + '">' +
         '<div class="access-row-main">' +
           '<div class="access-row-info">' +
             '<span class="material-symbols-outlined access-row-icon">domain</span>' +
             '<span class="access-row-name">' + name + '</span>' +
-            (uoms.length > 1 && enabled ? '<span class="access-uom-count">(' + uomEnabledCount + ' of ' + uoms.length + ' UOMs)</span>' : '') +
+            (hqEnabledUoms.length > 1 && enabled ? '<span class="access-uom-count">(' + uomEnabledCount + ' of ' + hqEnabledUoms.length + ' UOMs)</span>' : '') +
           '</div>' +
           '<button class="access-toggle' + (enabled ? ' on' : '') + '" onclick="toggleGroupAccess(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',this)"></button>' +
         '</div>';
@@ -1810,7 +1982,9 @@ function renderAccessPanel(itemIdx) {
         html += '<div class="access-uom-row' + (!enabled ? ' access-uom-row-off' : '') + '">';
         uoms.forEach((u, ui) => {
           const isOn = s.uoms[ui];
-          html += '<button class="access-uom-chip' + (isOn ? ' on' : '') + '" onclick="toggleUomAccess(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + ui + ',' + (!isOn) + ')">' + u + '</button>';
+          const hqOff = !item.uomEnabled[ui];
+          html += '<button class="access-uom-chip' + (isOn && !hqOff ? ' on' : '') + (hqOff ? ' hq-disabled' : '') + '"' +
+            (hqOff ? ' title="Disabled at HQ level"' : ' onclick="toggleUomAccess(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + ui + ',' + (!isOn) + ')"') + '>' + u + '</button>';
         });
         html += '</div>';
       }
@@ -1826,13 +2000,14 @@ function renderAccessPanel(itemIdx) {
     outletNames.forEach(name => {
       const s = state[name];
       const enabled = s.enabled;
-      const uomEnabledCount = s.uoms.filter(u => u).length;
+      const hqEnabledUomsO = uoms.filter((_, ui) => item.uomEnabled[ui]);
+      const uomEnabledCountO = s.uoms.filter((on, ui) => on && item.uomEnabled[ui]).length;
       html += '<div class="access-row' + (!enabled ? ' access-row-off' : '') + '">' +
         '<div class="access-row-main">' +
           '<div class="access-row-info">' +
             '<span class="material-symbols-outlined access-row-icon">store</span>' +
             '<span class="access-row-name">' + name + '</span>' +
-            (uoms.length > 1 && enabled ? '<span class="access-uom-count">(' + uomEnabledCount + ' of ' + uoms.length + ' UOMs)</span>' : '') +
+            (hqEnabledUomsO.length > 1 && enabled ? '<span class="access-uom-count">(' + uomEnabledCountO + ' of ' + hqEnabledUomsO.length + ' UOMs)</span>' : '') +
           '</div>' +
           '<button class="access-toggle' + (enabled ? ' on' : '') + '" onclick="toggleGroupAccess(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',this)"></button>' +
         '</div>';
@@ -1841,7 +2016,9 @@ function renderAccessPanel(itemIdx) {
         html += '<div class="access-uom-row' + (!enabled ? ' access-uom-row-off' : '') + '">';
         uoms.forEach((u, ui) => {
           const isOn = s.uoms[ui];
-          html += '<button class="access-uom-chip' + (isOn ? ' on' : '') + '" onclick="toggleUomAccess(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + ui + ',' + (!isOn) + ')">' + u + '</button>';
+          const hqOff = !item.uomEnabled[ui];
+          html += '<button class="access-uom-chip' + (isOn && !hqOff ? ' on' : '') + (hqOff ? ' hq-disabled' : '') + '"' +
+            (hqOff ? ' title="Disabled at HQ level"' : ' onclick="toggleUomAccess(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + ui + ',' + (!isOn) + ')"') + '>' + u + '</button>';
         });
         html += '</div>';
       }
@@ -1876,33 +2053,51 @@ function renderMl() {
 
   document.getElementById('mlBody').innerHTML = page.map(item => {
     const rawIdx = ITEMS.indexOf(item);
-    const isMulti = Array.isArray(item.uom);
-    const firstUom = isMulti ? item.uom[0] : item.uom;
-    const uomCell = '$' + item.price.toFixed(2) + ' <span style="color:var(--ink-mute);font-size:12px">' + firstUom + '</span>' +
-      (isMulti ? '<div style="font-size:11px;font-weight:600;color:var(--ink-mute);margin-top:2px">+' + (item.uom.length - 1) + ' more UOM</div>' : '');
-
-    const allGroups = item.groupList.length === ML_GROUPS.length && item.outletList.length === 0;
-    const mlParts = [];
-    if (item.groupList.length > 0) mlParts.push(item.groupList.length === 1 ? '1 group' : item.groupList.length + ' groups');
-    if (item.outletList.length > 0) mlParts.push(item.outletList.length === 1 ? '1 outlet' : item.outletList.length + ' outlets');
-    const grpLabel = allGroups ? 'All groups' : mlParts.join(' · ');
-    const grpHtml = allGroups
-      ? '<span style="font-size:12px;color:var(--ink-mute)">' + grpLabel + '</span>'
-      : '<button onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ',\'hqItemAccessPanel\')" style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:500;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
+    const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
     const hasExc = (GROUP_EXCEPTIONS[rawIdx] || []).length > 0;
-    return '<tr' + (item.active ? '' : ' class="ml-inactive"') + ' style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-      '<td><div class="ml-item-name">' + item.name + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><span class="ml-cat-tag">' + item.cat + '</span></td>' +
-      '<td style="color:var(--ink-mute);font-size:13px">' + item.supplier + '</td>' +
-      '<td>' + uomCell + '</td>' +
-      '<td style="text-align:left">' + grpHtml + '</td>' +
-      '<td><div class="row-actions-wrap">' +
-        '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
-        '<div class="row-actions-menu">' +
-          '<div class="row-action-item">Edit pricing</div>' +
-          '<div class="row-action-item">Manage UOM</div>' +
-          '<div class="row-action-item danger">' + (item.active ? 'Deactivate' : 'Activate') + '</div>' +
-        '</div></div></td>' +
-    '</tr>';
+    ensureItemAccessState(rawIdx);
+    const state = itemAccessState[rawIdx];
+
+    return uoms.map((uom, ui) => {
+      const isFirst = ui === 0;
+      const borderTop = !isFirst ? 'border-top:1px dashed var(--rule);' : '';
+
+      const uomCell = '$' + item.price.toFixed(2);
+
+      // Compute which groups/outlets have this UOM enabled
+      const accessNames = [...ML_GROUPS, ...ALL_OUTLETS];
+      const enabledForUom = accessNames.filter(name => {
+        const s = state[name];
+        return s && s.enabled && s.uoms[ui];
+      });
+      const groupsEnabled = enabledForUom.filter(n => ML_GROUPS.includes(n));
+      const outletsEnabled = enabledForUom.filter(n => ALL_OUTLETS.includes(n));
+      const allAccess = groupsEnabled.length === ML_GROUPS.length && outletsEnabled.length === 0;
+      const uomParts = [];
+      if (groupsEnabled.length > 0) uomParts.push(groupsEnabled.length === 1 ? '1 group' : groupsEnabled.length + ' groups');
+      if (outletsEnabled.length > 0) uomParts.push(outletsEnabled.length === 1 ? '1 outlet' : outletsEnabled.length + ' outlets');
+      const grpLabel = allAccess ? 'All groups' : uomParts.join(' · ');
+      const grpDataAttr = 'data-groups="' + groupsEnabled.join('|') + '" data-outlets="' + outletsEnabled.join('|') + '"';
+      const grpHtml = '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" ' + grpDataAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
+
+      const nameTd = '<td style="' + borderTop + '"><div class="ml-item-name">' + item.name + (isFirst && hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + item.supplier + '</div></td>';
+      const uomTd = '<td style="font-size:13px;color:var(--ink-mute);' + borderTop + '">' + uom.replace(/^per /i, '') + '</td>';
+      const actionsTd = isFirst
+        ? '<td><div class="row-actions-wrap">' +
+            '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
+            '<div class="row-actions-menu">' +
+              '<div class="row-action-item" onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ')">Edit pricing</div>' +
+              '<div class="row-action-item danger">' + (item.active ? 'Deactivate' : 'Activate') + '</div>' +
+            '</div></div></td>'
+        : '<td style="' + borderTop + '"></td>';
+
+      return '<tr' + (item.active ? '' : ' class="ml-inactive"') + ' style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
+        nameTd + uomTd +
+        '<td style="' + borderTop + 'font-size:13px;font-weight:600;color:var(--ink)">' + uomCell + '</td>' +
+        '<td style="text-align:left;' + borderTop + '">' + grpHtml + '</td>' +
+        actionsTd +
+      '</tr>';
+    }).join('');
   }).join('');
 
   const totalPages = Math.max(1, Math.ceil(total / ML_PER_PAGE));
@@ -2080,9 +2275,7 @@ function renderRec() {
     if (r.outletList.length > 0) parts.push(r.outletList.length === 1 ? '1 outlet' : r.outletList.length + ' outlets');
     const accessLabel = parts.join(' · ');
     const grpAttr = 'data-groups="' + r.groupList.join('|') + '" data-outlets="' + r.outletList.join('|') + '"';
-    const grpHtml = allGroups
-      ? '<span style="font-size:12px;color:var(--ink-mute)">All groups</span>'
-      : '<button onclick="openRecGroupsDialog(this)" ' + grpAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + accessLabel + '</button>';
+    const grpHtml = '<button onclick="openRecGroupsDialog(this)" ' + grpAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + (allGroups ? 'All groups' : accessLabel) + '</button>';
     const versionsHtml = r.versions > 1
       ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' versions</span>'
       : '';
@@ -2385,15 +2578,13 @@ function renderSuppliers() {
   const rows = SUPPLIERS.filter(s => {
     if (q && !s.name.toLowerCase().includes(q)) return false;
     return true;
-  });
+  }).sort((a, b) => a.name.localeCompare(b.name));
   document.getElementById('supBody').innerHTML = rows.map(s => {
     const allGroups = s.groupList.length === 2 && s.outletList.length === 0;
     const supParts = [];
     if (s.groupList.length > 0) supParts.push(s.groupList.length === 1 ? '1 group' : s.groupList.length + ' groups');
     if (s.outletList.length > 0) supParts.push(s.outletList.length === 1 ? '1 outlet' : s.outletList.length + ' outlets');
-    const grpHtml = allGroups
-      ? '<span style="font-size:12px;color:var(--ink-mute)">All groups</span>'
-      : '<button onclick="openRecGroupsDialog(this)" data-groups="' + s.groupList.join('|') + '" data-outlets="' + s.outletList.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + supParts.join(' · ') + '</button>';
+    const grpHtml = '<button onclick="openRecGroupsDialog(this)" data-groups="' + s.groupList.join('|') + '" data-outlets="' + s.outletList.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + (allGroups ? 'All groups' : supParts.join(' · ')) + '</button>';
     return '<tr' + (s.active ? '' : ' class="ml-inactive"') + '>' +
     '<td><div class="ml-item-name">' + s.name + '</div></td>' +
     '<td style="text-align:center;font-size:13px;color:var(--ink)">' + (s.itemCount || '—') + '</td>' +
@@ -2403,9 +2594,8 @@ function renderSuppliers() {
     '<td><div class="row-actions-wrap">' +
       '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
       '<div class="row-actions-menu">' +
-        '<div class="row-action-item">View items</div>' +
+        '<div class="row-action-item" onclick="viewSupplierItems(\'' + s.name.replace(/'/g,"\\'") + '\')">View items</div>' +
         '<div class="row-action-item' + (s.active ? ' danger' : '') + '" onclick="toggleSupActive(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (s.active ? 'Disable supplier' : 'Enable supplier') + '</div>' +
-        '<div class="row-action-item danger">Unlink supplier</div>' +
       '</div></div></td>' +
     '</tr>';
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--ink-mute)">No suppliers found</td></tr>';
@@ -2519,7 +2709,111 @@ document.addEventListener('click', function() {
   if (m) m.style.display = 'none';
   var m2 = document.getElementById('addItemMenu');
   if (m2) m2.style.display = 'none';
+  var m3 = document.getElementById('linkSupMenu');
+  if (m3) m3.style.display = 'none';
 });
+
+// ── Link supplier dropdown + modal ──────────────────────────────
+function toggleLinkSupMenu(e) {
+  e.stopPropagation();
+  var m = document.getElementById('linkSupMenu');
+  m.style.display = m.style.display === 'none' ? '' : 'none';
+}
+
+// Platform-wide supplier directory (not yet linked to this HQ)
+const PLATFORM_SUPPLIERS = [
+  { name: 'Rich Products Corporation', reg: '199804321K', cat: 'Frozen & Bakery',  contact: 'sg@richproducts.com',        phone: '+65 6863 3800' },
+  { name: 'Tee Yih Jia Food Mfg',     reg: '197200145Z', cat: 'Frozen',           contact: 'sales@teeyihjia.com.sg',     phone: '+65 6862 8838' },
+  { name: 'Prima Food Pte Ltd',        reg: '196100073D', cat: 'Dry Goods',        contact: 'trade@primafood.com.sg',     phone: '+65 6862 9888' },
+  { name: 'Olam International',        reg: '199504676H', cat: 'Commodities',      contact: 'foodservice@olamgroup.com',  phone: '+65 6339 4100' },
+  { name: 'Lim Ah Boy Seafood',        reg: '200312774W', cat: 'Seafood',          contact: 'wholesale@limahboy.com.sg',  phone: '+65 6534 1199' },
+  { name: 'Sim Lim Meats Pte Ltd',     reg: '201508833E', cat: 'Beef & Lamb',      contact: 'orders@simlimmeats.com.sg',  phone: '+65 6292 4455' },
+  { name: 'Sun Huat Heng Produce',     reg: '198803221G', cat: 'Produce',          contact: 'b2b@sunhuatheng.com.sg',     phone: '+65 6744 3388' },
+  { name: 'Bunge Asia Pte Ltd',        reg: '200001823N', cat: 'Oils & Fats',      contact: 'asia@bunge.com',             phone: '+65 6438 8200' },
+  { name: 'Dairy Farm International',  reg: '199301594D', cat: 'Dairy & Eggs',     contact: 'foodservice@dfi.com.hk',     phone: '+65 6235 5500' },
+  { name: 'Wilmar International',      reg: '199904785Z', cat: 'Oils & Dry Goods', contact: 'sg.trade@wilmar-intl.com',   phone: '+65 6216 0244' },
+];
+
+const linkSupSelected = new Set();
+
+function openLinkSupModal() {
+  linkSupSelected.clear();
+  document.getElementById('linkSupSearch').value = '';
+  renderLinkSupList();
+  updateLinkSupFooter();
+  document.getElementById('linkSupOverlay').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('linkSupSearch').focus(); }, 80);
+}
+
+function closeLinkSupModal() {
+  document.getElementById('linkSupOverlay').style.display = 'none';
+}
+
+function renderLinkSupList() {
+  var q = document.getElementById('linkSupSearch').value.trim();
+  var listEl = document.getElementById('linkSupList');
+
+  if (q.length < 2) {
+    listEl.innerHTML =
+      '<div style="padding:48px 24px;text-align:center;color:var(--ink-mute);font-size:14px;line-height:1.6">' +
+        '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto 12px;opacity:.35"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>' +
+        'Type a supplier name or registration number to search' +
+      '</div>';
+    return;
+  }
+
+  var ql = q.toLowerCase();
+  var linkedNames = new Set(SUPPLIERS.map(function(s){ return s.name.toLowerCase(); }));
+  var results = PLATFORM_SUPPLIERS.filter(function(s) {
+    if (linkedNames.has(s.name.toLowerCase())) return false;
+    return s.name.toLowerCase().includes(ql) || s.reg.toLowerCase().includes(ql);
+  });
+
+  if (!results.length) {
+    listEl.innerHTML =
+      '<div style="padding:48px 24px;text-align:center;color:var(--ink-mute);font-size:14px">No suppliers found for <strong>' + q + '</strong></div>';
+    return;
+  }
+
+  listEl.innerHTML = results.map(function(s) {
+    var checked = linkSupSelected.has(s.name);
+    return '<label style="display:flex;align-items:center;gap:14px;padding:13px 24px;border-bottom:1px solid var(--rule);cursor:pointer;transition:background .1s" onmouseover="this.style.background=\'var(--row-hover)\'" onmouseout="this.style.background=\'\'">' +
+      '<input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleLinkSupSel(\'' + s.name.replace(/'/g,"\\'") + '\',this.checked)" style="width:16px;height:16px;accent-color:var(--nomni-green);flex-shrink:0;cursor:pointer" />' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:500;font-size:14px;color:var(--ink)">' + s.name + '</div>' +
+        '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + s.reg + ' · ' + s.cat + '</div>' +
+      '</div>' +
+    '</label>';
+  }).join('');
+}
+
+function toggleLinkSupSel(name, checked) {
+  if (checked) { linkSupSelected.add(name); } else { linkSupSelected.delete(name); }
+  updateLinkSupFooter();
+}
+
+function updateLinkSupFooter() {
+  var n = linkSupSelected.size;
+  document.getElementById('linkSupSelCount').textContent = n === 0 ? 'No suppliers selected' : n + ' supplier' + (n > 1 ? 's' : '') + ' selected';
+  var btn = document.getElementById('linkSupConfirmBtn');
+  btn.disabled = n === 0;
+  btn.textContent = n > 0 ? 'Link ' + n + ' supplier' + (n > 1 ? 's' : '') : 'Link suppliers';
+}
+
+function confirmLinkSuppliers() {
+  linkSupSelected.forEach(function(name) {
+    var src = PLATFORM_SUPPLIERS.find(function(s){ return s.name === name; });
+    if (!src) return;
+    SUPPLIERS.push({
+      name: src.name, cat: src.cat, contact: src.contact, phone: src.phone,
+      active: true, type: 'active',
+      itemCount: 0, groupList: ['Chargrill Outlets', 'Family Dining Express'], outletList: []
+    });
+  });
+  document.getElementById('supCount').textContent = SUPPLIERS.length;
+  renderSuppliers();
+  closeLinkSupModal();
+}
 
 function renderInv() {
   var items = INV_ITEMS.slice();
@@ -2541,29 +2835,32 @@ function renderInv() {
     var globalIdx = INV_ITEMS.indexOf(r);
     var inactiveClass = r.active ? '' : ' class="ml-inactive"';
 
-    var expandBtn = r.type === 'group'
-      ? '<button onclick="event.stopPropagation();toggleInvExpand(' + globalIdx + ')" style="width:22px;height:22px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:#F3F4F6;border:none;border-radius:4px;cursor:pointer"><svg style="transition:transform .15s;transform:' + (invExpanded.has(globalIdx) ? 'rotate(90deg)' : '') + '" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 6 15 12 9 18"/></svg></button>'
-      : '<span style="width:22px;flex-shrink:0;display:inline-block"></span>';
 
     var detail = r.detail || '';
 
     var costCell = r.cost !== null
-      ? '<td style="' + td + 'font-size:13px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '<span style="font-size:11px;font-weight:400;color:var(--ink-mute)"> /' + r.uom + '</span></td>'
+      ? '<td style="' + td + 'font-size:13px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</td>'
       : '<td style="' + td + 'font-size:13px;color:var(--ink-mute)">varies</td>';
 
     var allGroups = r.groups && r.groups.length === INV_GROUPS.length;
-    var grpHtml = !r.groups || r.groups.length === 0
+    var grpLabel = !r.groups || r.groups.length === 0
+      ? null
+      : allGroups ? 'All groups' : (r.groups.length === 1 ? '1 group' : r.groups.length + ' groups');
+    var grpHtml = !grpLabel
       ? '<span style="font-size:12px;color:var(--ink-mute)">—</span>'
-      : allGroups
-        ? '<span style="font-size:12px;color:var(--ink-mute)">All groups</span>'
-        : '<span style="font-size:13px;font-weight:600;color:var(--spinach)">' + (r.groups.length === 1 ? '1 group' : r.groups.length + ' groups') + '</span>';
+      : '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + (r.groups||[]).join('|') + '" data-outlets="" style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
 
     rows.push('<tr' + inactiveClass + '>' +
       '<td style="' + td + '">' +
-        '<div style="display:flex;align-items:center;gap:8px">' + expandBtn +
+        '<div style="display:flex;align-items:center;gap:8px">' +
         '<div>' +
-          '<div style="font-size:14px;font-weight:500;color:var(--ink);margin-bottom:2px">' + r.name + '</div>' +
-          (detail ? '<div style="font-size:12px;color:var(--ink-mute)">' + detail + '</div>' : '') +
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">' +
+            '<span style="font-size:14px;font-weight:500;color:var(--ink)">' + r.name + '</span>' +
+            (r.type === 'group' ? '<span style="font-size:10px;font-weight:700;letter-spacing:.04em;background:#EDE9FE;color:#6D28D9;border-radius:4px;padding:2px 6px;flex-shrink:0">G</span>' : '') +
+          '</div>' +
+          (detail ? (r.type === 'group'
+            ? '<button onclick="event.stopPropagation();toggleInvExpand(' + globalIdx + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;font-weight:600;color:var(--spinach);cursor:pointer;display:inline-flex;align-items:center;gap:3px;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + detail + '<svg style="transition:transform .15s;transform:' + (invExpanded.has(globalIdx) ? 'rotate(180deg)' : '') + '" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>'
+            : '<div style="font-size:12px;color:var(--ink-mute)">' + detail + '</div>') : '') +
         '</div></div>' +
       '</td>' +
       '<td style="' + td + 'font-size:13px;color:var(--ink-mute)">' + r.uom + '</td>' +
@@ -2573,7 +2870,6 @@ function renderInv() {
         '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
         '<div class="row-actions-menu">' +
           '<div class="row-action-item">Edit</div>' +
-          (r.type === 'recipe' || r.type === 'sub-recipe' ? '<div class="row-action-item">Produce</div>' : '') +
           '<div class="row-action-item">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
           '<div class="row-action-item danger">Remove from inventory</div>' +
         '</div></div>' +
@@ -2588,7 +2884,7 @@ function renderInv() {
             '<div style="font-size:12px;color:var(--ink-mute)">' + c.supplier + '</div>' +
           '</td>' +
           '<td style="' + td + 'font-size:13px;color:var(--ink-mute)">' + r.uom + '</td>' +
-          '<td style="' + td + 'font-size:13px;font-weight:600;color:var(--ink)">$' + c.cost.toFixed(2) + '<span style="font-size:11px;font-weight:400;color:var(--ink-mute)"> /' + r.uom + '</span></td>' +
+          '<td style="' + td + 'font-size:13px;font-weight:600;color:var(--ink)">$' + c.cost.toFixed(2) + '</td>' +
           '<td style="' + td + '"></td><td style="' + td + '"></td>' +
         '</tr>');
       });
@@ -2697,14 +2993,22 @@ function renderAiList() {
 function toggleAiItem(id) { aiSel.has(id) ? aiSel.delete(id) : aiSel.add(id); renderAiList(); }
 function showAiStep2() {
   const items = CAT_ITEMS.filter(i => aiSel.has(i.id));
-  document.getElementById('aiPriceRows').innerHTML = items.map((item, idx) => {
+  document.getElementById('aiPriceRows').innerHTML = items.map((item) => {
+    const multi = item.uoms.length > 1;
     return item.uoms.map((u, ui) => {
       const isFirst = ui === 0;
-      return '<tr class="' + (isFirst ? 'item-first' : '') + '">' +
+      const checkId = 'aiUomCheck_' + item.id + '_' + ui;
+      const uomCell = multi
+        ? '<td class="col-uom" style="display:flex;align-items:center;gap:4px;padding-top:14px;padding-bottom:14px">' +
+            '<input type="checkbox" class="uom-check" id="' + checkId + '" checked onchange="toggleAiUomRow(this,\'' + item.id + '\',' + ui + ')" />' +
+            '<span class="uom-badge" id="aiUomBadge_' + item.id + '_' + ui + '">' + u + '</span>' +
+          '</td>'
+        : '<td class="col-uom"><span class="uom-badge">' + u + '</span></td>';
+      return '<tr class="' + (isFirst ? 'item-first' : '') + '" id="aiUomRow_' + item.id + '_' + ui + '">' +
         '<td class="col-name">' + (isFirst
           ? '<div class="col-name-text" title="' + item.name + '">' + item.name + '</div><div class="col-name-sub">' + item.supplier + '</div>'
           : '') + '</td>' +
-        '<td class="col-uom"><span class="uom-badge">' + u + '</span></td>' +
+        uomCell +
         '<td class="col-price"><div class="price-wrap"><span>$</span><input type="number" placeholder="0.00" step="0.01" min="0" /></div></td>' +
         '<td class="col-moq"><input type="text" placeholder="e.g. 5 ' + u + '" /></td>' +
       '</tr>';
@@ -2713,8 +3017,32 @@ function showAiStep2() {
   document.getElementById('aiAddBtn').textContent = 'Add ' + items.length + ' item' + (items.length>1?'s':'');
   setAiStep(2);
 }
+function toggleAiUomRow(cb, itemId, uomIdx) {
+  const item = CAT_ITEMS.find(i => i.id === itemId);
+  if (!item) return;
+  const enabledCount = item.uoms.filter((_, i) => {
+    const el = document.getElementById('aiUomCheck_' + itemId + '_' + i);
+    return !el || el.checked;
+  }).length;
+  if (!cb.checked && enabledCount === 0) { cb.checked = true; return; }
+  const row = document.getElementById('aiUomRow_' + itemId + '_' + uomIdx);
+  const badge = document.getElementById('aiUomBadge_' + itemId + '_' + uomIdx);
+  if (row) row.classList.toggle('uom-row-off', !cb.checked);
+  if (badge) badge.classList.toggle('uom-badge-off', !cb.checked);
+}
 function showAiStep3() { setAiStep(3); }
 function showAiStep2Back() { setAiStep(2); }
+function updateStep3ToggleLabel() {
+  const boxes = document.querySelectorAll('#aiGrp0,#aiGrp1,#aiOut0,#aiOut1');
+  const allChecked = Array.from(boxes).every(b => b.checked);
+  document.getElementById('aiStep3ToggleAll').textContent = allChecked ? 'Deselect all' : 'Select all';
+}
+function toggleAllStep3() {
+  const boxes = document.querySelectorAll('#aiGrp0,#aiGrp1,#aiOut0,#aiOut1');
+  const allChecked = Array.from(boxes).every(b => b.checked);
+  boxes.forEach(b => b.checked = !allChecked);
+  updateStep3ToggleLabel();
+}
 function showAiStep1() { setAiStep(1); }
 function confirmAddItems() {
   const n = aiSel.size;
@@ -2753,7 +3081,7 @@ function renderIsList() {
   const filtered = INV_AVAIL_SKUS.filter(i =>
     (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
     (!sup || i.supplier === sup)
-  );
+  ).sort((a, b) => a.name.localeCompare(b.name));
   document.getElementById('isList').innerHTML = filtered.length ? filtered.map(i => {
     const s = isSel.has(i.id);
     return '<div class="picker-row' + (s?' sel':'') + '" onclick="toggleIsItem(\'' + i.id + '\')">' +
@@ -3098,10 +3426,14 @@ function confirmRemoveFromHQ() {
     <!-- Step 3: Groups with access -->
     <div id="aiPanel3" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
       <div class="step3-body">
-        <p class="step3-intro">Select which outlet groups can see and order these items. You can change this later from each item's settings.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <p class="step3-intro" style="margin:0">Select which outlet groups and individual outlets can see and order these items. You can change this later from each item's settings.</p>
+          <button id="aiStep3ToggleAll" onclick="toggleAllStep3()" style="flex-shrink:0;margin-left:16px;background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:2px">Deselect all</button>
+        </div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);padding:0 2px 8px">Outlet groups</div>
         <div class="step3-group">
           <label class="step3-grp-row">
-            <input type="checkbox" id="aiGrp0" checked />
+            <input type="checkbox" id="aiGrp0" checked onchange="updateStep3ToggleLabel()" />
             <div class="step3-grp-info">
               <div class="step3-grp-name">Chargrill Outlets</div>
               <div class="step3-grp-sub">4 outlets</div>
@@ -3110,10 +3442,27 @@ function confirmRemoveFromHQ() {
         </div>
         <div class="step3-group">
           <label class="step3-grp-row">
-            <input type="checkbox" id="aiGrp1" checked />
+            <input type="checkbox" id="aiGrp1" checked onchange="updateStep3ToggleLabel()" />
             <div class="step3-grp-info">
               <div class="step3-grp-name">Family Dining Express</div>
               <div class="step3-grp-sub">3 outlets</div>
+            </div>
+          </label>
+        </div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);padding:16px 2px 8px">Individual outlets</div>
+        <div class="step3-group">
+          <label class="step3-grp-row">
+            <input type="checkbox" id="aiOut0" checked onchange="updateStep3ToggleLabel()" />
+            <div class="step3-grp-info">
+              <div class="step3-grp-name">(WF 139) Chargrill @ 139 Tampines</div>
+            </div>
+          </label>
+        </div>
+        <div class="step3-group">
+          <label class="step3-grp-row">
+            <input type="checkbox" id="aiOut1" checked onchange="updateStep3ToggleLabel()" />
+            <div class="step3-grp-info">
+              <div class="step3-grp-name">(WF 290) Garden Express @ 290 Sengkang</div>
             </div>
           </label>
         </div>
@@ -3280,6 +3629,45 @@ function confirmRemoveFromHQ() {
     <div class="modal-foot">
       <button class="modal-cancel" onclick="closeAddToGroupModal()">Cancel</button>
       <button class="btn-primary" onclick="confirmAddToGroup()">Add to group</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Link existing supplier modal ── -->
+<div class="modal-overlay" id="linkSupOverlay" style="display:none;align-items:flex-start;justify-content:center;padding-top:72px" onclick="if(event.target===this)closeLinkSupModal()">
+  <div style="background:#fff;border-radius:12px;width:580px;max-width:calc(100vw - 32px);box-shadow:0 24px 64px rgba(0,0,0,.22);max-height:calc(100vh - 110px);display:flex;flex-direction:column;overflow:hidden">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--rule);flex-shrink:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+        <div style="font-size:18px;font-weight:700;letter-spacing:-.02em">Find existing supplier</div>
+        <button onclick="closeLinkSupModal()" style="background:none;border:none;cursor:pointer;color:var(--ink-mute);padding:4px;border-radius:6px;display:flex;align-items:center" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div style="font-size:13px;color:var(--ink-mute);margin-bottom:14px">Search for a supplier already on Nomni to link to this HQ</div>
+      <div class="ml-search-wrap" style="width:100%">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="ml-search-input" id="linkSupSearch" placeholder="Search by supplier name or registration number…" oninput="renderLinkSupList()" style="width:100%" />
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto" id="linkSupList"></div>
+    <div style="padding:14px 24px;border-top:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <span id="linkSupSelCount" style="font-size:13px;color:var(--ink-mute)">No suppliers selected</span>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-tertiary" onclick="closeLinkSupModal()">Cancel</button>
+        <button class="btn btn-primary" id="linkSupConfirmBtn" disabled onclick="confirmLinkSuppliers()">Link suppliers</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete group confirm ── -->
+<div class="confirm-overlay" id="deleteGroupOverlay" onclick="if(event.target===this)closeDeleteGroupModal()">
+  <div class="danger-confirm-card">
+    <div class="danger-confirm-title">Delete group?</div>
+    <div class="danger-confirm-body"><strong id="deleteGroupModalName"></strong> will be permanently deleted. <span id="deleteGroupModalOutlets"></span></div>
+    <div class="danger-confirm-actions">
+      <button class="btn-cancel-plain" onclick="closeDeleteGroupModal()">Cancel</button>
+      <button class="btn-danger-confirm" onclick="confirmDeleteGroup()">Delete group</button>
     </div>
   </div>
 </div>
