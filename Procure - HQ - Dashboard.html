@@ -67,16 +67,144 @@
   .main { grid-column: 2; grid-row: 2; padding: 32px 40px 56px; min-width: 0; background: #fff; }
 
   /* Page head */
-  .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 16px; }
+  .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; }
   .page-head-left { display: flex; align-items: baseline; gap: 12px; }
   .page-divider { border: none; border-top: 1px solid var(--rule); margin: 0 0 28px; }
   .page-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -0.03em;; font-family: "Hanken Grotesk", system-ui, sans-serif; }
   .hq-badge { display: inline-flex; align-items: center; background: var(--seaweed); color: var(--nomni-green); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 5px; }
 
-  /* Placeholder */
-  .placeholder-area { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52vh; text-align: center; gap: 10px; }
-  .placeholder-title { font-size: 21px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 0; }
-  .placeholder-sub { font-size: 14px; color: var(--ink-mute); margin: 0; }
+  /* Stats strip */
+  .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 28px; }
+  .stats-cell { position: relative; padding: 18px 22px 16px; background: color-mix(in srgb, var(--accent, #2AC864) 7%, #fff); text-decoration: none; color: inherit; display: block; }
+  .stats-cell[href]:hover { background: color-mix(in srgb, var(--accent, #2AC864) 14%, #fff); }
+  .stats-cell + .stats-cell { border-left: 1px solid var(--rule); }
+  .stats-cell::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent, var(--nomni-green)); }
+  .stats-icon { display: flex; margin-bottom: 10px; }
+  .stats-val { font-size: 28px; font-weight: 800; letter-spacing: -0.04em; color: var(--ink); line-height: 1; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .stats-lbl { font-size: 13px; color: var(--ink); margin-top: 4px; }
+  .stats-lbl span { font-weight: 600; }
+
+  /* Overview grid */
+  .overview-grid { display: grid; grid-template-columns: 1fr 288px; gap: 40px; align-items: start; }
+
+  /* Panel label row */
+  .panel-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .panel-label-text { font-size: 21px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
+  .panel-count { font-size: 11px; font-weight: 400; color: var(--ink-mute); }
+
+  /* Outlet groups table */
+  .og-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  .og-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 10px 14px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fff; white-space: nowrap; }
+  .og-table thead th + th { text-align: center; }
+  .og-table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .og-table tbody td + td { text-align: center; }
+  .og-table tbody tr:last-child td { border-bottom: none; }
+  .og-table tbody tr:hover td { background: var(--row-hover); }
+  .og-name-cell { display: flex; align-items: center; gap: 6px; }
+  .og-expand-btn { background: none; border: none; cursor: pointer; padding: 2px; display: inline-flex; align-items: center; color: var(--ink-mute); border-radius: 3px; transition: color .13s; flex-shrink: 0; }
+  .og-expand-btn:hover { color: var(--ink); }
+  .og-expand-btn svg { transition: transform .18s; }
+  .og-expand-btn.open svg { transform: rotate(90deg); }
+  .og-name { font-weight: 600; color: var(--ink); font-size: 14px; text-decoration: none; }
+  .og-name:hover { color: var(--spinach); text-decoration: underline; }
+  .og-sub { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .og-count { font-weight: 600; color: var(--ink); }
+  .og-sub-row { display: none; }
+  .og-sub-row.open { display: table-row; }
+  .og-sub-row td { background: #f9fafb !important; padding: 0 14px 0 38px !important; }
+  .outlet-list { padding: 8px 0 10px; display: flex; flex-direction: column; gap: 2px; }
+  .outlet-item { font-size: 12px; color: var(--ink); padding: 4px 6px; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+  .outlet-item:hover { background: #eef0f3; }
+
+  /* Page meta (timestamp) */
+  .page-meta { font-size: 12px; color: var(--ink-mute); margin-top: 4px; }
+
+  /* Outlet group search */
+  .og-search-wrap { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; margin-bottom: 12px; }
+  .og-search-wrap:focus-within { border-color: var(--nomni-green); }
+  .og-search-wrap svg { flex-shrink: 0; color: var(--ink-mute); }
+  .og-search-input { flex: 1; border: none; outline: none; font-size: 14px; color: var(--ink); background: transparent; }
+  .og-search-input::placeholder { color: var(--ink-mute); }
+
+  /* Row action menus (••• buttons) */
+  .row-actions-wrap { position: relative; display: inline-block; }
+  .btn-row-actions { background: none; border: none; color: var(--ink-mute); cursor: pointer; padding: 4px 8px; border-radius: 4px; font-size: 18px; line-height: 1; letter-spacing: 1px; display: flex; align-items: center; transition: background .1s, color .1s; }
+  .btn-row-actions:hover { background: #f0f1f3; color: var(--ink); }
+  .row-actions-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 300; overflow: hidden; min-width: 160px; }
+  .row-actions-menu.open { display: block; }
+  .row-action-item { padding: 10px 16px; font-size: 12px; color: var(--ink); cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .row-action-item:hover { background: var(--mint); }
+  .row-action-item.danger { color: #D0291E; }
+  .row-action-item.danger:hover { background: #FDD6DC; }
+  .outlet-actions-btn { font-size: 14px !important; padding: 2px 5px !important; }
+
+  /* Health check */
+  .hc-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .hc-icon { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .hc-icon.warn { background: #FEF3C7; color: #92400E; }
+  .hc-icon.info { background: #F3F4F6; color: #6B7280; }
+  .hc-text { flex: 1; }
+  .hc-text.warn { color: #92400E; font-weight: 500; }
+  .hc-text.info { color: #6B7280; }
+
+  /* Ungrouped outlet rows */
+  .og-ungrouped-row { }
+
+  /* Confirm overlays */
+  .confirm-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 1000; display: none; align-items: center; justify-content: center; }
+  .confirm-overlay.open { display: flex; }
+  .danger-confirm-card { background: #fff; border-radius: 12px; width: 440px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); padding: 24px; }
+  .danger-confirm-title { font-size: 16px; font-weight: 700; margin: 0 0 10px; letter-spacing: -.02em; }
+  .danger-confirm-body { font-size: 14px; color: var(--ink); line-height: 1.6; margin: 0 0 20px; }
+  .danger-confirm-actions { display: flex; justify-content: flex-end; gap: 10px; }
+  .btn-danger-confirm { background: #D0291E; color: #fff; border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 18px; cursor: pointer; transition: background .15s; }
+  .btn-danger-confirm:hover { background: #b02016; }
+  .btn-cancel-plain { background: none; border: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink-mute); padding: 9px 14px; cursor: pointer; border-radius: 6px; transition: color .13s; }
+  .btn-cancel-plain:hover { color: var(--ink); }
+
+  /* Modal overlay (assign to group) */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: flex-start; justify-content: center; padding-top: 72px; }
+  .modal-overlay.open { display: flex; }
+  .modal-card { background: #fff; border-radius: 12px; width: 480px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); display: flex; flex-direction: column; max-height: calc(100vh - 100px); overflow: hidden; }
+  .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+  .modal-title { font-size: 16px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+  .modal-close { background: none; border: none; cursor: pointer; color: var(--ink-mute); padding: 4px; border-radius: 6px; display: flex; align-items: center; }
+  .modal-close:hover { background: #f0f1f3; color: var(--ink); }
+  .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+  .modal-foot { padding: 14px 24px 18px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+  .modal-cancel { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; transition: color .13s; }
+  .modal-cancel:hover { color: var(--ink); }
+  .group-radio-list { display: flex; flex-direction: column; gap: 8px; }
+  .group-radio-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; transition: border-color .15s; }
+  .group-radio-item:has(input:checked) { border-color: var(--nomni-green); background: #F6FFF9; }
+  .group-radio-item input[type="radio"] { accent-color: var(--nomni-green); width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; }
+  .group-radio-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .group-radio-meta { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .modal-warning { background: #FFF8EC; border: 1px solid #F5D87A; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #7A5C00; line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
+  .modal-warning svg { flex-shrink: 0; margin-top: 1px; color: #C47B00; }
+
+  /* Toast */
+  .hq-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--seaweed); color: #fff; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 2000; white-space: nowrap; }
+  .hq-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Activity feed */
+  .side-panel-label { font-size: 21px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 0 0 14px; }
+  .activity-feed { border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .activity-item { display: flex; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--rule); align-items: flex-start; cursor: default; transition: background .1s; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-item:hover { background: var(--row-hover); }
+  .activity-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .activity-body { flex: 1; min-width: 0; }
+  .activity-text { font-size: 13px; color: var(--ink); line-height: 1.4; }
+  .activity-text strong { font-weight: 600; }
+  .activity-time { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+  .activity-module { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 3px; padding: 1px 6px; margin-left: 4px; }
+  .act-items     { background: #E0F0FF; color: #1565C0; }
+  .act-recipes   { background: #FFF0D9; color: #B45309; }
+  .act-outlets   { background: #E2FFE6; color: var(--spinach); }
+  .act-suppliers { background: #FFF3CD; color: #7A5F00; }
+  .act-inventory { background: #F0F0F2; color: #555; }
+  .act-settings  { background: #F0F0F2; color: #555; }
 
   /* Mode switcher */
   .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
@@ -111,8 +239,9 @@
     .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); overflow-y: auto; }
     .main { min-width: 900px; }
     .nav a { white-space: nowrap; }
-    .sidebar .nav-label { display: none; }
+    .sidebar .nav-label, .sidebar .warn-icon { display: none; }
     .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .warn-icon { display: inline-flex; }
     /* Collapsed mode switcher */
     .sidebar .mode-label { display: none; }
     .sidebar .mode-icon { display: block; }
@@ -127,6 +256,16 @@
     .sidebar:not(:hover) .sidebar-hq-select { display: none !important; }
     .sidebar:hover .sidebar-hq-select { display: block; }
   }
+  .assign-group-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+  .assign-group-option:hover { background: var(--row-hover); }
+  .assign-group-option input[type="radio"] { accent-color: var(--nomni-green); width: 16px; height: 16px; flex-shrink: 0; }
+    .pos-chip { font-size: 10px; font-weight: 700; letter-spacing: .03em; border-radius: 3px; padding: 1px 6px; flex-shrink: 0; display: inline-flex; align-items: center; }
+  .pos-chip.ok { background: #D9F5E4; color: #1A8040; }
+  .pos-chip.off { background: #F3F4F6; color: #9CA3AF; }
+  .btn-primary-confirm { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 18px; cursor: pointer; transition: background .15s; }
+  .btn-primary-confirm:hover { background: #1FA551; }
+    .nav .warn-icon { margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; height: 18px; align-self: center; }
+  .nav .warn-icon img { height: 18px; width: 18px; }
 </style>
 </head>
 <body>
@@ -198,11 +337,12 @@
 
     <nav class="nav" aria-label="Primary">
       <a href="Procure - HQ - Dashboard.html" class="active"><span class="ms-icon material-symbols-outlined">dashboard</span><span class="nav-label">Dashboard</span></a>
-      <a href="Procure - HQ - Outlet Groups.html"><span class="ms-icon material-symbols-outlined">account_tree</span><span class="nav-label">Outlets</span></a>
-      <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Items</span></a>
+      <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Items</span><span class="warn-icon"><img src="error_24dp_1F1F1F 1.png" width="18" height="18" alt=""></span></a>
       <a href="Procure - HQ - Recipe Library.html"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipes</span></a>
       <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inventory</span></a>
       <a href="#"><span class="ms-icon material-symbols-outlined">point_of_sale</span><span class="nav-label">POS mapping</span></a>
+      <a href="Procure - HQ - Activity Log.html"><span class="ms-icon material-symbols-outlined">history</span><span class="nav-label">Activity log</span></a>
+      <a href="Procure - HQ - Settings.html" style="margin-top:4px;border-top:1px solid var(--rule);padding-top:10px"><span class="ms-icon material-symbols-outlined">settings</span><span class="nav-label">Settings</span></a>
     </nav>
     <div class="sidebar-foot">
       <div class="help-fab" title="Help">
@@ -215,14 +355,375 @@
     <div class="page-head">
       <div class="page-head-left">
         <h1 class="page-title" id="pageTitle">Roll'd Australia HQ</h1>
-        
+        <div class="page-meta" id="pageLastUpdated">Last updated 10 Jun 2026</div>
       </div>
     </div>
     <hr class="page-divider" />
 
-    <div class="placeholder-area">
-      <p class="placeholder-title">HQ Dashboard</p>
-      <p class="placeholder-sub">Content coming soon</p>
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <a class="stats-cell" href="Procure - HQ - Market Lists.html" style="--accent:#2AC864">
+        <div class="stats-icon" style="color:#1A8040"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg></div>
+        <div class="stats-val">234</div>
+        <div class="stats-lbl"><span>Items</span> in market list</div>
+      </a>
+      <a class="stats-cell" href="Procure - HQ - Recipe Library.html" style="--accent:#6C4DF2">
+        <div class="stats-icon" style="color:#4C34B8"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div class="stats-val">84</div>
+        <div class="stats-lbl"><span>Recipes</span> in library</div>
+      </a>
+      <div class="stats-cell" style="--accent:#E8B94F">
+        <div class="stats-icon" style="color:#B45309"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+        <div class="stats-val">22</div>
+        <div class="stats-lbl"><span>Suppliers</span> group-wide</div>
+      </div>
+      <a class="stats-cell" href="Procure - HQ - Dashboard.html" style="--accent:#1A8040">
+        <div class="stats-icon" style="color:#0E3727"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="stats-val">91</div>
+        <div class="stats-lbl"><span>Outlets</span> across 6 groups</div>
+      </a>
+    </div>
+
+    <!-- Two-column overview -->
+    <div class="overview-grid">
+
+      <!-- Left: outlet groups table -->
+      <div>
+        <div class="panel-label-row">
+          <span class="panel-label-text">Outlets &amp; groups <span class="panel-count">6 groups · 91 outlets</span></span>
+        </div>
+        <div class="og-search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="og-search-input" id="ogSearch" type="text" placeholder="Search groups or outlets…" oninput="filterOg(this.value)" autocomplete="off" />
+        </div>
+        <div style="overflow:clip">
+          <table class="og-table">
+            <thead>
+              <tr>
+                <th>Group / Outlet</th>
+                <th>Items</th>
+                <th>Recipes</th>
+                <th>Suppliers</th>
+                <th>Last updated</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- NSW Metro -->
+              <tr>
+                <td>
+                  <div class="og-name-cell">
+                    <button class="og-expand-btn" data-og="og1" onclick="toggleOg(this,'og1')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+                    <div><a href="Procure - HQ - Edit Outlet Group.html" class="og-name">NSW Metro</a><div class="og-sub">8 outlets</div></div>
+                  </div>
+                </td>
+                <td><span class="og-count">156</span></td>
+                <td><span class="og-count">42</span></td>
+                <td><span class="og-count">18</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">10 Jun 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="location.href='Procure - HQ - Edit Outlet Group.html'">Edit group</div><div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div></div></div></td>
+              </tr>
+              <tr class="og-sub-row" id="og1"><td colspan="6"><div class="outlet-list">
+                <div class="outlet-item"><span>Roll'd Bondi Junction NSW</span><span class="pos-chip off">POS ✕</span></div>
+                <div class="outlet-item"><span>Roll'd Broadway NSW</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Central NSW</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Chatswood NSW</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Macquarie Centre NSW</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Newtown NSW</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Parramatta NSW</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Westfield Hornsby NSW</span><span class="pos-chip ok">POS ✓</span></div>
+              </div></td></tr>
+
+              <!-- QLD Coastal -->
+              <tr>
+                <td>
+                  <div class="og-name-cell">
+                    <button class="og-expand-btn" data-og="og2" onclick="toggleOg(this,'og2')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+                    <div><a href="Procure - HQ - Edit Outlet Group.html" class="og-name">QLD Coastal</a><div class="og-sub">19 outlets</div></div>
+                  </div>
+                </td>
+                <td><span class="og-count">203</span></td>
+                <td><span class="og-count">77</span></td>
+                <td><span class="og-count">21</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">05 Jun 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="location.href='Procure - HQ - Edit Outlet Group.html'">Edit group</div><div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div></div></div></td>
+              </tr>
+              <tr class="og-sub-row" id="og2"><td colspan="6"><div class="outlet-list">
+                <div class="outlet-item"><span>Roll'd Broadbeach QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Brisbane City QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Cairns Central QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Chermside QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Garden City QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Gold Coast QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Indooroopilly QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Ipswich QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Logan QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Mt Gravatt QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Noosa QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd North Lakes QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Robina QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Rockhampton QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Strathpine QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Sunshine Coast QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Toowoomba QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Townsville QLD</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Westfield Carindale QLD</span><span class="pos-chip ok">POS ✓</span></div>
+              </div></td></tr>
+
+              <!-- SA Regional -->
+              <tr>
+                <td>
+                  <div class="og-name-cell">
+                    <button class="og-expand-btn" data-og="og3" onclick="toggleOg(this,'og3')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+                    <div><a href="Procure - HQ - Edit Outlet Group.html" class="og-name">SA Regional</a><div class="og-sub">31 outlets</div></div>
+                  </div>
+                </td>
+                <td><span class="og-count">192</span></td>
+                <td><span class="og-count">55</span></td>
+                <td><span class="og-count">19</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">28 May 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="location.href='Procure - HQ - Edit Outlet Group.html'">Edit group</div><div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div></div></div></td>
+              </tr>
+              <tr class="og-sub-row" id="og3"><td colspan="6"><div class="outlet-list">
+                <div class="outlet-item"><span>Roll'd Adelaide Airport SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Burnside SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Colonnades SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Elizabeth SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Gawler SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Glenelg SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Henley Beach SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Hindmarsh SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Ingle Farm SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Marion SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Mitcham SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Modbury SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Morphett Vale SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Mount Barker SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Mount Gambier SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Murray Bridge SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Noarlunga SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Norwood SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Port Adelaide SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Port Augusta SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Port Lincoln SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Port Pirie SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Prospect SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Reynella SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Rundle Mall SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Salisbury SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Tea Tree Plaza SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Victor Harbor SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd West Lakes SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Whyalla SA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Woodville SA</span><span class="pos-chip ok">POS ✓</span></div>
+              </div></td></tr>
+
+              <!-- TAS Island -->
+              <tr>
+                <td>
+                  <div class="og-name-cell">
+                    <button class="og-expand-btn" data-og="og4" onclick="toggleOg(this,'og4')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+                    <div><a href="Procure - HQ - Edit Outlet Group.html" class="og-name">TAS Island</a><div class="og-sub">4 outlets</div></div>
+                  </div>
+                </td>
+                <td><span class="og-count">134</span></td>
+                <td><span class="og-count">29</span></td>
+                <td><span class="og-count">14</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">20 May 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="location.href='Procure - HQ - Edit Outlet Group.html'">Edit group</div><div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div></div></div></td>
+              </tr>
+              <tr class="og-sub-row" id="og4"><td colspan="6"><div class="outlet-list">
+                <div class="outlet-item"><span>Roll'd Devonport TAS</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Eastlands TAS</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Hobart CBD TAS</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Launceston TAS</span><span class="pos-chip ok">POS ✓</span></div>
+              </div></td></tr>
+
+              <!-- VIC Central -->
+              <tr>
+                <td>
+                  <div class="og-name-cell">
+                    <button class="og-expand-btn" data-og="og5" onclick="toggleOg(this,'og5')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+                    <div><a href="Procure - HQ - Edit Outlet Group.html" class="og-name">VIC Central</a><div class="og-sub">14 outlets</div></div>
+                  </div>
+                </td>
+                <td><span class="og-count">178</span></td>
+                <td><span class="og-count">61</span></td>
+                <td><span class="og-count">20</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">07 Jun 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="location.href='Procure - HQ - Edit Outlet Group.html'">Edit group</div><div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div></div></div></td>
+              </tr>
+              <tr class="og-sub-row" id="og5"><td colspan="6"><div class="outlet-list">
+                <div class="outlet-item"><span>Roll'd Ballarat VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Box Hill VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Broadmeadows VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Chadstone VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Doncaster VIC</span><span class="pos-chip off">POS ✕</span></div>
+                <div class="outlet-item"><span>Roll'd Eastland VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Geelong VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Knox VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Melbourne Central VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Northland VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Pacific Werribee VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Southland VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Sunshine VIC</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Watergardens VIC</span><span class="pos-chip ok">POS ✓</span></div>
+              </div></td></tr>
+
+              <!-- WA Metro -->
+              <tr>
+                <td>
+                  <div class="og-name-cell">
+                    <button class="og-expand-btn" data-og="og6" onclick="toggleOg(this,'og6')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+                    <div><a href="Procure - HQ - Edit Outlet Group.html" class="og-name">WA Metro</a><div class="og-sub">12 outlets</div></div>
+                  </div>
+                </td>
+                <td><span class="og-count">145</span></td>
+                <td><span class="og-count">38</span></td>
+                <td><span class="og-count">16</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">02 Jun 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="location.href='Procure - HQ - Edit Outlet Group.html'">Edit group</div><div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div></div></div></td>
+              </tr>
+              <tr class="og-sub-row" id="og6"><td colspan="6"><div class="outlet-list">
+                <div class="outlet-item"><span>Roll'd Armadale WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Baldivis WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Cannington WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Fremantle WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Joondalup WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Karrinyup WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Mandurah WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Morley WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Perth CBD WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Rockingham WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Subiaco WA</span><span class="pos-chip ok">POS ✓</span></div>
+                <div class="outlet-item"><span>Roll'd Whitford City WA</span><span class="pos-chip ok">POS ✓</span></div>
+              </div></td></tr>
+
+              <!-- Ungrouped — alpha sorted -->
+              <tr class="og-ungrouped-row">
+                <td>
+                  <div class="og-name-cell">
+                    <div style="width:15px;flex-shrink:0"></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span class="og-name">Popup Stall – Sydney Markets</span><span class="pos-chip off">POS ✕</span></div>
+                  </div>
+                </td>
+                <td><span class="og-count">45</span></td>
+                <td><span class="og-count">5</span></td>
+                <td><span class="og-count">3</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">15 Jun 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="openAssignToGroupModal(this.closest('tr').querySelector('.og-name').textContent.trim())">Assign to group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest('tr').querySelector('.og-name').textContent.trim())">Remove from HQ</div></div></div></td>
+              </tr>
+
+              <tr class="og-ungrouped-row">
+                <td>
+                  <div class="og-name-cell">
+                    <div style="width:15px;flex-shrink:0"></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span class="og-name">Roll'd Alice Springs NT</span><span class="pos-chip off">POS ✕</span></div>
+                  </div>
+                </td>
+                <td><span class="og-count">76</span></td>
+                <td><span class="og-count">18</span></td>
+                <td><span class="og-count">8</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">08 Apr 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="openAssignToGroupModal(this.closest('tr').querySelector('.og-name').textContent.trim())">Assign to group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest('tr').querySelector('.og-name').textContent.trim())">Remove from HQ</div></div></div></td>
+              </tr>
+
+              <tr class="og-ungrouped-row">
+                <td>
+                  <div class="og-name-cell">
+                    <div style="width:15px;flex-shrink:0"></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span class="og-name">Roll’d Darwin NT</span><span class="pos-chip off">POS ✕</span></div>
+                  </div>
+                </td>
+                <td><span class="og-count">52</span></td>
+                <td><span class="og-count">11</span></td>
+                <td><span class="og-count">5</span></td>
+                <td style="color:var(--ink-mute);font-size:13px">03 May 2026</td>
+                <td style="text-align:right;padding-right:8px"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="openAssignToGroupModal(this.closest('tr').querySelector('.og-name').textContent.trim())">Assign to group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest('tr').querySelector('.og-name').textContent.trim())">Remove from HQ</div></div></div></td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right: health check + activity feed -->
+      <div style="display:flex;flex-direction:column;gap:28px">
+
+        <!-- Health check -->
+        <div>
+          <div class="panel-label-row" style="margin-bottom:12px">
+            <span class="panel-label-text">Health check</span>
+          </div>
+          <div style="border:1px solid var(--rule);border-radius:10px;overflow:hidden;padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+            <div class="hc-item">
+              <span class="hc-icon warn">⚠</span>
+              <span class="hc-text warn">3 outlets not assigned to any group</span>
+            </div>
+            <div class="hc-item">
+              <span class="hc-icon warn">⚠</span>
+              <span class="hc-text warn">2 price changes pending review</span>
+            </div>
+            <div class="hc-item">
+              <span class="hc-icon info">○</span>
+              <span class="hc-text info">7 outlets not connected to POS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity feed -->
+        <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="side-panel-label" style="margin-bottom:0">Recent activity</div>
+          <a href="Procure - HQ - Activity Log.html" style="font-size:13px;font-weight:500;color:var(--spinach);text-decoration:none" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">View all</a>
+        </div>
+        <div class="activity-feed">
+          <div class="activity-item">
+            <div class="activity-body">
+              <div class="activity-text"><strong>12 items synced</strong> to NSW Metro</div>
+              <div class="activity-time">2 hours ago &nbsp;·&nbsp; <span class="activity-module act-items">Items</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-body">
+              <div class="activity-text">Recipe <strong>Wagyu Slider</strong> added to library</div>
+              <div class="activity-time">5 hours ago &nbsp;·&nbsp; <span class="activity-module act-recipes">Recipes</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-body">
+              <div class="activity-text">Price update received from <strong>Coca-Cola (T)</strong></div>
+              <div class="activity-time">Yesterday · 3:42 PM &nbsp;·&nbsp; <span class="activity-module act-suppliers">Suppliers</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-body">
+              <div class="activity-text"><strong>3 outlets</strong> added to VIC Central</div>
+              <div class="activity-time">2 days ago &nbsp;·&nbsp; <span class="activity-module act-outlets">Outlets</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-body">
+              <div class="activity-text">QLD Coastal market list updated — <strong>8 items changed</strong></div>
+              <div class="activity-time">3 days ago &nbsp;·&nbsp; <span class="activity-module act-items">Items</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-body">
+              <div class="activity-text">Inventory master synced to <strong>all 6 groups</strong></div>
+              <div class="activity-time">4 days ago &nbsp;·&nbsp; <span class="activity-module act-inventory">Inventory</span></div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-body">
+              <div class="activity-text"><strong>Wagyu Beef Strips</strong> price exception added for WA Metro</div>
+              <div class="activity-time">5 days ago &nbsp;·&nbsp; <span class="activity-module act-suppliers">Suppliers</span></div>
+            </div>
+          </div>
+        </div>
+        </div><!-- /activity feed -->
+      </div><!-- /right column -->
+
     </div>
   </main>
 
@@ -238,6 +739,175 @@
   });
 </script>
 <script>
+  function toggleRowActions(e, btn) {
+    e.stopPropagation();
+    var menu = btn.nextElementSibling;
+    var isOpen = menu.classList.contains('open');
+    document.querySelectorAll('.row-actions-menu.open').forEach(function(m) { m.classList.remove('open'); });
+    if (!isOpen) menu.classList.add('open');
+  }
+  document.addEventListener('click', function() {
+    document.querySelectorAll('.row-actions-menu.open').forEach(function(m) { m.classList.remove('open'); });
+  });
+
+  // Inject ••• buttons into outlet sub-row items
+  document.querySelectorAll('.outlet-item').forEach(function(el) {
+    if (el.textContent.includes('more outlets')) return;
+    var outletName = el.querySelector('span') ? el.querySelector('span').textContent.trim() : el.textContent.trim();
+    // Find group name by walking up to the sub-row, then to its group row
+    var subRow = el.closest('.og-sub-row');
+    var groupName = '';
+    if (subRow) {
+      var prevRow = subRow.previousElementSibling;
+      while (prevRow) {
+        var nameEl = prevRow.querySelector('.og-name');
+        if (nameEl) { groupName = nameEl.textContent.trim(); break; }
+        prevRow = prevRow.previousElementSibling;
+      }
+    }
+    var wrap = document.createElement('div');
+    wrap.className = 'row-actions-wrap';
+    wrap.style.marginLeft = 'auto';
+    var isGrouped = subRow !== null;
+    // Add POS chip alongside name
+    var nameSpan = el.querySelector('span');
+    if (nameSpan && !el.querySelector('.pos-chip')) {
+      var chip = document.createElement('span');
+      chip.className = 'pos-chip ' + (el.dataset.posOk === 'false' ? 'off' : 'ok');
+      chip.textContent = el.dataset.posOk === 'false' ? 'POS ✕' : 'POS ✓';
+      nameSpan.insertAdjacentElement('afterend', chip);
+    }
+    var menuHtml = '<button class="btn-row-actions outlet-actions-btn" onclick="toggleRowActions(event,this)">•••</button><div class="row-actions-menu">';
+    if (isGrouped) {
+      menuHtml += '<div class="row-action-item danger" onclick="openRemoveFromGroupModal(\'' + outletName.replace(/'/g,"\\'") + '\',\'' + groupName.replace(/'/g,"\\'") + '\')">Remove from group</div>';
+    }
+    menuHtml += '<div class="row-action-item danger" onclick="openRemoveFromHQModal(\'' + outletName.replace(/'/g,"\\'") + '\')">Remove from HQ</div></div>';
+    wrap.innerHTML = menuHtml;
+    el.appendChild(wrap);
+  });
+
+  // ── Toast ──
+  function showToast(msg) {
+    var t = document.getElementById('hqToast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  // ── Delete group ──
+  function openDeleteGroupModal(btn) {
+    document.querySelectorAll('.row-actions-menu.open').forEach(function(m){ m.classList.remove('open'); });
+    var row = btn.closest('tr');
+    var groupName = row.querySelector('.og-name') ? row.querySelector('.og-name').textContent.trim() : 'this group';
+    var expandBtn = row.querySelector('[data-og]');
+    var ogId = expandBtn ? expandBtn.getAttribute('data-og') : '';
+    var subRow = ogId ? document.getElementById(ogId) : null;
+    var count = subRow ? subRow.querySelectorAll('.outlet-item').length : 0;
+    document.getElementById('deleteGroupName').textContent = groupName;
+    document.getElementById('deleteGroupOutlets').textContent = count > 0
+      ? 'Its ' + count + ' outlet' + (count !== 1 ? 's' : '') + ' will remain in the HQ as ungrouped.'
+      : 'This group has no outlets.';
+    document.getElementById('deleteGroupOverlay').classList.add('open');
+  }
+  function closeDeleteGroupModal() { document.getElementById('deleteGroupOverlay').classList.remove('open'); }
+  function confirmDeleteGroup() {
+    var name = document.getElementById('deleteGroupName').textContent;
+    closeDeleteGroupModal();
+    showToast(name + ' deleted');
+  }
+
+  // ── Remove from group ──
+  var _rfgOutlet = '', _rfgGroup = '';
+  function openRemoveFromGroupModal(outletName, groupName) {
+    _rfgOutlet = outletName; _rfgGroup = groupName;
+    document.getElementById('rfgOutletName').textContent = outletName;
+    document.getElementById('rfgGroupName').textContent = groupName;
+    document.getElementById('removeFromGroupOverlay').classList.add('open');
+  }
+  function closeRemoveFromGroupModal() { document.getElementById('removeFromGroupOverlay').classList.remove('open'); }
+  function confirmRemoveFromGroup() { closeRemoveFromGroupModal(); showToast(_rfgOutlet + ' moved to ungrouped'); }
+
+  // ── Remove from HQ ──
+  var _rfhqOutlet = '';
+  function openRemoveFromHQModal(outletName) {
+    _rfhqOutlet = outletName;
+    document.getElementById('rfhqOutletName').textContent = outletName;
+    document.getElementById('removeFromHQOverlay').classList.add('open');
+  }
+  function closeRemoveFromHQModal() { document.getElementById('removeFromHQOverlay').classList.remove('open'); }
+  function confirmRemoveFromHQ() { closeRemoveFromHQModal(); showToast(_rfhqOutlet + ' removed from HQ'); }
+
+  // ── Assign to group ──
+  var _assignOutlet = '';
+  function openAssignToGroupModal(outletName) {
+    _assignOutlet = outletName;
+    document.getElementById('assignOutletName').textContent = outletName;
+    document.querySelectorAll('input[name="assignGroup"]').forEach(function(r){ r.checked = false; });
+    document.getElementById('assignGroupOverlay').classList.add('open');
+  }
+  function closeAssignToGroupModal() { document.getElementById('assignGroupOverlay').classList.remove('open'); }
+  function confirmAssignToGroup() {
+    var sel = document.querySelector('input[name="assignGroup"]:checked');
+    if (!sel) return;
+    closeAssignToGroupModal();
+    showToast(_assignOutlet + ' added to ' + sel.value);
+  }
+
+  function toggleOg(btn, id) {
+    btn.classList.toggle('open');
+    document.getElementById(id).classList.toggle('open');
+  }
+
+  function filterOg(q) {
+    q = q.trim().toLowerCase();
+
+    // Group rows (identified by their expand button's data-og attr)
+    document.querySelectorAll('[data-og]').forEach(function(btn) {
+      var ogId = btn.getAttribute('data-og');
+      var groupRow = btn.closest('tr');
+      var subRow = document.getElementById(ogId);
+      var groupName = groupRow.querySelector('.og-name') ? groupRow.querySelector('.og-name').textContent.toLowerCase() : '';
+
+      if (!q) {
+        groupRow.style.display = '';
+        if (subRow) { subRow.style.display = ''; btn.classList.remove('open'); subRow.classList.remove('open'); }
+        return;
+      }
+
+      var groupMatch = groupName.includes(q);
+      var outletItems = subRow ? Array.from(subRow.querySelectorAll('.outlet-item')) : [];
+      var matchedOutlets = outletItems.filter(function(el) { return el.textContent.toLowerCase().includes(q); });
+
+      if (groupMatch || matchedOutlets.length > 0) {
+        groupRow.style.display = '';
+        if (subRow) {
+          subRow.style.display = 'table-row';
+          btn.classList.add('open');
+          subRow.classList.add('open');
+          // dim non-matching outlets when filtering by outlet name
+          outletItems.forEach(function(el) {
+            el.style.opacity = (!groupMatch && !el.textContent.toLowerCase().includes(q)) ? '0.35' : '';
+          });
+        }
+      } else {
+        groupRow.style.display = 'none';
+        if (subRow) subRow.style.display = 'none';
+      }
+    });
+
+    // Ungrouped rows
+    var ungroupedRows = Array.from(document.querySelectorAll('.og-ungrouped-row'));
+    if (!q) {
+      ungroupedRows.forEach(function(r) { r.style.display = ''; });
+      return;
+    }
+    ungroupedRows.forEach(function(r) {
+      var name = r.querySelector('.og-name') ? r.querySelector('.og-name').textContent.toLowerCase() : '';
+      r.style.display = name.includes(q) ? '' : 'none';
+    });
+  }
+
   document.getElementById('outletModeBtn').addEventListener('click', function() {
     window.location.href = 'Procure - Dashboard.html';
   });
@@ -267,5 +937,85 @@
     });
   })();
 </script>
+
+  <!-- Delete group confirm -->
+  <div class="confirm-overlay" id="deleteGroupOverlay">
+    <div class="danger-confirm-card">
+      <div class="danger-confirm-icon">
+        <span class="material-symbols-outlined" style="font-size:28px;color:#D0291E;">delete</span>
+      </div>
+      <div class="danger-confirm-title">Delete group?</div>
+      <div class="danger-confirm-body">
+        <strong id="deleteGroupName"></strong> will be deleted.
+        <span id="deleteGroupOutlets"></span>
+      </div>
+      <div class="danger-confirm-actions">
+        <button class="btn-cancel-plain" onclick="closeDeleteGroupModal()">Cancel</button>
+        <button class="btn-danger-confirm" onclick="confirmDeleteGroup()">Delete group</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove from group confirm -->
+  <div class="confirm-overlay" id="removeFromGroupOverlay">
+    <div class="danger-confirm-card">
+      <div class="danger-confirm-icon">
+        <span class="material-symbols-outlined" style="font-size:28px;color:#D0291E;">group_remove</span>
+      </div>
+      <div class="danger-confirm-title">Remove from group?</div>
+      <div class="danger-confirm-body">
+        <strong id="rfgOutletName"></strong> will be removed from <strong id="rfgGroupName"></strong> and moved to ungrouped outlets.
+      </div>
+      <div class="danger-confirm-actions">
+        <button class="btn-cancel-plain" onclick="closeRemoveFromGroupModal()">Cancel</button>
+        <button class="btn-danger-confirm" onclick="confirmRemoveFromGroup()">Remove from group</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove from HQ confirm -->
+  <div class="confirm-overlay" id="removeFromHQOverlay">
+    <div class="danger-confirm-card">
+      <div class="danger-confirm-icon">
+        <span class="material-symbols-outlined" style="font-size:28px;color:#D0291E;">domain_disabled</span>
+      </div>
+      <div class="danger-confirm-title">Remove from HQ?</div>
+      <div class="danger-confirm-body">
+        <strong id="rfhqOutletName"></strong> will be removed from this HQ. Their data and settings will be retained.
+      </div>
+      <div class="danger-confirm-actions">
+        <button class="btn-cancel-plain" onclick="closeRemoveFromHQModal()">Cancel</button>
+        <button class="btn-danger-confirm" onclick="confirmRemoveFromHQ()">Remove from HQ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign to group modal -->
+  <div class="modal-overlay" id="assignGroupOverlay" onclick="if(event.target===this)closeAssignToGroupModal()">
+    <div class="modal-card" style="width:480px;">
+      <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;">
+        <div class="modal-title">Assign to group</div>
+        <button class="btn-ghost" onclick="closeAssignToGroupModal()" style="font-size:20px;line-height:1;padding:4px 8px;">×</button>
+      </div>
+      <div class="modal-body" style="padding:0 24px 8px;gap:12px;">
+        <div style="font-size:14px;color:var(--ink-mute);margin-bottom:4px;">Select a group for <strong id="assignOutletName"></strong>:</div>
+        <div id="assignGroupList" style="display:flex;flex-direction:column;gap:2px;">
+          <label class="assign-group-option"><input type="radio" name="assignGroup" value="NSW Metro"> NSW Metro</label>
+          <label class="assign-group-option"><input type="radio" name="assignGroup" value="QLD Coastal"> QLD Coastal</label>
+          <label class="assign-group-option"><input type="radio" name="assignGroup" value="SA Regional"> SA Regional</label>
+          <label class="assign-group-option"><input type="radio" name="assignGroup" value="TAS Island"> TAS Island</label>
+          <label class="assign-group-option"><input type="radio" name="assignGroup" value="VIC Central"> VIC Central</label>
+          <label class="assign-group-option"><input type="radio" name="assignGroup" value="WA Metro"> WA Metro</label>
+        </div>
+      </div>
+      <div class="modal-foot" style="display:flex;justify-content:flex-end;gap:10px;padding:14px 24px 18px;border-top:1px solid var(--rule);">
+        <button class="btn-cancel-plain" onclick="closeAssignToGroupModal()">Cancel</button>
+        <button class="btn-primary-confirm" onclick="confirmAssignToGroup()">Assign to group</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="hq-toast" id="hqToast"></div>
 </body>
 </html>

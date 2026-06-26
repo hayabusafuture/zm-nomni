@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Admin — Create Outlet Group</title>
+<title>Procure — HQ · Create Outlet Group</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -15,18 +15,21 @@
     --seaweed: #0E3727;
     --spinach: #1A8040;
     --mint: #E2FFE6;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42,200,100,.14);
+    --sidebar-text: #1a1f2b;
     --ink: #1a1f2b;
-    --ink-2: #4a4f5a;
+    --ink-2: #1a1f2b;
     --ink-mute: #8a8f98;
     --ink-soft: #c7c9cf;
     --rule: #e7e8ec;
-    --row-hover: #f7f8fa;
     --primary: #2AC864;
+    --row-hover: #f7f8fa;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; background: #fff; }
-  .app { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+  .app { display: grid; grid-template-columns: 232px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
 
   /* ── Topbar ── */
   .topbar { grid-column: 1/-1; grid-row: 1; background: #1F2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
@@ -35,7 +38,7 @@
   .brand { display: flex; align-items: center; gap: 8px; }
   .brand-logo-img { height: 26px; }
   .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
-  .topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #7F6AD0; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; font-family: "Hanken Grotesk", sans-serif; }
   .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
   .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
@@ -43,21 +46,42 @@
   .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
   .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
 
-  /* ── Sidebar — dark green ── */
-  .sidebar { grid-column: 1; grid-row: 2; background: var(--seaweed); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
-  .nav { padding: 8px 0; flex: 1; }
-  .nav a { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: rgba(255,255,255,.55); text-decoration: none; font-size: 13px; font-weight: 400; transition: background .15s, color .15s; border-left: 2px solid transparent; white-space: nowrap; }
-  .nav a svg { flex-shrink: 0; transition: color .15s; color: rgba(255,255,255,.3); }
-  .nav a:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
-  .nav a:hover svg { color: rgba(255,255,255,.6); }
-  .nav a.active { color: #fff; background: rgba(42,200,100,.12); border-left-color: var(--nomni-green); font-weight: 500; padding-left: 14px; }
-  .nav a.active svg { color: var(--nomni-green); }
-  .nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .sidebar-foot { padding: 12px 14px 16px; border-top: 1px solid rgba(255,255,255,.08); }
-  .sidebar-user { display: flex; align-items: center; gap: 10px; }
-  .sidebar-avt { width: 30px; height: 30px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; flex-shrink: 0; }
-  .sidebar-uname { font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,.8); }
-  .sidebar-role-lbl { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 1px; }
+  /* ── Sidebar ── */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--sidebar-bg); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+
+  /* Mode switcher */
+  .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
+  .sidebar-mode-pill { display: flex; background: rgba(0,0,0,.07); border-radius: 8px; padding: 3px; gap: 2px; }
+  .sidebar-mode-opt { flex: 1; background: transparent; border: none; color: var(--ink-mute); font-family: inherit; font-size: 13px; font-weight: 500; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  .sidebar-mode-opt:not(.active):hover { color: var(--ink); }
+  .mode-icon { display: none; flex-shrink: 0; }
+  .mode-label { display: inline; }
+
+  /* HQ selector */
+  .sidebar-hq-select { margin: 8px 0 2px; position: relative; }
+  .sidebar-hq-btn { width: 100%; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); cursor: pointer; transition: border-color .13s; text-align: left; }
+  .sidebar-hq-btn:hover { border-color: #b0b4bc; }
+  .sidebar-hq-btn.open { border-color: var(--nomni-green); }
+  .sidebar-hq-btn-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-hq-dropdown { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 50; overflow: hidden; display: none; }
+  .sidebar-hq-dropdown.open { display: block; }
+  .sidebar-hq-option { padding: 9px 12px; font-size: 13px; color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; transition: background .1s; }
+  .sidebar-hq-option:hover { background: var(--mint); }
+  .sidebar-hq-option.active { font-weight: 600; color: var(--seaweed); }
+  .sidebar-hq-option.active::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--nomni-green); display: block; flex-shrink: 0; }
+
+  /* Nav */
+  .nav { margin-top: 4px; padding: 6px 10px 0; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: var(--sidebar-text); text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #888888; transition: color .15s; }
+  .nav a .nav-label { line-height: 1; }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a.active { background: var(--sidebar-item-active); color: var(--seaweed); font-weight: 600; }
+  .nav a.active .ms-icon { color: var(--spinach); }
+
+  .sidebar-foot { padding: 16px; flex-shrink: 0; }
+  .help-fab { width: 44px; height: 44px; border-radius: 50%; background: #6c4df2; display: grid; place-items: center; color: #fff; box-shadow: 0 6px 18px rgba(108,77,242,.4); }
 
   /* ── Main ── */
   .main { grid-column: 2; grid-row: 2; padding: 28px 40px 80px; min-width: 0; background: #fff; }
@@ -88,7 +112,7 @@
   .field-input::placeholder { color: var(--ink-mute); }
   .field-textarea { min-height: 80px; resize: vertical; font-family: inherit; line-height: 1.5; }
   .field-hint { font-size: 12px; color: var(--ink-mute); margin-top: 4px; display: block; }
-  .field-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+  .field-readonly { width: 100%; padding: 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink-mute); background: #f9fafb; }
 
   /* ── Two-panel outlet picker ── */
   .outlet-picker { display: flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; height: 420px; }
@@ -120,7 +144,6 @@
   .picker-item-info { flex: 1; min-width: 0; }
   .picker-item-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .picker-item-meta { font-size: 12px; color: var(--ink-mute); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .meta-sep { margin: 0 5px; color: var(--ink-soft); }
   .picker-no-results { padding: 32px 14px; text-align: center; color: var(--ink-mute); font-size: 13px; }
 
   .picker-selected { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; background: #f9fafb; }
@@ -143,7 +166,7 @@
   .picker-empty-hint { font-size: 12px; color: var(--ink-soft); line-height: 1.5; }
 
   /* ── Sticky footer ── */
-  .sticky-footer { position: fixed; bottom: 0; left: 220px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .sticky-footer { position: fixed; bottom: 0; left: 232px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
   .cancel-link { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: none; transition: color .13s; }
   .cancel-link:hover { color: var(--ink); }
   .save-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 24px; cursor: pointer; transition: background .15s; }
@@ -162,21 +185,26 @@
   .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
   .user-menu-item:hover { background: #f3f4f6; }
   .user-menu-item.logout { color: #e53535; }
+  .user-menu-item.supplier-hub { color: #1a6fcc; font-weight: 500; }
 
   /* ── Toast ── */
   .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--seaweed); color: #fff; font-size: 14px; font-weight: 500; padding: 12px 20px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 9999; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   @media (max-width: 1280px) {
-    .app { grid-template-columns: 56px 1fr; }
-    .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
-    .sidebar:hover { width: 220px; box-shadow: 2px 0 16px rgba(0,0,0,.25); }
-    .nav a span { display: none; }
-    .sidebar:hover .nav a span { display: inline; }
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 64px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); overflow-y: auto; }
+    .nav a .nav-label { display: none; }
+    .sidebar:hover .nav a .nav-label { display: inline; }
+    .sidebar .sidebar-mode-wrap { display: none; }
+    .sidebar:hover .sidebar-mode-wrap { display: block; }
     .sidebar .sidebar-foot { display: none; }
     .sidebar:hover .sidebar-foot { display: block; }
-    .sticky-footer { left: 56px; }
+    .sticky-footer { left: 64px; }
   }
+  .nav .warn-icon { margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; height: 18px; align-self: center; }
+  .nav .warn-icon img { height: 18px; width: 18px; }
 </style>
 </head>
 <body>
@@ -187,7 +215,7 @@
     <div class="topbar-left">
       <div class="brand">
         <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
-        <div class="brand-sub">Admin</div>
+        <div class="brand-sub">Procure</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -196,23 +224,24 @@
       </a>
       <div class="user-wrap">
         <div class="user" id="userMenuBtn">
-          <div class="topbar-avt">WA</div>
+          <div class="avatar">WA</div>
           <span>William Arya</span>
           <span class="chev"></span>
         </div>
         <div class="user-menu" id="userMenu">
           <div class="user-menu-header">
-            <div class="user-menu-name">William Arya</div>
+            <div class="user-menu-name">William Arya (Zeemart)</div>
             <div class="user-menu-email">william@zeemart.co</div>
           </div>
           <div class="user-menu-divider"></div>
           <div class="user-menu-section">
+            <a href="Supply - Dashboard.html" class="user-menu-item supplier-hub"><span class="material-symbols-outlined" style="font-size:16px;line-height:1">open_in_new</span>Use Nomni Supply</a>
             <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
             <a href="#" class="user-menu-item">Change password</a>
           </div>
           <div class="user-menu-divider"></div>
           <div class="user-menu-section">
-            <a href="#" class="user-menu-item logout">Logout</a>
+            <a href="Procure - Login.html" class="user-menu-item logout">Logout</a>
           </div>
         </div>
       </div>
@@ -221,49 +250,54 @@
 
   <!-- Sidebar -->
   <aside class="sidebar">
+    <div class="sidebar-mode-wrap">
+      <div class="sidebar-mode-pill">
+        <button class="sidebar-mode-opt" id="outletModeBtn">
+          <svg class="mode-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="mode-label">Outlet</span>
+        </button>
+        <button class="sidebar-mode-opt active" id="hqModeBtn">
+          <svg class="mode-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 21V7M8 21V7M2 12h20"/><path d="M9 3h6l2 4H7z"/></svg>
+          <span class="mode-label">HQ</span>
+        </button>
+      </div>
+      <div class="sidebar-hq-select" id="sidebarHqSelect">
+        <button class="sidebar-hq-btn" id="sidebarHqBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-mute)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-hq-btn-name" id="sidebarHqName">Roll'd Australia HQ</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="color:var(--ink-mute)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="sidebar-hq-dropdown" id="sidebarHqDropdown">
+          <div class="sidebar-hq-option active">Roll'd Australia HQ</div>
+          <div class="sidebar-hq-option">Liven Group HQ</div>
+          <div class="sidebar-hq-option">Shake Shack SG HQ</div>
+        </div>
+      </div>
+    </div>
+
     <nav class="nav" aria-label="Primary">
-      <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
-        <span>Orders</span>
-      </a>
-      <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg>
-        <span>Invoices</span>
-      </a>
-      <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg>
-        <span>Reports</span>
-      </a>
-      <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-        <span>Promotions</span>
-      </a>
-      <a href="Admin - Buyers.html#outlet-groups" class="active">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>Buyers</span>
-      </a>
-      <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg>
-        <span>Suppliers</span>
-      </a>
-      <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span>Notifications</span><span class="badge">4</span>
-      </a>
-      <a href="Admin - Buyer User.html">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
-        <span>Users</span>
-      </a>
+      <a href="Procure - HQ - Dashboard.html"><span class="ms-icon material-symbols-outlined">dashboard</span><span class="nav-label">Dashboard</span></a>
+      <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Items</span><span class="warn-icon"><img src="error_24dp_1F1F1F 1.png" width="18" height="18" alt=""></span></a>
+      <a href="Procure - HQ - Recipe Library.html"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inventory</span></a>
+      <a href="#"><span class="ms-icon material-symbols-outlined">point_of_sale</span><span class="nav-label">POS mapping</span></a>
+      <a href="Procure - HQ - Activity Log.html"><span class="ms-icon material-symbols-outlined">history</span><span class="nav-label">Activity log</span></a>
+      <a href="Procure - HQ - Settings.html" style="margin-top:4px;border-top:1px solid var(--rule);padding-top:10px"><span class="ms-icon material-symbols-outlined">settings</span><span class="nav-label">Settings</span></a>
     </nav>
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/><path d="M12 8v5l3 2"/></svg>
+      </div>
+    </div>
   </aside>
 
   <!-- Main -->
   <main class="main">
 
     <div class="breadcrumb">
-      <a href="#" class="back-link" onclick="history.back();return false;">
+      <a href="Procure - HQ - Dashboard.html" class="back-link">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back
+        Outlets
       </a>
     </div>
 
@@ -278,36 +312,13 @@
 
       <div class="field-group">
         <label class="field-label">Group name <span style="color:#e53535">*</span></label>
-        <input type="text" class="field-input" id="groupName" placeholder="e.g. CBD Lunch Venues" oninput="checkReady()" />
+        <input type="text" class="field-input" id="groupName" placeholder="e.g. NSW Metro" oninput="checkReady()" />
       </div>
 
       <div class="field-group">
-        <label class="field-label">HQ <span style="color:#e53535">*</span></label>
-        <select class="field-input field-select" id="hqSelect" onchange="checkReady()">
-          <option value="">Select an HQ…</option>
-          <option>1-Group HQ</option>
-          <option>Alchemy Dining Group HQ</option>
-          <option>Baoshi HQ</option>
-          <option>Braise Collective HQ</option>
-          <option>Char Restaurant Group HQ</option>
-          <option>Da Paolo HQ</option>
-          <option>Dandy Group HQ</option>
-          <option>East Coast Eats HQ</option>
-          <option>Fable Hospitality HQ</option>
-          <option>Garden Cuisine HQ</option>
-          <option>Grain Group HQ</option>
-          <option>Hua Ting Group HQ</option>
-          <option>Imperial Palace HQ</option>
-          <option>Juniper Hospitality HQ</option>
-          <option>Kinship Dining HQ</option>
-          <option>Laut Seafood Group HQ</option>
-          <option>Mosaic Food Group HQ</option>
-          <option>Noodle Republic HQ</option>
-          <option>Paradise Group HQ</option>
-          <option>Pique Restaurant Group HQ</option>
-          <option>Soup Restaurant Group HQ</option>
-        </select>
-        <span class="field-hint">The HQ this group will be managed under.</span>
+        <label class="field-label">HQ</label>
+        <div class="field-readonly" id="hqDisplay">Roll'd Australia HQ</div>
+        <span class="field-hint">Groups are created under your currently selected HQ.</span>
       </div>
 
       <div class="field-group">
@@ -320,7 +331,7 @@
 
       <!-- Outlets -->
       <div class="section-heading">Outlets</div>
-      <div class="section-note">Select the outlets that belong to this group. Outlets can come from any company or cluster.</div>
+      <div class="section-note">Select the outlets that belong to this group.</div>
 
       <div class="outlet-picker">
 
@@ -329,23 +340,17 @@
           <div class="picker-filters">
             <div class="picker-search-wrap">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" id="searchInput" placeholder="Search by outlet or company name…" oninput="renderList()" />
+              <input type="text" id="searchInput" placeholder="Search by outlet name…" oninput="renderList()" />
             </div>
             <div class="picker-filter-row">
-              <select class="picker-filter-sel" id="companyFilter" onchange="renderList()">
-                <option value="">All companies</option>
-                <option>The Grand Hospitality Group</option>
-                <option>Rolling Dough Co.</option>
-                <option>Pepper Lane Restaurants</option>
-                <option>Coastal Kitchen Group</option>
-                <option>Urban Bites</option>
-              </select>
               <select class="picker-filter-sel" id="clusterFilter" onchange="renderList()">
                 <option value="">All clusters</option>
-                <option>CBD Cluster</option>
-                <option>Metro East Cluster</option>
-                <option>Metro West Cluster</option>
-                <option>Northern Region</option>
+                <option>NSW Metro</option>
+                <option>VIC Central</option>
+                <option>QLD Coastal</option>
+                <option>WA Metro</option>
+                <option>SA Regional</option>
+                <option>TAS Island</option>
               </select>
             </div>
           </div>
@@ -385,7 +390,7 @@
 
 <!-- Sticky footer -->
 <div class="sticky-footer">
-  <a href="#" class="cancel-link" onclick="history.back();return false;">Cancel</a>
+  <a href="Procure - HQ - Dashboard.html" class="cancel-link">Cancel</a>
   <button class="save-btn" id="saveBtn" disabled onclick="handleCreate()">Create outlet group</button>
 </div>
 
@@ -397,44 +402,44 @@
 
 <script>
 const OUTLETS = [
-  { id:  1, name: "Amber Restaurant",               company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
-  { id:  2, name: "Sky Bar & Lounge",                company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
-  { id:  3, name: "Garden Terrace Cafe",             company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
-  { id:  4, name: "Executive Dining Room",           company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
-  { id:  5, name: "Roll'd Broadway",                 company: "Rolling Dough Co.",           cluster: "Metro East Cluster" },
-  { id:  6, name: "Roll'd Pitt Street",              company: "Rolling Dough Co.",           cluster: "CBD Cluster" },
-  { id:  7, name: "Roll'd Chatswood",                company: "Rolling Dough Co.",           cluster: "Northern Region" },
-  { id:  8, name: "Roll'd Parramatta",               company: "Rolling Dough Co.",           cluster: "Metro West Cluster" },
-  { id:  9, name: "Roll'd Bondi Junction",           company: "Rolling Dough Co.",           cluster: "Metro East Cluster" },
-  { id: 10, name: "Roll'd Newtown",                  company: "Rolling Dough Co.",           cluster: "Metro East Cluster" },
-  { id: 11, name: "Pepper Lane CBD",                 company: "Pepper Lane Restaurants",     cluster: "CBD Cluster" },
-  { id: 12, name: "Pepper Lane Darling Harbour",     company: "Pepper Lane Restaurants",     cluster: "CBD Cluster" },
-  { id: 13, name: "Pepper Lane North Sydney",        company: "Pepper Lane Restaurants",     cluster: "Northern Region" },
-  { id: 14, name: "Pepper Lane Surry Hills",         company: "Pepper Lane Restaurants",     cluster: "Metro East Cluster" },
-  { id: 15, name: "Manly Beach Kitchen",             company: "Coastal Kitchen Group",       cluster: "Northern Region" },
-  { id: 16, name: "Bondi Coastal Kitchen",           company: "Coastal Kitchen Group",       cluster: "Metro East Cluster" },
-  { id: 17, name: "Coogee Coastal Kitchen",          company: "Coastal Kitchen Group",       cluster: "Metro East Cluster" },
-  { id: 18, name: "Cronulla Coastal Kitchen",        company: "Coastal Kitchen Group",       cluster: "Metro East Cluster" },
-  { id: 19, name: "Palm Beach Kitchen",              company: "Coastal Kitchen Group",       cluster: "Northern Region" },
-  { id: 20, name: "Urban Bites Central Station",     company: "Urban Bites",                 cluster: "CBD Cluster" },
-  { id: 21, name: "Urban Bites Redfern",             company: "Urban Bites",                 cluster: "Metro East Cluster" },
-  { id: 22, name: "Urban Bites Surry Hills",         company: "Urban Bites",                 cluster: "Metro East Cluster" },
-  { id: 23, name: "Urban Bites Newtown",             company: "Urban Bites",                 cluster: "Metro East Cluster" },
-  { id: 24, name: "Urban Bites Chippendale",         company: "Urban Bites",                 cluster: "Metro East Cluster" },
-  { id: 25, name: "Urban Bites Ultimo",              company: "Urban Bites",                 cluster: "CBD Cluster" },
+  { id:  1, name: "Sydney CBD",        cluster: "NSW Metro" },
+  { id:  2, name: "Parramatta",        cluster: "NSW Metro" },
+  { id:  3, name: "Chatswood",         cluster: "NSW Metro" },
+  { id:  4, name: "Newtown",           cluster: "NSW Metro" },
+  { id:  5, name: "Newcastle",         cluster: "NSW Metro" },
+  { id:  6, name: "Manly",             cluster: "NSW Metro" },
+  { id:  7, name: "Wollongong",        cluster: "NSW Metro" },
+  { id:  8, name: "Penrith",           cluster: "NSW Metro" },
+  { id:  9, name: "Melbourne CBD",     cluster: "VIC Central" },
+  { id: 10, name: "Southbank",         cluster: "VIC Central" },
+  { id: 11, name: "St Kilda",          cluster: "VIC Central" },
+  { id: 12, name: "Fitzroy",           cluster: "VIC Central" },
+  { id: 13, name: "Brisbane CBD",      cluster: "QLD Coastal" },
+  { id: 14, name: "Fortitude Valley",  cluster: "QLD Coastal" },
+  { id: 15, name: "Sunshine Coast",    cluster: "QLD Coastal" },
+  { id: 16, name: "Perth CBD",         cluster: "WA Metro" },
+  { id: 17, name: "Fremantle",         cluster: "WA Metro" },
+  { id: 18, name: "Subiaco",           cluster: "WA Metro" },
+  { id: 19, name: "Adelaide CBD",      cluster: "SA Regional" },
+  { id: 20, name: "Glenelg",           cluster: "SA Regional" },
+  { id: 21, name: "Hobart City",       cluster: "TAS Island" },
+  { id: 22, name: "Launceston",        cluster: "TAS Island" },
+  { id: 23, name: "Devonport",         cluster: "TAS Island" },
+  { id: 24, name: "Cairns",            cluster: "QLD Coastal" },
+  { id: 25, name: "Gold Coast",        cluster: "QLD Coastal" },
+  { id: 26, name: "Canberra City",     cluster: "NSW Metro" },
+  { id: 27, name: "Darwin CBD",        cluster: "SA Regional" },
 ];
 
 const selected = new Set();
 
 function getVisible() {
   const q  = document.getElementById('searchInput').value.trim().toLowerCase();
-  const co = document.getElementById('companyFilter').value;
   const cl = document.getElementById('clusterFilter').value;
-  if (!q && !co && !cl) return null;
+  if (!q && !cl) return null;
   return OUTLETS.filter(o => {
-    if (co && o.company !== co) return false;
     if (cl && o.cluster !== cl) return false;
-    if (q && !o.name.toLowerCase().includes(q) && !o.company.toLowerCase().includes(q)) return false;
+    if (q && !o.name.toLowerCase().includes(q)) return false;
     return true;
   });
 }
@@ -450,7 +455,7 @@ function renderList() {
     selectAllBtn.style.display = 'none';
     list.innerHTML = `<div class="picker-left-empty">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-      <p>Search by name, or filter by company or cluster to find outlets</p>
+      <p>Search by name or filter by cluster to find outlets</p>
     </div>`;
     return;
   }
@@ -469,7 +474,7 @@ function renderList() {
       <input type="checkbox" ${selected.has(o.id) ? 'checked' : ''} />
       <div class="picker-item-info">
         <div class="picker-item-name">${o.name}</div>
-        <div class="picker-item-meta">${o.company}</div>
+        <div class="picker-item-meta">${o.cluster}</div>
       </div>
     </div>
   `).join('');
@@ -493,7 +498,7 @@ function renderSelected() {
     <div class="picker-sel-item">
       <div class="picker-sel-info">
         <div class="picker-sel-name">${o.name}</div>
-        <div class="picker-sel-company">${o.company}</div>
+        <div class="picker-sel-company">${o.cluster}</div>
       </div>
       <button class="picker-remove" onclick="removeOutlet(${o.id})" title="Remove">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -511,7 +516,8 @@ function removeOutlet(id) {
   renderList(); renderSelected(); checkReady();
 }
 function selectAllVisible() {
-  getVisible().forEach(o => selected.add(o.id));
+  const v = getVisible();
+  if (v) v.forEach(o => selected.add(o.id));
   renderList(); renderSelected(); checkReady();
 }
 function clearAll() {
@@ -519,9 +525,7 @@ function clearAll() {
   renderList(); renderSelected(); checkReady();
 }
 function checkReady() {
-  const ok = document.getElementById('groupName').value.trim().length > 0
-    && document.getElementById('hqSelect').value.length > 0
-    && selected.size > 0;
+  const ok = document.getElementById('groupName').value.trim().length > 0 && selected.size > 0;
   document.getElementById('saveBtn').disabled = !ok;
 }
 function handleCreate() {
@@ -529,7 +533,7 @@ function handleCreate() {
   toast.classList.add('show');
   setTimeout(() => {
     toast.classList.remove('show');
-    setTimeout(() => { history.back(); }, 300);
+    setTimeout(() => { window.location.href = 'Procure - HQ - Dashboard.html'; }, 300);
   }, 1800);
 }
 
@@ -539,20 +543,41 @@ document.getElementById('userMenuBtn').addEventListener('click', e => {
 });
 document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
 
+// HQ selector
+(function() {
+  var btn = document.getElementById('sidebarHqBtn');
+  var dd = document.getElementById('sidebarHqDropdown');
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    dd.classList.toggle('open');
+    btn.classList.toggle('open');
+  });
+  document.querySelectorAll('.sidebar-hq-option').forEach(function(opt) {
+    opt.addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.querySelectorAll('.sidebar-hq-option').forEach(function(o){ o.classList.remove('active'); });
+      this.classList.add('active');
+      var name = this.textContent.trim();
+      document.getElementById('sidebarHqName').textContent = name;
+      document.getElementById('hqDisplay').textContent = name;
+      dd.classList.remove('open');
+      btn.classList.remove('open');
+    });
+  });
+  document.addEventListener('click', function() {
+    dd.classList.remove('open');
+    btn.classList.remove('open');
+  });
+})();
+
+// Outlet mode switch
+document.getElementById('outletModeBtn').addEventListener('click', function() {
+  window.location.href = 'Procure - Dashboard.html';
+});
+
 renderList();
 renderSelected();
 document.getElementById('clearAllBtn').style.visibility = 'hidden';
-
-// Pre-fill HQ from URL param (e.g. ?hq=Garden+Cuisine+HQ)
-(function() {
-  var hqParam = new URLSearchParams(window.location.search).get('hq');
-  if (!hqParam) return;
-  var sel = document.getElementById('hqSelect');
-  for (var i = 0; i < sel.options.length; i++) {
-    if (sel.options[i].text === hqParam) { sel.selectedIndex = i; break; }
-  }
-  checkReady();
-})();
 </script>
 </body>
 </html>

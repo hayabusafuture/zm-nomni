@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin — New recipe · Garden Cuisine HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+:root {
+  --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
+  --ink: #1a1f2b; --ink-2: #4a4f5a; --ink-mute: #8a8f98; --ink-soft: #c7c9cf;
+  --rule: #e7e8ec; --row-hover: #f7f8fa; --primary: #2AC864;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; background: #fff; }
+.app { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+/* ── Topbar ── */
+.topbar { grid-column: 1/-1; grid-row: 1; background: #1F2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-right { display: flex; align-items: center; gap: 4px; }
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-logo-img { height: 26px; }
+.brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+.topbar-avt { width: 32px; height: 32px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: "Hanken Grotesk", sans-serif; }
+.user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+.chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+.help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+.help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+.user-wrap { position: relative; }
+.user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+.user-menu.open { display: block; }
+.user-menu-header { padding: 14px 16px 12px; }
+.user-menu-name { font-size: 14px; font-weight: 600; }
+.user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+.user-menu-divider { height: 1px; background: var(--rule); }
+.user-menu-section { padding: 6px 0; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; }
+.user-menu-item:hover { background: #f3f4f6; }
+.user-menu-item.logout { color: #e53535; }
+
+/* ── Sidebar ── */
+.sidebar { grid-column: 1; grid-row: 2; background: var(--seaweed); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+.nav { padding: 8px 0; flex: 1; }
+.nav a { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: rgba(255,255,255,.55); text-decoration: none; font-size: 13px; font-weight: 400; transition: background .15s, color .15s; border-left: 2px solid transparent; white-space: nowrap; }
+.nav a svg { flex-shrink: 0; color: rgba(255,255,255,.3); transition: color .15s; }
+.nav a:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.06); }
+.nav a:hover svg { color: rgba(255,255,255,.6); }
+.nav a.active { color: #fff; background: rgba(42,200,100,.12); border-left-color: var(--nomni-green); font-weight: 500; padding-left: 14px; }
+.nav a.active svg { color: var(--nomni-green); }
+.nav .badge { margin-left: auto; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* ── Main ── */
+.main { grid-column: 2; grid-row: 2; padding: 28px 40px 80px; min-width: 0; background: #fff; }
+.back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; }
+.back-link:hover { color: var(--seaweed); }
+
+/* ── Page header bar ── */
+.page-header { display: flex; align-items: center; justify-content: space-between; padding: 0 0 20px; border-bottom: 1px solid var(--rule); margin-bottom: 0; gap: 16px; }
+.page-header-left { display: flex; flex-direction: column; gap: 6px; }
+.page-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+.page-header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* ── Buttons ── */
+.btn { font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 6px; padding: 9px 16px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; line-height: 1; white-space: nowrap; transition: background .18s, color .18s; }
+.btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+.btn-primary:hover:not(:disabled) { background: #22b055; border-color: #22b055; }
+.btn-primary:disabled { background: #d0d2d8; border-color: #d0d2d8; color: #8a8f98; cursor: not-allowed; }
+.btn-tertiary { background: #F3F4F6; color: var(--ink-2); }
+.btn-tertiary:hover { background: #E6E8EC; }
+.btn-pill { border-radius: 20px; padding: 9px 20px; }
+
+/* ── Gray form section (name, portion, tags, cost card) ── */
+/* Extends flush to the main padding edges using negative margins */
+.form-section { background: #f4f4f6; padding: 32px 40px; margin: 0 -40px; }
+.form-row { display: flex; gap: 40px; align-items: flex-start; }
+.form-col-main { flex: 1; min-width: 0; }
+.form-col-side { width: 260px; flex-shrink: 0; }
+
+/* Name + Portion side by side, large borderless inputs */
+.name-portion-row { display: flex; gap: 32px; align-items: flex-end; margin-bottom: 20px; }
+.name-group { flex: 3; min-width: 0; }
+.portion-group { flex: 1; min-width: 100px; }
+.field-label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 6px; }
+.input-lg { width: 100%; font-family: "Inter", sans-serif; font-size: 22px; font-weight: 600; color: var(--ink); border: none; background: transparent; outline: none; padding: 0; line-height: 1.2; }
+.input-lg::placeholder { color: var(--ink-soft); }
+
+/* Sub-recipe checkbox */
+.checkbox-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 24px; font-size: 13px; color: var(--ink-mute); }
+.checkbox-row input[type="checkbox"] { accent-color: var(--seaweed); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
+.checkbox-row label { cursor: pointer; line-height: 1.4; }
+.danger-txt { color: #c02020; font-weight: 600; }
+
+/* Tags */
+.tags-field { width: 100%; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; background: #fff; }
+.tags-field:focus { border-color: var(--nomni-green); }
+.tags-field::placeholder { color: var(--ink-mute); }
+
+/* Applies-to chips */
+.chips-label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; display: block; margin-bottom: 8px; margin-top: 20px; }
+.chips-hint { font-size: 12px; color: var(--ink-mute); display: block; margin-bottom: 10px; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 5px 8px; border-radius: 20px; border: 1px solid #dcdee3; background: #fff; font-size: 12px; font-weight: 500; color: var(--ink-mute); cursor: pointer; user-select: none; transition: all .15s; }
+.chip.active { border-color: #a8e6be; background: #f0fdf5; color: var(--seaweed); font-weight: 600; }
+.chip-dot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid #ccc; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
+.chip.active .chip-dot { background: var(--nomni-green); border-color: var(--nomni-green); }
+.chip-check { display: none; }
+.chip.active .chip-check { display: block; }
+
+/* Cost card */
+.cost-card { background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 20px; }
+.cost-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.cost-row:last-child { margin-bottom: 0; }
+.cost-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+.cost-sublabel { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+.cost-value { font-size: 14px; font-weight: 600; color: var(--ink); }
+.cost-hr { height: 1px; background: var(--rule); margin: 14px 0; }
+.cost-food-row { display: flex; justify-content: space-between; align-items: center; }
+.cost-food-label { font-size: 22px; font-weight: 700; color: var(--ink); }
+.cost-food-value { font-size: 22px; font-weight: 700; color: var(--ink); }
+.retail-input-wrap { display: flex; align-items: center; gap: 6px; }
+.retail-currency { font-size: 13px; color: var(--ink-mute); font-weight: 600; }
+.retail-input { width: 70px; padding: 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; text-align: right; outline: none; transition: border-color .13s; }
+.retail-input:focus { border-color: var(--nomni-green); }
+
+/* ── Ingredients + cooking section (white) ── */
+.body-section { padding: 28px 0 0; }
+.body-row { display: flex; gap: 40px; align-items: flex-start; }
+.body-col-main { flex: 1; min-width: 0; }
+.body-col-side { width: 260px; flex-shrink: 0; }
+
+/* Ingredients table */
+.ing-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ing-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 10px 12px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); white-space: nowrap; }
+.ing-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.ing-table tbody tr:hover td { background: var(--row-hover); }
+.col-ctrl { width: 80px; }
+.col-name { /* fluid */ }
+.col-qty { width: 190px; }
+.col-price { width: 90px; text-align: right; }
+.col-amount { width: 90px; text-align: right; }
+.col-price, .col-amount { text-align: right; }
+.ing-table thead th.r { text-align: right; }
+
+/* Row controls */
+.row-ctrl { display: flex; align-items: center; gap: 6px; }
+.drag-handle { cursor: grab; color: var(--ink-soft); display: inline-flex; padding: 2px; }
+.del-btn { background: none; border: none; cursor: pointer; color: var(--ink-soft); display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: 4px; transition: background .12s, color .12s; padding: 0; }
+.del-btn:hover { background: #fde8e8; color: #c02020; }
+.row-num { font-size: 12px; font-weight: 600; color: var(--ink-mute); min-width: 16px; text-align: center; }
+
+/* Ingredient name input */
+.ing-name-input { width: 100%; padding: 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; outline: none; transition: border-color .13s; }
+.ing-name-input:focus { border-color: var(--nomni-green); }
+.ing-name-input::placeholder { color: var(--ink-mute); }
+
+/* Qty + UOM */
+.qty-uom { display: flex; gap: 6px; align-items: center; }
+.qty-input { width: 64px; padding: 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; text-align: right; outline: none; transition: border-color .13s; }
+.qty-input:focus { border-color: var(--nomni-green); }
+.uom-select { flex: 1; padding: 5px 22px 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 7px center; transition: border-color .13s; }
+.uom-select:focus { border-color: var(--nomni-green); outline: none; }
+.price-val { font-size: 13px; color: var(--ink-mute); display: block; text-align: right; }
+
+/* Empty state row */
+.empty-row td { text-align: center; padding: 40px 16px; color: var(--ink-mute); }
+.empty-icon { width: 36px; height: 36px; border-radius: 8px; background: #f0f0f2; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.empty-label { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.empty-sub { font-size: 13px; color: var(--ink-mute); }
+
+/* Add ingredient row */
+.add-ing-row { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+
+/* Cooking instructions */
+.cooking-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cooking-label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; }
+.cooking-char-count { font-size: 12px; color: var(--ink-mute); }
+.cooking-textarea { width: 100%; padding: 10px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 13px; color: var(--ink); resize: vertical; outline: none; min-height: 220px; transition: border-color .13s; }
+.cooking-textarea:focus { border-color: var(--nomni-green); }
+.cooking-textarea::placeholder { color: var(--ink-mute); }
+
+/* Ingredient name dropdown */
+.ing-select-wrap { position: relative; }
+.ing-dropdown { position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; box-shadow: 0 6px 16px rgba(0,0,0,.12); z-index: 200; max-height: 200px; overflow-y: auto; display: none; }
+.ing-dd-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--rule); }
+.ing-dd-item:last-child { border-bottom: none; }
+.ing-dd-item:hover { background: #f0fdf5; }
+.ing-dd-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+.ing-dd-supplier { font-size: 11px; color: var(--ink-mute); margin-top: 1px; }
+
+@media (max-width: 1280px) {
+  .app { grid-template-columns: 56px 1fr; }
+  .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width .2s; z-index: 4; }
+  .sidebar:hover { width: 220px; box-shadow: 2px 0 16px rgba(0,0,0,.25); }
+  .nav a span { display: none; }
+  .sidebar:hover .nav a span { display: inline; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <span class="brand-sub">Admin</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <span class="topbar-avt">WA</span>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item">Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span>Orders</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg><span>Invoices</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg><span>Reports</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><span>Promotions</span></a>
+      <a href="Admin - Buyers.html" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Buyers</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M12 12v3M9 12h6"/></svg><span>Suppliers</span></a>
+      <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>Notifications</span><span class="badge">4</span></a>
+      <a href="Admin - Buyer User.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>Users</span></a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Header bar: back + title + actions -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <a href="Admin - HQ Settings.html#recipes" class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Garden Cuisine HQ
+        </a>
+        <h1 class="page-title">New recipe</h1>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-tertiary" type="button">Save &amp; create another</button>
+        <button class="btn btn-primary" id="saveBtn" type="button" disabled>Save</button>
+      </div>
+    </div>
+
+    <!-- Gray section: Name / Portion / Tags / Applies-to + Cost card -->
+    <div class="form-section">
+      <div class="form-row">
+
+        <!-- Left: fields -->
+        <div class="form-col-main">
+
+          <div class="name-portion-row">
+            <div class="name-group">
+              <p style="margin:0 0 6px;font-size:13px"><strong>Name</strong> <span style="color:var(--ink-mute)">The recipe's display name across all reports and outlet views</span></p>
+              <input type="text" class="tags-field" id="recipeName" placeholder="eg. Vegetable Dumplings" autocomplete="off" style="font-size:16px;font-weight:600" />
+            </div>
+            <div class="portion-group">
+              <p style="margin:0 0 6px;font-size:13px"><strong>Portion</strong></p>
+              <input type="text" class="tags-field" id="portion" placeholder="1" style="font-size:16px;font-weight:600;text-align:center" />
+            </div>
+          </div>
+
+          <div class="checkbox-row">
+            <input type="checkbox" id="subRecipe" />
+            <label for="subRecipe">Make this a sub-recipe (can be nested inside another recipe) — <span class="danger-txt">cannot be reverted</span></label>
+          </div>
+
+          <div style="margin-bottom:20px">
+            <p style="margin:0 0 6px;font-size:13px"><strong>Tags</strong> <span style="color:var(--ink-mute)">Use this to group Recipe / Sub-Recipe in any way you like, eg. Main Course, Dessert, Sides, etc.</span></p>
+            <input type="text" class="tags-field" placeholder="Select or type to add new" />
+          </div>
+
+          <div>
+            <p style="margin:0 0 8px;font-size:13px"><strong>Applies to</strong> <span style="color:var(--ink-mute)">Select which outlet groups this recipe is for. Ingredient availability is checked against each selected group.</span></p>
+            <div class="chips-row" id="appliesChips">
+              <button class="chip active" data-group="nsw" type="button"><span class="chip-dot"><svg class="chip-check" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>NSW Metro</button>
+              <button class="chip active" data-group="vic" type="button"><span class="chip-dot"><svg class="chip-check" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>VIC Central</button>
+              <button class="chip active" data-group="qld" type="button"><span class="chip-dot"><svg class="chip-check" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>QLD Coastal</button>
+              <button class="chip active" data-group="wa" type="button"><span class="chip-dot"><svg class="chip-check" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>WA Metro</button>
+              <button class="chip active" data-group="sa" type="button"><span class="chip-dot"><svg class="chip-check" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>SA Regional</button>
+              <button class="chip active" data-group="tas" type="button"><span class="chip-dot"><svg class="chip-check" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>TAS Island</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Cost card -->
+        <div class="form-col-side">
+          <div class="cost-card">
+            <div class="cost-row">
+              <div>
+                <div class="cost-label">Recipe cost</div>
+                <div class="cost-sublabel">1 portion</div>
+              </div>
+              <div class="cost-value">—</div>
+            </div>
+            <div class="cost-row">
+              <div class="cost-label">Cost per portion</div>
+              <div class="cost-value">—</div>
+            </div>
+            <div class="cost-row">
+              <div>
+                <div class="cost-label">Retail price</div>
+                <div class="cost-sublabel">Per portion</div>
+              </div>
+              <div class="retail-input-wrap">
+                <span class="retail-currency">A$</span>
+                <input type="text" class="retail-input" placeholder="—" />
+              </div>
+            </div>
+            <div class="cost-hr"></div>
+            <div class="cost-food-row">
+              <div class="cost-food-label">Food cost</div>
+              <div class="cost-food-value">0%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- White section: Ingredients table + Cooking instructions -->
+    <div class="body-section">
+      <div class="body-row">
+
+        <!-- Left: Ingredients -->
+        <div class="body-col-main">
+          <table class="ing-table">
+            <thead>
+              <tr>
+                <th class="col-ctrl"></th>
+                <th class="col-name">Name</th>
+                <th class="col-qty">Recipe Qty - UoM</th>
+                <th class="col-price r">Unit price</th>
+                <th class="col-amount r">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="ingBody">
+              <tr class="empty-row" id="emptyRow">
+                <td colspan="5">
+                  <div class="empty-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#adb0b8" stroke-width="1.8"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+                  </div>
+                  <div class="empty-label">No ingredients yet</div>
+                  <div class="empty-sub">Add ingredients to calculate cost and check availability</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="add-ing-row">
+            <button class="btn btn-primary btn-pill" id="addIngBtn" type="button">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Add ingredient
+            </button>
+            <button class="btn btn-tertiary" type="button">Copy data from…</button>
+          </div>
+        </div>
+
+        <!-- Right: Cooking instructions -->
+        <div class="body-col-side">
+          <div class="cooking-label-row">
+            <span class="cooking-label">Cooking instructions</span>
+            <span class="cooking-char-count" id="charCount">0/1500</span>
+          </div>
+          <textarea class="cooking-textarea" id="cookingTA" maxlength="1500" placeholder="eg. Step 1..."></textarea>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  let rowCount = 0;
+
+  const ING_ITEMS = [
+    { name: 'Chicken Thigh Fillet', supplier: 'PFD Food Services' },
+    { name: 'Chicken Breast', supplier: 'PFD Food Services' },
+    { name: 'Pork Shoulder', supplier: 'Fresh Meats Co.' },
+    { name: 'Pork Belly', supplier: 'Fresh Meats Co.' },
+    { name: 'Beef Chuck', supplier: 'Horizons Supply' },
+    { name: 'Salmon Fillet', supplier: 'Pacific Seafoods' },
+    { name: 'Jasmine Rice', supplier: 'Sydney Direct' },
+    { name: 'Soy Sauce', supplier: 'PFD Food Services' },
+    { name: 'Hoisin Sauce', supplier: 'Horizons Supply' },
+    { name: 'Oyster Sauce', supplier: 'Horizons Supply' },
+    { name: 'Sesame Oil', supplier: 'PFD Food Services' },
+    { name: 'Chinese Five Spice', supplier: 'Parisi Bakery' },
+    { name: 'Fresh Ginger', supplier: 'Produce Direct' },
+    { name: 'Spring Onion', supplier: 'Sydney Direct Herbs' },
+    { name: 'Garlic', supplier: 'Produce Direct' },
+    { name: 'Shaoxing Rice Wine', supplier: 'Horizons Supply' },
+    { name: 'Honey', supplier: 'Sydney Direct' },
+    { name: 'White Sugar', supplier: 'PFD Food Services' },
+    { name: 'Vegetable Oil', supplier: 'PFD Food Services' },
+    { name: 'Bok Choy', supplier: 'Produce Direct' },
+    { name: 'Bean Sprouts', supplier: 'Produce Direct' },
+    { name: 'Tofu (Firm)', supplier: 'Sydney Direct' },
+  ];
+
+  function makeIngSelectCell() {
+    const wrap = document.createElement('div');
+    wrap.className = 'ing-select-wrap';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'ing-name-input';
+    input.placeholder = 'Search item…';
+    input.autocomplete = 'off';
+
+    const dd = document.createElement('div');
+    dd.className = 'ing-dropdown';
+
+    function renderDD(filter) {
+      const q = (filter || '').toLowerCase();
+      const items = ING_ITEMS.filter(x => x.name.toLowerCase().includes(q));
+      if (!items.length) {
+        dd.innerHTML = '<div style="padding:10px 12px;font-size:13px;color:var(--ink-mute)">No items found</div>';
+      } else {
+        dd.innerHTML = items.map(x =>
+          '<div class="ing-dd-item" data-name="' + x.name + '" data-supplier="' + x.supplier + '">' +
+          '<div class="ing-dd-name">' + x.name + '</div>' +
+          '<div class="ing-dd-supplier">' + x.supplier + '</div>' +
+          '</div>'
+        ).join('');
+        dd.querySelectorAll('.ing-dd-item').forEach(function(item) {
+          item.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            input.value = this.dataset.name;
+            input.dataset.supplier = this.dataset.supplier;
+            dd.style.display = 'none';
+          });
+        });
+      }
+    }
+
+    input.addEventListener('focus', function() { renderDD(this.value); dd.style.display = 'block'; });
+    input.addEventListener('input', function() { renderDD(this.value); dd.style.display = 'block'; });
+    input.addEventListener('blur', function() { setTimeout(function() { dd.style.display = 'none'; }, 200); });
+
+    wrap.appendChild(input);
+    wrap.appendChild(dd);
+    return wrap;
+  }
+
+  // Enable Save when name typed
+  document.getElementById('recipeName').addEventListener('input', function() {
+    document.getElementById('saveBtn').disabled = this.value.trim() === '';
+  });
+
+  // Chip toggles
+  document.querySelectorAll('.chip').forEach(function(chip) {
+    chip.addEventListener('click', function() { this.classList.toggle('active'); });
+  });
+
+  // Add ingredient
+  document.getElementById('addIngBtn').addEventListener('click', addIngredient);
+
+  function addIngredient() {
+    const body = document.getElementById('ingBody');
+    const emptyRow = document.getElementById('emptyRow');
+    if (emptyRow) emptyRow.remove();
+
+    rowCount++;
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><div class="row-ctrl">' +
+        '<span class="drag-handle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg></span>' +
+        '<button class="del-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>' +
+        '<span class="row-num">' + rowCount + '</span>' +
+      '</div></td>' +
+      '<td class="ing-name-cell-td"></td>' +
+      '<td><div class="qty-uom"><input type="text" class="qty-input" placeholder="0" />' +
+        '<select class="uom-select"><option>kg</option><option>g</option><option>L</option><option>ml</option><option>unit</option><option>portion</option><option>pack</option><option>bunch</option></select>' +
+      '</div></td>' +
+      '<td><span class="price-val">A$0.00</span></td>' +
+      '<td><span class="price-val">A$0.00</span></td>';
+
+    body.appendChild(tr);
+
+    const nameCellTd = tr.querySelector('.ing-name-cell-td');
+    const selectCell = makeIngSelectCell();
+    nameCellTd.appendChild(selectCell);
+    selectCell.querySelector('.ing-name-input').focus();
+
+    tr.querySelector('.del-btn').addEventListener('click', function() {
+      tr.remove();
+      rowCount = document.querySelectorAll('#ingBody tr:not(.empty-row)').length;
+      document.querySelectorAll('#ingBody .row-num').forEach(function(el, i) { el.textContent = i + 1; });
+      if (body.children.length === 0) {
+        const emptyTr = document.createElement('tr');
+        emptyTr.className = 'empty-row';
+        emptyTr.id = 'emptyRow';
+        emptyTr.innerHTML = '<td colspan="5"><div class="empty-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#adb0b8" stroke-width="1.8"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></div><div class="empty-label">No ingredients yet</div><div class="empty-sub">Add ingredients to calculate cost and check availability</div></td>';
+        body.appendChild(emptyTr);
+      }
+    });
+  }
+
+  // Cooking char count
+  const ta = document.getElementById('cookingTA');
+  ta.addEventListener('input', function() { document.getElementById('charCount').textContent = ta.value.length + '/1500'; });
+
+  // Save
+  document.getElementById('saveBtn').addEventListener('click', function() {
+    window.location.href = 'Admin - HQ Settings.html#recipes';
+  });
+
+  // User menu
+  document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', function() { document.getElementById('userMenu').classList.remove('open'); });
+</script>
+</body>
+</html>

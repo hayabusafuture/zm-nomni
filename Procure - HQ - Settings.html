@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procure — HQ · Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --seaweed: #0E3727; --nomni-green: #2AC864; --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --sidebar-bg: #F5F5F5; --sidebar-item-active: rgba(42,200,100,.14);
+    --sidebar-text: #1a1f2b; --ink: #1a1f2b; --ink-2: #1a1f2b;
+    --ink-mute: #8a8f98; --ink-soft: #c7c9cf; --rule: #e7e8ec;
+    --primary: #2AC864; --row-hover: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  .app { display: grid; grid-template-columns: 232px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* Topbar */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1f2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #7F6AD0; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+  .user-menu-item.supplier-hub { color: #1a6fcc; font-weight: 500; }
+
+  /* Sidebar */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--sidebar-bg); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+  .nav { margin-top: 12px; padding: 6px 10px 0; display: flex; flex-direction: column; gap: 2px; }
+  .nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: var(--sidebar-text); text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a.active { background: var(--sidebar-item-active); color: var(--seaweed); font-weight: 600; }
+  .nav a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #888888; transition: color .15s; }
+  .nav a:hover .ms-icon { color: #888; }
+  .nav a.active .ms-icon { color: var(--spinach); }
+  .nav-label { line-height: 1; }
+  .sidebar-foot { padding: 16px; flex-shrink: 0; }
+  .help-fab { width: 44px; height: 44px; border-radius: 50%; background: #6c4df2; display: grid; place-items: center; color: #fff; box-shadow: 0 6px 18px rgba(108,77,242,.4); }
+
+  /* Mode switcher */
+  .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
+  .sidebar-mode-pill { display: flex; background: rgba(0,0,0,.07); border-radius: 8px; padding: 3px; gap: 2px; }
+  .sidebar-mode-opt { flex: 1; background: transparent; border: none; color: var(--ink-mute); font-family: inherit; font-size: 13px; font-weight: 500; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  .sidebar-mode-opt:not(.active):hover { color: var(--ink); }
+  .mode-icon { display: none; flex-shrink: 0; }
+  .mode-label { display: inline; }
+  .sidebar-hq-select { margin: 8px 0 2px; position: relative; }
+  .sidebar-hq-btn { width: 100%; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); cursor: pointer; transition: border-color .13s; text-align: left; }
+  .sidebar-hq-btn:hover { border-color: #b0b4bc; }
+  .sidebar-hq-btn.open { border-color: var(--nomni-green); }
+  .sidebar-hq-btn-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-hq-dropdown { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 50; overflow: hidden; display: none; }
+  .sidebar-hq-dropdown.open { display: block; }
+  .sidebar-hq-option { padding: 9px 12px; font-size: 13px; color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; transition: background .1s; }
+  .sidebar-hq-option:hover { background: var(--mint); }
+  .sidebar-hq-option.active { font-weight: 600; color: var(--seaweed); }
+  .sidebar-hq-option.active::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--nomni-green); display: block; flex-shrink: 0; }
+
+  /* Main */
+  .main { grid-column: 2; grid-row: 2; padding: 32px 40px 56px; min-width: 0; background: #fff; }
+
+  /* Page head */
+  .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; }
+  .page-head-left { display: flex; align-items: baseline; gap: 12px; }
+  .page-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .page-divider { border: none; border-top: 1px solid var(--rule); margin: 0 0 28px; }
+
+  /* Info banner */
+  .info-banner { display: flex; align-items: flex-start; gap: 10px; background: var(--mint); border: 1px solid #B9F0C5; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--seaweed); margin-bottom: 28px; line-height: 1.5; }
+  .info-banner .material-symbols-outlined { font-size: 18px; flex-shrink: 0; margin-top: 1px; color: var(--spinach); }
+  .info-banner a { color: var(--spinach); font-weight: 600; text-decoration: none; }
+  .info-banner a:hover { text-decoration: underline; }
+
+  /* Settings layout */
+  .settings-body { max-width: 640px; margin: 0 auto; }
+
+  /* Section headings + dividers — matches ZM Admin Edit HQ */
+  .section-heading { font-size: 18px; font-weight: 700; margin: 0 0 16px; letter-spacing: -0.02em; color: var(--ink); }
+  .section-divider { height: 1px; background: var(--rule); margin: 28px 0; }
+
+  /* Field groups */
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .field-label .optional { font-size: 12px; font-weight: 400; color: var(--ink-mute); margin-left: 4px; }
+  .field-input { width: 100%; border: 1px solid #dcdee3; border-radius: 6px; padding: 8px 12px; font: inherit; font-size: 14px; color: var(--ink); background: #fff; outline: none; transition: border-color .13s; resize: none; line-height: 1.5; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input:disabled { background: #f3f4f6; color: var(--ink-mute); cursor: not-allowed; }
+  .field-hint { font-size: 12px; color: var(--ink-mute); margin-top: 4px; display: block; line-height: 1.5; }
+  .form-row { display: flex; gap: 16px; margin-bottom: 8px; }
+  .form-row .field-group { flex: 1; margin-bottom: 0; }
+  .field-select { width: 100%; padding: 8px 28px 8px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; transition: border-color .13s; }
+  .field-select:focus { border-color: var(--nomni-green); }
+  /* Read-only display value (non-field rows) */
+  .field-val { font-size: 14px; color: var(--ink); line-height: 1.6; }
+  /* Buttons */
+  .btn { font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 6px; padding: 9px 20px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; line-height: 1; white-space: nowrap; transition: background-color .18s ease, color .18s ease, border-color .18s ease; }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+  .btn-primary:hover { background: #0E3727; color: var(--nomni-green); border-color: #0E3727; }
+
+  /* Add-ons grid */
+  .addons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .addon-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink); }
+  .addon-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .addon-dot.on { background: var(--nomni-green); }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 64px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); overflow-y: auto; }
+    .main { min-width: 900px; }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label, .sidebar .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .warn-icon { display: inline-flex; }
+    .sidebar .mode-label { display: none; }
+    .sidebar .mode-icon { display: block; }
+    .sidebar:not(:hover) .sidebar-mode-wrap { padding: 10px 0 0; display: flex; align-items: flex-start; justify-content: center; height: 46px; flex-shrink: 0; }
+    .sidebar:not(:hover) .sidebar-mode-pill { background: transparent; padding: 0; justify-content: center; }
+    .sidebar:not(:hover) .sidebar-mode-opt:not(.active) { display: none; }
+    .sidebar:not(:hover) .sidebar-mode-opt.active { flex: 0 0 auto; width: 36px; height: 36px; padding: 0; background: rgba(0,0,0,.08); box-shadow: none; border-radius: 8px; color: var(--seaweed); }
+    .sidebar:hover .sidebar-mode-wrap { padding: 10px 10px 0; height: auto; display: block; }
+    .sidebar:hover .sidebar-mode-opt { display: inline-flex; padding: 6px 8px; width: auto; height: auto; }
+    .sidebar:hover .mode-label { display: inline; }
+    .sidebar:hover .mode-icon { display: none; }
+    .sidebar:not(:hover) .sidebar-hq-select { display: none !important; }
+    .sidebar:hover .sidebar-hq-select { display: block; }
+  }
+  .nav .warn-icon { margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; height: 18px; align-self: center; }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Procure</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="avatar">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya (Zeemart)</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Supply - Dashboard.html" class="user-menu-item supplier-hub"><span class="material-symbols-outlined" style="font-size:16px;line-height:1">open_in_new</span>Use Nomni Supply</a>
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Procure - Login.html" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-mode-wrap">
+      <div class="sidebar-mode-pill">
+        <button class="sidebar-mode-opt" id="outletModeBtn">
+          <svg class="mode-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="mode-label">Outlet</span>
+        </button>
+        <button class="sidebar-mode-opt active" id="hqModeBtn">
+          <svg class="mode-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 21V7M8 21V7M2 12h20"/><path d="M9 3h6l2 4H7z"/></svg>
+          <span class="mode-label">HQ</span>
+        </button>
+      </div>
+      <div class="sidebar-hq-select" id="sidebarHqSelect">
+        <button class="sidebar-hq-btn" id="sidebarHqBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-mute)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-hq-btn-name" id="sidebarHqName">Roll'd Australia HQ</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="color:var(--ink-mute)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="sidebar-hq-dropdown" id="sidebarHqDropdown">
+          <div class="sidebar-hq-option active">Roll'd Australia HQ</div>
+          <div class="sidebar-hq-option">Liven Group HQ</div>
+          <div class="sidebar-hq-option">Shake Shack SG HQ</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="Procure - HQ - Dashboard.html"><span class="ms-icon material-symbols-outlined">dashboard</span><span class="nav-label">Dashboard</span></a>
+      <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Items</span><span class="warn-icon"><img src="error_24dp_1F1F1F 1.png" width="18" height="18" alt=""></span></a>
+      <a href="Procure - HQ - Recipe Library.html"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inventory</span></a>
+      <a href="#"><span class="ms-icon material-symbols-outlined">point_of_sale</span><span class="nav-label">POS mapping</span></a>
+      <a href="Procure - HQ - Activity Log.html"><span class="ms-icon material-symbols-outlined">history</span><span class="nav-label">Activity log</span></a>
+      <a href="Procure - HQ - Settings.html" class="active" style="margin-top:4px;border-top:1px solid var(--rule);padding-top:10px"><span class="ms-icon material-symbols-outlined">settings</span><span class="nav-label">Settings</span></a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/><path d="M12 8v5l3 2"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-head">
+      <div class="page-head-left">
+        <h1 class="page-title" id="pageTitle">HQ Settings</h1>
+      </div>
+    </div>
+    <hr class="page-divider" />
+
+    <div class="settings-body">
+
+      <!-- Basic information -->
+      <h2 class="section-heading" style="margin-top:0">Basic information</h2>
+
+      <div class="field-group">
+        <label class="field-label" for="fieldHqName">HQ name</label>
+        <input id="fieldHqName" class="field-input" type="text" value="Roll'd Australia HQ" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Company</label>
+        <div class="field-val">Roll'd Australia Pty Ltd</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="fieldAddr1">Address</label>
+        <input id="fieldAddr1" class="field-input" type="text" value="Level 4, 580 Collins Street" style="margin-bottom:8px" />
+        <input class="field-input" type="text" placeholder="Address Line 2 (optional)" style="margin-bottom:8px" />
+        <div class="form-row">
+          <div class="field-group"><input class="field-input" type="text" value="Melbourne" /></div>
+          <div class="field-group"><input class="field-input" type="text" value="VIC 3000" /></div>
+        </div>
+        <select class="field-select">
+          <option selected>Australia</option>
+          <option>Singapore</option>
+          <option>Malaysia</option>
+          <option>Indonesia</option>
+          <option>Thailand</option>
+          <option>Hong Kong</option>
+          <option>United Kingdom</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="fieldEmail">Email</label>
+        <input id="fieldEmail" class="field-input" type="email" value="admin@rolld.com.au" />
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:4px;margin-bottom:4px">
+        <button class="btn btn-primary" onclick="this.textContent='Saved ✓';setTimeout(()=>this.textContent='Save changes',1800)">Save changes</button>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Subscription -->
+      <h2 class="section-heading">Subscription</h2>
+
+      <div class="field-group" style="margin-bottom:0">
+        <label class="field-label">Add-ons</label>
+        <div class="addons-grid">
+          <div class="addon-item"><span class="addon-dot on"></span>Invoice processing</div>
+          <div class="addon-item"><span class="addon-dot on"></span>3-way match</div>
+          <div class="addon-item"><span class="addon-dot on"></span>Inventory tracking</div>
+          <div class="addon-item"><span class="addon-dot on"></span>AI features</div>
+          <div class="addon-item"><span class="addon-dot on"></span>Retail POS</div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Outlet groups -->
+      <h2 class="section-heading">Outlet groups</h2>
+
+      <div class="field-group">
+        <label class="field-label">Total outlets</label>
+        <div class="field-val">88 outlets</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Outlet groups</label>
+        <div class="field-val">NSW Metro, VIC Central, QLD Coastal, WA Metro, SA Regional, TAS Island</div>
+        <span class="field-hint">6 groups · Outlet group structure is managed by your Nomni administrator.</span>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<script>
+  document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', function() {
+    document.getElementById('userMenu').classList.remove('open');
+  });
+
+  document.getElementById('outletModeBtn').addEventListener('click', function() {
+    window.location.href = 'Procure - Dashboard.html';
+  });
+
+  (function() {
+    var btn = document.getElementById('sidebarHqBtn');
+    var dd = document.getElementById('sidebarHqDropdown');
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      dd.classList.toggle('open');
+      btn.classList.toggle('open');
+    });
+    document.querySelectorAll('.sidebar-hq-option').forEach(function(opt) {
+      opt.addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.querySelectorAll('.sidebar-hq-option').forEach(function(o){ o.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById('sidebarHqName').textContent = this.textContent.trim();
+        dd.classList.remove('open');
+        btn.classList.remove('open');
+      });
+    });
+    document.addEventListener('click', function() {
+      dd.classList.remove('open');
+      btn.classList.remove('open');
+    });
+  })();
+</script>
+</body>
+</html>

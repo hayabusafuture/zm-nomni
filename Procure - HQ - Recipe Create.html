@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procure — HQ · New recipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --seaweed: #0E3727;
+    --nomni-green: #2AC864;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42,200,100,0.14);
+    --sidebar-text: #1a1f2b;
+    --ink: #1a1f2b;
+    --ink-2: #1a1f2b;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+    --primary: #2AC864;
+    --row-hover: #f7f8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  .app { display: grid; grid-template-columns: 232px 1fr; grid-template-rows: 56px 1fr; min-height: 100vh; }
+
+  /* Topbar */
+  .topbar { grid-column: 1/-1; grid-row: 1; background: #1f2226; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #000; position: sticky; top: 0; z-index: 5; }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; }
+  .brand-sub { color: var(--nomni-green); font-weight: 400; font-size: 23px; font-family: "Hanken Grotesk", sans-serif; line-height: 1; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #7F6AD0; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; font-family: "Hanken Grotesk", sans-serif; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
+  .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
+  .font-inspector-btn { background: transparent; border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.6); cursor: pointer; display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: monospace; }
+
+  /* Sidebar */
+  .sidebar { grid-column: 1; grid-row: 2; background: var(--sidebar-bg); display: flex; flex-direction: column; position: sticky; top: 56px; height: calc(100vh - 56px); }
+  .nav { margin-top: 12px; padding: 6px 10px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; color: var(--sidebar-text); text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav a .ms-icon { font-size: 18px; line-height: 1; flex: 0 0 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #888; transition: color .15s; }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a:hover .ms-icon { color: #888; }
+  .nav a.active { background: var(--sidebar-item-active); color: var(--seaweed); font-weight: 600; }
+  .nav a.active .ms-icon { color: var(--spinach); }
+  .nav-label { line-height: 1; }
+  .sidebar-foot { padding: 16px; }
+  .help-fab { width: 44px; height: 44px; border-radius: 50%; background: #6c4df2; display: grid; place-items: center; color: #fff; box-shadow: 0 6px 18px rgba(108,77,242,.4); }
+
+  /* Mode switcher */
+  .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
+  .sidebar-mode-pill { display: flex; background: rgba(0,0,0,.07); border-radius: 8px; padding: 3px; gap: 2px; }
+  .sidebar-mode-opt { flex: 1; background: transparent; border: none; color: var(--ink-mute); font-family: inherit; font-size: 13px; font-weight: 500; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  .sidebar-mode-opt:not(.active):hover { color: var(--ink); }
+
+  /* HQ selector */
+  .sidebar-hq-select { margin: 8px 0 2px; position: relative; }
+  .sidebar-hq-btn { width: 100%; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); cursor: pointer; transition: border-color .13s; text-align: left; }
+  .sidebar-hq-btn:hover { border-color: #b0b4bc; }
+  .sidebar-hq-btn.open { border-color: var(--nomni-green); }
+  .sidebar-hq-btn-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-hq-dropdown { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 50; overflow: hidden; display: none; }
+  .sidebar-hq-dropdown.open { display: block; }
+  .sidebar-hq-option { padding: 9px 12px; font-size: 13px; color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: background .1s; }
+  .sidebar-hq-option:hover { background: #f0fdf5; }
+  .sidebar-hq-option.active { font-weight: 600; color: var(--seaweed); }
+  .sidebar-hq-option.active::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--nomni-green); display: block; }
+
+  /* Main */
+  .main { grid-column: 2; grid-row: 2; padding: 32px 40px 56px; min-width: 0; background: #fff; }
+
+  /* Breadcrumb */
+  .breadcrumb { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+  .breadcrumb a { color: var(--spinach); font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+  .breadcrumb a:hover { color: var(--seaweed); }
+  .breadcrumb-sep { color: var(--ink-soft); font-size: 13px; }
+  .breadcrumb-current { color: var(--ink-mute); font-size: 13px; }
+
+  /* Title row */
+  .recipe-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+  .recipe-title-left { display: flex; align-items: center; gap: 10px; }
+  .hq-badge { display: inline-flex; align-items: center; background: var(--seaweed); color: var(--nomni-green); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 5px; flex-shrink: 0; }
+  .recipe-name-input { font-size: 22px; font-weight: 700; color: var(--ink); border: none; outline: none; background: transparent; letter-spacing: -0.02em; padding: 0; font-family: inherit; width: 360px; }
+  .recipe-name-input:focus { border-bottom: 2px solid var(--nomni-green); }
+  .recipe-name-input::placeholder { color: var(--ink-soft); }
+  .recipe-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+  /* Buttons */
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border: none; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px 20px; border-radius: 6px; transition: background .13s; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary:hover { background: #22b055; }
+  .btn-ghost { background: none; border: 1px solid #d0d2d8; color: var(--ink); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 7px 14px; border-radius: 6px; transition: background .13s, border-color .13s; white-space: nowrap; }
+  .btn-ghost:hover { background: #f3f4f6; border-color: #b0b2b8; }
+
+  /* Layout */
+  .recipe-layout { display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: start; }
+
+  /* Form fields */
+  .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+  .field-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .field-hint { font-size: 12px; color: var(--ink-mute); }
+  .field-input { width: 100%; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input::placeholder { color: var(--ink-mute); }
+  .yield-row { display: flex; align-items: center; gap: 8px; }
+  .yield-input { width: 80px; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; text-align: center; transition: border-color .13s; }
+  .yield-input:focus { border-color: var(--nomni-green); }
+  .yield-unit-select { padding: 9px 28px 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; }
+  .yield-eq { color: var(--ink-mute); font-size: 14px; }
+  .yield-amount { width: 60px; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; text-align: center; }
+  .subrec-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 18px; font-size: 13px; color: var(--ink-mute); padding: 10px 12px; background: #fafafa; border: 1px solid var(--rule); border-radius: 6px; }
+  .subrec-row input[type="checkbox"] { accent-color: var(--nomni-green); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
+  .subrec-row .warn-txt { color: #c02020; font-weight: 600; }
+
+  /* Applies-to */
+  .applies-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .applies-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 8px; border-radius: 20px; border: 1px solid #dcdee3; background: #fff; font-size: 12px; font-weight: 500; cursor: pointer; user-select: none; transition: all .15s; color: var(--ink-mute); }
+  .applies-chip.active { border-color: #a8e6be; background: #f0fdf5; color: var(--seaweed); font-weight: 600; }
+  .applies-chip .chip-dot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid #ccc; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
+  .applies-chip.active .chip-dot { background: var(--nomni-green); border-color: var(--nomni-green); }
+  .chip-check-svg { display: none; }
+  .applies-chip.active .chip-check-svg { display: block; }
+
+  /* Ingredients table */
+  .ing-section-head { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .ingredients-table-wrap { overflow-x: auto; margin-bottom: 12px; }
+  table.ing-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  .ing-table thead th { text-align: left; font-weight: 600; color: var(--ink-mute); padding: 10px 12px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fafafa; font-size: 12px; white-space: nowrap; }
+  .ing-table thead th.r { text-align: right; }
+  .ing-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: middle; background: #fff; }
+  .ing-table tbody tr:hover td { background: var(--row-hover); }
+  .col-del { width: 32px; padding-right: 4px !important; }
+  .col-ingname { min-width: 210px; }
+  .col-qty { width: 80px; }
+  .col-unit { width: 110px; }
+  .col-uprice { width: 90px; }
+  .col-amount { width: 80px; }
+  .ing-name { font-weight: 500; color: var(--ink); }
+  .ing-supplier { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+  .ing-avail-warn { font-size: 11px; color: #b35e00; margin-top: 3px; display: flex; align-items: center; gap: 4px; font-weight: 500; }
+  .ing-input { width: 100%; padding: 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; text-align: right; outline: none; transition: border-color .13s; }
+  .ing-input:focus { border-color: var(--nomni-green); }
+  .ing-unit-select { width: 100%; padding: 5px 22px 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 6px center; }
+  .amount-val { font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right; display: block; }
+  .uprice-val { font-variant-numeric: tabular-nums; color: var(--ink-mute); text-align: right; display: block; }
+  .del-btn { background: none; border: none; cursor: pointer; color: var(--ink-soft); display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; transition: background .12s, color .12s; }
+  .del-btn:hover { background: #fde8e8; color: #c02020; }
+  .ing-actions { display: flex; align-items: center; gap: 8px; padding-top: 4px; }
+  .ing-add-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: 1px dashed #c0c2c8; border-radius: 6px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-mute); cursor: pointer; padding: 8px 14px; transition: border-color .13s, color .13s; }
+  .ing-add-btn:hover { border-color: var(--spinach); color: var(--spinach); }
+  .ing-copy-btn { background: none; border: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--spinach); cursor: pointer; padding: 8px 10px; border-radius: 6px; transition: background .12s; }
+  .ing-copy-btn:hover { background: #f0faf3; }
+
+  /* Right sidebar */
+  .recipe-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 80px; }
+  .cost-card { border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; background: #fafcfa; }
+  .cost-card-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 10px; }
+  .cost-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .cost-row:last-child { margin-bottom: 0; }
+  .cost-key { font-size: 13px; color: var(--ink-mute); }
+  .cost-big { font-size: 18px; font-weight: 700; color: var(--spinach); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .cost-unit-val { font-size: 14px; font-weight: 600; color: var(--spinach); font-variant-numeric: tabular-nums; }
+  .cost-unit-desc { font-size: 11px; color: var(--ink-mute); }
+  .retail-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--rule); }
+  .retail-label { font-size: 12px; color: var(--ink-mute); flex: 1; }
+  .retail-input { width: 80px; padding: 5px 8px; border: 1px solid #dcdee3; border-radius: 5px; font: inherit; font-size: 13px; text-align: right; outline: none; transition: border-color .13s; }
+  .retail-input:focus { border-color: var(--nomni-green); }
+  .cooking-card { border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .cooking-card-label { font-size: 12px; font-weight: 600; color: var(--ink-mute); padding: 12px 14px 8px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; }
+  .cooking-char-count { font-size: 11px; font-weight: 400; color: var(--ink-soft); }
+  .cooking-textarea { width: 100%; border: none; outline: none; font: inherit; font-size: 13px; color: var(--ink); padding: 12px 14px; resize: none; min-height: 140px; background: #fff; }
+  .cooking-textarea::placeholder { color: var(--ink-soft); }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: flex-start; justify-content: center; padding-top: 64px; }
+  .modal-overlay.open { display: flex; }
+  .modal-card { background: #fff; border-radius: 12px; width: 620px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); max-height: calc(100vh - 96px); display: flex; flex-direction: column; overflow: hidden; }
+  .modal-header { padding: 22px 24px 16px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+  .modal-title { font-size: 18px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 4px; }
+  .modal-subtitle { font-size: 13px; color: var(--ink-mute); margin: 0; }
+  .modal-body { padding: 16px 24px 4px; overflow-y: auto; flex: 1; }
+  .modal-foot { padding: 14px 24px 18px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+
+  /* Conflict group cards */
+  .conflict-group { border: 1px solid var(--rule); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .conflict-group-head { padding: 11px 14px; background: #fafafa; border-bottom: 1px solid var(--rule); display: flex; align-items: baseline; gap: 10px; }
+  .conflict-group-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .conflict-group-sub { font-size: 12px; color: var(--ink-mute); }
+  .conflict-missing { display: flex; flex-wrap: wrap; gap: 5px; padding: 10px 14px; border-bottom: 1px solid var(--rule); background: #fffdf8; }
+  .conflict-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #b35e00; background: #fff8ee; border: 1px solid #f5d9a8; border-radius: 4px; padding: 3px 8px; }
+  .conflict-resolutions { padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 2px; }
+  .res-option { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 6px; cursor: pointer; transition: background .1s; }
+  .res-option:hover { background: #f7f8fa; }
+  .res-option input[type="radio"] { margin-top: 2px; accent-color: var(--nomni-green); cursor: pointer; flex-shrink: 0; }
+  .res-label { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .res-desc { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+
+  /* User menu */
+  .user-wrap { position: relative; }
+  .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 248px; background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08); display: none; z-index: 200; overflow: hidden; }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 14px; color: var(--ink); text-decoration: none; cursor: pointer; transition: background .1s; white-space: nowrap; }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item.logout { color: #e53535; }
+  .user-menu-item.supplier-hub { color: #1a6fcc; font-weight: 500; }
+
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { position: fixed; top: 56px; left: 0; width: 64px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
+    .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); }
+    .main { min-width: 900px; }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label, .sidebar .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .warn-icon { display: inline-flex; }
+    .sidebar .mode-label { display: none; }
+    .sidebar:hover .mode-label { display: inline; }
+    .sidebar:not(:hover) .sidebar-hq-select { display: none; }
+    .sidebar:hover .sidebar-hq-select { display: block; }
+  }
+  .nav .warn-icon { margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; height: 18px; align-self: center; }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Procure</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="font-inspector-btn" title="Font inspector">Aa</button>
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span> Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn">
+          <div class="avatar">WA</div>
+          <span>William Arya</span>
+          <span class="chev"></span>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya (Zeemart)</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Supply - Dashboard.html" class="user-menu-item supplier-hub"><span class="material-symbols-outlined" style="font-size:16px;line-height:1">open_in_new</span>Use Nomni Supply</a>
+            <a href="#" class="user-menu-item"><span class="material-symbols-outlined" style="font-size:16px;line-height:1;color:var(--ink-mute)">settings</span>Settings</a>
+            <a href="#" class="user-menu-item">Change password</a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="Procure - Login.html" class="user-menu-item logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-mode-wrap">
+      <div class="sidebar-mode-pill">
+        <button class="sidebar-mode-opt" id="outletModeBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="mode-label">Outlet</span>
+        </button>
+        <button class="sidebar-mode-opt active">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 21V7M8 21V7M2 12h20"/><path d="M9 3h6l2 4H7z"/></svg>
+          <span class="mode-label">HQ</span>
+        </button>
+      </div>
+      <div class="sidebar-hq-select">
+        <button class="sidebar-hq-btn" id="sidebarHqBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-mute)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-hq-btn-name" id="sidebarHqName">Roll'd Australia HQ</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="color:var(--ink-mute)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="sidebar-hq-dropdown" id="sidebarHqDropdown">
+          <div class="sidebar-hq-option active">Roll'd Australia HQ</div>
+          <div class="sidebar-hq-option">Liven Group HQ</div>
+          <div class="sidebar-hq-option">Shake Shack SG HQ</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="Procure - HQ - Dashboard.html"><span class="ms-icon material-symbols-outlined">dashboard</span><span class="nav-label">Dashboard</span></a>
+      <a href="Procure - HQ - Market Lists.html"><span class="ms-icon material-symbols-outlined">list_alt</span><span class="nav-label">Items</span><span class="warn-icon"><img src="error_24dp_1F1F1F 1.png" width="18" height="18" alt=""></span></a>
+      <a href="Procure - HQ - Recipe Library.html" class="active"><span class="ms-icon material-symbols-outlined">menu_book</span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="ms-icon material-symbols-outlined">inventory</span><span class="nav-label">Inventory</span></a>
+      <a href="#"><span class="ms-icon material-symbols-outlined">point_of_sale</span><span class="nav-label">POS mapping</span></a>
+      <a href="Procure - HQ - Activity Log.html"><span class="ms-icon material-symbols-outlined">history</span><span class="nav-label">Activity log</span></a>
+      <a href="Procure - HQ - Settings.html" style="margin-top:4px;border-top:1px solid var(--rule);padding-top:10px"><span class="ms-icon material-symbols-outlined">settings</span><span class="nav-label">Settings</span></a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/><path d="M12 8v5l3 2"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="breadcrumb">
+      <a href="Procure - HQ - Recipe Library.html">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Recipes
+      </a>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-current">New recipe</span>
+    </div>
+
+    <div class="recipe-title-row">
+      <div class="recipe-title-left">
+        <span class="hq-badge">HQ</span>
+        <input type="text" class="recipe-name-input" placeholder="Recipe name" value="Char Siu Pork Rice Bowl" />
+      </div>
+      <div class="recipe-actions">
+        <button class="btn-ghost">Save &amp; create another</button>
+        <button class="btn-primary" id="saveBtn">Save</button>
+      </div>
+    </div>
+
+    <div class="recipe-layout">
+
+      <!-- Left -->
+      <div>
+
+        <div class="field-group">
+          <label class="field-label">Yield</label>
+          <div class="yield-row">
+            <input type="number" class="yield-input" value="1" min="0" step="0.01" />
+            <select class="yield-unit-select">
+              <option>portion</option>
+              <option>unit</option>
+              <option>kg</option>
+              <option>batch</option>
+            </select>
+            <span class="yield-eq">=</span>
+            <input type="number" class="yield-amount" value="1" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <div class="subrec-row">
+          <input type="checkbox" id="subrecCheck" />
+          <label for="subrecCheck" style="cursor:pointer">Make this a sub-recipe (can be nested inside another recipe as an ingredient) — <span class="warn-txt">cannot be reverted</span></label>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Tags</label>
+          <input type="text" class="field-input" placeholder="Select or type to add" />
+          <span class="field-hint">Group recipes by category, e.g. Main Course, Dessert, Sides</span>
+        </div>
+
+        <!-- Applies to -->
+        <div class="field-group" style="margin-bottom:22px">
+          <label class="field-label">Applies to</label>
+          <span class="field-hint" style="margin-bottom:8px">Select which outlet groups this recipe is for. Ingredient availability is checked per group.</span>
+          <div class="applies-chips" id="appliesChips">
+            <button class="applies-chip active" data-group="nsw" type="button">
+              <span class="chip-dot"><svg class="chip-check-svg" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              NSW Metro
+            </button>
+            <button class="applies-chip active" data-group="vic" type="button">
+              <span class="chip-dot"><svg class="chip-check-svg" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              VIC Central
+            </button>
+            <button class="applies-chip active" data-group="qld" type="button">
+              <span class="chip-dot"><svg class="chip-check-svg" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              QLD Coastal
+            </button>
+            <button class="applies-chip active" data-group="wa" type="button">
+              <span class="chip-dot"><svg class="chip-check-svg" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              WA Metro
+            </button>
+            <button class="applies-chip active" data-group="sa" type="button">
+              <span class="chip-dot"><svg class="chip-check-svg" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              SA Regional
+            </button>
+            <button class="applies-chip active" data-group="tas" type="button">
+              <span class="chip-dot"><svg class="chip-check-svg" width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1 3 3 5 7 1" stroke="#0E3727" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              TAS Island
+            </button>
+          </div>
+        </div>
+
+        <!-- Ingredients -->
+        <div>
+          <div class="ing-section-head">Ingredients</div>
+          <div class="ingredients-table-wrap">
+            <table class="ing-table">
+              <thead>
+                <tr>
+                  <th class="col-del"></th>
+                  <th class="col-ingname">Name</th>
+                  <th class="col-qty">Recipe Qty</th>
+                  <th class="col-unit">Unit</th>
+                  <th class="col-uprice r">Unit price</th>
+                  <th class="col-amount r">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="ingBody">
+
+                <!-- Char Siu Pork — all groups OK -->
+                <tr>
+                  <td><button class="del-btn" type="button" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Char Siu Pork 2kg</div>
+                    <div class="ing-supplier">PFD Food Services Pty Ltd</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="1" /></td>
+                  <td><select class="ing-unit-select"><option>kg</option><option>unit</option><option>g</option></select></td>
+                  <td><span class="uprice-val">A$14.20</span></td>
+                  <td><span class="amount-val">A$14.20</span></td>
+                </tr>
+
+                <!-- Jasmine Rice — all groups OK -->
+                <tr>
+                  <td><button class="del-btn" type="button" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Jasmine Rice 10kg</div>
+                    <div class="ing-supplier">Horizons Supply Pty Ltd</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="0.2" /></td>
+                  <td><select class="ing-unit-select"><option>kg</option><option>g</option><option>bag</option></select></td>
+                  <td><span class="uprice-val">A$2.60</span></td>
+                  <td><span class="amount-val">A$0.52</span></td>
+                </tr>
+
+                <!-- Fresh Ginger — NOT in SA, TAS -->
+                <tr data-ing="ginger">
+                  <td><button class="del-btn" type="button" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Fresh Ginger Root 1kg</div>
+                    <div class="ing-supplier">Sydney Direct Herbs Produce Pty Ltd</div>
+                    <div class="ing-avail-warn" id="avail-ginger">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      <span>Not available in: SA Regional, TAS Island</span>
+                    </div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="0.02" /></td>
+                  <td><select class="ing-unit-select"><option>kg</option><option>g</option><option>unit</option></select></td>
+                  <td><span class="uprice-val">A$4.80</span></td>
+                  <td><span class="amount-val">A$0.10</span></td>
+                </tr>
+
+                <!-- Chinese Five Spice — NOT in TAS -->
+                <tr data-ing="fivespice">
+                  <td><button class="del-btn" type="button" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Chinese Five Spice Powder 500g</div>
+                    <div class="ing-supplier">Parisi Bakery</div>
+                    <div class="ing-avail-warn" id="avail-fivespice">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      <span>Not available in: TAS Island</span>
+                    </div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="0.005" /></td>
+                  <td><select class="ing-unit-select"><option>kg</option><option>g</option><option>unit</option></select></td>
+                  <td><span class="uprice-val">A$18.50</span></td>
+                  <td><span class="amount-val">A$0.09</span></td>
+                </tr>
+
+                <!-- Bok Choy — all groups OK -->
+                <tr>
+                  <td><button class="del-btn" type="button" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Bok Choy 5kg</div>
+                    <div class="ing-supplier">Sydney Direct Herbs Produce Pty Ltd</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="0.12" /></td>
+                  <td><select class="ing-unit-select"><option>kg</option><option>g</option><option>bunch</option></select></td>
+                  <td><span class="uprice-val">A$3.20</span></td>
+                  <td><span class="amount-val">A$0.38</span></td>
+                </tr>
+
+                <!-- Oyster Sauce Premium — NOT in WA -->
+                <tr data-ing="oyster">
+                  <td><button class="del-btn" type="button" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Oyster Sauce Premium 5L</div>
+                    <div class="ing-supplier">Horizons Supply Pty Ltd</div>
+                    <div class="ing-avail-warn" id="avail-oyster">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      <span>Not available in: WA Metro</span>
+                    </div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="0.01" /></td>
+                  <td><select class="ing-unit-select"><option>L</option><option>ml</option><option>unit</option></select></td>
+                  <td><span class="uprice-val">A$5.40</span></td>
+                  <td><span class="amount-val">A$0.05</span></td>
+                </tr>
+
+                <!-- Sesame Oil — all groups OK -->
+                <tr>
+                  <td><button class="del-btn" type="button" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button></td>
+                  <td>
+                    <div class="ing-name">Sesame Oil 1L</div>
+                    <div class="ing-supplier">PFD Food Services Pty Ltd</div>
+                  </td>
+                  <td><input type="number" class="ing-input" value="0.005" /></td>
+                  <td><select class="ing-unit-select"><option>L</option><option>ml</option><option>unit</option></select></td>
+                  <td><span class="uprice-val">A$8.90</span></td>
+                  <td><span class="amount-val">A$0.04</span></td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+          <div class="ing-actions">
+            <button class="ing-add-btn" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Add ingredient
+            </button>
+            <button class="ing-copy-btn" type="button">Copy data from…</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right sidebar -->
+      <div class="recipe-sidebar">
+        <div class="cost-card">
+          <div class="cost-card-label">Cost summary</div>
+          <div class="cost-row">
+            <span class="cost-key">Recipe cost</span>
+            <span class="cost-big">A$15.38</span>
+          </div>
+          <div class="cost-row" style="align-items:flex-start">
+            <span class="cost-key">Cost per portion</span>
+            <div style="text-align:right">
+              <div class="cost-unit-val">A$15.38</div>
+              <div class="cost-unit-desc">per portion</div>
+            </div>
+          </div>
+          <div class="retail-row">
+            <span class="retail-label">Retail price</span>
+            <div style="display:flex;align-items:center;gap:4px">
+              <span style="font-size:12px;color:var(--ink-mute)">A$</span>
+              <input type="number" class="retail-input" placeholder="0.00" />
+            </div>
+          </div>
+        </div>
+
+        <div class="cooking-card">
+          <div class="cooking-card-label">
+            Cooking instructions
+            <span class="cooking-char-count" id="charCount">0/1500</span>
+          </div>
+          <textarea class="cooking-textarea" id="cookingTA" maxlength="1500" placeholder="Add step-by-step cooking instructions…" rows="7"></textarea>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Conflict resolution modal -->
+<div class="modal-overlay" id="conflictModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Review availability gaps</h2>
+      <p class="modal-subtitle" id="modalSubtitle">Some outlet groups can't make this recipe as written. Choose how to handle each before saving.</p>
+    </div>
+    <div class="modal-body" id="modalBody">
+
+      <!-- SA Regional -->
+      <div class="conflict-group" id="cg-sa" style="display:none">
+        <div class="conflict-group-head">
+          <span class="conflict-group-name">SA Regional</span>
+          <span class="conflict-group-sub" id="cg-sa-sub"></span>
+        </div>
+        <div class="conflict-missing" id="cg-sa-chips"></div>
+        <div class="conflict-resolutions">
+          <label class="res-option">
+            <input type="radio" name="res-sa" value="variation" checked />
+            <div>
+              <div class="res-label">Create a variation for this group</div>
+              <div class="res-desc">A separate version of this recipe will be set up for SA Regional with substitute ingredients</div>
+            </div>
+          </label>
+          <label class="res-option">
+            <input type="radio" name="res-sa" value="exclude" />
+            <div>
+              <div class="res-label">Exclude this group</div>
+              <div class="res-desc">Recipe won't appear for any outlets in SA Regional</div>
+            </div>
+          </label>
+          <label class="res-option">
+            <input type="radio" name="res-sa" value="flag" />
+            <div>
+              <div class="res-label">Flag for group manager to resolve</div>
+              <div class="res-desc">Recipe saves as unresolved for SA Regional — group manager will be notified</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- TAS Island -->
+      <div class="conflict-group" id="cg-tas" style="display:none">
+        <div class="conflict-group-head">
+          <span class="conflict-group-name">TAS Island</span>
+          <span class="conflict-group-sub" id="cg-tas-sub"></span>
+        </div>
+        <div class="conflict-missing" id="cg-tas-chips"></div>
+        <div class="conflict-resolutions">
+          <label class="res-option">
+            <input type="radio" name="res-tas" value="variation" checked />
+            <div>
+              <div class="res-label">Create a variation for this group</div>
+              <div class="res-desc">A separate version of this recipe will be set up for TAS Island with substitute ingredients</div>
+            </div>
+          </label>
+          <label class="res-option">
+            <input type="radio" name="res-tas" value="exclude" />
+            <div>
+              <div class="res-label">Exclude this group</div>
+              <div class="res-desc">Recipe won't appear for any outlets in TAS Island</div>
+            </div>
+          </label>
+          <label class="res-option">
+            <input type="radio" name="res-tas" value="flag" />
+            <div>
+              <div class="res-label">Flag for group manager to resolve</div>
+              <div class="res-desc">Recipe saves as unresolved for TAS Island — group manager will be notified</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- WA Metro -->
+      <div class="conflict-group" id="cg-wa" style="display:none">
+        <div class="conflict-group-head">
+          <span class="conflict-group-name">WA Metro</span>
+          <span class="conflict-group-sub" id="cg-wa-sub"></span>
+        </div>
+        <div class="conflict-missing" id="cg-wa-chips"></div>
+        <div class="conflict-resolutions">
+          <label class="res-option">
+            <input type="radio" name="res-wa" value="variation" checked />
+            <div>
+              <div class="res-label">Create a variation for this group</div>
+              <div class="res-desc">A separate version of this recipe will be set up for WA Metro with a substitute ingredient</div>
+            </div>
+          </label>
+          <label class="res-option">
+            <input type="radio" name="res-wa" value="exclude" />
+            <div>
+              <div class="res-label">Exclude this group</div>
+              <div class="res-desc">Recipe won't appear for any outlets in WA Metro</div>
+            </div>
+          </label>
+          <label class="res-option">
+            <input type="radio" name="res-wa" value="flag" />
+            <div>
+              <div class="res-label">Flag for group manager to resolve</div>
+              <div class="res-desc">Recipe saves as unresolved for WA Metro — group manager will be notified</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="modalBackBtn" type="button">Back to editing</button>
+      <button class="btn-primary" id="modalSaveBtn" type="button">Save recipe</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Ingredient availability data ──────────────────────────────────────────
+  // key → { groups that DON'T have it, ingredient display name }
+  const ING_AVAIL = {
+    ginger:    { missing: ['sa', 'tas'], name: 'Fresh Ginger Root 1kg' },
+    fivespice: { missing: ['tas'],       name: 'Chinese Five Spice Powder 500g' },
+    oyster:    { missing: ['wa'],        name: 'Oyster Sauce Premium 5L' }
+  };
+
+  const GROUP_META = {
+    nsw: { name: 'NSW Metro',   outlets: 8 },
+    vic: { name: 'VIC Central', outlets: 14 },
+    qld: { name: 'QLD Coastal', outlets: 19 },
+    wa:  { name: 'WA Metro',    outlets: 12 },
+    sa:  { name: 'SA Regional', outlets: 31 },
+    tas: { name: 'TAS Island',  outlets: 4 }
+  };
+
+  // ── Applies-to chip toggles ───────────────────────────────────────────────
+  document.querySelectorAll('.applies-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      this.classList.toggle('active');
+      refreshAvailWarnings();
+    });
+  });
+
+  function getActiveGroups() {
+    return new Set(
+      Array.from(document.querySelectorAll('.applies-chip.active')).map(c => c.dataset.group)
+    );
+  }
+
+  function refreshAvailWarnings() {
+    const active = getActiveGroups();
+    Object.entries(ING_AVAIL).forEach(([key, data]) => {
+      const el = document.getElementById('avail-' + key);
+      if (!el) return;
+      const row = el.closest('tr');
+      if (!row || !row.parentNode) return; // row deleted
+      const relevant = data.missing.filter(g => active.has(g));
+      if (relevant.length === 0) {
+        el.style.display = 'none';
+      } else {
+        el.style.display = 'flex';
+        el.querySelector('span').textContent = 'Not available in: ' + relevant.map(g => GROUP_META[g].name).join(', ');
+      }
+    });
+  }
+
+  // ── Delete ingredient rows ────────────────────────────────────────────────
+  document.getElementById('ingBody').addEventListener('click', function(e) {
+    const btn = e.target.closest('.del-btn');
+    if (btn) { btn.closest('tr').remove(); refreshAvailWarnings(); }
+  });
+
+  // ── Cooking instructions char count ──────────────────────────────────────
+  const ta = document.getElementById('cookingTA');
+  const cc = document.getElementById('charCount');
+  ta.addEventListener('input', () => { cc.textContent = ta.value.length + '/1500'; });
+
+  // ── Save → compute conflicts → open modal or navigate ────────────────────
+  function computeConflicts() {
+    const active = getActiveGroups();
+    const conflicts = {}; // group → [ingredient names]
+
+    Object.entries(ING_AVAIL).forEach(([key, data]) => {
+      const avEl = document.getElementById('avail-' + key);
+      if (!avEl) return; // ingredient row was deleted
+      const row = avEl.closest('tr');
+      if (!row || !row.parentNode) return;
+      data.missing.forEach(g => {
+        if (!active.has(g)) return;
+        if (!conflicts[g]) conflicts[g] = [];
+        conflicts[g].push(data.name);
+      });
+    });
+    return conflicts;
+  }
+
+  function chipHTML(name) {
+    return `<span class="conflict-chip"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>${name}</span>`;
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', function() {
+    const conflicts = computeConflicts();
+    const conflictGroups = Object.keys(conflicts);
+    if (conflictGroups.length === 0) {
+      window.location.href = 'Procure - HQ - Recipe Library.html';
+      return;
+    }
+
+    // Populate and show relevant conflict cards
+    ['sa', 'tas', 'wa'].forEach(g => {
+      const card = document.getElementById('cg-' + g);
+      const items = conflicts[g];
+      if (items && items.length) {
+        card.style.display = '';
+        document.getElementById('cg-' + g + '-sub').textContent =
+          GROUP_META[g].outlets + ' outlets · ' + items.length + ' ingredient' + (items.length > 1 ? 's' : '') + ' missing';
+        document.getElementById('cg-' + g + '-chips').innerHTML = items.map(chipHTML).join('');
+        // Reset radio to default
+        const radios = card.querySelectorAll('input[type="radio"]');
+        radios.forEach((r, i) => { r.checked = i === 0; });
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    const n = conflictGroups.length;
+    document.getElementById('modalSubtitle').textContent =
+      n + ' outlet group' + (n > 1 ? 's' : '') + ' can\'t make this recipe as written. Choose how to handle each before saving.';
+
+    document.getElementById('conflictModal').classList.add('open');
+  });
+
+  document.getElementById('modalBackBtn').addEventListener('click', function() {
+    document.getElementById('conflictModal').classList.remove('open');
+  });
+
+  document.getElementById('modalSaveBtn').addEventListener('click', function() {
+    window.location.href = 'Procure - HQ - Recipe Library.html';
+  });
+
+  // Close modal on overlay click
+  document.getElementById('conflictModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+
+  // ── User menu ─────────────────────────────────────────────────────────────
+  document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('open');
+  });
+  document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
+
+  // ── Sidebar HQ selector ───────────────────────────────────────────────────
+  (function() {
+    var btn = document.getElementById('sidebarHqBtn');
+    var dd  = document.getElementById('sidebarHqDropdown');
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation(); dd.classList.toggle('open'); btn.classList.toggle('open');
+    });
+    document.querySelectorAll('.sidebar-hq-option').forEach(function(opt) {
+      opt.addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.querySelectorAll('.sidebar-hq-option').forEach(o => o.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('sidebarHqName').textContent = this.textContent.trim();
+        dd.classList.remove('open'); btn.classList.remove('open');
+      });
+    });
+    document.addEventListener('click', () => { dd.classList.remove('open'); btn.classList.remove('open'); });
+  })();
+
+  document.getElementById('outletModeBtn').addEventListener('click', () => {
+    window.location.href = 'Procure - Dashboard.html';
+  });
+</script>
+</body>
+</html>

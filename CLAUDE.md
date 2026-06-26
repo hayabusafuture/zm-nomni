@@ -561,6 +561,14 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Procure — HQ · Settings: Procure - HQ - Settings.html
+- Procure — HQ · New recipe: Procure - HQ - Recipe Create.html
+- Procure — HQ · Outlet Group Settings: Procure - HQ - Outlet Group Settings.html
+- Procure — HQ · NSW Metro: Procure - HQ - Edit Outlet Group.html
+- Procure — HQ · Create Outlet Group: Procure - HQ - Create Outlet Group.html
+- Procure — HQ · Activity Log: Procure - HQ - Activity Log.html
+- Admin — New recipe · Garden Cuisine HQ: Admin - HQ Recipe Create - New.html
+- Admin — Add Supplier: Admin - Add Supplier.html
 - Admin — Recipe · BBQ Baby Back Pork Ribs with House Sauce: Admin - HQ Recipe Create.html
 - Admin — Create Item: Admin - HQ Create Item.html
 - Admin — Chargrill Outlets · Settings: Admin - Outlet Group Settings.html
