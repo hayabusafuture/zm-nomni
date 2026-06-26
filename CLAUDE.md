@@ -561,6 +561,28 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- saved_resource: assets/Users_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Users_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/Users_files/inner.html
+- controller-with-preconnect-b41a457423c9cc45cd9566990215d372: assets/Users_files/controller-with-preconnect-b41a457423c9cc45cd9566990215d372.html
+- Nomni Procure: assets/Users.html
+- saved_resource: assets/User Detail_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/User Detail_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/User Detail_files/inner.html
+- controller-with-preconnect-b41a457423c9cc45cd9566990215d372: assets/User Detail_files/controller-with-preconnect-b41a457423c9cc45cd9566990215d372.html
+- Nomni Procure: assets/User Detail.html
+- saved_resource: assets/Recipes_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Recipes_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/Recipes_files/inner.html
+- controller-with-preconnect-4ba4eceba9ac6550142d8416e64fb10b: assets/Recipes_files/controller-with-preconnect-4ba4eceba9ac6550142d8416e64fb10b.html
+- Nomni Procure: assets/Recipes.html
+- saved_resource: assets/Buyers/create SKU_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Buyers/create SKU_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/Buyers/create SKU_files/inner.html
+- controller-with-preconnect-1ab8249157a00348d9a3714ca1d16fcf: assets/Buyers/create SKU_files/controller-with-preconnect-1ab8249157a00348d9a3714ca1d16fcf.html
+- Nomni Procure: assets/Buyers/create SKU.html
+- Outlet Details | Zeemart Admin: assets/Buyers/Outlet Details _ Zeemart Admin.html
+- BuyerUser | Zeemart Admin: assets/BuyerUser _ Zeemart Admin.html
 - Procure — HQ · Settings: Procure - HQ - Settings.html
 - Procure — HQ · New recipe: Procure - HQ - Recipe Create.html
 - Procure — HQ · Outlet Group Settings: Procure - HQ - Outlet Group Settings.html
