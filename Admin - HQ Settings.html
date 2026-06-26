@@ -885,23 +885,14 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       <div class="panel-label-row">
         <span class="panel-label-text">Recipes <span class="panel-label-count" id="recCount"></span></span>
         <div style="display:flex;align-items:center;gap:8px">
-          <div id="recFcThresholdWidget" style="display:flex;align-items:center;gap:6px">
-            <button id="recFcEditBtn" onclick="editRecFcThreshold()" class="btn-tertiary" style="font-size:13px;padding:8px 12px;display:inline-flex;align-items:center;gap:6px">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-              FC% target: <span id="recFcThresholdDisplay" style="font-weight:700">25%</span>
-            </button>
-          </div>
-          <span id="recFcEditInline" style="display:none;align-items:center;gap:6px;background:#F9FAFB;border:1px solid var(--rule);border-radius:7px;padding:5px 10px">
-            <span style="font-size:13px;color:var(--ink-mute)">FC% target:</span>
-            <input type="number" id="recFcInput" min="1" max="100" value="25" style="width:52px;padding:4px 8px;border:1px solid var(--rule);border-radius:5px;font-size:13px;font-family:inherit;color:var(--ink);text-align:center">
-            <span style="font-size:13px;color:var(--ink-mute)">%</span>
-            <button onclick="saveRecFcThreshold()" style="font-size:12px;font-weight:600;color:#fff;background:var(--seaweed);border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-family:inherit">Save</button>
-            <button onclick="cancelRecFcThreshold()" style="font-size:12px;font-weight:600;color:var(--ink);background:#F3F4F6;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-family:inherit">Cancel</button>
-          </span>
-          <button class="btn-primary">
+          <button onclick="openRecSettings()" class="btn btn-tertiary" style="font-size:13px;padding:8px 12px;display:inline-flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+          </button>
+          <a href="Admin - HQ Recipe Create - New.html" class="btn-primary" style="text-decoration:none">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             Add recipe
-          </button>
+          </a>
         </div>
       </div>
       <div class="ml-filter-row">
@@ -1104,6 +1095,28 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     </div>
 
   </main>
+</div>
+
+<!-- Recipes settings modal -->
+<div class="modal-overlay" id="recSettingsModal" onclick="if(event.target===this)closeRecSettings()">
+  <div class="modal-card" style="width:480px">
+    <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:24px 28px 0">
+      <h2 class="modal-title" style="font-size:22px">Settings</h2>
+      <button onclick="closeRecSettings()" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--spinach);display:flex;align-items:center;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:28px 28px 8px;gap:0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <label style="font-size:14px;font-weight:500;color:var(--ink);white-space:nowrap">Highlight food cost higher than:</label>
+        <input type="number" id="recFcInput" min="1" max="100" value="25" style="width:80px;padding:10px 14px;border:1px solid #DCDEE3;border-radius:6px;font-size:14px;font-family:inherit;color:var(--ink);text-align:center;outline:none" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#DCDEE3'">
+        <span style="font-size:14px;color:var(--ink-mute)">%</span>
+      </div>
+    </div>
+    <div class="modal-foot" style="padding:24px 28px 28px;border-top:none">
+      <button onclick="saveRecSettings()" class="btn btn-primary" style="padding:11px 28px;font-size:14px">Save</button>
+    </div>
+  </div>
 </div>
 
 <!-- Unified item detail modal -->
@@ -2193,8 +2206,9 @@ RECIPES.forEach((r, i) => {
   const g = (i % 5 === 0) ? 1 : 2;
   r.groupList = g === 2 ? REC_GROUPS.slice() : [REC_GROUPS[i % 2]];
   r.outletList = (i % 4 === 1) ? REC_OUTLETS.slice() : (i % 4 === 3) ? [REC_OUTLETS[0]] : [];
-  r.versions = (i === 2 || i === 7 || i === 15 || i === 22 || i === 35) ? 2 : 1;
+  r.versions = (i === 2) ? 7 : (i === 7 || i === 15 || i === 22 || i === 35) ? 2 : 1;
   r.lastUpdated = REC_DATES[i % REC_DATES.length];
+  if (i === 2) r.lastUpdated = '23 Jun 2026';
   r.active = (i % 9 !== 0);
   const fc = REC_FC_TARGETS[r.cat] || 0.30;
   r.price = Math.round(r.cost / fc * 2) / 2;
@@ -2206,21 +2220,18 @@ const REC_PER_PAGE = 20;
 let recSearch = '', recCatFilter = '', recStatusFilter = '', recSortKey = 'default';
 let recFcThreshold = 25;
 
-function editRecFcThreshold() {
+function openRecSettings() {
   document.getElementById('recFcInput').value = recFcThreshold;
-  document.getElementById('recFcThresholdWidget').style.display = 'none';
-  document.getElementById('recFcEditInline').style.display = 'inline-flex';
-  document.getElementById('recFcInput').focus();
+  document.getElementById('recSettingsModal').classList.add('open');
+  setTimeout(() => document.getElementById('recFcInput').focus(), 50);
 }
-function cancelRecFcThreshold() {
-  document.getElementById('recFcThresholdWidget').style.display = '';
-  document.getElementById('recFcEditInline').style.display = 'none';
+function closeRecSettings() {
+  document.getElementById('recSettingsModal').classList.remove('open');
 }
-function saveRecFcThreshold() {
+function saveRecSettings() {
   const v = parseInt(document.getElementById('recFcInput').value, 10);
   if (!isNaN(v) && v >= 1 && v <= 100) recFcThreshold = v;
-  document.getElementById('recFcThresholdDisplay').textContent = recFcThreshold + '%';
-  cancelRecFcThreshold();
+  closeRecSettings();
   renderRec();
   renderHealthCheck();
 }
@@ -2277,10 +2288,10 @@ function renderRec() {
     const grpAttr = 'data-groups="' + r.groupList.join('|') + '" data-outlets="' + r.outletList.join('|') + '"';
     const grpHtml = '<button onclick="openRecGroupsDialog(this)" ' + grpAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + (allGroups ? 'All groups' : accessLabel) + '</button>';
     const versionsHtml = r.versions > 1
-      ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' versions</span>'
+      ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' variations</span>'
       : '';
     return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
-      '<td><div class="ml-item-name">' + r.name + versionsHtml + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
+      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + versionsHtml + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
       '<td><span style="font-size:13px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">sell $' + r.price.toFixed(2) + '</div></td>' +
       '<td><span style="font-size:13px;font-weight:700;color:' + (r.foodCostPct > recFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
       '<td style="text-align:left">' + grpHtml + '</td>' +
@@ -2483,6 +2494,15 @@ function navigateToTab(tab) {
   if (t) t.click();
   window.scrollTo(0, 0);
 }
+
+// Activate tab from URL hash (e.g. #recipes from recipe create back link)
+(function() {
+  var hash = window.location.hash.replace('#', '');
+  if (hash) {
+    var t = document.querySelector('.tab[data-tab="' + hash + '"]');
+    if (t) { t.click(); window.scrollTo(0, 0); }
+  }
+})();
 
 renderActivity();
 
