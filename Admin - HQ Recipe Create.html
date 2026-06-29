@@ -92,6 +92,11 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .name-portion-row { display: flex; gap: 32px; align-items: flex-start; margin-bottom: 20px; }
 .name-group { flex: 3; min-width: 0; }
 .portion-group { width: 110px; flex-shrink: 0; }
+.yield-control { display: grid; grid-template-columns: 1fr 92px; gap: 8px; align-items: center; }
+.portion-group:not(.is-sub) .yield-control { grid-template-columns: 1fr; }
+.yield-uom { display: none; width: 100%; padding: 10px 10px; border: 1px solid #dcdee3; border-radius: 10px; font: inherit; font-size: 14px; color: var(--ink); background: #fff; outline: none; }
+.yield-uom:focus { border-color: var(--nomni-green); }
+.sub-recipe-status { display: none; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--spinach); }
 
 /* Tags-style field */
 .tags-field { width: 100%; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s; background: #fff; }
@@ -119,6 +124,9 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .checkbox-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 24px; font-size: 13px; color: var(--ink-mute); }
 .checkbox-row input[type="checkbox"] { accent-color: var(--seaweed); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
 .checkbox-row label { cursor: pointer; line-height: 1.4; }
+.checkbox-row.locked { background: var(--mint) !important; border-color: #b9efc8 !important; color: var(--seaweed); }
+.checkbox-row.locked label { cursor: default; }
+.checkbox-row.locked input[type="checkbox"] { cursor: not-allowed; }
 .danger-txt { color: #c02020; font-weight: 600; }
 
 /* Applies-to chips */
@@ -258,6 +266,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .version-info { flex: 1; min-width: 0; }
 .version-name { font-size: 14px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; }
 .version-meta { font-size: 12px; color: var(--ink-mute); margin-top: 3px; }
+.version-kind { font-weight: 500; color: var(--ink-mute); }
+.version-kind.sub { color: var(--spinach); }
 .version-restore-btn { font-size: 12px; font-weight: 600; color: var(--spinach); background: none; border: none; cursor: pointer; padding: 5px 10px; border-radius: 4px; transition: background .12s; white-space: nowrap; flex-shrink: 0; }
 .version-restore-btn:hover { background: var(--mint); }
 .version-current-badge { font-size: 10px; font-weight: 700; background: #D9F5E4; color: #1A8040; padding: 2px 7px; border-radius: 4px; }
@@ -265,12 +275,32 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 /* ── Conflict modal ── */
 .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: flex-start; justify-content: center; padding: 72px 16px 40px; overflow-y: auto; }
 .modal-overlay.open { display: flex; }
+.modal-overlay.centered { align-items: center; padding-top: 16px; padding-bottom: 16px; }
 .modal-card { background: #fff; border-radius: 12px; width: 580px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); max-height: calc(100vh - 100px); display: flex; flex-direction: column; overflow: hidden; }
 .modal-header { padding: 20px 24px 16px; flex-shrink: 0; }
 .modal-title { font-size: 21px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 4px; }
 .modal-subtitle { font-size: 14px; color: var(--ink-mute); }
 .modal-body { padding: 0 24px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 .modal-foot { padding: 14px 24px 18px; border-top: 1px solid var(--rule); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+.copy-modal-card { width: 650px; overflow: visible; }
+.copy-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.copy-modal-close { border: 0; background: transparent; color: var(--spinach); font-size: 26px; line-height: 1; cursor: pointer; padding: 0 2px; }
+.copy-modal-close:hover { color: var(--seaweed); }
+.copy-picker { position: relative; }
+.copy-search { width: 100%; height: 38px; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 40px 0 14px; font: inherit; font-size: 14px; color: var(--ink); outline: none; background: #fff; }
+.copy-search:focus { border-color: var(--nomni-green); box-shadow: 0 0 0 3px rgba(42,200,100,.14); }
+.copy-toggle { position: absolute; right: 1px; top: 1px; width: 38px; height: 36px; border: 0; background: transparent; color: var(--ink-mute); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; border-radius: 0 6px 6px 0; }
+.copy-toggle:hover { color: var(--ink); background: #f7f8fa; }
+.copy-picker.open .copy-toggle svg { transform: rotate(180deg); }
+.copy-toggle svg { transition: transform .14s ease; }
+.copy-modal-body { overflow: visible; }
+.copy-menu { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 80; display: none; max-height: 220px; overflow-y: auto; background: #fff; border: 1px solid #dcdee3; border-radius: 8px; box-shadow: 0 14px 34px rgba(10,20,15,.18); padding: 6px; }
+.copy-picker.open .copy-menu { display: block; }
+.copy-group-label { padding: 8px 10px 5px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); }
+.copy-option { width: 100%; border: 0; background: transparent; border-radius: 6px; padding: 9px 10px; text-align: left; font: inherit; font-size: 14px; color: var(--ink); cursor: pointer; }
+.copy-option:hover, .copy-option.active { background: var(--mint); color: var(--seaweed); }
+.copy-empty { padding: 10px; font-size: 13px; color: var(--ink-mute); }
+.copy-note { margin: 2px 0 0; font-size: 14px; color: var(--ink); }
 .restore-modal-card { width: 560px; }
 .restore-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .restore-modal-close { width: 32px; height: 32px; border: 0; border-radius: 6px; background: #F3F4F6; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; transition: background .12s, color .12s; }
@@ -344,8 +374,31 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .variation-title { font-family:"Hanken Grotesk", system-ui, sans-serif; font-size:22px; font-weight:800; letter-spacing:-.02em; color:var(--ink); margin:0; }
 .variation-title-edit { border:0; background:#f3f4f6; border-radius:8px; padding:6px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
 .variation-title-edit:hover { background:#e9ebef; }
+.variation-title-delete { border:0; background:#fff1f1; border-radius:8px; padding:6px; display:none; align-items:center; justify-content:center; cursor:pointer; color:#D0291E; }
+.variation-title-delete:hover { background:#FDD6DC; }
 .variation-title-input { font-family:"Hanken Grotesk", system-ui, sans-serif; font-size:22px; font-weight:800; letter-spacing:-.02em; color:var(--ink); border:1px solid #d8dbe0; border-radius:10px; padding:5px 9px; width:min(460px, 100%); outline:none; }
 .variation-title-input:focus { border-color:var(--nomni-green); box-shadow:0 0 0 3px rgba(42,200,100,.16); }
+.var-assignment-row { display:flex; align-items:center; gap:10px; padding:8px 26px 0; color:var(--ink-mute); font-size:13px; }
+.assignment-label { font-weight:600; color:var(--ink-2); }
+.assignment-chip-row { position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-width:0; }
+.assignment-summary-btn { border:0; background:transparent; color:var(--spinach); font:inherit; font-size:13px; font-weight:700; cursor:pointer; padding:5px 6px; border-radius:5px; }
+.assignment-summary-btn:hover, .assignment-summary-btn.active { background:var(--mint); }
+.assignment-popover { position:absolute; left:0; top:calc(100% + 6px); z-index:70; display:none; width:320px; max-height:280px; overflow-y:auto; background:#fff; border:1px solid var(--rule); border-radius:10px; box-shadow:0 14px 34px rgba(10,20,15,.16); padding:8px; }
+.assignment-chip-row.open .assignment-popover { display:block; }
+.assignment-popover-section { padding:8px 8px 5px; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-mute); }
+.assignment-popover-item { padding:7px 8px; border-radius:6px; font-size:13px; font-weight:500; color:var(--ink); }
+.assignment-popover-item:hover { background:#f7f8fa; }
+.assignment-empty { font-size:13px; color:var(--ink-mute); }
+.assignment-manage-btn { border:0; background:transparent; color:var(--spinach); font:inherit; font-size:13px; font-weight:700; cursor:pointer; padding:5px 6px; border-radius:5px; }
+.assignment-manage-btn:hover { background:var(--mint); }
+.assignment-list { display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; }
+.assignment-option { display:flex; align-items:flex-start; gap:10px; border:1px solid var(--rule); border-radius:8px; padding:10px 12px; cursor:pointer; }
+.assignment-option:hover { background:#fbfcfb; }
+.assignment-option input { margin-top:2px; accent-color:var(--nomni-green); }
+.assignment-option-title { font-size:14px; font-weight:600; color:var(--ink); }
+.assignment-option-meta { margin-top:2px; font-size:12px; color:var(--ink-mute); }
+.assignment-warning { display:none; background:#FFF8EC; border:1px solid #F5D97A; border-radius:8px; padding:10px 12px; font-size:13px; color:#7A5F00; line-height:1.45; }
+.assignment-warning.show { display:block; }
 .body-section::before { display:none !important; content:none !important; }
 .cost-bar { margin: 14px 26px 8px; border: 0; background: transparent; gap: 12px; align-items: stretch; }
 .cost-bar-item { border: 1px solid var(--rule); border-radius: 14px; padding: 18px 18px 20px; background: linear-gradient(180deg, #fff 0%, #fbfcfb 100%); box-shadow: 0 3px 12px rgba(10,20,15,.04); min-height: 126px; justify-content: flex-start; }
@@ -361,6 +414,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .retail-input { display: none; width: 118px; height: 38px; padding: 0 8px; border-radius: 8px; border: 1px solid #d8dbe0; background: #fff; font-size: 26px; line-height: 1; text-align: right; }
 .retail-input.editing { display: block; }
 .retail-display.editing { display: none; }
+.sub-recipe-mode #sellingPriceItem, .sub-recipe-mode #foodCostItem { display: none; }
 #foodCostItem { background: #f3fff6; border-color: #b8efc8; }
 #foodCostItem .cost-bar-food { color: var(--seaweed); }
 .body-inner { padding: 0 26px 36px; }
@@ -522,9 +576,21 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
           <input type="text" class="tags-field" id="recipeName" value="BBQ Baby Back Pork Ribs with House Sauce — Half Rack" autocomplete="off" style="font-size:16px;font-weight:600" />
         </div>
         <div class="portion-group">
-          <label class="form-label" for="portion">Portion</label>
-          <span class="form-hint">Serves per batch</span>
-          <input type="text" class="tags-field" id="portion" value="1" style="font-size:16px;font-weight:600;text-align:center" />
+          <label class="form-label" for="portion" id="portionLabel">Portion</label>
+          <span class="form-hint" id="portionHint">Serves per batch</span>
+          <div class="yield-control">
+            <input type="text" class="tags-field" id="portion" value="1" style="font-size:16px;font-weight:600;text-align:center" />
+            <select class="yield-uom" id="yieldUom" aria-label="Yield unit">
+              <option selected>portion</option>
+              <option>g</option>
+              <option>kg</option>
+              <option>ml</option>
+              <option>L</option>
+              <option>unit</option>
+              <option>batch</option>
+            </select>
+          </div>
+          <div class="sub-recipe-status" id="subRecipeStatus">Saved as sub-recipe</div>
         </div>
       </div>
 
@@ -583,19 +649,27 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
         <button class="variation-title-edit" id="renameVariationBtn" type="button" title="Rename variation">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--spinach)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
+        <button class="variation-title-delete" id="deleteVariationBtn" type="button" title="Delete variation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
+        </button>
         <button class="btn btn-tertiary" id="historyBtn" type="button" style="margin-left:auto;font-size:13px;padding:7px 12px;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
           History
         </button>
       </div>
+      <div class="var-assignment-row">
+        <span class="assignment-label">Applies to</span>
+        <div class="assignment-chip-row" id="assignmentSummary"></div>
+        <button class="assignment-manage-btn" id="manageAssignmentBtn" type="button">Manage</button>
+      </div>
 
       <!-- Cost bar -->
       <div class="cost-bar">
         <div class="cost-bar-item">
-          <span class="cost-bar-label">Cost <small>per portion</small></span>
+          <span class="cost-bar-label">Cost <small id="costScopeLabel">per portion</small></span>
           <span class="cost-bar-val" id="costRecipeVal">A$18.20</span>
         </div>
-        <div class="cost-bar-item">
+        <div class="cost-bar-item" id="sellingPriceItem">
           <span class="cost-bar-label">Selling price <small>per portion</small></span>
           <div class="retail-input-wrap">
             <button class="retail-display" id="retailDisplayBtn" type="button" aria-label="Edit selling price">
@@ -719,7 +793,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
               Add ingredient
             </button>
-            <button class="btn btn-tertiary" type="button">Copy data from…</button>
+            <button class="btn btn-tertiary" id="copyDataBtn" type="button">Copy data from…</button>
           </div>
 
 
@@ -758,6 +832,34 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   <span class="save-timestamp" id="saveTimestamp">Last saved Jun 24 at 3:42 PM</span>
   <button class="btn btn-tertiary" id="saveVersionBtn" type="button">Save version</button>
   <button class="btn btn-primary" id="saveBtn" type="button">Save</button>
+  </div>
+</div>
+
+<!-- Copy data modal -->
+<div class="modal-overlay centered" id="copyDataModal">
+  <div class="modal-card copy-modal-card">
+    <div class="modal-header">
+      <div class="copy-modal-head">
+        <div>
+          <div class="modal-title">Copy data from...</div>
+          <label class="form-label" for="copyDataSearch" style="margin-top:2px">Recipes</label>
+        </div>
+        <button class="copy-modal-close" id="copyDataCloseBtn" type="button" aria-label="Close copy data dialog">×</button>
+      </div>
+    </div>
+    <div class="modal-body copy-modal-body" style="padding-top:0">
+      <div class="copy-picker" id="copyDataPicker">
+        <input class="copy-search" id="copyDataSearch" type="text" placeholder="Select" autocomplete="off" aria-label="Search recipes and variations" />
+        <button class="copy-toggle" id="copyDataToggleBtn" type="button" aria-label="Open or close recipes list">
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="copy-menu" id="copyDataMenu"></div>
+      </div>
+      <p class="copy-note"><strong>Note:</strong> Copying will completely overwrite any existing data.</p>
+    </div>
+    <div class="modal-foot" style="border-top:0;justify-content:flex-start;padding-top:0">
+      <button class="btn btn-primary" id="copyDataNextBtn" type="button">Next</button>
+    </div>
   </div>
 </div>
 
@@ -819,6 +921,90 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   </div>
 </div>
 
+<!-- Create variation modal -->
+<div class="modal-overlay" id="createVariationModal">
+  <div class="modal-card" style="width:560px">
+    <div class="modal-header">
+      <div class="restore-modal-head">
+        <div>
+          <div class="modal-title">Create variation</div>
+          <div class="modal-subtitle">Create outlet- or group-specific recipe data.</div>
+        </div>
+        <button class="restore-modal-close" id="createVariationCloseBtn" type="button" aria-label="Close create variation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding-top:0">
+      <div>
+        <label class="form-label" for="createVariationName">Variation name</label>
+        <input type="text" class="tags-field" id="createVariationName" placeholder="e.g. Chargrill Tampines" />
+      </div>
+      <div>
+        <div class="form-label">Applies to</div>
+        <div class="assignment-warning" id="createAssignmentWarning"></div>
+        <div class="assignment-list" id="createAssignmentList" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-tertiary" id="createVariationCancelBtn" type="button">Cancel</button>
+      <button class="btn btn-primary" id="createVariationConfirmBtn" type="button">Create variation</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manage variation assignment modal -->
+<div class="modal-overlay" id="assignmentModal">
+  <div class="modal-card" style="width:560px">
+    <div class="modal-header">
+      <div class="restore-modal-head">
+        <div>
+          <div class="modal-title">Manage variation assignment</div>
+          <div class="modal-subtitle" id="assignmentModalSubtitle"></div>
+        </div>
+        <button class="restore-modal-close" id="assignmentCloseBtn" type="button" aria-label="Close assignment dialog">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding-top:0">
+      <div class="assignment-warning" id="assignmentWarning"></div>
+      <div class="assignment-list" id="assignmentList"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-tertiary" id="assignmentCancelBtn" type="button">Cancel</button>
+      <button class="btn btn-primary" id="assignmentSaveBtn" type="button">Save assignments</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete variation modal -->
+<div class="modal-overlay" id="deleteVariationModal">
+  <div class="modal-card restore-modal-card">
+    <div class="modal-header">
+      <div class="restore-modal-head">
+        <div>
+          <div class="modal-title">Delete variation?</div>
+          <div class="modal-subtitle" id="deleteVariationSubtitle"></div>
+        </div>
+        <button class="restore-modal-close" id="deleteVariationCloseBtn" type="button" aria-label="Close delete variation confirmation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding-top:0;padding-bottom:20px">
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D0291E" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16.5" r="1" fill="#D0291E" stroke="none"/></svg>
+        <p id="deleteVariationWarning" style="margin:0;font-size:14px;color:#991B1B;line-height:1.5"></p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-tertiary" id="deleteVariationCancelBtn" type="button">Cancel</button>
+      <button class="btn btn-danger" id="deleteVariationConfirmBtn" type="button">Delete variation</button>
+    </div>
+  </div>
+</div>
+
 <!-- Save version modal -->
 <div class="modal-overlay" id="saveVersionModal">
   <div class="modal-card" style="width:440px">
@@ -875,7 +1061,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       <!-- Snapshot content -->
       <div style="display:flex;gap:10px;margin-bottom:16px">
         <div style="flex:1;background:#f9fafb;border:1px solid var(--rule);border-radius:8px;padding:14px 16px">
-          <div style="font-size:11px;font-weight:600;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Portion</div>
+          <div id="previewMeasureLabel" style="font-size:11px;font-weight:600;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Portion</div>
           <div id="previewPortion" style="font-size:15px;font-weight:600">—</div>
         </div>
         <div style="flex:1;background:#f9fafb;border:1px solid var(--rule);border-radius:8px;padding:14px 16px">
@@ -930,6 +1116,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
         </div>
         <div id="restoreMissingList" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto"></div>
       </div>
+      <div id="restoreMeasureWrap" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:12px 14px;gap:10px;align-items:flex-start">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D0291E" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16.5" r="1" fill="#D0291E" stroke="none"/></svg>
+        <p id="restoreMeasureWarning" style="margin:0;font-size:14px;color:#991B1B;line-height:1.5"></p>
+      </div>
       <div style="background:#FFF8EC;border:1px solid #F5D97A;border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B07D0A" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r="1" fill="#B07D0A" stroke="none"/></svg>
         <p id="restoreConfirmWarning" style="margin:0;font-size:14px;color:#7A5F00;line-height:1.5"></p>
@@ -979,10 +1169,114 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
   const TAG_OPTIONS = ['Mains', 'Gloves', 'BAO', 'Testing', 'Simpel', 'Beverages', 'Test', 'Two Items', 'Dessert', 'Sides'];
   const selectedTags = new Set(['Mains']);
+  const COPY_RECIPE_OPTIONS = [
+    'Char Siu Chicken Bao',
+    'Vegetable Dumplings',
+    'House BBQ Sauce',
+    'XO Fried Rice',
+    'Cucumber Pickle'
+  ];
+  const ASSIGNMENT_OPTIONS = [
+    { id: 'group_family', type: 'Outlet group', label: 'Family Dining Express' },
+    { id: 'group_chargrill', type: 'Outlet group', label: 'Chargrill Outlets' },
+    { id: 'outlet_301', type: 'Outlet', label: '(WF 301) Chargrill @ 301 Punggol' },
+    { id: 'outlet_107', type: 'Outlet', label: '(WF 107) Chargrill @ 107 Serangoon' },
+    { id: 'outlet_259', type: 'Outlet', label: '(WF 259) Chargrill @ 259 Bukit Panjang' },
+    { id: 'outlet_280', type: 'Outlet', label: '(WF 280) Chargrill @ 280 Bishan' },
+    { id: 'outlet_055', type: 'Outlet', label: '(WF 055) Garden Express @ 055 Jurong East' },
+    { id: 'outlet_088', type: 'Outlet', label: '(WF 088) Garden Express @ 088 Clementi' },
+    { id: 'outlet_112', type: 'Outlet', label: '(WF 112) Garden Bistro @ 112 Novena' },
+    { id: 'outlet_167', type: 'Outlet', label: '(WF 167) Garden Bistro @ 167 Ang Mo Kio' },
+    { id: 'outlet_203', type: 'Outlet', label: '(WF 203) Garden Café @ 203 Bedok' },
+    { id: 'outlet_244', type: 'Outlet', label: '(WF 244) Garden Café @ 244 Woodlands' },
+    { id: 'outlet_139', type: 'Outlet', label: '(WF 139) Chargrill @ 139 Tampines' },
+    { id: 'outlet_290', type: 'Outlet', label: '(WF 290) Garden Express @ 290 Sengkang' }
+  ];
+  const UOM_OPTIONS = [
+    'bag', 'blk', 'btl', 'box', 'bkt', 'bch', 'bdl', 'can', 'ctn', 'cs',
+    'cask', 'clm', 'cob', 'con', 'crt', 'cup', 'cyl', 'doz', 'drm', 'ea',
+    'flt', 'g', 'jar', 'keg', 'kg', 'ltr', 'lf', 'ml', 'no', 'pk',
+    'pkt', 'Pail', 'pr', 'pet', 'pcs', 'pch', 'lbs', 'pot', 'pun', 'rm',
+    'roll', 'sac', 'set', 'sht', 'stack', 'stk', 'tin', 'tr', 'tub', 'tube',
+    'unit', 'wk', 'ptn'
+  ];
+  const UOM_ALIASES = { L: 'ltr', l: 'ltr', portion: 'ptn', portions: 'ptn', pack: 'pk', bunch: 'bch' };
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, function(ch) {
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+    });
+  }
+
+  function normaliseUom(uom) {
+    return UOM_ALIASES[uom] || uom;
+  }
+
+  function uomOptionsHtml(selected) {
+    const selectedUom = normaliseUom(selected || 'ptn');
+    return UOM_OPTIONS.map(function(uom) {
+      return '<option' + (uom === selectedUom ? ' selected' : '') + '>' + escapeHtml(uom) + '</option>';
+    }).join('');
+  }
+
+  function populateUomSelects() {
+    document.querySelectorAll('.uom-select, #yieldUom').forEach(function(select) {
+      const current = normaliseUom(select.value || select.querySelector('option[selected]')?.textContent || 'ptn');
+      select.innerHTML = uomOptionsHtml(current);
+    });
+  }
+
+  let selectedCopySource = null;
+
+  function copyDataOptions() {
+    return [
+      {
+        label: 'Current recipe variations',
+        options: VAR_KEY_ORDER.filter(function(key) { return VAR_META[key]; }).map(function(key) {
+          return { value: 'variation:' + key, label: VAR_META[key].title };
+        })
+      },
+      {
+        label: 'Recipes',
+        options: COPY_RECIPE_OPTIONS.map(function(name) {
+          return { value: 'recipe:' + name, label: name };
+        })
+      }
+    ];
+  }
+
+  function renderCopyDataMenu(filter) {
+    const menu = document.getElementById('copyDataMenu');
+    const q = String(filter || '').trim().toLowerCase();
+    const groups = copyDataOptions().map(function(group) {
+      return {
+        label: group.label,
+        options: group.options.filter(function(option) {
+          return option.label.toLowerCase().includes(q);
+        })
+      };
+    }).filter(function(group) { return group.options.length; });
+
+    if (!groups.length) {
+      menu.innerHTML = '<div class="copy-empty">No recipes found</div>';
+      return;
+    }
+
+    menu.innerHTML = groups.map(function(group) {
+      return '<div class="copy-group-label">' + escapeHtml(group.label) + '</div>' +
+        group.options.map(function(option) {
+          return '<button class="copy-option' + (selectedCopySource && selectedCopySource.value === option.value ? ' active' : '') + '" type="button" data-value="' + escapeHtml(option.value) + '" data-label="' + escapeHtml(option.label) + '">' + escapeHtml(option.label) + '</button>';
+        }).join('');
+    }).join('');
+
+    menu.querySelectorAll('.copy-option').forEach(function(option) {
+      option.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        selectedCopySource = { value: option.dataset.value, label: option.dataset.label };
+        document.getElementById('copyDataSearch').value = selectedCopySource.label;
+        document.getElementById('copyDataPicker').classList.remove('open');
+        renderCopyDataMenu(selectedCopySource.label);
+      });
     });
   }
 
@@ -1103,6 +1397,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     if (picker && !picker.contains(e.target)) picker.classList.remove('open');
   });
   renderTags();
+  populateUomSelects();
 
   function makeIngSelectCell() {
     const wrap = document.createElement('div');
@@ -1180,7 +1475,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       '</div></td>' +
       '<td class="ing-name-cell-td"></td>' +
       '<td><div class="qty-uom"><input type="text" class="qty-input" placeholder="0" />' +
-        '<select class="uom-select"><option>kg</option><option>g</option><option>L</option><option>ml</option><option>unit</option><option>portion</option><option>pack</option><option>bunch</option></select>' +
+        '<select class="uom-select">' + uomOptionsHtml('g') + '</select>' +
       '</div></td>' +
       '<td class="r"><span class="price-val">A$0.00</span></td>' +
       '<td class="r"><span class="price-val">A$0.00</span></td>';
@@ -1205,6 +1500,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   ta.addEventListener('input', function() { document.getElementById('charCount').textContent = ta.value.length + '/1500'; });
 
   // Save → check for active chips + warnings → show conflict modal
+  var savedSubRecipe = false;
+
   function updateSaveTimestamp() {
     var ts = document.getElementById('saveTimestamp');
     if (!ts) return;
@@ -1216,7 +1513,46 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     ts.textContent = 'Last saved ' + months[now.getMonth()] + ' ' + now.getDate() + ' at ' + h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
   }
 
+  function currentMeasureLabel() {
+    var qty = (document.getElementById('portion').value || '').trim() || '1';
+    if (document.getElementById('subRecipe').checked) {
+      return qty + ' ' + document.getElementById('yieldUom').value;
+    }
+    return qty;
+  }
+
+  function updateSubRecipeMode() {
+    var isSub = document.getElementById('subRecipe').checked;
+    var portionLabel = document.getElementById('portionLabel');
+    var portionHint = document.getElementById('portionHint');
+    var yieldUom = document.getElementById('yieldUom');
+    var status = document.getElementById('subRecipeStatus');
+    var editor = document.getElementById('variationEditor');
+    var checkboxRow = document.querySelector('.checkbox-row');
+    var subRecipeInput = document.getElementById('subRecipe');
+    var portionGroup = document.querySelector('.portion-group');
+
+    portionLabel.textContent = isSub ? 'Yield' : 'Portion';
+    portionHint.textContent = isSub ? 'Batch output' : 'Serves per batch';
+    yieldUom.style.display = isSub ? 'block' : 'none';
+    status.style.display = savedSubRecipe ? 'block' : 'none';
+    editor.classList.toggle('sub-recipe-mode', isSub);
+    portionGroup.classList.toggle('is-sub', isSub);
+    checkboxRow.classList.toggle('locked', savedSubRecipe);
+    subRecipeInput.disabled = savedSubRecipe;
+    updateFoodCostHighlight();
+  }
+
   document.getElementById('saveBtn').addEventListener('click', function() {
+    if (document.getElementById('subRecipe').checked && !savedSubRecipe) {
+      savedSubRecipe = true;
+      unsavedVariations.clear();
+      updateSubRecipeMode();
+      updateSaveTimestamp();
+      showToast('Saved as a sub-recipe. This cannot be changed back.');
+      return;
+    }
+
     const activeChips = document.querySelectorAll('.chip.active').length;
     const warnings = document.querySelectorAll('.ing-warning').length;
     if (activeChips > 0 && warnings > 0) {
@@ -1233,6 +1569,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   });
 
   document.getElementById('modalSaveBtn').addEventListener('click', function() {
+    if (document.getElementById('subRecipe').checked) {
+      savedSubRecipe = true;
+      updateSubRecipeMode();
+    }
     window.location.href = 'Admin - HQ Settings.html#recipes';
   });
 
@@ -1305,7 +1645,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     ]
   };
   var VERSION_SNAPSHOT_B = {
-    portion: '1',
+    portion: '2',
     variations: [
       { title: 'Base recipe', cost: 'A$17.54', ings: [
         { name: 'Pork Baby Back Ribs', qty: '500g', unit: 'A$0.030/g', total: 'A$15.00' },
@@ -1402,6 +1742,23 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   var VAR_KEY_ORDER = ['base', 'family', 'airport', 'cbd', 'catering', 'events', 'delivery'];
   var activeVarFilter = null;
 
+  function buildCurrentSnapshot() {
+    var source = VERSION_SNAPSHOT_A;
+    var isSub = document.getElementById('subRecipe').checked;
+    return {
+      kind: isSub ? 'subRecipe' : 'recipe',
+      portion: isSub ? undefined : currentMeasureLabel(),
+      yield: isSub ? currentMeasureLabel() : undefined,
+      variations: source.variations.map(function(vr) {
+        return {
+          title: vr.title,
+          cost: (VAR_META[VAR_KEY_ORDER[source.variations.indexOf(vr)]] || {}).cost || vr.cost,
+          ings: vr.ings.slice()
+        };
+      })
+    };
+  }
+
   function renderFilterChips() {
     var row = document.getElementById('varFilterRow');
     var chips = [{ key: null, label: 'All versions' }];
@@ -1418,6 +1775,14 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
         renderVersionList();
       });
     });
+  }
+
+  function snapshotKind(snapshot) {
+    return snapshot && snapshot.kind === 'subRecipe' ? 'subRecipe' : 'recipe';
+  }
+
+  function snapshotKindLabel(snapshot) {
+    return snapshotKind(snapshot) === 'subRecipe' ? 'Sub-recipe' : 'Recipe';
   }
 
   function renderVersionList() {
@@ -1438,8 +1803,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     }
     el.innerHTML = filtered.map(function(v, i) {
       var origIdx = VERSIONS.indexOf(v);
-      var varCountText = v.varCount + ' variation' + (v.varCount === 1 ? '' : 's');
-      var metaLine = varCountText + (v.name ? ' · ' + v.name : '');
+      var isSubSnapshot = snapshotKind(v.snapshot) === 'subRecipe';
+      var metaLine = v.varCount + ' variation' + (v.varCount === 1 ? '' : 's') +
+        ' · <span class="version-kind' + (isSubSnapshot ? ' sub' : '') + '">' + snapshotKindLabel(v.snapshot) + '</span>' +
+        (v.name ? ' · ' + v.name : '');
       var restoreBtn = !v.expired ? '<button class="version-restore-btn" type="button" onclick="reviewVersion(' + origIdx + ')">Review</button>' : '';
       var dividerHtml = (v.expired && (i === 0 || !filtered[i-1].expired))
         ? '<div style="display:flex;align-items:center;gap:10px;padding:14px 0 6px"><span style="font-size:11px;font-weight:600;color:var(--ink-mute);white-space:nowrap;letter-spacing:.03em">OLDER THAN 1 YEAR</span><div style="flex:1;height:1px;background:var(--rule)"></div></div>'
@@ -1483,6 +1850,45 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     return results;
   }
 
+  function getSnapshotMeasure(snapshot) {
+    if (!snapshot) return '';
+    return snapshot.yield || snapshot.portion || '';
+  }
+
+  function getCurrentMeasureForRestore() {
+    return currentMeasureLabel();
+  }
+
+  function getMeasureMismatch(v, scope) {
+    if (scope !== 'variation') return null;
+    var savedMeasure = getSnapshotMeasure(v.snapshot);
+    var currentMeasure = getCurrentMeasureForRestore();
+    if (!savedMeasure || String(savedMeasure).trim() === String(currentMeasure).trim()) return null;
+    var isSub = document.getElementById('subRecipe').checked;
+    return {
+      noun: isSub ? 'yield' : 'portion',
+      saved: savedMeasure,
+      current: currentMeasure
+    };
+  }
+
+  function variationExistsByTitle(title) {
+    return Object.keys(VAR_META).some(function(key) {
+      return VAR_META[key] && VAR_META[key].title === title;
+    });
+  }
+
+  function keyFromVariationTitle(title) {
+    var base = String(title || 'variation').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'variation';
+    var key = base;
+    var i = 2;
+    while (VAR_META[key]) {
+      key = base + '_' + i;
+      i++;
+    }
+    return key;
+  }
+
   function renderPreviewVariation(vr) {
     document.getElementById('previewCost').textContent = vr.cost;
     document.getElementById('previewIngBody').innerHTML = vr.ings.map(function(ing, n) {
@@ -1516,7 +1922,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
     document.getElementById('previewModalTitle').textContent = v.date + ' · ' + v.user;
     document.getElementById('previewModalSubtitle').textContent = v.name || '';
-    document.getElementById('previewPortion').textContent = s.portion;
+    document.getElementById('previewMeasureLabel').textContent = snapshotKind(s) === 'subRecipe' ? 'Yield' : 'Portion';
+    document.getElementById('previewPortion').textContent = getSnapshotMeasure(s);
 
     var tabRowEl = document.getElementById('previewTabRow');
     var tabsEl = document.getElementById('previewVarTabs');
@@ -1646,19 +2053,34 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
     if (scope === 'variation') {
       document.getElementById('restoreConfirmTitle').textContent = 'Restore this variation?';
-      document.getElementById('restoreConfirmWarning').textContent = 'This will replace the current "' + pendingRestoreVariationTitle + '" variation with its state at the time of this snapshot. Other variations will not be affected. This cannot be undone.';
+      if (!variationExistsByTitle(pendingRestoreVariationTitle)) {
+        document.getElementById('restoreConfirmWarning').textContent = 'This variation no longer exists. Restoring it will recreate "' + pendingRestoreVariationTitle + '" from this snapshot. It will not be assigned to any outlets or groups yet. This cannot be undone.';
+      } else {
+        document.getElementById('restoreConfirmWarning').textContent = 'This will replace the current "' + pendingRestoreVariationTitle + '" variation data with its state at the time of this snapshot. Outlet and group assignments will not change. This cannot be undone.';
+      }
     } else {
       document.getElementById('restoreConfirmTitle').textContent = 'Restore all variations?';
-      document.getElementById('restoreConfirmWarning').textContent = 'This will replace all ' + v.varCount + ' variation' + (v.varCount === 1 ? '' : 's') + ' with their state at the time of this snapshot. Any changes made since will be lost. This cannot be undone.';
+      document.getElementById('restoreConfirmWarning').textContent = 'This will replace all ' + v.varCount + ' variation' + (v.varCount === 1 ? '' : 's') + ' with their state at the time of this snapshot. Outlet and group assignments will not change. This cannot be undone.';
     }
 
     var missing = checkMissingItems(v, scope, pendingRestoreVariationTitle);
     var missingWrap = document.getElementById('restoreMissingWrap');
     var missingList = document.getElementById('restoreMissingList');
     var confirmOkBtn = document.getElementById('restoreConfirmOkBtn');
+    var measureWrap = document.getElementById('restoreMeasureWrap');
+    var measureWarning = document.getElementById('restoreMeasureWarning');
 
     var completeOnlyBtn = document.getElementById('restoreCompleteOnlyBtn');
     var restoreActions = document.querySelector('.restore-modal-actions');
+    var mismatch = getMeasureMismatch(v, scope);
+    if (mismatch) {
+      measureWarning.textContent = 'This version was saved with a different ' + mismatch.noun + ': ' + mismatch.saved + '. Your current ' + (mismatch.noun === 'yield' ? 'sub-recipe' : 'recipe') + ' uses ' + mismatch.current + ', so ingredients will be restored but the ' + mismatch.noun + ' will stay unchanged.';
+      measureWrap.style.display = 'flex';
+    } else {
+      measureWarning.textContent = '';
+      measureWrap.style.display = 'none';
+    }
+
     if (missing.length) {
       restoreActions.classList.toggle('has-restore-options', scope === 'all');
       missingList.innerHTML = missing.map(function(m) {
@@ -1716,9 +2138,19 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     document.getElementById('restoreConfirmModal').classList.remove('open');
     var v = VERSIONS[pendingRestoreIndex];
     var label = v.name || v.date;
+    var recreatedKey = null;
+    if (pendingRestoreScope === 'variation' && !variationExistsByTitle(pendingRestoreVariationTitle)) {
+      recreatedKey = recreateVariationFromSnapshot(v, pendingRestoreVariationTitle);
+    }
     var toastMsg = pendingRestoreScope === 'variation'
       ? '"' + pendingRestoreVariationTitle + '" restored to: ' + label
       : 'All variations restored to: ' + label;
+    if (recreatedKey) {
+      switchVariation(recreatedKey);
+      layoutVariationRail();
+      renderFilterChips();
+      toastMsg = '"' + pendingRestoreVariationTitle + '" recreated unassigned from: ' + label;
+    }
     pendingRestoreIndex = null;
     pendingRestoreScope = null;
     pendingRestoreVariationTitle = null;
@@ -1778,7 +2210,15 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
   document.getElementById('saveVersionConfirmBtn').addEventListener('click', function() {
     var label = document.getElementById('versionNameInput').value.trim() || 'Unnamed version';
-    VERSIONS.unshift({ name: label, date: 'Just now', user: 'William Arya' });
+    var snapshot = buildCurrentSnapshot();
+    VERSIONS.unshift({
+      name: label,
+      date: 'Just now',
+      user: 'William Arya',
+      varCount: snapshot.variations.length,
+      expired: false,
+      snapshot: snapshot
+    });
     document.getElementById('saveVersionModal').classList.remove('open');
     showToast('Version saved: ' + label);
   });
@@ -1815,6 +2255,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   var currentVar = 'base';
   var newVariationCount = 0;
   var unsavedVariations = new Set();
+  var deletedVariationTitles = new Set();
 
   var VAR_META = {
     base: { title: 'Base recipe', cost: 'A$18.20', costNum: 18.20, retail: '52.00' },
@@ -1825,10 +2266,227 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     events:   { title: 'Stadium & Events', cost: 'A$19.80', costNum: 19.80, retail: '58.00' },
     delivery: { title: 'Takeaway & Delivery', cost: 'A$17.40', costNum: 17.40, retail: '50.00' }
   };
+  var VAR_ASSIGNMENTS = {
+    base: [],
+    family: ['group_family'],
+    airport: ['outlet_139'],
+    cbd: ['outlet_290'],
+    catering: [],
+    events: [],
+    delivery: []
+  };
+  var pendingAssignmentMode = null;
+
+  document.getElementById('copyDataBtn').addEventListener('click', function() {
+    selectedCopySource = null;
+    document.getElementById('copyDataSearch').value = '';
+    renderCopyDataMenu('');
+    document.getElementById('copyDataModal').classList.add('open');
+    setTimeout(function() {
+      document.getElementById('copyDataPicker').classList.add('open');
+      document.getElementById('copyDataSearch').focus();
+    }, 60);
+  });
+
+  document.getElementById('copyDataCloseBtn').addEventListener('click', function() {
+    document.getElementById('copyDataModal').classList.remove('open');
+  });
+
+  document.getElementById('copyDataSearch').addEventListener('focus', function() {
+    renderCopyDataMenu(this.value);
+    document.getElementById('copyDataPicker').classList.add('open');
+  });
+
+  document.getElementById('copyDataToggleBtn').addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var picker = document.getElementById('copyDataPicker');
+    if (picker.classList.contains('open')) {
+      picker.classList.remove('open');
+    } else {
+      renderCopyDataMenu(document.getElementById('copyDataSearch').value);
+      picker.classList.add('open');
+      document.getElementById('copyDataSearch').focus();
+    }
+  });
+
+  document.getElementById('copyDataSearch').addEventListener('input', function() {
+    selectedCopySource = null;
+    renderCopyDataMenu(this.value);
+    document.getElementById('copyDataPicker').classList.add('open');
+  });
+
+  document.getElementById('copyDataSearch').addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.getElementById('copyDataPicker').classList.remove('open');
+    if (e.key === 'Enter') {
+      var first = document.querySelector('#copyDataMenu .copy-option');
+      if (first) {
+        selectedCopySource = { value: first.dataset.value, label: first.dataset.label };
+        this.value = selectedCopySource.label;
+        document.getElementById('copyDataPicker').classList.remove('open');
+      }
+    }
+  });
+
+  document.getElementById('copyDataNextBtn').addEventListener('click', function() {
+    if (!selectedCopySource) {
+      document.getElementById('copyDataSearch').focus();
+      document.getElementById('copyDataPicker').classList.add('open');
+      return;
+    }
+    document.getElementById('copyDataModal').classList.remove('open');
+    showToast('Copy source selected: ' + selectedCopySource.label);
+  });
+
+  document.getElementById('copyDataModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+    else if (!document.getElementById('copyDataPicker').contains(e.target)) {
+      document.getElementById('copyDataPicker').classList.remove('open');
+    }
+  });
+
+  document.getElementById('copyDataPicker').addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+
+  function assignmentOptionById(id) {
+    return ASSIGNMENT_OPTIONS.find(function(item) { return item.id === id; });
+  }
+
+  function assignmentOwner(id) {
+    return Object.keys(VAR_ASSIGNMENTS).find(function(key) {
+      return key !== 'base' && VAR_META[key] && (VAR_ASSIGNMENTS[key] || []).indexOf(id) !== -1;
+    }) || null;
+  }
+
+  function assignmentLabel(id) {
+    var item = assignmentOptionById(id);
+    return item ? item.label : id;
+  }
+
+  function assignedNonBaseIds() {
+    var ids = [];
+    Object.keys(VAR_ASSIGNMENTS).forEach(function(key) {
+      if (key !== 'base' && VAR_META[key]) ids = ids.concat(VAR_ASSIGNMENTS[key] || []);
+    });
+    return Array.from(new Set(ids));
+  }
+
+  function assignmentIdsForSummary(key) {
+    if (key === 'base') {
+      var assigned = assignedNonBaseIds();
+      return ASSIGNMENT_OPTIONS.map(function(item) { return item.id; }).filter(function(id) {
+        return assigned.indexOf(id) === -1;
+      });
+    }
+    return (VAR_ASSIGNMENTS[key] || []).slice();
+  }
+
+  function assignmentCountText(ids) {
+    var groups = ids.filter(function(id) { var item = assignmentOptionById(id); return item && item.type === 'Outlet group'; }).length;
+    var outlets = ids.filter(function(id) { var item = assignmentOptionById(id); return item && item.type === 'Outlet'; }).length;
+    var parts = [];
+    if (groups) parts.push(groups + ' group' + (groups === 1 ? '' : 's'));
+    if (outlets) parts.push(outlets + ' outlet' + (outlets === 1 ? '' : 's'));
+    return parts.length ? parts.join(', ') : '0 groups, 0 outlets';
+  }
+
+  function assignmentPopoverHtml(ids) {
+    if (!ids.length) return '<div class="assignment-popover-item" style="color:var(--ink-mute)">No linked outlets or groups</div>';
+    var grouped = ['Outlet group', 'Outlet'].map(function(type) {
+      var items = ids.map(assignmentOptionById).filter(function(item) { return item && item.type === type; });
+      if (!items.length) return '';
+      return '<div class="assignment-popover-section">' + (type === 'Outlet group' ? 'Outlet groups' : 'Outlets') + '</div>' +
+        items.map(function(item) { return '<div class="assignment-popover-item">' + escapeHtml(item.label) + '</div>'; }).join('');
+    }).join('');
+    return grouped;
+  }
+
+  function renderAssignmentSummary() {
+    var el = document.getElementById('assignmentSummary');
+    var manageBtn = document.getElementById('manageAssignmentBtn');
+    if (!el || !manageBtn) return;
+    var ids = assignmentIdsForSummary(currentVar);
+    var label = assignmentCountText(ids);
+    manageBtn.style.display = currentVar === 'base' ? 'none' : '';
+    el.innerHTML = '<button class="assignment-summary-btn" id="assignmentSummaryBtn" type="button">' + escapeHtml(label) + '</button>' +
+      '<div class="assignment-popover">' + assignmentPopoverHtml(ids) + '</div>';
+    document.getElementById('assignmentSummaryBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      el.classList.toggle('open');
+      this.classList.toggle('active', el.classList.contains('open'));
+    });
+  }
+
+  function renderAssignmentList(containerId, selectedIds, targetKey) {
+    var container = document.getElementById(containerId);
+    container.innerHTML = ASSIGNMENT_OPTIONS.map(function(item) {
+      var owner = assignmentOwner(item.id);
+      var checked = selectedIds.indexOf(item.id) !== -1;
+      var ownerText = owner && owner !== targetKey ? 'Currently using ' + VAR_META[owner].title : item.type;
+      return '<label class="assignment-option">' +
+        '<input type="checkbox" value="' + escapeHtml(item.id) + '"' + (checked ? ' checked' : '') + ' />' +
+        '<span>' +
+          '<span class="assignment-option-title">' + escapeHtml(item.label) + '</span>' +
+          '<span class="assignment-option-meta">' + escapeHtml(ownerText) + '</span>' +
+        '</span>' +
+      '</label>';
+    }).join('');
+    container.querySelectorAll('input[type="checkbox"]').forEach(function(input) {
+      input.addEventListener('change', function() { updateAssignmentWarning(containerId, targetKey); });
+    });
+  }
+
+  function selectedAssignmentIds(containerId) {
+    return Array.prototype.slice.call(document.querySelectorAll('#' + containerId + ' input[type="checkbox"]:checked')).map(function(input) {
+      return input.value;
+    });
+  }
+
+  function assignmentMovesFor(containerId, targetKey) {
+    return selectedAssignmentIds(containerId).map(function(id) {
+      var owner = assignmentOwner(id);
+      return owner && owner !== targetKey ? { id: id, from: owner } : null;
+    }).filter(Boolean);
+  }
+
+  function updateAssignmentWarning(containerId, targetKey) {
+    var warningId = containerId === 'createAssignmentList' ? 'createAssignmentWarning' : 'assignmentWarning';
+    var warning = document.getElementById(warningId);
+    var moves = assignmentMovesFor(containerId, targetKey);
+    if (!moves.length) {
+      warning.classList.remove('show');
+      warning.textContent = '';
+      return;
+    }
+    warning.textContent = moves.map(function(move) {
+      return assignmentLabel(move.id) + ' will move from ' + VAR_META[move.from].title + '.';
+    }).join(' ');
+    warning.classList.add('show');
+  }
+
+  function applyAssignments(targetKey, ids) {
+    Object.keys(VAR_ASSIGNMENTS).forEach(function(key) {
+      if (key !== targetKey) {
+        VAR_ASSIGNMENTS[key] = (VAR_ASSIGNMENTS[key] || []).filter(function(id) { return ids.indexOf(id) === -1; });
+      }
+    });
+    VAR_ASSIGNMENTS[targetKey] = ids.slice();
+    renderAssignmentSummary();
+  }
 
   function getCurrentCostNumber() {
     var meta = VAR_META[currentVar] || VAR_META.base;
     return meta.costNum || parseFloat(String(meta.cost || '').replace(/[^0-9.]/g, '')) || 0;
+  }
+
+  function formatMoney(n) {
+    return isFinite(n) ? 'A$' + n.toFixed(2) : 'A$—';
+  }
+
+  function getYieldQuantity() {
+    var qty = parseFloat(String(document.getElementById('portion').value || '').replace(/[^0-9.]/g, ''));
+    return qty > 0 ? qty : 0;
   }
 
   function updateFoodCostHighlight() {
@@ -1836,9 +2494,21 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     var retailDisplayEl = document.getElementById('retailDisplayValue');
     var foodEl = document.getElementById('foodCostPct');
     var itemEl = document.getElementById('foodCostItem');
+    var costEl = document.getElementById('costRecipeVal');
+    var costScopeLabel = document.getElementById('costScopeLabel');
+    var isSub = document.getElementById('subRecipe').checked;
+    var cost = getCurrentCostNumber();
+    if (isSub) {
+      var yieldQty = getYieldQuantity();
+      var yieldUom = document.getElementById('yieldUom').value;
+      if (costScopeLabel) costScopeLabel.textContent = 'per ' + yieldUom;
+      if (costEl) costEl.textContent = yieldQty ? formatMoney(cost / yieldQty) : 'A$—';
+    } else {
+      if (costScopeLabel) costScopeLabel.textContent = 'per portion';
+      if (costEl) costEl.textContent = (VAR_META[currentVar] || VAR_META.base).cost;
+    }
     var retail = parseFloat(String(retailEl.value || '').replace(/[^0-9.]/g, ''));
     if (retailDisplayEl) retailDisplayEl.textContent = retail ? 'A$' + retail.toFixed(2) : 'A$—';
-    var cost = getCurrentCostNumber();
     if (!retail || retail <= 0) {
       foodEl.textContent = '—';
       itemEl.classList.remove('cost-alert');
@@ -1872,6 +2542,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       this.blur();
     }
   });
+  document.getElementById('subRecipe').addEventListener('change', updateSubRecipeMode);
+  document.getElementById('portion').addEventListener('input', updateSubRecipeMode);
+  document.getElementById('yieldUom').addEventListener('change', updateSubRecipeMode);
 
   // Row 5 (index 4) is Smoked Paprika in the base; Sweet Paprika in the Family Dining variation
   var ROW5_BASE = document.querySelectorAll('#ingBody tr')[4];
@@ -1899,6 +2572,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     updateFoodCostHighlight();
     var histBtn = document.getElementById('historyBtn');
     if (histBtn) histBtn.style.display = unsavedVariations.has(v) ? 'none' : '';
+    var deleteBtn = document.getElementById('deleteVariationBtn');
+    if (deleteBtn) deleteBtn.style.display = v === 'base' ? 'none' : 'inline-flex';
+    renderAssignmentSummary();
 
     var rows = document.querySelectorAll('#ingBody tr');
     var row5 = rows[4];
@@ -1920,6 +2596,93 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     el.addEventListener('click', function() { switchVariation(el.dataset.var); });
   }
   document.querySelectorAll('.var-item').forEach(bindVariationTab);
+
+  function openAssignmentModal() {
+    if (currentVar === 'base') return;
+    pendingAssignmentMode = currentVar;
+    document.getElementById('assignmentModalSubtitle').textContent = VAR_META[currentVar].title;
+    renderAssignmentList('assignmentList', VAR_ASSIGNMENTS[currentVar] || [], currentVar);
+    updateAssignmentWarning('assignmentList', currentVar);
+    document.getElementById('assignmentModal').classList.add('open');
+  }
+
+  function closeAssignmentModal() {
+    document.getElementById('assignmentModal').classList.remove('open');
+    pendingAssignmentMode = null;
+  }
+
+  document.getElementById('manageAssignmentBtn').addEventListener('click', openAssignmentModal);
+  document.getElementById('assignmentCloseBtn').addEventListener('click', closeAssignmentModal);
+  document.getElementById('assignmentCancelBtn').addEventListener('click', closeAssignmentModal);
+  document.getElementById('assignmentSaveBtn').addEventListener('click', function() {
+    if (!pendingAssignmentMode) return;
+    var title = VAR_META[pendingAssignmentMode].title;
+    applyAssignments(pendingAssignmentMode, selectedAssignmentIds('assignmentList'));
+    closeAssignmentModal();
+    showToast('Assignments updated for ' + title);
+  });
+  document.getElementById('assignmentModal').addEventListener('click', function(e) {
+    if (e.target === this) closeAssignmentModal();
+  });
+
+  function openDeleteVariationModal() {
+    if (currentVar === 'base') return;
+    var meta = VAR_META[currentVar];
+    if (!meta) return;
+    var assignmentCount = (VAR_ASSIGNMENTS[currentVar] || []).length;
+    document.getElementById('deleteVariationSubtitle').textContent = meta.title;
+    document.getElementById('deleteVariationWarning').textContent = meta.title + ' will use the base recipe again. ' + assignmentCount + ' linked outlet' + (assignmentCount === 1 ? ' or group' : 's or groups') + ' will be unlinked from this variation. Any custom ingredients, quantities, cooking instructions, and pricing for this variation will be removed.';
+    document.getElementById('deleteVariationModal').classList.add('open');
+  }
+
+  function closeDeleteVariationModal() {
+    document.getElementById('deleteVariationModal').classList.remove('open');
+  }
+
+  function deleteCurrentVariation() {
+    if (currentVar === 'base') return;
+    var key = currentVar;
+    var meta = VAR_META[key];
+    if (!meta) return;
+    deletedVariationTitles.add(meta.title);
+    delete VAR_ASSIGNMENTS[key];
+    delete VAR_META[key];
+    unsavedVariations.delete(key);
+    var tab = document.querySelector('.var-item[data-var="' + key + '"]');
+    if (tab) tab.remove();
+    var moreOption = document.querySelector('.var-more-option[data-var="' + key + '"]');
+    if (moreOption) moreOption.remove();
+    closeDeleteVariationModal();
+    switchVariation('base');
+    renderFilterChips();
+    showToast(meta.title + ' deleted. It now uses the base recipe.');
+  }
+
+  function recreateVariationFromSnapshot(v, title) {
+    var snapshotVariation = (v.snapshot.variations || []).find(function(vr) { return vr.title === title; });
+    if (!snapshotVariation || variationExistsByTitle(title)) return null;
+    var key = keyFromVariationTitle(title);
+    var costNum = parseFloat(String(snapshotVariation.cost || '').replace(/[^0-9.]/g, '')) || 0;
+    VAR_META[key] = { title: title, cost: snapshotVariation.cost, costNum: costNum, retail: '52.00' };
+    VAR_ASSIGNMENTS[key] = [];
+    VAR_KEY_ORDER.push(key);
+    deletedVariationTitles.delete(title);
+    var tab = document.createElement('div');
+    tab.className = 'var-item';
+    tab.dataset.var = key;
+    tab.textContent = title;
+    document.getElementById('varTabs').appendChild(tab);
+    bindVariationTab(tab);
+    return key;
+  }
+
+  document.getElementById('deleteVariationBtn').addEventListener('click', openDeleteVariationModal);
+  document.getElementById('deleteVariationCloseBtn').addEventListener('click', closeDeleteVariationModal);
+  document.getElementById('deleteVariationCancelBtn').addEventListener('click', closeDeleteVariationModal);
+  document.getElementById('deleteVariationConfirmBtn').addEventListener('click', deleteCurrentVariation);
+  document.getElementById('deleteVariationModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteVariationModal();
+  });
 
   function layoutVariationRail() {
     var rail = document.getElementById('variationRail');
@@ -2000,6 +2763,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   document.addEventListener('click', function() {
     var wrap = document.getElementById('varMoreWrap'); if (wrap) wrap.classList.remove('open');
     var pw = document.getElementById('previewMoreWrap'); if (pw) pw.classList.remove('open');
+    var as = document.getElementById('assignmentSummary'); if (as) as.classList.remove('open');
+    var asBtn = document.getElementById('assignmentSummaryBtn'); if (asBtn) asBtn.classList.remove('active');
   });
   window.addEventListener('resize', layoutVariationRail);
 
@@ -2066,11 +2831,30 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     }
   });
 
-  document.getElementById('createVariationBtn').addEventListener('click', function() {
+  function openCreateVariationModal() {
+    var nextVariationNumber = newVariationCount + 1;
+    var title = nextVariationNumber === 1 ? 'New Variation' : 'New Variation ' + nextVariationNumber;
+    document.getElementById('createVariationName').value = title;
+    renderAssignmentList('createAssignmentList', [], '');
+    updateAssignmentWarning('createAssignmentList', '');
+    document.getElementById('createVariationModal').classList.add('open');
+    setTimeout(function() {
+      document.getElementById('createVariationName').focus();
+      document.getElementById('createVariationName').select();
+    }, 60);
+  }
+
+  function closeCreateVariationModal() {
+    document.getElementById('createVariationModal').classList.remove('open');
+  }
+
+  function createVariationFromModal() {
     newVariationCount += 1;
     var key = 'new' + newVariationCount;
-    var title = newVariationCount === 1 ? 'New Variation' : 'New Variation ' + newVariationCount;
+    var title = document.getElementById('createVariationName').value.trim() || ('New Variation ' + newVariationCount);
     VAR_META[key] = { title: title, cost: 'A$18.20', costNum: 18.20, retail: '52.00' };
+    VAR_ASSIGNMENTS[key] = [];
+    applyAssignments(key, selectedAssignmentIds('createAssignmentList'));
     unsavedVariations.add(key);
 
     var tab = document.createElement('div');
@@ -2079,12 +2863,24 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     tab.textContent = title;
     document.getElementById('varTabs').appendChild(tab);
     bindVariationTab(tab);
+    closeCreateVariationModal();
     switchVariation(key);
     showToast('Created ' + title);
-    startRenameVariation();
+  }
+
+  document.getElementById('createVariationBtn').addEventListener('click', openCreateVariationModal);
+  document.getElementById('createVariationCloseBtn').addEventListener('click', closeCreateVariationModal);
+  document.getElementById('createVariationCancelBtn').addEventListener('click', closeCreateVariationModal);
+  document.getElementById('createVariationConfirmBtn').addEventListener('click', createVariationFromModal);
+  document.getElementById('createVariationName').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') createVariationFromModal();
+    if (e.key === 'Escape') closeCreateVariationModal();
+  });
+  document.getElementById('createVariationModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCreateVariationModal();
   });
 
-  updateFoodCostHighlight();
+  updateSubRecipeMode();
   function updateSaveContext() {
     var ctx = document.getElementById('saveContext');
     if (ctx) ctx.classList.toggle('show', window.scrollY > 160);
