@@ -226,6 +226,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .var-item { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--rule); background: #fff; cursor: pointer; font-size: 13px; color: var(--ink); font-weight: 500; transition: all .12s; }
 .var-item:hover:not(.active) { background: var(--row-hover); }
 .var-item.active { background: rgba(42,200,100,.1); border-color: #a8e6be; color: var(--seaweed); font-weight: 600; }
+.var-item.dirty::after { content:""; width:7px; height:7px; border-radius:50%; background:#E8B94F; box-shadow:0 0 0 2px #fff; flex:0 0 auto; }
 .var-rail-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 6px; border-radius: 3px; display: inline-block; width: fit-content; }
 .var-item-add { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 6px; border: 1px dashed #dcdee3; font-size: 13px; color: var(--spinach); cursor: pointer; transition: all .12s; }
 .var-item-add:hover { background: var(--row-hover); }
@@ -395,10 +396,12 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .assignment-option { display:flex; align-items:flex-start; gap:10px; border:1px solid var(--rule); border-radius:8px; padding:10px 12px; cursor:pointer; }
 .assignment-option:hover { background:#fbfcfb; }
 .assignment-option input { margin-top:2px; accent-color:var(--nomni-green); }
+.assignment-option > span { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; min-width:0; }
 .assignment-option-title { font-size:14px; font-weight:600; color:var(--ink); }
-.assignment-option-meta { margin-top:2px; font-size:12px; color:var(--ink-mute); }
+.assignment-option-meta { font-size:12px; color:var(--ink-mute); }
 .assignment-warning { display:none; background:#FFF8EC; border:1px solid #F5D97A; border-radius:8px; padding:10px 12px; font-size:13px; color:#7A5F00; line-height:1.45; }
 .assignment-warning.show { display:block; }
+.assignment-warning-title { font-weight:700; color:#7A5F00; }
 .body-section::before { display:none !important; content:none !important; }
 .cost-bar { margin: 14px 26px 8px; border: 0; background: transparent; gap: 12px; align-items: stretch; }
 .cost-bar-item { border: 1px solid var(--rule); border-radius: 14px; padding: 18px 18px 20px; background: linear-gradient(180deg, #fff 0%, #fbfcfb 100%); box-shadow: 0 3px 12px rgba(10,20,15,.04); min-height: 126px; justify-content: flex-start; }
@@ -493,6 +496,39 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 #ingBody tr[draggable="true"] { cursor:grab; }
 #ingBody tr.dragging { opacity:.42; }
 #ingBody tr.drag-over td { box-shadow: inset 0 2px 0 var(--nomni-green); }
+.bulk-apply-row td { padding: 0 16px 8px !important; border: 0 !important; background: transparent !important; }
+.bulk-apply-card { display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid #b9efc8; background:#f3fff6; border-radius:10px; padding:10px 12px; box-shadow:0 3px 10px rgba(14,55,39,.04); }
+.bulk-apply-text { font-size:13px; color:var(--seaweed); line-height:1.35; }
+.bulk-apply-text strong { font-weight:700; }
+.bulk-apply-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.pending-updates-tray { display:none; border:1px solid #b9efc8; background:#f8fffa; border-radius:12px; padding:12px; margin:0 0 14px; }
+.pending-updates-tray.show { display:block; }
+.pending-updates-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px; }
+.pending-updates-title { font-size:13px; font-weight:700; color:var(--seaweed); }
+.pending-updates-list { display:flex; flex-direction:column; gap:6px; }
+.pending-update-section { display:flex; flex-direction:column; gap:6px; }
+.pending-update-section + .pending-update-section { margin-top:12px; }
+.pending-update-section-title { font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-mute); padding:0 2px; }
+.pending-update-item { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid #d8f4df; background:#fff; border-radius:8px; padding:8px 10px; }
+.pending-update-main { min-width:0; }
+.pending-update-name { font-size:13px; font-weight:700; color:var(--ink); }
+.pending-update-meta { font-size:12px; color:var(--ink-mute); margin-top:1px; }
+.save-status { display:none; align-items:center; gap:8px; min-width:0; }
+.save-status.show { display:flex; }
+.save-status-text { font-size:13px; font-weight:700; color:var(--seaweed); white-space:nowrap; }
+.save-status-btn { border:0; background:var(--mint); color:var(--seaweed); border-radius:6px; padding:7px 10px; font:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+.save-status-btn:hover { background:#ccf7d3; }
+.bulk-mini-btn { border:0; border-radius:6px; padding:7px 10px; font:inherit; font-size:12px; font-weight:700; cursor:pointer; background:#fff; color:var(--ink-2); }
+.bulk-mini-btn:hover { background:#edf7f0; }
+.bulk-mini-btn.primary { background:var(--nomni-green); color:var(--seaweed); }
+.bulk-variation-toolbar { display:flex; justify-content:flex-end; margin-bottom:8px; }
+.bulk-select-link { border:0; background:transparent; color:var(--spinach); padding:2px 0; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+.bulk-select-link:hover { color:var(--seaweed); text-decoration:underline; }
+.bulk-variation-list { display:flex; flex-direction:column; gap:8px; max-height:340px; overflow-y:auto; }
+.bulk-variation-option { display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; border:1px solid var(--rule); border-radius:8px; padding:10px 12px; }
+.bulk-variation-option input { accent-color:var(--nomni-green); }
+.bulk-var-title { font-size:14px; font-weight:600; color:var(--ink); }
+.bulk-var-change { font-size:13px; color:var(--ink-mute); white-space:nowrap; }
 .drag-handle { cursor:grab; }
 .drag-handle:active { cursor:grabbing; }
 @media (max-width: 1280px) { .save-bar { left:56px !important; } }
@@ -825,8 +861,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
 <!-- Save bar -->
 <div class="save-bar">
-  <div class="save-context" id="saveContext">
-    <span class="save-context-title">BBQ Baby Back Pork Ribs with House Sauce — Half Rack</span>
+  <div class="save-status" id="saveStatus">
+    <span class="save-status-text" id="saveStatusText"></span>
+    <button class="save-status-btn" id="reviewPendingBtn" type="button" style="display:none">Review pending</button>
   </div>
   <div class="save-actions">
   <span class="save-timestamp" id="saveTimestamp">Last saved Jun 24 at 3:42 PM</span>
@@ -917,6 +954,56 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     <div class="modal-foot">
       <button class="btn btn-tertiary" id="modalCancelBtn" type="button">Cancel</button>
       <button class="btn btn-primary" id="modalSaveBtn" type="button">Save recipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Review variation update modal -->
+<div class="modal-overlay centered" id="bulkQtyModal">
+  <div class="modal-card" style="width:620px">
+    <div class="modal-header">
+      <div class="restore-modal-head">
+        <div>
+          <div class="modal-title" id="bulkQtyTitle">Review variation update</div>
+          <div class="modal-subtitle" id="bulkQtySubtitle"></div>
+        </div>
+        <button class="restore-modal-close" id="bulkQtyCloseBtn" type="button" aria-label="Close variation update dialog">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding-top:0">
+      <div class="bulk-variation-toolbar">
+        <button class="bulk-select-link" id="bulkQtySelectAllBtn" type="button">Select all</button>
+      </div>
+      <div class="bulk-variation-list" id="bulkQtyList"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-tertiary" id="bulkQtyCancelBtn" type="button">Cancel</button>
+      <button class="btn btn-primary" id="bulkQtyApplyBtn" type="button">Apply to selected variations</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pending variation updates modal -->
+<div class="modal-overlay centered" id="pendingUpdatesModal">
+  <div class="modal-card" style="width:620px">
+    <div class="modal-header">
+      <div class="restore-modal-head">
+        <div>
+          <div class="modal-title">Pending variation updates</div>
+          <div class="modal-subtitle">Review changes before applying them to other variations.</div>
+        </div>
+        <button class="restore-modal-close" id="pendingUpdatesCloseBtn" type="button" aria-label="Close pending updates">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding-top:0">
+      <div class="pending-updates-list" id="pendingUpdatesList"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-tertiary" id="pendingUpdatesDoneBtn" type="button">Done</button>
     </div>
   </div>
 </div>
@@ -1427,9 +1514,18 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
         dd.querySelectorAll('.ing-dd-item').forEach(function(item) {
           item.addEventListener('mousedown', function(e) {
             e.preventDefault();
+            var previousName = input.dataset.pendingAddName || '';
             input.value = this.dataset.name;
             input.dataset.supplier = this.dataset.supplier;
+            input.dataset.pendingAddName = this.dataset.name;
             dd.style.display = 'none';
+            var row = input.closest('tr');
+            if (previousName && previousName !== input.value && typeof removePendingBulkUpdate === 'function') {
+              removePendingBulkUpdate('add', previousName, currentVar);
+            }
+            if (row && row.parentElement && row.parentElement.id === 'ingBody' && typeof createPendingIngredientAdd === 'function') {
+              createPendingIngredientAdd(row, input.value);
+            }
           });
         });
       }
@@ -1481,23 +1577,24 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       '<td class="r"><span class="price-val">A$0.00</span></td>';
 
     body.appendChild(tr);
+    markVariationDirty(currentVar);
     const nameCellTd = tr.querySelector('.ing-name-cell-td');
     const selectCell = makeIngSelectCell();
     nameCellTd.appendChild(selectCell);
     selectCell.querySelector('.ing-name-input').focus();
 
-    tr.querySelector('.del-btn').addEventListener('click', function() {
-      tr.remove();
-      if (typeof renumberIngredients === 'function') renumberIngredients();
-      else document.querySelectorAll('#ingBody .row-num').forEach(function(el, i) { el.textContent = i + 1; });
-    });
+    bindIngredientDeleteButtons(tr);
+    if (typeof bindQuantityBulkPrompts === 'function') bindQuantityBulkPrompts(tr);
     if (typeof makeRowsDraggable === 'function') makeRowsDraggable();
   }
 
   // Cooking char count
   const ta = document.getElementById('cookingTA');
   document.getElementById('charCount').textContent = (ta.value.length) + '/1500';
-  ta.addEventListener('input', function() { document.getElementById('charCount').textContent = ta.value.length + '/1500'; });
+  ta.addEventListener('input', function() {
+    document.getElementById('charCount').textContent = ta.value.length + '/1500';
+    markVariationDirty(currentVar);
+  });
 
   // Save → check for active chips + warnings → show conflict modal
   var savedSubRecipe = false;
@@ -1544,9 +1641,17 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   }
 
   document.getElementById('saveBtn').addEventListener('click', function() {
+    if (pendingBulkQtyUpdates.length) {
+      openPendingUpdatesModal();
+      showToast('Review pending variation updates before saving.');
+      return;
+    }
+
     if (document.getElementById('subRecipe').checked && !savedSubRecipe) {
       savedSubRecipe = true;
       unsavedVariations.clear();
+      setTabDirtyStates();
+      updateSaveStatus();
       updateSubRecipeMode();
       updateSaveTimestamp();
       showToast('Saved as a sub-recipe. This cannot be changed back.');
@@ -1559,6 +1664,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       document.getElementById('conflictModal').classList.add('open');
     } else {
       unsavedVariations.clear();
+      setTabDirtyStates();
+      updateSaveStatus();
       updateSaveTimestamp();
       window.location.href = 'Admin - HQ Settings.html#recipes';
     }
@@ -1571,6 +1678,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   document.getElementById('modalSaveBtn').addEventListener('click', function() {
     if (document.getElementById('subRecipe').checked) {
       savedSubRecipe = true;
+      unsavedVariations.clear();
+      setTabDirtyStates();
+      updateSaveStatus();
       updateSubRecipeMode();
     }
     window.location.href = 'Admin - HQ Settings.html#recipes';
@@ -1738,6 +1848,391 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     { date: '9 Jan 2025, 9:30 am', user: 'William Arya', name: '', varCount: 1, expired: true, snapshot: VERSION_SNAPSHOT_C },
     { date: '5 Nov 2024, 2:30 pm', user: 'William Arya', name: 'Initial approved version', varCount: 1, expired: true, snapshot: VERSION_SNAPSHOT_C },
   ];
+
+  var pendingBulkQty = null;
+  var pendingBulkQtyUpdates = [];
+
+  function markVariationDirty(key) {
+    if (!key) return;
+    unsavedVariations.add(key);
+    setTabDirtyStates();
+    updateSaveStatus();
+  }
+
+  function setTabDirtyStates() {
+    document.querySelectorAll('.var-item').forEach(function(tab) {
+      tab.classList.toggle('dirty', unsavedVariations.has(tab.dataset.var));
+    });
+    document.querySelectorAll('.var-more-option').forEach(function(option) {
+      option.classList.toggle('dirty', unsavedVariations.has(option.dataset.var));
+    });
+  }
+
+  function updateSaveStatus() {
+    var status = document.getElementById('saveStatus');
+    var text = document.getElementById('saveStatusText');
+    var reviewBtn = document.getElementById('reviewPendingBtn');
+    if (!status || !text || !reviewBtn) return;
+    var parts = [];
+    if (unsavedVariations.size) {
+      parts.push('Unsaved changes in ' + unsavedVariations.size + ' variation' + (unsavedVariations.size === 1 ? '' : 's'));
+    }
+    if (pendingBulkQtyUpdates.length) {
+      parts.push(pendingBulkQtyUpdates.length + ' variation update' + (pendingBulkQtyUpdates.length === 1 ? '' : 's') + ' pending');
+    }
+    status.classList.toggle('show', parts.length > 0);
+    text.textContent = parts.join(' · ');
+    reviewBtn.style.display = pendingBulkQtyUpdates.length ? '' : 'none';
+  }
+
+  function rowIngredientName(row) {
+    var el = row ? row.querySelector('.ing-name-main') : null;
+    if (el) return el.childNodes[0].textContent.trim();
+    var input = row ? row.querySelector('.ing-name-input') : null;
+    return input ? input.value.trim() : '';
+  }
+
+  function rowQuantityLabel(row) {
+    var qtyInput = row.querySelector('.qty-input');
+    var uomSelect = row.querySelector('.uom-select');
+    var qty = qtyInput ? qtyInput.value : '';
+    var uom = uomSelect ? uomSelect.value : '';
+    return (qty || '0') + (uom ? ' ' + uom : '');
+  }
+
+  function variationUsageForIngredient(name, newQty) {
+    return VAR_KEY_ORDER.filter(function(key) { return VAR_META[key]; }).map(function(key, idx) {
+      var snapVar = VERSION_SNAPSHOT_A.variations[idx];
+      if (!snapVar) return null;
+      var ing = snapVar.ings.find(function(item) { return item.name === name; });
+      if (!ing) return null;
+      return {
+        key: key,
+        title: VAR_META[key].title,
+        current: ing.qty,
+        next: newQty
+      };
+    }).filter(Boolean);
+  }
+
+  function variationHasIngredient(key, name) {
+    var idx = VAR_KEY_ORDER.indexOf(key);
+    var snapVar = VERSION_SNAPSHOT_A.variations[idx];
+    return !!(snapVar && snapVar.ings.some(function(item) { return item.name === name; }));
+  }
+
+  function allActiveVariationKeys() {
+    return VAR_KEY_ORDER.filter(function(key) { return VAR_META[key]; });
+  }
+
+  function usageForAddedIngredient(name) {
+    return allActiveVariationKeys().map(function(key) {
+      var exists = variationHasIngredient(key, name);
+      var state = key === currentVar ? 'source' : (exists ? 'exists' : 'available');
+      return {
+        key: key,
+        title: VAR_META[key].title,
+        state: state,
+        current: state === 'exists' ? 'Already exists' : (state === 'source' ? 'Added here' : 'Not in variation'),
+        next: state === 'exists' ? 'No change' : 'Add'
+      };
+    });
+  }
+
+  function usageForRemovedIngredient(name, sourceVars) {
+    sourceVars = sourceVars || [currentVar];
+    return allActiveVariationKeys().map(function(key) {
+      var isSource = sourceVars.indexOf(key) !== -1;
+      if (!isSource && !variationHasIngredient(key, name)) return null;
+      return {
+        key: key,
+        title: VAR_META[key].title,
+        state: isSource ? 'source' : 'available',
+        current: isSource ? 'Removed here' : 'Has ingredient',
+        next: 'Remove'
+      };
+    }).filter(Boolean);
+  }
+
+  function clearBulkApplyPrompt() {
+    document.querySelectorAll('.bulk-apply-row').forEach(function(row) { row.remove(); });
+  }
+
+  function pendingUpdateKey(update) {
+    if ((update.type || 'quantity') === 'remove') return 'remove|' + update.ingredient;
+    return (update.type || 'quantity') + '|' + update.ingredient + '|' + update.sourceVar;
+  }
+
+  function upsertPendingBulkUpdate(update) {
+    var existingIndex = pendingBulkQtyUpdates.findIndex(function(item) {
+      return pendingUpdateKey(item) === pendingUpdateKey(update);
+    });
+    if (existingIndex >= 0) pendingBulkQtyUpdates[existingIndex] = update;
+    else pendingBulkQtyUpdates.push(update);
+    renderPendingUpdatesTray();
+  }
+
+  function removePendingBulkUpdate(type, ingredient, sourceVar) {
+    var key = pendingUpdateKey({ type: type, ingredient: ingredient, sourceVar: sourceVar });
+    var before = pendingBulkQtyUpdates.length;
+    pendingBulkQtyUpdates = pendingBulkQtyUpdates.filter(function(update) {
+      return pendingUpdateKey(update) !== key;
+    });
+    if (before !== pendingBulkQtyUpdates.length) renderPendingUpdatesTray();
+    return before !== pendingBulkQtyUpdates.length;
+  }
+
+  function removeSourceFromPendingRemove(ingredient, sourceVar) {
+    var existing = pendingBulkQtyUpdates.find(function(update) {
+      return (update.type || 'quantity') === 'remove' && update.ingredient === ingredient;
+    });
+    if (!existing) return false;
+    var sourceVars = (existing.sourceVars || [existing.sourceVar]).filter(function(key) { return key !== sourceVar; });
+    if (!sourceVars.length) {
+      return removePendingBulkUpdate('remove', ingredient, sourceVar);
+    }
+    existing.sourceVars = sourceVars;
+    existing.sourceVar = sourceVars[0];
+    existing.usage = usageForRemovedIngredient(ingredient, sourceVars);
+    renderPendingUpdatesTray();
+    return true;
+  }
+
+  function renderPendingUpdatesList() {
+    var list = document.getElementById('pendingUpdatesList');
+    if (!list) return;
+    var sections = [
+      { type: 'quantity', title: 'Quantity changes' },
+      { type: 'add', title: 'Add ingredients' },
+      { type: 'remove', title: 'Remove ingredients' }
+    ];
+    list.innerHTML = sections.map(function(section) {
+      var items = pendingBulkQtyUpdates.map(function(update, idx) {
+        return { update: update, idx: idx };
+      }).filter(function(item) {
+        return (item.update.type || 'quantity') === section.type;
+      });
+      if (!items.length) return '';
+      return '<div class="pending-update-section">' +
+        '<div class="pending-update-section-title">' + section.title + '</div>' +
+        items.map(function(item) {
+          var update = item.update;
+          return '<div class="pending-update-item">' +
+            '<div class="pending-update-main">' +
+              '<div class="pending-update-name">' + escapeHtml(update.ingredient) + '</div>' +
+            '</div>' +
+            '<div class="bulk-apply-actions">' +
+              '<button class="bulk-mini-btn primary" type="button" data-pending-review="' + item.idx + '">Review</button>' +
+              '<button class="bulk-mini-btn" type="button" data-pending-dismiss="' + item.idx + '">Dismiss</button>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+    }).join('');
+    if (!pendingBulkQtyUpdates.length) {
+      list.innerHTML = '<div class="pending-update-item"><div class="pending-update-main"><div class="pending-update-name">No pending updates</div></div></div>';
+    }
+    list.querySelectorAll('[data-pending-review]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        pendingBulkQty = pendingBulkQtyUpdates[parseInt(btn.dataset.pendingReview, 10)];
+        closePendingUpdatesModal();
+        openBulkQtyModal();
+      });
+    });
+    list.querySelectorAll('[data-pending-dismiss]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        pendingBulkQtyUpdates.splice(parseInt(btn.dataset.pendingDismiss, 10), 1);
+        renderPendingUpdatesList();
+        updateSaveStatus();
+      });
+    });
+  }
+
+  function renderPendingUpdatesTray() {
+    renderPendingUpdatesList();
+    updateSaveStatus();
+  }
+
+  function showBulkApplyPrompt(sourceRow) {
+    var name = rowIngredientName(sourceRow);
+    if (!name) return;
+    var newQty = rowQuantityLabel(sourceRow);
+    var usage = variationUsageForIngredient(name, newQty);
+    markVariationDirty(currentVar);
+    if (usage.length <= 1) return;
+    clearBulkApplyPrompt();
+    pendingBulkQty = { type: 'quantity', ingredient: name, newQty: newQty, usage: usage, sourceVar: currentVar };
+    upsertPendingBulkUpdate(pendingBulkQty);
+    var otherCount = usage.length - 1;
+    var tr = document.createElement('tr');
+    tr.className = 'bulk-apply-row';
+    tr.innerHTML = '<td colspan="5">' +
+      '<div class="bulk-apply-card">' +
+        '<div class="bulk-apply-text"><strong>' + escapeHtml(name) + '</strong> appears in ' + otherCount + ' other variation' + (otherCount === 1 ? '' : 's') + '. Apply this quantity change elsewhere?</div>' +
+        '<div class="bulk-apply-actions">' +
+          '<button class="bulk-mini-btn" type="button" data-bulk-action="only">Only this variation</button>' +
+          '<button class="bulk-mini-btn primary" type="button" data-bulk-action="review">Review variations</button>' +
+        '</div>' +
+      '</div>' +
+    '</td>';
+    sourceRow.insertAdjacentElement('afterend', tr);
+    tr.querySelector('[data-bulk-action="only"]').addEventListener('click', function() {
+      removePendingBulkUpdate('quantity', name, currentVar);
+      clearBulkApplyPrompt();
+      showToast('Quantity updated for this variation only.');
+    });
+    tr.querySelector('[data-bulk-action="review"]').addEventListener('click', openBulkQtyModal);
+  }
+
+  function createPendingIngredientAdd(row, name) {
+    name = (name || rowIngredientName(row)).trim();
+    if (!name) return;
+    markVariationDirty(currentVar);
+    removeSourceFromPendingRemove(name, currentVar);
+    pendingBulkQty = { type: 'add', ingredient: name, usage: usageForAddedIngredient(name), sourceVar: currentVar };
+    upsertPendingBulkUpdate(pendingBulkQty);
+    showToast('Ingredient added here. Review pending updates to add it to other variations.');
+  }
+
+  function createPendingIngredientRemove(row, name) {
+    name = (name || rowIngredientName(row)).trim();
+    if (!name) return;
+    markVariationDirty(currentVar);
+    if (removePendingBulkUpdate('add', name, currentVar)) {
+      showToast('New ingredient removed from this variation.');
+      return;
+    }
+    var existingRemove = pendingBulkQtyUpdates.find(function(update) {
+      return (update.type || 'quantity') === 'remove' && update.ingredient === name;
+    });
+    var sourceVars = existingRemove ? (existingRemove.sourceVars || [existingRemove.sourceVar]).slice() : [];
+    if (sourceVars.indexOf(currentVar) === -1) sourceVars.push(currentVar);
+    pendingBulkQty = { type: 'remove', ingredient: name, usage: usageForRemovedIngredient(name, sourceVars), sourceVar: sourceVars[0], sourceVars: sourceVars };
+    upsertPendingBulkUpdate(pendingBulkQty);
+    showToast('Ingredient removed here. Review pending updates to remove it from other variations.');
+  }
+
+  function handleIngredientRemoval(btn) {
+    var row = btn.closest('tr');
+    if (!row || !confirm('Remove this ingredient?')) return;
+    var name = rowIngredientName(row);
+    row.remove();
+    clearBulkApplyPrompt();
+    createPendingIngredientRemove(row, name);
+    if (typeof renumberIngredients === 'function') renumberIngredients();
+    else document.querySelectorAll('#ingBody .row-num').forEach(function(el, i) { el.textContent = i + 1; });
+  }
+
+  function bindQuantityBulkPrompts(scope) {
+    (scope || document).querySelectorAll('.qty-input, .uom-select').forEach(function(input) {
+      if (input.dataset.bulkBound) return;
+      input.dataset.bulkBound = 'true';
+      input.addEventListener('change', function() {
+        var row = input.closest('tr');
+        if (row && row.parentElement && row.parentElement.id === 'ingBody') showBulkApplyPrompt(row);
+      });
+    });
+  }
+
+  function bindIngredientDeleteButtons(scope) {
+    (scope || document).querySelectorAll('.del-btn').forEach(function(btn) {
+      if (btn.dataset.deleteBound) return;
+      btn.dataset.deleteBound = 'true';
+      btn.addEventListener('click', function() {
+        handleIngredientRemoval(btn);
+      });
+    });
+  }
+
+  function openBulkQtyModal() {
+    if (!pendingBulkQty) return;
+    var type = pendingBulkQty.type || 'quantity';
+    var subtitle = pendingBulkQty.ingredient + ' appears in ' + pendingBulkQty.usage.length + ' variations.';
+    if (type === 'add') {
+      subtitle = 'Choose which variations should also get ' + pendingBulkQty.ingredient + '. Variations that already have it are shown for reference.';
+    } else if (type === 'remove') {
+      subtitle = 'Choose which variations should also remove ' + pendingBulkQty.ingredient + '.';
+    }
+    document.getElementById('bulkQtyTitle').textContent = type === 'add' ? 'Add ingredient to variations' : (type === 'remove' ? 'Remove ingredient from variations' : 'Apply quantity change');
+    document.getElementById('bulkQtySubtitle').textContent = subtitle;
+    document.getElementById('bulkQtyList').innerHTML = pendingBulkQty.usage.map(function(item) {
+      var checked = '';
+      if (type === 'quantity') checked = item.key === pendingBulkQty.sourceVar ? ' checked disabled' : ' checked';
+      if (type === 'add') checked = item.state === 'source' ? ' checked disabled' : (item.state === 'exists' ? ' disabled' : '');
+      if (type === 'remove') checked = item.state === 'source' ? ' checked disabled' : ' checked';
+      return '<label class="bulk-variation-option">' +
+        '<input type="checkbox" value="' + escapeHtml(item.key) + '"' + checked + ' />' +
+        '<span class="bulk-var-title">' + escapeHtml(item.title) + '</span>' +
+        '<span class="bulk-var-change">' + escapeHtml(item.current) + ' → ' + escapeHtml(item.next) + '</span>' +
+      '</label>';
+    }).join('');
+    updateBulkSelectAllLink();
+    document.querySelectorAll('#bulkQtyList input[type="checkbox"]').forEach(function(input) {
+      input.addEventListener('change', updateBulkSelectAllLink);
+    });
+    document.getElementById('bulkQtyModal').classList.add('open');
+  }
+
+  function updateBulkSelectAllLink() {
+    var btn = document.getElementById('bulkQtySelectAllBtn');
+    var eligible = Array.prototype.slice.call(document.querySelectorAll('#bulkQtyList input[type="checkbox"]:not(:disabled)'));
+    if (!btn) return;
+    var allSelected = eligible.length > 0 && eligible.every(function(input) { return input.checked; });
+    btn.textContent = allSelected ? 'Deselect all' : 'Select all';
+    btn.style.display = eligible.length ? '' : 'none';
+  }
+
+  function closeBulkQtyModal() {
+    document.getElementById('bulkQtyModal').classList.remove('open');
+  }
+
+  document.getElementById('bulkQtyCloseBtn').addEventListener('click', closeBulkQtyModal);
+  document.getElementById('bulkQtyCancelBtn').addEventListener('click', closeBulkQtyModal);
+  document.getElementById('bulkQtySelectAllBtn').addEventListener('click', function() {
+    var eligible = Array.prototype.slice.call(document.querySelectorAll('#bulkQtyList input[type="checkbox"]:not(:disabled)'));
+    var allSelected = eligible.length > 0 && eligible.every(function(input) { return input.checked; });
+    eligible.forEach(function(input) {
+      input.checked = !allSelected;
+    });
+    updateBulkSelectAllLink();
+  });
+  document.getElementById('bulkQtyApplyBtn').addEventListener('click', function() {
+    var count = document.querySelectorAll('#bulkQtyList input[type="checkbox"]:checked').length;
+    closeBulkQtyModal();
+    clearBulkApplyPrompt();
+    if (pendingBulkQty) {
+      var type = pendingBulkQty.type || 'quantity';
+      var message = 'Quantity applied to ' + count + ' variation' + (count === 1 ? '' : 's') + ' with ' + pendingBulkQty.ingredient + '.';
+      if (type === 'add') message = pendingBulkQty.ingredient + ' added to ' + count + ' variation' + (count === 1 ? '' : 's') + '.';
+      if (type === 'remove') message = pendingBulkQty.ingredient + ' removed from ' + count + ' variation' + (count === 1 ? '' : 's') + '.';
+      showToast(message);
+    }
+    if (pendingBulkQty) {
+      var activeKey = pendingUpdateKey(pendingBulkQty);
+      pendingBulkQtyUpdates = pendingBulkQtyUpdates.filter(function(update) { return pendingUpdateKey(update) !== activeKey; });
+      renderPendingUpdatesTray();
+    }
+    pendingBulkQty = null;
+  });
+  document.getElementById('bulkQtyModal').addEventListener('click', function(e) {
+    if (e.target === this) closeBulkQtyModal();
+  });
+
+  function openPendingUpdatesModal() {
+    renderPendingUpdatesList();
+    document.getElementById('pendingUpdatesModal').classList.add('open');
+  }
+
+  function closePendingUpdatesModal() {
+    document.getElementById('pendingUpdatesModal').classList.remove('open');
+  }
+
+  document.getElementById('reviewPendingBtn').addEventListener('click', openPendingUpdatesModal);
+  document.getElementById('pendingUpdatesCloseBtn').addEventListener('click', closePendingUpdatesModal);
+  document.getElementById('pendingUpdatesDoneBtn').addEventListener('click', closePendingUpdatesModal);
+  document.getElementById('pendingUpdatesModal').addEventListener('click', function(e) {
+    if (e.target === this) closePendingUpdatesModal();
+  });
 
   var VAR_KEY_ORDER = ['base', 'family', 'airport', 'cbd', 'catering', 'events', 'delivery'];
   var activeVarFilter = null;
@@ -2456,12 +2951,12 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     var moves = assignmentMovesFor(containerId, targetKey);
     if (!moves.length) {
       warning.classList.remove('show');
-      warning.textContent = '';
+      warning.innerHTML = '';
       return;
     }
-    warning.textContent = moves.map(function(move) {
-      return assignmentLabel(move.id) + ' will move from ' + VAR_META[move.from].title + '.';
-    }).join(' ');
+    warning.innerHTML = '<div class="assignment-warning-title">' +
+      moves.length + ' selected ' + (moves.length === 1 ? 'assignment' : 'assignments') + ' will move from other variations.' +
+      '</div>';
     warning.classList.add('show');
   }
 
@@ -2553,6 +3048,61 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     .replace('Smoked Paprika', 'Sweet Paprika')
     .replace(/Not available in:[^<]+/g, 'Substituted from base recipe')
     .replace('class="ing-warning"', 'class="ing-warning" style="color:var(--spinach);background:var(--mint)"');
+  var ING_TABLE_HTML_BY_VAR = {};
+
+  function clearIngredientBindingFlags(scope) {
+    (scope || document).querySelectorAll('[data-delete-bound], [data-bulk-bound]').forEach(function(el) {
+      delete el.dataset.deleteBound;
+      delete el.dataset.bulkBound;
+    });
+  }
+
+  function serializeIngredientTable() {
+    var body = document.getElementById('ingBody');
+    var clone = body.cloneNode(true);
+    clone.querySelectorAll('.bulk-apply-row').forEach(function(row) { row.remove(); });
+    clearIngredientBindingFlags(clone);
+    clone.querySelectorAll('input').forEach(function(input) {
+      input.setAttribute('value', input.value || '');
+    });
+    clone.querySelectorAll('select').forEach(function(select) {
+      Array.prototype.slice.call(select.options).forEach(function(option) {
+        option.toggleAttribute('selected', option.value === select.value);
+      });
+    });
+    return clone.innerHTML;
+  }
+
+  function baseIngredientTableHtml() {
+    if (ING_TABLE_HTML_BY_VAR.base) return ING_TABLE_HTML_BY_VAR.base;
+    return serializeIngredientTable();
+  }
+
+  function ingredientTableHtmlForVar(key) {
+    if (ING_TABLE_HTML_BY_VAR[key]) return ING_TABLE_HTML_BY_VAR[key];
+    var html = baseIngredientTableHtml();
+    if (key === 'family') {
+      var wrap = document.createElement('tbody');
+      wrap.innerHTML = html;
+      var row5 = wrap.querySelectorAll('tr')[4];
+      if (row5) {
+        row5.innerHTML = ROW5_VAR_HTML;
+        row5.classList.add('ing-substituted');
+      }
+      return wrap.innerHTML;
+    }
+    return html;
+  }
+
+  function restoreIngredientTableForVar(key) {
+    clearBulkApplyPrompt();
+    var body = document.getElementById('ingBody');
+    body.innerHTML = ingredientTableHtmlForVar(key);
+    clearIngredientBindingFlags(body);
+    bindIngredientDeleteButtons(body);
+    bindQuantityBulkPrompts(body);
+    renumberIngredients();
+  }
 
   function setTabActive(v) {
     document.querySelectorAll('.var-item').forEach(function(el) { el.classList.toggle('active', el.dataset.var === v); });
@@ -2560,6 +3110,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   }
 
   function switchVariation(v) {
+    if (currentVar) {
+      ING_TABLE_HTML_BY_VAR[currentVar] = serializeIngredientTable();
+    }
     currentVar = v;
     setTabActive(v);
     document.getElementById('varContextBar').classList.toggle('show', v === 'family');
@@ -2576,18 +3129,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     if (deleteBtn) deleteBtn.style.display = v === 'base' ? 'none' : 'inline-flex';
     renderAssignmentSummary();
 
-    var rows = document.querySelectorAll('#ingBody tr');
-    var row5 = rows[4];
-    if (row5) {
-      if (v === 'family') {
-        row5.innerHTML = ROW5_VAR_HTML;
-        row5.classList.add('ing-substituted');
-      } else {
-        row5.innerHTML = ROW5_BASE_HTML;
-        row5.classList.remove('ing-substituted');
-      }
-      row5.querySelectorAll('.del-btn').forEach(function(b) { b.addEventListener('click', function() { if (confirm('Remove this ingredient?')) b.closest('tr').remove(); renumberIngredients(); }); });
-    }
+    restoreIngredientTableForVar(v);
     makeRowsDraggable();
     layoutVariationRail();
   }
@@ -2630,8 +3172,12 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     var meta = VAR_META[currentVar];
     if (!meta) return;
     var assignmentCount = (VAR_ASSIGNMENTS[currentVar] || []).length;
+    var assignmentText = assignmentCount + ' linked outlet/group ' + (assignmentCount === 1 ? 'assignment' : 'assignments');
+    var fallbackText = assignmentCount
+      ? assignmentText + ' will fall back to the base recipe.'
+      : 'No outlets or groups are currently assigned to this variation.';
     document.getElementById('deleteVariationSubtitle').textContent = meta.title;
-    document.getElementById('deleteVariationWarning').textContent = meta.title + ' will use the base recipe again. ' + assignmentCount + ' linked outlet' + (assignmentCount === 1 ? ' or group' : 's or groups') + ' will be unlinked from this variation. Any custom ingredients, quantities, cooking instructions, and pricing for this variation will be removed.';
+    document.getElementById('deleteVariationWarning').textContent = fallbackText + ' The custom ingredients, quantities, cooking instructions, and pricing in "' + meta.title + '" will be removed.';
     document.getElementById('deleteVariationModal').classList.add('open');
   }
 
@@ -2893,11 +3439,11 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   var draggedRow = null;
 
   function renumberIngredients() {
-    document.querySelectorAll('#ingBody .row-num').forEach(function(el, i) { el.textContent = i + 1; });
+    document.querySelectorAll('#ingBody tr:not(.bulk-apply-row) .row-num').forEach(function(el, i) { el.textContent = i + 1; });
   }
 
   function getDragAfterElement(container, y) {
-    var rows = Array.prototype.slice.call(container.querySelectorAll('tr:not(.dragging)'));
+    var rows = Array.prototype.slice.call(container.querySelectorAll('tr:not(.dragging):not(.bulk-apply-row)'));
     return rows.reduce(function(closest, child) {
       var box = child.getBoundingClientRect();
       var offset = y - box.top - box.height / 2;
@@ -2910,7 +3456,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
   function makeRowsDraggable() {
     var tbody = document.getElementById('ingBody');
-    tbody.querySelectorAll('tr').forEach(function(row) {
+    tbody.querySelectorAll('tr:not(.bulk-apply-row)').forEach(function(row) {
       row.setAttribute('draggable', 'true');
       row.removeEventListener('dragstart', row._dragStart || function(){});
       row.removeEventListener('dragend', row._dragEnd || function(){});
@@ -2935,6 +3481,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
         e.preventDefault();
         var afterElement = getDragAfterElement(tbody, e.clientY);
         tbody.querySelectorAll('tr').forEach(function(r) { r.classList.remove('drag-over'); });
+        if (!draggedRow) return;
         if (afterElement == null) {
           tbody.appendChild(draggedRow);
         } else {
@@ -2947,6 +3494,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     }
   }
   makeRowsDraggable();
+  bindQuantityBulkPrompts(document.getElementById('ingBody'));
+  bindIngredientDeleteButtons(document.getElementById('ingBody'));
 
   // ── Content tabs (Ingredients / Cooking instructions) ───────────────────
   document.getElementById('tabIngredients').addEventListener('click', function() {
