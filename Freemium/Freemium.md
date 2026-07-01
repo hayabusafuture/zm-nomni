@@ -20,7 +20,7 @@ Step 1 presents two paths after the user enters an email:
 
 2. **Sign up for FREE**
    - Let the user create a real account and begin a 30-day trial.
-   - Step 2 asks for first name, last name, mobile number optional, company registered name, and trading name.
+   - Step 2 asks for first name, last name, mobile number optional, company registered name, and venue name.
    - Step 3 asks optional setup questions: business type, primary goal, number of locations, and current ordering method.
    - Finish sends the user to the trial dashboard placeholder.
 
@@ -85,12 +85,13 @@ The shared `Get started` dialog flow:
 - Demo confirmation:
   - `Check your inbox`
   - Private demo link sent to the captured email, expiring in 30 days.
+- Form validation is temporarily disabled in prototype mode so the flow can be clicked through without entering every field.
 - Signup Step 2:
   - First name
   - Last name
   - Mobile optional
   - Company registered name
-  - Trading name
+  - Venue name
 - Signup Step 3 optional questions:
   - Business type
   - Primary goal
