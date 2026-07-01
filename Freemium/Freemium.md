@@ -9,7 +9,11 @@ The start of the flow currently presents two CTAs:
 - **Get started** as the primary CTA
 - **Book a demo** as the secondary CTA
 
-The `Get started` CTA opens a shared lead-capture and signup dialog on both the Nomni and Zeemart pages. The first screen captures the user's work email and shows the two path CTAs in the same view.
+The `Get started` CTA on the Nomni and Zeemart marketing pages redirects to a Procure-owned entry page: `Freemium/procure-get-started.html`.
+
+That page shows the lead-capture and signup dialog over a heavily blurred Procure dashboard background with a cream-led brand wash. The intent is that the marketing sites only need to own a simple link, while the Procure product owns the lead capture, demo request, signup, onboarding transition, and dashboard handoff.
+
+The first screen captures the user's work email and shows the two path CTAs in the same view.
 
 The opening email screen presents two paths after the user enters an email:
 
@@ -57,6 +61,7 @@ User-provided screenshots used as the strongest visual references:
 
 - `Freemium/nomni.html`
 - `Freemium/Zeemart.html`
+- `Freemium/procure-get-started.html`
 - `Freemium/Procure Trial Dashboard.html`
 
 Generated preview screenshots:
@@ -73,7 +78,7 @@ Both prototypes are standalone HTML files:
 - Google Fonts only
 - Local assets referenced from `_refs`
 
-The shared `Get started` dialog flow:
+The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html`:
 
 - Email screen headline: `Enter your email`
 - Email screen body: `Start free, or take a quick look around first.`
@@ -81,6 +86,11 @@ The shared `Get started` dialog flow:
 - Email screen CTAs:
   - Primary: `Sign up for FREE`
   - Secondary: `Try the demo account`
+- The page reads `?source=nomni` or `?source=zeemart` so the back link can return to the relevant marketing prototype.
+- On page load, the blurred Procure dashboard background appears first. The dialog then fades/settles in softly, shows a short `Opening Nomni Procure` transition, and crossfades into the email step. Step changes also animate the dialog height so the card shape does not snap between forms.
+- Background treatment uses the actual dashboard pattern rather than the trial setup dashboard. It is intentionally very blurred with a cream-led overlay so it gives product context without competing with the dialog, while making the move from the Nomni marketing page feel less abrupt.
+- The entry dialog does not show an `X` close button; returning to the marketing site is reserved for explicit confirmation states.
+- CTA and form label weights are semibold to reduce visual heaviness.
 - Dialog width: `540px` max on desktop.
 - Demo confirmation:
   - `Check your inbox`
@@ -127,7 +137,7 @@ Current key visual structure:
   - Four green check bullets
 - Hero CTA row:
   - Primary CTA: `Get started →`
-    - Opens the shared freemium dialog
+    - Links to `procure-get-started.html?source=nomni`
   - Secondary CTA: `Book a demo`
     - Links to `https://www.nomni.ai/lets-chat`
 - Header CTA:
@@ -153,7 +163,7 @@ Current key visual structure:
   - Nav links: Restaurants, Suppliers, Pricing, News, Support
   - `Get started` green filled button
     - Replaces the previous `Get in touch` button
-    - Opens the same shared freemium dialog as the Nomni page
+    - Links to `procure-get-started.html?source=zeemart`
 - Large rounded hero card on grey background:
   - Text overlay: “Nomni is the new home of Zeemart”
   - Switch pill: `Zeemart → Now Nomni`
