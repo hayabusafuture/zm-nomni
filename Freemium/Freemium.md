@@ -9,9 +9,9 @@ The start of the flow currently presents two CTAs:
 - **Get started** as the primary CTA
 - **Book a demo** as the secondary CTA
 
-The `Get started` CTA opens a shared lead-capture and signup dialog on both the Nomni and Zeemart pages. The first step captures the user's work email and shows the two path CTAs in the same view.
+The `Get started` CTA opens a shared lead-capture and signup dialog on both the Nomni and Zeemart pages. The first screen captures the user's work email and shows the two path CTAs in the same view.
 
-Step 1 presents two paths after the user enters an email:
+The opening email screen presents two paths after the user enters an email:
 
 1. **Try the demo account**
    - User sees a confirmation message telling them to check their inbox.
@@ -20,9 +20,9 @@ Step 1 presents two paths after the user enters an email:
 
 2. **Sign up for FREE**
    - Let the user create a real account and begin a 30-day trial.
-   - Step 2 asks for first name, last name, mobile number optional, company registered name, and venue name.
-   - Step 3 asks optional setup questions: business type, primary goal, number of locations, and current ordering method.
-   - Finish sends the user to the trial dashboard placeholder.
+   - Step 1 asks for first name, last name, mobile number optional, company registered name, and venue name.
+   - Step 2 asks optional setup questions: business type, primary goal, number of locations, and current ordering method.
+   - Finish shows a short `Creating your workspace` transition, then sends the user to the trial dashboard placeholder.
 
 The current landing-page work is the top-of-funnel UI for this flow. The above-the-fold sections should make the “try Nomni Procure” action feel immediate and low-friction.
 
@@ -75,10 +75,10 @@ Both prototypes are standalone HTML files:
 
 The shared `Get started` dialog flow:
 
-- Step 1 headline: `Try Nomni Procure`
-- Step 1 body: `Start free, or take a quick look around first.`
-- Step 1 field: `Work email`
-- Step 1 CTAs:
+- Email screen headline: `Enter your email`
+- Email screen body: `Start free, or take a quick look around first.`
+- Email screen field: `Work email`
+- Email screen CTAs:
   - Primary: `Sign up for FREE`
   - Secondary: `Try the demo account`
 - Dialog width: `540px` max on desktop.
@@ -86,19 +86,23 @@ The shared `Get started` dialog flow:
   - `Check your inbox`
   - Private demo link sent to the captured email, expiring in 30 days.
 - Form validation is temporarily disabled in prototype mode so the flow can be clicked through without entering every field.
-- Signup Step 2:
+- Signup Step 1:
   - First name
   - Last name
   - Mobile optional
   - Company registered name
   - Venue name
-- Signup Step 3 optional questions:
+- Signup Step 2 optional questions:
   - Heading: `Tell us about your business`
   - Body: `A few quick details to help us understand your business.`
   - Business type
   - Primary goal
   - Number of locations
   - Current ordering method
+- Finish transition:
+  - Heading: `Creating your workspace`
+  - Body: `Setting up your Nomni Procure trial.`
+  - Redirects to `Freemium/Procure Trial Dashboard.html` after a short loading state.
 - Dialog padding: `36px` on desktop, reduced slightly on mobile.
 
 The prototypes were initially too large, like the browser was zoomed to roughly 125%. We adjusted:
