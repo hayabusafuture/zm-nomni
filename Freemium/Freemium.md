@@ -93,6 +93,8 @@ The shared `Get started` dialog flow:
   - Company registered name
   - Venue name
 - Signup Step 3 optional questions:
+  - Heading: `Tell us about your business`
+  - Body: `A few quick details to help us understand your business.`
   - Business type
   - Primary goal
   - Number of locations
