@@ -87,6 +87,7 @@ The shared `Get started` dialog flow:
   - Private demo link sent to the captured email, expiring in 30 days.
 - Form validation is temporarily disabled in prototype mode so the flow can be clicked through without entering every field.
 - Signup Step 1:
+  - Body: `Set up the basics for your trial workspace.`
   - First name
   - Last name
   - Mobile optional
