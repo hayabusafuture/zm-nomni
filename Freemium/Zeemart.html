@@ -795,7 +795,7 @@
         <p class="step-kicker">Step 1</p>
         <h2 class="dialog-title" id="dialog-title">Try Nomni Procure</h2>
         <p class="dialog-copy">Start free, or take a quick look around first.</p>
-        <form class="lead-form" data-next-step="details">
+        <form class="lead-form" data-next-step="details" novalidate>
           <input class="email-field" type="email" name="email" placeholder="Work email" autocomplete="email" required />
           <div class="lead-actions">
             <button class="dialog-submit" type="submit" data-next-step="details">Sign up for FREE</button>
@@ -819,7 +819,7 @@
         <p class="step-kicker">Step 2</p>
         <h2 class="dialog-title">Create your free account</h2>
         <p class="dialog-copy">A few details so your workspace feels like yours.</p>
-        <form data-next-step="optional">
+        <form data-next-step="optional" novalidate>
           <div class="form-grid">
             <div class="field">
               <label for="zm-first-name">First name</label>
@@ -855,7 +855,7 @@
         <p class="step-kicker">Step 3</p>
         <h2 class="dialog-title">Tailor your setup</h2>
         <p class="dialog-copy">Optional, but helpful for shaping your first dashboard.</p>
-        <form action="Procure Trial Dashboard.html">
+        <form action="Procure Trial Dashboard.html" novalidate>
           <div class="form-grid">
             <div class="field full">
               <label for="zm-business-type">Business type <span>optional</span></label>
@@ -927,8 +927,9 @@
       dialog.querySelectorAll('button[data-next-step], a[data-next-step]').forEach((control) => {
         control.addEventListener('click', () => {
           if (control.tagName === 'BUTTON' && control.type === 'submit') return;
-          const form = control.closest('form');
-          if (control.hasAttribute('data-requires-email') && form && !form.reportValidity()) return;
+          // Prototype mode: validation is disabled so the full flow can be clicked through freely.
+          // const form = control.closest('form');
+          // if (control.hasAttribute('data-requires-email') && form && !form.reportValidity()) return;
           if (control.hasAttribute('data-requires-email') && emailInput && emailInput.value) {
             emailOutputs.forEach((node) => { node.textContent = emailInput.value; });
           }
@@ -939,7 +940,8 @@
       dialog.querySelectorAll('form[data-next-step]').forEach((form) => {
         form.addEventListener('submit', (event) => {
           event.preventDefault();
-          if (!form.reportValidity()) return;
+          // Prototype mode: validation is disabled so the full flow can be clicked through freely.
+          // if (!form.reportValidity()) return;
           if (emailInput && emailInput.value) {
             emailOutputs.forEach((node) => { node.textContent = emailInput.value; });
           }
