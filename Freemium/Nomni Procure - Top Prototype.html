@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nomni Procure - Top Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,600;1,9..144,700&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --nomni-green: #2AC864;
+      --seaweed: #0E3727;
+      --spinach: #1A8040;
+      --mint: #E2FFE6;
+      --cream: #FAF7E9;
+      --ink: #1A1F2B;
+      --ink-2: #1A1F2B;
+      --ink-mute: #8A8F98;
+      --ink-soft: #C7C9CF;
+      --rule: #E7E8EC;
+      --primary: #2AC864;
+      --primary-hover: #1FA551;
+      --primary-ink: #0E3727;
+      --panel: #FFFFFF;
+      --white: #FFFFFF;
+      --black: #1E2024;
+      --copy-grey: #6B6E77;
+      --shape: #E7E4D5;
+      --deep: #083E2A;
+      --chat-shadow: rgba(10, 20, 15, .18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Hanken Grotesk", "Inter", system-ui, sans-serif;
+      color: var(--seaweed);
+      background: var(--cream);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .notice {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 18px;
+      background: var(--nomni-green);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: .01em;
+    }
+
+    .notice a {
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .nav {
+      height: 86px;
+      width: min(1200px, calc(100% - 48px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 230px 1fr 270px;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo img {
+      display: block;
+      width: 124px;
+      height: auto;
+    }
+
+    .menu {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 38px;
+      color: var(--black);
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .menu a {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chev {
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 9px solid currentColor;
+      transform: translateY(2px);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border-radius: 999px;
+      padding: 0 24px;
+      border: 2px solid transparent;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: transform .16s ease, background-color .16s ease, color .16s ease, border-color .16s ease;
+    }
+
+    .btn:active { transform: scale(.96); }
+    .btn-outline { background: var(--white); color: var(--seaweed); border-color: rgba(14, 55, 39, .72); }
+    .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+    .btn-primary:hover { background: var(--seaweed); color: var(--nomni-green); border-color: var(--seaweed); }
+
+    .hero {
+      min-height: 844px;
+      position: relative;
+      overflow: hidden;
+      padding: 120px 24px 74px;
+      background: var(--cream);
+    }
+
+    .hero-grid {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 430px minmax(540px, 1fr);
+      align-items: center;
+      gap: 70px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .copy {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transform: translateY(-8px);
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      color: var(--seaweed);
+      font-size: 66px;
+      line-height: 1.03;
+      font-weight: 800;
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+
+    h1 em {
+      display: block;
+      color: var(--nomni-green);
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 56px;
+      font-style: italic;
+      font-weight: 700;
+      line-height: .96;
+      letter-spacing: -.04em;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 490px;
+      color: var(--copy-grey);
+      font-size: 20px;
+      line-height: 1.3;
+      text-wrap: pretty;
+    }
+
+    .checks {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 36px 0 38px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .checks li {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: var(--seaweed);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: .005em;
+    }
+
+    .check {
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--nomni-green);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .hero .btn {
+      min-height: 48px;
+      padding: 0 26px;
+      font-size: 15px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--seaweed);
+      border-color: rgba(14, 55, 39, .18);
+      box-shadow: 0 10px 30px rgba(14, 55, 39, .08);
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(14, 55, 39, .34);
+      background: var(--mint);
+    }
+
+    .arrow {
+      width: 24px;
+      height: 2px;
+      background: currentColor;
+      position: relative;
+      opacity: .9;
+    }
+
+    .arrow::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid currentColor;
+      border-top: 2px solid currentColor;
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .visual {
+      height: 560px;
+      position: relative;
+    }
+
+    .visual::before,
+    .visual::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      background: var(--shape);
+      opacity: .72;
+      pointer-events: none;
+    }
+
+    .visual::before {
+      width: 620px;
+      height: 620px;
+      right: -18px;
+      bottom: -166px;
+      border-radius: 50%;
+      clip-path: polygon(0 0, 100% 18%, 100% 100%, 0 100%);
+    }
+
+    .visual::after {
+      width: 620px;
+      height: 350px;
+      right: -58px;
+      top: 100px;
+      border-radius: 24px;
+      transform: rotate(12deg);
+      clip-path: polygon(12% 0, 70% 0, 100% 100%, 0 100%);
+    }
+
+    .screen {
+      position: absolute;
+      z-index: 2;
+      left: 42px;
+      top: 54px;
+      width: 592px;
+      border-radius: 30px;
+      filter: drop-shadow(0 24px 34px rgba(10, 20, 15, .23));
+    }
+
+    .screen img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .status {
+      position: absolute;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 62px;
+      padding: 0 18px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .82);
+      color: var(--copy-grey);
+      font-size: 26px;
+      font-weight: 800;
+      box-shadow: 0 18px 42px rgba(10, 20, 15, .12);
+      backdrop-filter: blur(8px);
+    }
+
+    .status.small {
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 14px;
+      font-size: 15px;
+      top: -16px;
+      left: 334px;
+    }
+
+    .status.placed { top: 44px; left: 377px; }
+    .status.received { top: 138px; left: 436px; }
+    .status.invoiced { top: 218px; left: 518px; }
+
+    .tick {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--nomni-green);
+      color: var(--white);
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .bottom-band {
+      min-height: 154px;
+      background: var(--deep);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bottom-band::after {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      right: 370px;
+      top: 62px;
+      border-radius: 24px;
+      background: var(--nomni-green);
+      opacity: .04;
+      transform: rotate(-12deg);
+    }
+
+    .chat {
+      position: fixed;
+      right: 36px;
+      bottom: 30px;
+      z-index: 20;
+      height: 48px;
+      min-width: 238px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 15px;
+      border-radius: 999px;
+      color: var(--black);
+      background: var(--white);
+      box-shadow: 0 10px 28px var(--chat-shadow);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .dialog {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(10, 20, 15, .46);
+    }
+
+    .dialog:target {
+      display: flex;
+    }
+
+    .dialog-card {
+      width: min(540px, 100%);
+      border-radius: 22px;
+      background: var(--white);
+      color: var(--seaweed);
+      box-shadow: 0 26px 80px rgba(10, 20, 15, .25);
+      padding: 36px;
+      position: relative;
+    }
+
+    .dialog-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--cream);
+      color: var(--seaweed);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .dialog-title {
+      margin: 0 42px 10px 0;
+      font-size: 30px;
+      line-height: 1.08;
+      letter-spacing: -.03em;
+      font-weight: 800;
+      text-wrap: balance;
+    }
+
+    .dialog-copy {
+      margin: 0 0 22px;
+      color: var(--copy-grey);
+      font-size: 16px;
+      line-height: 1.45;
+      text-wrap: pretty;
+    }
+
+    .step-kicker {
+      margin: 0 0 12px;
+      color: var(--spinach);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .flow-step {
+      display: none;
+    }
+
+    .flow-step.active {
+      display: block;
+    }
+
+    .lead-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .lead-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      color: var(--seaweed);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .field label span {
+      color: var(--copy-grey);
+      font-weight: 600;
+    }
+
+    .email-field,
+    .dialog-input,
+    .dialog-select {
+      width: 100%;
+      min-height: 54px;
+      border: 1px solid rgba(14, 55, 39, .16);
+      border-radius: 14px;
+      padding: 0 20px;
+      color: var(--seaweed);
+      background: var(--cream);
+      font: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      outline: none;
+      transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+    }
+
+    .email-field {
+      border-radius: 999px;
+    }
+
+    .dialog-select {
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--seaweed) 50%), linear-gradient(135deg, var(--seaweed) 50%, transparent 50%);
+      background-position: calc(100% - 22px) 24px, calc(100% - 16px) 24px;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    .email-field::placeholder,
+    .dialog-input::placeholder {
+      color: rgba(10, 20, 15, .42);
+      font-weight: 600;
+    }
+
+    .email-field:focus,
+    .dialog-input:focus,
+    .dialog-select:focus {
+      border-color: var(--nomni-green);
+      background: var(--white);
+      box-shadow: 0 0 0 4px rgba(42, 200, 100, .14);
+    }
+
+    .dialog-submit,
+    .dialog-secondary,
+    .dialog-text-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 54px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 22px;
+      background: var(--nomni-green);
+      color: var(--seaweed);
+      font: inherit;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .16s ease, background-color .16s ease, color .16s ease;
+    }
+
+    .dialog-secondary {
+      background: var(--cream);
+      color: var(--seaweed);
+    }
+
+    .dialog-text-btn {
+      min-height: 44px;
+      padding: 0 8px;
+      background: transparent;
+      color: var(--copy-grey);
+      font-size: 14px;
+    }
+
+    .dialog-submit:hover {
+      background: var(--seaweed);
+      color: var(--nomni-green);
+    }
+
+    .dialog-secondary:hover {
+      background: var(--mint);
+    }
+
+    .dialog-text-btn:hover {
+      color: var(--seaweed);
+    }
+
+    .dialog-submit:active,
+    .dialog-secondary:active,
+    .dialog-text-btn:active { transform: scale(.96); }
+
+    .dialog-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .choice-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .choice-card {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 84px;
+      border: 0;
+      border-radius: 18px;
+      padding: 18px 20px;
+      color: var(--seaweed);
+      background: var(--cream);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(14, 55, 39, .08);
+      transition: transform .16s ease, background-color .16s ease, box-shadow .16s ease;
+    }
+
+    .choice-card.primary {
+      background: var(--nomni-green);
+      box-shadow: 0 14px 28px rgba(42, 200, 100, .18);
+    }
+
+    .choice-card:hover {
+      transform: translateY(-1px);
+      box-shadow: inset 0 0 0 1px rgba(14, 55, 39, .12), 0 12px 24px rgba(10, 20, 15, .08);
+    }
+
+    .choice-card:active { transform: scale(.96); }
+
+    .choice-card strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .choice-card span {
+      display: block;
+      color: rgba(14, 55, 39, .72);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .choice-card::after {
+      content: "→";
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--white);
+      color: var(--seaweed);
+      font-weight: 800;
+    }
+
+    .sent-card {
+      display: grid;
+      place-items: center;
+      gap: 14px;
+      padding: 20px 0 4px;
+      text-align: center;
+    }
+
+    .sent-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--mint);
+      color: var(--spinach);
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .sent-email {
+      color: var(--seaweed);
+      font-weight: 800;
+    }
+
+    @media (max-width: 1100px) {
+      .nav { grid-template-columns: auto 1fr; }
+      .menu { display: none; }
+      .hero { min-height: auto; padding-top: 58px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 30px; }
+      .copy { align-items: center; text-align: center; }
+      .checks { align-items: flex-start; }
+      .visual { width: min(760px, 100%); margin: 0 auto; }
+    }
+
+    @media (max-width: 680px) {
+      .notice { min-height: 38px; height: auto; font-size: 13px; }
+      .nav { width: calc(100% - 28px); height: 72px; grid-template-columns: 1fr auto; }
+      .actions .btn-outline { display: none; }
+      .actions .btn { min-height: 42px; padding: 0 16px; font-size: 14px; }
+      .hero { padding: 38px 18px 56px; }
+      h1 { font-size: 50px; }
+      h1 em { font-size: 46px; }
+      .lead { font-size: 18px; }
+      .checks li { font-size: 16px; }
+      .hero-actions { width: 100%; justify-content: center; }
+      .hero-actions .btn { width: 100%; max-width: 260px; }
+      .visual { height: 330px; }
+      .screen { width: 430px; left: 50%; top: 74px; transform: translateX(-50%); }
+      .status { display: none; }
+      .dialog-card { padding: 30px 24px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .lead-actions { grid-template-columns: 1fr; }
+      .dialog-row { flex-direction: column-reverse; align-items: stretch; }
+      .chat { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="notice">Welcome to Nomni, a new day for hospitality, take back control. <a href="#">Learn more here.</a></div>
+  <header>
+    <nav class="nav" aria-label="Primary">
+      <a class="logo" href="#"><img src="_refs/Nomni - Procure_files/YrWX4pL0xkRKmYWVXyVDn3E.svg" alt="Nomni" /></a>
+      <div class="menu">
+        <a href="#">Solutions <span class="chev" aria-hidden="true"></span></a>
+        <a href="#">Venues <span class="chev" aria-hidden="true"></span></a>
+        <a href="#">Resources <span class="chev" aria-hidden="true"></span></a>
+        <a href="#">About <span class="chev" aria-hidden="true"></span></a>
+      </div>
+      <div class="actions">
+        <a class="btn btn-outline" href="#">Login</a>
+        <a class="btn btn-primary" href="https://www.nomni.ai/lets-chat">Let's Chat</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Nomni Procure hero">
+      <div class="hero-grid">
+        <div class="copy">
+          <h1>Daily ordering &amp; inventory <em>simplified.</em></h1>
+          <p class="lead">Make ordering ingredients from your suppliers a breeze and automate tasks like updating prices and digitising invoices with Nomni Procure.</p>
+          <ul class="checks">
+            <li><span class="check">✓</span>Easy to create &amp; repeat orders</li>
+            <li><span class="check">✓</span>Upload invoices for digitisation</li>
+            <li><span class="check">✓</span>Manage inventory across 1 or 100s of venues</li>
+            <li><span class="check">✓</span>Reduce ordering errors</li>
+          </ul>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#get-started-dialog">Get started <span class="arrow" aria-hidden="true"></span></a>
+            <a class="btn btn-secondary" href="https://www.nomni.ai/lets-chat">Book a demo</a>
+          </div>
+        </div>
+
+        <div class="visual" aria-hidden="true">
+          <div class="screen"><img src="_refs/Nomni - Procure_files/8Qo0RnAz08WIcl17DKFpocOrvY.png" alt="" /></div>
+          <div class="status small">ORDER # PO-2407381900</div>
+          <div class="status placed">Placed <span class="tick">✓</span></div>
+          <div class="status received">Received <span class="tick">✓</span></div>
+          <div class="status invoiced">Invoiced <span class="tick">✓</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="bottom-band" aria-hidden="true"></section>
+  </main>
+  <div class="chat" aria-hidden="true"><span>✦ Ask me anything...</span><span>↗</span></div>
+  <div class="dialog" id="get-started-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <div class="dialog-card">
+      <a class="dialog-close" href="#" aria-label="Close">×</a>
+      <section class="flow-step active" data-step="email">
+        <p class="step-kicker">Step 1</p>
+        <h2 class="dialog-title" id="dialog-title">Try Nomni Procure</h2>
+        <p class="dialog-copy">Start free, or take a quick look around first.</p>
+        <form class="lead-form" data-next-step="details">
+          <input class="email-field" type="email" name="email" placeholder="Work email" autocomplete="email" required />
+          <div class="lead-actions">
+            <button class="dialog-submit" type="submit" data-next-step="details">Sign up for FREE</button>
+            <button class="dialog-secondary" type="submit" data-next-step="demo-sent">Try the demo account</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="flow-step" data-step="demo-sent">
+        <div class="sent-card">
+          <div class="sent-icon">✓</div>
+          <div>
+            <h2 class="dialog-title" style="margin-right:0">Check your inbox</h2>
+            <p class="dialog-copy">We sent a private demo link to <span class="sent-email" data-email-output>your email</span>. It expires in 30 days.</p>
+          </div>
+          <a class="dialog-submit" href="#">Back to site</a>
+        </div>
+      </section>
+
+      <section class="flow-step" data-step="details">
+        <p class="step-kicker">Step 2</p>
+        <h2 class="dialog-title">Create your free account</h2>
+        <p class="dialog-copy">A few details so your workspace feels like yours.</p>
+        <form data-next-step="optional">
+          <div class="form-grid">
+            <div class="field">
+              <label for="first-name">First name</label>
+              <input class="dialog-input" id="first-name" name="firstName" autocomplete="given-name" required />
+            </div>
+            <div class="field">
+              <label for="last-name">Last name</label>
+              <input class="dialog-input" id="last-name" name="lastName" autocomplete="family-name" required />
+            </div>
+            <div class="field full">
+              <label for="mobile">Mobile <span>optional</span></label>
+              <input class="dialog-input" id="mobile" name="mobile" type="tel" autocomplete="tel" />
+            </div>
+            <div class="field full">
+              <label for="company-name">Company registered name</label>
+              <input class="dialog-input" id="company-name" name="companyName" autocomplete="organization" required />
+            </div>
+            <div class="field full">
+              <label for="trading-name">Trading name</label>
+              <input class="dialog-input" id="trading-name" name="tradingName" required />
+            </div>
+          </div>
+          <div class="dialog-row">
+            <button class="dialog-text-btn" type="button" data-next-step="email">Back</button>
+            <button class="dialog-submit" type="submit">Continue →</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="flow-step" data-step="optional">
+        <p class="step-kicker">Step 3</p>
+        <h2 class="dialog-title">Tailor your setup</h2>
+        <p class="dialog-copy">Optional, but helpful for shaping your first dashboard.</p>
+        <form action="Procure Trial Dashboard.html">
+          <div class="form-grid">
+            <div class="field full">
+              <label for="business-type">Business type <span>optional</span></label>
+              <select class="dialog-select" id="business-type" name="businessType">
+                <option value="">Select one</option>
+                <option>Restaurant</option>
+                <option>Cafe</option>
+                <option>Hotel</option>
+                <option>Caterer</option>
+                <option>Food service group</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="primary-goal">Primary goal <span>optional</span></label>
+              <select class="dialog-select" id="primary-goal" name="primaryGoal">
+                <option value="">Select one</option>
+                <option>Order faster</option>
+                <option>Control food cost</option>
+                <option>Digitise invoices</option>
+                <option>Manage inventory</option>
+                <option>Standardise multiple locations</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="locations">No. of locations <span>optional</span></label>
+              <select class="dialog-select" id="locations" name="locations">
+                <option value="">Select</option>
+                <option>1</option>
+                <option>2-5</option>
+                <option>6-20</option>
+                <option>21+</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ordering-now">Current ordering <span>optional</span></label>
+              <select class="dialog-select" id="ordering-now" name="orderingNow">
+                <option value="">Select</option>
+                <option>WhatsApp / SMS</option>
+                <option>Email</option>
+                <option>Supplier portals</option>
+                <option>Spreadsheets</option>
+                <option>Another system</option>
+              </select>
+            </div>
+          </div>
+          <div class="dialog-row">
+            <button class="dialog-text-btn" type="button" data-next-step="details">Back</button>
+            <div class="dialog-row" style="margin:0">
+              <a class="dialog-secondary" href="Procure Trial Dashboard.html">Skip for now</a>
+              <button class="dialog-submit" type="submit">Finish →</button>
+            </div>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const dialog = document.getElementById('get-started-dialog');
+      if (!dialog) return;
+      const steps = [...dialog.querySelectorAll('.flow-step')];
+      const emailInput = dialog.querySelector('input[name="email"]');
+      const emailOutputs = dialog.querySelectorAll('[data-email-output]');
+
+      function showStep(name) {
+        steps.forEach((step) => step.classList.toggle('active', step.dataset.step === name));
+      }
+
+      dialog.querySelectorAll('[data-next-step]').forEach((control) => {
+        control.addEventListener('click', () => {
+          if (control.tagName === 'BUTTON' && control.type === 'submit') return;
+          showStep(control.dataset.nextStep);
+        });
+      });
+
+      dialog.querySelectorAll('form[data-next-step]').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          if (!form.reportValidity()) return;
+          if (emailInput && emailInput.value) {
+            emailOutputs.forEach((node) => { node.textContent = emailInput.value; });
+          }
+          const nextStep = event.submitter?.dataset.nextStep || form.dataset.nextStep;
+          showStep(nextStep);
+        });
+      });
+
+      window.addEventListener('hashchange', () => {
+        if (window.location.hash === '#get-started-dialog') showStep('email');
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -6,6 +6,14 @@ This repo contains **Nomni Procure** HTML prototypes — a web-based procurement
 
 ---
 
+## Freemium Prototype Context
+
+For the Nomni Procure / Zeemart freemium landing and trial/demo flow, see `Freemium/Freemium.md`.
+
+Keep `Freemium/Freemium.md` updated when changing the freemium UX, CTA flow, prototype pages, screenshots, or onboarding/trial/demo assumptions.
+
+---
+
 ## Support Documentation
 
 Full product documentation is at **https://support.zeemart.co/**
@@ -561,6 +569,24 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Nomni Procure Freemium Prototype: freemium.html
+- saved_resource: Freemium/_refs/Zeemart_files/saved_resource.html
+- saved_resource(2): Freemium/_refs/Zeemart_files/saved_resource(2).html
+- saved_resource(1): Freemium/_refs/Zeemart_files/saved_resource(1).html
+- edit: Freemium/_refs/Zeemart_files/edit.html
+- canvas-sandbox-on-page: Freemium/_refs/Zeemart_files/canvas-sandbox-on-page.html
+- Zeemart: Freemium/_refs/Zeemart.html
+- saved_resource: Freemium/_refs/Nomni - Procure_files/saved_resource.html
+- saved_resource(3): Freemium/_refs/Nomni - Procure_files/saved_resource(3).html
+- saved_resource(2): Freemium/_refs/Nomni - Procure_files/saved_resource(2).html
+- saved_resource(1): Freemium/_refs/Nomni - Procure_files/saved_resource(1).html
+- edit: Freemium/_refs/Nomni - Procure_files/edit.html
+- Chat Widget: Freemium/_refs/Nomni - Procure_files/d9a01f6cfd4043528bd8ef34985799aa.html
+- reCAPTCHA: Freemium/_refs/Nomni - Procure_files/anchor.html
+- Procurement &amp; Inventory Software from Nomni Procurement: Freemium/_refs/Nomni - Procure.html
+- Zeemart - Top Prototype: Freemium/Zeemart - Top Prototype.html
+- Nomni Procure — Trial Dashboard: Freemium/Procure Trial Dashboard.html
+- Nomni Procure - Top Prototype: Freemium/Nomni Procure - Top Prototype.html
 - saved_resource: assets/Users_files/saved_resource.html
 - m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Users_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
 - StripeM-Inner: assets/Users_files/inner.html

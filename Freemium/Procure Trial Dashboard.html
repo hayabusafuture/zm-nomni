@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nomni Procure — Trial Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864;
+    --seaweed: #0E3727;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --cream: #FAF7E9;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42, 200, 100, 0.14);
+    --sidebar-text: #1A1F2B;
+    --ink: #1A1F2B;
+    --ink-2: #1A1F2B;
+    --ink-mute: #8A8F98;
+    --ink-soft: #C7C9CF;
+    --rule: #E7E8EC;
+    --primary: #2AC864;
+    --primary-hover: #1FA551;
+    --primary-ink: #0E3727;
+    --row-hover: #F7F8FA;
+    --panel: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .app {
+    display: grid;
+    grid-template-columns: 232px 1fr;
+    grid-template-rows: 56px 1fr;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    height: 56px;
+    background: #1F2226;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    border-bottom: 1px solid #000;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; width: auto; display: block; }
+  .brand-sub {
+    color: var(--nomni-green);
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 23px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .help-link {
+    color: rgba(255,255,255,.76);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 7px 10px;
+    border-radius: 6px;
+  }
+  .help-link:hover { background: rgba(255,255,255,.10); color: #fff; }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #7F6AD0;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+  .sidebar-head { padding: 18px 16px 8px; }
+  .trial-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: var(--mint);
+    color: var(--seaweed);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .trial-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--nomni-green);
+  }
+  .nav {
+    margin-top: 4px;
+    padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: var(--sidebar-text);
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a.active {
+    background: var(--sidebar-item-active);
+    color: var(--seaweed);
+    font-weight: 600;
+  }
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    color: #888;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .nav a.active .nav-icon { color: var(--spinach); }
+  .sidebar-foot { padding: 16px; }
+  .sidebar-note {
+    border-top: 1px solid var(--rule);
+    padding-top: 14px;
+    color: var(--ink-mute);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .main {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    padding: 32px 40px 56px;
+    background: #fff;
+  }
+  .page-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+  .eyebrow {
+    margin: 0 0 8px;
+    color: var(--spinach);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .page-title {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+  .page-copy {
+    margin: 0;
+    max-width: 620px;
+    color: var(--ink-mute);
+    font-size: 15px;
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .page-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .16s ease;
+  }
+  .btn:active { transform: scale(.96); }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+  .btn-primary:hover { background: var(--seaweed); color: var(--nomni-green); border-color: var(--seaweed); }
+  .btn-secondary { background: var(--mint); color: var(--seaweed); border-color: var(--mint); }
+  .btn-secondary:hover { background: #C6F2CE; }
+  .btn-tertiary { background: #F3F4F6; color: var(--ink-2); }
+  .btn-tertiary:hover { background: #E6E8EC; }
+
+  .hero-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 28px;
+    align-items: stretch;
+    margin-bottom: 24px;
+    border: 1px solid rgba(42,200,100,.24);
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--mint), #fff 62%);
+    padding: 28px;
+    overflow: hidden;
+  }
+  .progress-card {
+    border-radius: 10px;
+    background: rgba(255,255,255,.78);
+    padding: 20px;
+    box-shadow: 0 14px 36px rgba(10,20,15,.08);
+  }
+  .progress-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    color: var(--ink-mute);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .progress-track {
+    height: 10px;
+    border-radius: 999px;
+    background: #E7E8EC;
+    overflow: hidden;
+  }
+  .progress-fill {
+    width: 28%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--nomni-green);
+  }
+  .progress-stat {
+    margin-top: 14px;
+    color: var(--seaweed);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -.04em;
+  }
+
+  .setup-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+    gap: 24px;
+    align-items: start;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 24px;
+  }
+  .panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .panel-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .panel-sub {
+    margin: 5px 0 0;
+    color: var(--ink-mute);
+    font-size: 14px;
+  }
+  .task-list {
+    display: grid;
+    gap: 12px;
+  }
+  .task {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: #fff;
+  }
+  .task:hover { background: var(--row-hover); }
+  .task-check {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--mint);
+    color: var(--spinach);
+    font-weight: 800;
+  }
+  .task.pending .task-check {
+    background: #F3F4F6;
+    color: var(--ink-mute);
+  }
+  .task-title {
+    margin: 0 0 3px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .task-copy {
+    margin: 0;
+    color: var(--ink-mute);
+    font-size: 13px;
+  }
+  .support-card {
+    display: grid;
+    gap: 16px;
+    background: var(--cream);
+  }
+  .support-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .support-card p {
+    margin: 0;
+    color: var(--ink-mute);
+    line-height: 1.5;
+  }
+  .quick-links {
+    display: grid;
+    gap: 10px;
+  }
+  .quick-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 46px;
+    padding: 0 14px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--seaweed);
+    font-weight: 600;
+  }
+  .quick-link:hover { background: var(--mint); }
+
+  @media (max-width: 1100px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { width: 64px; overflow: hidden; }
+    .sidebar-head, .sidebar-foot { display: none; }
+    .nav a { justify-content: center; padding: 10px; }
+    .nav-label { display: none; }
+    .main { padding: 28px 24px 48px; }
+    .hero-panel,
+    .setup-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 760px) {
+    .app { display: block; }
+    .topbar { position: static; }
+    .sidebar { display: none; }
+    .page-head { flex-direction: column; }
+    .page-actions { flex-wrap: wrap; }
+    .hero-panel { padding: 22px; }
+    .task { grid-template-columns: 38px minmax(0, 1fr); }
+    .task .btn { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-logo-img" src="../assets/nomni-logo-light.svg" alt="nomni" />
+      <div class="brand-sub">Procure</div>
+    </div>
+    <div class="topbar-right">
+      <a class="help-link" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank">Help</a>
+      <div class="user">
+        <div class="avatar">TR</div>
+        <span>Trial user</span>
+      </div>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <span class="trial-pill"><span class="trial-dot"></span> 30-day trial</span>
+    </div>
+    <nav class="nav" aria-label="Trial navigation">
+      <a class="active" href="#"><span class="nav-icon">●</span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="nav-icon">O</span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="nav-icon">I</span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="nav-icon">S</span><span class="nav-label">Suppliers</span></a>
+      <a href="#"><span class="nav-icon">P</span><span class="nav-label">Products</span></a>
+      <a href="#"><span class="nav-icon">R</span><span class="nav-label">Reports</span></a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="sidebar-note">Your dashboard will fill up once suppliers, orders, and invoices are connected.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <p class="eyebrow">Welcome to Nomni Procure</p>
+        <h1 class="page-title">Let’s get your trial workspace ready.</h1>
+        <p class="page-copy">Start with the essentials: invite your team, add suppliers, place a sample order, or speak with us if you want a guided setup.</p>
+      </div>
+      <div class="page-actions">
+        <a class="btn btn-secondary" href="https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app" target="_blank">Read guide</a>
+        <a class="btn btn-primary" href="https://www.nomni.ai/lets-chat">Book a demo</a>
+      </div>
+    </div>
+
+    <section class="hero-panel" aria-label="Trial progress">
+      <div>
+        <p class="eyebrow">Trial setup</p>
+        <h2 class="page-title">Your account is live. Now make it useful.</h2>
+        <p class="page-copy">We’ll keep the first dashboard focused on setup until there is real order and invoice activity to report.</p>
+      </div>
+      <div class="progress-card">
+        <div class="progress-label"><span>Setup progress</span><span>2 of 7</span></div>
+        <div class="progress-track"><div class="progress-fill"></div></div>
+        <div class="progress-stat">28%</div>
+      </div>
+    </section>
+
+    <div class="setup-grid">
+      <section class="panel" aria-label="Onboarding checklist">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Next best steps</h2>
+            <p class="panel-sub">A practical checklist for turning this from an empty trial into a working Procure setup.</p>
+          </div>
+        </div>
+        <div class="task-list">
+          <div class="task">
+            <div class="task-check">✓</div>
+            <div>
+              <p class="task-title">Create your account</p>
+              <p class="task-copy">Your email and business details are captured.</p>
+            </div>
+            <span class="btn btn-tertiary">Done</span>
+          </div>
+          <div class="task pending">
+            <div class="task-check">1</div>
+            <div>
+              <p class="task-title">Add your first supplier</p>
+              <p class="task-copy">Set up who you order from most often.</p>
+            </div>
+            <a class="btn btn-secondary" href="#">Add supplier</a>
+          </div>
+          <div class="task pending">
+            <div class="task-check">2</div>
+            <div>
+              <p class="task-title">Build a starter product list</p>
+              <p class="task-copy">Choose items you order every week.</p>
+            </div>
+            <a class="btn btn-secondary" href="#">Add products</a>
+          </div>
+          <div class="task pending">
+            <div class="task-check">3</div>
+            <div>
+              <p class="task-title">Place a sample order</p>
+              <p class="task-copy">Preview the workflow before inviting the team.</p>
+            </div>
+            <a class="btn btn-secondary" href="#">Start order</a>
+          </div>
+          <div class="task pending">
+            <div class="task-check">4</div>
+            <div>
+              <p class="task-title">Upload an invoice</p>
+              <p class="task-copy">See how invoice digitisation works.</p>
+            </div>
+            <a class="btn btn-secondary" href="#">Upload invoice</a>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel support-card" aria-label="Help and support">
+        <div class="support-icon">?</div>
+        <div>
+          <h2 class="panel-title">Want help setting this up?</h2>
+          <p>Talk to our team for a guided walkthrough, or read the Procure guide if you prefer to explore on your own.</p>
+        </div>
+        <div class="quick-links">
+          <a class="quick-link" href="https://www.nomni.ai/lets-chat">Book a demo <span>→</span></a>
+          <a class="quick-link" href="https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app" target="_blank">Read setup guide <span>→</span></a>
+          <a class="quick-link" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank">Browse help centre <span>→</span></a>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+</body>
+</html>
