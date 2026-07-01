@@ -569,6 +569,8 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Your Nomni Procure Demo Link: Freemium/procure-demo-email.html
+- Nomni Procure — Demo Account: Freemium/procure-demo-dashboard.html
 - Nomni Procure — Get Started: Freemium/procure-get-started.html
 - Nomni Procure Freemium Prototype: freemium.html
 - saved_resource: Freemium/_refs/Zeemart_files/saved_resource.html

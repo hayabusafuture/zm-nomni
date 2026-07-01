@@ -19,8 +19,13 @@ The opening email screen presents two paths after the user enters an email:
 
 1. **Try the demo account**
    - User sees a confirmation message telling them to check their inbox.
-   - Copy says a private demo link was sent to their email and expires in 30 days.
+   - Copy says a private demo link was sent to their email and expires in 14 days.
    - This verifies the email address before demo access.
+   - While on the `Check your inbox` step, a push-notification-style email toast appears.
+   - Clicking the toast opens `Freemium/procure-demo-email.html` in a new tab.
+   - The email contains a CTA to `Freemium/procure-demo-dashboard.html`, a demo dashboard with sample data.
+   - The captured email is carried through the email and demo dashboard links, then prefilled if the user starts a free trial from the demo.
+   - Prototype duplicate-demo logic: when the entry page is opened with a prefilled `?email=...`, clicking `Try the demo account` with the same email shows a `Demo already requested` message instead of sending another demo link. The message asks the user to check their inbox or speak to Nomni's team if they need another demo.
 
 2. **Sign up for FREE**
    - Let the user create a real account and begin a 30-day trial.
@@ -62,6 +67,8 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/nomni.html`
 - `Freemium/Zeemart.html`
 - `Freemium/procure-get-started.html`
+- `Freemium/procure-demo-email.html`
+- `Freemium/procure-demo-dashboard.html`
 - `Freemium/Procure Trial Dashboard.html`
 
 Generated preview screenshots:
@@ -94,7 +101,24 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
 - Dialog width: `540px` max on desktop.
 - Demo confirmation:
   - `Check your inbox`
-  - Private demo link sent to the captured email, expiring in 30 days.
+  - Private demo link sent to the captured email, expiring in 14 days.
+  - Animated email notification appears after a small delay on the confirmation state.
+  - Notification uses a red email icon so it is easier to notice.
+  - Notification opens the demo email mockup in a new tab.
+- Duplicate demo request state:
+  - Triggered when the page has a prefilled `?email=...` value and the user clicks `Try the demo account` while that same email is still in the field.
+  - Heading: `Demo already requested`
+  - Body tells the user a private demo link has already been sent to that email.
+  - Primary action: `Speak to Nomni's team`, linking to `https://www.nomni.ai/lets-chat`.
+  - Secondary action: `Use another email`, returning to the email step.
+- Demo email:
+  - Subject-style page: `Your private Nomni Procure demo link`.
+  - Main CTA opens the demo account dashboard.
+- Demo dashboard:
+  - Uses sample Procure dashboard data.
+  - Topbar includes `Demo link expires in 14 days`.
+  - Topbar CTAs: `Start my FREE trial` and `Book a demo`.
+  - `Start my FREE trial` links back to `procure-get-started.html?source=demo&email=...` when an email is available.
 - Form validation is temporarily disabled in prototype mode so the flow can be clicked through without entering every field.
 - Signup Step 1:
   - Body: `Set up the basics for your trial workspace.`

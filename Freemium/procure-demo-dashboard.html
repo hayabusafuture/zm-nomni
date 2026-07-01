@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nomni Procure — Demo Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864;
+    --seaweed: #0E3727;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --cream: #FAF7E9;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42,200,100,.14);
+    --ink: #1A1F2B;
+    --ink-mute: #8A8F98;
+    --rule: #E7E8EC;
+    --panel: #fff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #fff; }
+  body {
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  .app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    grid-template-rows: 56px minmax(0, 1fr);
+  }
+  .topbar {
+    grid-column: 1 / -1;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 22px;
+    background: #1F2226;
+    color: #fff;
+    border-bottom: 1px solid #000;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; width: auto; display: block; }
+  .brand-sub {
+    color: var(--nomni-green);
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 23px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .demo-status {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: rgba(226,255,230,.14);
+    color: var(--mint);
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform .16s ease, background-color .16s ease, color .16s ease;
+  }
+  .btn:active { transform: scale(.96); }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+  .btn-primary:hover { background: var(--mint); }
+  .btn-secondary { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.22); }
+  .btn-secondary:hover { background: rgba(255,255,255,.16); }
+  .sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    background: var(--sidebar-bg);
+    color: var(--ink);
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+  }
+  .demo-pill {
+    margin: 16px 16px 6px;
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--mint);
+    color: var(--seaweed);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .nav {
+    padding: 6px 10px;
+    display: grid;
+    gap: 2px;
+  }
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  .nav a.active {
+    background: var(--sidebar-item-active);
+    color: var(--seaweed);
+    font-weight: 700;
+  }
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    color: var(--spinach);
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .main {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    padding: 32px 40px 56px;
+    background: #fff;
+  }
+  .demo-banner {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--cream), var(--mint));
+    padding: 18px 20px;
+    color: var(--seaweed);
+  }
+  .demo-banner h1 {
+    margin: 0 0 4px;
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 26px;
+    line-height: 1.05;
+    letter-spacing: -.04em;
+  }
+  .demo-banner p {
+    margin: 0;
+    color: rgba(14,55,39,.72);
+  }
+  .page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .dash-welcome {
+    margin: 0 0 6px;
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 30px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -.04em;
+  }
+  .dash-subtitle { margin: 0; color: var(--ink-mute); }
+  .metrics-section {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .metric-card {
+    padding: 18px 20px;
+    border-right: 1px solid var(--rule);
+    background: #fff;
+  }
+  .metric-card:last-child { border-right: 0; }
+  .metric-label {
+    margin: 0 0 8px;
+    color: var(--ink-mute);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .metric-value {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .metric-note {
+    margin: 6px 0 0;
+    color: var(--spinach);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+    gap: 24px;
+    align-items: start;
+  }
+  .panel {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: var(--panel);
+    padding: 24px;
+  }
+  .panel-title {
+    margin: 0 0 16px;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .chart {
+    height: 240px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 12px 4px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    background: var(--nomni-green);
+    opacity: .88;
+  }
+  .order-list {
+    display: grid;
+    gap: 10px;
+  }
+  .order-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 54px;
+    padding: 0 14px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+  }
+  .order-row strong { color: var(--ink); }
+  .order-row span { color: var(--ink-mute); font-size: 13px; }
+  .chip {
+    border-radius: 999px;
+    background: var(--mint);
+    color: var(--spinach);
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  @media (max-width: 1100px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { width: 64px; overflow: hidden; }
+    .demo-pill, .nav-label { display: none; }
+    .nav a { justify-content: center; padding: 10px; }
+    .main { padding: 28px 24px 48px; }
+    .metrics-section { grid-template-columns: 1fr 1fr; }
+    .content-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    .app { display: block; }
+    .sidebar { display: none; }
+    .topbar { position: static; height: auto; min-height: 56px; align-items: flex-start; flex-direction: column; padding: 14px 18px; }
+    .top-actions { flex-wrap: wrap; }
+    .main { padding: 22px 18px 42px; }
+    .demo-banner, .page-head { flex-direction: column; }
+    .metrics-section { grid-template-columns: 1fr; }
+    .metric-card { border-right: 0; border-bottom: 1px solid var(--rule); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-logo-img" src="../assets/nomni-logo-light.svg" alt="nomni" />
+      <div class="brand-sub">Procure</div>
+    </div>
+    <div class="demo-status">Demo link expires in 14 days</div>
+    <div class="top-actions">
+      <a class="btn btn-primary" href="procure-get-started.html?source=demo" data-start-trial>Start my FREE trial</a>
+      <a class="btn btn-secondary" href="https://www.nomni.ai/lets-chat">Book a demo</a>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="demo-pill">Demo account</div>
+    <nav class="nav" aria-label="Demo navigation">
+      <a class="active" href="#"><span class="nav-icon">●</span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="nav-icon">O</span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="nav-icon">I</span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="nav-icon">S</span><span class="nav-label">Suppliers</span></a>
+      <a href="#"><span class="nav-icon">P</span><span class="nav-label">Products</span></a>
+      <a href="#"><span class="nav-icon">R</span><span class="nav-label">Reports</span></a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <section class="demo-banner">
+      <div>
+        <h1>Explore with sample data.</h1>
+        <p>This demo account uses sample suppliers, orders, invoices, and spend reports so you can see how Procure feels in motion.</p>
+      </div>
+      <a class="btn btn-primary" href="procure-get-started.html?source=demo" data-start-trial>Start my FREE trial</a>
+    </section>
+
+    <div class="page-head">
+      <div>
+        <h1 class="dash-welcome">Welcome to your Nomni Procure demo.</h1>
+        <p class="dash-subtitle">Today’s sample outlets have placed <strong>S$4,890.40</strong> worth of orders and are expecting <strong>12 deliveries</strong>.</p>
+      </div>
+    </div>
+
+    <section class="metrics-section" aria-label="Demo metrics">
+      <div class="metric-card">
+        <p class="metric-label">Weekly orders</p>
+        <p class="metric-value">S$4,890.40</p>
+        <p class="metric-note">24 sample orders</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-label">Monthly spend</p>
+        <p class="metric-value">S$37,805.21</p>
+        <p class="metric-note">Across 5 venues</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-label">Invoices digitised</p>
+        <p class="metric-value">128</p>
+        <p class="metric-note">This month</p>
+      </div>
+      <div class="metric-card">
+        <p class="metric-label">Price changes</p>
+        <p class="metric-value">17</p>
+        <p class="metric-note">Needs review</p>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section class="panel">
+        <h2 class="panel-title">Spending overview</h2>
+        <div class="chart" aria-hidden="true">
+          <div class="bar" style="height:55%"></div>
+          <div class="bar" style="height:72%"></div>
+          <div class="bar" style="height:45%"></div>
+          <div class="bar" style="height:88%"></div>
+          <div class="bar" style="height:62%"></div>
+          <div class="bar" style="height:76%"></div>
+          <div class="bar" style="height:50%"></div>
+          <div class="bar" style="height:94%"></div>
+          <div class="bar" style="height:68%"></div>
+          <div class="bar" style="height:82%"></div>
+          <div class="bar" style="height:38%"></div>
+          <div class="bar" style="height:71%"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Recent sample orders</h2>
+        <div class="order-list">
+          <div class="order-row"><div><strong>Fresh Direct</strong><br><span>Produce and dairy</span></div><span class="chip">Placed</span></div>
+          <div class="order-row"><div><strong>Ocean Catch</strong><br><span>Seafood delivery</span></div><span class="chip">Received</span></div>
+          <div class="order-row"><div><strong>Morning Roast Co.</strong><br><span>Coffee and pantry</span></div><span class="chip">Invoiced</span></div>
+          <div class="order-row"><div><strong>Greenfield Meats</strong><br><span>Weekly standing order</span></div><span class="chip">Approved</span></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<script>
+  (() => {
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email');
+    if (!email) return;
+    document.querySelectorAll('[data-start-trial]').forEach((link) => {
+      link.href = `procure-get-started.html?source=demo&email=${encodeURIComponent(email)}`;
+    });
+  })();
+</script>
+</body>
+</html>

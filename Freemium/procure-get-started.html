@@ -879,6 +879,10 @@
     font-size: 28px;
     font-weight: 800;
   }
+  .sent-icon.warning {
+    background: #FFF3CD;
+    color: #7A5F00;
+  }
   .sent-email {
     color: var(--seaweed);
     font-weight: 800;
@@ -901,6 +905,66 @@
     font-weight: 700;
   }
   .setup-list span { display: block; }
+
+  .mail-toast {
+    position: fixed;
+    right: 28px;
+    top: 28px;
+    z-index: 60;
+    width: min(360px, calc(100vw - 36px));
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.92);
+    color: var(--ink);
+    box-shadow: 0 18px 50px rgba(10,20,15,.22), 0 1px 0 rgba(255,255,255,.7) inset;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-16px) scale(.97);
+    transition: opacity .34s ease, transform .34s ease;
+    backdrop-filter: blur(14px);
+  }
+  .mail-toast.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+  .mail-toast:active { transform: translateY(0) scale(.96); }
+  .mail-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #FDD6DC;
+    color: #D0291E;
+    font-size: 20px;
+  }
+  .mail-source {
+    margin: 0 0 2px;
+    color: var(--ink-mute);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .mail-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .mail-preview {
+    margin: 3px 0 0;
+    color: var(--ink-mute);
+    font-size: 13px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   @keyframes spin {
     to { transform: rotate(360deg); }
@@ -935,6 +999,7 @@
     .lead-actions { grid-template-columns: 1fr; }
     .dialog-row { flex-direction: column-reverse; align-items: stretch; }
     .dialog-title { font-size: 28px; }
+    .mail-toast { top: auto; right: 18px; bottom: 18px; }
   }
 </style>
 </head>
@@ -1150,9 +1215,21 @@
           <div class="sent-icon">✓</div>
           <div>
             <h2 class="dialog-title" style="margin-right:0">Check your inbox</h2>
-            <p class="dialog-copy">We sent a private demo link to <span class="sent-email" data-email-output>your email</span>. It expires in 30 days.</p>
+            <p class="dialog-copy">We sent a private demo link to <span class="sent-email" data-email-output>your email</span>. It expires in 14 days.</p>
           </div>
           <a class="dialog-submit" href="nomni.html" data-back-link>Back to site</a>
+        </div>
+      </section>
+
+      <section class="flow-step" data-step="demo-used">
+        <div class="sent-card">
+          <div class="sent-icon warning">!</div>
+          <div>
+            <h2 class="dialog-title" style="margin-right:0">Demo already requested</h2>
+            <p class="dialog-copy">A private demo link has already been sent to <span class="sent-email" data-email-output>your email</span>. Check your inbox, or speak to Nomni’s team if you need another demo.</p>
+          </div>
+          <a class="dialog-submit" href="https://www.nomni.ai/lets-chat">Speak to Nomni’s team</a>
+          <button class="dialog-text-btn" type="button" data-next-step="email">Use another email</button>
         </div>
       </section>
 
@@ -1267,6 +1344,14 @@
       </section>
     </div>
   </main>
+  <a class="mail-toast" href="procure-demo-email.html" target="_blank" rel="noopener" data-mail-toast aria-label="Open demo email">
+    <span class="mail-icon" aria-hidden="true">✉</span>
+    <span>
+      <p class="mail-source">Nomni Procure</p>
+      <p class="mail-title">Your private demo link is ready</p>
+      <p class="mail-preview">Open your demo account. Link expires in 14 days.</p>
+    </span>
+  </a>
 </div>
 
 <script>
@@ -1278,16 +1363,25 @@
     const steps = [...root.querySelectorAll('.flow-step')];
     const emailInput = root.querySelector('input[name="email"]');
     const emailOutputs = root.querySelectorAll('[data-email-output]');
+    const mailToast = document.querySelector('[data-mail-toast]');
     const dashboardUrl = 'Procure Trial Dashboard.html';
     const params = new URLSearchParams(window.location.search);
     const source = params.get('source');
+    const prefillEmail = params.get('email');
+    const prefilledDemoEmail = prefillEmail ? prefillEmail.trim().toLowerCase() : '';
     const backUrl = source === 'zeemart' ? 'Zeemart.html' : 'nomni.html';
     let redirectTimer;
     let stepTimer;
+    let mailToastTimer;
 
     root.querySelectorAll('[data-back-link]').forEach((link) => {
       link.setAttribute('href', backUrl);
     });
+
+    if (prefillEmail && emailInput) {
+      emailInput.value = prefillEmail;
+      emailOutputs.forEach((node) => { node.textContent = prefillEmail; });
+    }
 
     function setStep(name) {
       window.clearTimeout(redirectTimer);
@@ -1311,6 +1405,10 @@
     function showStep(name) {
       window.clearTimeout(stepTimer);
       window.clearTimeout(redirectTimer);
+      if (name !== 'demo-sent') {
+        window.clearTimeout(mailToastTimer);
+        if (mailToast) mailToast.classList.remove('visible');
+      }
       const current = steps.find((step) => step.classList.contains('active'));
       const next = steps.find((step) => step.dataset.step === name);
       if (!next || current === next) {
@@ -1359,6 +1457,14 @@
             window.location.href = dashboardUrl;
           }, 1700);
         }
+        if (name === 'demo-sent' && mailToast) {
+          mailToastTimer = window.setTimeout(() => {
+            const email = emailInput && emailInput.value ? emailInput.value : '';
+            const suffix = email ? `?email=${encodeURIComponent(email)}` : '';
+            mailToast.href = `procure-demo-email.html${suffix}`;
+            mailToast.classList.add('visible');
+          }, 1250);
+        }
       }, 210);
     }
 
@@ -1381,6 +1487,11 @@
         // if (control.hasAttribute('data-requires-email') && form && !form.reportValidity()) return;
         if (control.hasAttribute('data-requires-email') && emailInput && emailInput.value) {
           emailOutputs.forEach((node) => { node.textContent = emailInput.value; });
+        }
+        const currentEmail = emailInput && emailInput.value ? emailInput.value.trim().toLowerCase() : '';
+        if (control.hasAttribute('data-requires-email') && prefilledDemoEmail && currentEmail === prefilledDemoEmail) {
+          showStep('demo-used');
+          return;
         }
         showStep(control.dataset.nextStep);
       });
