@@ -584,9 +584,9 @@ Copy the full `:root` variable block, topbar, and sidebar verbatim from an exist
 - Chat Widget: Freemium/_refs/Nomni - Procure_files/d9a01f6cfd4043528bd8ef34985799aa.html
 - reCAPTCHA: Freemium/_refs/Nomni - Procure_files/anchor.html
 - Procurement &amp; Inventory Software from Nomni Procurement: Freemium/_refs/Nomni - Procure.html
-- Zeemart - Top Prototype: Freemium/Zeemart - Top Prototype.html
+- Zeemart: Freemium/Zeemart.html
 - Nomni Procure — Trial Dashboard: Freemium/Procure Trial Dashboard.html
-- Nomni Procure - Top Prototype: Freemium/Nomni Procure - Top Prototype.html
+- Nomni Procure Freemium: Freemium/nomni.html
 - saved_resource: assets/Users_files/saved_resource.html
 - m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Users_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
 - StripeM-Inner: assets/Users_files/inner.html

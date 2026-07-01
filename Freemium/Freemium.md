@@ -55,8 +55,8 @@ User-provided screenshots used as the strongest visual references:
 
 ## Prototype Files
 
-- `Freemium/Nomni Procure - Top Prototype.html`
-- `Freemium/Zeemart - Top Prototype.html`
+- `Freemium/nomni.html`
+- `Freemium/Zeemart.html`
 - `Freemium/Procure Trial Dashboard.html`
 
 Generated preview screenshots:
