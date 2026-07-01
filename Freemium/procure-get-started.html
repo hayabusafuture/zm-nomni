@@ -1199,7 +1199,7 @@
       </section>
 
       <section class="flow-step" data-step="email">
-        <h2 class="dialog-title" id="dialog-title">Enter your email</h2>
+        <h2 class="dialog-title" id="dialog-title">What's your email address?</h2>
         <p class="dialog-copy">Start free, or take a quick look around first.</p>
         <form class="lead-form" data-next-step="details" novalidate>
           <input class="email-field" type="email" name="email" placeholder="Work email" autocomplete="email" required />
@@ -1482,9 +1482,8 @@
     root.querySelectorAll('button[data-next-step], a[data-next-step]').forEach((control) => {
       control.addEventListener('click', () => {
         if (control.tagName === 'BUTTON' && control.type === 'submit') return;
-        // Prototype mode: validation is disabled so the full flow can be clicked through freely.
-        // const form = control.closest('form');
-        // if (control.hasAttribute('data-requires-email') && form && !form.reportValidity()) return;
+        const form = control.closest('form');
+        if (control.hasAttribute('data-requires-email') && form && !form.reportValidity()) return;
         if (control.hasAttribute('data-requires-email') && emailInput && emailInput.value) {
           emailOutputs.forEach((node) => { node.textContent = emailInput.value; });
         }
@@ -1500,8 +1499,7 @@
     root.querySelectorAll('form[data-next-step]').forEach((form) => {
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        // Prototype mode: validation is disabled so the full flow can be clicked through freely.
-        // if (!form.reportValidity()) return;
+        if (form.classList.contains('lead-form') && !form.reportValidity()) return;
         if (emailInput && emailInput.value) {
           emailOutputs.forEach((node) => { node.textContent = emailInput.value; });
         }

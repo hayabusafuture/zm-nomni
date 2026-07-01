@@ -87,7 +87,7 @@ Both prototypes are standalone HTML files:
 
 The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html`:
 
-- Email screen headline: `Enter your email`
+- Email screen headline: `What's your email address?`
 - Email screen body: `Start free, or take a quick look around first.`
 - Email screen field: `Work email`
 - Email screen CTAs:
@@ -119,7 +119,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Topbar includes `Demo link expires in 14 days`.
   - Topbar CTAs: `Start my FREE trial` and `Book a demo`.
   - `Start my FREE trial` links back to `procure-get-started.html?source=demo&email=...` when an email is available.
-- Form validation is temporarily disabled in prototype mode so the flow can be clicked through without entering every field.
+- Email validation is enabled on the first email screen. Later signup/detail fields remain relaxed in prototype mode so the flow can be clicked through without entering every field.
 - Signup Step 1:
   - Body: `Set up the basics for your trial workspace.`
   - First name
