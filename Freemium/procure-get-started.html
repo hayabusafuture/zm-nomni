@@ -699,6 +699,10 @@
     position: relative;
     transition: height .3s cubic-bezier(.2, 0, .2, 1), min-height .22s ease;
   }
+  .dialog-card.is-email-step {
+    padding-top: 46px;
+    padding-bottom: 46px;
+  }
 
   .dialog-card.is-loading {
     min-height: 286px;
@@ -750,7 +754,20 @@
     line-height: 1.45;
     text-wrap: pretty;
   }
+  .email-step {
+    text-align: center;
+  }
+  .email-step .dialog-title {
+    margin-right: 0;
+  }
+  .email-step .dialog-copy {
+    margin-left: auto;
+    margin-right: auto;
+  }
   .lead-form { display: grid; gap: 12px; }
+  .email-step .lead-form {
+    gap: 20px;
+  }
   .lead-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1198,7 +1215,7 @@
         </div>
       </section>
 
-      <section class="flow-step" data-step="email">
+      <section class="flow-step email-step" data-step="email">
         <h2 class="dialog-title" id="dialog-title">What's your email address?</h2>
         <p class="dialog-copy">Start free, or take a quick look around first.</p>
         <form class="lead-form" data-next-step="details" novalidate>
@@ -1390,7 +1407,10 @@
         card.classList.remove('is-resizing');
         card.style.height = '';
       }
-      if (card) card.classList.toggle('is-loading', name === 'intro');
+      if (card) {
+        card.classList.toggle('is-loading', name === 'intro');
+        card.classList.toggle('is-email-step', name === 'email');
+      }
       steps.forEach((step) => {
         step.classList.remove('is-entering', 'is-exiting');
         step.classList.toggle('active', step.dataset.step === name);
@@ -1420,6 +1440,7 @@
         card.classList.add('is-resizing');
         card.style.height = `${startHeight}px`;
         card.classList.toggle('is-loading', name === 'intro');
+        card.classList.toggle('is-email-step', name === 'email');
       }
       if (current) current.classList.add('is-exiting');
       stepTimer = window.setTimeout(() => {
