@@ -395,7 +395,7 @@
     overflow: hidden;
   }
   .progress-fill {
-    width: 20%;
+    width: 16.666%;
     height: 100%;
     border-radius: inherit;
     background: var(--nomni-green);
@@ -406,6 +406,99 @@
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -.04em;
+  }
+  .profile-step {
+    margin-bottom: 18px;
+    border: 1px solid rgba(42,200,100,.22);
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(226,255,230,.72), #fff 62%);
+    padding: 22px;
+  }
+  .profile-step-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .profile-step-kicker {
+    margin: 0 0 5px;
+    color: var(--spinach);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .profile-step-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .profile-step-copy {
+    margin: 5px 0 0;
+    color: var(--ink-mute);
+    font-size: 13px;
+  }
+  .profile-status {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    color: var(--spinach);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .profile-status::before {
+    content: "✓";
+    width: 16px;
+    height: 16px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 11px;
+  }
+  .profile-step.saved .profile-status { display: inline-flex; }
+  .profile-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .profile-field {
+    display: grid;
+    gap: 7px;
+  }
+  .profile-field.full { grid-column: 1 / -1; }
+  .profile-field label {
+    color: var(--seaweed);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .profile-select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #DCDEE3;
+    border-radius: 8px;
+    padding: 0 12px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    outline: none;
+  }
+  .profile-select:focus {
+    border-color: var(--nomni-green);
+    box-shadow: 0 0 0 4px rgba(42,200,100,.12);
+  }
+  .profile-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 2px;
   }
 
   .setup-grid {
@@ -645,6 +738,10 @@
     .page-head { flex-direction: column; align-items: center; }
     .page-actions { flex-wrap: wrap; }
     .panel { padding: 28px; border-radius: 18px; }
+    .profile-step-head { display: grid; }
+    .profile-form { grid-template-columns: 1fr; }
+    .profile-field.full,
+    .profile-actions { grid-column: auto; }
     .task { grid-template-columns: 38px minmax(0, 1fr); }
     .task .btn,
     .task-status { grid-column: 1 / -1; }
@@ -692,7 +789,7 @@
     </nav>
     <div class="sidebar-foot">
       <div class="sidebar-tracker" aria-label="Setup progress">
-        <div class="sidebar-tracker-top"><span>Setup steps</span><span>4 left</span></div>
+        <div class="sidebar-tracker-top"><span>Setup steps</span><span data-steps-left>5 left</span></div>
         <div class="progress-track"><div class="progress-fill"></div></div>
         <p class="sidebar-tracker-caption">Finish key steps to start ordering.</p>
       </div>
@@ -716,10 +813,69 @@
           </div>
 
           <div class="progress-card">
-            <div class="progress-label"><span>Account setup</span><span>1 of 5 steps complete</span></div>
+            <div class="progress-label"><span>Account setup</span><span data-progress-label>1 of 6 steps complete</span></div>
             <div class="progress-track"><div class="progress-fill"></div></div>
-            <div class="progress-stat">20% complete</div>
+            <div class="progress-stat" data-progress-stat>17% complete</div>
           </div>
+
+          <section class="profile-step" data-profile-step aria-label="Business profile">
+            <div class="profile-step-head">
+              <div>
+                <p class="profile-step-kicker">Step 2</p>
+                <h3 class="profile-step-title">Tell us about your business</h3>
+                <p class="profile-step-copy">A few quick details help us guide the first setup conversation.</p>
+              </div>
+              <span class="profile-status">Saved</span>
+            </div>
+            <form class="profile-form" data-profile-form>
+              <div class="profile-field full">
+                <label for="dashboard-business-type">Business type <span>optional</span></label>
+                <select class="profile-select" id="dashboard-business-type" name="businessType">
+                  <option value="">Select one</option>
+                  <option>Restaurant</option>
+                  <option>Cafe</option>
+                  <option>Hotel</option>
+                  <option>Caterer</option>
+                  <option>Food service group</option>
+                </select>
+              </div>
+              <div class="profile-field full">
+                <label for="dashboard-primary-goal">Primary goal <span>optional</span></label>
+                <select class="profile-select" id="dashboard-primary-goal" name="primaryGoal">
+                  <option value="">Select one</option>
+                  <option>Order faster</option>
+                  <option>Control food cost</option>
+                  <option>Digitise invoices</option>
+                  <option>Manage inventory</option>
+                  <option>Standardise multiple locations</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <label for="dashboard-locations">No. of locations <span>optional</span></label>
+                <select class="profile-select" id="dashboard-locations" name="locations">
+                  <option value="">Select</option>
+                  <option>1</option>
+                  <option>2-5</option>
+                  <option>6-20</option>
+                  <option>21+</option>
+                </select>
+              </div>
+              <div class="profile-field">
+                <label for="dashboard-ordering-now">Current ordering <span>optional</span></label>
+                <select class="profile-select" id="dashboard-ordering-now" name="orderingNow">
+                  <option value="">Select</option>
+                  <option>WhatsApp / SMS</option>
+                  <option>Email</option>
+                  <option>Supplier portals</option>
+                  <option>Spreadsheets</option>
+                  <option>Another system</option>
+                </select>
+              </div>
+              <div class="profile-actions">
+                <button class="btn btn-primary" type="submit">Save and continue</button>
+              </div>
+            </form>
+          </section>
 
           <div class="task-list">
             <div class="task completed">
@@ -731,7 +887,7 @@
               <span class="task-status">Completed</span>
             </div>
             <div class="task pending">
-              <div class="task-check">2</div>
+              <div class="task-check">3</div>
               <div>
                 <p class="task-title">Add your first supplier</p>
                 <p class="task-copy">Set up who you order from most often.</p>
@@ -739,7 +895,7 @@
               <a class="btn btn-secondary" href="#">Add supplier</a>
             </div>
             <div class="task pending">
-              <div class="task-check">3</div>
+              <div class="task-check">4</div>
               <div>
                 <p class="task-title">Build a starter product list</p>
                 <p class="task-copy">Choose items you order every week.</p>
@@ -747,7 +903,7 @@
               <a class="btn btn-secondary" href="#">Add products</a>
             </div>
             <div class="task pending">
-              <div class="task-check">4</div>
+              <div class="task-check">5</div>
               <div>
                 <p class="task-title">Place your first order</p>
                 <p class="task-copy">Start ordering from a supplier you use regularly.</p>
@@ -755,7 +911,7 @@
               <a class="btn btn-secondary" href="#">Start order</a>
             </div>
             <div class="task pending">
-              <div class="task-check">5</div>
+              <div class="task-check">6</div>
               <div>
                 <p class="task-title">Upload an invoice</p>
                 <p class="task-copy">See how invoice digitisation works.</p>
@@ -781,6 +937,12 @@
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
     var setupTitleNode = document.querySelector('[data-setup-title]');
+    var profileForm = document.querySelector('[data-profile-form]');
+    var profileStep = document.querySelector('[data-profile-step]');
+    var progressLabel = document.querySelector('[data-progress-label]');
+    var progressStat = document.querySelector('[data-progress-stat]');
+    var stepsLeft = document.querySelector('[data-steps-left]');
+    var progressFills = document.querySelectorAll('.progress-fill');
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -801,6 +963,19 @@
       if (venueNode) venueNode.textContent = venueName;
     } else if (firstName && setupTitleNode) {
       setupTitleNode.textContent = 'Let’s finish your Procure setup, ' + firstName + '.';
+    }
+
+    if (profileForm && profileStep) {
+      profileForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        profileStep.classList.add('saved');
+        if (progressLabel) progressLabel.textContent = '2 of 6 steps complete';
+        if (progressStat) progressStat.textContent = '33% complete';
+        if (stepsLeft) stepsLeft.textContent = '4 left';
+        progressFills.forEach(function(fill) {
+          fill.style.width = '33.333%';
+        });
+      });
     }
   })();
 </script>

@@ -29,8 +29,14 @@ The opening email screen presents two paths after the user enters an email:
 
 2. **Sign up for FREE**
    - Let the user create a real account and begin a 30-day trial.
-   - Step 1 asks for first name, last name, mobile number optional, company registered name, and venue name.
-   - Step 2 asks optional setup questions: business type, primary goal, number of locations, and current ordering method.
+   - The user is first asked to verify their email with a 6-digit code.
+   - A push-notification-style email toast appears while the user is on the verification step.
+   - Clicking the toast opens `Freemium/procure-verification-email.html`, showing the mock email and verification code.
+   - Prototype verification code: `123456`.
+   - After verification, Step 1 asks for first name, last name, and password.
+   - Password rule: minimum 8 characters with at least one lowercase letter, one uppercase letter, one number, and one symbol/special character.
+   - Step 2 asks for company registered name, venue name, and structured Australian venue address fields: street address, suburb, state, and postcode.
+   - The previous optional setup questions now appear as a dashboard onboarding step after account creation: business type, primary goal, number of locations, and current ordering method.
    - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard placeholder.
 
 The current landing-page work is the top-of-funnel UI for this flow. The above-the-fold sections should make the “try Nomni Procure” action feel immediate and low-friction.
@@ -67,6 +73,7 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/nomni.html`
 - `Freemium/Zeemart.html`
 - `Freemium/procure-get-started.html`
+- `Freemium/procure-verification-email.html`
 - `Freemium/procure-demo-email.html`
 - `Freemium/procure-demo-dashboard.html`
 - `Freemium/Procure Trial Dashboard.html`
@@ -93,6 +100,11 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
 - Email screen CTAs:
   - Primary: `Sign up for FREE`
   - Secondary: `Try the demo account`
+- Signup verification:
+  - `Sign up for FREE` moves to a verification step before collecting account details.
+  - The page shows a delayed email notification toast for the verification code.
+  - The toast opens `Freemium/procure-verification-email.html` in a new tab.
+  - Mock verification code: `123456`.
 - The page reads `?source=nomni` or `?source=zeemart` so the back link can return to the relevant marketing prototype.
 - On page load, the blurred Procure dashboard background appears first. The dialog then fades/settles in softly, shows a short `Opening Nomni Procure` transition, and crossfades into the email step. Step changes also animate the dialog height so the card shape does not snap between forms.
 - Background treatment uses the actual dashboard pattern rather than the trial setup dashboard. It is intentionally very blurred with a cream-led overlay so it gives product context without competing with the dialog, while making the move from the Nomni marketing page feel less abrupt.
@@ -119,17 +131,29 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Topbar includes `Demo link expires in 14 days`.
   - Topbar CTAs: `Start my FREE trial` and `Book a demo`.
   - `Start my FREE trial` links back to `procure-get-started.html?source=demo&email=...` when an email is available.
-- Email validation is enabled on the first email screen. Later signup/detail fields remain relaxed in prototype mode so the flow can be clicked through without entering every field.
+- Email validation is enabled on the first email screen, the verification step checks for the mock 6-digit code, and Step 1 validates the password rule. The venue details step also uses required fields so the trial dashboard can receive meaningful venue context.
 - Signup Step 1:
-  - Body: `Tell us where to set up your account.`
+  - Body: `Set your name and password.`
   - First name
   - Last name
-  - Mobile optional
+  - Create password
+- Signup Step 2:
+  - Heading: `Add your venue details`
+  - Body: `Tell us where your team will use Nomni Procure.`
   - Company registered name
   - Venue name
-- Signup Step 2 optional questions:
+  - Street address
+  - Suburb
+  - Australian state
+  - Postcode
+- Address autocomplete note:
+  - No third-party address autocomplete is wired into this static prototype.
+  - Browser autofill can still help through standard autocomplete attributes.
+  - Public OpenStreetMap/Nominatim is not suitable for production autocomplete because its public usage policy forbids autocomplete-style use.
+  - Google Places and Mapbox are better production candidates, but both require reviewing billing/free-tier limits.
+- Dashboard business profile step:
   - Heading: `Tell us about your business`
-  - Body: `A few quick details to help us understand your business.`
+  - Body: `A few quick details help us guide the first setup conversation.`
   - Business type
   - Primary goal
   - Number of locations
@@ -213,7 +237,8 @@ Current role:
   - Topbar user name and avatar initials use the entered name.
   - Setup panel title mentions the entered venue name in green.
 - Uses a soft cream/mint patterned background treatment and a floating panel surface for the setup section.
-- Shows account setup progress inside `Next steps` and as a compact tracker in the sidebar. The full setup is 5 steps; the account-created step is already complete, leaving 4 remaining actions.
+- Shows account setup progress inside `Next steps` and as a compact tracker in the sidebar. The full setup is now 6 steps; the account-created step is already complete, with the business-profile questions as the first dashboard step.
+- The dashboard business-profile step contains the previous optional signup questions and updates progress from `1 of 6` to `2 of 6` when saved.
 - Marks the completed account step with a quiet green `Completed` status rather than a button-like chip.
 - Adds two non-checklist helper CTAs inside the setup panel: `Explore our setup guide` and `Book a live demo`.
 - Topbar has a `Need help?` menu with:
