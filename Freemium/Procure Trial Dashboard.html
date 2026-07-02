@@ -63,6 +63,7 @@
     top: 0;
     z-index: 5;
   }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
   .brand { display: flex; align-items: center; gap: 8px; }
   .brand-logo-img { height: 26px; width: auto; display: block; }
   .brand-sub {
@@ -73,14 +74,53 @@
     line-height: 1;
   }
   .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .help-menu { position: relative; }
   .help-link {
-    color: rgba(255,255,255,.76);
+    border: 0;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font: inherit;
     font-size: 14px;
-    font-weight: 500;
-    padding: 7px 10px;
-    border-radius: 6px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(42,200,100,.22);
   }
-  .help-link:hover { background: rgba(255,255,255,.10); color: #fff; }
+  .help-link:hover,
+  .help-link[aria-expanded="true"] { background: #fff; color: var(--seaweed); }
+  .help-menu-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 224px;
+    display: none;
+    border: 1px solid #e0e2e8;
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+    box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08);
+    padding: 6px;
+    z-index: 30;
+  }
+  .help-menu-panel.open { display: block; }
+  .help-menu-panel a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 38px;
+    padding: 0 10px;
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .help-menu-panel a:hover { background: var(--mint); color: var(--seaweed); }
   .user { display: flex; align-items: center; gap: 10px; color: #fff; }
   .avatar {
     width: 32px;
@@ -106,7 +146,6 @@
     top: 56px;
     height: calc(100vh - 56px);
   }
-  .sidebar-head { padding: 18px 16px 8px; }
   .trial-pill {
     display: inline-flex;
     align-items: center;
@@ -149,16 +188,48 @@
     color: var(--seaweed);
     font-weight: 600;
   }
-  .nav-icon {
+  .nav a .icon-wrap {
+    flex: 0 0 18px;
     width: 18px;
     height: 18px;
-    display: grid;
-    place-items: center;
-    color: #888;
-    font-size: 15px;
+    position: relative;
+    display: block;
+  }
+  .nav a .icon {
+    position: absolute;
+    inset: 0;
+    width: 18px;
+    height: 18px;
+    transition: color .15s ease;
+  }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav .badge {
+    margin-left: auto;
+    min-width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
     font-weight: 700;
   }
-  .nav a.active .nav-icon { color: var(--spinach); }
+  .nav .warn-icon {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .nav .warn-icon img {
+    width: 18px;
+    height: 18px;
+  }
   .sidebar-foot { padding: 16px; }
   .sidebar-note {
     border-top: 1px solid var(--rule);
@@ -167,20 +238,55 @@
     font-size: 12px;
     line-height: 1.45;
   }
+  .sidebar-tracker {
+    border-top: 1px solid var(--rule);
+    padding-top: 14px;
+    display: grid;
+    gap: 10px;
+  }
+  .sidebar-tracker-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--seaweed);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .sidebar-tracker-caption {
+    margin: 0;
+    color: var(--ink-mute);
+    font-size: 12px;
+    line-height: 1.4;
+  }
 
   .main {
     grid-column: 2;
     grid-row: 2;
     min-width: 0;
-    padding: 32px 40px 56px;
-    background: #fff;
+    padding: 78px 40px 64px;
+    background:
+      linear-gradient(rgba(14,55,39,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14,55,39,.035) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(250,247,233,.72) 0%, rgba(255,255,255,.96) 42%, #fff 100%),
+      linear-gradient(135deg, rgba(226,255,230,.55) 0%, rgba(255,255,255,0) 48%);
+    background-size: 28px 28px, 28px 28px, auto, auto;
+  }
+  .content-shell {
+    width: min(800px, 100%);
+    margin: 0 auto;
   }
   .page-head {
     display: flex;
     align-items: flex-start;
-    justify-content: space-between;
+    justify-content: center;
     gap: 18px;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .page-head > div {
+    width: 100%;
+    margin: 0 auto;
   }
   .eyebrow {
     margin: 0 0 8px;
@@ -199,14 +305,39 @@
     letter-spacing: -.04em;
     line-height: 1.04;
     text-wrap: balance;
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(4px);
+    animation: loadInUp .46s cubic-bezier(.2, 0, .2, 1) .22s forwards;
+  }
+  .welcome-wave {
+    display: inline-block;
+    margin: 0 auto 14px;
+    font-size: 44px;
+    line-height: 1;
+    transform-origin: 50% 58%;
+    opacity: 0;
+    filter: blur(4px);
+    animation: fadeInSoft .34s cubic-bezier(.2, 0, .2, 1) .06s forwards, waveHello 1.45s ease-in-out 760ms 2;
+  }
+  @keyframes waveHello {
+    0%, 100% { transform: rotate(0deg); }
+    18% { transform: rotate(10deg); }
+    36% { transform: rotate(-7deg); }
+    54% { transform: rotate(8deg); }
+    72% { transform: rotate(-4deg); }
   }
   .page-copy {
-    margin: 0;
+    margin: 0 auto;
     max-width: 620px;
     color: var(--ink-mute);
     font-size: 15px;
     line-height: 1.5;
     text-wrap: pretty;
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(4px);
+    animation: loadInUp .46s cubic-bezier(.2, 0, .2, 1) .34s forwards;
   }
   .page-actions {
     display: flex;
@@ -239,23 +370,12 @@
   .btn-tertiary { background: #F3F4F6; color: var(--ink-2); }
   .btn-tertiary:hover { background: #E6E8EC; }
 
-  .hero-panel {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
-    gap: 28px;
-    align-items: stretch;
-    margin-bottom: 24px;
-    border: 1px solid rgba(42,200,100,.24);
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--mint), #fff 62%);
-    padding: 28px;
-    overflow: hidden;
-  }
   .progress-card {
     border-radius: 10px;
-    background: rgba(255,255,255,.78);
-    padding: 20px;
-    box-shadow: 0 14px 36px rgba(10,20,15,.08);
+    background: linear-gradient(135deg, var(--mint), #fff 72%);
+    border: 1px solid rgba(42,200,100,.18);
+    padding: 18px;
+    margin-bottom: 18px;
   }
   .progress-label {
     display: flex;
@@ -275,30 +395,57 @@
     overflow: hidden;
   }
   .progress-fill {
-    width: 28%;
+    width: 20%;
     height: 100%;
     border-radius: inherit;
     background: var(--nomni-green);
   }
   .progress-stat {
-    margin-top: 14px;
+    margin-top: 10px;
     color: var(--seaweed);
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: -.04em;
   }
 
   .setup-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     align-items: start;
   }
   .panel {
     background: var(--panel);
-    border: 1px solid var(--rule);
-    border-radius: 10px;
-    padding: 24px;
+    border: 1px solid rgba(14,55,39,.08);
+    border-radius: 24px;
+    padding: 42px;
+    box-shadow:
+      0 24px 70px rgba(10,20,15,.12),
+      0 6px 20px rgba(10,20,15,.06),
+      0 1px 0 rgba(255,255,255,.8) inset;
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(5px);
+    animation: loadInUp .52s cubic-bezier(.2, 0, .2, 1) .48s forwards;
+  }
+  @keyframes fadeInSoft {
+    from { opacity: 0; filter: blur(4px); }
+    to { opacity: 1; filter: blur(0); }
+  }
+  @keyframes loadInUp {
+    from { opacity: 0; transform: translateY(10px); filter: blur(5px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .welcome-wave,
+    .page-title,
+    .page-copy,
+    .panel {
+      animation: none;
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
   }
   .panel-head {
     display: flex;
@@ -306,6 +453,15 @@
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 18px;
+  }
+  .panel-head.centered {
+    display: block;
+    text-align: center;
+  }
+  .panel-head.centered .panel-sub {
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
   }
   .panel-title {
     margin: 0;
@@ -333,7 +489,12 @@
     border-radius: 8px;
     background: #fff;
   }
+  .task.completed {
+    border-color: rgba(42,200,100,.24);
+    background: linear-gradient(90deg, rgba(226,255,230,.48), #fff 46%);
+  }
   .task:hover { background: var(--row-hover); }
+  .task.completed:hover { background: linear-gradient(90deg, rgba(226,255,230,.58), #fff 46%); }
   .task-check {
     width: 38px;
     height: 38px;
@@ -348,6 +509,30 @@
     background: #F3F4F6;
     color: var(--ink-mute);
   }
+  .task-status {
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0;
+    color: var(--spinach);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .task-status::before {
+    content: "✓";
+    width: 16px;
+    height: 16px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 11px;
+    line-height: 1;
+  }
   .task-title {
     margin: 0 0 3px;
     color: var(--ink);
@@ -357,6 +542,48 @@
     margin: 0;
     color: var(--ink-mute);
     font-size: 13px;
+  }
+  .panel-actions {
+    margin-top: 22px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .panel-action {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .16s ease;
+  }
+  .panel-action:active { transform: scale(.96); }
+  .panel-action.guide {
+    border: 1px solid var(--rule);
+    background: #fff;
+    color: var(--seaweed);
+  }
+  .panel-action.guide:hover {
+    background: var(--mint);
+    border-color: #B9F0C5;
+  }
+  .panel-action.demo {
+    border: 1px solid var(--nomni-green);
+    background: var(--nomni-green);
+    color: var(--seaweed);
+  }
+  .panel-action.demo:hover {
+    background: var(--seaweed);
+    border-color: var(--seaweed);
+    color: var(--nomni-green);
   }
   .support-card {
     display: grid;
@@ -401,11 +628,10 @@
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
     .sidebar { width: 64px; overflow: hidden; }
-    .sidebar-head, .sidebar-foot { display: none; }
+    .sidebar-foot { display: none; }
     .nav a { justify-content: center; padding: 10px; }
-    .nav-label { display: none; }
+    .nav-label, .nav .badge, .nav .warn-icon, .sidebar-tracker { display: none; }
     .main { padding: 28px 24px 48px; }
-    .hero-panel,
     .setup-grid { grid-template-columns: 1fr; }
   }
 
@@ -413,23 +639,34 @@
     .app { display: block; }
     .topbar { position: static; }
     .sidebar { display: none; }
-    .page-head { flex-direction: column; }
+    .page-head { flex-direction: column; align-items: center; }
     .page-actions { flex-wrap: wrap; }
-    .hero-panel { padding: 22px; }
+    .panel { padding: 28px; border-radius: 18px; }
     .task { grid-template-columns: 38px minmax(0, 1fr); }
-    .task .btn { grid-column: 1 / -1; }
+    .task .btn,
+    .task-status { grid-column: 1 / -1; }
   }
 </style>
 </head>
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand">
-      <img class="brand-logo-img" src="../assets/nomni-logo-light.svg" alt="nomni" />
-      <div class="brand-sub">Procure</div>
+    <div class="topbar-left">
+      <div class="brand">
+        <img class="brand-logo-img" src="../assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Procure</div>
+      </div>
+      <span class="trial-pill"><span class="trial-dot"></span> Trial ends in 30 days</span>
     </div>
     <div class="topbar-right">
-      <a class="help-link" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank">Help</a>
+      <div class="help-menu">
+        <button class="help-link" type="button" id="helpMenuBtn" aria-haspopup="true" aria-expanded="false">Need help? <span aria-hidden="true">⌄</span></button>
+        <div class="help-menu-panel" id="helpMenuPanel" role="menu">
+          <a href="https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app" target="_blank" role="menuitem">View setup guides <span>→</span></a>
+          <a href="https://www.nomni.ai/lets-chat" role="menuitem">Book a live demo <span>→</span></a>
+          <a href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank" role="menuitem">Browse Help Centre <span>→</span></a>
+        </div>
+      </div>
       <div class="user">
         <div class="avatar">TR</div>
         <span>Trial user</span>
@@ -438,114 +675,126 @@
   </header>
 
   <aside class="sidebar">
-    <div class="sidebar-head">
-      <span class="trial-pill"><span class="trial-dot"></span> 30-day trial</span>
-    </div>
     <nav class="nav" aria-label="Trial navigation">
-      <a class="active" href="#"><span class="nav-icon">●</span><span class="nav-label">Dashboard</span></a>
-      <a href="#"><span class="nav-icon">O</span><span class="nav-label">Orders</span></a>
-      <a href="#"><span class="nav-icon">I</span><span class="nav-label">Invoices</span></a>
-      <a href="#"><span class="nav-icon">S</span><span class="nav-label">Suppliers</span></a>
-      <a href="#"><span class="nav-icon">P</span><span class="nav-label">Products</span></a>
-      <a href="#"><span class="nav-icon">R</span><span class="nav-label">Reports</span></a>
+      <a class="active" href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span><span class="warn-icon"><img src="../error_24dp_1F1F1F 1.png" alt=""></span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
     </nav>
     <div class="sidebar-foot">
-      <div class="sidebar-note">Your dashboard will fill up once suppliers, orders, and invoices are connected.</div>
+      <div class="sidebar-tracker" aria-label="Setup progress">
+        <div class="sidebar-tracker-top"><span>Setup steps</span><span>4 left</span></div>
+        <div class="progress-track"><div class="progress-fill"></div></div>
+        <p class="sidebar-tracker-caption">Finish key steps to start ordering.</p>
+      </div>
     </div>
   </aside>
 
   <main class="main">
-    <div class="page-head">
-      <div>
-        <p class="eyebrow">Welcome to Nomni Procure</p>
-        <h1 class="page-title">Let’s get your trial workspace ready.</h1>
-        <p class="page-copy">Start with the essentials: invite your team, add suppliers, place a sample order, or speak with us if you want a guided setup.</p>
-      </div>
-      <div class="page-actions">
-        <a class="btn btn-secondary" href="https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app" target="_blank">Read guide</a>
-        <a class="btn btn-primary" href="https://www.nomni.ai/lets-chat">Book a demo</a>
-      </div>
-    </div>
-
-    <section class="hero-panel" aria-label="Trial progress">
-      <div>
-        <p class="eyebrow">Trial setup</p>
-        <h2 class="page-title">Your account is live. Now make it useful.</h2>
-        <p class="page-copy">We’ll keep the first dashboard focused on setup until there is real order and invoice activity to report.</p>
-      </div>
-      <div class="progress-card">
-        <div class="progress-label"><span>Setup progress</span><span>2 of 7</span></div>
-        <div class="progress-track"><div class="progress-fill"></div></div>
-        <div class="progress-stat">28%</div>
-      </div>
-    </section>
-
-    <div class="setup-grid">
-      <section class="panel" aria-label="Onboarding checklist">
-        <div class="panel-head">
-          <div>
-            <h2 class="panel-title">Next best steps</h2>
-            <p class="panel-sub">A practical checklist for turning this from an empty trial into a working Procure setup.</p>
-          </div>
-        </div>
-        <div class="task-list">
-          <div class="task">
-            <div class="task-check">✓</div>
-            <div>
-              <p class="task-title">Create your account</p>
-              <p class="task-copy">Your email and business details are captured.</p>
-            </div>
-            <span class="btn btn-tertiary">Done</span>
-          </div>
-          <div class="task pending">
-            <div class="task-check">1</div>
-            <div>
-              <p class="task-title">Add your first supplier</p>
-              <p class="task-copy">Set up who you order from most often.</p>
-            </div>
-            <a class="btn btn-secondary" href="#">Add supplier</a>
-          </div>
-          <div class="task pending">
-            <div class="task-check">2</div>
-            <div>
-              <p class="task-title">Build a starter product list</p>
-              <p class="task-copy">Choose items you order every week.</p>
-            </div>
-            <a class="btn btn-secondary" href="#">Add products</a>
-          </div>
-          <div class="task pending">
-            <div class="task-check">3</div>
-            <div>
-              <p class="task-title">Place a sample order</p>
-              <p class="task-copy">Preview the workflow before inviting the team.</p>
-            </div>
-            <a class="btn btn-secondary" href="#">Start order</a>
-          </div>
-          <div class="task pending">
-            <div class="task-check">4</div>
-            <div>
-              <p class="task-title">Upload an invoice</p>
-              <p class="task-copy">See how invoice digitisation works.</p>
-            </div>
-            <a class="btn btn-secondary" href="#">Upload invoice</a>
-          </div>
-        </div>
-      </section>
-
-      <aside class="panel support-card" aria-label="Help and support">
-        <div class="support-icon">?</div>
+    <div class="content-shell">
+      <div class="page-head">
         <div>
-          <h2 class="panel-title">Want help setting this up?</h2>
-          <p>Talk to our team for a guided walkthrough, or read the Procure guide if you prefer to explore on your own.</p>
+          <span class="welcome-wave" aria-hidden="true">👋</span>
+          <h1 class="page-title">Welcome to Nomni Procure!</h1>
+          <p class="page-copy">Start with the essentials: invite your team, add suppliers, place a sample order, or speak with us if you want a guided setup.</p>
         </div>
-        <div class="quick-links">
-          <a class="quick-link" href="https://www.nomni.ai/lets-chat">Book a demo <span>→</span></a>
-          <a class="quick-link" href="https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app" target="_blank">Read setup guide <span>→</span></a>
-          <a class="quick-link" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank">Browse help centre <span>→</span></a>
-        </div>
-      </aside>
+      </div>
+
+      <div class="setup-grid">
+        <section class="panel" aria-label="Onboarding checklist">
+          <div class="panel-head centered">
+            <h2 class="panel-title">Let’s finish your Procure setup.</h2>
+          </div>
+
+          <div class="progress-card">
+            <div class="progress-label"><span>Account setup</span><span>1 of 5 steps complete</span></div>
+            <div class="progress-track"><div class="progress-fill"></div></div>
+            <div class="progress-stat">20% complete</div>
+          </div>
+
+          <div class="task-list">
+            <div class="task completed">
+              <div class="task-check">1</div>
+              <div>
+                <p class="task-title">Create your account</p>
+                <p class="task-copy">Your email and business details are captured.</p>
+              </div>
+              <span class="task-status">Completed</span>
+            </div>
+            <div class="task pending">
+              <div class="task-check">2</div>
+              <div>
+                <p class="task-title">Add your first supplier</p>
+                <p class="task-copy">Set up who you order from most often.</p>
+              </div>
+              <a class="btn btn-secondary" href="#">Add supplier</a>
+            </div>
+            <div class="task pending">
+              <div class="task-check">3</div>
+              <div>
+                <p class="task-title">Build a starter product list</p>
+                <p class="task-copy">Choose items you order every week.</p>
+              </div>
+              <a class="btn btn-secondary" href="#">Add products</a>
+            </div>
+            <div class="task pending">
+              <div class="task-check">4</div>
+              <div>
+                <p class="task-title">Place a sample order</p>
+                <p class="task-copy">Preview the workflow before inviting the team.</p>
+              </div>
+              <a class="btn btn-secondary" href="#">Start order</a>
+            </div>
+            <div class="task pending">
+              <div class="task-check">5</div>
+              <div>
+                <p class="task-title">Upload an invoice</p>
+                <p class="task-copy">See how invoice digitisation works.</p>
+              </div>
+              <a class="btn btn-secondary" href="#">Upload invoice</a>
+            </div>
+          </div>
+          <div class="panel-actions" aria-label="Setup help">
+            <a class="panel-action guide" href="https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app" target="_blank">Explore our setup guide <span aria-hidden="true">→</span></a>
+            <a class="panel-action demo" href="https://www.nomni.ai/lets-chat">Book a live demo <span aria-hidden="true">→</span></a>
+          </div>
+        </section>
+      </div>
     </div>
   </main>
 </div>
+<script>
+  (function() {
+    var btn = document.getElementById('helpMenuBtn');
+    var panel = document.getElementById('helpMenuPanel');
+    if (!btn || !panel) return;
+
+    function closeMenu() {
+      panel.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', function(event) {
+      event.stopPropagation();
+      var isOpen = panel.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    panel.addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+
+    document.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') closeMenu();
+    });
+  })();
+</script>
 </body>
 </html>

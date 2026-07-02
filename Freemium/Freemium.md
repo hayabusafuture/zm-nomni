@@ -31,7 +31,7 @@ The opening email screen presents two paths after the user enters an email:
    - Let the user create a real account and begin a 30-day trial.
    - Step 1 asks for first name, last name, mobile number optional, company registered name, and venue name.
    - Step 2 asks optional setup questions: business type, primary goal, number of locations, and current ordering method.
-   - Finish shows a short `Creating your workspace` transition, then sends the user to the trial dashboard placeholder.
+   - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard placeholder.
 
 The current landing-page work is the top-of-funnel UI for this flow. The above-the-fold sections should make the “try Nomni Procure” action feel immediate and low-friction.
 
@@ -121,7 +121,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - `Start my FREE trial` links back to `procure-get-started.html?source=demo&email=...` when an email is available.
 - Email validation is enabled on the first email screen. Later signup/detail fields remain relaxed in prototype mode so the flow can be clicked through without entering every field.
 - Signup Step 1:
-  - Body: `Set up the basics for your trial workspace.`
+  - Body: `Tell us where to set up your account.`
   - First name
   - Last name
   - Mobile optional
@@ -135,8 +135,8 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Number of locations
   - Current ordering method
 - Finish transition:
-  - Heading: `Creating your workspace`
-  - Body: `Setting up your Nomni Procure trial.`
+  - Heading: `Creating your account`
+  - Body: `Setting up Nomni Procure for your venue.`
   - Redirects to `Freemium/Procure Trial Dashboard.html` after a short loading state.
 - Dialog padding: `36px` on desktop, reduced slightly on mobile.
 
@@ -204,14 +204,24 @@ Note: the exact Zeemart screenshot hero photo was not found among downloaded ref
 Current role:
 
 - Uses a Procure-style app shell with topbar, sidebar, and dashboard content.
+- Shows a countdown-style `Trial ends in 30 days` flag in the topbar beside the Nomni Procure logo.
+- Uses the real Procure sidebar menu and icon assets, excluding `Payments`.
 - Shows onboarding/setup content instead of live metrics.
+- Centers the setup panel with a constrained max width, a large gently animated wave mark above the `Welcome to Nomni Procure!` headline, and a soft staggered load-in for the welcome content and checklist panel.
+- Uses a soft cream/mint patterned background treatment and a floating panel surface for the setup section.
+- Shows account setup progress inside `Next steps` and as a compact tracker in the sidebar. The full setup is 5 steps; the account-created step is already complete, leaving 4 remaining actions.
+- Marks the completed account step with a quiet green `Completed` status rather than a button-like chip.
+- Adds two non-checklist helper CTAs inside the setup panel: `Explore our setup guide` and `Book a live demo`.
+- Topbar has a `Need help?` menu with:
+  - `View setup guides`
+  - `Book a live demo`
+  - `Browse Help Centre`
 - Includes setup tasks:
   - Create your account
   - Add your first supplier
   - Build a starter product list
   - Place a sample order
   - Upload an invoice
-- Includes a `Book a demo` button linking to `https://www.nomni.ai/lets-chat`.
 - Includes help/support links:
   - Navigating Nomni Procure app: `https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app`
   - Nomni Procure help collection: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`
