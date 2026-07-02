@@ -138,6 +138,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Heading: `Creating your account`
   - Body: `Setting up Nomni Procure for your venue.`
   - Redirects to `Freemium/Procure Trial Dashboard.html` after a short loading state.
+  - Carries the entered email, first/last name, and venue name into the trial dashboard URL so the dashboard can personalize the topbar user and setup panel.
 - Dialog padding: `36px` on desktop, reduced slightly on mobile.
 
 The prototypes were initially too large, like the browser was zoomed to roughly 125%. We adjusted:
@@ -208,6 +209,9 @@ Current role:
 - Uses the real Procure sidebar menu and icon assets, excluding `Payments`.
 - Shows onboarding/setup content instead of live metrics.
 - Centers the setup panel with a constrained max width, a large gently animated wave mark above the `Welcome to Nomni Procure!` headline, and a soft staggered load-in for the welcome content and checklist panel.
+- Reads signup details from URL params when available:
+  - Topbar user name and avatar initials use the entered name.
+  - Setup panel title mentions the entered venue name in green.
 - Uses a soft cream/mint patterned background treatment and a floating panel surface for the setup section.
 - Shows account setup progress inside `Next steps` and as a compact tracker in the sidebar. The full setup is 5 steps; the account-created step is already complete, leaving 4 remaining actions.
 - Marks the completed account step with a quiet green `Completed` status rather than a button-like chip.
@@ -220,7 +224,7 @@ Current role:
   - Create your account
   - Add your first supplier
   - Build a starter product list
-  - Place a sample order
+  - Place your first order
   - Upload an invoice
 - Includes help/support links:
   - Navigating Nomni Procure app: `https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app`

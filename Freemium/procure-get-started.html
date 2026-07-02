@@ -1339,7 +1339,7 @@
           <div class="dialog-row">
             <button class="dialog-text-btn" type="button" data-next-step="details">Back</button>
             <div class="dialog-row" style="margin:0">
-              <a class="dialog-secondary" href="Procure Trial Dashboard.html">Skip for now</a>
+              <a class="dialog-secondary" href="Procure Trial Dashboard.html" data-dashboard-link>Skip for now</a>
               <button class="dialog-submit" type="submit">Finish →</button>
             </div>
           </div>
@@ -1390,6 +1390,12 @@
     let redirectTimer;
     let stepTimer;
     let mailToastTimer;
+    const signupData = {
+      email: '',
+      firstName: '',
+      lastName: '',
+      venueName: ''
+    };
 
     root.querySelectorAll('[data-back-link]').forEach((link) => {
       link.setAttribute('href', backUrl);
@@ -1398,6 +1404,30 @@
     if (prefillEmail && emailInput) {
       emailInput.value = prefillEmail;
       emailOutputs.forEach((node) => { node.textContent = prefillEmail; });
+    }
+
+    function fieldValue(name) {
+      const field = root.querySelector(`[name="${name}"]`);
+      return field && field.value ? field.value.trim() : '';
+    }
+
+    function updateSignupData() {
+      signupData.email = fieldValue('email');
+      signupData.firstName = fieldValue('firstName');
+      signupData.lastName = fieldValue('lastName');
+      signupData.venueName = fieldValue('venueName');
+    }
+
+    function buildDashboardUrl() {
+      updateSignupData();
+      const query = new URLSearchParams();
+      const fullName = [signupData.firstName, signupData.lastName].filter(Boolean).join(' ');
+      if (fullName) query.set('userName', fullName);
+      if (signupData.firstName) query.set('firstName', signupData.firstName);
+      if (signupData.email) query.set('email', signupData.email);
+      if (signupData.venueName) query.set('venueName', signupData.venueName);
+      const suffix = query.toString();
+      return suffix ? `${dashboardUrl}?${suffix}` : dashboardUrl;
     }
 
     function setStep(name) {
@@ -1417,7 +1447,7 @@
       });
       if (name === 'creating') {
         redirectTimer = window.setTimeout(() => {
-          window.location.href = dashboardUrl;
+          window.location.href = buildDashboardUrl();
         }, 1700);
       }
     }
@@ -1475,7 +1505,7 @@
         });
         if (name === 'creating') {
           redirectTimer = window.setTimeout(() => {
-            window.location.href = dashboardUrl;
+            window.location.href = buildDashboardUrl();
           }, 1700);
         }
         if (name === 'demo-sent' && mailToast) {
@@ -1517,10 +1547,17 @@
       });
     });
 
+    root.querySelectorAll('[data-dashboard-link]').forEach((link) => {
+      link.addEventListener('click', () => {
+        link.setAttribute('href', buildDashboardUrl());
+      });
+    });
+
     root.querySelectorAll('form[data-next-step]').forEach((form) => {
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         if (form.classList.contains('lead-form') && !form.reportValidity()) return;
+        updateSignupData();
         if (emailInput && emailInput.value) {
           emailOutputs.forEach((node) => { node.textContent = emailInput.value; });
         }

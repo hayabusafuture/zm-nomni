@@ -470,6 +470,9 @@
     font-weight: 700;
     letter-spacing: -.02em;
   }
+  .venue-highlight {
+    color: var(--spinach);
+  }
   .panel-sub {
     margin: 5px 0 0;
     color: var(--ink-mute);
@@ -668,8 +671,8 @@
         </div>
       </div>
       <div class="user">
-        <div class="avatar">TR</div>
-        <span>Trial user</span>
+        <div class="avatar" data-avatar>TR</div>
+        <span data-user-name>Trial user</span>
       </div>
     </div>
   </header>
@@ -702,14 +705,14 @@
         <div>
           <span class="welcome-wave" aria-hidden="true">👋</span>
           <h1 class="page-title">Welcome to Nomni Procure!</h1>
-          <p class="page-copy">Start with the essentials: invite your team, add suppliers, place a sample order, or speak with us if you want a guided setup.</p>
+          <p class="page-copy">Start with the essentials: add suppliers, build your product list, place your first order, or speak with us if you want a guided setup.</p>
         </div>
       </div>
 
       <div class="setup-grid">
         <section class="panel" aria-label="Onboarding checklist">
           <div class="panel-head centered">
-            <h2 class="panel-title">Let’s finish your Procure setup.</h2>
+            <h2 class="panel-title" data-setup-title>Let’s finish your Procure setup.</h2>
           </div>
 
           <div class="progress-card">
@@ -746,8 +749,8 @@
             <div class="task pending">
               <div class="task-check">4</div>
               <div>
-                <p class="task-title">Place a sample order</p>
-                <p class="task-copy">Preview the workflow before inviting the team.</p>
+                <p class="task-title">Place your first order</p>
+                <p class="task-copy">Start ordering from a supplier you use regularly.</p>
               </div>
               <a class="btn btn-secondary" href="#">Start order</a>
             </div>
@@ -769,6 +772,38 @@
     </div>
   </main>
 </div>
+<script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var userName = params.get('userName') || '';
+    var firstName = params.get('firstName') || '';
+    var venueName = params.get('venueName') || '';
+    var userNameNode = document.querySelector('[data-user-name]');
+    var avatarNode = document.querySelector('[data-avatar]');
+    var setupTitleNode = document.querySelector('[data-setup-title]');
+
+    function initialsFromName(name) {
+      var parts = name.trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return 'TR';
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    if (userName && userNameNode) {
+      userNameNode.textContent = userName;
+    }
+    if (userName && avatarNode) {
+      avatarNode.textContent = initialsFromName(userName);
+    }
+    if (venueName && setupTitleNode) {
+      setupTitleNode.innerHTML = 'Let’s finish setting up <span class="venue-highlight"></span>';
+      var venueNode = setupTitleNode.querySelector('.venue-highlight');
+      if (venueNode) venueNode.textContent = venueName;
+    } else if (firstName && setupTitleNode) {
+      setupTitleNode.textContent = 'Let’s finish your Procure setup, ' + firstName + '.';
+    }
+  })();
+</script>
 <script>
   (function() {
     var btn = document.getElementById('helpMenuBtn');
