@@ -36,7 +36,7 @@ The opening email screen presents two paths after the user enters an email:
    - After verification, Step 1 asks for first name, last name, and password.
    - Password rule: minimum 8 characters with at least one lowercase letter, one uppercase letter, one number, and one symbol/special character.
    - Step 2 asks for company registered name, venue name, and structured Australian venue address fields: street address, suburb, state, and postcode.
-   - The previous optional setup questions now appear as a dashboard onboarding step after account creation: business type, primary goal, number of locations, and current ordering method.
+   - Step 3 asks optional setup questions: business type, primary goal, number of locations, and current ordering method.
    - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard placeholder.
 
 The current landing-page work is the top-of-funnel UI for this flow. The above-the-fold sections should make the “try Nomni Procure” action feel immediate and low-friction.
@@ -151,9 +151,9 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Browser autofill can still help through standard autocomplete attributes.
   - Public OpenStreetMap/Nominatim is not suitable for production autocomplete because its public usage policy forbids autocomplete-style use.
   - Google Places and Mapbox are better production candidates, but both require reviewing billing/free-tier limits.
-- Dashboard business profile step:
+- Signup Step 3 optional questions:
   - Heading: `Tell us about your business`
-  - Body: `A few quick details help us guide the first setup conversation.`
+  - Body: `A few quick details to help us understand your business.`
   - Business type
   - Primary goal
   - Number of locations
@@ -237,8 +237,7 @@ Current role:
   - Topbar user name and avatar initials use the entered name.
   - Setup panel title mentions the entered venue name in green.
 - Uses a soft cream/mint patterned background treatment and a floating panel surface for the setup section.
-- Shows account setup progress inside `Next steps` and as a compact tracker in the sidebar. The full setup is now 6 steps; the account-created step is already complete, with the business-profile questions as the first dashboard step.
-- The dashboard business-profile step contains the previous optional signup questions and updates progress from `1 of 6` to `2 of 6` when saved.
+- Shows account setup progress inside `Next steps` and as a compact tracker in the sidebar. The full setup is 5 steps; the account-created step is already complete, leaving 4 remaining actions.
 - Marks the completed account step with a quiet green `Completed` status rather than a button-like chip.
 - Adds two non-checklist helper CTAs inside the setup panel: `Explore our setup guide` and `Book a live demo`.
 - Topbar has a `Need help?` menu with:
