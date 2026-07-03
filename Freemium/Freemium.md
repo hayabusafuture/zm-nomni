@@ -147,7 +147,11 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Australian state
   - Postcode
 - Address autocomplete note:
-  - No third-party address autocomplete is wired into this static prototype.
+  - Suburb lookup is wired into the static prototype using a trimmed Matthew Proctor Australian Postcodes CSV at `Freemium/assets/australian_postcodes.csv`.
+  - The CSV keeps only `locality`, `state`, and `postcode`; selecting a suburb suggestion fills state and postcode.
+  - Search matches suburb, state, and postcode together, so entries like `Armadale`, `Armadale VIC`, and `Armadale 3143` can return the same result.
+  - The state and postcode fields remain editable because this is locality lookup, not full address validation.
+  - If the CSV cannot load, the prototype falls back to a small demo suburb list.
   - Browser autofill can still help through standard autocomplete attributes.
   - Public OpenStreetMap/Nominatim is not suitable for production autocomplete because its public usage policy forbids autocomplete-style use.
   - Google Places and Mapbox are better production candidates, but both require reviewing billing/free-tier limits.

@@ -795,6 +795,7 @@
   .field {
     display: grid;
     gap: 7px;
+    position: relative;
   }
   .field.full { grid-column: 1 / -1; }
   .field label {
@@ -811,6 +812,51 @@
     color: #6B6E77;
     font-size: 13px;
     line-height: 1.35;
+  }
+  .locality-suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 12;
+    display: none;
+    max-height: 230px;
+    overflow-y: auto;
+    border: 1px solid rgba(14,55,39,.12);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 18px 46px rgba(10,20,15,.16), 0 1px 0 rgba(255,255,255,.8) inset;
+    padding: 6px;
+  }
+  .locality-suggestions.visible { display: grid; gap: 3px; }
+  .locality-option {
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--seaweed);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    padding: 0 12px;
+  }
+  .locality-option:hover,
+  .locality-option:focus {
+    background: var(--mint);
+    outline: none;
+  }
+  .locality-option span:last-child {
+    flex: 0 0 auto;
+    color: #6B6E77;
+    font-size: 13px;
+    font-weight: 700;
   }
   .password-note {
     margin: -2px 0 0;
@@ -1339,7 +1385,8 @@
             </div>
             <div class="field">
               <label for="suburb">Suburb</label>
-              <input class="dialog-input" id="suburb" name="suburb" autocomplete="address-level2" required />
+              <input class="dialog-input" id="suburb" name="suburb" autocomplete="address-level2" required aria-autocomplete="list" aria-controls="locality-suggestions" aria-expanded="false" />
+              <div class="locality-suggestions" id="locality-suggestions" role="listbox" data-locality-suggestions></div>
             </div>
             <div class="field">
               <label for="aus-state">State</label>
@@ -1466,7 +1513,30 @@
     const mailIcon = document.querySelector('[data-mail-icon]');
     const mailTitle = document.querySelector('[data-mail-title]');
     const mailPreview = document.querySelector('[data-mail-preview]');
+    const suburbInput = root.querySelector('input[name="suburb"]');
+    const stateSelect = root.querySelector('select[name="ausState"]');
+    const postcodeInput = root.querySelector('input[name="postcode"]');
+    const localitySuggestions = root.querySelector('[data-locality-suggestions]');
     const dashboardUrl = 'Procure Trial Dashboard.html';
+    const postcodeCsvUrl = 'assets/australian_postcodes.csv';
+    const fallbackLocalities = [
+      { locality: 'Adelaide', state: 'SA', postcode: '5000' },
+      { locality: 'Brisbane', state: 'QLD', postcode: '4000' },
+      { locality: 'Canberra', state: 'ACT', postcode: '2600' },
+      { locality: 'Darwin', state: 'NT', postcode: '0800' },
+      { locality: 'Hobart', state: 'TAS', postcode: '7000' },
+      { locality: 'Melbourne', state: 'VIC', postcode: '3000' },
+      { locality: 'Perth', state: 'WA', postcode: '6000' },
+      { locality: 'Sydney', state: 'NSW', postcode: '2000' },
+      { locality: 'Parramatta', state: 'NSW', postcode: '2150' },
+      { locality: 'Surry Hills', state: 'NSW', postcode: '2010' },
+      { locality: 'Richmond', state: 'VIC', postcode: '3121' },
+      { locality: 'Richmond', state: 'NSW', postcode: '2753' },
+      { locality: 'Fitzroy', state: 'VIC', postcode: '3065' },
+      { locality: 'New Farm', state: 'QLD', postcode: '4005' },
+      { locality: 'Fremantle', state: 'WA', postcode: '6160' }
+    ];
+    let auLocalities = fallbackLocalities;
     const params = new URLSearchParams(window.location.search);
     const source = params.get('source');
     const prefillEmail = params.get('email');
@@ -1494,6 +1564,141 @@
     if (prefillEmail && emailInput) {
       emailInput.value = prefillEmail;
       emailOutputs.forEach((node) => { node.textContent = prefillEmail; });
+    }
+
+    function normaliseSearch(value) {
+      return value.trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function parseCsvRows(csv) {
+      const rows = [];
+      let row = [];
+      let field = '';
+      let quoted = false;
+      for (let i = 0; i < csv.length; i += 1) {
+        const char = csv[i];
+        const next = csv[i + 1];
+        if (quoted) {
+          if (char === '"' && next === '"') {
+            field += '"';
+            i += 1;
+          } else if (char === '"') {
+            quoted = false;
+          } else {
+            field += char;
+          }
+        } else if (char === '"') {
+          quoted = true;
+        } else if (char === ',') {
+          row.push(field);
+          field = '';
+        } else if (char === '\n') {
+          row.push(field);
+          rows.push(row);
+          row = [];
+          field = '';
+        } else if (char !== '\r') {
+          field += char;
+        }
+      }
+      if (field || row.length) {
+        row.push(field);
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function localitiesFromCsv(csv) {
+      const rows = parseCsvRows(csv);
+      const header = rows.shift() || [];
+      const postcodeIndex = header.findIndex((name) => normaliseSearch(name) === 'postcode');
+      const localityIndex = header.findIndex((name) => normaliseSearch(name) === 'locality');
+      const stateIndex = header.findIndex((name) => normaliseSearch(name) === 'state');
+      if (postcodeIndex < 0 || localityIndex < 0 || stateIndex < 0) return [];
+      const seen = new Set();
+      return rows.map((row) => ({
+        locality: (row[localityIndex] || '').trim(),
+        state: (row[stateIndex] || '').trim().toUpperCase(),
+        postcode: (row[postcodeIndex] || '').trim().padStart(4, '0')
+      })).filter((item) => {
+        const key = `${item.locality}|${item.state}|${item.postcode}`;
+        if (!item.locality || !item.state || !/^\d{4}$/.test(item.postcode) || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function hideLocalitySuggestions() {
+      if (!localitySuggestions) return;
+      localitySuggestions.classList.remove('visible');
+      localitySuggestions.innerHTML = '';
+      if (suburbInput) suburbInput.setAttribute('aria-expanded', 'false');
+    }
+
+    function selectLocality(locality) {
+      if (suburbInput) suburbInput.value = locality.locality;
+      if (stateSelect) stateSelect.value = locality.state;
+      if (postcodeInput) postcodeInput.value = locality.postcode;
+      hideLocalitySuggestions();
+    }
+
+    function renderLocalitySuggestions(query) {
+      if (!localitySuggestions || !suburbInput) return;
+      const term = normaliseSearch(query);
+      if (term.length < 2) {
+        hideLocalitySuggestions();
+        return;
+      }
+      const searchableText = (item) => normaliseSearch(`${item.locality} ${item.state} ${item.postcode}`);
+      const termParts = term.split(' ').filter(Boolean);
+      const seenMatches = new Set();
+      const addMatches = (items) => items.filter((item) => {
+        const key = `${item.locality}|${item.state}|${item.postcode}`;
+        if (seenMatches.has(key)) return false;
+        seenMatches.add(key);
+        return true;
+      });
+      const matches = addMatches(auLocalities.filter((item) => searchableText(item).startsWith(term)))
+        .concat(addMatches(auLocalities.filter((item) => {
+          const searchable = searchableText(item);
+          return !searchable.startsWith(term) && termParts.every((part) => searchable.includes(part));
+        })))
+        .concat(addMatches(auLocalities.filter((item) => {
+          const searchable = searchableText(item);
+          return !searchable.startsWith(term) && searchable.includes(term);
+        })))
+        .slice(0, 8);
+      if (!matches.length) {
+        hideLocalitySuggestions();
+        return;
+      }
+      localitySuggestions.innerHTML = '';
+      matches.forEach((item) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'locality-option';
+        button.setAttribute('role', 'option');
+        button.innerHTML = `<span>${item.locality}</span><span>${item.state} ${item.postcode}</span>`;
+        button.addEventListener('mousedown', (event) => {
+          event.preventDefault();
+          selectLocality(item);
+        });
+        localitySuggestions.appendChild(button);
+      });
+      localitySuggestions.classList.add('visible');
+      suburbInput.setAttribute('aria-expanded', 'true');
+    }
+
+    async function loadPostcodeLocalities() {
+      if (!suburbInput) return;
+      try {
+        const response = await fetch(postcodeCsvUrl, { cache: 'force-cache' });
+        if (!response.ok) throw new Error('Postcode CSV unavailable');
+        const localities = localitiesFromCsv(await response.text());
+        if (!localities.length) throw new Error('Postcode CSV could not be parsed');
+        auLocalities = localities;
+      } catch (error) {
+      }
     }
 
     function fieldValue(name) {
@@ -1694,6 +1899,25 @@
       input.addEventListener('input', () => {
         input.value = input.value.replace(/\D/g, '').slice(0, 4);
       });
+    });
+
+    if (suburbInput) {
+      loadPostcodeLocalities();
+      suburbInput.addEventListener('input', () => {
+        renderLocalitySuggestions(suburbInput.value);
+      });
+      suburbInput.addEventListener('focus', () => {
+        renderLocalitySuggestions(suburbInput.value);
+      });
+      suburbInput.addEventListener('blur', () => {
+        window.setTimeout(hideLocalitySuggestions, 120);
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      if (!localitySuggestions || !suburbInput) return;
+      if (localitySuggestions.contains(event.target) || event.target === suburbInput) return;
+      hideLocalitySuggestions();
     });
 
     root.querySelectorAll('input[name="password"]').forEach((input) => {
