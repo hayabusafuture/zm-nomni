@@ -730,13 +730,67 @@
     opacity: 0;
     transform: translateY(-4px);
   }
-  .step-kicker {
-    margin: 0 0 12px;
-    color: var(--spinach);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .08em;
+  .signup-stepper {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0 0 24px;
+  }
+  .signup-step {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    min-width: 0;
+    color: #8A8F98;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
     text-transform: uppercase;
+  }
+  .signup-step::before {
+    content: "";
+    display: block;
+    flex: 0 0 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: #E7E8EC;
+    transition: background-color .18s ease;
+  }
+  .signup-step-badge {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    background: #ECEEF2;
+    color: #7A7F89;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transition: background-color .18s ease, color .18s ease;
+  }
+  .signup-step.is-current,
+  .signup-step.is-complete {
+    color: var(--seaweed);
+  }
+  .signup-step.is-current::before,
+  .signup-step.is-complete::before {
+    background: var(--nomni-green);
+  }
+  .signup-step.is-current .signup-step-badge,
+  .signup-step.is-complete .signup-step-badge {
+    background: var(--nomni-green);
+    color: var(--seaweed);
+  }
+  .signup-step span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .dialog-title {
     margin: 0 42px 10px 0;
@@ -746,6 +800,10 @@
     letter-spacing: -.03em;
     font-weight: 800;
     text-wrap: balance;
+  }
+  .flow-step[data-step="details"] .dialog-title,
+  .flow-step[data-step="business-details"] .dialog-title {
+    margin-bottom: 18px;
   }
   .dialog-copy {
     margin: 0 0 22px;
@@ -955,6 +1013,11 @@
     font-size: 14px;
   }
   .dialog-text-btn:hover { color: var(--seaweed); }
+  .dialog-row > .dialog-text-btn {
+    min-height: 54px;
+    justify-content: flex-start;
+    padding: 0;
+  }
   .dialog-row {
     display: flex;
     align-items: center;
@@ -1351,9 +1414,12 @@
       </section>
 
       <section class="flow-step" data-step="details">
-        <p class="step-kicker">Step 1</p>
+        <div class="signup-stepper" aria-label="Signup progress">
+          <div class="signup-step is-current" aria-current="step"><b class="signup-step-badge">1</b><span>Account</span></div>
+          <div class="signup-step"><b class="signup-step-badge">2</b><span>Venue</span></div>
+          <div class="signup-step"><b class="signup-step-badge">3</b><span>Business</span></div>
+        </div>
         <h2 class="dialog-title">Create your free account</h2>
-        <p class="dialog-copy">Set your name and password.</p>
         <form class="account-form" data-next-step="business-details" novalidate>
           <div class="form-grid">
             <div class="field">
@@ -1378,9 +1444,12 @@
       </section>
 
       <section class="flow-step" data-step="business-details">
-        <p class="step-kicker">Step 2</p>
+        <div class="signup-stepper" aria-label="Signup progress">
+          <div class="signup-step is-complete"><b class="signup-step-badge">1</b><span>Account</span></div>
+          <div class="signup-step is-current" aria-current="step"><b class="signup-step-badge">2</b><span>Venue</span></div>
+          <div class="signup-step"><b class="signup-step-badge">3</b><span>Business</span></div>
+        </div>
         <h2 class="dialog-title">Add your venue details</h2>
-        <p class="dialog-copy">Tell us where your team will use Nomni Procure.</p>
         <form class="business-form" data-next-step="optional" novalidate>
           <div class="form-grid">
             <div class="field full">
@@ -1440,7 +1509,11 @@
       </section>
 
       <section class="flow-step" data-step="optional">
-        <p class="step-kicker">Step 3</p>
+        <div class="signup-stepper" aria-label="Signup progress">
+          <div class="signup-step is-complete"><b class="signup-step-badge">1</b><span>Account</span></div>
+          <div class="signup-step is-complete"><b class="signup-step-badge">2</b><span>Venue</span></div>
+          <div class="signup-step is-current" aria-current="step"><b class="signup-step-badge">3</b><span>Business</span></div>
+        </div>
         <h2 class="dialog-title">Tell us about your business</h2>
         <p class="dialog-copy">A few quick details to help us understand your business.</p>
         <form data-next-step="creating" novalidate>

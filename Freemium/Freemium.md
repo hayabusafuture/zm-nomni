@@ -153,13 +153,15 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - `Start my FREE trial` links back to `procure-get-started.html?source=demo&email=...` when an email is available.
 - Email validation is enabled on the first email screen, the verification step checks for the mock 6-digit code, and Step 1 validates the password rule. The venue details step also uses required fields so the trial dashboard can receive meaningful venue context.
 - Signup Step 1:
-  - Body: `Set your name and password.`
+  - A compact 3-part visual stepper appears above the title: 1 Account, 2 Venue, 3 Business.
+  - No helper/body text below the title.
   - First name
   - Last name
   - Create password
 - Signup Step 2:
+  - The stepper marks Account complete and Venue current.
   - Heading: `Add your venue details`
-  - Body: `Tell us where your team will use Nomni Procure.`
+  - No helper/body text below the title.
   - Company registered name
   - Venue name
   - Country
@@ -179,6 +181,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Public OpenStreetMap/Nominatim is not suitable for production autocomplete because its public usage policy forbids autocomplete-style use.
   - Google Places and Mapbox are better production candidates, but both require reviewing billing/free-tier limits.
 - Signup Step 3 optional questions:
+  - The stepper marks Account and Venue complete, with Business current.
   - Heading: `Tell us about your business`
   - Body: `A few quick details to help us understand your business.`
   - Business type
