@@ -174,6 +174,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - The CSV keeps only `locality`, `state`, and `postcode`; selecting a suburb or postcode suggestion fills the matching postcode, suburb, and state.
   - Search matches suburb, state, and postcode together, so entries like `Armadale`, `Armadale VIC`, and `Armadale 3143` can return the same result.
   - Postcode search is also wired to the same CSV so users can type a postcode first and choose the matching locality.
+  - Postcode/suburb suggestions float over the dialog instead of expanding the dialog height, so longer match lists do not make Step 2 scroll.
   - The state and postcode fields remain editable because this is locality lookup, not full address validation.
   - Singapore currently uses a plain postal code field with no autocomplete.
   - If the CSV cannot load, the prototype falls back to a small demo suburb list.
