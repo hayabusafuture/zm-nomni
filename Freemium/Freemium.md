@@ -262,7 +262,7 @@ Current role:
 - Shows a countdown-style `Trial ends in 30 days` flag in the topbar beside the Nomni Procure logo.
 - Uses the real Procure sidebar menu and icon assets, excluding `Payments`.
 - Shows onboarding/setup content instead of live metrics.
-- Centers the setup panel with a constrained max width, a large gently animated wave mark above the `Welcome to Nomni Procure!` headline, and a soft staggered load-in for the welcome content and checklist panel.
+- Centers the setup panel with a constrained max width, a large gently animated wave mark above the `Welcome to Nomni Procure!` headline, and a soft staggered load-in for the welcome content. The `Let’s finish setting up` checklist panel slides up subtly on page load.
 - Reads signup details from URL params when available:
   - Topbar user name and avatar initials use the entered name.
   - Setup panel title mentions the entered venue name in green.
