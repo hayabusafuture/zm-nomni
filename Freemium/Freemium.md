@@ -74,6 +74,8 @@ User-provided screenshots used as the strongest visual references:
 
 - `Freemium/nomni.html`
 - `Freemium/Zeemart.html`
+- `Freemium/freemium.html`
+- `Freemium/zeemart.html`
 - `Freemium/procure-get-started.html`
 - `Freemium/procure-verification-email.html`
 - `Freemium/procure-demo-email.html`
@@ -93,6 +95,22 @@ Both prototypes are standalone HTML files:
 - No external JavaScript
 - Google Fonts only
 - Local assets referenced from `_refs`
+
+Lowercase helper URLs:
+
+- `Freemium/freemium.html` redirects to `Freemium/nomni.html`
+- `Freemium/zeemart.html` redirects to `Freemium/Zeemart.html`
+
+Important casing/deploy note:
+
+- GitHub Pages is case-sensitive, so users typing lowercase `Freemium/zeemart.html` will not reach uppercase `Freemium/Zeemart.html` unless a redirect exists.
+- GitHub can store both `Zeemart.html` and `zeemart.html`, but a typical macOS checkout is case-insensitive and can confuse or collapse those two paths locally.
+- Long-term recommendation: avoid keeping both case variants in the repo. Keep canonical `Freemium/Zeemart.html`, and use a hosting redirect instead.
+- If moving to Cloudflare Pages, add a redirect rule or `_redirects` entry:
+  - `/Freemium/zeemart.html /Freemium/Zeemart.html 301`
+  - `/Freemium/freemium.html /Freemium/nomni.html 301`
+- Cloudflare Pages redirect setup has been added in the repo-root `_redirects` file. This assumes the Pages project publishes the repository root as the static output directory, preserving URLs like `/Freemium/nomni.html`.
+- Cloudflare Pages would help with routing/case redirects and potentially faster/more reliable preview deploys, but it does not fix this Codex sandbox's local `.git/index.lock` write limitation.
 
 The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html`:
 
