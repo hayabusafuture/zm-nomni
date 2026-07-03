@@ -128,6 +128,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
 - The page reads `?source=nomni` or `?source=zeemart` so the back link can return to the relevant marketing prototype.
 - On page load, the blurred Procure dashboard background appears first. The dialog then fades/settles in softly, shows a short `Opening Nomni Procure` transition, and crossfades into the email step. Step changes also animate the dialog height so the card shape does not snap between forms.
 - Background treatment uses the actual dashboard pattern rather than the trial setup dashboard. It is intentionally very blurred with a cream-led overlay so it gives product context without competing with the dialog, while making the move from the Nomni marketing page feel less abrupt.
+- The page behind the entry dialog is locked; only the dialog card itself scrolls when needed.
 - The entry dialog does not show an `X` close button; returning to the marketing site is reserved for explicit confirmation states.
 - CTA and form label weights are semibold to reduce visual heaviness.
 - Dialog width: `540px` max on desktop.
