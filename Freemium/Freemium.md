@@ -35,7 +35,9 @@ The opening email screen presents two paths after the user enters an email:
    - Prototype verification code: `123456`.
    - After verification, Step 1 asks for first name, last name, and password.
    - Password rule: minimum 8 characters with at least one lowercase letter, one uppercase letter, one number, and one symbol/special character.
-   - Step 2 asks for company registered name, venue name, and structured Australian venue address fields: street address, suburb, state, and postcode.
+   - Step 2 asks for company registered name, venue name, country, and structured venue address fields.
+   - Supported prototype countries are Australia and Singapore. The country selector auto-detects Singapore from browser locale/timezone; all other detected countries default to Australia.
+   - For Australia, address entry is ordered as postcode, suburb, then state. For Singapore, only postal code is shown after street address and autocomplete is disabled for now.
    - Step 3 asks optional setup questions: business type, primary goal, number of locations, and current ordering method.
    - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard placeholder.
 
@@ -142,15 +144,18 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Body: `Tell us where your team will use Nomni Procure.`
   - Company registered name
   - Venue name
+  - Country
   - Street address
-  - Suburb
-  - Australian state
   - Postcode
+  - Suburb, only when Australia is selected
+  - Australian state, only when Australia is selected
 - Address autocomplete note:
   - Suburb lookup is wired into the static prototype using a trimmed Matthew Proctor Australian Postcodes CSV at `Freemium/assets/australian_postcodes.csv`.
-  - The CSV keeps only `locality`, `state`, and `postcode`; selecting a suburb suggestion fills state and postcode.
+  - The CSV keeps only `locality`, `state`, and `postcode`; selecting a suburb or postcode suggestion fills the matching postcode, suburb, and state.
   - Search matches suburb, state, and postcode together, so entries like `Armadale`, `Armadale VIC`, and `Armadale 3143` can return the same result.
+  - Postcode search is also wired to the same CSV so users can type a postcode first and choose the matching locality.
   - The state and postcode fields remain editable because this is locality lookup, not full address validation.
+  - Singapore currently uses a plain postal code field with no autocomplete.
   - If the CSV cannot load, the prototype falls back to a small demo suburb list.
   - Browser autofill can still help through standard autocomplete attributes.
   - Public OpenStreetMap/Nominatim is not suitable for production autocomplete because its public usage policy forbids autocomplete-style use.

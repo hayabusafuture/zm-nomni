@@ -792,6 +792,12 @@
     grid-template-columns: 1fr 1fr;
     gap: 14px;
   }
+  .address-grid {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: .82fr 1.16fr .72fr;
+    gap: 14px;
+  }
   .field {
     display: grid;
     gap: 7px;
@@ -807,6 +813,7 @@
     color: #6B6E77;
     font-weight: 500;
   }
+  .field.is-hidden { display: none; }
   .field-hint {
     margin: -1px 0 0;
     color: #6B6E77;
@@ -816,10 +823,11 @@
   .locality-suggestions {
     position: absolute;
     left: 0;
-    right: 0;
     top: calc(100% + 6px);
     z-index: 12;
     display: none;
+    width: max(100%, 320px);
+    max-width: min(390px, calc(100vw - 48px));
     max-height: 230px;
     overflow-y: auto;
     border: 1px solid rgba(14,55,39,.12);
@@ -832,9 +840,9 @@
   .locality-option {
     width: 100%;
     min-height: 44px;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
     border: 0;
     border-radius: 10px;
@@ -845,12 +853,16 @@
     font-weight: 600;
     text-align: left;
     cursor: pointer;
-    padding: 0 12px;
+    padding: 10px 12px;
   }
   .locality-option:hover,
   .locality-option:focus {
     background: var(--mint);
     outline: none;
+  }
+  .locality-option span:first-child {
+    min-width: 0;
+    line-height: 1.22;
   }
   .locality-option span:last-child {
     flex: 0 0 auto;
@@ -858,6 +870,7 @@
     font-size: 13px;
     font-weight: 700;
   }
+  .business-form.is-singapore .address-grid { grid-template-columns: 1fr; }
   .password-note {
     margin: -2px 0 0;
     color: #6B6E77;
@@ -1086,6 +1099,8 @@
     .entry-dialog { align-items: flex-start; padding: 18px; overflow-y: auto; }
     .dialog-card { padding: 30px 24px; max-height: none; }
     .form-grid,
+    .address-grid,
+    .business-form.is-singapore .address-grid,
     .lead-actions { grid-template-columns: 1fr; }
     .dialog-row { flex-direction: column-reverse; align-items: stretch; }
     .dialog-title { font-size: 28px; }
@@ -1379,32 +1394,42 @@
               <p class="field-hint">Example: Garden Bistro - Surry Hills</p>
             </div>
             <div class="field full">
+              <label for="country">Country</label>
+              <select class="dialog-select" id="country" name="country" autocomplete="country-name" required>
+                <option value="Australia">Australia</option>
+                <option value="Singapore">Singapore</option>
+              </select>
+            </div>
+            <div class="field full">
               <label for="street-name">Street address</label>
               <input class="dialog-input" id="street-name" name="streetName" autocomplete="address-line1" required />
               <p class="field-hint">Example: 120 Crown Street</p>
             </div>
-            <div class="field">
-              <label for="suburb">Suburb</label>
-              <input class="dialog-input" id="suburb" name="suburb" autocomplete="address-level2" required aria-autocomplete="list" aria-controls="locality-suggestions" aria-expanded="false" />
-              <div class="locality-suggestions" id="locality-suggestions" role="listbox" data-locality-suggestions></div>
-            </div>
-            <div class="field">
-              <label for="aus-state">State</label>
-              <select class="dialog-select" id="aus-state" name="ausState" autocomplete="address-level1" required>
-                <option value="">Select</option>
-                <option>ACT</option>
-                <option>NSW</option>
-                <option>NT</option>
-                <option>QLD</option>
-                <option>SA</option>
-                <option>TAS</option>
-                <option>VIC</option>
-                <option>WA</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="postcode">Postcode</label>
-              <input class="dialog-input" id="postcode" name="postcode" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{4}" maxlength="4" required />
+            <div class="address-grid">
+              <div class="field">
+                <label for="postcode" data-postcode-label>Postcode</label>
+                <input class="dialog-input" id="postcode" name="postcode" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{4}" maxlength="4" required aria-autocomplete="list" aria-controls="postcode-suggestions" aria-expanded="false" />
+                <div class="locality-suggestions" id="postcode-suggestions" role="listbox" data-postcode-suggestions></div>
+              </div>
+              <div class="field">
+                <label for="suburb" data-suburb-label>Suburb</label>
+                <input class="dialog-input" id="suburb" name="suburb" autocomplete="address-level2" required aria-autocomplete="list" aria-controls="suburb-suggestions" aria-expanded="false" />
+                <div class="locality-suggestions" id="suburb-suggestions" role="listbox" data-suburb-suggestions></div>
+              </div>
+              <div class="field state-field" data-state-field>
+                <label for="aus-state">State</label>
+                <select class="dialog-select" id="aus-state" name="ausState" autocomplete="address-level1" required>
+                  <option value="">Select</option>
+                  <option>ACT</option>
+                  <option>NSW</option>
+                  <option>NT</option>
+                  <option>QLD</option>
+                  <option>SA</option>
+                  <option>TAS</option>
+                  <option>VIC</option>
+                  <option>WA</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="dialog-row">
@@ -1513,10 +1538,16 @@
     const mailIcon = document.querySelector('[data-mail-icon]');
     const mailTitle = document.querySelector('[data-mail-title]');
     const mailPreview = document.querySelector('[data-mail-preview]');
+    const businessForm = root.querySelector('.business-form');
+    const countrySelect = root.querySelector('select[name="country"]');
     const suburbInput = root.querySelector('input[name="suburb"]');
     const stateSelect = root.querySelector('select[name="ausState"]');
     const postcodeInput = root.querySelector('input[name="postcode"]');
-    const localitySuggestions = root.querySelector('[data-locality-suggestions]');
+    const suburbSuggestions = root.querySelector('[data-suburb-suggestions]');
+    const postcodeSuggestions = root.querySelector('[data-postcode-suggestions]');
+    const suburbLabel = root.querySelector('[data-suburb-label]');
+    const postcodeLabel = root.querySelector('[data-postcode-label]');
+    const stateField = root.querySelector('[data-state-field]');
     const dashboardUrl = 'Procure Trial Dashboard.html';
     const postcodeCsvUrl = 'assets/australian_postcodes.csv';
     const fallbackLocalities = [
@@ -1551,6 +1582,7 @@
       lastName: '',
       companyName: '',
       venueName: '',
+      country: '',
       streetName: '',
       suburb: '',
       ausState: '',
@@ -1564,6 +1596,16 @@
     if (prefillEmail && emailInput) {
       emailInput.value = prefillEmail;
       emailOutputs.forEach((node) => { node.textContent = prefillEmail; });
+    }
+
+    function detectedCountry() {
+      const languages = [navigator.language, ...(navigator.languages || [])].filter(Boolean).join(' ').toLowerCase();
+      const timeZone = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
+      return languages.includes('-sg') || timeZone.includes('singapore') ? 'Singapore' : 'Australia';
+    }
+
+    function isAustraliaSelected() {
+      return !countrySelect || countrySelect.value === 'Australia';
     }
 
     function normaliseSearch(value) {
@@ -1628,11 +1670,20 @@
       });
     }
 
-    function hideLocalitySuggestions() {
-      if (!localitySuggestions) return;
-      localitySuggestions.classList.remove('visible');
-      localitySuggestions.innerHTML = '';
-      if (suburbInput) suburbInput.setAttribute('aria-expanded', 'false');
+    function suggestionListFor(input) {
+      if (input === postcodeInput) return postcodeSuggestions;
+      if (input === suburbInput) return suburbSuggestions;
+      return null;
+    }
+
+    function hideLocalitySuggestions(input) {
+      const lists = input ? [suggestionListFor(input)] : [postcodeSuggestions, suburbSuggestions];
+      lists.filter(Boolean).forEach((list) => {
+        list.classList.remove('visible');
+        list.innerHTML = '';
+      });
+      if (!input || input === suburbInput) suburbInput?.setAttribute('aria-expanded', 'false');
+      if (!input || input === postcodeInput) postcodeInput?.setAttribute('aria-expanded', 'false');
     }
 
     function selectLocality(locality) {
@@ -1642,14 +1693,22 @@
       hideLocalitySuggestions();
     }
 
-    function renderLocalitySuggestions(query) {
-      if (!localitySuggestions || !suburbInput) return;
-      const term = normaliseSearch(query);
-      if (term.length < 2) {
+    function renderLocalitySuggestions(input) {
+      if (!input || !isAustraliaSelected()) {
         hideLocalitySuggestions();
         return;
       }
+      const suggestionList = suggestionListFor(input);
+      if (!suggestionList) return;
+      const query = input.value || '';
+      const term = normaliseSearch(query);
+      if (term.length < 2) {
+        hideLocalitySuggestions(input);
+        return;
+      }
       const searchableText = (item) => normaliseSearch(`${item.locality} ${item.state} ${item.postcode}`);
+      const postcodeText = (item) => normaliseSearch(`${item.postcode} ${item.locality} ${item.state}`);
+      const primaryText = input === postcodeInput ? postcodeText : searchableText;
       const termParts = term.split(' ').filter(Boolean);
       const seenMatches = new Set();
       const addMatches = (items) => items.filter((item) => {
@@ -1658,21 +1717,24 @@
         seenMatches.add(key);
         return true;
       });
-      const matches = addMatches(auLocalities.filter((item) => searchableText(item).startsWith(term)))
+      const matches = addMatches(auLocalities.filter((item) => primaryText(item).startsWith(term)))
         .concat(addMatches(auLocalities.filter((item) => {
           const searchable = searchableText(item);
-          return !searchable.startsWith(term) && termParts.every((part) => searchable.includes(part));
+          const postcodeSearchable = postcodeText(item);
+          return !primaryText(item).startsWith(term) && termParts.every((part) => searchable.includes(part) || postcodeSearchable.includes(part));
         })))
         .concat(addMatches(auLocalities.filter((item) => {
           const searchable = searchableText(item);
-          return !searchable.startsWith(term) && searchable.includes(term);
+          const postcodeSearchable = postcodeText(item);
+          return !primaryText(item).startsWith(term) && (searchable.includes(term) || postcodeSearchable.includes(term));
         })))
         .slice(0, 8);
       if (!matches.length) {
-        hideLocalitySuggestions();
+        hideLocalitySuggestions(input);
         return;
       }
-      localitySuggestions.innerHTML = '';
+      hideLocalitySuggestions(input === postcodeInput ? suburbInput : postcodeInput);
+      suggestionList.innerHTML = '';
       matches.forEach((item) => {
         const button = document.createElement('button');
         button.type = 'button';
@@ -1683,10 +1745,10 @@
           event.preventDefault();
           selectLocality(item);
         });
-        localitySuggestions.appendChild(button);
+        suggestionList.appendChild(button);
       });
-      localitySuggestions.classList.add('visible');
-      suburbInput.setAttribute('aria-expanded', 'true');
+      suggestionList.classList.add('visible');
+      input.setAttribute('aria-expanded', 'true');
     }
 
     async function loadPostcodeLocalities() {
@@ -1701,6 +1763,27 @@
       }
     }
 
+    function applyCountryMode() {
+      const isAustralia = isAustraliaSelected();
+      businessForm?.classList.toggle('is-singapore', !isAustralia);
+      if (postcodeLabel) postcodeLabel.textContent = isAustralia ? 'Postcode' : 'Postal code';
+      suburbInput?.closest('.field')?.classList.toggle('is-hidden', !isAustralia);
+      if (stateField) stateField.classList.toggle('is-hidden', !isAustralia);
+      if (suburbInput) {
+        suburbInput.required = isAustralia;
+        if (!isAustralia) suburbInput.value = '';
+      }
+      if (stateSelect) {
+        stateSelect.required = isAustralia;
+        if (!isAustralia) stateSelect.value = '';
+      }
+      if (postcodeInput) {
+        postcodeInput.pattern = isAustralia ? '[0-9]{4}' : '[0-9]{6}';
+        postcodeInput.maxLength = isAustralia ? 4 : 6;
+      }
+      hideLocalitySuggestions();
+    }
+
     function fieldValue(name) {
       const field = root.querySelector(`[name="${name}"]`);
       return field && field.value ? field.value.trim() : '';
@@ -1712,6 +1795,7 @@
       signupData.lastName = fieldValue('lastName');
       signupData.companyName = fieldValue('companyName');
       signupData.venueName = fieldValue('venueName');
+      signupData.country = fieldValue('country');
       signupData.streetName = fieldValue('streetName');
       signupData.suburb = fieldValue('suburb');
       signupData.ausState = fieldValue('ausState');
@@ -1727,7 +1811,7 @@
       if (signupData.email) query.set('email', signupData.email);
       if (signupData.companyName) query.set('companyName', signupData.companyName);
       if (signupData.venueName) query.set('venueName', signupData.venueName);
-      const venueAddress = [signupData.streetName, signupData.suburb, signupData.ausState, signupData.postcode].filter(Boolean).join(', ');
+      const venueAddress = [signupData.streetName, signupData.suburb, signupData.ausState, signupData.postcode, signupData.country].filter(Boolean).join(', ');
       if (venueAddress) query.set('venueAddress', venueAddress);
       const suffix = query.toString();
       return suffix ? `${dashboardUrl}?${suffix}` : dashboardUrl;
@@ -1897,26 +1981,39 @@
 
     root.querySelectorAll('input[name="postcode"]').forEach((input) => {
       input.addEventListener('input', () => {
-        input.value = input.value.replace(/\D/g, '').slice(0, 4);
+        input.value = input.value.replace(/\D/g, '').slice(0, isAustraliaSelected() ? 4 : 6);
+        renderLocalitySuggestions(input);
+      });
+      input.addEventListener('focus', () => {
+        renderLocalitySuggestions(input);
+      });
+      input.addEventListener('blur', () => {
+        window.setTimeout(() => hideLocalitySuggestions(input), 120);
       });
     });
+
+    if (countrySelect) {
+      countrySelect.value = detectedCountry();
+      applyCountryMode();
+      countrySelect.addEventListener('change', applyCountryMode);
+    }
 
     if (suburbInput) {
       loadPostcodeLocalities();
       suburbInput.addEventListener('input', () => {
-        renderLocalitySuggestions(suburbInput.value);
+        renderLocalitySuggestions(suburbInput);
       });
       suburbInput.addEventListener('focus', () => {
-        renderLocalitySuggestions(suburbInput.value);
+        renderLocalitySuggestions(suburbInput);
       });
       suburbInput.addEventListener('blur', () => {
-        window.setTimeout(hideLocalitySuggestions, 120);
+        window.setTimeout(() => hideLocalitySuggestions(suburbInput), 120);
       });
     }
 
     document.addEventListener('click', (event) => {
-      if (!localitySuggestions || !suburbInput) return;
-      if (localitySuggestions.contains(event.target) || event.target === suburbInput) return;
+      if ([suburbSuggestions, postcodeSuggestions].filter(Boolean).some((list) => list.contains(event.target))) return;
+      if (event.target === suburbInput || event.target === postcodeInput) return;
       hideLocalitySuggestions();
     });
 
