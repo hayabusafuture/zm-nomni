@@ -1187,6 +1187,63 @@
     to { transform: rotate(360deg); }
   }
 
+  /* Handoff inspectors */
+  .handoff-inspector {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .handoff-inspector-btn {
+    background: rgba(0,0,0,.4);
+    border: 1px solid rgba(255,255,255,.25);
+    color: rgba(255,255,255,.7);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 6px;
+    transition: background .15s, color .15s, border-color .15s;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: monospace;
+    letter-spacing: .03em;
+  }
+  .handoff-inspector-btn:hover { background: rgba(0,0,0,.6); color: #fff; }
+  .handoff-inspector-btn.active { background: rgba(0,0,0,.75); color: #fff; border-color: rgba(255,255,255,.5); }
+  #handoff-inspector-tip {
+    position: fixed;
+    background: #1a1f2b;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: monospace;
+    padding: 3px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 99999;
+    display: none;
+    white-space: pre-line;
+    max-width: min(360px, calc(100vw - 32px));
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    letter-spacing: .02em;
+  }
+  #handoff-inspector-highlight {
+    position: fixed;
+    z-index: 99998;
+    display: none;
+    pointer-events: none;
+    border: 1px solid rgba(42,200,100,.9);
+    border-radius: 6px;
+    box-shadow:
+      0 0 0 2px rgba(42,200,100,.18),
+      0 8px 24px rgba(10,20,15,.14);
+    transition: top .08s ease, left .08s ease, width .08s ease, height .08s ease, border-radius .08s ease;
+  }
+
   @media (max-width: 1100px) {
     .product-bg { grid-template-columns: 64px 1fr; }
     .sidebar { width: 64px; overflow: hidden; }
@@ -1223,6 +1280,12 @@
 </style>
 </head>
 <body>
+<div class="handoff-inspector" aria-label="Handoff inspectors">
+  <button class="handoff-inspector-btn" id="fontInspectorBtn" title="Font size inspector">Aa</button>
+  <button class="handoff-inspector-btn" id="boxInspectorBtn" title="Box model inspector">Box</button>
+</div>
+<div id="handoff-inspector-tip"></div>
+<div id="handoff-inspector-highlight"></div>
 <div class="entry-shell">
   <div class="product-bg" aria-hidden="true">
     <header class="topbar">
@@ -2204,6 +2267,217 @@
       });
     });
   })();
+</script>
+<script>
+(function(){
+  var fontBtn = document.getElementById('fontInspectorBtn');
+  var boxBtn = document.getElementById('boxInspectorBtn');
+  var tip = document.getElementById('handoff-inspector-tip');
+  var highlight = document.getElementById('handoff-inspector-highlight');
+  if (!fontBtn || !boxBtn || !tip || !highlight) return;
+
+  var mode = null;
+  var pinned = false;
+  var inspectedTarget = null;
+  var tokenMap = {
+    '10px': '--text-micro',
+    '11px': '--text-xs',
+    '12px': '--text-small',
+    '13px': '--text-small',
+    '14px': '--text-body',
+    '15px': '--text-body+',
+    '16px': '--text-input',
+    '20px': '--text-card-title',
+    '21px': '--text-section-heading',
+    '23px': '--text-brand-sub',
+    '24px': '--text-auth-heading',
+    '26px': '--text-dashboard-title',
+    '28px': '--text-auth-brand',
+    '30px': '--text-dialog-title',
+    '34px': '--text-product-bg-title'
+  };
+  var colorMap = {
+    'rgb(26, 31, 43)': '--ink',
+    'rgb(138, 143, 152)': '--ink-mute',
+    'rgb(199, 201, 207)': '--ink-soft',
+    'rgb(26, 128, 64)': '--spinach',
+    'rgb(42, 200, 100)': '--nomni-green',
+    'rgb(14, 55, 39)': '--seaweed',
+    'rgb(245, 245, 245)': '--sidebar-bg',
+    'rgb(250, 247, 233)': '--cream',
+    'rgb(226, 255, 230)': '--mint',
+    'rgb(255, 255, 255)': 'white',
+    'rgb(0, 0, 0)': 'black'
+  };
+
+  function colorLabel(color) {
+    if (colorMap[color]) return colorMap[color];
+    var match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (!match) return color;
+    return '#' + [match[1], match[2], match[3]].map(function(channel){
+      return (+channel).toString(16).padStart(2, '0');
+    }).join('').toUpperCase();
+  }
+
+  function fontLabel(fontFamily) {
+    return fontFamily.split(',')[0].replace(/"/g, '').trim();
+  }
+
+  function cleanNumber(value) {
+    var number = Number.parseFloat(value);
+    if (!Number.isFinite(number)) return value;
+    return Number.isInteger(number) ? String(number) + 'px' : number.toFixed(1).replace(/\.0$/, '') + 'px';
+  }
+
+  function compactBoxValue(styles, prefix) {
+    var top = styles.getPropertyValue(prefix + '-top');
+    var right = styles.getPropertyValue(prefix + '-right');
+    var bottom = styles.getPropertyValue(prefix + '-bottom');
+    var left = styles.getPropertyValue(prefix + '-left');
+    if (top === right && right === bottom && bottom === left) return cleanNumber(top);
+    if (top === bottom && right === left) return cleanNumber(top) + ' ' + cleanNumber(right);
+    return cleanNumber(top) + ' ' + cleanNumber(right) + ' ' + cleanNumber(bottom) + ' ' + cleanNumber(left);
+  }
+
+  function radiusValue(styles) {
+    var tl = styles.borderTopLeftRadius;
+    var tr = styles.borderTopRightRadius;
+    var br = styles.borderBottomRightRadius;
+    var bl = styles.borderBottomLeftRadius;
+    if (tl === tr && tr === br && br === bl) return cleanNumber(tl);
+    return [tl, tr, br, bl].map(cleanNumber).join(' ');
+  }
+
+  function readableSelector(element) {
+    if (!element || element.nodeType !== 1) return '';
+    var name = element.tagName.toLowerCase();
+    if (element.id) name += '#' + element.id;
+    if (element.classList && element.classList.length) {
+      name += '.' + Array.from(element.classList).slice(0, 3).join('.');
+    }
+    return name;
+  }
+
+  function highlightElement(element) {
+    if (!element) {
+      highlight.style.display = 'none';
+      return;
+    }
+    var styles = window.getComputedStyle(element);
+    var rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      highlight.style.display = 'none';
+      return;
+    }
+    var inset = 2;
+    highlight.style.left = (rect.left - inset) + 'px';
+    highlight.style.top = (rect.top - inset) + 'px';
+    highlight.style.width = (rect.width + inset * 2) + 'px';
+    highlight.style.height = (rect.height + inset * 2) + 'px';
+    highlight.style.borderRadius = styles.borderRadius || '6px';
+    highlight.style.display = 'block';
+  }
+
+  function transparentLabel(color) {
+    return color === 'rgba(0, 0, 0, 0)' ? 'transparent' : colorLabel(color);
+  }
+
+  function textDetails(element) {
+    var styles = window.getComputedStyle(element);
+    var size = styles.fontSize;
+    var sizeLabel = tokenMap[size] ? size + ' · ' + tokenMap[size] : size;
+    return sizeLabel + ' · ' + styles.fontWeight + ' · ' + colorLabel(styles.color) + ' · ' + fontLabel(styles.fontFamily);
+  }
+
+  function boxDetails(element) {
+    var styles = window.getComputedStyle(element);
+    var rect = element.getBoundingClientRect();
+    var width = rect.width.toFixed(1).replace(/\.0$/, '');
+    var height = rect.height.toFixed(1).replace(/\.0$/, '');
+    var border = styles.borderTopWidth === '0px'
+      ? 'none'
+      : cleanNumber(styles.borderTopWidth) + ' ' + styles.borderTopStyle + ' ' + colorLabel(styles.borderTopColor);
+    var gap = styles.display.includes('flex') || styles.display.includes('grid')
+      ? cleanNumber(styles.rowGap) + ' / ' + cleanNumber(styles.columnGap)
+      : 'n/a';
+
+    return [
+      readableSelector(element),
+      'size ' + width + ' x ' + height,
+      'padding ' + compactBoxValue(styles, 'padding'),
+      'margin ' + compactBoxValue(styles, 'margin'),
+      'radius ' + radiusValue(styles),
+      'border ' + border,
+      'bg ' + transparentLabel(styles.backgroundColor),
+      'display ' + styles.display + ' · gap ' + gap,
+      'position ' + styles.position + ' · box ' + styles.boxSizing
+    ].join('\n');
+  }
+
+  function setMode(nextMode) {
+    mode = mode === nextMode ? null : nextMode;
+    pinned = false;
+    inspectedTarget = null;
+    fontBtn.classList.toggle('active', mode === 'font');
+    boxBtn.classList.toggle('active', mode === 'box');
+    document.body.style.cursor = mode ? 'crosshair' : '';
+    tip.style.display = 'none';
+    highlightElement(null);
+  }
+
+  function updateTip(event, target) {
+    if (!mode || !target) return;
+    inspectedTarget = target;
+    tip.textContent = mode === 'font' ? textDetails(target) : boxDetails(target);
+    tip.style.display = 'block';
+    highlightElement(target);
+    if (!pinned && event) {
+      tip.style.left = (event.clientX + 14) + 'px';
+      tip.style.top = (event.clientY + 14) + 'px';
+    }
+  }
+
+  fontBtn.addEventListener('click', function(){ setMode('font'); });
+  boxBtn.addEventListener('click', function(){ setMode('box'); });
+
+  document.addEventListener('mousemove', function(event){
+    if (!mode || pinned) return;
+    tip.style.left = (event.clientX + 14) + 'px';
+    tip.style.top = (event.clientY + 14) + 'px';
+    if (inspectedTarget) highlightElement(inspectedTarget);
+  });
+
+  document.addEventListener('mouseover', function(event){
+    if (!mode || pinned) return;
+    if (event.target.closest('.handoff-inspector') || event.target === tip) return;
+    updateTip(event, event.target);
+  });
+
+  document.addEventListener('click', function(event){
+    if (!mode || event.target.closest('.handoff-inspector')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pinned = !pinned || inspectedTarget !== event.target;
+    inspectedTarget = event.target;
+    updateTip(event, event.target);
+    if (pinned) {
+      tip.style.left = Math.min(event.clientX + 14, window.innerWidth - 376) + 'px';
+      tip.style.top = Math.min(event.clientY + 14, window.innerHeight - 180) + 'px';
+    }
+  }, true);
+
+  document.addEventListener('keydown', function(event){
+    if (event.key === 'Escape' && mode) {
+      setMode(null);
+    }
+  });
+
+  document.addEventListener('mouseleave', function(){
+    if (pinned) return;
+    tip.style.display = 'none';
+    highlightElement(null);
+  });
+})();
 </script>
 </body>
 </html>

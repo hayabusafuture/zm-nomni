@@ -28,7 +28,7 @@ The opening email screen presents two paths after the user enters an email:
    - Prototype duplicate-demo logic: when the entry page is opened with a prefilled `?email=...`, clicking `Try the demo account` with the same email shows a `Demo already requested` message instead of sending another demo link. The message asks the user to check their inbox or speak to Nomni's team if they need another demo.
 
 2. **Sign up for FREE**
-   - Let the user create a real account and begin a 30-day trial.
+   - Let the user create a real account and begin a 14-day trial.
    - The user is first asked to verify their email with a 6-digit code.
    - A push-notification-style email toast appears while the user is on the verification step.
    - Clicking the toast opens `Freemium/procure-verification-email.html`, showing the mock email and verification code.
@@ -203,6 +203,10 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Redirects to `Freemium/Procure Trial Dashboard.html` after a short loading state.
   - Carries the entered email, first/last name, and venue name into the trial dashboard URL so the dashboard can personalize the topbar user and setup panel.
 - Dialog padding: `36px` on desktop, reduced slightly on mobile.
+- The signup flow includes handoff inspectors in the top-right corner:
+  - `Aa` enables hover inspection for font size/token, font weight, colour, and font family.
+  - `Box` enables hover inspection for dimensions, padding, margin, corner radius, border, background, display/gap, positioning, and box sizing.
+  - Clicking while an inspector is active pins the tooltip; pressing `Escape` clears inspector mode.
 
 Trial dashboard / onboarding behavior:
 
@@ -213,7 +217,7 @@ Trial dashboard / onboarding behavior:
   - The dismissed dashboard mirrors the existing Procure dashboard structure, with the standard greeting, order metric cards, spending overview, and top expenditures sections, but all values are zero/empty because the trial account has no setup data yet.
   - The persistent `Setup guide` card in the sidebar opens the onboarding checklist again with `?setup=1`.
 - Trial support controls are now part of the persistent app chrome:
-  - Topbar pill: `Trial ends in 30 days`
+  - Topbar pill: `Trial ends in 14 days`
   - Topbar CTA: `Book setup`
   - Sidebar card: `Setup guide`, showing progress and `4 steps left`
   - These controls also appear in the split supplier setup pages so trial users can see trial status and reopen setup while moving through the guided flow.

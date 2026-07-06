@@ -555,7 +555,21 @@ The **only** permitted external dependencies are:
 
 No CDN CSS frameworks (Bootstrap, Tailwind, etc.). No external JS libraries. All interactivity must be written as inline `<script>` at the bottom of `<body>`.
 
-### 2. Always Reference Existing Prototypes Before Building
+### 2. Include Handoff Inspectors
+
+Every prototype page should include two top-right handoff inspectors unless the user explicitly asks to remove them:
+
+- `Aa` typography inspector:
+  - Shows font size, matching text token when known, font weight, text colour token/hex, and font family on hover.
+  - Use the existing Procure inspector pattern as the baseline.
+- `Box` layout/style inspector:
+  - Shows element dimensions, padding, margin, border radius, border, background colour token/hex, display/gap, positioning, and box sizing on hover.
+  - Highlight the currently hovered element with a subtle non-blocking outline.
+  - Clicking an inspected element should pin the tooltip; pressing `Escape` should clear inspector mode.
+
+The inspectors are for developer handoff only. They must be lightweight, inline CSS/JS, and must not require external libraries.
+
+### 3. Always Reference Existing Prototypes Before Building
 
 Before creating any new prototype or adding a component to an existing one, **read at least one relevant existing file** from this repo as a pattern reference. Specifically:
 
@@ -569,6 +583,31 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- saved_resource: assets/outlet_detail_suppliers_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/outlet_detail_suppliers_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/outlet_detail_suppliers_files/inner.html
+- controller-with-preconnect-f98a7ab40df07d2ee58c8199ca5cc558: assets/outlet_detail_suppliers_files/controller-with-preconnect-f98a7ab40df07d2ee58c8199ca5cc558.html
+- Nomni Procure: assets/outlet_detail_suppliers.html
+- saved_resource: assets/outlet_detail_suppliers-addsupplier_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/outlet_detail_suppliers-addsupplier_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/outlet_detail_suppliers-addsupplier_files/inner.html
+- controller-with-preconnect-f98a7ab40df07d2ee58c8199ca5cc558: assets/outlet_detail_suppliers-addsupplier_files/controller-with-preconnect-f98a7ab40df07d2ee58c8199ca5cc558.html
+- saved_resource: assets/outlet_detail_suppliers-addsupplier2_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/outlet_detail_suppliers-addsupplier2_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/outlet_detail_suppliers-addsupplier2_files/inner.html
+- controller-with-preconnect-f98a7ab40df07d2ee58c8199ca5cc558: assets/outlet_detail_suppliers-addsupplier2_files/controller-with-preconnect-f98a7ab40df07d2ee58c8199ca5cc558.html
+- Nomni Procure: assets/outlet_detail_suppliers-addsupplier2.html
+- Nomni Procure: assets/outlet_detail_suppliers-addsupplier.html
+- saved_resource: assets/outlet_detail_details_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/outlet_detail_details_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/outlet_detail_details_files/inner.html
+- controller-with-preconnect-f98a7ab40df07d2ee58c8199ca5cc558: assets/outlet_detail_details_files/controller-with-preconnect-f98a7ab40df07d2ee58c8199ca5cc558.html
+- Nomni Procure: assets/outlet_detail_details.html
+- Nomni Procure — Outlet Suppliers: Freemium/procure-trial-outlet-suppliers.html
+- Redirecting to supplier setup: Freemium/procure-trial-add-supplier.html
+- Nomni Procure — Supplier Settings: Freemium/procure-trial-add-supplier-settings.html
+- Nomni Procure — Search Supplier: Freemium/procure-trial-add-supplier-search.html
+- Nomni Procure — Supplier Results: Freemium/procure-trial-add-supplier-results.html
 - Nomni Procure Freemium: Freemium/freemium.html
 - Your Nomni Procure Verification Code: Freemium/procure-verification-email.html
 - Your Nomni Procure Demo Link: Freemium/procure-demo-email.html
