@@ -81,6 +81,11 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/procure-demo-email.html`
 - `Freemium/procure-demo-dashboard.html`
 - `Freemium/Procure Trial Dashboard.html`
+- `Freemium/procure-trial-outlet-suppliers.html`
+- `Freemium/procure-trial-add-supplier-search.html`
+- `Freemium/procure-trial-add-supplier-results.html`
+- `Freemium/procure-trial-add-supplier-settings.html`
+- `Freemium/procure-trial-add-supplier.html` redirects to the split supplier setup entry page for compatibility.
 
 Generated preview screenshots:
 
@@ -107,6 +112,7 @@ Important casing/deploy note:
 - GitHub can store both `Zeemart.html` and `zeemart.html`, but a typical macOS checkout is case-insensitive and can confuse or collapse those two paths locally.
 - Long-term recommendation: avoid keeping both case variants in the repo. Keep canonical `Freemium/Zeemart.html`, and use a hosting redirect instead.
 - If moving to Cloudflare Pages, add a redirect rule or `_redirects` entry:
+  - `/freemium.html /Freemium/nomni.html 301`
   - `/Freemium/zeemart.html /Freemium/Zeemart.html 301`
   - `/Freemium/freemium.html /Freemium/nomni.html 301`
 - Cloudflare Pages redirect setup has been added in the repo-root `_redirects` file. This assumes the Pages project publishes the repository root as the static output directory, preserving URLs like `/Freemium/nomni.html`.
@@ -159,6 +165,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - First name
   - Last name
   - Create password
+  - Password field includes an inline eye icon toggle to show or hide the password.
 - Signup Step 2:
   - The stepper marks Account complete and Venue current.
   - Heading: `Add your venue details`
@@ -196,6 +203,25 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Redirects to `Freemium/Procure Trial Dashboard.html` after a short loading state.
   - Carries the entered email, first/last name, and venue name into the trial dashboard URL so the dashboard can personalize the topbar user and setup panel.
 - Dialog padding: `36px` on desktop, reduced slightly on mobile.
+
+Trial dashboard / onboarding behavior:
+
+- `Freemium/Procure Trial Dashboard.html` now behaves as the trial dashboard route with two states:
+  - First visit, or `?setup=1`, shows the onboarding checklist.
+  - Clicking `Go to dashboard` explicitly dismisses onboarding and stores that choice in `localStorage` under `nomniProcureSetupDismissed`.
+  - After dismissal, clicking Dashboard shows the regular dashboard layout instead of the onboarding checklist.
+  - The dismissed dashboard mirrors the existing Procure dashboard structure, with the standard greeting, order metric cards, spending overview, and top expenditures sections, but all values are zero/empty because the trial account has no setup data yet.
+  - The persistent `Setup guide` card in the sidebar opens the onboarding checklist again with `?setup=1`.
+- Trial support controls are now part of the persistent app chrome:
+  - Topbar pill: `Trial ends in 30 days`
+  - Topbar CTA: `Book setup`
+  - Sidebar card: `Setup guide`, showing progress and `4 steps left`
+  - These controls also appear in the split supplier setup pages so trial users can see trial status and reopen setup while moving through the guided flow.
+- The setup checklist is sequential:
+  - Step 2: Add your first supplier
+  - Step 3: Build a starter product list, locked until supplier setup
+  - Step 4: Place your first order, locked until products exist
+  - Step 5: Set up inventory, locked until products exist
 
 The prototypes were initially too large, like the browser was zoomed to roughly 125%. We adjusted:
 
@@ -261,7 +287,6 @@ Note: the exact Zeemart screenshot hero photo was not found among downloaded ref
 Current role:
 
 - Uses a Procure-style app shell with topbar, sidebar, and dashboard content.
-- Shows a countdown-style `Trial ends in 30 days` flag in the topbar beside the Nomni Procure logo.
 - Uses the real Procure sidebar menu and icon assets, excluding `Payments`.
 - Shows onboarding/setup content instead of live metrics.
 - Centers the setup panel with a constrained max width, a large gently animated wave mark above the `Welcome to Nomni Procure!` headline, and a soft staggered load-in for the welcome content. The `Let’s finish setting up` checklist panel slides up subtly on page load.
@@ -269,19 +294,38 @@ Current role:
   - Topbar user name and avatar initials use the entered name.
   - Setup panel title mentions the entered venue name in green.
 - Uses a soft cream/mint patterned background treatment and a floating panel surface for the setup section.
-- Shows account setup progress inside `Next steps` and as a compact tracker in the sidebar. The full setup is 5 steps; the account-created step is already complete, leaving 4 remaining actions.
+- Keeps trial guidance inside the setup panel rather than scattering it through the topbar and sidebar. The topbar and sidenav stay focused on normal app navigation.
+- Shows trial status and guided setup help as compact cards above the setup progress.
+- Shows account setup progress inside the setup panel. The full setup is 5 steps; the account-created step is already complete, leaving 4 remaining actions.
 - Marks the completed account step with a quiet green `Completed` status rather than a button-like chip.
 - Adds two non-checklist helper CTAs inside the setup panel: `Explore our setup guide` and `Book a live demo`.
-- Topbar has a `Need help?` menu with:
-  - `View setup guides`
-  - `Book a live demo`
-  - `Browse Help Centre`
 - Includes setup tasks:
   - Create your account
   - Add your first supplier
   - Build a starter product list
   - Place your first order
   - Upload an invoice
+- Checklist tasks are sequential:
+  - `Add your first supplier` is the only active next action after account creation.
+  - Product list is locked until a supplier exists.
+  - First order is locked until products exist.
+  - Invoice upload is locked until the first order flow is available.
+- Add supplier onboarding:
+  - The `Add supplier` checklist action now starts a guided pointer on the trial dashboard instead of immediately changing the main content.
+  - Step 1 points to `Outlets` in the dashboard sidenav. Clicking that real nav item opens `Freemium/procure-trial-outlet-suppliers.html?tour=2`.
+  - The prototype assumes the trial account has only one outlet/venue, so after the `Outlets` pointer it skips the outlet listing page and starts directly inside that outlet's `Suppliers` tab.
+  - Steps 2-5 cover clicking `Add new`, searching by supplier name/UEN, choosing a supplier result, and confirming supplier settings.
+  - Each supplier setup step is now a separate static HTML page:
+    - Step 2: `Freemium/procure-trial-outlet-suppliers.html`
+    - Step 3: `Freemium/procure-trial-add-supplier-search.html`
+    - Step 4: `Freemium/procure-trial-add-supplier-results.html`
+    - Step 5: `Freemium/procure-trial-add-supplier-settings.html`
+  - Tour popovers do not include forward CTAs; users advance by clicking the highlighted product controls.
+  - The outlet details page reads the signup `venueName` URL parameter so the outlet name matches the venue created during signup.
+  - The Suppliers tab starts with an empty state because this is a new trial outlet with no suppliers yet.
+  - Tour typography follows the app styleguide scale: 12px kicker, 21px title, 14px body/action text.
+  - The tour uses a lightweight highlight ring and card without a dark page overlay so the product controls remain visible and clickable.
+  - Saved real-product references for this path live in `assets/outlet_detail_details.html`, `assets/outlet_detail_suppliers.html`, `assets/outlet_detail_suppliers-addsupplier.html`, and `assets/outlet_detail_suppliers-addsupplier2.html`.
 - Includes help/support links:
   - Navigating Nomni Procure app: `https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app`
   - Nomni Procure help collection: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`
