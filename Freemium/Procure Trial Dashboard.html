@@ -469,10 +469,10 @@
   }
   .task {
     display: grid;
-    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-columns: 68px minmax(0, 1fr) auto;
     gap: 14px;
     align-items: center;
-    padding: 14px;
+    padding: 14px 20px;
     border: 1px solid var(--rule);
     border-radius: 8px;
     background: #fff;
@@ -498,27 +498,24 @@
   .task.optional.locked {
     background: #FAFAFB;
   }
-  .task-check {
-    width: 38px;
-    height: 38px;
+  .task-visual {
+    position: relative;
+    width: 64px;
+    height: 58px;
     display: grid;
     place-items: center;
-    border-radius: 50%;
-    background: var(--mint);
+    background: transparent;
+  }
+  .task-icon-img {
+    width: 56px;
+    height: 50px;
+    object-fit: contain;
+    display: block;
+  }
+  .task-icon-placeholder {
+    width: 40px;
+    height: 40px;
     color: var(--spinach);
-    font-weight: 800;
-  }
-  .task.pending .task-check {
-    background: #F3F4F6;
-    color: var(--ink-mute);
-  }
-  .task.current .task-check {
-    background: var(--mint);
-    color: var(--seaweed);
-  }
-  .task.locked .task-check {
-    background: #ECEEF2;
-    color: #A0A4AD;
   }
   .task-status {
     min-height: 24px;
@@ -599,13 +596,16 @@
   }
   .more-setup summary::-webkit-details-marker { display: none; }
   .more-setup summary::after {
-    content: "⌄";
-    color: var(--spinach);
-    font-size: 18px;
-    line-height: 1;
-    transition: transform .16s ease;
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--spinach);
+    border-bottom: 2px solid var(--spinach);
+    transform: rotate(45deg) translateY(-2px);
+    transform-origin: 60% 60%;
+    transition: transform .16s cubic-bezier(.2, 0, .2, 1);
   }
-  .more-setup[open] summary::after { transform: rotate(180deg); }
+  .more-setup[open] summary::after { transform: rotate(225deg) translate(-1px, -1px); }
   .more-task-list {
     display: grid;
     gap: 10px;
@@ -1106,7 +1106,7 @@
     .top-exp-body { grid-template-columns: 1fr; }
     .metrics-row .metric-card:first-child { border-right: 0; border-bottom: 1px solid var(--rule); }
     .top-exp-sidebar { border-right: 0; border-bottom: 1px solid var(--rule); }
-    .task { grid-template-columns: 38px minmax(0, 1fr); }
+    .task { grid-template-columns: 68px minmax(0, 1fr); }
     .task .btn,
     .task-lock,
     .task-status { grid-column: 1 / -1; }
@@ -1390,48 +1390,57 @@
       account: {
         title: 'Create account',
         copy: 'Your email, password, and venue details are ready.',
-        completed: true
+        completed: true,
+        icon: 'assets/create acc.svg'
       },
       supplier: {
         title: 'Add first supplier',
         copy: 'Start here. Market lists and the rest of setup unlock after you add a supplier.',
         cta: 'Add supplier',
-        href: 'supplier'
+        href: 'supplier',
+        icon: 'assets/add supplier.svg'
       },
       market: {
         title: 'Build market list',
         copy: 'Choose the products you order from your supplier.',
-        locked: 'Add supplier first'
+        locked: 'Add supplier first',
+        icon: 'assets/build mkt list.svg'
       },
       order: {
         title: 'Place first order',
         copy: 'Create your first order once your supplier and market list are ready.',
-        locked: 'Build market list first'
+        locked: 'Build market list first',
+        icon: 'assets/1st order v2.svg'
       },
       inventory: {
         title: 'Set up inventory',
         copy: 'Create inventory lists so your team can track stock on hand.',
-        locked: 'Build market list first'
+        locked: 'Build market list first',
+        icon: 'assets/setup inv v2.svg'
       },
       invoiceUpload: {
         title: 'Upload first invoice',
         copy: 'Upload a supplier invoice to start capturing purchasing records.',
-        locked: 'Build market list first'
+        locked: 'Build market list first',
+        icon: 'assets/upload inv.svg'
       },
       invoiceDigitise: {
         title: 'Digitise invoices',
         copy: 'Review extracted invoice details and turn uploads into structured records.',
-        locked: 'Upload first invoice first'
+        locked: 'Upload first invoice first',
+        icon: 'assets/digitise inv.svg'
       },
       invoiceExport: {
         title: 'Export invoices',
         copy: 'Send clean invoice records to your accounting workflow.',
-        locked: 'Digitise invoices first'
+        locked: 'Digitise invoices first',
+        icon: 'assets/export inv.svg'
       },
       stockCount: {
         title: 'Complete first stock count',
         copy: 'Record your first count once inventory lists are ready.',
-        locked: 'Set up inventory first'
+        locked: 'Set up inventory first',
+        icon: 'assets/1st stock ct.svg'
       }
     };
     var goalChecklist = {
@@ -1460,10 +1469,18 @@
       row.className = 'task' + (isCompleted ? ' completed' : ' pending') + (isCurrent ? ' current' : '') + (!isCompleted && !isCurrent ? ' locked' : '') + (counted ? '' : ' optional');
       if (!isCompleted && !isCurrent) row.setAttribute('aria-disabled', 'true');
 
-      var check = document.createElement('div');
-      check.className = 'task-check';
-      check.textContent = String(index + 1);
-      row.appendChild(check);
+      var visual = document.createElement('div');
+      visual.className = 'task-visual';
+      if (task.icon) {
+        var icon = document.createElement('img');
+        icon.className = 'task-icon-img';
+        icon.src = task.icon;
+        icon.alt = '';
+        visual.appendChild(icon);
+      } else {
+        visual.innerHTML = '<svg class="task-icon-placeholder" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20 5.5a8.5 8.5 0 0 1 6.1 14.42c3.82 1.55 6.68 4.72 7.28 8.58.16 1.02-.66 1.94-1.69 1.94H8.31c-1.03 0-1.85-.92-1.69-1.94.6-3.86 3.46-7.03 7.28-8.58A8.5 8.5 0 0 1 20 5.5Zm0 3.4a5.1 5.1 0 1 0 0 10.2 5.1 5.1 0 0 0 0-10.2Zm0 13.5c-4.28 0-7.92 1.9-9.36 4.64h18.72C27.92 24.3 24.28 22.4 20 22.4Z"/></svg>';
+      }
+      row.appendChild(visual);
 
       var copyWrap = document.createElement('div');
       var title = document.createElement('p');

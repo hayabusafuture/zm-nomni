@@ -151,6 +151,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Add first supplier and Build market list are mandatory prerequisites before later setup options unlock.
   - Other useful setup actions remain visible in a collapsed `More setup options` section, but do not count toward onboarding progress.
   - The sidebar setup entry is labelled `Complete setup`.
+  - Checklist rows use full-colour task icons from `Freemium/assets/*.svg`.
 - Demo confirmation:
   - `Check your inbox`
   - Private demo link sent to the captured email, expiring in 14 days.
