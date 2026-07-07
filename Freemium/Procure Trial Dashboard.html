@@ -370,17 +370,6 @@
     padding: 18px;
     margin-bottom: 18px;
   }
-  .progress-label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    color: var(--ink-mute);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-  }
   .progress-track {
     height: 10px;
     border-radius: 999px;
@@ -503,6 +492,12 @@
   .task:hover { background: var(--row-hover); }
   .task.completed:hover { background: linear-gradient(90deg, rgba(226,255,230,.58), #fff 46%); }
   .task.locked:hover { background: #FAFAFB; }
+  .task.optional {
+    background: #fff;
+  }
+  .task.optional.locked {
+    background: #FAFAFB;
+  }
   .task-check {
     width: 38px;
     height: 38px;
@@ -581,6 +576,40 @@
     margin: 0;
     color: var(--ink-mute);
     font-size: 13px;
+  }
+  .more-setup {
+    margin-top: 14px;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .more-setup summary {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    color: var(--seaweed);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+  .more-setup summary::-webkit-details-marker { display: none; }
+  .more-setup summary::after {
+    content: "⌄";
+    color: var(--spinach);
+    font-size: 18px;
+    line-height: 1;
+    transition: transform .16s ease;
+  }
+  .more-setup[open] summary::after { transform: rotate(180deg); }
+  .more-task-list {
+    display: grid;
+    gap: 10px;
+    padding: 0 14px 14px;
   }
   .panel-actions {
     margin-top: 22px;
@@ -1126,7 +1155,7 @@
     </nav>
     <div class="sidebar-setup">
       <a class="sidebar-setup-link" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
-        <span class="sidebar-setup-title">Setup guide</span>
+        <span class="sidebar-setup-title">Complete setup</span>
         <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         <span class="sidebar-setup-copy">4 steps left</span>
       </a>
@@ -1150,53 +1179,17 @@
           </div>
 
           <div class="progress-card">
-            <div class="progress-label"><span>Account setup</span><span>Next: add supplier</span></div>
-            <div class="progress-track"><div class="progress-fill"></div></div>
-            <div class="progress-stat">20% complete</div>
+            <div class="progress-track"><div class="progress-fill" data-progress-fill style="width:20%"></div></div>
+            <div class="progress-stat" data-progress-stat>20% complete</div>
           </div>
 
-          <div class="task-list">
-            <div class="task completed">
-              <div class="task-check">1</div>
-              <div>
-                <p class="task-title">Create your account</p>
-                <p class="task-copy">Your email and business details are captured.</p>
-              </div>
-              <span class="task-status">Completed</span>
-            </div>
-            <div class="task pending current">
-              <div class="task-check">2</div>
-              <div>
-                <p class="task-title">Add your first supplier</p>
-                <p class="task-copy">Start here. Product lists and orders unlock after you add a supplier.</p>
-              </div>
-      <a class="btn btn-secondary" data-supplier-setup-link href="procure-trial-outlet-suppliers.html?tour=2">Add supplier</a>
-            </div>
-            <div class="task pending locked" aria-disabled="true">
-              <div class="task-check">3</div>
-              <div>
-                <p class="task-title">Build a starter product list</p>
-                <p class="task-copy">Choose items from your supplier once they are set up.</p>
-              </div>
-              <span class="task-lock">Add supplier first</span>
-            </div>
-            <div class="task pending locked" aria-disabled="true">
-              <div class="task-check">4</div>
-              <div>
-                <p class="task-title">Place your first order</p>
-                <p class="task-copy">Ordering unlocks after your product list is ready.</p>
-              </div>
-              <span class="task-lock">Add products first</span>
-            </div>
-            <div class="task pending locked" aria-disabled="true">
-              <div class="task-check">5</div>
-              <div>
-                <p class="task-title">Set up inventory</p>
-                <p class="task-copy">Create inventory lists so your team can track stock on hand.</p>
-              </div>
-              <span class="task-lock">Add products first</span>
-            </div>
-          </div>
+          <div class="task-list" data-checklist></div>
+          <details class="more-setup" data-extra-setup>
+            <summary>
+              <span>More setup options</span>
+            </summary>
+            <div class="more-task-list" data-extra-checklist></div>
+          </details>
           <div class="panel-actions" aria-label="Setup help">
             <button class="panel-action guide" type="button" data-dismiss-onboarding>Go to dashboard</button>
             <a class="panel-action guide" href="https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app" target="_blank">Explore our setup guide <span aria-hidden="true">→</span></a>
@@ -1374,10 +1367,15 @@
     var userName = params.get('userName') || '';
     var firstName = params.get('firstName') || '';
     var venueName = params.get('venueName') || '';
+    var primaryGoal = params.get('primaryGoal') || 'Order faster';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
     var setupTitleNode = document.querySelector('[data-setup-title]');
     var supplierSetupLink = document.querySelector('[data-supplier-setup-link]');
+    var checklistNode = document.querySelector('[data-checklist]');
+    var extraChecklistNode = document.querySelector('[data-extra-checklist]');
+    var progressStat = document.querySelector('[data-progress-stat]');
+    var progressFill = document.querySelector('[data-progress-fill]');
     var outletsNavLink = document.querySelector('[data-nav-outlets]');
     var onboardingView = document.querySelector('[data-onboarding-view]');
     var dashboardView = document.querySelector('[data-dashboard-view]');
@@ -1388,12 +1386,149 @@
     var tourCard = document.querySelector('[data-tour-card]');
     var tourDismiss = document.querySelector('[data-tour-dismiss]');
     var setupDismissedKey = 'nomniProcureSetupDismissed';
+    var taskCatalog = {
+      account: {
+        title: 'Create account',
+        copy: 'Your email, password, and venue details are ready.',
+        completed: true
+      },
+      supplier: {
+        title: 'Add first supplier',
+        copy: 'Start here. Market lists and the rest of setup unlock after you add a supplier.',
+        cta: 'Add supplier',
+        href: 'supplier'
+      },
+      market: {
+        title: 'Build market list',
+        copy: 'Choose the products you order from your supplier.',
+        locked: 'Add supplier first'
+      },
+      order: {
+        title: 'Place first order',
+        copy: 'Create your first order once your supplier and market list are ready.',
+        locked: 'Build market list first'
+      },
+      inventory: {
+        title: 'Set up inventory',
+        copy: 'Create inventory lists so your team can track stock on hand.',
+        locked: 'Build market list first'
+      },
+      invoiceUpload: {
+        title: 'Upload first invoice',
+        copy: 'Upload a supplier invoice to start capturing purchasing records.',
+        locked: 'Build market list first'
+      },
+      invoiceDigitise: {
+        title: 'Digitise invoices',
+        copy: 'Review extracted invoice details and turn uploads into structured records.',
+        locked: 'Upload first invoice first'
+      },
+      invoiceExport: {
+        title: 'Export invoices',
+        copy: 'Send clean invoice records to your accounting workflow.',
+        locked: 'Digitise invoices first'
+      },
+      stockCount: {
+        title: 'Complete first stock count',
+        copy: 'Record your first count once inventory lists are ready.',
+        locked: 'Set up inventory first'
+      }
+    };
+    var goalChecklist = {
+      'Order faster': ['supplier', 'market', 'order', 'inventory'],
+      'Digitise invoices': ['supplier', 'market', 'invoiceUpload', 'invoiceDigitise'],
+      'Manage inventory': ['supplier', 'market', 'inventory', 'stockCount']
+    };
+    var extraTaskOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'inventory', 'stockCount'];
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
       if (!parts.length) return 'TR';
       if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function normaliseGoal(goal) {
+      return goalChecklist[goal] ? goal : 'Order faster';
+    }
+
+    function createTask(taskKey, index, counted) {
+      var task = taskCatalog[taskKey];
+      var isCompleted = Boolean(task.completed && counted);
+      var isCurrent = counted && !isCompleted && taskKey === 'supplier';
+      var row = document.createElement('div');
+      row.className = 'task' + (isCompleted ? ' completed' : ' pending') + (isCurrent ? ' current' : '') + (!isCompleted && !isCurrent ? ' locked' : '') + (counted ? '' : ' optional');
+      if (!isCompleted && !isCurrent) row.setAttribute('aria-disabled', 'true');
+
+      var check = document.createElement('div');
+      check.className = 'task-check';
+      check.textContent = String(index + 1);
+      row.appendChild(check);
+
+      var copyWrap = document.createElement('div');
+      var title = document.createElement('p');
+      title.className = 'task-title';
+      title.textContent = task.title;
+      var copy = document.createElement('p');
+      copy.className = 'task-copy';
+      copy.textContent = task.copy;
+      copyWrap.appendChild(title);
+      copyWrap.appendChild(copy);
+      row.appendChild(copyWrap);
+
+      if (isCompleted) {
+        var status = document.createElement('span');
+        status.className = 'task-status';
+        status.textContent = 'Completed';
+        row.appendChild(status);
+      } else if (task.href === 'supplier' && counted) {
+        var link = document.createElement('a');
+        link.className = 'btn btn-secondary';
+        link.setAttribute('data-supplier-setup-link', '');
+        link.href = 'procure-trial-outlet-suppliers.html?tour=2';
+        link.textContent = task.cta;
+        row.appendChild(link);
+      } else {
+        var lock = document.createElement('span');
+        lock.className = 'task-lock';
+        lock.textContent = task.locked || 'Complete required steps first';
+        row.appendChild(lock);
+      }
+
+      return row;
+    }
+
+    function renderChecklist() {
+      var selectedGoal = normaliseGoal(primaryGoal);
+      var countedTasks = ['account'].concat(goalChecklist[selectedGoal]);
+      var extraTasks = extraTaskOrder.filter(function(key) {
+        return countedTasks.indexOf(key) === -1;
+      });
+
+      if (progressStat) progressStat.textContent = '20% complete';
+      if (progressFill) progressFill.style.width = '20%';
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) {
+        node.style.width = '20%';
+      });
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) {
+        node.textContent = '4 steps left';
+      });
+
+      if (checklistNode) {
+        checklistNode.innerHTML = '';
+        countedTasks.forEach(function(taskKey, index) {
+          checklistNode.appendChild(createTask(taskKey, index, true));
+        });
+      }
+
+      if (extraChecklistNode) {
+        extraChecklistNode.innerHTML = '';
+        extraTasks.forEach(function(taskKey, index) {
+          extraChecklistNode.appendChild(createTask(taskKey, index, false));
+        });
+      }
+
+      supplierSetupLink = document.querySelector('[data-supplier-setup-link]');
     }
 
     if (userName && userNameNode) {
@@ -1456,7 +1591,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1492,7 +1627,7 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1522,6 +1657,8 @@
       dashboardTour.hidden = false;
       placeDashboardTour();
     }
+
+    renderChecklist();
 
     if (supplierSetupLink) {
       supplierSetupLink.href = supplierSetupUrl('2');

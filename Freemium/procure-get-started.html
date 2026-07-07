@@ -986,6 +986,72 @@
   .password-toggle .icon-eye-off { display: none; }
   .password-toggle[aria-pressed="true"] .icon-eye { display: none; }
   .password-toggle[aria-pressed="true"] .icon-eye-off { display: block; }
+  .goal-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .goal-option {
+    min-height: 104px;
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    border: 1px solid rgba(14,55,39,.14);
+    border-radius: 16px;
+    padding: 14px;
+    background: #fff;
+    color: var(--seaweed);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease, transform .16s ease;
+  }
+  .goal-option:hover {
+    border-color: rgba(42,200,100,.42);
+    background: rgba(226,255,230,.4);
+    box-shadow: 0 12px 30px rgba(10,20,15,.08);
+  }
+  .goal-option:active { transform: scale(.96); }
+  .goal-option:focus-visible {
+    outline: 2px solid var(--nomni-green);
+    outline-offset: 2px;
+  }
+  .goal-option.is-selected,
+  .goal-option[aria-pressed="true"] {
+    border-color: var(--nomni-green);
+    background: var(--mint);
+    box-shadow: 0 0 0 3px rgba(42,200,100,.14);
+  }
+  .goal-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(42,200,100,.12);
+    color: var(--spinach);
+  }
+  .goal-icon svg {
+    width: 23px;
+    height: 23px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .goal-copy {
+    display: grid;
+    gap: 4px;
+  }
+  .goal-copy strong {
+    color: var(--seaweed);
+    font-size: 14px;
+    line-height: 1.18;
+    font-weight: 800;
+    letter-spacing: -.01em;
+  }
   .email-field,
   .dialog-input,
   .dialog-select {
@@ -1272,6 +1338,7 @@
     .form-grid,
     .address-grid,
     .business-form.is-singapore .address-grid,
+    .goal-options,
     .lead-actions { grid-template-columns: 1fr; }
     .dialog-row { flex-direction: column-reverse; align-items: stretch; }
     .dialog-title { font-size: 28px; }
@@ -1647,6 +1714,49 @@
         <form data-next-step="creating" novalidate>
           <div class="form-grid">
             <div class="field full">
+              <label id="primary-goal-label" for="primary-goal">Primary goal <span>optional</span></label>
+              <input type="hidden" id="primary-goal" name="primaryGoal" />
+              <div class="goal-options" role="group" aria-labelledby="primary-goal-label">
+                <button class="goal-option" type="button" data-goal-option="Order faster" aria-pressed="false">
+                  <span class="goal-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 13a8 8 0 0 1 16 0" />
+                      <path d="M12 13l5-5" />
+                      <path d="M7 18h10" />
+                    </svg>
+                  </span>
+                  <span class="goal-copy">
+                    <strong>Order faster</strong>
+                  </span>
+                </button>
+                <button class="goal-option" type="button" data-goal-option="Digitise invoices" aria-pressed="false">
+                  <span class="goal-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M7 3h8l4 4v14H7z" />
+                      <path d="M15 3v5h5" />
+                      <path d="M10 12h6" />
+                      <path d="M10 16h4" />
+                    </svg>
+                  </span>
+                  <span class="goal-copy">
+                    <strong>Digitise invoices</strong>
+                  </span>
+                </button>
+                <button class="goal-option" type="button" data-goal-option="Manage inventory" aria-pressed="false">
+                  <span class="goal-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 7l8-4 8 4-8 4z" />
+                      <path d="M4 7v10l8 4 8-4V7" />
+                      <path d="M12 11v10" />
+                    </svg>
+                  </span>
+                  <span class="goal-copy">
+                    <strong>Manage inventory</strong>
+                  </span>
+                </button>
+              </div>
+            </div>
+            <div class="field full">
               <label for="business-type">Business type <span>optional</span></label>
               <select class="dialog-select" id="business-type" name="businessType">
                 <option value="">Select one</option>
@@ -1655,17 +1765,6 @@
                 <option>Hotel</option>
                 <option>Caterer</option>
                 <option>Food service group</option>
-              </select>
-            </div>
-            <div class="field full">
-              <label for="primary-goal">Primary goal <span>optional</span></label>
-              <select class="dialog-select" id="primary-goal" name="primaryGoal">
-                <option value="">Select one</option>
-                <option>Order faster</option>
-                <option>Control food cost</option>
-                <option>Digitise invoices</option>
-                <option>Manage inventory</option>
-                <option>Standardise multiple locations</option>
               </select>
             </div>
             <div class="field">
@@ -1692,10 +1791,7 @@
           </div>
           <div class="dialog-row">
             <button class="dialog-text-btn" type="button" data-next-step="business-details">Back</button>
-            <div class="dialog-row" style="margin:0">
-              <button class="dialog-secondary" type="button" data-next-step="creating">Skip for now</button>
-              <button class="dialog-submit" type="submit">Finish →</button>
-            </div>
+            <button class="dialog-submit" type="submit">Finish →</button>
           </div>
         </form>
       </section>
@@ -1740,6 +1836,8 @@
     const mailTitle = document.querySelector('[data-mail-title]');
     const mailPreview = document.querySelector('[data-mail-preview]');
     const businessForm = root.querySelector('.business-form');
+    const primaryGoalInput = document.getElementById('primary-goal');
+    const goalOptions = root.querySelectorAll('[data-goal-option]');
     const countrySelect = root.querySelector('select[name="country"]');
     const suburbInput = root.querySelector('input[name="suburb"]');
     const stateSelect = root.querySelector('select[name="ausState"]');
@@ -1749,7 +1847,7 @@
     const suburbLabel = root.querySelector('[data-suburb-label]');
     const postcodeLabel = root.querySelector('[data-postcode-label]');
     const stateField = root.querySelector('[data-state-field]');
-    const dashboardUrl = 'Procure Trial Dashboard.html';
+    const dashboardUrl = 'Procure%20Trial%20Dashboard.html';
     const postcodeCsvUrl = 'assets/australian_postcodes.csv';
     const fallbackLocalities = [
       { locality: 'Adelaide', state: 'SA', postcode: '5000' },
@@ -1787,7 +1885,8 @@
       streetName: '',
       suburb: '',
       ausState: '',
-      postcode: ''
+      postcode: '',
+      primaryGoal: ''
     };
 
     root.querySelectorAll('[data-back-link]').forEach((link) => {
@@ -2001,17 +2100,20 @@
       signupData.suburb = fieldValue('suburb');
       signupData.ausState = fieldValue('ausState');
       signupData.postcode = fieldValue('postcode');
+      signupData.primaryGoal = fieldValue('primaryGoal');
     }
 
     function buildDashboardUrl() {
       updateSignupData();
       const query = new URLSearchParams();
+      query.set('setup', '1');
       const fullName = [signupData.firstName, signupData.lastName].filter(Boolean).join(' ');
       if (fullName) query.set('userName', fullName);
       if (signupData.firstName) query.set('firstName', signupData.firstName);
       if (signupData.email) query.set('email', signupData.email);
       if (signupData.companyName) query.set('companyName', signupData.companyName);
       if (signupData.venueName) query.set('venueName', signupData.venueName);
+      query.set('primaryGoal', signupData.primaryGoal || 'Order faster');
       const venueAddress = [signupData.streetName, signupData.suburb, signupData.ausState, signupData.postcode, signupData.country].filter(Boolean).join(', ');
       if (venueAddress) query.set('venueAddress', venueAddress);
       const suffix = query.toString();
@@ -2145,12 +2247,55 @@
       root.classList.add('is-visible');
     }
 
-    setStep('intro');
+    function setNamedField(name, value) {
+      const field = root.querySelector(`[name="${name}"]`);
+      if (!field) return;
+      field.value = value;
+    }
 
-    window.setTimeout(showDialog, 360);
-    window.setTimeout(() => {
-      showStep('email');
-    }, 1250);
+    function selectPrimaryGoal(goal) {
+      if (!goal) return;
+      goalOptions.forEach((option) => {
+        const isMatch = option.dataset.goalOption === goal;
+        option.classList.toggle('is-selected', isMatch);
+        option.setAttribute('aria-pressed', String(isMatch));
+      });
+      if (primaryGoalInput) primaryGoalInput.value = goal;
+    }
+
+    function applyPrototypePrefill() {
+      setNamedField('email', 'william@example.com');
+      setNamedField('verificationCode', verificationCode);
+      setNamedField('firstName', 'William');
+      setNamedField('lastName', 'Arya');
+      setNamedField('password', 'NomniDemo1!');
+      setNamedField('companyName', 'Tester Company');
+      setNamedField('venueName', 'Test Outlet ZM');
+      setNamedField('country', 'Singapore');
+      setNamedField('streetName', '120 Neil Road');
+      setNamedField('postcode', '123456');
+      setNamedField('businessType', 'Restaurant');
+      setNamedField('locations', '1');
+      setNamedField('orderingNow', 'WhatsApp / SMS');
+      selectPrimaryGoal(params.get('primaryGoal') || 'Order faster');
+      updateSignupData();
+    }
+
+    const prototypeStep = params.get('step') || params.get('prototypeStep');
+    const usePrototypePrefill = params.get('prefill') === '1' || Boolean(prototypeStep);
+    if (usePrototypePrefill) applyPrototypePrefill();
+
+    if (prototypeStep === '3' || prototypeStep === 'optional') {
+      setStep('optional');
+      showDialog();
+    } else {
+      setStep('intro');
+
+      window.setTimeout(showDialog, 360);
+      window.setTimeout(() => {
+        showStep('email');
+      }, 1250);
+    }
 
     root.querySelectorAll('button[data-next-step], a[data-next-step]').forEach((control) => {
       control.addEventListener('click', () => {
@@ -2236,6 +2381,25 @@
         input.type = isVisible ? 'password' : 'text';
         button.setAttribute('aria-pressed', String(!isVisible));
         button.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password');
+      });
+    });
+
+    goalOptions.forEach((button) => {
+      button.addEventListener('click', () => {
+        const wasSelected = button.getAttribute('aria-pressed') === 'true';
+        goalOptions.forEach((option) => {
+          option.classList.remove('is-selected');
+          option.setAttribute('aria-pressed', 'false');
+        });
+
+        if (wasSelected) {
+          if (primaryGoalInput) primaryGoalInput.value = '';
+          return;
+        }
+
+        button.classList.add('is-selected');
+        button.setAttribute('aria-pressed', 'true');
+        if (primaryGoalInput) primaryGoalInput.value = button.dataset.goalOption || '';
       });
     });
 

@@ -38,8 +38,12 @@ The opening email screen presents two paths after the user enters an email:
    - Step 2 asks for company registered name, venue name, country, and structured venue address fields.
    - Supported prototype countries are Australia and Singapore. The country selector auto-detects Singapore from browser locale/timezone; all other detected countries default to Australia.
    - For Australia, address entry is ordered as postcode, suburb, then state. For Singapore, only postal code is shown after street address and autocomplete is disabled for now.
-   - Step 3 asks optional setup questions: business type, primary goal, number of locations, and current ordering method.
-   - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard placeholder.
+   - Step 3 asks optional setup questions: primary goal, business type, number of locations, and current ordering method.
+   - The primary goal is shown as three large selectable panels: `Order faster`, `Digitise invoices`, and `Manage inventory`. Users can click a panel once to select it, or click the selected panel again to clear it.
+   - The selected primary goal is stored as `primaryGoal` so the trial dashboard checklist can be personalised around the user's setup priority.
+   - Prototype evaluation shortcut: open `Freemium/procure-get-started.html?step=3&prefill=1` to jump straight to Step 3 with harmless sample details. Add `&primaryGoal=Digitise%20invoices` or `&primaryGoal=Manage%20inventory` to preview a selected goal.
+   - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard checklist with `setup=1`, so the onboarding view appears even if the user previously dismissed it.
+   - If no primary goal is selected, the dashboard defaults to the `Order faster` checklist.
 
 The current landing-page work is the top-of-funnel UI for this flow. The above-the-fold sections should make the “try Nomni Procure” action feel immediate and low-friction.
 
@@ -138,6 +142,14 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
 - The entry dialog does not show an `X` close button; returning to the marketing site is reserved for explicit confirmation states.
 - CTA and form label weights are semibold to reduce visual heaviness.
 - Dialog width: `540px` max on desktop.
+- Trial dashboard checklist personalisation:
+  - `Create account` is shown as completed Step 1 for every checklist, so users start at 20% progress with 4 steps left.
+  - `Order faster`: Add first supplier, Build market list, Place first order, Set up inventory.
+  - `Digitise invoices`: Add first supplier, Build market list, Upload first invoice, Digitise invoices.
+  - `Manage inventory`: Add first supplier, Build market list, Set up inventory, Complete first stock count.
+  - Add first supplier and Build market list are mandatory prerequisites before later setup options unlock.
+  - Other useful setup actions remain visible in a collapsed `More setup options` section, but do not count toward onboarding progress.
+  - The sidebar setup entry is labelled `Complete setup`.
 - Demo confirmation:
   - `Check your inbox`
   - Private demo link sent to the captured email, expiring in 14 days.
@@ -215,11 +227,11 @@ Trial dashboard / onboarding behavior:
   - Clicking `Go to dashboard` explicitly dismisses onboarding and stores that choice in `localStorage` under `nomniProcureSetupDismissed`.
   - After dismissal, clicking Dashboard shows the regular dashboard layout instead of the onboarding checklist.
   - The dismissed dashboard mirrors the existing Procure dashboard structure, with the standard greeting, order metric cards, spending overview, and top expenditures sections, but all values are zero/empty because the trial account has no setup data yet.
-  - The persistent `Setup guide` card in the sidebar opens the onboarding checklist again with `?setup=1`.
+  - The persistent `Complete setup` card in the sidebar opens the onboarding checklist again with `?setup=1`.
 - Trial support controls are now part of the persistent app chrome:
   - Topbar pill: `Trial ends in 14 days`
   - Topbar CTA: `Book setup`
-  - Sidebar card: `Setup guide`, showing progress and `4 steps left`
+  - Sidebar card: `Complete setup`, showing progress and `4 steps left`
   - These controls also appear in the split supplier setup pages so trial users can see trial status and reopen setup while moving through the guided flow.
 - The setup checklist is sequential:
   - Step 2: Add your first supplier
