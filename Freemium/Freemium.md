@@ -38,8 +38,9 @@ The opening email screen presents two paths after the user enters an email:
    - Step 2 asks for company registered name, venue name, country, and structured venue address fields.
    - Supported prototype countries are Australia and Singapore. The country selector auto-detects Singapore from browser locale/timezone; all other detected countries default to Australia.
    - For Australia, address entry is ordered as postcode, suburb, then state. For Singapore, only postal code is shown after street address and autocomplete is disabled for now.
-   - Step 3 asks optional setup questions: primary goal, business type, number of locations, and current ordering method.
-   - The primary goal is shown as three large selectable panels: `Order faster`, `Digitise invoices`, and `Manage inventory`. Users can click a panel once to select it, or click the selected panel again to clear it.
+   - Step 3 asks optional setup questions: primary goal, number of locations, and current ordering method.
+   - The primary goal is shown as a stacked list of three selectable rows with large icons: `Order faster`, `Digitise invoices`, and `Manage inventory`. Users can click a row once to select it, or click the selected row again to clear it.
+   - Goal row icons use `Freemium/assets/orders.svg`, `Freemium/assets/invoices.svg`, and `Freemium/assets/inventory.svg`.
    - The selected primary goal is stored as `primaryGoal` so the trial dashboard checklist can be personalised around the user's setup priority.
    - Prototype evaluation shortcut: open `Freemium/procure-get-started.html?step=3&prefill=1` to jump straight to Step 3 with harmless sample details. Add `&primaryGoal=Digitise%20invoices` or `&primaryGoal=Manage%20inventory` to preview a selected goal.
    - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard checklist with `setup=1`, so the onboarding view appears even if the user previously dismissed it.
@@ -205,7 +206,6 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - The stepper marks Account and Venue complete, with Business current.
   - Heading: `Tell us about your business`
   - Body: `A few quick details to help us understand your business.`
-  - Business type
   - Primary goal
   - Number of locations
   - Current ordering method
