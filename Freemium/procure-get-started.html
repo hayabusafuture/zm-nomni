@@ -722,6 +722,13 @@
   .dialog-card.is-business-step:not(.is-resizing) {
     overflow: visible;
   }
+  .entry-dialog.is-overflowing {
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+  .entry-dialog.is-overflowing .dialog-card {
+    max-height: none;
+  }
 
   .dialog-submit:active,
   .dialog-secondary:active,
@@ -889,6 +896,77 @@
     font-size: 13px;
     line-height: 1.35;
   }
+  .field-error {
+    display: none;
+    margin: -1px 0 0;
+    color: #D0291E;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .field.has-error .field-error {
+    display: block;
+  }
+  .field.has-error .field-hint {
+    display: none;
+  }
+  .field.has-error .dialog-input {
+    border-color: rgba(208,41,30,.58);
+    background: #FFF7F5;
+    box-shadow: 0 0 0 4px rgba(208,41,30,.08);
+  }
+  .company-exists-card {
+    display: none;
+    grid-column: 1 / -1;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid rgba(208,41,30,.18);
+    border-radius: 14px;
+    background: #FFF7F5;
+    color: var(--seaweed);
+  }
+  .company-exists-card.is-visible {
+    display: grid;
+  }
+  .company-exists-title {
+    margin: 0;
+    color: var(--seaweed);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  .company-exists-copy {
+    margin: 0;
+    color: #6B6E77;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .company-exists-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .company-exists-link {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0 12px;
+    background: #fff;
+    border: 1px solid rgba(208,41,30,.18);
+    color: var(--seaweed);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color .16s ease, border-color .16s ease, transform .16s ease;
+  }
+  .company-exists-link:hover {
+    background: var(--mint);
+    border-color: #B9F0C5;
+  }
+  .company-exists-link:active { transform: scale(.96); }
   .locality-suggestions {
     position: absolute;
     left: 0;
@@ -1093,6 +1171,11 @@
     background: #fff;
     box-shadow: 0 0 0 4px rgba(42,200,100,.14);
   }
+  .field.has-error .dialog-input:focus {
+    border-color: rgba(208,41,30,.58);
+    background: #FFF7F5;
+    box-shadow: 0 0 0 4px rgba(208,41,30,.08);
+  }
   .dialog-submit,
   .dialog-secondary,
   .dialog-text-btn {
@@ -1115,6 +1198,15 @@
   .dialog-submit:hover {
     background: var(--seaweed);
     color: var(--nomni-green);
+  }
+  .dialog-submit:disabled {
+    background: #E7E8EC;
+    color: var(--ink-mute);
+    cursor: not-allowed;
+  }
+  .dialog-submit:disabled:hover {
+    background: #E7E8EC;
+    color: var(--ink-mute);
   }
   .dialog-secondary {
     background: var(--cream);
@@ -1651,6 +1743,13 @@
               <input class="dialog-input" id="company-name" name="companyName" autocomplete="organization" required />
               <p class="field-hint">Example: Garden Cuisine Pty Ltd</p>
             </div>
+            <div class="company-exists-card" data-company-exists-card aria-live="polite">
+              <p class="company-exists-title" id="company-exists-title">This company may already have a Nomni Procure account.</p>
+              <p class="company-exists-copy">Ask your team admin to invite you, or sign in if you already have access.</p>
+              <div class="company-exists-actions">
+                <a class="company-exists-link" href="https://buyer.zeemart.co/">Sign in instead</a>
+              </div>
+            </div>
             <div class="field full">
               <label for="venue-name">Venue name</label>
               <input class="dialog-input" id="venue-name" name="venueName" required />
@@ -1811,6 +1910,9 @@
     const mailTitle = document.querySelector('[data-mail-title]');
     const mailPreview = document.querySelector('[data-mail-preview]');
     const businessForm = root.querySelector('.business-form');
+    const companyNameInput = root.querySelector('input[name="companyName"]');
+    const companyNameField = companyNameInput?.closest('.field');
+    const companyExistsCard = root.querySelector('[data-company-exists-card]');
     const primaryGoalInput = document.getElementById('primary-goal');
     const goalOptions = root.querySelectorAll('[data-goal-option]');
     const countrySelect = root.querySelector('select[name="country"]');
@@ -1824,6 +1926,11 @@
     const stateField = root.querySelector('[data-state-field]');
     const dashboardUrl = 'Procure%20Trial%20Dashboard.html';
     const postcodeCsvUrl = 'assets/australian_postcodes.csv';
+    const existingCompanyNames = [
+      'existing company pty ltd',
+      'kind foods pte ltd',
+      'whole foods pte ltd'
+    ];
     const fallbackLocalities = [
       { locality: 'Adelaide', state: 'SA', postcode: '5000' },
       { locality: 'Brisbane', state: 'QLD', postcode: '4000' },
@@ -1881,6 +1988,38 @@
 
     function isAustraliaSelected() {
       return !countrySelect || countrySelect.value === 'Australia';
+    }
+
+    function normaliseCompanyName(value) {
+      return (value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function companyAlreadyExists(value) {
+      return existingCompanyNames.includes(normaliseCompanyName(value));
+    }
+
+    function setCompanyExistsState(isExisting) {
+      const message = 'This company may already have a Nomni Procure account.';
+      if (companyNameField) companyNameField.classList.toggle('has-error', isExisting);
+      if (companyExistsCard) companyExistsCard.classList.toggle('is-visible', isExisting);
+      if (root) root.classList.toggle('is-overflowing', isExisting);
+      if (companyNameInput) {
+        companyNameInput.setCustomValidity(isExisting ? message : '');
+        companyNameInput.setAttribute('aria-invalid', String(isExisting));
+        if (isExisting) {
+          companyNameInput.setAttribute('aria-describedby', 'company-exists-title');
+        } else {
+          companyNameInput.removeAttribute('aria-describedby');
+        }
+      }
+      const businessSubmit = businessForm?.querySelector('.dialog-submit[type="submit"]');
+      if (businessSubmit) businessSubmit.disabled = isExisting;
+    }
+
+    function validateCompanyName() {
+      const isExisting = companyAlreadyExists(companyNameInput?.value);
+      setCompanyExistsState(isExisting);
+      return !isExisting;
     }
 
     function normaliseSearch(value) {
@@ -2345,6 +2484,10 @@
       });
     });
 
+    companyNameInput?.addEventListener('input', () => {
+      setCompanyExistsState(false);
+    });
+
     root.querySelectorAll('.password-toggle').forEach((button) => {
       const inputId = button.getAttribute('aria-controls');
       const input = inputId ? document.getElementById(inputId) : null;
@@ -2395,7 +2538,13 @@
           }
           if (!form.reportValidity()) return;
         }
-        if (form.classList.contains('business-form') && !form.reportValidity()) return;
+        if (form.classList.contains('business-form')) {
+          if (!validateCompanyName()) {
+            companyNameInput?.focus();
+            return;
+          }
+          if (!form.reportValidity()) return;
+        }
         updateSignupData();
         if (emailInput && emailInput.value) {
           emailOutputs.forEach((node) => { node.textContent = emailInput.value; });
