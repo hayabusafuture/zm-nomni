@@ -44,7 +44,7 @@ The opening email screen presents two paths after the user enters an email:
    - For Australia, address entry is ordered as postcode, suburb, then state. For Singapore, only postal code is shown after street address and autocomplete is disabled for now.
    - Step 3 asks optional setup questions: primary goal, number of locations, and current ordering method.
    - The primary goal is shown as a stacked list of three selectable rows with large icons: `Order faster`, `Digitise invoices`, and `Manage inventory`. Users can click a row once to select it, or click the selected row again to clear it.
-   - Goal row icons use `Freemium/assets/orders.svg`, `Freemium/assets/invoices.svg`, and `Freemium/assets/inventory.svg`.
+   - Goal row icons use `Freemium/assets/icons/orders.svg`, `Freemium/assets/icons/invoices.svg`, and `Freemium/assets/icons/inventory.svg`.
    - The selected primary goal is stored as `primaryGoal` so the trial dashboard checklist can be personalised around the user's setup priority.
    - Prototype evaluation shortcut: open `Freemium/procure-get-started.html?step=3&prefill=1` to jump straight to Step 3 with harmless sample details. Add `&primaryGoal=Digitise%20invoices` or `&primaryGoal=Manage%20inventory` to preview a selected goal.
    - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard checklist with `setup=1`, so the onboarding view appears even if the user previously dismissed it.
@@ -149,14 +149,15 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
 - CTA and form label weights are semibold to reduce visual heaviness.
 - Dialog width: `540px` max on desktop.
 - Trial dashboard checklist personalisation:
-  - `Create account` is shown as completed Step 1 for every checklist, so users start at 20% progress with 4 steps left.
+  - `Create account` is shown as completed Step 1 for every checklist, so users start at 20% progress.
   - `Order faster`: Add first supplier, Build market list, Place first order, Set up inventory.
   - `Digitise invoices`: Add first supplier, Build market list, Upload first invoice, Digitise invoices.
   - `Manage inventory`: Add first supplier, Build market list, Set up inventory, Complete first stock count.
   - Add first supplier and Build market list are mandatory prerequisites before later setup options unlock.
   - Other useful setup actions remain visible in a collapsed `More setup options` section, but do not count toward onboarding progress.
-  - The sidebar setup entry is labelled `Complete setup`.
-  - Checklist rows use full-colour task icons from `Freemium/assets/*.svg`.
+  - The sidebar setup entry is labelled `Get started` and shows `20% done`.
+  - Checklist rows use full-colour task icons from `Freemium/assets/icons/*.svg`.
+  - The checklist panel uses a compact header: `Get started with just a few steps` is set in Hanken Grotesk and sits beside a small thick-stroke circular progress indicator and separate `20% done` text, so the first checklist item appears higher on the page without a wide progress strip above it.
 - Demo confirmation:
   - `Check your inbox`
   - Private demo link sent to the captured email, expiring in 14 days.
@@ -233,11 +234,11 @@ Trial dashboard / onboarding behavior:
   - Clicking `Go to dashboard` explicitly dismisses onboarding and stores that choice in `localStorage` under `nomniProcureSetupDismissed`.
   - After dismissal, clicking Dashboard shows the regular dashboard layout instead of the onboarding checklist.
   - The dismissed dashboard mirrors the existing Procure dashboard structure, with the standard greeting, order metric cards, spending overview, and top expenditures sections, but all values are zero/empty because the trial account has no setup data yet.
-  - The persistent `Complete setup` card in the sidebar opens the onboarding checklist again with `?setup=1`.
+  - The persistent `Get started` card in the sidebar opens the onboarding checklist again with `?setup=1`.
 - Trial support controls are now part of the persistent app chrome:
   - Topbar pill: `Trial ends in 14 days`
   - Topbar CTA: `Book setup`
-  - Sidebar card: `Complete setup`, showing progress and `4 steps left`
+  - Sidebar card: `Get started`, showing progress and `20% done`
   - These controls also appear in the split supplier setup pages so trial users can see trial status and reopen setup while moving through the guided flow.
 - The setup checklist is sequential:
   - Step 2: Add your first supplier
@@ -311,10 +312,10 @@ Current role:
 - Uses a Procure-style app shell with topbar, sidebar, and dashboard content.
 - Uses the real Procure sidebar menu and icon assets, excluding `Payments`.
 - Shows onboarding/setup content instead of live metrics.
-- Centers the setup panel with a constrained max width, a large gently animated wave mark above the `Welcome to Nomni Procure!` headline, and a soft staggered load-in for the welcome content. The `Let’s finish setting up` checklist panel slides up subtly on page load.
+- Centers the setup panel with a constrained max width, a large gently animated wave mark above the `Welcome to Nomni Procure!` headline, and a soft staggered load-in for the welcome content. The `Get started with just a few steps` checklist panel slides up subtly on page load.
 - Reads signup details from URL params when available:
   - Topbar user name and avatar initials use the entered name.
-  - Setup panel title mentions the entered venue name in green.
+  - Setup panel keeps the generic `Get started with just a few steps` title so the progress header stays compact.
 - Uses a soft cream/mint patterned background treatment and a floating panel surface for the setup section.
 - Keeps trial guidance inside the setup panel rather than scattering it through the topbar and sidebar. The topbar and sidenav stay focused on normal app navigation.
 - Shows trial status and guided setup help as compact cards above the setup progress.
