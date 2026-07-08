@@ -109,6 +109,7 @@ Both prototypes are standalone HTML files:
 - No external JavaScript
 - Google Fonts only
 - Local assets referenced from `_refs`
+- Top-level Freemium pages use the root favicon at `../assets/favicon.svg` so Cloudflare-served `/Freemium/...` URLs show the Nomni tab icon.
 
 Lowercase helper URLs:
 
