@@ -253,7 +253,7 @@ Trial dashboard / onboarding behavior:
 - Trial support controls are now part of the persistent app chrome:
   - Topbar pill: `Trial ends in 14 days`
   - Topbar CTA: `Book setup`
-  - Sidebar card: white elevated card below the nav list, showing `Get started`, `20% done`, progress bar, and `Next • [next checklist step]`, while keeping the bottom-left Intercom area free. The card body links back to the onboarding dashboard; only the next action name links directly to the guided prototype flow.
+  - Sidebar card: white elevated card below the nav list, showing `Get started`, `20% done`, progress bar, and `Next • [next checklist step]`, while keeping the bottom-left Intercom area free. The card body links back to the onboarding dashboard; only the next action name links directly to the guided prototype flow. The `Get started` title uses font-weight 700 (not 800).
   - The sidebar also includes a 48×48 px Intercom-style chat launcher in the lower-left corner to match the real Procure shell.
   - These controls also appear in the split supplier setup pages so trial users can see trial status and reopen setup while moving through the guided flow.
 - The setup checklist is sequential:
@@ -336,7 +336,7 @@ Current role:
 - Keeps trial guidance inside the setup panel rather than scattering it through the topbar and sidebar. The topbar and sidenav stay focused on normal app navigation.
 - Shows trial status and guided setup help as compact cards above the setup progress.
 - Shows account setup progress inside the setup panel. The full setup is 5 steps; the account-created step is already complete, leaving 4 remaining actions.
-- Marks the completed account step with a quiet green `Completed` status rather than a button-like chip.
+- Marks completed checklist rows with just an enlarged green checkmark badge (32px) — no `Completed` text label.
 - Adds two non-checklist helper CTAs inside the setup panel: `Explore our setup guide` and `Book a live demo`.
 - Includes setup tasks:
   - Create your account
