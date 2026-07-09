@@ -852,7 +852,7 @@
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
-      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a data-nav-items href="procure-trial-items.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
       <a class="active" data-nav-outlets href="procure-trial-outlet-suppliers.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span></a>
@@ -1031,12 +1031,25 @@
     document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
       link.href = dashboardUrl(true);
     });
+    document.querySelectorAll('[data-nav-items]').forEach(function(link) {
+      link.href = withParams('procure-trial-items.html');
+    });
+    var supplierAdded = params.get('supplierAdded') === '1';
+    if (supplierAdded) {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '40% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '40%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = 'Build market list'; });
+    }
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      link.href = withParams('Procure%20Trial%20Dashboard.html', '1');
-      link.addEventListener('click', function(event) {
-        event.preventDefault();
-        startSupplierTourHere();
-      });
+      if (supplierAdded) {
+        link.href = dashboardUrl(true);
+      } else {
+        link.href = withParams('Procure%20Trial%20Dashboard.html', '1');
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startSupplierTourHere();
+        });
+      }
     });
     if (outletsNavLink) outletsNavLink.href = withParams('procure-trial-outlet-suppliers.html', '2');
 

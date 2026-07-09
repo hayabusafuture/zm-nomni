@@ -583,6 +583,8 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Nomni Procure — Items: Freemium/procure-trial-items.html
+- Nomni Procure — Supplier Search: Freemium/procure-trial-add-supplier-no-results.html
 - saved_resource: assets/outlet_detail_suppliers_files/saved_resource.html
 - m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/outlet_detail_suppliers_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
 - StripeM-Inner: assets/outlet_detail_suppliers_files/inner.html

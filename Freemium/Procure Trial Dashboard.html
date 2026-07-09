@@ -1233,7 +1233,7 @@
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
-      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a data-nav-items href="procure-trial-items.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
       <a data-nav-outlets href="procure-trial-outlet-suppliers.html?tour=2"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span><span class="warn-icon"><img src="../error_24dp_1F1F1F 1.png" alt=""></span></a>
@@ -1493,12 +1493,14 @@
         title: 'Add first supplier',
         copy: 'Start here. Market lists and the rest of setup unlock after you add a supplier.',
         cta: 'Add supplier',
-        href: 'supplier',
+        ctaHref: 'procure-trial-outlet-suppliers.html',
         icon: 'assets/icons/add supplier.svg'
       },
       market: {
         title: 'Build market list',
         copy: 'Choose the products you order from your supplier.',
+        cta: 'Add items',
+        ctaHref: 'procure-trial-items.html',
         locked: 'Add supplier first',
         icon: 'assets/icons/build mkt list.svg'
       },
@@ -1597,11 +1599,11 @@
         status.className = 'task-status';
         status.textContent = 'Completed';
         row.appendChild(status);
-      } else if (task.href === 'supplier' && counted) {
+      } else if (isCurrent && task.cta) {
         var link = document.createElement('a');
         link.className = 'btn btn-secondary';
-        link.setAttribute('data-supplier-setup-link', '');
-        link.href = 'procure-trial-outlet-suppliers.html?tour=2';
+        if (taskKey === 'supplier') link.setAttribute('data-supplier-setup-link', '');
+        link.href = preserveParams(task.ctaHref, taskKey === 'supplier' ? { tour: '2' } : {});
         link.textContent = task.cta;
         row.appendChild(link);
       } else if (isCurrent) {
@@ -1764,6 +1766,9 @@
       });
       document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
         link.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
+      });
+      document.querySelectorAll('[data-nav-items]').forEach(function(link) {
+        link.href = preserveParams('procure-trial-items.html');
       });
     }
 

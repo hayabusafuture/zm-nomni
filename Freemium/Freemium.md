@@ -95,6 +95,7 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/procure-trial-add-supplier-results.html`
 - `Freemium/procure-trial-add-supplier-settings.html`
 - `Freemium/procure-trial-add-supplier.html` redirects to the split supplier setup entry page for compatibility.
+- `Freemium/procure-trial-items.html` — placeholder Items page, empty state only, linked from the `Items` sidenav entry and the checklist's `Add items` CTA.
 
 Generated preview screenshots:
 
@@ -364,6 +365,15 @@ Current role:
   - Tour typography follows the app styleguide scale: 12px kicker, 21px title, 14px body/action text.
   - The tour uses a lightweight highlight ring and card without a dark page overlay so the product controls remain visible and clickable.
   - Saved real-product references for this path live in `assets/outlet_detail_details.html`, `assets/outlet_detail_suppliers.html`, `assets/outlet_detail_suppliers-addsupplier.html`, and `assets/outlet_detail_suppliers-addsupplier2.html`.
+  - On `procure-trial-add-supplier-settings.html`, the guided tour (Steps 5-8 of 8) covers order contacts, order policy, delivery days, then save:
+    - Step 5 (`Add order contacts`) copy references adding a WhatsApp number for updates instead of SMS, matching the visible WhatsApp field (SMS only appears behind `More`).
+    - Step 6 (`Set the order policy`), Step 7 (`Add delivery days`), and Step 8 (`Save the supplier`) each show their own distinct copy — a prior stray-quote typo on the popover's copy element broke the selector that updates this text, so every step after Step 5 incorrectly showed Step 5's copy. Fixed.
+    - The standalone `Copy if needed` (Apply to all) tour step was removed; `Apply to all` remains a per-row action but is no longer a numbered tour stop.
+    - The tour highlight box now re-syncs on scroll so it doesn't drift out of alignment with its target while the page auto-scrolls between steps.
+  - After saving a supplier, `procure-trial-outlet-suppliers.html` shows a top-right toast (`"<Supplier name> created"`) for 4 seconds, in addition to the existing inline `Supplier added` note.
+  - The sidebar `Get started` card is now wired dynamically (not just static markup) on every supplier onboarding page (`procure-trial-outlet-suppliers.html`, `-add-supplier-search.html`, `-add-supplier-results.html`, `-add-supplier-no-results.html`, `-add-supplier-settings.html`): once `supplierAdded=1` is present, it updates from `20% done` / `Next • Add first supplier` to `40% done` / `Next • Build market list`, and the next-action link goes to the dashboard checklist instead of re-triggering the add-supplier tour.
+  - The `Build market list` checklist row on the trial dashboard now shows a real `Add items` button (like `Add supplier` on the first row) instead of a plain, non-interactive `Next` label. It links to `Freemium/procure-trial-items.html`.
+  - `Freemium/procure-trial-items.html` is a new placeholder Items page (topbar, sidebar with `Items` active, empty state: `No items yet`). It is intentionally left empty for now — building the real add-items flow is a future follow-up. The `Items` sidenav entry across every trial page (dashboard, outlet suppliers, and all add-supplier pages) now links here instead of `#`.
 - Includes help/support links:
   - Navigating Nomni Procure app: `https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app`
   - Nomni Procure help collection: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`
