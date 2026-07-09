@@ -95,7 +95,8 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/procure-trial-add-supplier-results.html`
 - `Freemium/procure-trial-add-supplier-settings.html`
 - `Freemium/procure-trial-add-supplier.html` redirects to the split supplier setup entry page for compatibility.
-- `Freemium/procure-trial-items.html` — placeholder Items page, empty state only, linked from the `Items` sidenav entry and the checklist's `Add items` CTA.
+- `Freemium/procure-trial-items.html` — Items page and guided Add item / Build market list onboarding flow, linked from the `Items` sidenav entry and the checklist's `Add items` CTA.
+- `Freemium/procure-trial-create-sku.html` — full-page manual `Create SKU` form used after selecting a supplier from the Items `Add > Create new` path.
 
 Generated preview screenshots:
 
@@ -360,6 +361,13 @@ Current role:
     - Step 4: `Freemium/procure-trial-add-supplier-results.html`
     - Step 5: `Freemium/procure-trial-add-supplier-settings.html`
   - Tour popovers do not include forward CTAs; users advance by clicking the highlighted product controls.
+  - Guided-tour copy standard:
+    - Copy should sound like helpful product onboarding, not implementation notes or prototype instructions.
+    - Avoid technical/internal wording such as `SKU manually`, `OCR-assisted path`, `create form`, or copy that explains how the prototype is wired.
+    - Lead with the user's job: add items the team orders, link the item to the right supplier, set how it is bought, choose whether it should be counted in inventory, then save.
+    - Where a real product control naturally advances the flow, the tour should ask users to click that highlighted control instead of relying on a `Next` button.
+    - Popovers must not cover the control users need to click; if a CTA is the action, place the card away from the CTA and hide `Next` where appropriate.
+  - Add-supplier tour copy was rewritten across all 9 steps (Outlets start, Add supplier, Search, Choose match / no-results Create, Contacts, Policy, Delivery days, Save) to follow the guided-tour copy standard above — leading with the user's job (find or create the right business record, keep orders/contacts/pricing tied to it, set ordering rules) instead of describing prototype mechanics.
   - The outlet details page reads the signup `venueName` URL parameter so the outlet name matches the venue created during signup.
   - The Suppliers tab starts with an empty state because this is a new trial outlet with no suppliers yet.
   - Tour typography follows the app styleguide scale: 12px kicker, 21px title, 14px body/action text.
@@ -371,9 +379,27 @@ Current role:
     - The standalone `Copy if needed` (Apply to all) tour step was removed; `Apply to all` remains a per-row action but is no longer a numbered tour stop.
     - The tour highlight box now re-syncs on scroll so it doesn't drift out of alignment with its target while the page auto-scrolls between steps.
   - After saving a supplier, `procure-trial-outlet-suppliers.html` shows a top-right toast (`"<Supplier name> created"`) for 4 seconds, in addition to the existing inline `Supplier added` note.
+  - After saving a supplier, `procure-trial-outlet-suppliers.html` also auto-opens a `Setup updated` / `Supplier added` handoff popover pointing at the sidebar `Get started` card (same pattern as the post-save handoff on the Items page), telling users they're `40% done` and can click the setup panel to continue.
+  - Popover placement bugfix: a `placement: 'right'` tour step's arrow is fixed at a hardcoded offset from the card's top edge in CSS, but the positioning math previously placed the card far above/below that offset, so the arrow never lined up with its target (most visible on the `Market list built` handoff pointing at the sidebar card). Both `procure-trial-items.html` and `procure-trial-outlet-suppliers.html` now compute the card's vertical position from the target's vertical center so the arrow stays aligned; near viewport edges it still adaptively flips to `above`/`left`/`below` as before.
   - The sidebar `Get started` card is now wired dynamically (not just static markup) on every supplier onboarding page (`procure-trial-outlet-suppliers.html`, `-add-supplier-search.html`, `-add-supplier-results.html`, `-add-supplier-no-results.html`, `-add-supplier-settings.html`): once `supplierAdded=1` is present, it updates from `20% done` / `Next • Add first supplier` to `40% done` / `Next • Build market list`, and the next-action link goes to the dashboard checklist instead of re-triggering the add-supplier tour.
-  - The `Build market list` checklist row on the trial dashboard now shows a real `Add items` button (like `Add supplier` on the first row) instead of a plain, non-interactive `Next` label. It links to `Freemium/procure-trial-items.html`.
-  - `Freemium/procure-trial-items.html` is a new placeholder Items page (topbar, sidebar with `Items` active, empty state: `No items yet`). It is intentionally left empty for now — building the real add-items flow is a future follow-up. The `Items` sidenav entry across every trial page (dashboard, outlet suppliers, and all add-supplier pages) now links here instead of `#`.
+  - The `Build market list` checklist row on the trial dashboard shows a real `Add items` button (like `Add supplier` on the first row). Once the supplier prerequisite is complete, it starts a dashboard pointer first instead of jumping straight into the Items page.
+  - `Freemium/procure-trial-items.html` now handles the guided Add item / Build market list flow. Saved real-product references for this path live in `assets/Items.html`, `assets/Items-Select supplier.html`, and `assets/Items-create SKU.html`.
+  - The Items page remains locked if `supplierAdded=1` is not present, because market-list items must be linked to a supplier before they can be ordered.
+  - Manual item creation follows the current Buyer Hub product path:
+    - Step 1 points to `Items` in the dashboard sidenav. Clicking that real nav item opens `Freemium/procure-trial-items.html?tour=1`.
+    - The sidebar `Get started` card mirrors the add-supplier behaviour: once `supplierAdded=1` is present, clicking `Next • Build market list` on any trial onboarding page opens a local Step 1 pointer at the `Items` sidenav entry, rather than silently sending the user back to the dashboard.
+    - Items list page with `Purchased` tab, outlet selector, `Search SKU`, table rows, and action bar.
+    - The Items outlet selector reads the signup `venueName` URL parameter so it matches the venue the user created; direct file previews fall back to `Trial Outlet` rather than saved sample-account data.
+    - Steps 2-5 cover opening `Add`, choosing `Create new`, selecting the supplier, and continuing to `Freemium/procure-trial-create-sku.html`.
+    - Steps 6-11 cover SKU name, optional product codes, UOM/minimum order quantity/price, the optional `Add to Inventory` branch, inventory list/UOM/par fields, and saving the SKU.
+    - The `Create SKU` page includes SKU name, supplier/my product codes, tax selection, UOM, minimum order quantity, price before tax, optional inventory controls, and the sticky footer actions. The inventory list/UOM/par fields stay visible but greyed out until `Add to Inventory` is selected; selecting it enables those fields and advances the guidance.
+  - The invoice-upload branch is visible as `Add from invoice`, but is not yet implemented in the freemium prototype. Per Jira `PWF-1511`, that branch should later support up to 5 PDF/JPEG/PNG invoices, OCR extraction, and a per-invoice review page before saving items to the market list.
+  - Saving a SKU returns to the Items table with a success toast (`added to market list`) and `marketListBuilt=1`. The setup checklist advances from `40% done` to `60% done`, marks `Build market list` as complete, and moves the sidebar next action to the goal-dependent next step:
+    - `Order faster`: `Place first order`
+    - `Digitise invoices`: `Upload first invoice`
+    - `Manage inventory`: `Set up inventory`
+  - After saving a SKU, the Items page uses the same tour panel style for the completion handoff. It points at the bottom-left `Get started` card and tells users to click that panel to return to the checklist and continue with the next goal-dependent setup action.
+  - The `Items` sidenav entry across every trial page (dashboard, outlet suppliers, and all add-supplier pages) links to this Items page instead of `#`.
 - Includes help/support links:
   - Navigating Nomni Procure app: `https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app`
   - Nomni Procure help collection: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`

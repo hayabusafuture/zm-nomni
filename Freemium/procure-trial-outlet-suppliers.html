@@ -696,40 +696,42 @@
 
   .success-toast {
     position: fixed;
-    top: 72px;
-    right: 20px;
+    right: 28px;
+    top: 78px;
     z-index: 1100;
+    min-width: 300px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 14px 18px;
-    border-radius: 10px;
-    background: #fff;
+    gap: 14px;
+    padding: 15px 18px;
+    border-radius: 4px;
+    border: 1px solid #AFE7C2;
+    background: #E2FFE6;
+    box-shadow: 0 16px 44px rgba(10,20,15,.16);
     color: var(--seaweed);
-    font-weight: 700;
-    font-size: 14px;
-    box-shadow: 0 18px 40px rgba(10,20,15,.18), 0 1px 0 rgba(255,255,255,.7) inset;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-10px);
-    transition: opacity .28s ease, transform .28s ease;
+    transform: translateY(-8px);
+    transition: opacity .2s ease, transform .2s ease;
   }
   .success-toast.visible {
     opacity: 1;
     transform: translateY(0);
   }
   .success-toast-icon {
-    width: 22px;
-    height: 22px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: var(--nomni-green);
-    color: var(--seaweed);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background: #0BBE3F;
+    color: #fff;
+    font-size: 27px;
+    line-height: 1;
+    flex: 0 0 auto;
   }
+  .success-toast-title { font-weight: 800; margin-bottom: 2px; }
+  .success-toast-copy { color: var(--seaweed); font-size: 14px; }
 
   .tour-overlay {
     position: fixed;
@@ -982,7 +984,7 @@
 
 <div class="success-toast" data-success-toast>
   <span class="success-toast-icon" aria-hidden="true">✓</span>
-  <span data-success-toast-text>Supplier created</span>
+  <span><span class="success-toast-title" data-success-toast-text>Supplier</span><br><span class="success-toast-copy">created</span></span>
 </div>
 
 <div class="tour-overlay" data-tour hidden>
@@ -991,7 +993,7 @@
   <section class="tour-card" data-tour-card aria-live="polite">
     <p class="tour-kicker">Step 2 of 5</p>
     <h2 class="tour-title">Add a supplier</h2>
-    <p class="tour-copy">This outlet does not have suppliers yet. Click Add new to add the first one.</p>
+    <p class="tour-copy">Add your first supplier here. Once they’re saved, you can link items to them and start building orders.</p>
     <button class="tour-dismiss" data-tour-dismiss>Dismiss</button>
   </section>
 </div>
@@ -1014,6 +1016,7 @@
     var outletsNavLink = document.querySelector('[data-nav-outlets]');
     var tourStep = { target: '[data-add-new]' };
     var supplierAdded = params.get('supplierAdded') === '1';
+    var marketListBuilt = params.get('marketListBuilt') === '1';
     var supplierName = params.get('supplierName') || 'KPP Pte Ltd';
 
     function initialsFromName(name) {
@@ -1026,7 +1029,7 @@
     function withParams(file, step) {
       var nextParams = new URLSearchParams();
       if (step) nextParams.set('tour', step);
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1036,7 +1039,7 @@
 
     function dashboardUrl(forceSetup) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1059,9 +1062,23 @@
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '40%'; });
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = 'Build market list'; });
     }
+    if (marketListBuilt) {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '60% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '60%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+        var goal = params.get('primaryGoal') || 'Order faster';
+        node.textContent = goal === 'Digitise invoices' ? 'Upload first invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place first order';
+      });
+    }
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      if (supplierAdded) {
+      if (marketListBuilt) {
         link.href = dashboardUrl(true);
+      } else if (supplierAdded) {
+        link.href = dashboardUrl(true);
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startMarketListTourHere();
+        });
       } else {
         link.href = withParams('Procure%20Trial%20Dashboard.html', '1');
         link.addEventListener('click', function(event) {
@@ -1084,22 +1101,28 @@
       tourHighlight.style.height = (rect.height + pad * 2) + 'px';
       tourCard.classList.remove('above', 'below', 'left');
       var cardWidth = Math.min(380, window.innerWidth - 32);
+      var cardHeight = tourCard.getBoundingClientRect().height || 200;
       var cardLeft = rect.right + 34;
       var cardTop = rect.top - 28;
       if (tourStep.placement === 'below') {
         cardLeft = Math.max(16, Math.min(rect.left, window.innerWidth - cardWidth - 16));
-        cardTop = Math.min(window.innerHeight - 220, rect.bottom + 26);
+        cardTop = Math.min(window.innerHeight - cardHeight - 16, rect.bottom + 26);
         tourCard.classList.add('below');
+      }
+      if (tourStep.placement === 'right') {
+        cardLeft = rect.right + 34;
+        cardTop = Math.max(16, Math.min(rect.top + rect.height / 2 - 42, window.innerHeight - cardHeight - 16));
       }
       if (cardLeft + cardWidth > window.innerWidth - 16) {
         cardLeft = Math.max(16, rect.left - cardWidth - 34);
         tourCard.classList.add('left');
       }
       if (cardLeft < 16) cardLeft = 16;
-      if (cardTop + 300 > window.innerHeight - 16) {
-        cardTop = Math.max(16, rect.top - 320);
+      if (tourStep.placement !== 'right' && cardTop + cardHeight > window.innerHeight - 16) {
+        cardTop = Math.max(16, rect.top - cardHeight - 20);
         tourCard.classList.add('above');
       }
+      if (cardTop + cardHeight > window.innerHeight - 16) cardTop = Math.max(16, window.innerHeight - cardHeight - 16);
       if (cardTop < 16) cardTop = 16;
       tourCard.style.left = cardLeft + 'px';
       tourCard.style.top = cardTop + 'px';
@@ -1122,7 +1145,26 @@
       tourStep = { target: '[data-nav-outlets]' };
       if (tourKicker) tourKicker.textContent = 'Step 1 of 5';
       if (tourTitle) tourTitle.textContent = 'Start from Outlets';
-      if (tourCopy) tourCopy.textContent = 'Supplier setup starts in Outlets. Click Outlets in the sidenav to continue.';
+      if (tourCopy) tourCopy.textContent = 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
+      openTour();
+    }
+
+    function startMarketListTourHere() {
+      tourStep = { target: '[data-nav-items]' };
+      document.querySelectorAll('[data-nav-items]').forEach(function(link) {
+        link.href = withParams('procure-trial-items.html', '1');
+      });
+      if (tourKicker) tourKicker.textContent = 'Step 1 of 11';
+      if (tourTitle) tourTitle.textContent = 'Start from Items';
+      if (tourCopy) tourCopy.textContent = 'Add the items your team orders most. Start from Items in the sidebar.';
+      openTour();
+    }
+
+    function showSupplierCompletionHandoff() {
+      tourStep = { target: '[data-sidebar-setup-card]', placement: 'right' };
+      if (tourKicker) tourKicker.textContent = 'Setup updated';
+      if (tourTitle) tourTitle.textContent = 'Supplier added';
+      if (tourCopy) tourCopy.textContent = 'You’re 40% done. Click the setup panel to continue with the next step.';
       openTour();
     }
 
@@ -1146,9 +1188,9 @@
       var toast = document.querySelector('[data-success-toast]');
       var toastText = document.querySelector('[data-success-toast-text]');
       if (toast && toastText) {
-        toastText.textContent = supplierName + ' created';
+        toastText.textContent = supplierName;
         requestAnimationFrame(function() { toast.classList.add('visible'); });
-        setTimeout(function() { toast.classList.remove('visible'); }, 4000);
+        setTimeout(function() { toast.classList.remove('visible'); }, 4200);
       }
     }
 
@@ -1160,7 +1202,12 @@
     if (addNew) addNew.addEventListener('click', function() { window.location.href = withParams('procure-trial-add-supplier-search.html', '3'); });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
     window.addEventListener('resize', placeTour);
-    if (params.has('tour')) openTour();
+    window.addEventListener('scroll', placeTour, { passive: true });
+    if (params.has('tour')) {
+      openTour();
+    } else if (supplierAdded && !marketListBuilt) {
+      showSupplierCompletionHandoff();
+    }
   })();
 </script>
 </body>

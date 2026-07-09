@@ -967,14 +967,28 @@
     border: 1px solid transparent;
     border-radius: 6px;
     padding: 0 14px;
-    background: var(--mint);
+    background: var(--nomni-green);
     color: var(--seaweed);
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .16s ease;
   }
-  .tour-step-btn:hover { background: #C6F2CE; }
+  .tour-step-btn:hover {
+    background: var(--seaweed);
+    color: var(--nomni-green);
+    border-color: var(--seaweed);
+  }
+  .tour-step-btn[data-tour-prev] {
+    background: var(--mint);
+    border-color: var(--mint);
+    color: var(--seaweed);
+  }
+  .tour-step-btn[data-tour-prev]:hover {
+    background: #C6F2CE;
+    border-color: #C6F2CE;
+    color: var(--seaweed);
+  }
   .tour-step-btn:active { transform: scale(.96); }
   .tour-step-btn[disabled] {
     opacity: .45;
@@ -1221,7 +1235,7 @@
   <section class="tour-card" data-tour-card aria-live="polite">
     <p class="tour-kicker" data-tour-kicker>Step 5 of 8</p>
     <h2 class="tour-title" data-tour-title>Add order contacts</h2>
-    <p class="tour-copy" data-tour-copy>Add an email address for order notifications, or tick No email address if orders are not sent by email. You can also add a WhatsApp number for updates.</p>
+    <p class="tour-copy" data-tour-copy>Add where orders should be sent. If this supplier doesn’t use email, mark that here and add a WhatsApp number for updates.</p>
     <div class="tour-actions">
       <button class="tour-dismiss" data-tour-dismiss>Dismiss</button>
       <div class="tour-nav">
@@ -1269,25 +1283,25 @@
         target: '[data-contact-card]',
         kicker: 'Step 5 of 8',
         title: 'Add order contacts',
-        copy: 'Add an email address for order notifications, or tick No email address if orders are not sent by email. You can also add a WhatsApp number for updates.'
+        copy: 'Add where orders should be sent. If this supplier doesn’t use email, mark that here and add a WhatsApp number for updates.'
       },
       policy: {
         target: '[data-policy-target]',
         kicker: 'Step 6 of 8',
         title: 'Set the order policy',
-        copy: 'Set the minimum order amount if this supplier has one. Keep the block option on if orders below that amount should not be sent.'
+        copy: 'Add any ordering rules this supplier expects, such as a minimum order amount.'
       },
       delivery: {
         target: '[data-delivery-target]',
         kicker: 'Step 7 of 8',
         title: 'Add delivery days',
-        copy: 'Select each day this supplier delivers, then add how many days earlier orders close and the cutoff time.'
+        copy: 'Choose when this supplier delivers and when orders need to be placed, so your team knows the cut-off.'
       },
       save: {
         target: '[data-finish-supplier]',
         kicker: 'Step 8 of 8',
         title: 'Save the supplier',
-        copy: 'Save to add this supplier to your outlet and finish the first setup task.'
+        copy: 'Save the supplier. Next, we’ll help you add items from this supplier to your market list.'
       }
     };
     var tourStep = tourSteps.contact;
@@ -1302,7 +1316,7 @@
     function withParams(file, step, extras) {
       var nextParams = new URLSearchParams();
       if (step) nextParams.set('tour', step);
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierCreated', 'supplierAdded'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierCreated', 'supplierAdded', 'marketListBuilt'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1317,7 +1331,7 @@
 
     function dashboardUrl(forceSetup) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1336,14 +1350,29 @@
       link.href = withParams('procure-trial-items.html');
     });
     var sidebarSupplierAdded = params.get('supplierAdded') === '1';
+    var sidebarMarketListBuilt = params.get('marketListBuilt') === '1';
     if (sidebarSupplierAdded) {
       document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '40% done'; });
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '40%'; });
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = 'Build market list'; });
     }
+    if (sidebarMarketListBuilt) {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '60% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '60%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+        var goal = params.get('primaryGoal') || 'Order faster';
+        node.textContent = goal === 'Digitise invoices' ? 'Upload first invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place first order';
+      });
+    }
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      if (sidebarSupplierAdded) {
+      if (sidebarMarketListBuilt) {
         link.href = dashboardUrl(true);
+      } else if (sidebarSupplierAdded) {
+        link.href = dashboardUrl(true);
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startMarketListTourHere();
+        });
       } else {
         link.href = withParams('Procure%20Trial%20Dashboard.html', '1');
         link.addEventListener('click', function(event) {
@@ -1421,7 +1450,21 @@
       tourStep = { target: '[data-nav-outlets]' };
       if (tourKicker) tourKicker.textContent = 'Step 1 of 8';
       if (tourTitle) tourTitle.textContent = 'Start from Outlets';
-      if (tourCopy) tourCopy.textContent = 'Supplier setup starts in Outlets. Click Outlets in the sidenav to continue.';
+      if (tourCopy) tourCopy.textContent = 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
+      if (tourPrev) tourPrev.hidden = true;
+      if (tourNext) tourNext.hidden = true;
+      openTour();
+    }
+
+    function startMarketListTourHere() {
+      currentTourStepName = 'startMarket';
+      tourStep = { target: '[data-nav-items]' };
+      document.querySelectorAll('[data-nav-items]').forEach(function(link) {
+        link.href = withParams('procure-trial-items.html', '1');
+      });
+      if (tourKicker) tourKicker.textContent = 'Step 1 of 11';
+      if (tourTitle) tourTitle.textContent = 'Start from Items';
+      if (tourCopy) tourCopy.textContent = 'Add the items your team orders most. Start from Items in the sidebar.';
       if (tourPrev) tourPrev.hidden = true;
       if (tourNext) tourNext.hidden = true;
       openTour();
@@ -1459,7 +1502,10 @@
 
     function updateTourControls() {
       var index = tourOrder.indexOf(currentTourStepName);
-      if (tourPrev) tourPrev.disabled = index <= 0;
+      if (tourPrev) {
+        tourPrev.hidden = index <= 0;
+        tourPrev.disabled = index <= 0;
+      }
       if (!tourNext) return;
       var isLast = index >= tourOrder.length - 1;
       var needsDeliveryBeforeApply = currentTourStepName === 'delivery' && !anyDeliveryReady();

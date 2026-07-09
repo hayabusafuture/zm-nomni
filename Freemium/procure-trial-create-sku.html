@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+<title>Nomni Procure - Create SKU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864;
+    --seaweed: #0E3727;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --cream: #FAF7E9;
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42, 200, 100, 0.14);
+    --sidebar-text: #1A1F2B;
+    --ink: #1A1F2B;
+    --ink-2: #1A1F2B;
+    --ink-mute: #8A8F98;
+    --ink-soft: #C7C9CF;
+    --rule: #E7E8EC;
+    --primary: #2AC864;
+    --primary-hover: #1FA551;
+    --primary-ink: #0E3727;
+    --row-hover: #F7F8FA;
+    --panel: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  button, input, select { font: inherit; }
+
+  .app {
+    display: grid;
+    grid-template-columns: 232px 1fr;
+    grid-template-rows: 56px 1fr;
+    min-height: 100vh;
+  }
+  .topbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    height: 56px;
+    background: #1F2226;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    border-bottom: 1px solid #000;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; width: auto; display: block; }
+  .brand-sub {
+    color: var(--nomni-green);
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 23px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .trial-status {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(226,255,230,.96);
+    color: var(--seaweed);
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .trial-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    box-shadow: 0 0 0 4px rgba(42,200,100,.16);
+  }
+  .topbar-setup-link {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border-radius: 6px;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #7F6AD0;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+  .nav {
+    margin-top: 4px;
+    padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: var(--sidebar-text);
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .nav a:hover { background: rgba(0,0,0,.05); }
+  .nav a.active {
+    background: var(--sidebar-item-active);
+    color: var(--seaweed);
+    font-weight: 600;
+  }
+  .icon-wrap {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    display: block;
+  }
+  .icon { position: absolute; inset: 0; width: 18px; height: 18px; }
+  .icon-green { display: none; }
+  .active .icon-grey { display: none; }
+  .active .icon-green { display: block; }
+  .badge {
+    margin-left: auto;
+    min-width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .sidebar-setup { padding: 10px 10px 78px; }
+  .sidebar-setup-card {
+    display: grid;
+    gap: 10px;
+    padding: 14px 14px 15px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid rgba(42,200,100,.18);
+    color: var(--seaweed);
+    box-shadow: 0 8px 20px rgba(10,20,15,.06);
+  }
+  .sidebar-setup-main { display: grid; gap: 10px; color: inherit; }
+  .sidebar-setup-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .sidebar-setup-title { font-size: 13px; font-weight: 700; line-height: 1.2; }
+  .sidebar-setup-row::after {
+    content: "->";
+    color: var(--spinach);
+    font-size: 13px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .sidebar-setup-progress {
+    height: 9px;
+    border-radius: 999px;
+    background: #E7E8EC;
+    overflow: hidden;
+  }
+  .sidebar-setup-progress span {
+    display: block;
+    width: 40%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--nomni-green);
+  }
+  .sidebar-setup-copy {
+    margin-left: auto;
+    color: #687080;
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .sidebar-setup-next {
+    color: #687080;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .sidebar-setup-next strong { color: var(--spinach); font-weight: 800; }
+  .sidebar-setup-next-link { color: inherit; }
+  .intercom-launcher {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #6C4DF2;
+    box-shadow: 0 6px 18px rgba(108,77,242,.4);
+    cursor: pointer;
+  }
+  .intercom-launcher::before {
+    content: "";
+    width: 28px;
+    height: 23px;
+    display: block;
+    background: #fff;
+    border-radius: 5px;
+    clip-path: polygon(0 0, 100% 0, 100% 76%, 63% 76%, 45% 100%, 45% 76%, 0 76%);
+  }
+
+  .main {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    background: #fff;
+    padding-bottom: 96px;
+  }
+  .create-header {
+    padding: 32px 40px 34px;
+    border-bottom: 1px solid var(--rule);
+    background: #fff;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 4px;
+    color: var(--spinach);
+    font-weight: 700;
+  }
+  .create-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+  }
+  .create-content {
+    padding: 40px;
+  }
+  .yellow-banner {
+    max-width: 1110px;
+    margin: 0 0 48px;
+    padding: 18px 24px;
+    border-radius: 9px;
+    background: #FFF8D8;
+    color: var(--ink);
+    text-align: center;
+  }
+  .yellow-banner b { font-weight: 800; }
+  .yellow-banner .green { color: var(--spinach); }
+  .form-wrap {
+    width: 600px;
+    max-width: 100%;
+    margin-left: 255px;
+    display: grid;
+    gap: 27px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .compact-row {
+    display: grid;
+    grid-template-columns: 100px 100px 100px;
+    gap: 16px;
+    align-items: end;
+  }
+  .field {
+    display: grid;
+    gap: 8px;
+  }
+  .field label,
+  .field-label {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .field input,
+  .field select {
+    width: 100%;
+    min-height: 38px;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    padding: 9px 12px;
+    outline: none;
+  }
+  .field input:focus,
+  .field select:focus {
+    border-color: var(--nomni-green);
+    box-shadow: 0 0 0 3px rgba(42,200,100,.12);
+  }
+  .field-help {
+    margin: -3px 0 0;
+    color: #687080;
+    font-size: 12px;
+  }
+  .char-count { color: #687080; }
+  .tax-group {
+    display: grid;
+    gap: 12px;
+  }
+  .radio-row,
+  .check-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink);
+  }
+  .radio-dot {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #C7CDD5;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+  }
+  .radio-dot.active {
+    border-color: var(--spinach);
+  }
+  .radio-dot.active::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--spinach);
+  }
+  .check-box {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #C7CDD5;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    color: transparent;
+  }
+  .check-box.active {
+    border-color: var(--spinach);
+    color: var(--spinach);
+  }
+  .section-rule {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 24px 0 0;
+  }
+  .section-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+  }
+  .inventory-extra {
+    display: grid;
+    gap: 22px;
+  }
+  .inventory-extra.is-disabled {
+    opacity: .45;
+  }
+  .inventory-extra.is-disabled select,
+  .inventory-extra.is-disabled input {
+    pointer-events: none;
+    background: #F3F4F6;
+  }
+  .footer-bar {
+    position: fixed;
+    left: 232px;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 48px 16px 60px;
+    background: #fff;
+    box-shadow: 0 -8px 22px rgba(10,20,15,.10);
+  }
+  .cancel-link {
+    border: 0;
+    background: transparent;
+    color: #D0291E;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .save-more {
+    border: 0;
+    background: transparent;
+    color: var(--spinach);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 18px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    border-color: var(--nomni-green);
+  }
+  .btn:disabled,
+  .save-more:disabled {
+    cursor: not-allowed;
+    opacity: .45;
+  }
+
+  .tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 940;
+    pointer-events: none;
+  }
+  .tour-overlay[hidden] { display: none; }
+  .tour-highlight {
+    position: fixed;
+    border: 2px solid var(--nomni-green);
+    border-radius: 10px;
+    box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);
+    pointer-events: none;
+    transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
+  }
+  .tour-card {
+    position: fixed;
+    width: min(380px, calc(100vw - 32px));
+    padding: 18px 18px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(42,200,100,.24);
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(10,20,15,.18);
+    pointer-events: auto;
+  }
+  .tour-card::before {
+    content: "";
+    position: absolute;
+    left: -9px;
+    top: 28px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-left: 1px solid rgba(42,200,100,.24);
+    border-bottom: 1px solid rgba(42,200,100,.24);
+    transform: rotate(45deg);
+  }
+  .tour-card.left::before {
+    left: auto;
+    right: -9px;
+    border-left: 0;
+    border-bottom: 0;
+    border-right: 1px solid rgba(42,200,100,.24);
+    border-top: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-card.below::before {
+    left: 28px;
+    top: -9px;
+    border-left: 1px solid rgba(42,200,100,.24);
+    border-bottom: 0;
+    border-top: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-kicker {
+    margin: 0 0 6px;
+    color: var(--spinach);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .tour-title {
+    margin: 0 0 6px;
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .tour-copy {
+    margin: 0 0 14px;
+    color: #59606B;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .tour-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .tour-dismiss,
+  .tour-step-btn {
+    min-height: 34px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .tour-dismiss { background: #F3F4F6; color: #59606B; }
+  .tour-step-btn { background: var(--nomni-green); color: var(--seaweed); }
+  .tour-step-btn[data-tour-prev] {
+    background: var(--mint);
+    border-color: var(--mint);
+    color: var(--seaweed);
+  }
+  .tour-step-btn[data-tour-prev]:hover {
+    background: #C6F2CE;
+    border-color: #C6F2CE;
+  }
+  .tour-step-btn[data-tour-next]:hover {
+    background: var(--seaweed);
+    border-color: var(--seaweed);
+    color: var(--nomni-green);
+  }
+  .tour-step-btn:disabled { cursor: not-allowed; opacity: .5; }
+  .tour-nav { display: flex; gap: 8px; }
+
+  @media (max-width: 1180px) {
+    .form-wrap { margin-left: 80px; }
+  }
+  @media (max-width: 1100px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar { width: 64px; overflow: hidden; }
+    .nav a { justify-content: center; padding: 10px; }
+    .nav-label, .badge { display: none; }
+    .sidebar-setup { display: none; }
+    .footer-bar { left: 64px; }
+    .form-wrap { margin-left: 0; }
+  }
+  @media (max-width: 760px) {
+    .app { display: block; }
+    .topbar { position: static; }
+    .trial-status,
+    .topbar-setup-link { display: none; }
+    .sidebar { display: none; }
+    .create-content, .create-header { padding-left: 24px; padding-right: 24px; }
+    .form-row, .compact-row { grid-template-columns: 1fr; }
+    .footer-bar { left: 0; padding: 14px 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-logo-img" src="../assets/nomni-logo-light.svg" alt="nomni" />
+      <div class="brand-sub">Procure</div>
+    </div>
+    <div class="topbar-right">
+      <div class="trial-status" aria-label="Trial status"><span class="trial-dot" aria-hidden="true"></span>Trial ends in 14 days</div>
+      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book setup</a>
+      <div class="user">
+        <div class="avatar" data-avatar>TR</div>
+        <span data-user-name>Trial user</span>
+      </div>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <nav class="nav" aria-label="Trial navigation">
+      <a data-dashboard-link href="Procure%20Trial%20Dashboard.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+      <a data-nav-items href="procure-trial-items.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
+      <a class="active" data-nav-outlets href="procure-trial-outlet-suppliers.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
+    </nav>
+    <div class="sidebar-setup">
+      <div class="sidebar-setup-card" data-sidebar-setup-card>
+        <a class="sidebar-setup-main" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
+          <span class="sidebar-setup-row"><span class="sidebar-setup-title">Get started</span><span class="sidebar-setup-copy">40% done</span></span>
+          <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
+        </a>
+        <span class="sidebar-setup-next"><strong>Next</strong> • <a class="sidebar-setup-next-link" data-sidebar-next-action href="procure-trial-items.html?tour=1"><span>Build market list</span></a></span>
+      </div>
+    </div>
+    <button class="intercom-launcher" type="button" aria-label="Open chat support"></button>
+  </aside>
+
+  <main class="main">
+    <section class="create-header">
+      <a class="back-link" data-back-items href="procure-trial-items.html">&lt; <span data-supplier-name>Test Supplier</span></a>
+      <h1 class="create-title">Create SKU</h1>
+    </section>
+
+    <div class="create-content">
+      <div class="yellow-banner">
+        <b>Use this to create SKUs that are not yet available on the <span class="green">supplier's catalogue</span>.</b><br>
+        Data entered here may change when verified by Zeemart using digitised invoices.
+      </div>
+
+      <form class="form-wrap" data-create-form>
+        <div class="field" data-field-name>
+          <label for="skuName">SKU name</label>
+          <input id="skuName" data-sku-name type="text" maxlength="75" placeholder="Enter SKU name" />
+          <p class="field-help"><span class="char-count" data-char-count>0</span>/75 characters - Product name to appear in Purchase Orders sent to your suppliers</p>
+        </div>
+
+        <div class="form-row" data-field-codes>
+          <div class="field">
+            <label for="supplierCode">Supplier product code (optional)</label>
+            <input id="supplierCode" data-supplier-code type="text" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label for="myCode">My product code (optional)</label>
+            <input id="myCode" type="text" placeholder="Optional" />
+          </div>
+        </div>
+
+        <div class="tax-group" data-field-tax>
+          <div class="field-label">Tax/GST/VAT %</div>
+          <label class="radio-row"><span class="radio-dot active" aria-hidden="true"></span><span>Use default rate (9%)</span></label>
+          <label class="radio-row"><span class="radio-dot" aria-hidden="true"></span><span>Enter a different rate (%):</span><input style="width:60px;height:38px;border:1px solid #DCDEE3;border-radius:6px;padding:0 12px;" value="0" disabled></label>
+        </div>
+
+        <div class="compact-row" data-field-commercials>
+          <div class="field">
+            <label for="skuUom">UOM</label>
+            <select id="skuUom" data-sku-uom>
+              <option value="">Select</option>
+              <option value="blk">blk</option>
+              <option value="box">box</option>
+              <option value="ctn">ctn</option>
+              <option value="g">g</option>
+              <option value="kg">kg</option>
+              <option value="ml">ml</option>
+              <option value="pcs">pcs</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="moq">Min. order qty</label>
+            <input id="moq" data-moq type="text" value="1" />
+          </div>
+          <div class="field">
+            <label for="price">Price before tax (S$)</label>
+            <input id="price" data-price type="text" placeholder="0.00" />
+          </div>
+        </div>
+
+        <hr class="section-rule" />
+        <h2 class="section-title">Inventory</h2>
+        <label class="check-row" data-field-inventory-toggle><span class="check-box" data-inventory-check aria-hidden="true">✓</span><input data-add-inventory type="checkbox" hidden> Add to Inventory</label>
+        <div class="inventory-extra is-disabled" data-inventory-extra data-field-inventory-details>
+          <div class="field">
+            <label for="inventoryList">Inventory list</label>
+            <select id="inventoryList">
+              <option>Select</option>
+              <option>Ingredients</option>
+              <option>Uncategorised</option>
+            </select>
+            <p class="field-help">If no list is selected the item will be added to the Uncategorised list.<br>To create a new list, follow the steps in <span style="color:var(--spinach)">this article</span></p>
+          </div>
+          <div class="field" style="width:100px">
+            <label for="inventoryUom">Inventory UOM</label>
+            <select id="inventoryUom" data-inventory-uom>
+              <option>blk</option>
+              <option>box</option>
+              <option>g</option>
+              <option>kg</option>
+            </select>
+          </div>
+          <div class="field" style="width:100px">
+            <label for="inventoryPar">Inventory par</label>
+            <input id="inventoryPar" type="text" />
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<footer class="footer-bar">
+  <button class="cancel-link" data-cancel type="button">Cancel</button>
+  <div class="footer-actions">
+    <button class="save-more" data-save-more type="button" disabled>Save &amp; add another</button>
+    <button class="btn btn-primary" data-save-sku type="button" disabled>Save</button>
+  </div>
+</footer>
+
+<div class="tour-overlay" data-tour hidden>
+  <div class="tour-highlight" data-tour-highlight></div>
+  <section class="tour-card" data-tour-card aria-live="polite">
+    <p class="tour-kicker" data-tour-kicker>Step 6 of 11</p>
+    <h2 class="tour-title" data-tour-title>Name the item</h2>
+    <p class="tour-copy" data-tour-copy>Use the name your team will recognise when they search, order, or check stock.</p>
+    <div class="tour-actions">
+      <button class="tour-dismiss" data-tour-dismiss type="button">Dismiss</button>
+      <div class="tour-nav">
+        <button class="tour-step-btn" data-tour-prev type="button">Prev</button>
+        <button class="tour-step-btn" data-tour-next type="button">Next</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var userName = params.get('userName') || '';
+    var supplierName = params.get('selectedSupplier') || params.get('supplierName') || 'Test Supplier';
+    var userNameNode = document.querySelector('[data-user-name]');
+    var avatarNode = document.querySelector('[data-avatar]');
+    var supplierNodes = document.querySelectorAll('[data-supplier-name]');
+    var skuName = document.querySelector('[data-sku-name]');
+    var supplierCode = document.querySelector('[data-supplier-code]');
+    var skuUom = document.querySelector('[data-sku-uom]');
+    var moq = document.querySelector('[data-moq]');
+    var price = document.querySelector('[data-price]');
+    var charCount = document.querySelector('[data-char-count]');
+    var addInventory = document.querySelector('[data-add-inventory]');
+    var inventoryCheck = document.querySelector('[data-inventory-check]');
+    var inventoryExtra = document.querySelector('[data-inventory-extra]');
+    var inventoryUom = document.querySelector('[data-inventory-uom]');
+    var save = document.querySelector('[data-save-sku]');
+    var saveMore = document.querySelector('[data-save-more]');
+    var tour = document.querySelector('[data-tour]');
+    var tourHighlight = document.querySelector('[data-tour-highlight]');
+    var tourCard = document.querySelector('[data-tour-card]');
+    var tourDismiss = document.querySelector('[data-tour-dismiss]');
+    var tourPrev = document.querySelector('[data-tour-prev]');
+    var tourNext = document.querySelector('[data-tour-next]');
+    var tourKicker = document.querySelector('[data-tour-kicker]');
+    var tourTitle = document.querySelector('[data-tour-title]');
+    var tourCopy = document.querySelector('[data-tour-copy]');
+    var currentTourStep = 'name';
+    var tourOrder = ['name', 'codes', 'commercials', 'inventoryToggle', 'inventoryDetails', 'save'];
+    var tourSteps = {
+      marketStart: {
+        target: '[data-nav-items]',
+        kicker: 'Step 1 of 11',
+        title: 'Start from Items',
+        copy: 'Add the items your team orders most. Start from Items in the sidebar.'
+      },
+      name: {
+        target: '[data-field-name]',
+        kicker: 'Step 6 of 11',
+        title: 'Name the item',
+        copy: 'Use the name your team will recognise when they search, order, or check stock.'
+      },
+      codes: {
+        target: '[data-field-codes]',
+        kicker: 'Step 7 of 11',
+        title: 'Add product codes if you have them',
+        copy: 'Codes are optional, but useful when your supplier uses their own item reference on invoices or catalogues.',
+        placement: 'below'
+      },
+      commercials: {
+        target: '[data-field-commercials]',
+        kicker: 'Step 8 of 11',
+        title: 'Set how you buy it',
+        copy: 'Add the buying unit, minimum quantity, and price so future orders start with the right details.',
+        placement: 'below'
+      },
+      inventoryToggle: {
+        target: '[data-field-inventory-toggle]',
+        kicker: 'Step 9 of 11',
+        title: 'Track it in inventory too',
+        copy: 'Turn this on if your team should count this item during stocktake. You can skip it for items you only order.',
+        placement: 'right'
+      },
+      inventoryDetails: {
+        target: '[data-field-inventory-details]',
+        kicker: 'Step 10 of 11',
+        title: 'Choose how stock is counted',
+        copy: 'Pick the inventory list, counting unit, and par level your team should aim to keep on hand.',
+        placement: 'below'
+      },
+      save: {
+        target: '[data-save-sku]',
+        kicker: 'Step 11 of 11',
+        title: 'Save your item',
+        copy: 'Save it to your market list. We’ll show what changed and guide you back to the setup checklist.'
+      }
+    };
+
+    function initialsFromName(name) {
+      var parts = name.trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return 'TR';
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function withParams(file, extras) {
+      var nextParams = new URLSearchParams();
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName'].forEach(function(key) {
+        var value = params.get(key);
+        if (value) nextParams.set(key, value);
+      });
+      Object.keys(extras || {}).forEach(function(key) {
+        var value = extras[key];
+        if (value !== null && value !== undefined && value !== '') nextParams.set(key, value);
+      });
+      var query = nextParams.toString();
+      return file + (query ? '?' + query : '');
+    }
+
+    function syncLinks() {
+      document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
+        link.href = withParams('Procure%20Trial%20Dashboard.html');
+      });
+      document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
+        link.href = withParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
+      });
+      document.querySelectorAll('[data-nav-items], [data-back-items], [data-cancel], [data-sidebar-next-action]').forEach(function(link) {
+        link.href = withParams('procure-trial-items.html', { supplierAdded: '1', tour: '1' });
+      });
+      document.querySelectorAll('[data-nav-outlets]').forEach(function(link) {
+        link.href = withParams('procure-trial-outlet-suppliers.html');
+      });
+    }
+
+    function ready() {
+      return !!(skuName && skuName.value.trim() && skuUom && skuUom.value && moq && moq.value.trim() && price && price.value.trim());
+    }
+
+    function updateState() {
+      if (charCount && skuName) charCount.textContent = skuName.value.length;
+      var isReady = ready();
+      if (save) save.disabled = !isReady;
+      if (saveMore) saveMore.disabled = !isReady;
+      if (tourNext) tourNext.disabled = currentTourStep === 'commercials' && !isReady;
+    }
+
+    function fillDemoValues() {
+      if (skuName && !skuName.value) skuName.value = 'dqwewqe';
+      if (supplierCode && !supplierCode.value) supplierCode.value = 'wqewqe';
+      if (skuUom && !skuUom.value) skuUom.value = 'blk';
+      if (moq && !moq.value) moq.value = '1';
+      if (price && !price.value) price.value = '2.00';
+      updateState();
+    }
+
+    function toggleInventory(forceOn) {
+      var on = typeof forceOn === 'boolean' ? forceOn : !(addInventory && addInventory.checked);
+      if (addInventory) addInventory.checked = on;
+      if (inventoryCheck) inventoryCheck.classList.toggle('active', on);
+      if (inventoryExtra) inventoryExtra.classList.toggle('is-disabled', !on);
+      if (inventoryExtra) {
+        inventoryExtra.querySelectorAll('select, input').forEach(function(field) {
+          field.disabled = !on;
+        });
+      }
+      if (inventoryUom && skuUom && skuUom.value) inventoryUom.value = skuUom.value;
+      setTimeout(placeTour, 80);
+    }
+
+    function saveSku() {
+      if (!ready()) return;
+      window.location.href = withParams('procure-trial-items.html', {
+        supplierAdded: '1',
+        marketListBuilt: '1',
+        createdSku: skuName.value.trim(),
+        createdSupplier: supplierName,
+        createdUom: skuUom.value,
+        createdPrice: price.value.trim()
+      });
+    }
+
+    function placeTour() {
+      if (!tour || tour.hidden) return;
+      var step = tourSteps[currentTourStep] || tourSteps.name;
+      var target = document.querySelector(step.target);
+      if (!target) return;
+      var rect = target.getBoundingClientRect();
+      var pad = 10;
+      tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
+      tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
+      tourHighlight.style.width = (rect.width + pad * 2) + 'px';
+      tourHighlight.style.height = (rect.height + pad * 2) + 'px';
+      tourCard.classList.remove('left', 'below');
+      var cardWidth = Math.min(380, window.innerWidth - 32);
+      var cardLeft = rect.right + 34;
+      var cardTop = rect.top - 28;
+      if (step.placement === 'below') {
+        cardLeft = Math.max(16, Math.min(rect.left, window.innerWidth - cardWidth - 16));
+        cardTop = Math.min(window.innerHeight - 220, rect.bottom + 24);
+        tourCard.classList.add('below');
+      }
+      if (step.placement === 'right') {
+        cardLeft = Math.min(window.innerWidth - cardWidth - 16, rect.right + 28);
+        cardTop = Math.max(16, Math.min(rect.top - 90, window.innerHeight - 260));
+      }
+      if (cardLeft + cardWidth > window.innerWidth - 16) {
+        cardLeft = Math.max(16, rect.left - cardWidth - 34);
+        tourCard.classList.add('left');
+      }
+      if (cardTop + 260 > window.innerHeight - 16) cardTop = Math.max(16, window.innerHeight - 260);
+      if (cardTop < 16) cardTop = 16;
+      tourCard.style.left = cardLeft + 'px';
+      tourCard.style.top = cardTop + 'px';
+    }
+
+    function setTourStep(stepName, shouldScroll) {
+      currentTourStep = stepName;
+      var step = tourSteps[currentTourStep] || tourSteps.name;
+      if (tourKicker) tourKicker.textContent = step.kicker;
+      if (tourTitle) tourTitle.textContent = step.title;
+      if (tourCopy) tourCopy.textContent = step.copy;
+      var target = document.querySelector(step.target);
+      if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var index = tourOrder.indexOf(currentTourStep);
+      var isMarketStart = currentTourStep === 'marketStart';
+      if (tourPrev) {
+        tourPrev.hidden = isMarketStart;
+        tourPrev.disabled = index <= 0;
+      }
+      if (tourNext) {
+        tourNext.hidden = isMarketStart;
+        tourNext.disabled = currentTourStep === 'save' || (currentTourStep === 'commercials' && !ready());
+      }
+      setTimeout(placeTour, shouldScroll ? 240 : 40);
+    }
+
+    function openTour() {
+      if (!tour) return;
+      tour.hidden = false;
+      setTourStep('name', false);
+    }
+
+    function closeTour() {
+      if (tour) tour.hidden = true;
+    }
+
+    function startMarketListTourHere() {
+      document.querySelectorAll('[data-nav-items]').forEach(function(link) {
+        link.href = withParams('procure-trial-items.html', { supplierAdded: '1', tour: '1' });
+      });
+      if (!tour) return;
+      tour.hidden = false;
+      setTourStep('marketStart', false);
+    }
+
+    function goTour(delta) {
+      var index = tourOrder.indexOf(currentTourStep);
+      if (index < 0) index = 0;
+      if (delta > 0 && currentTourStep === 'codes') fillDemoValues();
+      if (delta > 0 && currentTourStep === 'inventoryToggle') toggleInventory(true);
+      var nextIndex = Math.max(0, Math.min(tourOrder.length - 1, index + delta));
+      setTourStep(tourOrder[nextIndex], true);
+    }
+
+    if (userName && userNameNode) {
+      userNameNode.textContent = userName;
+      if (avatarNode) avatarNode.textContent = initialsFromName(userName);
+    }
+    supplierNodes.forEach(function(node) { node.textContent = supplierName; });
+    syncLinks();
+    toggleInventory(false);
+    [skuName, supplierCode, skuUom, moq, price].forEach(function(field) {
+      if (!field) return;
+      field.addEventListener('input', updateState);
+      field.addEventListener('change', updateState);
+      field.addEventListener('focus', placeTour);
+    });
+    if (skuUom) skuUom.addEventListener('change', function() {
+      if (skuUom.value === 'kg' || skuUom.value === 'g') moq.value = '0';
+      if (inventoryUom && skuUom.value) inventoryUom.value = skuUom.value;
+      updateState();
+    });
+    var inventoryToggle = document.querySelector('[data-field-inventory-toggle]');
+    if (inventoryToggle) inventoryToggle.addEventListener('click', function(event) {
+      event.preventDefault();
+      toggleInventory();
+      if (tour && !tour.hidden && currentTourStep === 'inventoryToggle') setTourStep('inventoryDetails', true);
+    });
+    if (save) save.addEventListener('click', saveSku);
+    if (saveMore) saveMore.addEventListener('click', saveSku);
+    var cancel = document.querySelector('[data-cancel]');
+    if (cancel) cancel.addEventListener('click', function() {
+      window.location.href = withParams('procure-trial-items.html', { supplierAdded: '1', tour: '1' });
+    });
+    if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
+    if (tourPrev) tourPrev.addEventListener('click', function() { goTour(-1); });
+    if (tourNext) tourNext.addEventListener('click', function() { goTour(1); });
+    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
+      link.addEventListener('click', function(event) {
+        event.preventDefault();
+        startMarketListTourHere();
+      });
+    });
+    window.addEventListener('resize', placeTour);
+    window.addEventListener('scroll', placeTour, { passive: true });
+    updateState();
+    if (params.has('tour')) openTour();
+  })();
+</script>
+</body>
+</html>

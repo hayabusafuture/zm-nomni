@@ -1442,9 +1442,9 @@
 <div class="tour-overlay" data-dashboard-tour hidden>
   <div class="tour-highlight" data-tour-highlight></div>
   <section class="tour-card" data-tour-card aria-live="polite">
-    <p class="tour-kicker">Step 1 of 5</p>
-    <h2 class="tour-title">Start from Outlets</h2>
-    <p class="tour-copy">Supplier setup starts in Outlets. Click Outlets in the sidenav to continue.</p>
+    <p class="tour-kicker" data-dashboard-tour-kicker>Step 1 of 8</p>
+    <h2 class="tour-title" data-dashboard-tour-title>Start from Outlets</h2>
+    <p class="tour-copy" data-dashboard-tour-copy>Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.</p>
     <button class="tour-dismiss" data-tour-dismiss type="button">Dismiss</button>
   </section>
 </div>
@@ -1456,6 +1456,7 @@
     var venueName = params.get('venueName') || '';
     var primaryGoal = params.get('primaryGoal') || 'Order faster';
     var supplierAdded = params.get('supplierAdded') === '1';
+    var marketListBuilt = params.get('marketListBuilt') === '1';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
     var setupTitleNode = document.querySelector('[data-setup-title]');
@@ -1466,6 +1467,7 @@
     var sidebarNextStep = document.querySelector('[data-sidebar-next-step]');
     var sidebarNextAction = document.querySelector('[data-sidebar-next-action]');
     var outletsNavLink = document.querySelector('[data-nav-outlets]');
+    var itemsNavLink = document.querySelector('[data-nav-items]');
     var onboardingView = document.querySelector('[data-onboarding-view]');
     var mainNode = document.querySelector('.main');
     var dashboardView = document.querySelector('[data-dashboard-view]');
@@ -1475,7 +1477,11 @@
     var tourHighlight = document.querySelector('[data-tour-highlight]');
     var tourCard = document.querySelector('[data-tour-card]');
     var tourDismiss = document.querySelector('[data-tour-dismiss]');
+    var dashboardTourKicker = document.querySelector('[data-dashboard-tour-kicker]');
+    var dashboardTourTitle = document.querySelector('[data-dashboard-tour-title]');
+    var dashboardTourCopy = document.querySelector('[data-dashboard-tour-copy]');
     var setupDismissedKey = 'nomniProcureSetupDismissed';
+    var dashboardTourMode = 'supplier';
     var taskCatalog = {
       account: {
         title: 'Create account',
@@ -1544,6 +1550,9 @@
     if (supplierAdded) {
       taskCatalog.supplier.completed = true;
     }
+    if (marketListBuilt) {
+      taskCatalog.market.completed = true;
+    }
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -1598,7 +1607,12 @@
         var link = document.createElement('a');
         link.className = 'btn btn-secondary';
         if (taskKey === 'supplier') link.setAttribute('data-supplier-setup-link', '');
-        link.href = preserveParams(task.ctaHref, taskKey === 'supplier' ? { tour: '2' } : {});
+        if (taskKey === 'market') link.setAttribute('data-market-setup-link', '');
+        link.href = taskKey === 'supplier'
+          ? preserveParams(task.ctaHref, { tour: '2' })
+          : taskKey === 'market'
+            ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
+            : preserveParams(task.ctaHref, {});
         link.textContent = task.cta;
         row.appendChild(link);
       } else if (isCurrent) {
@@ -1651,7 +1665,9 @@
       if (sidebarNextAction) {
         sidebarNextAction.href = currentTaskKey === 'supplier'
           ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
-          : preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
+          : currentTaskKey === 'market'
+            ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
+            : preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
       }
 
       if (checklistNode) {
@@ -1729,7 +1745,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1770,16 +1786,34 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
       return 'procure-trial-outlet-suppliers.html?' + nextParams.toString();
     }
 
+    function marketSetupUrl() {
+      return preserveParams('procure-trial-items.html', { tour: '1' });
+    }
+
+    function setDashboardTourMode(mode) {
+      dashboardTourMode = mode === 'market' ? 'market' : 'supplier';
+      if (dashboardTourKicker) dashboardTourKicker.textContent = dashboardTourMode === 'market' ? 'Step 1 of 11' : 'Step 1 of 8';
+      if (dashboardTourTitle) dashboardTourTitle.textContent = dashboardTourMode === 'market' ? 'Start from Items' : 'Start from Outlets';
+      if (dashboardTourCopy) {
+        dashboardTourCopy.textContent = dashboardTourMode === 'market'
+          ? 'Add the items your team orders most. Start from Items in the sidebar.'
+          : 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
+      }
+      if (itemsNavLink) itemsNavLink.href = dashboardTourMode === 'market' ? marketSetupUrl() : preserveParams('procure-trial-items.html');
+      if (outletsNavLink) outletsNavLink.href = supplierSetupUrl('2');
+    }
+
     function placeDashboardTour() {
-      if (!dashboardTour || dashboardTour.hidden || !outletsNavLink) return;
-      var rect = outletsNavLink.getBoundingClientRect();
+      var target = dashboardTourMode === 'market' ? itemsNavLink : outletsNavLink;
+      if (!dashboardTour || dashboardTour.hidden || !target) return;
+      var rect = target.getBoundingClientRect();
       var pad = 10;
       tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
       tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
@@ -1795,8 +1829,9 @@
       tourCard.style.top = cardTop + 'px';
     }
 
-    function openDashboardTour() {
+    function openDashboardTour(mode) {
       if (!dashboardTour) return;
+      setDashboardTourMode(mode);
       dashboardTour.hidden = false;
       placeDashboardTour();
     }
@@ -1807,19 +1842,33 @@
       supplierSetupLink.href = supplierSetupUrl('2');
       supplierSetupLink.addEventListener('click', function(event) {
         event.preventDefault();
-        openDashboardTour();
+        openDashboardTour('supplier');
+      });
+    }
+    var marketSetupLink = document.querySelector('[data-market-setup-link]');
+    if (marketSetupLink) {
+      marketSetupLink.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' });
+      marketSetupLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        openDashboardTour('market');
       });
     }
     if (sidebarNextAction) {
       sidebarNextAction.addEventListener('click', function(event) {
-        if (!sidebarNextStep || sidebarNextStep.textContent !== taskCatalog.supplier.title) return;
+        if (!sidebarNextStep) return;
+        if (sidebarNextStep.textContent !== taskCatalog.supplier.title && sidebarNextStep.textContent !== taskCatalog.market.title) return;
         event.preventDefault();
         showOnboarding();
-        openDashboardTour();
+        openDashboardTour(sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : 'supplier');
       });
     }
     if (outletsNavLink) {
       outletsNavLink.href = supplierSetupUrl('2');
+    }
+    if (itemsNavLink) {
+      itemsNavLink.addEventListener('click', function() {
+        if (dashboardTourMode === 'market') itemsNavLink.href = marketSetupUrl();
+      });
     }
     syncChromeLinks();
     if (dismissOnboarding) {
@@ -1848,7 +1897,7 @@
       showOnboarding();
     }
     if (params.get('tour') === '1') {
-      openDashboardTour();
+      openDashboardTour(supplierAdded && !marketListBuilt ? 'market' : 'supplier');
     }
     window.addEventListener('resize', placeDashboardTour);
   })();

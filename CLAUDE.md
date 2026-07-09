@@ -583,6 +583,27 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- saved_resource: assets/Items_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Items_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/Items_files/inner.html
+- controller-with-preconnect-e8eb91de374fc143b33ed00a52b61613: assets/Items_files/controller-with-preconnect-e8eb91de374fc143b33ed00a52b61613.html
+- Nomni Procure: assets/Items.html
+- saved_resource: assets/Items-create SKU_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Items-create SKU_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/Items-create SKU_files/inner.html
+- controller-with-preconnect-e8eb91de374fc143b33ed00a52b61613: assets/Items-create SKU_files/controller-with-preconnect-e8eb91de374fc143b33ed00a52b61613.html
+- Nomni Procure: assets/Items-create SKU.html
+- saved_resource: assets/Items-Upload_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Items-Upload_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/Items-Upload_files/inner.html
+- controller-with-preconnect-e8eb91de374fc143b33ed00a52b61613: assets/Items-Upload_files/controller-with-preconnect-e8eb91de374fc143b33ed00a52b61613.html
+- Nomni Procure: assets/Items-Upload.html
+- saved_resource: assets/Items-Select supplier_files/saved_resource.html
+- m-outer-3437aaddcdf6922d623e172c2d6f9278: assets/Items-Select supplier_files/m-outer-3437aaddcdf6922d623e172c2d6f9278.html
+- StripeM-Inner: assets/Items-Select supplier_files/inner.html
+- controller-with-preconnect-e8eb91de374fc143b33ed00a52b61613: assets/Items-Select supplier_files/controller-with-preconnect-e8eb91de374fc143b33ed00a52b61613.html
+- Nomni Procure: assets/Items-Select supplier.html
+- Nomni Procure - Create SKU: Freemium/procure-trial-create-sku.html
 - Nomni Procure — Items: Freemium/procure-trial-items.html
 - Nomni Procure — Supplier Search: Freemium/procure-trial-add-supplier-no-results.html
 - saved_resource: assets/outlet_detail_suppliers_files/saved_resource.html
