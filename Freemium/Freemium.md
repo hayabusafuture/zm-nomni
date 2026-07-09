@@ -97,6 +97,7 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/procure-trial-add-supplier.html` redirects to the split supplier setup entry page for compatibility.
 - `Freemium/procure-trial-items.html` — Items page and guided Add item / Build market list onboarding flow, linked from the `Items` sidenav entry and the checklist's `Add items` CTA.
 - `Freemium/procure-trial-create-sku.html` — full-page manual `Create SKU` form used after selecting a supplier from the Items `Add > Create new` path.
+- `Freemium/procure-trial-orders.html`, `Freemium/procure-trial-inventory.html`, `Freemium/procure-trial-invoices.html` — placeholder pages (empty state only) for the `Place first order` / `Set up inventory` / `Upload first invoice` checklist CTAs.
 
 Generated preview screenshots:
 
@@ -402,6 +403,11 @@ Current role:
     - `Manage inventory`: `Set up inventory`
   - After saving a SKU, the Items page uses the same tour panel style for the completion handoff. It points at the bottom-left `Get started` card and tells users to click that panel to return to the checklist and continue with the next goal-dependent setup action.
   - The `Items` sidenav entry across every trial page (dashboard, outlet suppliers, and all add-supplier pages) links to this Items page instead of `#`.
+  - Checklist unlocking is now driven by an explicit `dependsOn` field per task instead of strict array position. Previously every task after the single "current" task showed as locked (or, for tasks with no assigned lock copy, an inert checkmark + `Next` label) regardless of whether its real prerequisite was actually met. Now each task's own `dependsOn` task must be completed for it to unlock:
+    - `order`, `inventory`, and `invoiceUpload` all depend only on `market` — once the market list is built, all three unlock with real CTA buttons (`Create order`, `Set up inventory`, `Upload invoice`) at the same time, since none of them actually depend on each other.
+    - `invoiceDigitise` depends on `invoiceUpload`, `invoiceExport` depends on `invoiceDigitise`, and `stockCount` depends on `inventory` — these keep their existing chained locks since they have real sequential prerequisites.
+    - The sidebar `Get started` card is unaffected by this and still recommends exactly one next action per the existing strict, goal-dependent order (e.g. `Place first order` for the `Order faster` goal) — the checklist itself just no longer artificially locks/mislabels the other already-unlocked options.
+  - `Freemium/procure-trial-orders.html`, `Freemium/procure-trial-inventory.html`, and `Freemium/procure-trial-invoices.html` are new placeholder pages (same empty-state pattern as the original Items page) that the `Create order`/`Set up inventory`/`Upload invoice` CTAs and their sidenav entries link to. All three are wired into the sidenav (`Orders`, `Inventory`, `Invoices`) across every trial page instead of `#`.
 - Includes help/support links:
   - Navigating Nomni Procure app: `https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app`
   - Nomni Procure help collection: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`
