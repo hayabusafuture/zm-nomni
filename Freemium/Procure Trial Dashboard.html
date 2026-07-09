@@ -207,38 +207,50 @@
     height: 18px;
   }
   .sidebar-setup {
-    padding: 12px 10px 16px;
-    border-top: 1px solid var(--rule);
+    padding: 10px 10px 78px;
   }
-  .sidebar-setup-link {
+  .sidebar-setup-card {
     display: grid;
-    gap: 8px;
-    padding: 12px;
+    gap: 10px;
+    padding: 14px 14px 15px;
     border-radius: 8px;
     background: #fff;
     border: 1px solid rgba(42,200,100,.18);
     color: var(--seaweed);
     box-shadow: 0 8px 20px rgba(10,20,15,.06);
   }
-  .sidebar-setup-link:hover {
+  .sidebar-setup-card:hover {
     background: var(--mint);
+    border-color: rgba(42,200,100,.24);
   }
-  .sidebar-setup-title {
+  .sidebar-setup-main {
+    display: grid;
+    gap: 10px;
+    color: inherit;
+  }
+  .sidebar-setup-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
+  }
+  .sidebar-setup-title {
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
-    font-family: "Hanken Grotesk", system-ui, sans-serif;
     font-size: 13px;
     font-weight: 800;
+    line-height: 1.2;
   }
-  .sidebar-setup-title::after {
+  .sidebar-setup-row::after {
     content: "↗";
     color: var(--spinach);
     font-size: 13px;
+    line-height: 1;
+    flex-shrink: 0;
   }
   .sidebar-setup-progress {
-    height: 8px;
+    height: 9px;
     border-radius: 999px;
     background: #E7E8EC;
     overflow: hidden;
@@ -251,10 +263,72 @@
     background: var(--nomni-green);
   }
   .sidebar-setup-copy {
+    margin-left: auto;
     color: #687080;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+  }
+  .sidebar-setup-next {
+    color: #687080;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+    padding-top: 1px;
+  }
+  .sidebar-setup-next strong {
+    color: var(--spinach);
+    font-weight: 800;
+  }
+  .sidebar-setup-next-link {
+    display: inline-flex;
+    color: inherit;
+    border-radius: 4px;
+    transition: color .16s ease, transform .16s ease;
+  }
+  .sidebar-setup-next-link:hover {
+    color: var(--seaweed);
+    transform: translateX(2px);
+  }
+  .sidebar-setup-next {
+    transition: color .16s ease;
+  }
+  .intercom-launcher {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    min-width: 48px;
+    min-height: 48px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    font: inherit;
+    line-height: 0;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #6C4DF2;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(108,77,242,.4);
+    cursor: pointer;
+  }
+  .intercom-launcher svg { display: none; }
+  .intercom-launcher::before {
+    content: "";
+    width: 28px;
+    height: 23px;
+    display: block;
+    background: #fff;
+    border-radius: 5px;
+    clip-path: polygon(0 0, 100% 0, 100% 76%, 63% 76%, 45% 100%, 45% 76%, 0 76%);
+  }
+  .intercom-launcher:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 24px rgba(108,77,242,.42);
   }
   .main {
     grid-column: 2;
@@ -1071,13 +1145,16 @@
   }
   .tour-dismiss {
     min-height: 40px;
-    border: 0;
-    background: transparent;
-    color: #98A0AE;
+    border: 1px solid #E1E4EA;
+    border-radius: 6px;
+    padding: 0 14px;
+    background: #F3F4F6;
+    color: #687080;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
   }
+  .tour-dismiss:hover { background: #E6E8EC; color: var(--ink); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -1164,12 +1241,20 @@
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
     </nav>
     <div class="sidebar-setup">
-      <a class="sidebar-setup-link" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
-        <span class="sidebar-setup-title">Get started</span>
-        <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
-        <span class="sidebar-setup-copy">20% done</span>
-      </a>
+      <div class="sidebar-setup-card" data-sidebar-setup-card>
+        <a class="sidebar-setup-main" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
+          <span class="sidebar-setup-row"><span class="sidebar-setup-title">Get started</span><span class="sidebar-setup-copy">20% done</span></span>
+          <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
+        </a>
+        <span class="sidebar-setup-next"><strong>Next</strong> • <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span data-sidebar-next-step>Add first supplier</span></a></span>
+      </div>
     </div>
+    <button class="intercom-launcher" type="button" aria-label="Open chat support">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M5.5 6.5A2.5 2.5 0 0 1 8 4h8a2.5 2.5 0 0 1 2.5 2.5v6A2.5 2.5 0 0 1 16 15H9.25L5.8 18.13A.75.75 0 0 1 4.55 17.5V6.5h.95Zm2.5-1A1 1 0 0 0 7 6.5v8.74l1.46-1.32a.75.75 0 0 1 .5-.19H16a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H8Z"/>
+        <path fill="currentColor" d="M8.7 8.7h6.6v1.4H8.7V8.7Zm0 2.8h4.8v1.4H8.7v-1.4Z"/>
+      </svg>
+    </button>
   </aside>
 
   <main class="main">
@@ -1376,6 +1461,7 @@
     var firstName = params.get('firstName') || '';
     var venueName = params.get('venueName') || '';
     var primaryGoal = params.get('primaryGoal') || 'Order faster';
+    var supplierAdded = params.get('supplierAdded') === '1';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
     var setupTitleNode = document.querySelector('[data-setup-title]');
@@ -1383,6 +1469,8 @@
     var checklistNode = document.querySelector('[data-checklist]');
     var extraChecklistNode = document.querySelector('[data-extra-checklist]');
     var progressStat = document.querySelector('[data-progress-stat]');
+    var sidebarNextStep = document.querySelector('[data-sidebar-next-step]');
+    var sidebarNextAction = document.querySelector('[data-sidebar-next-action]');
     var outletsNavLink = document.querySelector('[data-nav-outlets]');
     var onboardingView = document.querySelector('[data-onboarding-view]');
     var mainNode = document.querySelector('.main');
@@ -1457,6 +1545,9 @@
       'Manage inventory': ['supplier', 'market', 'inventory', 'stockCount']
     };
     var extraTaskOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'inventory', 'stockCount'];
+    if (supplierAdded) {
+      taskCatalog.supplier.completed = true;
+    }
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -1469,10 +1560,10 @@
       return goalChecklist[goal] ? goal : 'Order faster';
     }
 
-    function createTask(taskKey, index, counted) {
+    function createTask(taskKey, index, counted, currentTaskKey) {
       var task = taskCatalog[taskKey];
       var isCompleted = Boolean(task.completed && counted);
-      var isCurrent = counted && !isCompleted && taskKey === 'supplier';
+      var isCurrent = counted && !isCompleted && taskKey === currentTaskKey;
       var row = document.createElement('div');
       row.className = 'task' + (isCompleted ? ' completed' : ' pending') + (isCurrent ? ' current' : '') + (!isCompleted && !isCurrent ? ' locked' : '') + (counted ? '' : ' optional');
       if (!isCompleted && !isCurrent) row.setAttribute('aria-disabled', 'true');
@@ -1513,6 +1604,11 @@
         link.href = 'procure-trial-outlet-suppliers.html?tour=2';
         link.textContent = task.cta;
         row.appendChild(link);
+      } else if (isCurrent) {
+        var nextStatus = document.createElement('span');
+        nextStatus.className = 'task-status';
+        nextStatus.textContent = 'Next';
+        row.appendChild(nextStatus);
       } else {
         var lock = document.createElement('span');
         lock.className = 'task-lock';
@@ -1526,6 +1622,14 @@
     function renderChecklist() {
       var selectedGoal = normaliseGoal(primaryGoal);
       var countedTasks = ['account'].concat(goalChecklist[selectedGoal]);
+      var completedCount = countedTasks.filter(function(taskKey) {
+        return taskCatalog[taskKey].completed;
+      }).length;
+      var progressValue = Math.round((completedCount / countedTasks.length) * 100);
+      var progressLabelText = progressValue + '% done';
+      var currentTaskKey = countedTasks.find(function(taskKey) {
+        return !taskCatalog[taskKey].completed;
+      });
       var extraTasks = extraTaskOrder.filter(function(key) {
         return countedTasks.indexOf(key) === -1;
       });
@@ -1533,29 +1637,37 @@
       if (progressStat) {
         var progressRing = progressStat.querySelector('.progress-ring');
         var progressLabel = progressStat.querySelector('span:last-child');
-        if (progressLabel) progressLabel.textContent = '20% done';
-        progressStat.style.setProperty('--progress-value', '20%');
-        if (progressRing) progressRing.style.setProperty('--progress-value', '20%');
-        progressStat.setAttribute('aria-label', '20% done');
+        if (progressLabel) progressLabel.textContent = progressLabelText;
+        progressStat.style.setProperty('--progress-value', progressValue + '%');
+        if (progressRing) progressRing.style.setProperty('--progress-value', progressValue + '%');
+        progressStat.setAttribute('aria-label', progressLabelText);
       }
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) {
-        node.style.width = '20%';
+        node.style.width = progressValue + '%';
       });
       document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) {
-        node.textContent = '20% done';
+        node.textContent = progressLabelText;
       });
+      if (sidebarNextStep) {
+        sidebarNextStep.textContent = currentTaskKey ? taskCatalog[currentTaskKey].title : 'Setup complete';
+      }
+      if (sidebarNextAction) {
+        sidebarNextAction.href = currentTaskKey === 'supplier'
+          ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
+          : preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
+      }
 
       if (checklistNode) {
         checklistNode.innerHTML = '';
         countedTasks.forEach(function(taskKey, index) {
-          checklistNode.appendChild(createTask(taskKey, index, true));
+          checklistNode.appendChild(createTask(taskKey, index, true, currentTaskKey));
         });
       }
 
       if (extraChecklistNode) {
         extraChecklistNode.innerHTML = '';
         extraTasks.forEach(function(taskKey, index) {
-          extraChecklistNode.appendChild(createTask(taskKey, index, false));
+          extraChecklistNode.appendChild(createTask(taskKey, index, false, currentTaskKey));
         });
       }
 
@@ -1620,7 +1732,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1658,7 +1770,7 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName', 'primaryGoal'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1698,6 +1810,14 @@
         openDashboardTour();
       });
     }
+    if (sidebarNextAction) {
+      sidebarNextAction.addEventListener('click', function(event) {
+        if (!sidebarNextStep || sidebarNextStep.textContent !== taskCatalog.supplier.title) return;
+        event.preventDefault();
+        showOnboarding();
+        openDashboardTour();
+      });
+    }
     if (outletsNavLink) {
       outletsNavLink.href = supplierSetupUrl('2');
     }
@@ -1717,7 +1837,7 @@
         dashboardTour.hidden = true;
       });
     }
-    var forceSetup = params.get('setup') === '1';
+    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1';
     var setupDismissed = false;
     try {
       setupDismissed = window.localStorage.getItem(setupDismissedKey) === '1';
@@ -1726,6 +1846,9 @@
       showDashboard();
     } else {
       showOnboarding();
+    }
+    if (params.get('tour') === '1') {
+      openDashboardTour();
     }
     window.addEventListener('resize', placeDashboardTour);
   })();

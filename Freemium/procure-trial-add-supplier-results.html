@@ -194,35 +194,50 @@
   }
 
   .sidebar-setup {
-    padding: 12px 10px 16px;
-    border-top: 1px solid var(--rule);
+    padding: 10px 10px 78px;
   }
-  .sidebar-setup-link {
+  .sidebar-setup-card {
     display: grid;
-    gap: 8px;
-    padding: 12px;
+    gap: 10px;
+    padding: 14px 14px 15px;
     border-radius: 8px;
     background: #fff;
     border: 1px solid rgba(42,200,100,.18);
     color: var(--seaweed);
     box-shadow: 0 8px 20px rgba(10,20,15,.06);
   }
-  .sidebar-setup-link:hover { background: var(--mint); }
-  .sidebar-setup-title {
+  .sidebar-setup-card:hover {
+    background: var(--mint);
+    border-color: rgba(42,200,100,.24);
+  }
+  .sidebar-setup-main {
+    display: grid;
+    gap: 10px;
+    color: inherit;
+  }
+  .sidebar-setup-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
+  }
+  .sidebar-setup-title {
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
     font-size: 13px;
     font-weight: 800;
+    line-height: 1.2;
   }
-  .sidebar-setup-title::after {
+  .sidebar-setup-row::after {
     content: "↗";
     color: var(--spinach);
     font-size: 13px;
+    line-height: 1;
+    flex-shrink: 0;
   }
   .sidebar-setup-progress {
-    height: 8px;
+    height: 9px;
     border-radius: 999px;
     background: #E7E8EC;
     overflow: hidden;
@@ -235,9 +250,72 @@
     background: var(--nomni-green);
   }
   .sidebar-setup-copy {
+    margin-left: auto;
+    color: #687080;
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .sidebar-setup-next {
     color: #687080;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    line-height: 1.35;
+    padding-top: 1px;
+  }
+  .sidebar-setup-next strong {
+    color: var(--spinach);
+    font-weight: 800;
+  }
+  .sidebar-setup-next-link {
+    display: inline-flex;
+    color: inherit;
+    border-radius: 4px;
+    transition: color .16s ease, transform .16s ease;
+  }
+  .sidebar-setup-next-link:hover {
+    color: var(--seaweed);
+    transform: translateX(2px);
+  }
+  .sidebar-setup-next {
+    transition: color .16s ease;
+  }
+  .intercom-launcher {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    min-width: 48px;
+    min-height: 48px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    font: inherit;
+    line-height: 0;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #6C4DF2;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(108,77,242,.4);
+    cursor: pointer;
+  }
+  .intercom-launcher svg { display: none; }
+  .intercom-launcher::before {
+    content: "";
+    width: 28px;
+    height: 23px;
+    display: block;
+    background: #fff;
+    border-radius: 5px;
+    clip-path: polygon(0 0, 100% 0, 100% 76%, 63% 76%, 45% 100%, 45% 76%, 0 76%);
+  }
+  .intercom-launcher:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 24px rgba(108,77,242,.42);
   }
 
   .main {
@@ -703,13 +781,16 @@
   }
   .tour-dismiss {
     min-height: 40px;
-    border: 0;
-    background: transparent;
-    color: #98A0AE;
+    border: 1px solid #E1E4EA;
+    border-radius: 6px;
+    padding: 0 14px;
+    background: #F3F4F6;
+    color: #687080;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
   }
+  .tour-dismiss:hover { background: #E6E8EC; color: var(--ink); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -779,12 +860,20 @@
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
     </nav>
     <div class="sidebar-setup">
-      <a class="sidebar-setup-link" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
-        <span class="sidebar-setup-title">Setup guide</span>
-        <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
-        <span class="sidebar-setup-copy">4 steps left</span>
-      </a>
+      <div class="sidebar-setup-card" data-sidebar-setup-card>
+        <a class="sidebar-setup-main" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
+          <span class="sidebar-setup-row"><span class="sidebar-setup-title">Get started</span><span class="sidebar-setup-copy">20% done</span></span>
+          <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
+        </a>
+        <span class="sidebar-setup-next"><strong>Next</strong> • <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
+      </div>
     </div>
+    <button class="intercom-launcher" type="button" aria-label="Open chat support">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M5.5 6.5A2.5 2.5 0 0 1 8 4h8a2.5 2.5 0 0 1 2.5 2.5v6A2.5 2.5 0 0 1 16 15H9.25L5.8 18.13A.75.75 0 0 1 4.55 17.5V6.5h.95Zm2.5-1A1 1 0 0 0 7 6.5v8.74l1.46-1.32a.75.75 0 0 1 .5-.19H16a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H8Z"/>
+        <path fill="currentColor" d="M8.7 8.7h6.6v1.4H8.7V8.7Zm0 2.8h4.8v1.4H8.7v-1.4Z"/>
+      </svg>
+    </button>
   </aside>
 
   <main class="main">
@@ -896,6 +985,10 @@
     var tourHighlight = document.querySelector('[data-tour-highlight]');
     var tourCard = document.querySelector('[data-tour-card]');
     var tourDismiss = document.querySelector('[data-tour-dismiss]');
+    var tourKicker = document.querySelector('.tour-kicker');
+    var tourTitle = document.querySelector('.tour-title');
+    var tourCopy = document.querySelector('.tour-copy');
+    var outletsNavLink = document.querySelector('[data-nav-outlets]');
     var tourStep = { target: '[data-add-supplier-result]' };
 
     function initialsFromName(name) {
@@ -905,13 +998,18 @@
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-    function withParams(file, step) {
+    function withParams(file, step, extras) {
       var nextParams = new URLSearchParams();
       if (step) nextParams.set('tour', step);
-      ['userName', 'firstName', 'venueName'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierAdded'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
+      if (extras) {
+        Object.keys(extras).forEach(function(key) {
+          if (extras[key]) nextParams.set(key, extras[key]);
+        });
+      }
       var query = nextParams.toString();
       return file + (query ? '?' + query : '');
     }
@@ -933,6 +1031,14 @@
     document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
       link.href = dashboardUrl(true);
     });
+    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
+      link.href = withParams('Procure%20Trial%20Dashboard.html', '1');
+      link.addEventListener('click', function(event) {
+        event.preventDefault();
+        startSupplierTourHere();
+      });
+    });
+    if (outletsNavLink) outletsNavLink.href = withParams('procure-trial-outlet-suppliers.html', '2');
 
     function placeTour() {
       if (!tour || tour.hidden) return;
@@ -980,6 +1086,14 @@
       document.body.classList.remove('tour-open');
     }
 
+    function startSupplierTourHere() {
+      tourStep = { target: '[data-nav-outlets]' };
+      if (tourKicker) tourKicker.textContent = 'Step 1 of 5';
+      if (tourTitle) tourTitle.textContent = 'Start from Outlets';
+      if (tourCopy) tourCopy.textContent = 'Supplier setup starts in Outlets. Click Outlets in the sidenav to continue.';
+      openTour();
+    }
+
     if (userName && userNameNode) {
       userNameNode.textContent = userName;
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
@@ -990,8 +1104,23 @@
       link.href = withParams('procure-trial-outlet-suppliers.html', '2');
     });
 
+    document.querySelectorAll('[data-search-form]').forEach(function(form) {
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var search = document.querySelector('[data-supplier-search]');
+        var query = (search && search.value ? search.value : '').trim();
+        if (!query) return;
+        var hasDemoResults = query === '23';
+        var nextFile = hasDemoResults ? 'procure-trial-add-supplier-results.html' : 'procure-trial-add-supplier-no-results.html';
+        window.location.href = withParams(nextFile, '4', { supplierQuery: query });
+      });
+    });
     document.querySelectorAll('[data-add-supplier-result]').forEach(function(button) {
-      button.addEventListener('click', function() { window.location.href = withParams('procure-trial-add-supplier-settings.html', '5'); });
+      button.addEventListener('click', function() {
+        window.location.href = withParams('procure-trial-add-supplier-settings.html', '5', {
+          supplierName: 'KPP Pte Ltd'
+        });
+      });
     });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
     window.addEventListener('resize', placeTour);

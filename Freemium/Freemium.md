@@ -155,9 +155,23 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - `Manage inventory`: Add first supplier, Build market list, Set up inventory, Complete first stock count.
   - Add first supplier and Build market list are mandatory prerequisites before later setup options unlock.
   - Other useful setup actions remain visible in a collapsed `More setup options` section, but do not count toward onboarding progress.
-  - The sidebar setup entry is labelled `Get started` and shows `20% done`.
+  - The sidebar setup entry is a white elevated card below the nav list, leaving the lower-left corner free for the Intercom launcher. It uses relaxed internal spacing and shows `Get started` and `20% done` on the same row, followed by a small progress bar and `Next • Add first supplier`, with `Next` highlighted in green.
+  - The same sidebar setup card appears throughout the supplier onboarding pages. The card body returns to the onboarding dashboard, while only the next action name starts the guided action. For the current prototype, clicking `Add first supplier` keeps the user on the current page and opens Step 1 of the supplier tour in place, pointing at the Outlets nav item. Clicking Outlets then continues to the supplier setup flow.
   - Checklist rows use full-colour task icons from `Freemium/assets/icons/*.svg`.
   - The checklist panel uses a compact header: `Get started with just a few steps` is set in Hanken Grotesk and sits beside a small thick-stroke circular progress indicator and separate `20% done` text, so the first checklist item appears higher on the page without a wide progress strip above it.
+  - Add supplier guided flow now supports two search outcomes:
+    - Searching `23` shows the demo results table and continues through `Add to My Supplier`.
+    - Searching any other typed value shows a `No results` empty state with `Try expanded search` and `Or create new`.
+    - Blank search no longer routes to results; it stays on the search page.
+  - The no-results branch opens a `Create supplier` dialog. The supplier name is prefilled from the search term, and `Continue to Supplier settings` stays enabled once a name is present so the prototype remains easy to evaluate.
+  - Step 4 on the no-results branch keeps the page scrollable while the tour is active and deliberately anchors the tour above the `Or create new` button.
+  - Supplier settings now follows the real setup sequence: order contact details, order & delivery policy, one delivery-day cutoff, `Apply to all`, then `Save`.
+  - In supplier settings, clicking `More` below WhatsApp reveals an SMS phone field. The field stays visible and there is no collapse control, matching the current product behaviour.
+  - The guided popover on supplier settings uses explicit `Prev` / `Next` controls for same-page steps; typing into fields no longer advances the tour automatically.
+  - Supplier settings tour highlights use tighter inner targets for the minimum-order controls and delivery-day table, so the overlay does not wrap empty card padding.
+  - Each delivery day row has its own `Apply to all` action. The action becomes available once that row has a selected day, day(s)-earlier value, and cutoff time, then copies that row's cutoff to all days.
+  - The supplier is only considered added after the user saves supplier settings. Saving returns to the outlet Suppliers tab with the newly added supplier visible, and `supplierAdded=1` lets the trial dashboard advance the checklist from 20% to 40% done.
+  - Tour `Dismiss` controls use a filled secondary-button treatment rather than appearing as plain text.
 - Demo confirmation:
   - `Check your inbox`
   - Private demo link sent to the captured email, expiring in 14 days.
@@ -234,11 +248,12 @@ Trial dashboard / onboarding behavior:
   - Clicking `Go to dashboard` explicitly dismisses onboarding and stores that choice in `localStorage` under `nomniProcureSetupDismissed`.
   - After dismissal, clicking Dashboard shows the regular dashboard layout instead of the onboarding checklist.
   - The dismissed dashboard mirrors the existing Procure dashboard structure, with the standard greeting, order metric cards, spending overview, and top expenditures sections, but all values are zero/empty because the trial account has no setup data yet.
-  - The persistent `Get started` card in the sidebar opens the onboarding checklist again with `?setup=1`.
+  - The persistent setup card in the sidebar opens the onboarding checklist again with `?setup=1`.
 - Trial support controls are now part of the persistent app chrome:
   - Topbar pill: `Trial ends in 14 days`
   - Topbar CTA: `Book setup`
-  - Sidebar card: `Get started`, showing progress and `20% done`
+  - Sidebar card: white elevated card below the nav list, showing `Get started`, `20% done`, progress bar, and `Next • [next checklist step]`, while keeping the bottom-left Intercom area free. The card body links back to the onboarding dashboard; only the next action name links directly to the guided prototype flow.
+  - The sidebar also includes a 48×48 px Intercom-style chat launcher in the lower-left corner to match the real Procure shell.
   - These controls also appear in the split supplier setup pages so trial users can see trial status and reopen setup while moving through the guided flow.
 - The setup checklist is sequential:
   - Step 2: Add your first supplier

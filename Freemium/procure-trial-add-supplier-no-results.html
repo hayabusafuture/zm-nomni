@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
-<title>Nomni Procure — Search Supplier</title>
+<title>Nomni Procure — Supplier Search</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
@@ -41,7 +41,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  body.tour-open { overflow: hidden; }
+  body.tour-open { overflow: auto; }
   a { color: inherit; text-decoration: none; }
   button, input, select { font: inherit; }
 
@@ -693,6 +693,124 @@
     font-weight: 700;
   }
   .success-note.show { display: flex; }
+  .empty-state {
+    width: min(520px, 100%);
+    margin: 180px auto 0;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    color: #7A808A;
+  }
+  .empty-state img {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 10px;
+  }
+  .empty-title {
+    margin: 0 0 4px;
+    color: #7A808A;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .empty-copy {
+    margin: 0 0 24px;
+    font-size: 14px;
+  }
+  .empty-rule {
+    width: 100%;
+    height: 1px;
+    margin-bottom: 20px;
+    background: var(--rule);
+  }
+  .empty-actions {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+  }
+  .empty-secondary-copy {
+    margin: 0 0 12px;
+    color: #7A808A;
+    font-size: 12px;
+  }
+  .btn-outline {
+    min-height: 40px;
+    border-color: #DCDEE3;
+    background: #fff;
+    color: #2D6CDF;
+  }
+  .btn-outline:hover {
+    border-color: #B8C6E8;
+    background: #F7FAFF;
+  }
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 74px 20px 28px;
+    background: rgba(10,20,15,.54);
+  }
+  .modal-overlay[hidden] { display: none !important; }
+  body.modal-open { overflow: hidden; }
+  .modal-card {
+    width: min(650px, calc(100vw - 40px));
+    max-height: calc(100vh - 102px);
+    overflow: auto;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow:
+      0 24px 64px rgba(0,0,0,.22),
+      0 2px 8px rgba(10,20,15,.08);
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 36px 44px 12px;
+  }
+  .modal-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -.03em;
+    text-wrap: balance;
+  }
+  .modal-close {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--spinach);
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .modal-close:hover { background: var(--mint); }
+  .modal-body {
+    display: grid;
+    gap: 17px;
+    padding: 0 44px 44px;
+  }
+  .modal-help {
+    margin: 6px 0 0;
+    color: #7A808A;
+    font-size: 12px;
+  }
+  .modal-foot {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 2px;
+  }
+  .modal-foot .btn {
+    min-width: 286px;
+    min-height: 44px;
+  }
 
   .tour-overlay {
     position: fixed;
@@ -743,12 +861,12 @@
     border-radius: 4px;
   }
   .tour-card.above::before {
-    left: 42px;
+    left: calc(50% - 11px);
     top: auto;
     bottom: -10px;
   }
   .tour-card.below::before {
-    left: 42px;
+    left: calc(50% - 11px);
     top: -10px;
     bottom: auto;
   }
@@ -898,7 +1016,7 @@
     </div>
 
     <div class="content">
-      <section class="view active" data-view="search">
+      <section class="view active" data-view="no-results">
         <div class="tip-card">
           <div class="tip-icon" aria-hidden="true">▤</div>
           <div>
@@ -907,27 +1025,76 @@
           </div>
         </div>
         <form class="toolbar" data-search-form>
-          <div class="toolbar-left" style="flex: 1;" data-search-controls>
+          <div class="toolbar-left" style="flex: 1;">
             <label class="search-wrap wide">
               <span class="search-icon" aria-hidden="true"></span>
-              <input data-supplier-search type="text" placeholder="Enter company name or the Unique Entity Number (UEN)" />
+              <input data-supplier-search type="text" value="12121214" placeholder="Enter company name or the Unique Entity Number (UEN)" />
             </label>
-            <button class="btn btn-secondary" type="submit" data-search-button>Search</button>
+            <button class="btn btn-secondary" type="submit">Search</button>
           </div>
         </form>
         <p class="helper-text">Unique Entity Number (UEN) is a 9 or 10 digit identification number for businesses/entities operating in Singapore.</p>
+        <div class="empty-state">
+          <img src="../assets/Nomni Procure-search no results_files/no-results-icon.svg" alt="" aria-hidden="true" />
+          <h2 class="empty-title">No results</h2>
+          <p class="empty-copy">Please check for any spelling mistakes or try another keyword</p>
+          <div class="empty-rule" aria-hidden="true"></div>
+          <div class="empty-actions">
+            <button class="btn btn-outline" type="button">Try expanded search</button>
+            <p class="empty-secondary-copy">Searches ACRA database for suppliers not yet listed on Zeemart</p>
+            <button class="btn btn-outline" type="button" data-create-supplier>Or create new</button>
+          </div>
+        </div>
       </section>
     </div>
   </main>
+</div>
+
+<div class="modal-overlay" data-create-modal hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="create-supplier-title">
+    <div class="modal-head">
+      <h2 class="modal-title" id="create-supplier-title">Create supplier</h2>
+      <button class="modal-close" type="button" data-close-create aria-label="Close">×</button>
+    </div>
+    <form class="modal-body" data-create-form>
+      <div class="field">
+        <label for="supplier-name">Name</label>
+        <input id="supplier-name" data-new-supplier-name type="text" value="12121214" />
+      </div>
+      <div class="field">
+        <label for="supplier-reg">Company Reg. No.</label>
+        <input id="supplier-reg" type="text" inputmode="text" />
+        <p class="modal-help">Enter the company's UEN (9 or 10 characters)</p>
+      </div>
+      <div class="field">
+        <label for="supplier-address-1">Address</label>
+        <input id="supplier-address-1" type="text" placeholder="Address Line 1" />
+      </div>
+      <div class="field">
+        <input id="supplier-address-2" type="text" placeholder="Address Line 2" aria-label="Address Line 2" />
+      </div>
+      <div class="field" style="max-width: 276px;">
+        <label for="supplier-postcode">Postcode</label>
+        <input id="supplier-postcode" type="text" inputmode="numeric" />
+      </div>
+      <div class="field">
+        <label for="supplier-alias">Also known as (optional)</label>
+        <input id="supplier-alias" type="text" />
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-primary" type="submit" data-continue-settings>Continue to Supplier settings <span aria-hidden="true">→</span></button>
+      </div>
+    </form>
+  </section>
 </div>
 
 <div class="tour-overlay" data-tour hidden>
   <div class="tour-scrim"></div>
   <div class="tour-highlight" data-tour-highlight></div>
   <section class="tour-card" data-tour-card aria-live="polite">
-    <p class="tour-kicker">Step 3 of 5</p>
-    <h2 class="tour-title">Search for the supplier</h2>
-    <p class="tour-copy">Enter the supplier name or UEN, then click Search to find a matching business.</p>
+    <p class="tour-kicker">Step 4 of 7</p>
+    <h2 class="tour-title">Create this supplier</h2>
+    <p class="tour-copy">If your supplier is not listed, create a new supplier record and continue to setup.</p>
     <button class="tour-dismiss" data-tour-dismiss>Dismiss</button>
   </section>
 </div>
@@ -948,7 +1115,11 @@
     var tourTitle = document.querySelector('.tour-title');
     var tourCopy = document.querySelector('.tour-copy');
     var outletsNavLink = document.querySelector('[data-nav-outlets]');
-    var tourStep = { target: '[data-search-controls]', placement: 'below' };
+    var createModal = document.querySelector('[data-create-modal]');
+    var createForm = document.querySelector('[data-create-form]');
+    var newSupplierName = document.querySelector('[data-new-supplier-name]');
+    var supplierSearch = document.querySelector('[data-supplier-search]');
+    var tourStep = { target: '[data-create-supplier]', placement: 'above' };
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -960,7 +1131,7 @@
     function withParams(file, step, extras) {
       var nextParams = new URLSearchParams();
       if (step) nextParams.set('tour', step);
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierAdded'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1013,6 +1184,17 @@
       var cardWidth = Math.min(380, window.innerWidth - 32);
       var cardLeft = rect.right + 34;
       var cardTop = rect.top - 28;
+      if (tourStep.placement === 'above') {
+        var cardHeight = tourCard.offsetHeight || 220;
+        cardLeft = Math.max(16, Math.min(rect.left + rect.width / 2 - cardWidth / 2, window.innerWidth - cardWidth - 16));
+        cardTop = rect.top - cardHeight - 28;
+        if (cardTop < 16) {
+          cardTop = rect.bottom + 26;
+          tourCard.classList.add('below');
+        } else {
+          tourCard.classList.add('above');
+        }
+      }
       if (tourStep.placement === 'below') {
         cardLeft = Math.max(16, Math.min(rect.left, window.innerWidth - cardWidth - 16));
         cardTop = Math.min(window.innerHeight - 220, rect.bottom + 26);
@@ -1036,7 +1218,9 @@
       if (!tour) return;
       tour.hidden = false;
       document.body.classList.add('tour-open');
-      setTimeout(placeTour, 80);
+      var target = document.querySelector(tourStep.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(placeTour, 320);
     }
 
     function closeTour() {
@@ -1053,11 +1237,30 @@
       openTour();
     }
 
+    function openCreateModal() {
+      if (!createModal) return;
+      createModal.hidden = false;
+      document.body.classList.add('modal-open');
+      closeTour();
+      setTimeout(function() {
+        if (newSupplierName) newSupplierName.focus();
+      }, 60);
+    }
+
+    function closeCreateModal() {
+      if (!createModal) return;
+      createModal.hidden = true;
+      document.body.classList.remove('modal-open');
+    }
+
     if (userName && userNameNode) {
       userNameNode.textContent = userName;
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
     if (venueName && outletTitle) outletTitle.textContent = venueName;
+    var queryFromUrl = params.get('supplierQuery') || '';
+    if (queryFromUrl && supplierSearch) supplierSearch.value = queryFromUrl;
+    if (queryFromUrl && newSupplierName) newSupplierName.value = queryFromUrl;
 
     document.querySelectorAll('[data-back-suppliers]').forEach(function(link) {
       link.href = withParams('procure-trial-outlet-suppliers.html', '2');
@@ -1066,16 +1269,43 @@
     document.querySelectorAll('[data-search-form]').forEach(function(form) {
       form.addEventListener('submit', function(event) {
         event.preventDefault();
-        var query = (document.querySelector('[data-supplier-search]') || {}).value || '';
-        var normalisedQuery = query.trim();
-        if (!normalisedQuery) return;
-        var hasDemoResults = normalisedQuery === '23';
+        var query = (supplierSearch && supplierSearch.value ? supplierSearch.value : '').trim();
+        if (!query) return;
+        var hasDemoResults = query === '23';
         var nextFile = hasDemoResults ? 'procure-trial-add-supplier-results.html' : 'procure-trial-add-supplier-no-results.html';
-        window.location.href = withParams(nextFile, '4', { supplierQuery: normalisedQuery });
+        window.location.href = withParams(nextFile, '4', { supplierQuery: query });
       });
     });
+    document.querySelectorAll('[data-create-supplier]').forEach(function(button) {
+      button.addEventListener('click', openCreateModal);
+    });
+    document.querySelectorAll('[data-close-create]').forEach(function(button) {
+      button.addEventListener('click', closeCreateModal);
+    });
+    if (createModal) {
+      createModal.addEventListener('click', function(event) {
+        if (event.target === createModal) closeCreateModal();
+      });
+    }
+    if (createForm) {
+      createForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var supplierName = (newSupplierName && newSupplierName.value ? newSupplierName.value : '').trim() || 'New supplier';
+        window.location.href = withParams('procure-trial-add-supplier-settings.html', '5', {
+          supplierName: supplierName,
+          supplierCreated: '1'
+        });
+      });
+    }
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeCreateModal();
+        closeTour();
+      }
+    });
     window.addEventListener('resize', placeTour);
+    window.addEventListener('scroll', placeTour, { passive: true });
     if (params.has('tour')) openTour();
   })();
 </script>
