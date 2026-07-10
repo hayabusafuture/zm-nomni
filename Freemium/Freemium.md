@@ -318,7 +318,7 @@ Guided-tour standards:
 - Avoid technical/internal wording such as `SKU manually`, `OCR-assisted path`, `create form`, or copy that explains wiring.
 - Lead with the user's job: add items the team orders, link them to the right supplier, set buying details, decide whether to count them in inventory, then save.
 - Never start a checklist flow by automatically redirecting the user to another page. The CTA should first open the tour on the current page, point at the real sidenav or on-page control, and let the user click it to continue.
-- The sidebar `Next • ...` action follows the same rule: when a guided flow exists, it should open that flow's starting tour panel, not just send users to the checklist. Supplier and market-list starts use dashboard `setup=1&tour=1`; order starts use dashboard `setup=1&tour=order`.
+- The sidebar `Next • ...` action follows the same rule: when a guided flow exists, it should open that flow's starting tour panel on the current page, not send users back to the checklist. Supplier, market-list, and order starts all begin by pointing at the relevant sidenav item; clicking that real nav item continues the flow.
 - Users should advance by clicking highlighted product controls wherever possible.
 - Use `Prev` / `Next` only for same-page guidance where the real click target does not naturally advance. Show `Prev` only when the previous step is on the same page.
 - `Next` uses the primary green treatment and `Prev` uses the mint secondary treatment. Tour cards close with an X button in the top-right corner rather than a footer `Dismiss` button.
@@ -349,22 +349,22 @@ Build market list flow:
 - The Items page follows the real product shape: `Purchased` tab, outlet selector, `Search SKU`, table rows, and action bar. The outlet selector uses `venueName` or falls back to `Trial Outlet`.
 - Step 3 highlights the open `Add` menu as a choice point. Users can choose `Create new` for the manual path or `Add from invoice` for the upload-assisted path.
 - Manual item creation follows: `Create new`, supplier selection, then `Freemium/procure-trial-create-sku.html`.
-- The Select supplier dialog defaults to `Select supplier`. Choosing a supplier keeps users on Step 4 and moves the highlight to the dialog's `Create new` button, so users still click the real CTA without adding another numbered step.
-- The manual branch covers item name, UOM/minimum order quantity/price, optional `Add to Inventory`, inventory list/UOM/par fields, and the fixed footer `Save` action.
+- The Select supplier dialog defaults to `Select supplier`. Step 4 points only at the supplier dropdown; choosing a supplier closes the guidance so the dialog's `Create new` button is clearly visible and users can click the real CTA.
+- The manual branch covers item name, UOM/minimum order quantity/price, `Add to Inventory`, inventory list/UOM/par fields, and the fixed footer `Save` action.
 - Supplier/my product code fields remain visible but are no longer a dedicated tour stop.
-- Inventory list/UOM/par fields stay visible but disabled until `Add to Inventory` is selected; selecting it enables those fields and advances the guidance.
+- Once the mandatory item fields are complete, `Add to Inventory` turns on by default, matching the live product. The inventory tour is one step that explains how stock is counted and notes that users can turn `Add to Inventory` off for order-only items.
 - Saving returns to Items with a created row, success toast (`added to market list`), and `marketListBuilt=1`.
 - `marketListBuilt=1` advances setup progress from 40% to 60%, completes `Build market list`, and moves the sidebar next action to the goal-dependent step:
   - `Order faster`: `Place first order`
   - `Digitise invoices`: `Upload first invoice`
   - `Manage inventory`: `Set up inventory`
 - After save, the return URL includes `marketHandoff=1`; the Items page uses the same tour panel style for the one-time completion handoff, pointing at the sidebar `Get started` card so users know where to continue. Normal later navigation to Items must not replay this handoff.
-- If only one item-creation branch has been explored, the completion handoff and completed dashboard checklist row show a secondary button for the untried path: `Try adding from invoice` after manual creation, or `Try creating manually` after invoice upload. The secondary path starts at the branch point and highlights only that path.
+- If only one item-creation branch has been explored, the completion handoff shows a low-emphasis inline link for the untried path, while the completed dashboard checklist row keeps the secondary CTA on the right. Completed checklist rows show the tick on the left in place of the setup illustration.
 
 Invoice item creation:
 
 - `Add from invoice` is implemented as the alternate build-market-list path from the shared Step 3 `Add` menu choice.
-- The invoice branch covers: Items, Add, choose `Add from invoice`, select/upload invoices in one guided step, review the split view and extracted rows in one step, then save reviewed items.
+- The invoice branch covers: Items, Add, choose `Add from invoice`, select/upload invoices in one guided step, check the extracted item details in one step, then save reviewed items.
 - The upload modal supports a static demo selection of 3 invoice PDFs and simulates upload progress before opening `Freemium/procure-trial-review-invoice-items.html`.
 - The review page uses the saved product pattern: invoice preview on the left, extracted item rows on the right, invoice-level `Save` and `Skip for later`, collapsed pending invoices, and a `Save items?` confirmation modal.
 - For onboarding, all extracted rows are treated as new or updated market-list items, so the tour skips detailed status education and focuses on checking names, units, prices, and codes.
@@ -378,10 +378,11 @@ Placeholder pages:
 Place first order flow:
 
 - The `Order faster` checklist path unlocks `Place first order` after `marketListBuilt=1`.
-- The dashboard `Create order` CTA and sidebar `Next • Place first order` start Step 1 on the dashboard, pointing at `Orders` in the sidenav. Users click the real nav item to continue.
+- The dashboard `Create order` CTA starts Step 1 on the dashboard, pointing at `Orders` in the sidenav. The sidebar `Next • Place first order` starts the same Step 1 pointer in place on whatever trial page the user is currently viewing; it must not redirect back to the dashboard first.
 - After the user opens Orders, the next step highlights the `New order` split button and opens its menu. The first guided path chooses `Order by item`, because it reinforces the market list the user just built.
 - `Freemium/procure-trial-new-order-item.html` follows the existing product pattern: full-page create-order shell, market-list item table on the left, supplier-grouped cart on the right, and a fixed cart footer.
-- The guided order-by-item path covers: add an item to order, review/select the supplier cart group, then place the order.
+- The order-by-item page should reflect what the user added while building the market list: manual `createdSku`/`createdSupplier` values and invoice-created items feed the orderable item list. The cart starts empty and only appears as a supplier-grouped order after the user clicks `Add to order`.
+- The guided order-by-item path covers: add an item to order, review/select the newly-created supplier cart group, then place the order.
 - Placing the order returns to Orders with `orderPlaced=1`, shows a placed order row, marks `Place first order` complete on the dashboard, and advances `Order faster` setup progress from 60% to 80%.
 - The return URL also includes `orderHandoff=1`, which opens a short setup-updated tour panel pointing at the sidebar `Get started` card so users know where to continue.
 - Supplier-based ordering remains the secondary path for later: `New order > Order by supplier` opens a supplier picker, then the supplier-specific item list and review modal.
@@ -403,7 +404,10 @@ HTML parsing and local image reference checks were run during development.
 ## Open Follow-Ups
 
 - Define what “demo access” includes inside the stripped-down Nomni Procure prototype.
+- Decide how the demo dashboard works: what data appears, whether it is seeded, and how it differs from the guided trial checklist/dashboard.
+- Confirm Admin Panel support for extending a trial period when the Nomni team wants to give a prospect more time.
+- Define how trial accounts are flagged internally so the Nomni team can identify them, reach out during the trial, and follow up after the trial period ends.
+- Decide how trial users are told they can contact support via live chat, beyond the persistent Intercom-style launcher.
+- Define the conversion path from trial to paid account: what users see before the trial ends, who they contact, and what in-product CTA or message explains the next step.
 - Decide which exact support article should be the primary support link.
-- If an exact Zeemart hero photo asset is provided, swap it into the hero card background.
-- The Zeemart logo is currently approximated in text; replace with exact SVG/PNG if available.
 - Continue keeping this document updated as visual or content changes are made.

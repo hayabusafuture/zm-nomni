@@ -817,7 +817,8 @@
     var tourTitle = document.querySelector('[data-tour-title]');
     var tourCopy = document.querySelector('[data-tour-copy]');
     var currentTourStep = 'name';
-    var tourOrder = ['name', 'commercials', 'inventoryToggle', 'inventoryDetails', 'save'];
+    var inventoryTouched = false;
+    var tourOrder = ['name', 'commercials', 'inventoryDetails', 'save'];
     var tourSteps = {
       marketStart: {
         target: '[data-nav-items]',
@@ -838,23 +839,16 @@
         copy: 'Add the buying unit, minimum quantity, and price so future orders start with the right details.',
         placement: 'below'
       },
-      inventoryToggle: {
-        target: '[data-field-inventory-toggle]',
-        kicker: 'Step 7',
-        title: 'Track it in inventory too',
-        copy: 'Turn this on if your team should count this item during stocktake. You can skip it for items you only order.',
-        placement: 'right'
-      },
       inventoryDetails: {
         target: '[data-field-inventory-details]',
-        kicker: 'Step 8',
+        kicker: 'Step 7',
         title: 'Choose how stock is counted',
-        copy: 'Pick the inventory list, counting unit, and par level your team should aim to keep on hand.',
+        copy: 'Once the item details are ready, inventory tracking turns on by default. Pick how your team counts this item, or turn Add to Inventory off if you only need it for ordering.',
         placement: 'left'
       },
       save: {
         target: '[data-save-sku]',
-        kicker: 'Step 9',
+        kicker: 'Step 8',
         title: 'Save your item',
         copy: 'Save it to your market list. We’ll show what changed and guide you back to the setup checklist.',
         placement: 'above'
@@ -916,6 +910,7 @@
       if (save) save.disabled = !isReady;
       if (saveMore) saveMore.disabled = !isReady;
       if (tourNext) tourNext.disabled = currentTourStep === 'commercials' && !isReady;
+      if (!inventoryTouched) toggleInventory(isReady);
     }
 
     function fillDemoValues() {
@@ -927,7 +922,8 @@
       updateState();
     }
 
-    function toggleInventory(forceOn) {
+    function toggleInventory(forceOn, fromUser) {
+      if (fromUser) inventoryTouched = true;
       var on = typeof forceOn === 'boolean' ? forceOn : !(addInventory && addInventory.checked);
       if (addInventory) addInventory.checked = on;
       if (inventoryCheck) inventoryCheck.classList.toggle('active', on);
@@ -1045,7 +1041,6 @@
       var index = tourOrder.indexOf(currentTourStep);
       if (index < 0) index = 0;
       if (delta > 0 && currentTourStep === 'name') fillDemoValues();
-      if (delta > 0 && currentTourStep === 'inventoryToggle') toggleInventory(true);
       var nextIndex = Math.max(0, Math.min(tourOrder.length - 1, index + delta));
       setTourStep(tourOrder[nextIndex], true);
     }
@@ -1071,8 +1066,8 @@
     var inventoryToggle = document.querySelector('[data-field-inventory-toggle]');
     if (inventoryToggle) inventoryToggle.addEventListener('click', function(event) {
       event.preventDefault();
-      toggleInventory();
-      if (tour && !tour.hidden && currentTourStep === 'inventoryToggle') setTourStep('inventoryDetails', true);
+      toggleInventory(undefined, true);
+      if (tour && !tour.hidden && currentTourStep === 'inventoryDetails') placeTour();
     });
     if (save) save.addEventListener('click', saveSku);
     if (saveMore) saveMore.addEventListener('click', saveSku);

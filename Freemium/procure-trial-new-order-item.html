@@ -246,6 +246,23 @@
   }
   .select-all-btn:hover { text-decoration: underline; }
   .cart-body { flex: 1; overflow-y: auto; }
+  .cart-empty {
+    height: 100%;
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+    padding: 28px 20px;
+    text-align: center;
+    color: var(--ink-mute);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .cart-empty strong {
+    display: block;
+    color: var(--ink);
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
   .cart-group { border-bottom: 1px solid var(--rule); padding: 12px 14px; }
   .cart-group-head { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
   .cart-group-check {
@@ -297,24 +314,6 @@
     background: var(--nomni-green); color: var(--seaweed); cursor: pointer;
   }
   .btn-place.enabled:hover { background: var(--seaweed); color: var(--nomni-green); }
-  /* Font inspector */
-  .font-inspector-btn {
-    background: transparent; border: 1px solid rgba(255,255,255,.25);
-    color: rgba(255,255,255,.6); cursor: pointer;
-    display: inline-flex; align-items: center;
-    padding: 3px 8px; border-radius: 6px;
-    transition: background .15s, color .15s, border-color .15s;
-    font-size: 11px; font-weight: 700; font-family: monospace; letter-spacing: .03em;
-  }
-  .font-inspector-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
-  .font-inspector-btn.active { background: rgba(255,255,255,.18); color: #fff; border-color: rgba(255,255,255,.5); }
-  #font-inspector-tip {
-    position: fixed; background: #1a1f2b; color: #fff;
-    font-size: 11px; font-weight: 600; font-family: monospace;
-    padding: 3px 8px; border-radius: 4px; pointer-events: none;
-    z-index: 99999; display: none; white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(0,0,0,.3); letter-spacing: .02em;
-  }
 
   /* User menu dropdown */
   .user-wrap { position: relative; }
@@ -642,7 +641,7 @@
               <th class="col-qty">Quantity</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody data-products-body>
 
             <!-- Row 1: Blueberry (Add to order) -->
             <tr>
@@ -792,12 +791,12 @@
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            <span id="cartCount">3</span> items
+            <span id="cartCount">0</span> items
           </div>
           <button class="select-all-btn" id="selectAllBtn">Select all</button>
         </div>
 
-        <div class="cart-body">
+        <div class="cart-body" data-cart-body>
 
           <!-- Group 1: GMP Packaging -->
           <div class="cart-group" data-cart-group>
@@ -890,6 +889,8 @@
     var tourDismiss = document.querySelector('[data-tour-dismiss]');
     var tourPrev = document.querySelector('[data-tour-prev]');
     var tourNext = document.querySelector('[data-tour-next]');
+    var productsBody = document.querySelector('[data-products-body]');
+    var itemRange = document.querySelector('.item-range');
     var currentTourStep = 'addItem';
     var tourOrder = ['addItem', 'cart', 'place'];
     var tourSteps = {
@@ -904,7 +905,7 @@
       cart: {
         target: '[data-cart-group]',
         kicker: 'Step 4',
-        title: 'Review the supplier order',
+        title: 'Review the order',
         copy: 'Items are grouped by supplier and delivery date. Select the order you are ready to send.',
         placement: 'left',
         actionOnly: true
@@ -938,6 +939,70 @@
       });
       var query = nextParams.toString();
       return file + (query ? '?' + query : '');
+    }
+
+    function money(value) {
+      var number = parseFloat(value);
+      return isNaN(number) ? '2.00' : number.toFixed(2);
+    }
+
+    function marketItems() {
+      var items = [];
+      var supplier = params.get('createdSupplier') || params.get('supplierName') || 'Test Supplier';
+      if (params.get('createdSku')) {
+        items.push({
+          name: params.get('createdSku'),
+          supplier: supplier,
+          uom: params.get('createdUom') || 'box',
+          price: money(params.get('createdPrice') || '2.00')
+        });
+      }
+      if (params.get('invoiceItemsAdded') === '1') {
+        [
+          ['Garlic', 'g', '1.80'],
+          ['Soy sauce', 'btl', '3.50'],
+          ['Spring onions', 'g', '1.50'],
+          ['Rice', 'kg', '1.20']
+        ].forEach(function(item) {
+          items.push({ name: item[0], supplier: supplier, uom: item[1], price: item[2] });
+        });
+      }
+      if (!items.length) {
+        items.push({ name: 'APPLE TESTING', supplier: params.get('supplierName') || 'Test Supplier2', uom: 'box', price: '1.00' });
+      }
+      return items;
+    }
+
+    function itemRow(item, index) {
+      var row = document.createElement('tr');
+      row.innerHTML = '<td class="col-check"><input type="checkbox" class="row-check" /></td>' +
+        '<td><div class="prod-name"></div><div class="prod-supplier"></div></td>' +
+        '<td><div class="price-val"></div><div class="price-unit"></div></td>' +
+        '<td class="muted-val">-</td><td class="muted-val">-</td>' +
+        '<td class="col-qty"><button class="add-link" type="button" data-price="" data-qty="1" data-name="" data-supplier="" data-uom="">Add to order</button></td>';
+      row.querySelector('.prod-name').textContent = item.name;
+      row.querySelector('.prod-supplier').textContent = item.supplier;
+      row.querySelector('.price-val').textContent = 'S$' + item.price;
+      row.querySelector('.price-unit').textContent = 'per ' + item.uom;
+      var button = row.querySelector('.add-link');
+      if (index === 0) button.setAttribute('data-add-first-item', '');
+      button.dataset.price = item.price;
+      button.dataset.name = item.name;
+      button.dataset.supplier = item.supplier;
+      button.dataset.uom = item.uom;
+      return row;
+    }
+
+    function renderMarketItems() {
+      if (!productsBody) return;
+      var items = marketItems();
+      productsBody.innerHTML = '';
+      items.forEach(function(item, index) {
+        productsBody.appendChild(itemRow(item, index));
+      });
+      if (itemRange) {
+        itemRange.textContent = '1-' + items.length + ' of ' + items.length;
+      }
     }
 
     function placeTour() {
@@ -999,22 +1064,19 @@
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
     if (venueNode) venueNode.textContent = venueName;
+    renderMarketItems();
     document.querySelectorAll('.back-btn').forEach(function(link) {
       link.href = withParams('procure-trial-orders.html');
     });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
     if (tourPrev) tourPrev.addEventListener('click', function() {});
     if (tourNext) tourNext.addEventListener('click', function() {});
-    document.querySelectorAll('[data-add-first-item]').forEach(function(button) {
-      button.addEventListener('click', function() {
-        if (tour && !tour.hidden) setTimeout(function() { setTourStep('cart', true); }, 80);
-      });
-    });
-    document.querySelectorAll('[data-cart-check]').forEach(function(check) {
-      check.addEventListener('change', function() {
-        if (tour && !tour.hidden && check.checked) setTourStep('place', true);
-      });
-    });
+    window.__nomniOrderItemAdded = function() {
+      if (tour && !tour.hidden) setTimeout(function() { setTourStep('cart', true); }, 80);
+    };
+    window.__nomniOrderTourStep = function(isChecked) {
+      if (tour && !tour.hidden && isChecked) setTourStep('place', true);
+    };
     document.getElementById('placeOrderBtn').addEventListener('click', function() {
       if (!this.classList.contains('enabled')) return;
       window.location.href = withParams('procure-trial-orders.html', { orderPlaced: '1', orderHandoff: '1' });
@@ -1043,11 +1105,50 @@
   })();
 */
 
-  /* Cart checkboxes + Select all + Place order */
+  /* Add to order / Fill to par -> cart */
   (function(){
+    var cartBody = document.querySelector('[data-cart-body]');
+    var cartCount = document.getElementById('cartCount');
     var selectAllBtn = document.getElementById('selectAllBtn');
     var placeBtn = document.getElementById('placeOrderBtn');
-    var allChecked = false;
+    var cartItems = [];
+
+    function makeStepperHTML(qty) {
+      return '<div class="qty-stepper">'
+        + '<button type="button" data-action="dec">−</button>'
+        + '<input type="number" value="' + qty + '" min="1" />'
+        + '<button type="button" data-action="inc">+</button>'
+        + '</div>';
+    }
+
+    function attachStepperEvents(cell) {
+      var input = cell.querySelector('input');
+      function syncCartQuantity() {
+        if (!cell.dataset.cartName) return;
+        addCartItem({
+          dataset: {
+            name: cell.dataset.cartName,
+            supplier: cell.dataset.cartSupplier,
+            uom: cell.dataset.cartUom,
+            price: cell.dataset.cartPrice
+          }
+        }, parseInt(input.value, 10) || 1);
+      }
+      cell.querySelector('[data-action="dec"]').addEventListener('click', function(){
+        var v = parseInt(input.value, 10);
+        if (v > 1) { input.value = v - 1; }
+        syncCartQuantity();
+      });
+      cell.querySelector('[data-action="inc"]').addEventListener('click', function(){
+        input.value = parseInt(input.value, 10) + 1;
+        syncCartQuantity();
+      });
+      input.addEventListener('change', function(){
+        var v = parseInt(this.value, 10);
+        if (isNaN(v) || v < 1) this.value = 1;
+        syncCartQuantity();
+      });
+    }
 
     function updatePlaceOrder() {
       var checks = document.querySelectorAll('.cart-group-check');
@@ -1066,57 +1167,96 @@
         placeBtn.classList.remove('enabled');
         placeBtn.textContent = 'Place order';
       }
-      var allNowChecked = Array.from(checks).every(function(c){ return c.checked; });
-      selectAllBtn.textContent = allNowChecked ? 'Deselect all' : 'Select all';
+      var allNowChecked = checks.length > 0 && Array.from(checks).every(function(c){ return c.checked; });
+      if (selectAllBtn) {
+        selectAllBtn.hidden = checks.length === 0;
+        selectAllBtn.textContent = allNowChecked ? 'Deselect all' : 'Select all';
+      }
     }
 
-    document.querySelectorAll('.cart-group-check').forEach(function(c){
-      c.addEventListener('change', updatePlaceOrder);
-    });
-
-    selectAllBtn.addEventListener('click', function(){
-      var checks = document.querySelectorAll('.cart-group-check');
-      var shouldCheck = !Array.from(checks).every(function(c){ return c.checked; });
-      checks.forEach(function(c){ c.checked = shouldCheck; });
+    function renderCart() {
+      if (!cartBody) return;
+      if (cartCount) cartCount.textContent = cartItems.length;
+      if (!cartItems.length) {
+        cartBody.innerHTML = '<div class="cart-empty"><div><strong>Your cart is empty</strong>Add an item from your market list to start your order.</div></div>';
+        updatePlaceOrder();
+        return;
+      }
+      var bySupplier = {};
+      cartItems.forEach(function(item) {
+        if (!bySupplier[item.supplier]) bySupplier[item.supplier] = [];
+        bySupplier[item.supplier].push(item);
+      });
+      cartBody.innerHTML = '';
+      Object.keys(bySupplier).forEach(function(supplier, supplierIndex) {
+        var items = bySupplier[supplier];
+        var total = items.reduce(function(sum, item) { return sum + item.price * item.qty; }, 0);
+        var group = document.createElement('div');
+        group.className = 'cart-group';
+        if (supplierIndex === 0) group.setAttribute('data-cart-group', '');
+        group.innerHTML = '<div class="cart-group-head">' +
+          '<input type="checkbox" class="cart-group-check" data-cart-check data-amount="' + total.toFixed(2) + '" />' +
+          '<div class="cart-group-info"><div class="cart-group-name"></div><div class="cart-group-meta">Thu, 23 Apr 2026</div></div>' +
+          '<div class="cart-group-amount">S$' + total.toFixed(2) + '</div></div>' +
+          '<div class="cart-items"></div><a href="#" class="cart-view-edit">View/edit</a>';
+        group.querySelector('.cart-group-name').textContent = supplier;
+        var itemsNode = group.querySelector('.cart-items');
+        items.forEach(function(item) {
+          var itemNode = document.createElement('div');
+          itemNode.className = 'cart-item';
+          itemNode.innerHTML = '<div class="cart-item-name"></div><div class="cart-item-qty"></div>';
+          itemNode.querySelector('.cart-item-name').textContent = item.name;
+          itemNode.querySelector('.cart-item-qty').textContent = item.qty + ' ' + item.uom;
+          itemsNode.appendChild(itemNode);
+        });
+        cartBody.appendChild(group);
+      });
+      document.querySelectorAll('.cart-group-check').forEach(function(check) {
+        check.addEventListener('change', function() {
+          updatePlaceOrder();
+          if (window.__nomniOrderTourStep) window.__nomniOrderTourStep(check.checked);
+        });
+      });
       updatePlaceOrder();
-    });
-  })();
-
-  /* Add to order / Fill to par → stepper */
-  (function(){
-    function makeStepperHTML(qty) {
-      return '<div class="qty-stepper">'
-        + '<button type="button" data-action="dec">−</button>'
-        + '<input type="number" value="' + qty + '" min="1" />'
-        + '<button type="button" data-action="inc">+</button>'
-        + '</div>';
     }
 
-    function attachStepperEvents(cell) {
-      var input = cell.querySelector('input');
-      cell.querySelector('[data-action="dec"]').addEventListener('click', function(){
-        var v = parseInt(input.value, 10);
-        if (v > 1) { input.value = v - 1; }
+    function addCartItem(button, qty) {
+      var name = button.dataset.name || 'Item';
+      var supplier = button.dataset.supplier || 'Test Supplier';
+      var uom = button.dataset.uom || 'box';
+      var price = parseFloat(button.dataset.price || '0') || 0;
+      var existing = cartItems.find(function(item) {
+        return item.name === name && item.supplier === supplier && item.uom === uom;
       });
-      cell.querySelector('[data-action="inc"]').addEventListener('click', function(){
-        input.value = parseInt(input.value, 10) + 1;
-      });
-      input.addEventListener('change', function(){
-        var v = parseInt(this.value, 10);
-        if (isNaN(v) || v < 1) this.value = 1;
-      });
+      if (existing) existing.qty = qty;
+      else cartItems.push({ name: name, supplier: supplier, uom: uom, price: price, qty: qty });
+      renderCart();
     }
 
-    /* Attach to already-rendered Cake Boxes stepper */
-    attachStepperEvents(document.getElementById('qty-cake-boxes'));
+    renderCart();
+
+    if (selectAllBtn) {
+      selectAllBtn.addEventListener('click', function(){
+        var checks = document.querySelectorAll('.cart-group-check');
+        var shouldCheck = !Array.from(checks).every(function(c){ return c.checked; });
+        checks.forEach(function(c){ c.checked = shouldCheck; });
+        updatePlaceOrder();
+      });
+    }
 
     /* Add to order */
     document.querySelectorAll('.add-link').forEach(function(btn){
       btn.addEventListener('click', function(){
         var cell = this.parentElement;
         var qty = parseInt(this.dataset.qty, 10) || 1;
+        addCartItem(this, qty);
+        cell.dataset.cartName = this.dataset.name || 'Item';
+        cell.dataset.cartSupplier = this.dataset.supplier || 'Test Supplier';
+        cell.dataset.cartUom = this.dataset.uom || 'box';
+        cell.dataset.cartPrice = this.dataset.price || '0';
         cell.innerHTML = makeStepperHTML(qty);
         attachStepperEvents(cell);
+        if (window.__nomniOrderItemAdded) window.__nomniOrderItemAdded();
       });
     });
 
@@ -1130,51 +1270,6 @@
       });
     });
   })();
-</script>
-<div id="font-inspector-tip"></div>
-<script>
-(function(){
-  var btn = document.getElementById('fontInspectorBtn');
-  var tip = document.getElementById('font-inspector-tip');
-  var on = false;
-  var tokenMap = {
-    '10px': '--text-badge', '11px': '--text-xs', '12px': '--text-sm',
-    '14px': '--text-base',  '21px': '--text-heading', '24px': '--text-display'
-  };
-  var colorMap = {
-    'rgb(26, 31, 43)':   '--ink',
-    'rgb(138, 143, 152)':'--ink-mute',
-    'rgb(199, 201, 207)':'--ink-soft',
-    'rgb(26, 128, 64)':  '--spinach',
-    'rgb(42, 200, 100)': '--nomni-green',
-    'rgb(14, 55, 39)':   '--seaweed',
-    'rgb(17, 17, 17)':   '--sidebar-text',
-    'rgb(255, 255, 255)':'white'
-  };
-  btn.addEventListener('click', function(){
-    on = !on;
-    btn.classList.toggle('active', on);
-    document.body.style.cursor = on ? 'crosshair' : '';
-    tip.style.display = 'none';
-  });
-  document.addEventListener('mousemove', function(e){
-    if (!on) return;
-    tip.style.left = (e.clientX + 14) + 'px';
-    tip.style.top = (e.clientY + 14) + 'px';
-  });
-  document.addEventListener('mouseover', function(e){
-    if (!on) return;
-    var s = window.getComputedStyle(e.target);
-    var fs = s.fontSize;
-    var fw = s.fontWeight;
-    var col = s.color;
-    var fsLabel = tokenMap[fs] ? fs + ' · ' + tokenMap[fs] : fs;
-    var colLabel = colorMap[col] || col;
-    tip.textContent = fsLabel + ' · ' + fw + ' · ' + colLabel;
-    tip.style.display = 'block';
-  });
-  document.addEventListener('mouseleave', function(){ tip.style.display = 'none'; });
-})();
 </script>
 <script>
 (function(){

@@ -802,22 +802,20 @@
   }
   .tour-nav { display: flex; gap: 8px; }
   .tour-branch-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline;
     width: max-content;
-    min-height: 34px;
-    margin: -2px 0 14px;
-    padding: 0 12px;
-    border: 1px solid var(--mint);
-    border-radius: 6px;
-    background: var(--mint);
-    color: var(--seaweed);
+    margin: -4px 0 14px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--spinach);
     font-size: 13px;
-    font-weight: 800;
-    text-decoration: none;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
-  .tour-branch-link:hover { background: #C6F2CE; border-color: #C6F2CE; color: var(--seaweed); }
+  .tour-branch-link:hover { color: var(--seaweed); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -1139,7 +1137,7 @@
         target: '[data-supplier-select]',
         kicker: 'Step 4',
         title: 'Link it to a supplier',
-        copy: 'Choose who you buy this item from first. Then create the item under that supplier.',
+        copy: 'Choose the supplier this item belongs to.',
         placement: 'below',
         actionOnly: true
       },
@@ -1156,6 +1154,14 @@
         kicker: 'Setup updated',
         title: 'Market list built',
         copy: 'You’re 60% done. Click the setup panel to continue with the next step.',
+        placement: 'right',
+        actionOnly: true
+      },
+      orderStart: {
+        target: '[data-nav-orders]',
+        kicker: 'Step 1',
+        title: 'Start from Orders',
+        copy: 'Open Orders when you’re ready to place your first order from the items you just added.',
         placement: 'right',
         actionOnly: true
       }
@@ -1192,7 +1198,7 @@
 
     function sidebarNextUrl() {
       var goal = params.get('primaryGoal') || 'Order faster';
-      if (marketListBuilt && goal === 'Order faster') return setupTourUrl('order');
+      if (marketListBuilt && goal === 'Order faster') return withParams('procure-trial-orders.html', { tour: 'order' });
       if (!supplierAdded || (supplierAdded && !marketListBuilt)) return setupTourUrl('1');
       return dashboardUrl(true);
     }
@@ -1332,7 +1338,6 @@
       selectedItemFlow = 'manual';
       closeAddMenu();
       if (supplierModal) supplierModal.hidden = false;
-      updateSupplierTourTarget(false);
       if (tour && !tour.hidden) setTourStep('supplier', false);
     }
 
@@ -1395,16 +1400,6 @@
       window.location.href = createSkuUrl();
     }
 
-    function updateSupplierTourTarget(hasSupplier) {
-      if (!tourSteps.supplier) return;
-      tourSteps.supplier.target = hasSupplier ? '[data-create-sku]' : '[data-supplier-select]';
-      tourSteps.supplier.title = 'Link it to a supplier';
-      tourSteps.supplier.copy = hasSupplier
-        ? 'Now click Create new to continue with this supplier.'
-        : 'Choose who you buy this item from first. Then create the item under that supplier.';
-      tourSteps.supplier.placement = hasSupplier ? 'right' : 'below';
-    }
-
     function placeTour() {
       if (!tour || tour.hidden) return;
       var step = tourSteps[currentTourStep] || tourSteps.add;
@@ -1462,7 +1457,7 @@
         var otherPath = currentTourStep === 'complete' && hasManualPath && !hasInvoicePath ? 'invoice' : currentTourStep === 'complete' && hasInvoicePath && !hasManualPath ? 'manual' : '';
         if (otherPath) {
           tourBranchLink.hidden = false;
-          tourBranchLink.textContent = otherPath === 'invoice' ? 'Try adding from invoice' : 'Try creating manually';
+          tourBranchLink.textContent = otherPath === 'invoice' ? 'You can also try adding from invoice.' : 'You can also try creating manually.';
           tourBranchLink.href = branchReplayUrl(otherPath);
         } else {
           tourBranchLink.hidden = true;
@@ -1489,6 +1484,18 @@
       if (!tour) return;
       tour.hidden = false;
       setTourStep('add', false);
+    }
+
+    function openOrderStartTour() {
+      if (!tour) return;
+      closeAddMenu();
+      closeSupplierModal();
+      closeInvoiceModal();
+      document.querySelectorAll('[data-nav-orders]').forEach(function(link) {
+        link.href = withParams('procure-trial-orders.html', { tour: 'order' });
+      });
+      tour.hidden = false;
+      setTourStep('orderStart', false);
     }
 
     function openBranchReplayTour() {
@@ -1551,8 +1558,7 @@
     if (uploadInvoices) uploadInvoices.addEventListener('click', uploadDemoInvoices);
     if (supplierSelect) supplierSelect.addEventListener('change', function() {
       if (supplierHelp) supplierHelp.hidden = !!supplierSelect.value;
-      updateSupplierTourTarget(!!supplierSelect.value);
-      if (tour && !tour.hidden && currentTourStep === 'supplier') setTourStep('supplier', true);
+      if (supplierSelect.value && tour && !tour.hidden && currentTourStep === 'supplier') closeTour();
     });
     if (createSku) createSku.addEventListener('click', goCreateSku);
     document.addEventListener('click', function(event) {
@@ -1562,10 +1568,17 @@
     if (tourPrev) tourPrev.addEventListener('click', function() { goTour(-1); });
     if (tourNext) tourNext.addEventListener('click', function() { goTour(1); });
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      if (!supplierAdded || marketListBuilt) return;
       link.addEventListener('click', function(event) {
-        event.preventDefault();
-        openTour();
+        var goal = params.get('primaryGoal') || 'Order faster';
+        if (marketListBuilt && goal === 'Order faster') {
+          event.preventDefault();
+          openOrderStartTour();
+          return;
+        }
+        if (supplierAdded && !marketListBuilt) {
+          event.preventDefault();
+          openTour();
+        }
       });
     });
     window.addEventListener('resize', placeTour);

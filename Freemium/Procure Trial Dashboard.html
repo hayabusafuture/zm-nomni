@@ -605,14 +605,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 32px;
-    padding: 0 11px;
+    min-height: 40px;
+    padding: 10px 16px;
     border: 1px solid var(--mint);
     border-radius: 6px;
     background: var(--mint);
     color: var(--seaweed);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
+    line-height: 1;
     text-decoration: none;
     white-space: nowrap;
   }
@@ -633,6 +634,15 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 1;
+  }
+  .task.completed .task-visual {
+    width: 64px;
+    height: 58px;
+  }
+  .task.completed .task-status::before {
+    width: 34px;
+    height: 34px;
+    font-size: 17px;
   }
   .task-lock {
     min-height: 32px;
@@ -1646,7 +1656,13 @@
 
       var visual = document.createElement('div');
       visual.className = 'task-visual';
-      if (task.icon) {
+      if (isCompleted) {
+        var completedStatus = document.createElement('span');
+        completedStatus.className = 'task-status';
+        completedStatus.setAttribute('role', 'img');
+        completedStatus.setAttribute('aria-label', 'Completed');
+        visual.appendChild(completedStatus);
+      } else if (task.icon) {
         var icon = document.createElement('img');
         icon.className = 'task-icon-img';
         icon.src = task.icon;
@@ -1669,24 +1685,19 @@
       row.appendChild(copyWrap);
 
       if (isCompleted) {
-        var actionStack = document.createElement('div');
-        actionStack.className = 'task-action-stack';
-        var status = document.createElement('span');
-        status.className = 'task-status';
-        status.setAttribute('role', 'img');
-        status.setAttribute('aria-label', 'Completed');
-        actionStack.appendChild(status);
         if (taskKey === 'market') {
           var alternatePath = marketAlternatePath();
           if (alternatePath) {
+            var actionStack = document.createElement('div');
+            actionStack.className = 'task-action-stack';
             var alternateLink = document.createElement('a');
             alternateLink.className = 'task-secondary-action';
             alternateLink.href = alternatePath.href;
             alternateLink.textContent = alternatePath.label;
             actionStack.appendChild(alternateLink);
+            row.appendChild(actionStack);
           }
         }
-        row.appendChild(actionStack);
       } else if (dependencyMet && task.cta) {
         var link = document.createElement('a');
         link.className = 'btn btn-secondary';
