@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+<title>Nomni Procure - Review items</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --nomni-green: #2AC864;
+    --seaweed: #0E3727;
+    --spinach: #1A8040;
+    --mint: #E2FFE6;
+    --cream: #FAF7E9;
+    --ink: #1A1F2B;
+    --ink-mute: #8A8F98;
+    --rule: #E7E8EC;
+    --panel: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; background: #fff; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  button, input, select { font: inherit; }
+  .topbar {
+    height: 56px;
+    background: #1F2226;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    border-bottom: 1px solid #000;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; width: auto; display: block; }
+  .brand-sub {
+    color: var(--nomni-green);
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 23px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .user { display: flex; align-items: center; gap: 10px; color: #fff; }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #7F6AD0;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .review-shell {
+    height: calc(100vh - 56px);
+    display: grid;
+    grid-template-columns: minmax(360px, 35vw) 1fr;
+    overflow: hidden;
+  }
+  .invoice-pane {
+    position: relative;
+    background: #282828;
+    color: #fff;
+    padding: 56px 24px 28px;
+    overflow: auto;
+  }
+  .invoice-count {
+    text-align: center;
+    color: rgba(255,255,255,.86);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 34px;
+  }
+  .invoice-page {
+    width: min(100%, 620px);
+    min-height: 760px;
+    margin: 0 auto;
+    padding: 66px 56px;
+    background: #fff;
+    color: #111;
+    box-shadow: 0 16px 40px rgba(0,0,0,.35);
+  }
+  .invoice-doc-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 52px;
+  }
+  .invoice-doc-title { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .invoice-small { font-size: 10px; line-height: 1.35; }
+  .invoice-meta {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 5px 10px;
+    margin-top: 42px;
+    font-size: 10px;
+  }
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 44px;
+    font-size: 10px;
+  }
+  .invoice-table th {
+    background: #202327;
+    color: #fff;
+    padding: 8px;
+    text-align: left;
+  }
+  .invoice-table td { padding: 8px; border-bottom: 1px solid #ededed; }
+  .invoice-total {
+    width: 210px;
+    margin: 30px 0 0 auto;
+    font-size: 11px;
+  }
+  .invoice-total div { display: flex; justify-content: space-between; padding: 4px 0; }
+  .invoice-total strong { border-top: 2px solid #333; padding-top: 6px; }
+  .invoice-tools {
+    position: fixed;
+    left: calc(min(35vw, 640px) - 70px);
+    top: 48%;
+    display: grid;
+    gap: 9px;
+    z-index: 15;
+  }
+  .invoice-tool {
+    width: 46px;
+    height: 46px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #1f2226;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+    font-size: 22px;
+    cursor: pointer;
+  }
+  .content-pane {
+    overflow: auto;
+    background: #fff;
+    padding: 54px 40px 64px;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--spinach);
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .page-title {
+    margin: 0 0 28px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+  }
+  .invoice-card {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(10,20,15,.06);
+    overflow: hidden;
+  }
+  .invoice-card + .invoice-card { margin-top: 14px; }
+  .invoice-card.active { border-color: #F4E6AA; }
+  .invoice-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    background: #FFF8D9;
+    border-bottom: 1px solid #F0E7C0;
+  }
+  .invoice-card.collapsed .invoice-card-head { background: #fff; border-bottom: 0; }
+  .invoice-id-group { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .invoice-index {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 1px solid #DDE1E8;
+    background: #fff;
+    color: var(--ink);
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .invoice-number { font-weight: 800; }
+  .invoice-date { color: #687080; }
+  .invoice-actions { display: flex; align-items: center; gap: 18px; }
+  .link-button {
+    border: 0;
+    background: transparent;
+    color: var(--spinach);
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn {
+    min-height: 42px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+  .btn-primary:hover { background: var(--seaweed); color: var(--nomni-green); border-color: var(--seaweed); }
+  .btn-secondary { background: var(--mint); color: var(--seaweed); border-color: var(--mint); }
+  .btn-secondary:hover { background: #C6F2CE; }
+  .complete-pill {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #B9F0C5;
+    border-radius: 999px;
+    background: #F7FFF8;
+    color: var(--spinach);
+    padding: 0 18px;
+    font-weight: 800;
+  }
+  .review-body { padding: 22px; }
+  .review-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .review-title-row { display: flex; align-items: center; gap: 10px; }
+  .review-count {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.01em;
+  }
+  .review-badge {
+    border-radius: 7px;
+    background: #FFF3D8;
+    color: #FF5A00;
+    padding: 4px 9px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .02em;
+  }
+  .review-controls { display: flex; align-items: center; gap: 12px; }
+  .review-controls select,
+  .date-control,
+  .review-input,
+  .review-select {
+    height: 42px;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    padding: 0 12px;
+    outline: none;
+  }
+  .review-controls select { min-width: 280px; }
+  .date-control { width: 150px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .review-table-wrap {
+    border: 1px solid var(--rule);
+    overflow: auto;
+  }
+  .review-table {
+    width: 100%;
+    min-width: 920px;
+    border-collapse: collapse;
+  }
+  .review-table th {
+    padding: 14px 12px;
+    background: #F9FAFB;
+    color: #666D78;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: left;
+  }
+  .review-table td {
+    padding: 10px 12px;
+    border-top: 1px solid var(--rule);
+    vertical-align: middle;
+  }
+  .row-num {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: #FFF4E5;
+    color: #FF6A00;
+    font-weight: 800;
+  }
+  .status-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+  }
+  .status-new { background: #FF5A00; }
+  .status-ok { background: #C8CCD2; }
+  .review-input { width: 100%; }
+  .name-input { min-width: 310px; }
+  .code-input { width: 132px; }
+  .uom-select { width: 94px; }
+  .price-input { width: 88px; }
+  .remark { color: #F06C00; font-size: 18px; font-weight: 500; white-space: nowrap; }
+  .delete-cell { color: #C7C9CF; font-size: 18px; text-align: center; }
+  .add-row {
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    border: 0;
+    background: transparent;
+    color: var(--spinach);
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .toast {
+    position: fixed;
+    right: 28px;
+    top: 78px;
+    z-index: 980;
+    min-width: 310px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 18px;
+    border-radius: 4px;
+    border: 1px solid #AFE7C2;
+    background: #E2FFE6;
+    box-shadow: 0 16px 44px rgba(10,20,15,.16);
+    color: var(--seaweed);
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast-check {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #0BBE3F;
+    color: #fff;
+    font-size: 27px;
+    flex: 0 0 auto;
+  }
+  .toast-title { font-weight: 800; margin-bottom: 2px; }
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: rgba(0,0,0,.42);
+  }
+  .modal-card {
+    width: 520px;
+    max-width: calc(100vw - 32px);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 26px 70px rgba(0,0,0,.24);
+    padding: 38px 40px 36px;
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .modal-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+  }
+  .modal-close {
+    border: 0;
+    background: transparent;
+    color: var(--spinach);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .modal-copy { margin: 0 0 24px; color: var(--ink); font-size: 15px; }
+  .tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 940;
+    pointer-events: none;
+  }
+  .tour-highlight {
+    position: fixed;
+    border: 2px solid var(--nomni-green);
+    border-radius: 10px;
+    box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);
+    pointer-events: none;
+    transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
+  }
+  .tour-card {
+    position: fixed;
+    width: min(380px, calc(100vw - 32px));
+    padding: 18px 18px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(42,200,100,.24);
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(10,20,15,.18);
+    pointer-events: auto;
+  }
+  .tour-card::before {
+    content: "";
+    position: absolute;
+    left: -9px;
+    top: 28px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-left: 1px solid rgba(42,200,100,.24);
+    border-bottom: 1px solid rgba(42,200,100,.24);
+    transform: rotate(45deg);
+  }
+  .tour-card.left::before {
+    left: auto;
+    right: -9px;
+    border-left: 0;
+    border-bottom: 0;
+    border-right: 1px solid rgba(42,200,100,.24);
+    border-top: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-card.below::before {
+    left: 28px;
+    top: -9px;
+    border-left: 1px solid rgba(42,200,100,.24);
+    border-bottom: 0;
+    border-top: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-kicker {
+    margin: 0 0 6px;
+    color: var(--spinach);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .tour-title { margin: 0 0 6px; font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+  .tour-copy { margin: 0 0 14px; color: #59606B; font-size: 14px; line-height: 1.5; }
+  .tour-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .tour-dismiss,
+  .tour-step-btn {
+    min-height: 34px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .tour-dismiss { background: #F3F4F6; color: #59606B; }
+  .tour-dismiss:hover { background: #E6E8EC; color: var(--ink); }
+  .tour-step-btn { background: var(--nomni-green); color: var(--seaweed); }
+  .tour-step-btn[data-tour-prev] { background: var(--mint); border-color: var(--mint); color: var(--seaweed); }
+  .tour-step-btn[data-tour-prev]:hover { background: #C6F2CE; border-color: #C6F2CE; }
+  .tour-step-btn[data-tour-next]:hover {
+    background: var(--seaweed);
+    border-color: var(--seaweed);
+    color: var(--nomni-green);
+  }
+  .tour-step-btn:disabled { cursor: not-allowed; opacity: .5; }
+  .tour-nav { display: flex; gap: 8px; }
+  .intercom-launcher {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    z-index: 30;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #6C4DF2;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(108,77,242,.4);
+    cursor: pointer;
+  }
+  .intercom-launcher::before {
+    content: "";
+    width: 28px;
+    height: 23px;
+    display: block;
+    background: #fff;
+    border-radius: 5px;
+    clip-path: polygon(0 0, 100% 0, 100% 76%, 63% 76%, 45% 100%, 45% 76%, 0 76%);
+  }
+  @media (max-width: 1100px) {
+    .review-shell { grid-template-columns: 1fr; overflow: visible; height: auto; }
+    .invoice-pane { display: none; }
+    .content-pane { overflow: visible; padding: 32px 24px 56px; }
+    .review-top { align-items: flex-start; flex-direction: column; }
+    .review-controls { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img class="brand-logo-img" src="../assets/nomni-logo-light.svg" alt="nomni" />
+    <div class="brand-sub">Procure</div>
+  </div>
+  <div class="user">
+    <div class="avatar" data-avatar>TR</div>
+    <span data-user-name>Trial user</span>
+  </div>
+</header>
+
+<div class="review-shell">
+  <aside class="invoice-pane" aria-label="Invoice preview">
+    <div class="invoice-count">1 of 3 - INV-2026-0142</div>
+    <div class="invoice-page">
+      <div class="invoice-doc-head">
+        <div class="invoice-small"><strong>Test Supplier</strong><br>21 Tampines Industrial Ave 3<br>Singapore 528729<br>Tel: +65 6555 0192<br>GST REG NO: TS-0099-8877</div>
+        <div class="invoice-doc-title">INVOICE</div>
+      </div>
+      <div class="invoice-small"><strong>BILL TO</strong><br>Roll'd Australia<br>Shop 12, 500 George Street<br>Sydney NSW 2000, Australia</div>
+      <div class="invoice-meta">
+        <span>Invoice No:</span><strong>INV-2026-0142</strong>
+        <span>Invoice Date:</span><strong>01 Jul 2026</strong>
+        <span>Due Date:</span><strong>15 Jul 2026</strong>
+        <span>Currency:</span><strong>SGD</strong>
+      </div>
+      <table class="invoice-table">
+        <thead><tr><th>#</th><th>Item</th><th>Qty</th><th>Unit</th><th>Unit Price (SGD)</th><th>Amount (SGD)</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Beancurd (tofu)</td><td>20</td><td>g</td><td>2.50</td><td>50.00</td></tr>
+          <tr><td>2</td><td>Cooking oil</td><td>15</td><td>ml</td><td>2.00</td><td>30.00</td></tr>
+          <tr><td>3</td><td>Salt</td><td>10</td><td>g</td><td>2.00</td><td>20.00</td></tr>
+          <tr><td>4</td><td>Soy sauce</td><td>12</td><td>btl</td><td>3.50</td><td>42.00</td></tr>
+          <tr><td>5</td><td>Garlic</td><td>8</td><td>g</td><td>1.80</td><td>14.40</td></tr>
+          <tr><td>6</td><td>Spring onions</td><td>6</td><td>g</td><td>1.50</td><td>9.00</td></tr>
+          <tr><td>7</td><td>Rice</td><td>25</td><td>kg</td><td>1.20</td><td>30.00</td></tr>
+          <tr><td>8</td><td>Sugar</td><td>10</td><td>kg</td><td>1.10</td><td>11.00</td></tr>
+        </tbody>
+      </table>
+      <div class="invoice-total"><div><span>Subtotal</span><span>SGD 206.40</span></div><div><span>GST (9%)</span><span>SGD 18.58</span></div><div><strong>Total Due</strong><strong>SGD 224.98</strong></div></div>
+    </div>
+    <div class="invoice-tools" aria-hidden="true">
+      <button class="invoice-tool" type="button">⛓</button>
+      <button class="invoice-tool" type="button">⧉</button>
+      <button class="invoice-tool" type="button">↶</button>
+      <button class="invoice-tool" type="button">↷</button>
+      <button class="invoice-tool" type="button">+</button>
+      <button class="invoice-tool" type="button">−</button>
+    </div>
+  </aside>
+
+  <main class="content-pane">
+    <a class="back-link" data-items-link href="procure-trial-items.html">‹ Items</a>
+    <h1 class="page-title">Review items</h1>
+
+    <section class="invoice-card active" data-active-invoice>
+      <div class="invoice-card-head">
+        <div class="invoice-id-group">
+          <span class="invoice-index">1</span>
+          <div>
+            <div class="invoice-number">INV-2026-0142</div>
+            <div class="invoice-date">1 Jul 2026 - Test Supplier</div>
+          </div>
+        </div>
+        <div class="invoice-actions">
+          <button class="link-button" type="button">Skip for later</button>
+          <button class="btn btn-primary" data-save-review type="button">Save</button>
+        </div>
+      </div>
+      <div class="review-body">
+        <div class="review-top" data-review-overview>
+          <div class="review-title-row">
+            <span class="review-count">8 items</span>
+            <span class="review-badge">6 NEW/UPDATED</span>
+          </div>
+          <div class="review-controls">
+            <select><option>Test Supplier (Test supplier ...)</option></select>
+            <button class="date-control" type="button">▣ 1 Jul 2026</button>
+          </div>
+        </div>
+        <div class="review-table-wrap" data-review-table>
+          <table class="review-table">
+            <thead>
+              <tr><th>#</th><th>Name in invoice</th><th></th><th>Product code</th><th>UOM</th><th>Price</th><th>Old price/remarks</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="row-num">1</span></td><td><input class="review-input name-input" value="Beancurd (tofu)" /></td><td><span class="status-icon status-ok">✓</span></td><td><input class="review-input code-input" value="ZMTEMP-01" /></td><td><select class="review-select uom-select"><option>g</option></select></td><td><input class="review-input price-input" value="2.5" /></td><td><span class="remark">New item</span></td><td class="delete-cell">⌫</td></tr>
+              <tr><td><span class="row-num">2</span></td><td><input class="review-input name-input" value="Soy sauce" /></td><td><span class="status-icon status-new">?</span></td><td><input class="review-input code-input" placeholder="Enter code" /></td><td><select class="review-select uom-select"><option>btl</option></select></td><td><input class="review-input price-input" value="3.5" /></td><td><span class="remark">New item</span></td><td class="delete-cell">⌫</td></tr>
+              <tr><td><span class="row-num">3</span></td><td><input class="review-input name-input" value="Garlic" /></td><td><span class="status-icon status-new">?</span></td><td><input class="review-input code-input" placeholder="Enter code" /></td><td><select class="review-select uom-select"><option>g</option></select></td><td><input class="review-input price-input" value="1.8" /></td><td><span class="remark">New item</span></td><td class="delete-cell">⌫</td></tr>
+              <tr><td><span class="row-num">4</span></td><td><input class="review-input name-input" value="Spring onions" /></td><td><span class="status-icon status-new">?</span></td><td><input class="review-input code-input" placeholder="Enter code" /></td><td><select class="review-select uom-select"><option>g</option></select></td><td><input class="review-input price-input" value="1.5" /></td><td><span class="remark">New item</span></td><td class="delete-cell">⌫</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="add-row" type="button">+ Add item</button>
+      </div>
+    </section>
+
+    <section class="invoice-card collapsed">
+      <div class="invoice-card-head">
+        <div class="invoice-id-group"><span class="invoice-index">2</span><div><div class="invoice-number">INV-2026-0143</div><div class="invoice-date">8 Jul 2026 - Test Supplier</div></div></div>
+        <div class="invoice-actions"><button class="btn btn-secondary" type="button">View ›</button></div>
+      </div>
+    </section>
+    <section class="invoice-card collapsed">
+      <div class="invoice-card-head">
+        <div class="invoice-id-group"><span class="invoice-index">3</span><div><div class="invoice-number">INV-2026-0144</div><div class="invoice-date">9 Jul 2026 - Test Supplier</div></div></div>
+        <div class="invoice-actions"><button class="btn btn-secondary" type="button">View ›</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" data-toast>
+  <span class="toast-check" aria-hidden="true">✓</span>
+  <span><span class="toast-title">Success</span><br><span>4 items created or updated</span></span>
+</div>
+
+<div class="modal-overlay" data-save-modal hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="save-items-title">
+    <div class="modal-head">
+      <h2 class="modal-title" id="save-items-title">Save items?</h2>
+      <button class="modal-close" data-close-save type="button" aria-label="Close save confirmation">&times;</button>
+    </div>
+    <p class="modal-copy">4 items will be created or updated. This cannot be undone.</p>
+    <button class="btn btn-primary" data-confirm-save type="button">Save</button>
+  </section>
+</div>
+
+<div class="tour-overlay" data-tour hidden>
+  <div class="tour-highlight" data-tour-highlight></div>
+  <section class="tour-card" data-tour-card aria-live="polite">
+    <p class="tour-kicker" data-tour-kicker>Step 5</p>
+    <h2 class="tour-title" data-tour-title>Review what Nomni found</h2>
+    <p class="tour-copy" data-tour-copy>The invoice stays on the left while the items Nomni read appear on the right.</p>
+    <div class="tour-actions">
+      <button class="tour-dismiss" data-tour-dismiss type="button">Dismiss</button>
+      <div class="tour-nav">
+        <button class="tour-step-btn" data-tour-prev type="button">Prev</button>
+        <button class="tour-step-btn" data-tour-next type="button">Next</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<button class="intercom-launcher" type="button" aria-label="Open chat support"></button>
+
+<script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var userName = params.get('userName') || '';
+    var userNameNode = document.querySelector('[data-user-name]');
+    var avatarNode = document.querySelector('[data-avatar]');
+    var saveReview = document.querySelector('[data-save-review]');
+    var saveModal = document.querySelector('[data-save-modal]');
+    var confirmSave = document.querySelector('[data-confirm-save]');
+    var toast = document.querySelector('[data-toast]');
+    var tour = document.querySelector('[data-tour]');
+    var tourHighlight = document.querySelector('[data-tour-highlight]');
+    var tourCard = document.querySelector('[data-tour-card]');
+    var tourDismiss = document.querySelector('[data-tour-dismiss]');
+    var tourPrev = document.querySelector('[data-tour-prev]');
+    var tourNext = document.querySelector('[data-tour-next]');
+    var tourKicker = document.querySelector('[data-tour-kicker]');
+    var tourTitle = document.querySelector('[data-tour-title]');
+    var tourCopy = document.querySelector('[data-tour-copy]');
+    var currentTourStep = 'overview';
+    var tourOrder = ['overview', 'rows', 'save', 'confirm'];
+    var tourSteps = {
+      overview: {
+        target: '[data-review-overview]',
+        kicker: 'Step 5',
+        title: 'Review what Nomni found',
+        copy: 'The invoice stays on the left while the items Nomni read appear on the right.',
+        placement: 'below'
+      },
+      rows: {
+        target: '[data-review-table]',
+        kicker: 'Step 6',
+        title: 'Check the extracted rows',
+        copy: 'Confirm the item names, units, prices, and any product codes before saving them to your market list.',
+        placement: 'below'
+      },
+      save: {
+        target: '[data-save-review]',
+        kicker: 'Step 7',
+        title: 'Save reviewed items',
+        copy: 'Save this invoice once the item details look right.',
+        placement: 'left',
+        actionOnly: true
+      },
+      confirm: {
+        target: '[data-confirm-save]',
+        kicker: 'Step 8',
+        title: 'Confirm the update',
+        copy: 'Confirm to create or update the items in your market list.',
+        placement: 'right',
+        actionOnly: true
+      }
+    };
+
+    function initialsFromName(name) {
+      var parts = name.trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return 'TR';
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function withParams(file, extras) {
+      var nextParams = new URLSearchParams();
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName'].forEach(function(key) {
+        var value = params.get(key);
+        if (value) nextParams.set(key, value);
+      });
+      Object.keys(extras || {}).forEach(function(key) {
+        var value = extras[key];
+        if (value !== null && value !== undefined && value !== '') nextParams.set(key, value);
+      });
+      var query = nextParams.toString();
+      return file + (query ? '?' + query : '');
+    }
+
+    function finishUrl() {
+      return withParams('procure-trial-items.html', {
+        supplierAdded: '1',
+        marketListBuilt: '1',
+        invoiceItemsAdded: '1'
+      });
+    }
+
+    function placeTour() {
+      if (!tour || tour.hidden) return;
+      var step = tourSteps[currentTourStep] || tourSteps.overview;
+      var target = document.querySelector(step.target);
+      if (!target) return;
+      var rect = target.getBoundingClientRect();
+      var pad = 10;
+      tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
+      tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
+      tourHighlight.style.width = (rect.width + pad * 2) + 'px';
+      tourHighlight.style.height = (rect.height + pad * 2) + 'px';
+      tourCard.classList.remove('left', 'below');
+      var cardWidth = Math.min(380, window.innerWidth - 32);
+      var cardHeight = tourCard.getBoundingClientRect().height || 200;
+      var cardLeft = rect.right + 28;
+      var cardTop = rect.top - 28;
+      if (step.placement === 'below') {
+        cardLeft = Math.max(16, Math.min(rect.left, window.innerWidth - cardWidth - 16));
+        cardTop = Math.min(window.innerHeight - cardHeight - 16, rect.bottom + 24);
+        tourCard.classList.add('below');
+      }
+      if (step.placement === 'left') {
+        cardLeft = Math.max(16, rect.left - cardWidth - 34);
+        tourCard.classList.add('left');
+      }
+      if (cardLeft + cardWidth > window.innerWidth - 16) {
+        cardLeft = Math.max(16, rect.left - cardWidth - 34);
+        tourCard.classList.add('left');
+      }
+      if (cardTop + cardHeight > window.innerHeight - 16) cardTop = Math.max(16, window.innerHeight - cardHeight - 16);
+      if (cardTop < 16) cardTop = 16;
+      tourCard.style.left = cardLeft + 'px';
+      tourCard.style.top = cardTop + 'px';
+    }
+
+    function setTourStep(stepName, shouldScroll) {
+      currentTourStep = stepName;
+      var step = tourSteps[currentTourStep] || tourSteps.overview;
+      if (tourKicker) tourKicker.textContent = step.kicker;
+      if (tourTitle) tourTitle.textContent = step.title;
+      if (tourCopy) tourCopy.textContent = step.copy;
+      var target = document.querySelector(step.target);
+      if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var index = tourOrder.indexOf(currentTourStep);
+      if (tourPrev) {
+        tourPrev.hidden = index <= 0 || !!step.actionOnly;
+        tourPrev.disabled = index <= 0;
+      }
+      if (tourNext) tourNext.hidden = !!step.actionOnly;
+      setTimeout(placeTour, shouldScroll ? 240 : 40);
+    }
+
+    function openTour() {
+      if (!tour) return;
+      tour.hidden = false;
+      setTourStep('overview', false);
+    }
+
+    function closeTour() {
+      if (tour) tour.hidden = true;
+    }
+
+    function goTour(delta) {
+      var index = tourOrder.indexOf(currentTourStep);
+      if (index < 0) index = 0;
+      var nextIndex = Math.max(0, Math.min(tourOrder.length - 1, index + delta));
+      setTourStep(tourOrder[nextIndex], true);
+    }
+
+    if (userName && userNameNode) {
+      userNameNode.textContent = userName;
+      if (avatarNode) avatarNode.textContent = initialsFromName(userName);
+    }
+    document.querySelectorAll('[data-items-link]').forEach(function(link) {
+      link.href = withParams('procure-trial-items.html', { supplierAdded: '1' });
+    });
+    if (saveReview) saveReview.addEventListener('click', function() {
+      if (saveModal) saveModal.hidden = false;
+      if (tour && !tour.hidden) setTourStep('confirm', false);
+    });
+    document.querySelectorAll('[data-close-save]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        if (saveModal) saveModal.hidden = true;
+        placeTour();
+      });
+    });
+    if (confirmSave) confirmSave.addEventListener('click', function() {
+      if (toast) toast.classList.add('show');
+      setTimeout(function() { window.location.href = finishUrl(); }, 750);
+    });
+    if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
+    if (tourPrev) tourPrev.addEventListener('click', function() { goTour(-1); });
+    if (tourNext) tourNext.addEventListener('click', function() { goTour(1); });
+    window.addEventListener('resize', placeTour);
+    window.addEventListener('scroll', placeTour, { passive: true });
+    document.querySelector('.content-pane').addEventListener('scroll', placeTour, { passive: true });
+    if (params.get('tour') === '5') openTour();
+  })();
+</script>
+</body>
+</html>

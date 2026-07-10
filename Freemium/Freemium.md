@@ -97,6 +97,7 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/procure-trial-add-supplier.html` redirects to the split supplier setup entry page for compatibility.
 - `Freemium/procure-trial-items.html` — Items page and guided Add item / Build market list onboarding flow, linked from the `Items` sidenav entry and the checklist's `Add items` CTA.
 - `Freemium/procure-trial-create-sku.html` — full-page manual `Create SKU` form used after selecting a supplier from the Items `Add > Create new` path.
+- `Freemium/procure-trial-review-invoice-items.html` — invoice-assisted item review page used after Items `Add > Add from invoice`.
 - `Freemium/procure-trial-orders.html`, `Freemium/procure-trial-inventory.html`, `Freemium/procure-trial-invoices.html` — placeholder pages (empty state only) for the `Place first order` / `Set up inventory` / `Upload first invoice` checklist CTAs.
 
 Generated preview screenshots:
@@ -316,7 +317,7 @@ Guided-tour standards:
 - Lead with the user's job: add items the team orders, link them to the right supplier, set buying details, decide whether to count them in inventory, then save.
 - Users should advance by clicking highlighted product controls wherever possible.
 - Use `Prev` / `Next` only for same-page guidance where the real click target does not naturally advance. Show `Prev` only when the previous step is on the same page.
-- `Next` uses the primary button colour; `Prev` uses the secondary treatment; `Dismiss` uses a filled secondary button.
+- `Next` uses the primary green treatment; `Prev` uses the mint secondary treatment; `Dismiss` uses the tertiary grey treatment.
 - Popovers must not cover the control users need to click. Tour placement measures the rendered popover height and keeps arrows aligned, with adaptive clamping near viewport edges.
 - The tour uses lightweight highlight rings/cards without a full-page dark overlay, except where the underlying product control is a modal.
 
@@ -333,7 +334,6 @@ Add supplier flow:
 - Supplier settings covers order contacts, WhatsApp/SMS behind `More`, order policy/minimum order, delivery-day cutoff, per-row `Apply to all`, and `Save`.
 - Saving returns to the outlet Suppliers tab with the new supplier visible, shows a success toast, opens a `Setup updated` handoff pointing at the sidebar card, and passes `supplierAdded=1`.
 - `supplierAdded=1` advances setup progress from 20% to 40% and moves the next action to `Build market list`.
-- Saved real-product references live in `assets/outlet_detail_details.html`, `assets/outlet_detail_suppliers.html`, `assets/outlet_detail_suppliers-addsupplier.html`, and `assets/outlet_detail_suppliers-addsupplier2.html`.
 
 Build market list flow:
 
@@ -341,9 +341,10 @@ Build market list flow:
 - The CTA and sidebar `Next • Build market list` both start Step 1 pointing at `Items` in the sidenav. Clicking it opens `Freemium/procure-trial-items.html?tour=1`.
 - `Freemium/procure-trial-items.html` stays locked without `supplierAdded=1`, because items must be linked to a supplier.
 - The Items page follows the real product shape: `Purchased` tab, outlet selector, `Search SKU`, table rows, and action bar. The outlet selector uses `venueName` or falls back to `Trial Outlet`.
-- Manual item creation follows: `Add` menu, `Create new`, supplier selection, then `Freemium/procure-trial-create-sku.html`.
-- The Select supplier dialog defaults to `Select supplier`. Choosing a supplier advances automatically; this step has no `Next` button.
-- The Create SKU tour is 10 steps total. It covers item name, UOM/minimum order quantity/price, optional `Add to Inventory`, inventory list/UOM/par fields, and the fixed footer `Save` action.
+- Step 3 highlights the open `Add` menu as a choice point. Users can choose `Create new` for the manual path or `Add from invoice` for the upload-assisted path.
+- Manual item creation follows: `Create new`, supplier selection, then `Freemium/procure-trial-create-sku.html`.
+- The Select supplier dialog defaults to `Select supplier`. Choosing a supplier keeps users on Step 4 and moves the highlight to the dialog's `Create new` button, so users still click the real CTA without adding another numbered step.
+- The manual branch covers item name, UOM/minimum order quantity/price, optional `Add to Inventory`, inventory list/UOM/par fields, and the fixed footer `Save` action.
 - Supplier/my product code fields remain visible but are no longer a dedicated tour stop.
 - Inventory list/UOM/par fields stay visible but disabled until `Add to Inventory` is selected; selecting it enables those fields and advances the guidance.
 - Saving returns to Items with a created row, success toast (`added to market list`), and `marketListBuilt=1`.
@@ -352,12 +353,16 @@ Build market list flow:
   - `Digitise invoices`: `Upload first invoice`
   - `Manage inventory`: `Set up inventory`
 - After save, the Items page uses the same tour panel style for the completion handoff, pointing at the sidebar `Get started` card so users know where to continue.
-- Saved real-product references live in `assets/Items.html`, `assets/Items-Select supplier.html`, and `assets/Items-create SKU.html`.
 
 Invoice item creation:
 
-- `Add from invoice` is visible but not implemented in the freemium prototype yet.
-- Per Jira `PWF-1511`, the future branch should support up to 5 PDF/JPEG/PNG invoices, OCR extraction, and a per-invoice review page before saving items to the market list.
+- `Add from invoice` is implemented as the alternate build-market-list path from the shared Step 3 `Add` menu choice.
+- The invoice branch covers: Items, Add, choose `Add from invoice`, select/upload invoices in one guided step, review split view, check extracted rows, save reviewed items, confirm save.
+- The upload modal supports a static demo selection of 3 invoice PDFs and simulates upload progress before opening `Freemium/procure-trial-review-invoice-items.html`.
+- The review page uses the saved product pattern: invoice preview on the left, extracted item rows on the right, invoice-level `Save` and `Skip for later`, collapsed pending invoices, and a `Save items?` confirmation modal.
+- For onboarding, all extracted rows are treated as new or updated market-list items, so the tour skips detailed status education and focuses on checking names, units, prices, and codes.
+- Confirming save returns to Items with `marketListBuilt=1` and `invoiceItemsAdded=1`, shows `4 items created or updated`, appends invoice-created rows, and opens the same 60% completion handoff to the sidebar setup card.
+- Per Jira `PWF-1511`, a fuller future branch can add multi-invoice review handling, OCR error states, date/supplier editing, and pending-review skip flows.
 
 Placeholder pages:
 
