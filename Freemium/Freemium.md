@@ -358,7 +358,7 @@ Build market list flow:
   - `Order faster`: `Place first order`
   - `Digitise invoices`: `Upload first invoice`
   - `Manage inventory`: `Set up inventory`
-- After save, the Items page uses the same tour panel style for the completion handoff, pointing at the sidebar `Get started` card so users know where to continue.
+- After save, the return URL includes `marketHandoff=1`; the Items page uses the same tour panel style for the one-time completion handoff, pointing at the sidebar `Get started` card so users know where to continue. Normal later navigation to Items must not replay this handoff.
 - If only one item-creation branch has been explored, the completion handoff and completed dashboard checklist row show a secondary button for the untried path: `Try adding from invoice` after manual creation, or `Try creating manually` after invoice upload. The secondary path starts at the branch point and highlights only that path.
 
 Invoice item creation:
@@ -368,7 +368,7 @@ Invoice item creation:
 - The upload modal supports a static demo selection of 3 invoice PDFs and simulates upload progress before opening `Freemium/procure-trial-review-invoice-items.html`.
 - The review page uses the saved product pattern: invoice preview on the left, extracted item rows on the right, invoice-level `Save` and `Skip for later`, collapsed pending invoices, and a `Save items?` confirmation modal.
 - For onboarding, all extracted rows are treated as new or updated market-list items, so the tour skips detailed status education and focuses on checking names, units, prices, and codes.
-- Confirming save returns to Items with `marketListBuilt=1` and `invoiceItemsAdded=1`, shows `4 items created or updated`, appends invoice-created rows, and opens the same 60% completion handoff to the sidebar setup card.
+- Confirming save returns to Items with `marketListBuilt=1`, `invoiceItemsAdded=1`, and `marketHandoff=1`, shows `4 items created or updated`, appends invoice-created rows, and opens the same one-time 60% completion handoff to the sidebar setup card.
 - Per Jira `PWF-1511`, a fuller future branch can add multi-invoice review handling, OCR error states, date/supplier editing, and pending-review skip flows.
 
 Placeholder pages:

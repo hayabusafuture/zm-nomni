@@ -1075,6 +1075,7 @@
     var marketListBuilt = params.get('marketListBuilt') === '1';
     var createdSku = params.get('createdSku') || '';
     var invoiceItemsAdded = params.get('invoiceItemsAdded') === '1';
+    var marketHandoff = params.get('marketHandoff') === '1';
     var createdSupplier = params.get('createdSupplier') || params.get('supplierName') || 'Test Supplier';
     var createdUom = params.get('createdUom') || 'blk';
     var createdPrice = params.get('createdPrice') || '2.00';
@@ -1300,6 +1301,7 @@
 
     function showToast() {
       if (branchReplay) return;
+      if (!marketHandoff) return;
       if (!toast || (!createdSku && !invoiceItemsAdded)) return;
       if (toastTitle) toastTitle.textContent = invoiceItemsAdded ? 'Success' : createdSku;
       var toastCopy = toast.querySelector('.toast-copy');
@@ -1310,7 +1312,7 @@
 
     function showCompletionHandoff() {
       if (branchReplay) return;
-      if (!marketListBuilt || !tour) return;
+      if (!marketListBuilt || !marketHandoff || !tour) return;
       tour.hidden = false;
       setTourStep('complete', false);
     }
