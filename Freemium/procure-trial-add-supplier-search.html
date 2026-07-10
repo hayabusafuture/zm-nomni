@@ -707,19 +707,16 @@
   }
   .tour-highlight {
     position: absolute;
+    border: 2px solid var(--nomni-green);
     border-radius: 10px;
-    box-shadow:
-      0 0 0 3px rgba(42,200,100,.9),
-      0 0 0 8px rgba(42,200,100,.16),
-      0 10px 30px rgba(42,200,100,.22);
-    background: rgba(226,255,230,.06);
+    box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);
     transition: top .2s cubic-bezier(.2, 0, .2, 1), left .2s cubic-bezier(.2, 0, .2, 1), width .2s cubic-bezier(.2, 0, .2, 1), height .2s cubic-bezier(.2, 0, .2, 1);
   }
   .tour-card {
     position: absolute;
     width: min(380px, calc(100vw - 32px));
     padding: 20px 22px;
-    border: 1px solid rgba(14,55,39,.08);
+    border: 1px solid rgba(42,200,100,.24);
     border-radius: 12px;
     background: #fff;
     color: var(--ink);
@@ -757,7 +754,7 @@
   }
   .tour-kicker {
     margin: 0 0 6px;
-    color: var(--nomni-green);
+    color: var(--spinach);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: .06em;
@@ -779,18 +776,23 @@
     text-wrap: pretty;
   }
   .tour-dismiss {
-    min-height: 34px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    min-height: 30px;
     border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 0 12px;
-    background: #F3F4F6;
+    border-radius: 50%;
+    padding: 0;
+    background: transparent;
     color: #59606B;
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
     cursor: pointer;
     transition: background-color .18s ease, color .18s ease, border-color .18s ease;
   }
-  .tour-dismiss:hover { background: #E6E8EC; color: var(--ink); }
+  .tour-dismiss:hover { background: #F3F4F6; color: var(--ink); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -928,7 +930,7 @@
     <p class="tour-kicker">Step 3</p>
     <h2 class="tour-title">Search for the supplier</h2>
     <p class="tour-copy">Search by supplier name or registration number. We’ll look for an existing business record first.</p>
-    <button class="tour-dismiss" data-tour-dismiss>Dismiss</button>
+    <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
   </section>
 </div>
 
@@ -984,6 +986,11 @@
       return 'Procure%20Trial%20Dashboard.html' + (query ? '?' + query : '');
     }
 
+    function setupTourUrl(tour) {
+      var url = dashboardUrl(true);
+      return url + (url.indexOf('?') === -1 ? '?' : '&') + 'tour=' + encodeURIComponent(tour || '1');
+    }
+
     document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
       link.href = dashboardUrl(false);
     });
@@ -1019,15 +1026,15 @@
     }
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
       if (marketListBuilt) {
-        link.href = dashboardUrl(true);
+        link.href = (params.get('primaryGoal') || 'Order faster') === 'Order faster' ? setupTourUrl('order') : dashboardUrl(true);
       } else if (supplierAdded) {
-        link.href = dashboardUrl(true);
+        link.href = setupTourUrl('1');
         link.addEventListener('click', function(event) {
           event.preventDefault();
           startMarketListTourHere();
         });
       } else {
-        link.href = withParams('Procure%20Trial%20Dashboard.html', '1');
+        link.href = setupTourUrl('1');
         link.addEventListener('click', function(event) {
           event.preventDefault();
           startSupplierTourHere();

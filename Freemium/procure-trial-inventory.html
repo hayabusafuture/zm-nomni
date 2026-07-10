@@ -585,6 +585,17 @@
       return withParams('Procure%20Trial%20Dashboard.html', forceSetup ? { setup: '1' } : {});
     }
 
+    function setupTourUrl(tour) {
+      return withParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: tour || '1' });
+    }
+
+    function sidebarNextUrl() {
+      var goal = params.get('primaryGoal') || 'Order faster';
+      if (marketListBuilt && goal === 'Order faster') return setupTourUrl('order');
+      if (!supplierAdded || (supplierAdded && !marketListBuilt)) return setupTourUrl('1');
+      return dashboardUrl(true);
+    }
+
     document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
       link.href = dashboardUrl(false);
     });
@@ -621,7 +632,7 @@
       });
     }
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      link.href = dashboardUrl(true);
+      link.href = sidebarNextUrl();
     });
 
     if (userName && userNameNode) {

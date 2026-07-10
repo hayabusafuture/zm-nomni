@@ -474,7 +474,7 @@
   }
   .tour-title { margin: 0 0 6px; font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
   .tour-copy { margin: 0 0 14px; color: #59606B; font-size: 14px; line-height: 1.5; }
-  .tour-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .tour-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
   .tour-dismiss,
   .tour-step-btn {
     min-height: 34px;
@@ -486,8 +486,21 @@
     cursor: pointer;
     transition: background-color .18s ease, color .18s ease, border-color .18s ease;
   }
-  .tour-dismiss { background: #F3F4F6; color: #59606B; }
-  .tour-dismiss:hover { background: #E6E8EC; color: var(--ink); }
+  .tour-dismiss {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    min-height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #59606B;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .tour-dismiss:hover { background: #F3F4F6; color: var(--ink); }
   .tour-step-btn { background: var(--nomni-green); color: var(--seaweed); }
   .tour-step-btn[data-tour-prev] { background: var(--mint); border-color: var(--mint); color: var(--seaweed); }
   .tour-step-btn[data-tour-prev]:hover { background: #C6F2CE; border-color: #C6F2CE; }
@@ -669,7 +682,7 @@
     <h2 class="tour-title" data-tour-title>Review what Nomni found</h2>
     <p class="tour-copy" data-tour-copy>The invoice stays on the left while the items Nomni read appear on the right.</p>
     <div class="tour-actions">
-      <button class="tour-dismiss" data-tour-dismiss type="button">Dismiss</button>
+      <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
       <div class="tour-nav">
         <button class="tour-step-btn" data-tour-prev type="button">Prev</button>
         <button class="tour-step-btn" data-tour-next type="button">Next</button>
@@ -700,36 +713,21 @@
     var tourTitle = document.querySelector('[data-tour-title]');
     var tourCopy = document.querySelector('[data-tour-copy]');
     var currentTourStep = 'overview';
-    var tourOrder = ['overview', 'rows', 'save', 'confirm'];
+    var tourOrder = ['overview', 'save'];
     var tourSteps = {
       overview: {
-        target: '[data-review-overview]',
+        target: '[data-review-table]',
         kicker: 'Step 5',
         title: 'Review what Nomni found',
-        copy: 'The invoice stays on the left while the items Nomni read appear on the right.',
-        placement: 'below'
-      },
-      rows: {
-        target: '[data-review-table]',
-        kicker: 'Step 6',
-        title: 'Check the extracted rows',
-        copy: 'Confirm the item names, units, prices, and any product codes before saving them to your market list.',
+        copy: 'The invoice stays on the left while the extracted rows appear on the right. Check the item names, units, prices, and any product codes before saving.',
         placement: 'below'
       },
       save: {
         target: '[data-save-review]',
-        kicker: 'Step 7',
+        kicker: 'Step 6',
         title: 'Save reviewed items',
         copy: 'Save this invoice once the item details look right.',
         placement: 'left',
-        actionOnly: true
-      },
-      confirm: {
-        target: '[data-confirm-save]',
-        kicker: 'Step 8',
-        title: 'Confirm the update',
-        copy: 'Confirm to create or update the items in your market list.',
-        placement: 'right',
         actionOnly: true
       }
     };
@@ -743,7 +741,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -841,7 +839,7 @@
     });
     if (saveReview) saveReview.addEventListener('click', function() {
       if (saveModal) saveModal.hidden = false;
-      if (tour && !tour.hidden) setTourStep('confirm', false);
+      placeTour();
     });
     document.querySelectorAll('[data-close-save]').forEach(function(button) {
       button.addEventListener('click', function() {

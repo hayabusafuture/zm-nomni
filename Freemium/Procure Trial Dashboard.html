@@ -594,6 +594,33 @@
     align-items: center;
     justify-content: center;
   }
+  .task-action-stack {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    justify-self: end;
+  }
+  .task-secondary-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 11px;
+    border: 1px solid var(--mint);
+    border-radius: 6px;
+    background: var(--mint);
+    color: var(--seaweed);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .task-secondary-action:hover {
+    background: #C6F2CE;
+    border-color: #C6F2CE;
+    color: var(--seaweed);
+  }
   .task-status::before {
     content: "✓";
     width: 32px;
@@ -1137,18 +1164,23 @@
     text-wrap: pretty;
   }
   .tour-dismiss {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
     min-height: 34px;
     border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 0 12px;
-    background: #F3F4F6;
+    border-radius: 50%;
+    padding: 0;
+    background: transparent;
     color: #59606B;
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
     cursor: pointer;
     transition: background-color .18s ease, color .18s ease, border-color .18s ease;
   }
-  .tour-dismiss:hover { background: #E6E8EC; color: var(--ink); }
+  .tour-dismiss:hover { background: #F3F4F6; color: var(--ink); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -1190,7 +1222,9 @@
     .task { grid-template-columns: 68px minmax(0, 1fr); }
     .task .btn,
     .task-lock,
-    .task-status { grid-column: 1 / -1; }
+    .task-status,
+    .task-action-stack { grid-column: 1 / -1; }
+    .task-action-stack { align-items: flex-start; justify-self: start; }
     .tour-card {
       left: 16px !important;
       right: 16px;
@@ -1445,7 +1479,7 @@
     <p class="tour-kicker" data-dashboard-tour-kicker>Step 1</p>
     <h2 class="tour-title" data-dashboard-tour-title>Start from Outlets</h2>
     <p class="tour-copy" data-dashboard-tour-copy>Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.</p>
-    <button class="tour-dismiss" data-tour-dismiss type="button">Dismiss</button>
+    <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
   </section>
 </div>
 <script>
@@ -1457,6 +1491,9 @@
     var primaryGoal = params.get('primaryGoal') || 'Order faster';
     var supplierAdded = params.get('supplierAdded') === '1';
     var marketListBuilt = params.get('marketListBuilt') === '1';
+    var createdSku = params.get('createdSku') || '';
+    var invoiceItemsAdded = params.get('invoiceItemsAdded') === '1';
+    var orderPlaced = params.get('orderPlaced') === '1';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
     var setupTitleNode = document.querySelector('[data-setup-title]');
@@ -1468,6 +1505,7 @@
     var sidebarNextAction = document.querySelector('[data-sidebar-next-action]');
     var outletsNavLink = document.querySelector('[data-nav-outlets]');
     var itemsNavLink = document.querySelector('[data-nav-items]');
+    var ordersNavLink = document.querySelector('[data-nav-orders]');
     var onboardingView = document.querySelector('[data-onboarding-view]');
     var mainNode = document.querySelector('.main');
     var dashboardView = document.querySelector('[data-dashboard-view]');
@@ -1568,6 +1606,9 @@
     if (marketListBuilt) {
       taskCatalog.market.completed = true;
     }
+    if (orderPlaced) {
+      taskCatalog.order.completed = true;
+    }
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -1578,6 +1619,23 @@
 
     function normaliseGoal(goal) {
       return goalChecklist[goal] ? goal : 'Order faster';
+    }
+
+    function marketAlternatePath() {
+      if (!marketListBuilt) return null;
+      if (createdSku && !invoiceItemsAdded) {
+        return {
+          label: 'Try adding from invoice',
+          href: preserveParams('procure-trial-items.html', { retryPath: 'invoice' })
+        };
+      }
+      if (invoiceItemsAdded && !createdSku) {
+        return {
+          label: 'Try creating manually',
+          href: preserveParams('procure-trial-items.html', { retryPath: 'manual' })
+        };
+      }
+      return null;
     }
 
     function createTask(taskKey, index, counted, currentTaskKey) {
@@ -1614,20 +1672,36 @@
       row.appendChild(copyWrap);
 
       if (isCompleted) {
+        var actionStack = document.createElement('div');
+        actionStack.className = 'task-action-stack';
         var status = document.createElement('span');
         status.className = 'task-status';
         status.setAttribute('role', 'img');
         status.setAttribute('aria-label', 'Completed');
-        row.appendChild(status);
+        actionStack.appendChild(status);
+        if (taskKey === 'market') {
+          var alternatePath = marketAlternatePath();
+          if (alternatePath) {
+            var alternateLink = document.createElement('a');
+            alternateLink.className = 'task-secondary-action';
+            alternateLink.href = alternatePath.href;
+            alternateLink.textContent = alternatePath.label;
+            actionStack.appendChild(alternateLink);
+          }
+        }
+        row.appendChild(actionStack);
       } else if (dependencyMet && task.cta) {
         var link = document.createElement('a');
         link.className = 'btn btn-secondary';
         if (taskKey === 'supplier') link.setAttribute('data-supplier-setup-link', '');
         if (taskKey === 'market') link.setAttribute('data-market-setup-link', '');
+        if (taskKey === 'order') link.setAttribute('data-order-setup-link', '');
         link.href = taskKey === 'supplier'
           ? preserveParams(task.ctaHref, { tour: '2' })
           : taskKey === 'market'
             ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
+            : taskKey === 'order'
+              ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' })
             : preserveParams(task.ctaHref, {});
         link.textContent = task.cta;
         row.appendChild(link);
@@ -1683,7 +1757,9 @@
           ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
           : currentTaskKey === 'market'
             ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
-            : preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
+            : currentTaskKey === 'order'
+              ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' })
+              : preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
       }
 
       if (checklistNode) {
@@ -1761,7 +1837,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1811,7 +1887,7 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1822,21 +1898,38 @@
       return preserveParams('procure-trial-items.html', { tour: '1' });
     }
 
+    function orderSetupUrl() {
+      return preserveParams('procure-trial-orders.html', { tour: 'order' });
+    }
+
     function setDashboardTourMode(mode) {
-      dashboardTourMode = mode === 'market' ? 'market' : 'supplier';
-      if (dashboardTourKicker) dashboardTourKicker.textContent = dashboardTourMode === 'market' ? 'Step 1' : 'Step 1';
-      if (dashboardTourTitle) dashboardTourTitle.textContent = dashboardTourMode === 'market' ? 'Start from Items' : 'Start from Outlets';
+      dashboardTourMode = mode === 'market' || mode === 'order' ? mode : 'supplier';
+      if (dashboardTourKicker) dashboardTourKicker.textContent = 'Step 1';
+      if (dashboardTourTitle) {
+        dashboardTourTitle.textContent = dashboardTourMode === 'market'
+          ? 'Start from Items'
+          : dashboardTourMode === 'order'
+            ? 'Start from Orders'
+            : 'Start from Outlets';
+      }
       if (dashboardTourCopy) {
         dashboardTourCopy.textContent = dashboardTourMode === 'market'
           ? 'Add the items your team orders most. Start from Items in the sidebar.'
+          : dashboardTourMode === 'order'
+            ? 'Open Orders to create your first purchase order for the items you need.'
           : 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
       }
       if (itemsNavLink) itemsNavLink.href = dashboardTourMode === 'market' ? marketSetupUrl() : preserveParams('procure-trial-items.html');
+      if (ordersNavLink) ordersNavLink.href = dashboardTourMode === 'order' ? orderSetupUrl() : preserveParams('procure-trial-orders.html');
       if (outletsNavLink) outletsNavLink.href = supplierSetupUrl('2');
     }
 
     function placeDashboardTour() {
-      var target = dashboardTourMode === 'market' ? itemsNavLink : outletsNavLink;
+      var target = dashboardTourMode === 'market'
+        ? itemsNavLink
+        : dashboardTourMode === 'order'
+          ? ordersNavLink
+          : outletsNavLink;
       if (!dashboardTour || dashboardTour.hidden || !target) return;
       var rect = target.getBoundingClientRect();
       var pad = 10;
@@ -1878,13 +1971,21 @@
         openDashboardTour('market');
       });
     }
+    var orderSetupLink = document.querySelector('[data-order-setup-link]');
+    if (orderSetupLink) {
+      orderSetupLink.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' });
+      orderSetupLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        openDashboardTour('order');
+      });
+    }
     if (sidebarNextAction) {
       sidebarNextAction.addEventListener('click', function(event) {
         if (!sidebarNextStep) return;
-        if (sidebarNextStep.textContent !== taskCatalog.supplier.title && sidebarNextStep.textContent !== taskCatalog.market.title) return;
+        if (sidebarNextStep.textContent !== taskCatalog.supplier.title && sidebarNextStep.textContent !== taskCatalog.market.title && sidebarNextStep.textContent !== taskCatalog.order.title) return;
         event.preventDefault();
         showOnboarding();
-        openDashboardTour(sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : 'supplier');
+        openDashboardTour(sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : sidebarNextStep.textContent === taskCatalog.order.title ? 'order' : 'supplier');
       });
     }
     if (outletsNavLink) {
@@ -1893,6 +1994,11 @@
     if (itemsNavLink) {
       itemsNavLink.addEventListener('click', function() {
         if (dashboardTourMode === 'market') itemsNavLink.href = marketSetupUrl();
+      });
+    }
+    if (ordersNavLink) {
+      ordersNavLink.addEventListener('click', function() {
+        if (dashboardTourMode === 'order') ordersNavLink.href = orderSetupUrl();
       });
     }
     syncChromeLinks();
@@ -1911,7 +2017,7 @@
         dashboardTour.hidden = true;
       });
     }
-    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1';
+    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1' || params.get('tour') === 'order';
     var setupDismissed = false;
     try {
       setupDismissed = window.localStorage.getItem(setupDismissedKey) === '1';
@@ -1921,8 +2027,8 @@
     } else {
       showOnboarding();
     }
-    if (params.get('tour') === '1') {
-      openDashboardTour(supplierAdded && !marketListBuilt ? 'market' : 'supplier');
+    if (params.get('tour') === '1' || params.get('tour') === 'order') {
+      openDashboardTour(params.get('tour') === 'order' ? 'order' : supplierAdded && !marketListBuilt ? 'market' : 'supplier');
     }
     window.addEventListener('resize', placeDashboardTour);
   })();

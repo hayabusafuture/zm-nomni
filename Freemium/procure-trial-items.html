@@ -746,7 +746,7 @@
   .tour-actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 10px;
   }
   .tour-dismiss,
@@ -761,11 +761,21 @@
     transition: background-color .18s ease, color .18s ease, border-color .18s ease;
   }
   .tour-dismiss {
-    background: #F3F4F6;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    min-height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    background: transparent;
     color: #59606B;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
   }
   .tour-dismiss:hover {
-    background: #E6E8EC;
+    background: #F3F4F6;
     color: var(--ink);
   }
   .tour-step-btn {
@@ -791,6 +801,23 @@
     opacity: .5;
   }
   .tour-nav { display: flex; gap: 8px; }
+  .tour-branch-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    min-height: 34px;
+    margin: -2px 0 14px;
+    padding: 0 12px;
+    border: 1px solid var(--mint);
+    border-radius: 6px;
+    background: var(--mint);
+    color: var(--seaweed);
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .tour-branch-link:hover { background: #C6F2CE; border-color: #C6F2CE; color: var(--seaweed); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -1028,8 +1055,9 @@
     <p class="tour-kicker" data-tour-kicker>Step 2</p>
     <h2 class="tour-title" data-tour-title>Add your first item</h2>
     <p class="tour-copy" data-tour-copy>Your market list is where your team will find items to order. Start by opening Add.</p>
+    <a class="tour-branch-link" data-tour-branch-link hidden href="#"></a>
     <div class="tour-actions">
-      <button class="tour-dismiss" data-tour-dismiss type="button">Dismiss</button>
+      <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
       <div class="tour-nav">
         <button class="tour-step-btn" data-tour-prev type="button">Prev</button>
         <button class="tour-step-btn" data-tour-next type="button">Next</button>
@@ -1078,9 +1106,12 @@
     var tourKicker = document.querySelector('[data-tour-kicker]');
     var tourTitle = document.querySelector('[data-tour-title]');
     var tourCopy = document.querySelector('[data-tour-copy]');
+    var tourBranchLink = document.querySelector('[data-tour-branch-link]');
     var currentTourStep = 'add';
     var invoiceMode = params.get('tour') === 'invoice';
-    var selectedItemFlow = invoiceMode ? 'invoice' : '';
+    var retryPath = params.get('retryPath') || '';
+    var branchReplay = retryPath === 'invoice' || retryPath === 'manual';
+    var selectedItemFlow = branchReplay ? retryPath : invoiceMode ? 'invoice' : '';
     var tourOrder = ['add', 'chooseMethod', 'supplier'];
     var invoiceTourOrder = ['add', 'chooseMethod', 'upload'];
     var tourSteps = {
@@ -1092,10 +1123,14 @@
         actionOnly: true
       },
       chooseMethod: {
-        target: '[data-add-menu]',
+        target: retryPath === 'invoice' ? '[data-add-invoice]' : retryPath === 'manual' ? '[data-create-new]' : '[data-add-menu]',
         kicker: 'Step 3',
-        title: 'Choose how to add items',
-        copy: 'Create one item manually, or upload invoices to build the list faster. Choose the path that fits what you have ready.',
+        title: retryPath === 'invoice' ? 'Try adding from invoice' : retryPath === 'manual' ? 'Try creating manually' : 'Choose how to add items',
+        copy: retryPath === 'invoice'
+          ? 'Use invoices to build the list faster when you already have supplier invoices ready.'
+          : retryPath === 'manual'
+            ? 'Create one item by hand when you want to add a specific product yourself.'
+            : 'Create one item manually, or upload invoices to build the list faster. Choose the path that fits what you have ready.',
         placement: 'below',
         actionOnly: true
       },
@@ -1112,7 +1147,7 @@
         kicker: 'Step 4',
         title: 'Upload invoices',
         copy: 'Choose the invoice files, then click Upload. Nomni will read them and prepare the items for review.',
-        placement: 'right',
+        placement: 'below',
         actionOnly: true
       },
       complete: {
@@ -1134,7 +1169,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1150,6 +1185,17 @@
       return withParams('Procure%20Trial%20Dashboard.html', forceSetup ? { setup: '1' } : {});
     }
 
+    function setupTourUrl(tour) {
+      return withParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: tour || '1' });
+    }
+
+    function sidebarNextUrl() {
+      var goal = params.get('primaryGoal') || 'Order faster';
+      if (marketListBuilt && goal === 'Order faster') return setupTourUrl('order');
+      if (!supplierAdded || (supplierAdded && !marketListBuilt)) return setupTourUrl('1');
+      return dashboardUrl(true);
+    }
+
     function createSkuUrl() {
       return withParams('procure-trial-create-sku.html', {
         tour: '5',
@@ -1162,6 +1208,20 @@
         tour: '5',
         supplierAdded: '1'
       });
+    }
+
+    function branchReplayUrl(path) {
+      var extras = {
+        supplierAdded: '1',
+        marketListBuilt: '1',
+        retryPath: path
+      };
+      if (createdSku) extras.createdSku = createdSku;
+      if (createdSupplier) extras.createdSupplier = createdSupplier;
+      if (createdUom) extras.createdUom = createdUom;
+      if (createdPrice) extras.createdPrice = createdPrice;
+      if (invoiceItemsAdded) extras.invoiceItemsAdded = '1';
+      return withParams('procure-trial-items.html', extras);
     }
 
     function syncChrome() {
@@ -1200,7 +1260,7 @@
         });
       }
       document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-        link.href = marketListBuilt ? dashboardUrl(true) : withParams('procure-trial-items.html', { tour: '1' });
+        link.href = sidebarNextUrl();
       });
     }
 
@@ -1239,6 +1299,7 @@
     }
 
     function showToast() {
+      if (branchReplay) return;
       if (!toast || (!createdSku && !invoiceItemsAdded)) return;
       if (toastTitle) toastTitle.textContent = invoiceItemsAdded ? 'Success' : createdSku;
       var toastCopy = toast.querySelector('.toast-copy');
@@ -1248,6 +1309,7 @@
     }
 
     function showCompletionHandoff() {
+      if (branchReplay) return;
       if (!marketListBuilt || !tour) return;
       tour.hidden = false;
       setTourStep('complete', false);
@@ -1296,7 +1358,7 @@
       tourSteps.upload.target = '[data-invoice-upload-step]';
       tourSteps.upload.title = 'Upload invoices';
       tourSteps.upload.copy = 'Choose the invoice files, then click Upload. Nomni will read them and prepare the items for review.';
-      tourSteps.upload.placement = 'right';
+      tourSteps.upload.placement = 'below';
     }
 
     function addDemoInvoiceFiles() {
@@ -1334,9 +1396,9 @@
     function updateSupplierTourTarget(hasSupplier) {
       if (!tourSteps.supplier) return;
       tourSteps.supplier.target = hasSupplier ? '[data-create-sku]' : '[data-supplier-select]';
-      tourSteps.supplier.title = hasSupplier ? 'Create the item' : 'Link it to a supplier';
+      tourSteps.supplier.title = 'Link it to a supplier';
       tourSteps.supplier.copy = hasSupplier
-        ? 'Now click Create new to open the item form with this supplier already selected.'
+        ? 'Now click Create new to continue with this supplier.'
         : 'Choose who you buy this item from first. Then create the item under that supplier.';
       tourSteps.supplier.placement = hasSupplier ? 'right' : 'below';
     }
@@ -1383,10 +1445,29 @@
 
     function setTourStep(stepName, shouldScroll) {
       currentTourStep = stepName;
+      if (currentTourStep === 'upload' && invoiceModal && invoiceModal.hidden) {
+        selectedItemFlow = 'invoice';
+        closeAddMenu();
+        invoiceModal.hidden = false;
+      }
       var step = tourSteps[currentTourStep] || tourSteps.add;
       if (tourKicker) tourKicker.textContent = step.kicker;
       if (tourTitle) tourTitle.textContent = step.title;
       if (tourCopy) tourCopy.textContent = step.copy;
+      if (tourBranchLink) {
+        var hasManualPath = !!createdSku;
+        var hasInvoicePath = invoiceItemsAdded;
+        var otherPath = currentTourStep === 'complete' && hasManualPath && !hasInvoicePath ? 'invoice' : currentTourStep === 'complete' && hasInvoicePath && !hasManualPath ? 'manual' : '';
+        if (otherPath) {
+          tourBranchLink.hidden = false;
+          tourBranchLink.textContent = otherPath === 'invoice' ? 'Try adding from invoice' : 'Try creating manually';
+          tourBranchLink.href = branchReplayUrl(otherPath);
+        } else {
+          tourBranchLink.hidden = true;
+          tourBranchLink.removeAttribute('href');
+          tourBranchLink.textContent = '';
+        }
+      }
       var target = document.querySelector(step.target);
       if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       var activeOrder = selectedItemFlow === 'invoice' ? invoiceTourOrder : tourOrder;
@@ -1406,6 +1487,12 @@
       if (!tour) return;
       tour.hidden = false;
       setTourStep('add', false);
+    }
+
+    function openBranchReplayTour() {
+      if (!tour) return;
+      tour.hidden = false;
+      openAddMenu();
     }
 
     function closeTour() {
@@ -1481,7 +1568,8 @@
     });
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
-    if ((params.get('tour') === '1' || invoiceMode) && supplierAdded && !marketListBuilt) openTour();
+    if (branchReplay && supplierAdded) openBranchReplayTour();
+    else if ((params.get('tour') === '1' || invoiceMode) && supplierAdded && !marketListBuilt) openTour();
   })();
 </script>
 </body>
