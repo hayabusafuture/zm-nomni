@@ -287,13 +287,15 @@ Note: the exact Zeemart screenshot hero photo was not found among downloaded ref
 Dashboard states:
 
 - First visit, or `?setup=1`, shows the onboarding checklist.
-- `Go to dashboard` dismisses onboarding and stores the choice in `localStorage` under `nomniProcureSetupDismissed`.
+- Dashboard sidenav clicks also open the onboarding checklist by default until setup is 100% done or the user explicitly chooses `Go to dashboard`.
+- `Go to dashboard` dismisses onboarding by adding `setupDismissed=1` to the prototype URL state, so the regular dashboard remains the default target while navigating without relying on stale browser storage.
 - After dismissal, Dashboard shows the regular empty trial dashboard with zero-value cards and empty spending sections.
 - The persistent sidebar `Get started` card reopens the onboarding checklist with `?setup=1`.
 
 Trial app chrome:
 
-- Topbar shows `Trial ends in 14 days`, `Book setup`, and the trial user.
+- Topbar shows `Trial ends in 14 days`, `Book a live demo`, the real-site `Help` link, and the trial user.
+- `Help` and `Explore our setup guide` both point to the Restaurants / Nomni Procure knowledge-base collection.
 - Sidebar includes the Procure nav, the `Get started` card directly below `News`, and the lower-left Intercom-style launcher.
 - The sidebar card shows current setup progress, a progress bar, and one recommended next action. The card body returns to the checklist; only the next-action text starts the active guided flow.
 - Signup details travel through URL params. Trial pages use the captured user name and `venueName`; direct file previews fall back to `Trial user` and `Trial Outlet`.
@@ -373,7 +375,36 @@ Invoice item creation:
 
 Placeholder pages:
 
-- `Freemium/procure-trial-inventory.html` and `Freemium/procure-trial-invoices.html` are empty-state pages for the unlocked `Set up inventory` and `Upload invoice` CTAs.
+- `Freemium/procure-trial-invoices.html` is an empty-state page for the unlocked `Upload invoice` CTA.
+
+Set up inventory flow:
+
+- `Freemium/procure-trial-inventory.html` has Items and Lists tabs (matching the live Procure Inventory page), each with its own stat cards (Items: Est. value / No. of items / Below PAR; Lists: Est. value / No. of items) and empty states. State (lists + items) persists in `localStorage` under `nomniProcureInventoryStore`, scoped to the browser, not the checklist params. Item records carry `par`/`onHand`/`lastCount`/`lastCountDate`/`movement`/`price`/`supplier`/`tag`, so the stat cards, Below PAR count, and est. value are all computed live from the store rather than hardcoded.
+- Users land on the Items tab. Clicking `Add item` (toolbar or empty-state CTA) or either `Add SKU or recipe` / `Create Group SKU` opens the `Select inventory list` modal (`Add to:` dropdown + `Next`) — available to everyone, every time, not just first-time users.
+- The `Select inventory list` modal always shows a persistent `+ Create new list` link next to the dropdown. Clicking it stacks the `Create new list` modal (list name + `Next`) on top; submitting it adds the list, pre-selects it back in the `Add to:` dropdown, and returns to the Select inventory list modal.
+- `Next` opens the real **Add to list** catalog picker (matching the live product): item-name search, `Select Supplier` filter, `Not in Inventory` / `Invoiced in past` filters (decorative), and a checkbox table (Name incl. "In N lists"/Recipe/Sub-recipe tags, Inventory UOM, Conversion rate to order UOM, Par). Checking a row reveals an inline editable Par input. A small static `DEMO_CATALOG` (plain items + recipes + sub-recipes) backs the picker since there's no real catalog behind this prototype. Footer shows "N items selected", a `Save N selected & add more` link that commits without closing, and `Done` which commits and closes.
+- `Done` adds the selected items (with their par) to the chosen list in the store, shows a toast ("Inventory Management" / "Products added to the shelve succesfully" — copy matches the live product's typo), and re-renders the Items/Lists tabs.
+- The Items tab table now has the full live-product column set: Item/UOM/PAR/On hand/Last count/Movement/Incoming.
+- The catalog picker's `Done` action calls `markInventorySetupComplete()`, which sets `inventorySetup=1` into the live `params`/URL (via `history.replaceState`, no reload) the moment the store has at least one item, then re-syncs the sidebar `Get started` card in place. This is threaded through every trial page's param passthrough and marks the dashboard's `Set up inventory` checklist task complete (same pattern as `orderPlaced`), updating goal progress % automatically.
+- Follow-up (not yet built): a matching `+ Create new list` shortcut inside `procure-trial-create-sku.html`'s own `Inventory list` field for the non-inventory (Build market list) entry point, and real filtering behavior for `Not in Inventory` / `Invoiced in past`.
+
+Set up inventory guided tour:
+
+- Triggered by `?tour=1` on `procure-trial-inventory.html` whenever inventory is not yet marked complete. The tour is fully action-driven — there's no Next/Prev button, each step only advances when the user performs the real action, matching the "guided, but they do it themselves" rule used everywhere else in this trial.
+- Like the Items tour, the Inventory tour keeps page scrolling available and scrolls lower targets into view before positioning the popover. Step labels use `Step X`, not total counts.
+- Step 1 highlights `Add item` → user clicks it → Step 2 highlights the `+ Create new list` shortcut inside the Select inventory list modal → user clicks it → Step 3 highlights the list name field in the Create new list modal → user names it and clicks Next → Step 4 highlights the Select inventory list modal's own `Next` button (now enabled) → user clicks it → Step 5 highlights the Add to list catalog table → user checks an item → Step 6 highlights `Done` → user clicks it, which completes the tour and shows a brief "Inventory set up" handoff pointer at the sidebar `Get started` card.
+- Users are never redirected straight to `procure-trial-inventory.html` to start this tour. The dashboard's existing `dashboardTourMode` "Start from X" pointer system (previously `supplier`/`market`/`order`) gained a 4th `inventory` mode: pointer targets the `Inventory` sidenav link, "Start from Inventory" / "Create your first inventory list and add items to start tracking stock on hand." The dashboard checklist's `Set up inventory` CTA and every trial page's sidebar `Next` action now route through `setupTourUrl('inventory')` (reload the dashboard with the pointer) instead of linking directly to the Inventory page, whenever inventory is the actual next step for the user's goal — `Manage inventory` right after `Build market list`, or `Order faster` right after `Place first order`. The user still has to click Inventory in the sidebar themselves.
+
+Stock count flow:
+
+- The page header's `Stock count` button is a split button (`Stock count` + caret) opening a small menu: `New stock count` / `Import stock count` (decorative stub).
+- The `Complete first stock count` checklist CTA uses the same guided-start convention as the other flows: first show the dashboard pointer at `Inventory`; clicking Inventory opens `procure-trial-inventory.html?tour=stockCount`, which points at the real Stock count controls. If the user is already on Inventory, the sidebar `Next` action starts the stock-count pointer in place instead of bouncing them back to the dashboard.
+- `New stock count` opens a modal: `Inventory list` dropdown (populated from the store's lists) + `Start stock count` button, disabled until a list is chosen. Starting navigates to the new `Freemium/procure-trial-stock-count.html?list=<name>`.
+- That page mirrors the live product: `New stock count: {list}` header, count date/time (real `Date()`, not hardcoded), an item count + `SKU name` search, an `Auto-fill with last count data` shortcut, and a table (Name/Supplier/UOM/Last count/On hand/**Counted Qty** input/Value) sourced from the chosen list's items in the shared store. Value recalculates live per row (`counted qty × item price`) and the footer tracks `Est. value` + `N/M counted`.
+- Footer actions: `Cancel` and `Save as draft & exit` return to Inventory without persisting; `Save as draft` is a decorative no-op (shows "Draft saved" inline); `Done` opens the `Update stock count` confirm modal ("The stock levels will be immediately updated upon saving.") → `Save stock count`.
+- Saving updates each counted item's `onHand`/`lastCount`/`lastCountDate`/`movement` in the shared store and redirects to `procure-trial-inventory.html?stockCountDone=1`, which shows an "Inventory Management" / "Stock count created successfully" toast.
+- `stockCountDone=1` is threaded through every trial page's param passthrough and marks the dashboard's `Complete first stock count` checklist task complete, advancing the `Manage inventory` goal to 100% (goal-gated — a no-op for other goals since `stockCount` isn't in their checklist).
+- Currency note: this flow uses `A$` throughout for consistency with the rest of the Inventory page's own store-derived values, even though the reference production screenshots for this specific flow show `S$` (different demo region) — an intentional internal-consistency choice over screenshot-literal fidelity on a cosmetic detail.
 
 Place first order flow:
 
@@ -389,8 +420,7 @@ Place first order flow:
 
 Support links:
 
-- Navigating Nomni Procure app: `https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app`
-- Nomni Procure help collection: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`
+- Nomni Procure help collection for restaurants: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`
 
 ## Verification
 

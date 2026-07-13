@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
 <style>
   :root {
     --nomni-green: #2AC864;
@@ -77,6 +78,25 @@
   }
 
   .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  .help-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.7);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
   .trial-status {
     min-height: 34px;
     display: inline-flex;
@@ -483,7 +503,8 @@
     </div>
     <div class="topbar-right">
       <div class="trial-status" aria-label="Trial status"><span class="trial-dot" aria-hidden="true"></span>Trial ends in 14 days</div>
-      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book setup</a>
+      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book a live demo</a>
+      <a class="help-btn" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank"><span class="material-symbols-outlined" aria-hidden="true">help</span>Help</a>
       <div class="user">
         <div class="avatar" data-avatar>TR</div>
         <span data-user-name>Trial user</span>
@@ -559,6 +580,9 @@
     var avatarNode = document.querySelector('[data-avatar]');
     var supplierAdded = params.get('supplierAdded') === '1';
     var marketListBuilt = params.get('marketListBuilt') === '1';
+    var orderPlaced = params.get('orderPlaced') === '1';
+    var inventorySetup = params.get('inventorySetup') === '1';
+    var stockCountDone = params.get('stockCountDone') === '1';
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -569,7 +593,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -581,8 +605,18 @@
       return file + (query ? '?' + query : '');
     }
 
+
+    function setupDismissed() {
+      return params.get('setupDismissed') === '1';
+    }
+
+    function setupComplete() {
+      return params.get('setupComplete') === '1';
+    }
+
     function dashboardUrl(forceSetup) {
-      return withParams('Procure%20Trial%20Dashboard.html', forceSetup ? { setup: '1' } : {});
+      var shouldShowSetup = forceSetup || (!setupDismissed() && !setupComplete());
+      return withParams('Procure%20Trial%20Dashboard.html', shouldShowSetup ? { setup: '1' } : {});
     }
 
     function setupTourUrl(tour) {
@@ -591,7 +625,9 @@
 
     function sidebarNextUrl() {
       var goal = params.get('primaryGoal') || 'Order faster';
-      if (marketListBuilt && goal === 'Order faster') return setupTourUrl('order');
+      if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return setupTourUrl('stockCount');
+      if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return setupTourUrl('order');
+      if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return setupTourUrl('inventory');
       if (!supplierAdded || (supplierAdded && !marketListBuilt)) return setupTourUrl('1');
       return dashboardUrl(true);
     }
@@ -630,6 +666,31 @@
         var goal = params.get('primaryGoal') || 'Order faster';
         node.textContent = goal === 'Digitise invoices' ? 'Upload first invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place first order';
       });
+    }
+    if (orderPlaced) {
+      var orderGoal = params.get('primaryGoal') || 'Order faster';
+      var orderProgress = orderGoal === 'Order faster' ? '80% done' : '60% done';
+      var orderProgressWidth = orderGoal === 'Order faster' ? '80%' : '60%';
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = orderProgress; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = orderProgressWidth; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+        node.textContent = orderGoal === 'Digitise invoices' ? 'Upload first invoice' : 'Set up inventory';
+      });
+    }
+    if (inventorySetup) {
+      var invGoal = params.get('primaryGoal') || 'Order faster';
+      var invProgress = invGoal === 'Order faster' ? '100% done' : invGoal === 'Manage inventory' ? '80% done' : '60% done';
+      var invProgressWidth = invGoal === 'Order faster' ? '100%' : invGoal === 'Manage inventory' ? '80%' : '60%';
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = invProgress; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = invProgressWidth; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+        node.textContent = invGoal === 'Manage inventory' ? 'Complete first stock count' : "You're all set";
+      });
+    }
+    if (stockCountDone && (params.get('primaryGoal') || 'Order faster') === 'Manage inventory') {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '100% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
     }
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
       link.href = sidebarNextUrl();

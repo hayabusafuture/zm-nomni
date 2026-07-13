@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
 <style>
   :root {
     --nomni-green: #2AC864;
@@ -75,6 +76,25 @@
     line-height: 1;
   }
   .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  .help-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.7);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
   .trial-status {
     min-height: 34px;
     display: inline-flex;
@@ -638,7 +658,8 @@
     </div>
     <div class="topbar-right">
       <div class="trial-status" aria-label="Trial status"><span class="trial-dot" aria-hidden="true"></span>Trial ends in 14 days</div>
-      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book setup</a>
+      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book a live demo</a>
+      <a class="help-btn" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank"><span class="material-symbols-outlined" aria-hidden="true">help</span>Help</a>
       <div class="user">
         <div class="avatar" data-avatar>TR</div>
         <span data-user-name>Trial user</span>
@@ -737,7 +758,7 @@
         <div class="inventory-extra is-disabled" data-inventory-extra data-field-inventory-details>
           <div class="field">
             <label for="inventoryList">Inventory list</label>
-            <select id="inventoryList">
+            <select id="inventoryList" data-inventory-list-select>
               <option>Select</option>
               <option>Ingredients</option>
               <option>Uncategorised</option>
@@ -791,10 +812,13 @@
   (function() {
     var params = new URLSearchParams(window.location.search);
     var userName = params.get('userName') || '';
+    var fromInventory = params.get('from') === 'inventory';
+    var inventoryListParam = params.get('inventoryList') || '';
     var supplierName = params.get('selectedSupplier') || params.get('supplierName') || 'Test Supplier';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
     var supplierNodes = document.querySelectorAll('[data-supplier-name]');
+    var inventoryListSelect = document.querySelector('[data-inventory-list-select]');
     var skuName = document.querySelector('[data-sku-name]');
     var supplierCode = document.querySelector('[data-supplier-code]');
     var skuUom = document.querySelector('[data-sku-uom]');
@@ -864,7 +888,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'invoiceItemsAdded'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'invoiceItemsAdded', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -876,15 +900,32 @@
       return file + (query ? '?' + query : '');
     }
 
+
+    function setupDismissed() {
+      return params.get('setupDismissed') === '1';
+    }
+
+    function setupComplete() {
+      return params.get('setupComplete') === '1';
+    }
+
+    function dashboardUrl(forceSetup) {
+      var shouldShowSetup = forceSetup || (!setupDismissed() && !setupComplete());
+      return withParams('Procure%20Trial%20Dashboard.html', shouldShowSetup ? { setup: '1' } : {});
+    }
+
     function syncLinks() {
       document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
-        link.href = withParams('Procure%20Trial%20Dashboard.html');
+        link.href = dashboardUrl(false);
       });
       document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
-        link.href = withParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
+        link.href = dashboardUrl(true);
       });
-      document.querySelectorAll('[data-nav-items], [data-back-items], [data-cancel], [data-sidebar-next-action]').forEach(function(link) {
+      document.querySelectorAll('[data-nav-items]').forEach(function(link) {
         link.href = withParams('procure-trial-items.html', { supplierAdded: '1', tour: '1' });
+      });
+      document.querySelectorAll('[data-back-items], [data-cancel], [data-sidebar-next-action]').forEach(function(link) {
+        link.href = fromInventory ? withParams('procure-trial-inventory.html') : withParams('procure-trial-items.html', { supplierAdded: '1', tour: '1' });
       });
       document.querySelectorAll('[data-nav-outlets]').forEach(function(link) {
         link.href = withParams('procure-trial-outlet-suppliers.html');
@@ -939,6 +980,17 @@
 
     function saveSku() {
       if (!ready()) return;
+      if (fromInventory) {
+        var chosenList = (inventoryListSelect && inventoryListSelect.value && inventoryListSelect.value !== 'Select') ? inventoryListSelect.value : inventoryListParam;
+        window.location.href = withParams('procure-trial-inventory.html', {
+          inventorySetup: '1',
+          inventoryList: chosenList,
+          createdSku: skuName.value.trim(),
+          createdUom: skuUom.value,
+          createdPrice: price.value.trim()
+        });
+        return;
+      }
       window.location.href = withParams('procure-trial-items.html', {
         supplierAdded: '1',
         marketListBuilt: '1',
@@ -1049,7 +1101,16 @@
       userNameNode.textContent = userName;
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
-    supplierNodes.forEach(function(node) { node.textContent = supplierName; });
+    supplierNodes.forEach(function(node) { node.textContent = fromInventory ? 'Inventory' : supplierName; });
+    if (fromInventory && inventoryListSelect && inventoryListParam) {
+      var hasOption = Array.prototype.some.call(inventoryListSelect.options, function(opt) { return opt.value === inventoryListParam || opt.textContent === inventoryListParam; });
+      if (!hasOption) {
+        var customOption = document.createElement('option');
+        customOption.textContent = inventoryListParam;
+        inventoryListSelect.insertBefore(customOption, inventoryListSelect.firstChild.nextSibling);
+      }
+      inventoryListSelect.value = inventoryListParam;
+    }
     syncLinks();
     toggleInventory(false);
     [skuName, supplierCode, skuUom, moq, price].forEach(function(field) {
@@ -1073,17 +1134,19 @@
     if (saveMore) saveMore.addEventListener('click', saveSku);
     var cancel = document.querySelector('[data-cancel]');
     if (cancel) cancel.addEventListener('click', function() {
-      window.location.href = withParams('procure-trial-items.html', { supplierAdded: '1', tour: '1' });
+      window.location.href = fromInventory ? withParams('procure-trial-inventory.html') : withParams('procure-trial-items.html', { supplierAdded: '1', tour: '1' });
     });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
     if (tourPrev) tourPrev.addEventListener('click', function() { goTour(-1); });
     if (tourNext) tourNext.addEventListener('click', function() { goTour(1); });
-    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      link.addEventListener('click', function(event) {
-        event.preventDefault();
-        startMarketListTourHere();
+    if (!fromInventory) {
+      document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startMarketListTourHere();
+        });
       });
-    });
+    }
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
     updateState();

@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
 <style>
   :root {
     --nomni-green: #2AC864;
@@ -77,6 +78,25 @@
   }
 
   .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  .help-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.7);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
   .trial-status {
     min-height: 34px;
     display: inline-flex;
@@ -317,9 +337,15 @@
     background: #fff;
   }
   .page-header {
-    padding: 28px 40px 16px;
-    border-bottom: 1px solid var(--rule);
+    padding: 28px 40px 0;
     background: #fff;
+  }
+  .page-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
   }
   .page-title {
     margin: 0;
@@ -328,14 +354,76 @@
     font-weight: 700;
     letter-spacing: -.03em;
   }
+  .page-actions { display: flex; align-items: center; gap: 10px; }
 
-  .content { padding: 32px 40px 56px; }
+  .tabs {
+    display: flex;
+    gap: 28px;
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2px;
+  }
+  .tab {
+    position: relative;
+    padding: 10px 2px 14px;
+    color: var(--ink-mute);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    transition: color .15s ease;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--ink); }
+  .tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  .content { padding: 24px 40px 56px; }
+
+  .stat-cards { display: flex; gap: 16px; margin-bottom: 20px; }
+  .stat-card {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--rule);
+    background: #fff;
+  }
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 48px;
+  }
+  .stat-icon.green { background: #D4F5E0; color: var(--spinach); }
+  .stat-icon.teal { background: #D4EDF5; color: #1A6080; }
+  .stat-icon.red { background: #FDE8E8; color: #C02020; }
+  .stat-label { font-size: 12px; color: var(--ink-mute); line-height: 1.4; }
+  .stat-value { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin-top: 3px; }
+  .stat-value.green { color: var(--spinach); }
+  .stat-value.teal { color: #1A6080; }
+  .stat-value.red { color: #C02020; }
+
   .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin: 8px 0 24px;
+    margin: 8px 0 20px;
   }
   .toolbar-left,
   .toolbar-right {
@@ -390,8 +478,13 @@
     transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .16s ease;
   }
   .btn:active { transform: scale(.96); }
+  .btn:disabled { cursor: not-allowed; opacity: .55; transform: none; }
   .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
   .btn-primary:hover { background: var(--seaweed); color: var(--nomni-green); border-color: var(--seaweed); }
+  .btn-primary:disabled:hover { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+  .btn-secondary { background: var(--mint); color: var(--seaweed); border-color: var(--mint); }
+  .btn-secondary:hover { background: #C6F2CE; }
+  .btn-sm { min-height: 36px; padding: 0 14px; font-size: 13px; }
   .plus-icon {
     width: 18px;
     height: 18px;
@@ -412,6 +505,33 @@
   }
   .plus-icon::after { transform: translate(-50%, -50%) rotate(90deg); }
 
+  .add-menu-wrap { position: relative; }
+  .add-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 50;
+    width: 190px;
+    padding: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #DCDEE3;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(10,20,15,.12);
+  }
+  .add-menu button {
+    width: 100%;
+    min-height: 34px;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    padding: 7px 16px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .add-menu button:hover { background: var(--mint); }
+
   .table-card {
     border: 1px solid var(--rule);
     border-radius: 8px;
@@ -425,9 +545,7 @@
     padding: 40px 24px;
     text-align: center;
   }
-  .empty-state-inner {
-    max-width: 360px;
-  }
+  .empty-state-inner { max-width: 360px; }
   .empty-state-icon {
     width: 48px;
     height: 48px;
@@ -448,11 +566,404 @@
     letter-spacing: -.02em;
   }
   .empty-state-copy {
-    margin: 0;
+    margin: 0 0 20px;
     color: var(--ink-mute);
     font-size: 14px;
     line-height: 1.5;
   }
+
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  thead th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink-mute);
+    padding: 12px 14px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: #fff;
+    white-space: nowrap;
+  }
+  tbody td { padding: 14px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: var(--row-hover); }
+  .col-right { text-align: right; }
+  .item-name { font-weight: 500; color: var(--ink); font-size: 13px; }
+  .item-meta { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+  .val-mute { color: var(--ink-mute); }
+  .val-red { color: #C02020; font-weight: 600; }
+  .list-name { font-weight: 600; color: var(--ink); }
+
+  /* Modals */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: rgba(0,0,0,.54);
+  }
+  .modal-overlay[hidden] { display: none; }
+  .modal-card {
+    width: 480px;
+    max-width: calc(100vw - 32px);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 26px 70px rgba(0,0,0,.24);
+    padding: 32px 34px 30px;
+  }
+  .modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .modal-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+  }
+  .modal-close {
+    border: 0;
+    background: transparent;
+    color: var(--spinach);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .modal-intro {
+    margin: 0 0 20px;
+    color: var(--ink-mute);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .field { display: grid; gap: 9px; margin-bottom: 8px; }
+  .field label {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .select-control, .text-control {
+    width: 100%;
+    height: 42px;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    padding: 0 12px;
+    color: var(--ink);
+    background: #fff;
+    outline: none;
+    transition: border-color .13s;
+  }
+  .select-control:focus, .text-control:focus { border-color: var(--nomni-green); }
+  .create-list-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--spinach);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 0;
+  }
+  .create-list-link:hover { text-decoration: underline; }
+  .modal-foot { margin-top: 22px; }
+  .modal-foot .btn { width: 100%; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translate(-50%, 16px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--mint);
+    border: 1px solid rgba(42,200,100,.3);
+    border-radius: 10px;
+    padding: 14px 20px;
+    box-shadow: 0 14px 34px rgba(10,20,15,.16);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease;
+    z-index: 950;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .toast-check {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--spinach);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 15px;
+    line-height: 1;
+    flex: 0 0 auto;
+  }
+  .toast-title { font-weight: 800; margin-bottom: 2px; }
+  .toast-copy { color: var(--seaweed); font-size: 13px; }
+
+  /* Split button (Stock count) */
+  .split-btn-wrap { position: relative; display: inline-flex; }
+  .split-btn-main { border-radius: 6px 0 0 6px; }
+  .split-btn-caret {
+    border-radius: 0 6px 6px 0;
+    border-left: 1px solid rgba(14,55,39,.25);
+    padding: 0 10px;
+    min-width: 0;
+  }
+  .caret-icon {
+    width: 9px;
+    height: 9px;
+    display: inline-block;
+    border-right: 1.6px solid currentColor;
+    border-bottom: 1.6px solid currentColor;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+  .stock-count-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 60;
+    width: 190px;
+    padding: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #DCDEE3;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(10,20,15,.12);
+  }
+  .stock-count-menu button {
+    width: 100%;
+    min-height: 34px;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    padding: 7px 16px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .stock-count-menu button:hover { background: var(--mint); }
+
+  /* Add-to-list catalog modal */
+  .catalog-modal-card {
+    width: 780px;
+    max-width: calc(100vw - 32px);
+    padding: 30px 32px 0;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 96px);
+  }
+  .catalog-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .catalog-search { width: 220px; }
+  .catalog-supplier-select { width: 190px; height: 36px; }
+  .catalog-days-select { width: 100px; height: 36px; }
+  .catalog-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .catalog-filter-btn {
+    min-height: 36px;
+    padding: 0 14px;
+    background: #F3F4F6;
+    color: var(--ink);
+    border-color: transparent;
+    margin-left: auto;
+  }
+  .catalog-filter-btn:hover { background: #E6E8EC; }
+  .catalog-table-wrap {
+    overflow-y: auto;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    margin: 0 -32px;
+    padding: 0 32px;
+    flex: 1;
+    min-height: 0;
+  }
+  table.catalog-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  .catalog-table thead th {
+    position: sticky;
+    top: 0;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink-mute);
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--rule);
+    background: #fff;
+    white-space: nowrap;
+  }
+  .catalog-table tbody td { padding: 12px 10px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .catalog-table tbody tr:last-child td { border-bottom: 0; }
+  .catalog-table tbody tr:hover td { background: var(--row-hover); }
+  .catalog-table .col-check { width: 32px; }
+  .catalog-tag { color: var(--spinach); font-weight: 700; font-size: 11px; }
+  .catalog-tag-dot { color: var(--ink-mute); font-size: 11px; margin: 0 4px; }
+  .catalog-tag-type { color: var(--ink-mute); font-size: 11px; }
+  .catalog-par-input {
+    width: 64px;
+    height: 32px;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    padding: 0 8px;
+    text-align: right;
+    color: var(--ink);
+    outline: none;
+  }
+  .catalog-par-input:focus { border-color: var(--nomni-green); }
+  .catalog-foot {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: #fff;
+    margin: 0 -32px;
+    padding: 16px 32px;
+    border-top: 1px solid var(--rule);
+    font-size: 13px;
+    color: var(--ink-mute);
+  }
+  .catalog-foot-actions { display: flex; align-items: center; gap: 18px; }
+  .catalog-save-more {
+    border: 0;
+    background: transparent;
+    color: var(--spinach);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+  }
+  .catalog-save-more:hover { text-decoration: underline; }
+  .catalog-empty {
+    padding: 40px 0;
+    text-align: center;
+    color: var(--ink-mute);
+    font-size: 14px;
+  }
+
+  /* Guided tour */
+  .tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    pointer-events: none;
+  }
+  .tour-overlay[hidden] { display: none; }
+  .tour-highlight {
+    position: fixed;
+    border: 2px solid var(--nomni-green);
+    border-radius: 10px;
+    box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);
+    pointer-events: none;
+    transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
+  }
+  .tour-card {
+    position: fixed;
+    width: min(380px, calc(100vw - 32px));
+    padding: 18px 18px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(42,200,100,.24);
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(10,20,15,.18);
+    pointer-events: auto;
+  }
+  .tour-card::before {
+    content: "";
+    position: absolute;
+    left: -9px;
+    top: 28px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-left: 1px solid rgba(42,200,100,.24);
+    border-bottom: 1px solid rgba(42,200,100,.24);
+    transform: rotate(45deg);
+  }
+  .tour-card.left::before {
+    left: auto;
+    right: -9px;
+    border-left: 0;
+    border-bottom: 0;
+    border-right: 1px solid rgba(42,200,100,.24);
+    border-top: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-card.below::before {
+    left: 28px;
+    top: -9px;
+    border-left: 1px solid rgba(42,200,100,.24);
+    border-bottom: 0;
+    border-top: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-card.above::before {
+    left: auto;
+    right: 28px;
+    top: auto;
+    bottom: -9px;
+    border-left: 0;
+    border-bottom: 1px solid rgba(42,200,100,.24);
+    border-top: 0;
+    border-right: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-kicker {
+    margin: 0 0 6px;
+    color: var(--spinach);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .tour-title {
+    margin: 0 0 6px;
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .tour-copy {
+    margin: 0;
+    color: #59606B;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .tour-dismiss {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    min-height: 30px;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    padding: 0;
+    background: transparent;
+    color: #59606B;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .tour-dismiss:hover { background: #F3F4F6; color: var(--ink); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -461,6 +972,7 @@
     .nav-label, .badge { display: none; }
     .sidebar-setup { display: none; }
     .content, .page-header { padding-left: 24px; padding-right: 24px; }
+    .stat-cards { flex-wrap: wrap; }
   }
   @media (max-width: 760px) {
     .app { display: block; }
@@ -468,9 +980,11 @@
     .trial-status,
     .topbar-setup-link { display: none; }
     .sidebar { display: none; }
+    .page-header-top { flex-direction: column; align-items: flex-start; }
     .toolbar { align-items: stretch; flex-direction: column; }
     .toolbar-left, .toolbar-right { width: 100%; flex-wrap: wrap; }
     .search-wrap { width: 100%; }
+    .stat-cards { flex-direction: column; }
   }
 </style>
 </head>
@@ -483,7 +997,8 @@
     </div>
     <div class="topbar-right">
       <div class="trial-status" aria-label="Trial status"><span class="trial-dot" aria-hidden="true"></span>Trial ends in 14 days</div>
-      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book setup</a>
+      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book a live demo</a>
+      <a class="help-btn" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank"><span class="material-symbols-outlined" aria-hidden="true">help</span>Help</a>
       <div class="user">
         <div class="avatar" data-avatar>TR</div>
         <span data-user-name>Trial user</span>
@@ -523,42 +1038,353 @@
 
   <main class="main">
     <section class="page-header">
-      <h1 class="page-title">Inventory</h1>
+      <div class="page-header-top">
+        <h1 class="page-title" data-outlet-title>Test Outlet ZM</h1>
+        <div class="page-actions">
+          <div class="split-btn-wrap">
+            <button class="btn btn-primary btn-sm split-btn-main" data-stock-count-toggle type="button">Stock count</button>
+            <button class="btn btn-primary btn-sm split-btn-caret" data-stock-count-toggle type="button" aria-label="Stock count options"><span class="caret-icon" aria-hidden="true"></span></button>
+            <div class="stock-count-menu" data-stock-count-menu hidden>
+              <button type="button" data-new-stock-count>New stock count</button>
+              <button type="button" data-import-stock-count>Import stock count</button>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm" type="button">Adjustment/Production</button>
+        </div>
+      </div>
+      <nav class="tabs" aria-label="Inventory tabs">
+        <button class="tab active" data-tab-btn="items" type="button">Items</button>
+        <button class="tab" data-tab-btn="lists" type="button">Lists</button>
+      </nav>
     </section>
 
     <div class="content">
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <label class="search-wrap">
-            <span class="search-icon" aria-hidden="true"></span>
-            <input type="text" placeholder="Search inventory" />
-          </label>
+
+      <div class="stat-cards" data-stat-cards="items">
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label" data-stat-value-label>Est. value on hand (0 Lists)</div>
+            <div class="stat-value green" data-stat-est-value>A$0.00</div>
+          </div>
         </div>
-        <div class="toolbar-right">
-          <button class="btn btn-primary" type="button"><span class="plus-icon" aria-hidden="true"></span>New list</button>
+        <div class="stat-card">
+          <div class="stat-icon teal">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">No. of items</div>
+            <div class="stat-value teal" data-stat-item-count>0 items</div>
+          </div>
         </div>
-      </div>
-      <div class="table-card">
-        <div class="empty-state">
-          <div class="empty-state-inner">
-            <div class="empty-state-icon" aria-hidden="true">+</div>
-            <h2 class="empty-state-title">No inventory lists yet</h2>
-            <p class="empty-state-copy">Create inventory lists so your team can track stock on hand.</p>
+        <div class="stat-card">
+          <div class="stat-icon red">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">Below PAR</div>
+            <div class="stat-value red" data-stat-below-par>0 items</div>
           </div>
         </div>
       </div>
+
+      <div class="stat-cards" data-stat-cards="lists" hidden>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label" data-stat-value-label-lists>Est. value on hand (0 Lists)</div>
+            <div class="stat-value green" data-stat-est-value-lists>A$0.00</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon teal">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <div class="stat-body">
+            <div class="stat-label">No. of items</div>
+            <div class="stat-value teal" data-stat-item-count-lists>0 items</div>
+          </div>
+        </div>
+      </div>
+
+      <div data-tab-panel="items">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <label class="search-wrap">
+              <span class="search-icon" aria-hidden="true"></span>
+              <input type="text" placeholder="Search items" />
+            </label>
+          </div>
+          <div class="toolbar-right">
+            <div class="add-menu-wrap">
+              <button class="btn btn-primary btn-sm" data-add-item-toggle type="button"><span class="plus-icon" aria-hidden="true"></span>Add item</button>
+              <div class="add-menu" data-add-item-menu hidden>
+                <button type="button" data-add-sku>Add SKU or recipe</button>
+                <button type="button" data-add-group-sku>Create Group SKU</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card" data-items-empty-nolist>
+          <div class="empty-state">
+            <div class="empty-state-inner">
+              <div class="empty-state-icon" aria-hidden="true">+</div>
+              <h2 class="empty-state-title">Create an inventory list to get started</h2>
+              <p class="empty-state-copy">Add items so your team can track stock on hand. We'll help you create your first list along the way.</p>
+              <button class="btn btn-primary" data-add-item-toggle type="button"><span class="plus-icon" aria-hidden="true"></span>Add item</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card" data-items-empty-haslist hidden>
+          <div class="empty-state">
+            <div class="empty-state-inner">
+              <div class="empty-state-icon" aria-hidden="true">+</div>
+              <h2 class="empty-state-title">No items in inventory yet</h2>
+              <p class="empty-state-copy">Add SKUs or recipes from your market list to start tracking stock on hand.</p>
+              <button class="btn btn-primary" data-add-item-toggle type="button"><span class="plus-icon" aria-hidden="true"></span>Add item</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card" data-items-table hidden>
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>UOM</th>
+                <th class="col-right">PAR</th>
+                <th class="col-right">On hand</th>
+                <th class="col-right">Last count</th>
+                <th class="col-right">Movement</th>
+                <th class="col-right">Incoming</th>
+              </tr>
+            </thead>
+            <tbody data-items-body></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-tab-panel="lists" hidden>
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <label class="search-wrap">
+              <span class="search-icon" aria-hidden="true"></span>
+              <input type="text" placeholder="Search list" />
+            </label>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-primary btn-sm" data-new-list-toggle type="button"><span class="plus-icon" aria-hidden="true"></span>New list</button>
+          </div>
+        </div>
+
+        <div class="table-card" data-lists-empty>
+          <div class="empty-state">
+            <div class="empty-state-inner">
+              <div class="empty-state-icon" aria-hidden="true">+</div>
+              <h2 class="empty-state-title">No inventory lists yet</h2>
+              <p class="empty-state-copy">Create inventory lists so your team can track stock on hand.</p>
+              <button class="btn btn-primary" data-new-list-toggle type="button"><span class="plus-icon" aria-hidden="true"></span>New list</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card" data-lists-table hidden>
+          <table>
+            <thead>
+              <tr>
+                <th>List</th>
+                <th class="col-right">Est. value</th>
+                <th class="col-right">Items</th>
+                <th class="col-right">Last counted</th>
+              </tr>
+            </thead>
+            <tbody data-lists-body></tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </main>
+</div>
+
+<!-- Select inventory list modal -->
+<div class="modal-overlay" data-select-list-modal hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="select-list-title">
+    <div class="modal-head">
+      <h2 class="modal-title" id="select-list-title">Select inventory list</h2>
+      <button class="modal-close" data-close-select-list type="button" aria-label="Close select inventory list dialog">&times;</button>
+    </div>
+    <div class="field">
+      <label for="selectListDropdown">Add to:</label>
+      <select class="select-control" id="selectListDropdown" data-select-list-dropdown>
+        <option value="" selected>Select</option>
+      </select>
+      <button class="create-list-link" type="button" data-open-create-list><span class="plus-icon" aria-hidden="true" style="width:14px;height:14px"></span>Create new list</button>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-select-list-next type="button" disabled>Next</button>
+    </div>
+  </section>
+</div>
+
+<!-- Create new list modal -->
+<div class="modal-overlay" data-create-list-modal hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="create-list-title">
+    <div class="modal-head">
+      <h2 class="modal-title" id="create-list-title">Create new list</h2>
+      <button class="modal-close" data-close-create-list type="button" aria-label="Close create new list dialog">&times;</button>
+    </div>
+    <p class="modal-intro">Use lists to organise SKUs in your outlet, eg. for different storage areas.</p>
+    <div class="field">
+      <label for="newListName">List name</label>
+      <input class="text-control" id="newListName" data-new-list-name type="text" placeholder="e.g. Storeroom" />
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-create-list-next type="button" disabled>Next</button>
+    </div>
+  </section>
+</div>
+
+<!-- Add to list catalog picker modal -->
+<div class="modal-overlay" data-catalog-modal hidden>
+  <section class="modal-card catalog-modal-card" role="dialog" aria-modal="true" aria-labelledby="catalog-title">
+    <div class="modal-head">
+      <h2 class="modal-title" id="catalog-title">Add to list</h2>
+      <button class="modal-close" data-close-catalog type="button" aria-label="Close add to list dialog">&times;</button>
+    </div>
+    <div class="catalog-filters">
+      <label class="search-wrap catalog-search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input type="text" placeholder="Item name" data-catalog-search />
+      </label>
+      <select class="select-control catalog-supplier-select" data-catalog-supplier-select>
+        <option value="">Select Supplier</option>
+      </select>
+      <label class="catalog-check"><input type="checkbox" data-catalog-not-in-inventory /> Not in Inventory</label>
+      <label class="catalog-check"><input type="checkbox" data-catalog-invoiced /> Invoiced in past</label>
+      <select class="select-control catalog-days-select" data-catalog-days-select disabled>
+        <option>90 days</option>
+      </select>
+      <button class="btn catalog-filter-btn" type="button">Filter</button>
+    </div>
+    <div class="catalog-table-wrap">
+      <table class="catalog-table">
+        <thead>
+          <tr>
+            <th class="col-check"><input type="checkbox" data-catalog-select-all /></th>
+            <th>Name</th>
+            <th>Inventory UOM</th>
+            <th>Conversion rate to order UOM</th>
+            <th class="col-right">Par</th>
+          </tr>
+        </thead>
+        <tbody data-catalog-body></tbody>
+      </table>
+    </div>
+    <div class="catalog-foot">
+      <span data-catalog-selected-count>0 items selected</span>
+      <div class="catalog-foot-actions">
+        <button class="catalog-save-more" type="button" data-catalog-save-more>Save <span data-catalog-save-more-count>0</span> selected &amp; add more</button>
+        <button class="btn btn-primary" type="button" data-catalog-done disabled>Done</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- New stock count modal -->
+<div class="modal-overlay" data-new-stock-count-modal hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="new-stock-count-title">
+    <div class="modal-head">
+      <h2 class="modal-title" id="new-stock-count-title">New stock count</h2>
+      <button class="modal-close" data-close-new-stock-count type="button" aria-label="Close new stock count dialog">&times;</button>
+    </div>
+    <div class="field">
+      <label for="stockCountListSelect">Inventory list</label>
+      <select class="select-control" id="stockCountListSelect" data-stock-count-list-select>
+        <option value="" selected>Please select</option>
+      </select>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-start-stock-count type="button" disabled>Start stock count →</button>
+    </div>
+  </section>
+</div>
+
+<div class="toast" data-toast>
+  <span class="toast-check" aria-hidden="true">✓</span>
+  <span><span class="toast-title" data-toast-title>Item added</span><br><span class="toast-copy" data-toast-copy>Now tracked in your inventory</span></span>
+</div>
+
+<div class="tour-overlay" data-tour hidden>
+  <div class="tour-highlight" data-tour-highlight></div>
+  <section class="tour-card" data-tour-card aria-live="polite">
+    <p class="tour-kicker" data-tour-kicker>Step 1</p>
+    <h2 class="tour-title" data-tour-title>Add your first item</h2>
+    <p class="tour-copy" data-tour-copy>Start by adding items your team wants to count during stocktake.</p>
+    <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
+  </section>
 </div>
 
 <script>
   (function() {
     var params = new URLSearchParams(window.location.search);
     var userName = params.get('userName') || '';
+    var venueName = params.get('venueName') || '';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
+    var outletTitle = document.querySelector('[data-outlet-title]');
     var supplierAdded = params.get('supplierAdded') === '1';
     var marketListBuilt = params.get('marketListBuilt') === '1';
+    var orderPlaced = params.get('orderPlaced') === '1';
+    var inventorySetup = params.get('inventorySetup') === '1';
+    var stockCountDone = params.get('stockCountDone') === '1';
+    var stockCountListName = params.get('list') || '';
+
+    var storeKey = 'nomniProcureInventoryStore';
+    var pendingListKey = params.get('inventoryList') || '';
+    var pendingSku = params.get('createdSku') || '';
+    var pendingUom = params.get('createdUom') || '';
+
+    var DEMO_CATALOG = [
+      { name: 'Chicken Breast Fillet 1kg', uom: 'kg', supplier: 'Coles Fresh Meats', tag: '', price: 8.50 },
+      { name: 'Basmati Rice 5kg Bag', uom: 'bag', supplier: 'Golden Grain Distributors', tag: '', price: 14.20 },
+      { name: 'Iceberg Lettuce Shredded 5mm', uom: 'kg', supplier: 'Sydney Direct Herbs Produce', tag: '', price: 3.10 },
+      { name: 'White Burger Bun 12pk', uom: 'pk', supplier: 'Parisi Bakery', tag: '', price: 4.75 },
+      { name: 'Cheddar Cheese Slices 1kg', uom: 'kg', supplier: 'Coles Fresh Meats', tag: '', price: 9.90 },
+      { name: 'BBQ Chicken - Yield Adjusted', uom: 'unit', supplier: '', tag: 'Recipe', price: 0 },
+      { name: 'House BBQ Sauce', uom: 'ltr', supplier: '', tag: 'Sub-recipe', price: 0 },
+      { name: 'Bar BQ Chicken Marinade Base', uom: 'ltr', supplier: '', tag: 'Sub-recipe', price: 0 }
+    ];
+    var activeListName = '';
+
+    function loadStore() {
+      try {
+        var raw = window.localStorage.getItem(storeKey);
+        if (!raw) return { lists: [], items: [] };
+        var parsed = JSON.parse(raw);
+        return { lists: parsed.lists || [], items: parsed.items || [] };
+      } catch (error) {
+        return { lists: [], items: [] };
+      }
+    }
+    function saveStore(store) {
+      try { window.localStorage.setItem(storeKey, JSON.stringify(store)); } catch (error) {}
+    }
+    var store = loadStore();
+
+    if (pendingSku && pendingListKey) {
+      var alreadyAdded = store.items.some(function(item) { return item.name === pendingSku && item.list === pendingListKey; });
+      if (!alreadyAdded) {
+        store.items.push({ name: pendingSku, list: pendingListKey, uom: pendingUom || '', par: 0, onHand: 0, lastCount: null, lastCountDate: '', movement: 0, price: 0, supplier: '', tag: '' });
+        saveStore(store);
+      }
+    }
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -569,7 +1395,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -581,8 +1407,17 @@
       return file + (query ? '?' + query : '');
     }
 
+    function setupDismissed() {
+      return params.get('setupDismissed') === '1';
+    }
+
+    function setupComplete() {
+      return params.get('setupComplete') === '1';
+    }
+
     function dashboardUrl(forceSetup) {
-      return withParams('Procure%20Trial%20Dashboard.html', forceSetup ? { setup: '1' } : {});
+      var shouldShowSetup = forceSetup || (!setupDismissed() && !setupComplete());
+      return withParams('Procure%20Trial%20Dashboard.html', shouldShowSetup ? { setup: '1' } : {});
     }
 
     function setupTourUrl(tour) {
@@ -591,7 +1426,9 @@
 
     function sidebarNextUrl() {
       var goal = params.get('primaryGoal') || 'Order faster';
-      if (marketListBuilt && goal === 'Order faster') return setupTourUrl('order');
+      if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return setupTourUrl('order');
+      if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return setupTourUrl('stockCount');
+      if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return setupTourUrl('inventory');
       if (!supplierAdded || (supplierAdded && !marketListBuilt)) return setupTourUrl('1');
       return dashboardUrl(true);
     }
@@ -618,27 +1455,717 @@
       link.href = withParams('procure-trial-invoices.html');
     });
 
-    if (supplierAdded) {
-      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '40% done'; });
-      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '40%'; });
-      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = 'Build market list'; });
-    }
-    if (marketListBuilt) {
-      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '60% done'; });
-      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '60%'; });
-      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
-        var goal = params.get('primaryGoal') || 'Order faster';
-        node.textContent = goal === 'Digitise invoices' ? 'Upload first invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place first order';
+    function syncSidebarSetup() {
+      if (supplierAdded) {
+        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '40% done'; });
+        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '40%'; });
+        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = 'Build market list'; });
+      }
+      if (marketListBuilt) {
+        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '60% done'; });
+        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '60%'; });
+        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+          var goal = params.get('primaryGoal') || 'Order faster';
+          node.textContent = goal === 'Digitise invoices' ? 'Upload first invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place first order';
+        });
+      }
+      if (orderPlaced) {
+        var orderGoal = params.get('primaryGoal') || 'Order faster';
+        var orderProgress = orderGoal === 'Order faster' ? '80% done' : '60% done';
+        var orderProgressWidth = orderGoal === 'Order faster' ? '80%' : '60%';
+        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = orderProgress; });
+        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = orderProgressWidth; });
+        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+          node.textContent = orderGoal === 'Digitise invoices' ? 'Upload first invoice' : 'Set up inventory';
+        });
+      }
+      if (inventorySetup) {
+        var invGoal = params.get('primaryGoal') || 'Order faster';
+        var invProgress = invGoal === 'Order faster' ? '100% done' : invGoal === 'Manage inventory' ? '80% done' : '60% done';
+        var invProgressWidth = invGoal === 'Order faster' ? '100%' : invGoal === 'Manage inventory' ? '80%' : '60%';
+        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = invProgress; });
+        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = invProgressWidth; });
+        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+          node.textContent = invGoal === 'Manage inventory' ? 'Complete first stock count' : "You're all set";
+        });
+      }
+      if (stockCountDone && (params.get('primaryGoal') || 'Order faster') === 'Manage inventory') {
+        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '100% done'; });
+        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
+        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
+      }
+      document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
+        link.href = sidebarNextUrl();
       });
     }
-    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      link.href = sidebarNextUrl();
-    });
+    syncSidebarSetup();
+
+    function markInventorySetupComplete() {
+      if (inventorySetup) return;
+      inventorySetup = true;
+      params.set('inventorySetup', '1');
+      window.history.replaceState(null, '', withParams('procure-trial-inventory.html'));
+      syncSidebarSetup();
+    }
 
     if (userName && userNameNode) {
       userNameNode.textContent = userName;
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
+    if (venueName && outletTitle) outletTitle.textContent = venueName;
+
+    // ---- Tabs ----
+    var tabBtns = document.querySelectorAll('[data-tab-btn]');
+    var panels = document.querySelectorAll('[data-tab-panel]');
+    var statCardsItems = document.querySelector('[data-stat-cards="items"]');
+    var statCardsLists = document.querySelector('[data-stat-cards="lists"]');
+
+    function activateTab(name) {
+      tabBtns.forEach(function(btn) { btn.classList.toggle('active', btn.getAttribute('data-tab-btn') === name); });
+      panels.forEach(function(panel) { panel.hidden = panel.getAttribute('data-tab-panel') !== name; });
+      if (statCardsItems) statCardsItems.hidden = name !== 'items';
+      if (statCardsLists) statCardsLists.hidden = name !== 'lists';
+    }
+    tabBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() { activateTab(btn.getAttribute('data-tab-btn')); });
+    });
+
+    // ---- Render state ----
+    var itemsEmptyNoList = document.querySelector('[data-items-empty-nolist]');
+    var itemsEmptyHasList = document.querySelector('[data-items-empty-haslist]');
+    var itemsTable = document.querySelector('[data-items-table]');
+    var itemsBody = document.querySelector('[data-items-body]');
+    var listsEmpty = document.querySelector('[data-lists-empty]');
+    var listsTable = document.querySelector('[data-lists-table]');
+    var listsBody = document.querySelector('[data-lists-body]');
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, function(ch) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+      });
+    }
+
+    function render() {
+      var listCount = store.lists.length;
+      var itemCount = store.items.length;
+
+      document.querySelectorAll('[data-stat-value-label], [data-stat-value-label-lists]').forEach(function(node) {
+        node.textContent = 'Est. value on hand (' + listCount + (listCount === 1 ? ' List' : ' Lists') + ')';
+      });
+      document.querySelectorAll('[data-stat-item-count], [data-stat-item-count-lists]').forEach(function(node) {
+        node.textContent = itemCount + (itemCount === 1 ? ' item' : ' items');
+      });
+      var totalEstValue = store.items.reduce(function(sum, item) { return sum + (item.onHand || 0) * (item.price || 0); }, 0);
+      document.querySelectorAll('[data-stat-est-value], [data-stat-est-value-lists]').forEach(function(node) {
+        node.textContent = 'A$' + totalEstValue.toFixed(2);
+      });
+      var belowParCount = store.items.filter(function(item) { return (item.par || 0) > 0 && (item.onHand || 0) < item.par; }).length;
+      document.querySelectorAll('[data-stat-below-par]').forEach(function(node) {
+        node.textContent = belowParCount + (belowParCount === 1 ? ' item' : ' items');
+      });
+
+      if (itemCount === 0) {
+        if (itemsEmptyNoList) itemsEmptyNoList.hidden = listCount > 0;
+        if (itemsEmptyHasList) itemsEmptyHasList.hidden = listCount === 0;
+        if (itemsTable) itemsTable.hidden = true;
+      } else {
+        if (itemsEmptyNoList) itemsEmptyNoList.hidden = true;
+        if (itemsEmptyHasList) itemsEmptyHasList.hidden = true;
+        if (itemsTable) itemsTable.hidden = false;
+        if (itemsBody) {
+          itemsBody.innerHTML = '';
+          store.items.forEach(function(item) {
+            var par = item.par || 0;
+            var onHand = item.onHand || 0;
+            var onHandClass = par > 0 && onHand < par ? 'val-red' : '';
+            var movement = item.movement || 0;
+            var movementText = movement > 0 ? '+' + movement.toFixed(1) : movement < 0 ? movement.toFixed(1) : '—';
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td><div class="item-name">' + escapeHtml(item.name) + '</div><div class="item-meta">' + escapeHtml(item.list) + (item.tag ? ' • ' + escapeHtml(item.tag) : '') + '</div></td>' +
+              '<td>' + escapeHtml(item.uom || '—') + '</td>' +
+              '<td class="col-right">' + (par || '—') + '</td>' +
+              '<td class="col-right ' + onHandClass + '">' + onHand + '</td>' +
+              '<td class="col-right val-mute">' + (item.lastCount != null ? item.lastCount : '—') + '</td>' +
+              '<td class="col-right val-mute">' + movementText + '</td>' +
+              '<td class="col-right val-mute">—</td>';
+            itemsBody.appendChild(tr);
+          });
+        }
+      }
+
+      if (listCount === 0) {
+        if (listsEmpty) listsEmpty.hidden = false;
+        if (listsTable) listsTable.hidden = true;
+      } else {
+        if (listsEmpty) listsEmpty.hidden = true;
+        if (listsTable) listsTable.hidden = false;
+        if (listsBody) {
+          listsBody.innerHTML = '';
+          store.lists.forEach(function(list) {
+            var listItems = store.items.filter(function(item) { return item.list === list.name; });
+            var estValue = listItems.reduce(function(sum, item) { return sum + (item.onHand || 0) * (item.price || 0); }, 0);
+            var lastCounted = listItems.reduce(function(latest, item) { return item.lastCountDate && (!latest || item.lastCountDate > latest) ? item.lastCountDate : latest; }, '');
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td class="list-name">' + escapeHtml(list.name) + '</td>' +
+              '<td class="col-right val-mute">A$' + estValue.toFixed(2) + '</td>' +
+              '<td class="col-right">' + listItems.length + '</td>' +
+              '<td class="col-right val-mute">' + (lastCounted ? escapeHtml(lastCounted) : 'Never') + '</td>';
+            listsBody.appendChild(tr);
+          });
+        }
+      }
+
+      populateSelectListDropdown();
+    }
+
+    // ---- Add item menu ----
+    var addItemToggles = document.querySelectorAll('[data-add-item-toggle]');
+    var addItemMenu = document.querySelector('[data-add-item-menu]');
+    addItemToggles.forEach(function(toggle) {
+      toggle.addEventListener('click', function(event) {
+        event.stopPropagation();
+        openSelectListModal();
+      });
+    });
+    document.addEventListener('click', function(event) {
+      if (addItemMenu && !addItemMenu.hidden && !event.target.closest('.add-menu-wrap')) addItemMenu.hidden = true;
+    });
+
+    // ---- New list toggle (Lists tab) ----
+    document.querySelectorAll('[data-new-list-toggle]').forEach(function(btn) {
+      btn.addEventListener('click', function() { openCreateListModal(false); });
+    });
+
+    // ---- Select inventory list modal ----
+    var selectListModal = document.querySelector('[data-select-list-modal]');
+    var selectListDropdown = document.querySelector('[data-select-list-dropdown]');
+    var selectListNext = document.querySelector('[data-select-list-next]');
+    var pendingAddAction = null; // 'sku' | 'group'
+
+    function populateSelectListDropdown() {
+      if (!selectListDropdown) return;
+      var current = selectListDropdown.value;
+      selectListDropdown.innerHTML = '<option value="" ' + (current ? '' : 'selected') + '>Select</option>';
+      store.lists.forEach(function(list) {
+        var opt = document.createElement('option');
+        opt.value = list.name;
+        opt.textContent = list.name;
+        if (list.name === current) opt.selected = true;
+        selectListDropdown.appendChild(opt);
+      });
+      updateSelectListNextState();
+    }
+
+    function updateSelectListNextState() {
+      if (selectListNext) selectListNext.disabled = !selectListDropdown || !selectListDropdown.value;
+    }
+
+    function openSelectListModal(actionType) {
+      pendingAddAction = actionType || 'sku';
+      if (addItemMenu) addItemMenu.hidden = true;
+      populateSelectListDropdown();
+      if (selectListModal) selectListModal.hidden = false;
+      if (tourActive && currentTourStep === 'addItem') advanceTour('createList');
+    }
+    function closeSelectListModal() {
+      if (selectListModal) selectListModal.hidden = true;
+    }
+
+    document.querySelectorAll('[data-close-select-list]').forEach(function(btn) {
+      btn.addEventListener('click', closeSelectListModal);
+    });
+    if (selectListModal) {
+      selectListModal.addEventListener('click', function(event) {
+        if (event.target === selectListModal) closeSelectListModal();
+      });
+    }
+    if (selectListDropdown) selectListDropdown.addEventListener('change', updateSelectListNextState);
+
+    var addSkuBtn = document.querySelector('[data-add-sku]');
+    var addGroupSkuBtn = document.querySelector('[data-add-group-sku]');
+    if (addSkuBtn) addSkuBtn.addEventListener('click', function() { openSelectListModal('sku'); });
+    if (addGroupSkuBtn) addGroupSkuBtn.addEventListener('click', function() { openSelectListModal('group'); });
+
+    if (selectListNext) selectListNext.addEventListener('click', function() {
+      if (!selectListDropdown || !selectListDropdown.value) return;
+      activeListName = selectListDropdown.value;
+      closeSelectListModal();
+      openCatalogModal();
+      if (tourActive && currentTourStep === 'confirmList') advanceTour('pickItems');
+    });
+
+    // ---- Create new list modal (stacks on top of Select inventory list) ----
+    var createListModal = document.querySelector('[data-create-list-modal]');
+    var newListNameInput = document.querySelector('[data-new-list-name]');
+    var createListNext = document.querySelector('[data-create-list-next]');
+    var reopenSelectListAfterCreate = false;
+
+    function openCreateListModal(reopenSelect) {
+      reopenSelectListAfterCreate = !!reopenSelect;
+      if (reopenSelect && selectListModal) selectListModal.hidden = true;
+      if (newListNameInput) newListNameInput.value = '';
+      if (createListNext) createListNext.disabled = true;
+      if (createListModal) createListModal.hidden = false;
+      if (newListNameInput) setTimeout(function() { newListNameInput.focus(); }, 30);
+      if (tourActive && currentTourStep === 'createList') advanceTour('nameList');
+    }
+    function closeCreateListModal() {
+      if (createListModal) createListModal.hidden = true;
+      if (reopenSelectListAfterCreate && selectListModal) selectListModal.hidden = false;
+    }
+
+    document.querySelectorAll('[data-close-create-list]').forEach(function(btn) {
+      btn.addEventListener('click', closeCreateListModal);
+    });
+    if (createListModal) {
+      createListModal.addEventListener('click', function(event) {
+        if (event.target === createListModal) closeCreateListModal();
+      });
+    }
+    var openCreateListLink = document.querySelector('[data-open-create-list]');
+    if (openCreateListLink) openCreateListLink.addEventListener('click', function() { openCreateListModal(true); });
+    if (newListNameInput) newListNameInput.addEventListener('input', function() {
+      if (createListNext) createListNext.disabled = !newListNameInput.value.trim();
+    });
+    if (createListNext) createListNext.addEventListener('click', function() {
+      var name = newListNameInput ? newListNameInput.value.trim() : '';
+      if (!name) return;
+      if (!store.lists.some(function(list) { return list.name.toLowerCase() === name.toLowerCase(); })) {
+        store.lists.push({ name: name });
+        saveStore(store);
+      }
+      render();
+      if (selectListDropdown) selectListDropdown.value = name;
+      updateSelectListNextState();
+      closeCreateListModal();
+      if (tourActive && currentTourStep === 'nameList') advanceTour('confirmList');
+    });
+
+    // ---- Add to list catalog picker modal ----
+    var catalogModal = document.querySelector('[data-catalog-modal]');
+    var catalogBody = document.querySelector('[data-catalog-body]');
+    var catalogSearch = document.querySelector('[data-catalog-search]');
+    var catalogSupplierSelect = document.querySelector('[data-catalog-supplier-select]');
+    var catalogSelectAll = document.querySelector('[data-catalog-select-all]');
+    var catalogSelectedCount = document.querySelector('[data-catalog-selected-count]');
+    var catalogSaveMore = document.querySelector('[data-catalog-save-more]');
+    var catalogSaveMoreCount = document.querySelector('[data-catalog-save-more-count]');
+    var catalogDone = document.querySelector('[data-catalog-done]');
+    var catalogSelection = {}; // name -> par value (string)
+
+    function populateCatalogSupplierSelect() {
+      if (!catalogSupplierSelect) return;
+      var suppliers = [];
+      DEMO_CATALOG.forEach(function(entry) {
+        if (entry.supplier && suppliers.indexOf(entry.supplier) === -1) suppliers.push(entry.supplier);
+      });
+      catalogSupplierSelect.innerHTML = '<option value="">Select Supplier</option>';
+      suppliers.forEach(function(name) {
+        var opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        catalogSupplierSelect.appendChild(opt);
+      });
+    }
+
+    function catalogInListCount(name) {
+      var count = 0;
+      store.lists.forEach(function(list) {
+        if (store.items.some(function(item) { return item.name === name && item.list === list.name; })) count++;
+      });
+      return count;
+    }
+
+    function renderCatalogRows() {
+      if (!catalogBody) return;
+      var query = (catalogSearch && catalogSearch.value.trim().toLowerCase()) || '';
+      var supplierFilter = (catalogSupplierSelect && catalogSupplierSelect.value) || '';
+      var visible = DEMO_CATALOG.filter(function(entry) {
+        if (query && entry.name.toLowerCase().indexOf(query) === -1) return false;
+        if (supplierFilter && entry.supplier !== supplierFilter) return false;
+        return true;
+      });
+      catalogBody.innerHTML = '';
+      if (!visible.length) {
+        var emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = '<td colspan="5"><div class="catalog-empty">No items match your search.</div></td>';
+        catalogBody.appendChild(emptyRow);
+        return;
+      }
+      visible.forEach(function(entry) {
+        var checked = Object.prototype.hasOwnProperty.call(catalogSelection, entry.name);
+        var inListCount = catalogInListCount(entry.name);
+        var metaParts = [];
+        if (inListCount > 0) metaParts.push('<span class="catalog-tag">In ' + inListCount + (inListCount === 1 ? ' list' : ' lists') + '</span>');
+        if (entry.tag) metaParts.push('<span class="catalog-tag-type">' + escapeHtml(entry.tag) + '</span>');
+        var meta = metaParts.length ? '<div class="item-meta">' + metaParts.join('<span class="catalog-tag-dot">•</span>') + '</div>' : '';
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td><input type="checkbox" data-catalog-check value="' + escapeHtml(entry.name) + '"' + (checked ? ' checked' : '') + '></td>' +
+          '<td><div class="item-name">' + escapeHtml(entry.name) + '</div>' + meta + '</td>' +
+          '<td>' + escapeHtml(entry.uom || '') + '</td>' +
+          '<td class="val-mute" style="font-style:italic">Not Required</td>' +
+          '<td class="col-right"><input type="text" class="catalog-par-input" data-catalog-par value="' + escapeHtml(catalogSelection[entry.name] || '0') + '"' + (checked ? '' : ' hidden') + '></td>';
+        catalogBody.appendChild(tr);
+      });
+      updateCatalogFootCount();
+    }
+
+    function updateCatalogFootCount() {
+      var count = Object.keys(catalogSelection).length;
+      if (catalogSelectedCount) catalogSelectedCount.textContent = count + (count === 1 ? ' item selected' : ' items selected');
+      if (catalogSaveMoreCount) catalogSaveMoreCount.textContent = count;
+      if (catalogDone) catalogDone.disabled = count === 0;
+    }
+
+    if (catalogBody) {
+      catalogBody.addEventListener('change', function(event) {
+        var target = event.target;
+        if (target.matches('[data-catalog-check]')) {
+          var name = target.value;
+          var row = target.closest('tr');
+          var parInput = row ? row.querySelector('[data-catalog-par]') : null;
+          if (target.checked) {
+            catalogSelection[name] = (parInput && parInput.value) || '0';
+            if (parInput) parInput.hidden = false;
+          } else {
+            delete catalogSelection[name];
+            if (parInput) parInput.hidden = true;
+          }
+          updateCatalogFootCount();
+          if (tourActive && currentTourStep === 'pickItems' && Object.keys(catalogSelection).length > 0) advanceTour('doneStep');
+        } else if (target.matches('[data-catalog-par]')) {
+          var parName = target.closest('tr').querySelector('[data-catalog-check]').value;
+          catalogSelection[parName] = target.value;
+        }
+      });
+    }
+    if (catalogSelectAll) catalogSelectAll.addEventListener('change', function() {
+      var checks = catalogBody ? catalogBody.querySelectorAll('[data-catalog-check]') : [];
+      checks.forEach(function(check) {
+        check.checked = catalogSelectAll.checked;
+        check.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+    if (catalogSearch) catalogSearch.addEventListener('input', renderCatalogRows);
+    if (catalogSupplierSelect) catalogSupplierSelect.addEventListener('change', renderCatalogRows);
+
+    function commitCatalogSelection() {
+      var addedCount = 0;
+      Object.keys(catalogSelection).forEach(function(name) {
+        var entry = DEMO_CATALOG.filter(function(item) { return item.name === name; })[0];
+        if (!entry) return;
+        var par = parseFloat(catalogSelection[name]) || 0;
+        var existing = store.items.filter(function(item) { return item.name === name && item.list === activeListName; })[0];
+        if (existing) {
+          existing.par = par;
+        } else {
+          store.items.push({ name: name, list: activeListName, uom: entry.uom, par: par, onHand: 0, lastCount: null, lastCountDate: '', movement: 0, price: entry.price || 0, supplier: entry.supplier || '', tag: entry.tag || '' });
+          addedCount++;
+        }
+      });
+      saveStore(store);
+      catalogSelection = {};
+      return addedCount;
+    }
+
+    function openCatalogModal() {
+      populateCatalogSupplierSelect();
+      catalogSelection = {};
+      renderCatalogRows();
+      if (catalogModal) catalogModal.hidden = false;
+    }
+    function closeCatalogModal() {
+      if (catalogModal) catalogModal.hidden = true;
+    }
+    document.querySelectorAll('[data-close-catalog]').forEach(function(btn) {
+      btn.addEventListener('click', closeCatalogModal);
+    });
+    if (catalogModal) {
+      catalogModal.addEventListener('click', function(event) {
+        if (event.target === catalogModal) closeCatalogModal();
+      });
+    }
+    if (catalogSaveMore) catalogSaveMore.addEventListener('click', function() {
+      commitCatalogSelection();
+      render();
+      renderCatalogRows();
+    });
+    if (catalogDone) catalogDone.addEventListener('click', function() {
+      var addedCount = commitCatalogSelection();
+      render();
+      closeCatalogModal();
+      if (toast && addedCount >= 0) {
+        showToast('Inventory Management', 'Products added to the shelve succesfully');
+      }
+      if (store.items.length > 0) markInventorySetupComplete();
+      if (tourActive && currentTourStep === 'doneStep') {
+        currentTourStep = 'handoff';
+        renderTourStep();
+      }
+    });
+
+    // ---- Stock count split button + New stock count modal ----
+    var stockCountToggles = document.querySelectorAll('[data-stock-count-toggle]');
+    var stockCountMenu = document.querySelector('[data-stock-count-menu]');
+    stockCountToggles.forEach(function(toggle) {
+      toggle.addEventListener('click', function(event) {
+        event.stopPropagation();
+        if (stockCountMenu) stockCountMenu.hidden = !stockCountMenu.hidden;
+        if (tourActive && currentTourStep === 'stockCountButton') advanceTour('stockCountNew', false);
+      });
+    });
+    document.addEventListener('click', function(event) {
+      if (stockCountMenu && !stockCountMenu.hidden && !event.target.closest('.split-btn-wrap')) stockCountMenu.hidden = true;
+    });
+
+    var newStockCountModal = document.querySelector('[data-new-stock-count-modal]');
+    var stockCountListSelect = document.querySelector('[data-stock-count-list-select]');
+    var startStockCountBtn = document.querySelector('[data-start-stock-count]');
+
+    function openNewStockCountModal() {
+      if (stockCountMenu) stockCountMenu.hidden = true;
+      if (stockCountListSelect) {
+        stockCountListSelect.innerHTML = '<option value="" selected>Please select</option>';
+        store.lists.forEach(function(list) {
+          var opt = document.createElement('option');
+          opt.value = list.name;
+          opt.textContent = list.name;
+          stockCountListSelect.appendChild(opt);
+        });
+      }
+      if (startStockCountBtn) startStockCountBtn.disabled = true;
+      if (newStockCountModal) newStockCountModal.hidden = false;
+      if (tourActive && currentTourStep === 'stockCountNew') advanceTour('stockCountList', true);
+    }
+    function closeNewStockCountModal() {
+      if (newStockCountModal) newStockCountModal.hidden = true;
+    }
+    document.querySelectorAll('[data-new-stock-count]').forEach(function(btn) {
+      btn.addEventListener('click', openNewStockCountModal);
+    });
+    document.querySelectorAll('[data-close-new-stock-count]').forEach(function(btn) {
+      btn.addEventListener('click', closeNewStockCountModal);
+    });
+    if (newStockCountModal) {
+      newStockCountModal.addEventListener('click', function(event) {
+        if (event.target === newStockCountModal) closeNewStockCountModal();
+      });
+    }
+    if (stockCountListSelect) stockCountListSelect.addEventListener('change', function() {
+      if (startStockCountBtn) startStockCountBtn.disabled = !stockCountListSelect.value;
+      if (stockCountListSelect.value && tourActive && currentTourStep === 'stockCountList') advanceTour('stockCountStart', true);
+    });
+    if (startStockCountBtn) startStockCountBtn.addEventListener('click', function() {
+      if (!stockCountListSelect || !stockCountListSelect.value) return;
+      window.location.href = withParams('procure-trial-stock-count.html', { list: stockCountListSelect.value });
+    });
+
+    // ---- Toast ----
+    var toast = document.querySelector('[data-toast]');
+    var toastTitle = document.querySelector('[data-toast-title]');
+    var toastCopy = document.querySelector('[data-toast-copy]');
+    function showToast(title, copy) {
+      if (!toast) return;
+      if (toastTitle) toastTitle.textContent = title;
+      if (toastCopy) toastCopy.textContent = copy;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 4200);
+    }
+    if (pendingSku && pendingListKey) {
+      showToast('Item added', 'Added to ' + pendingListKey);
+    }
+    if (stockCountDone) {
+      showToast('Inventory Management', 'Stock count created successfully');
+    }
+
+    // ---- Guided tour: create your first list, then add items ----
+    var tour = document.querySelector('[data-tour]');
+    var tourHighlight = document.querySelector('[data-tour-highlight]');
+    var tourCard = document.querySelector('[data-tour-card]');
+    var tourDismiss = document.querySelector('[data-tour-dismiss]');
+    var tourKicker = document.querySelector('[data-tour-kicker]');
+    var tourTitle = document.querySelector('[data-tour-title]');
+    var tourCopy = document.querySelector('[data-tour-copy]');
+    var tourActive = false;
+    var currentTourStep = 'addItem';
+    var tourSteps = {
+      addItem: {
+        target: function() { return document.querySelector('[data-items-empty-nolist]:not([hidden]) [data-add-item-toggle]') || document.querySelector('.toolbar-right [data-add-item-toggle]'); },
+        kicker: 'Step 1',
+        title: 'Add your first item',
+        copy: 'Start by adding items your team wants to count during stocktake.'
+      },
+      createList: {
+        target: '[data-open-create-list]',
+        kicker: 'Step 2',
+        title: 'Create your first list',
+        copy: 'Create a list for the area your team will count, such as Storeroom or Walk-in Fridge.',
+        placement: 'below'
+      },
+      nameList: {
+        target: '[data-new-list-name]',
+        kicker: 'Step 3',
+        title: 'Name your list',
+        copy: 'Give it a name your team will recognise, like Storeroom or Walk-in Fridge.'
+      },
+      confirmList: {
+        target: '[data-select-list-next]',
+        kicker: 'Step 4',
+        title: 'Choose items to track',
+        copy: 'Continue to choose the items that belong in this inventory list.'
+      },
+      pickItems: {
+        target: '.catalog-table-wrap',
+        kicker: 'Step 5',
+        title: 'Pick your items',
+        copy: 'Check the items or recipes you want to track stock for.',
+        placement: 'below'
+      },
+      doneStep: {
+        target: '[data-catalog-done]',
+        kicker: 'Step 6',
+        title: 'Save your list',
+        copy: 'Save the selected items so your team can start counting them.',
+        placement: 'above'
+      },
+      stockCountButton: {
+        target: '[data-stock-count-toggle]',
+        kicker: 'Step 1',
+        title: 'Start a stock count',
+        copy: 'Use Stock count when your team is ready to record what is currently on hand.',
+        placement: 'below'
+      },
+      stockCountNew: {
+        target: '[data-new-stock-count]',
+        kicker: 'Step 2',
+        title: 'Create a new count',
+        copy: 'Start a fresh count from one of the inventory lists you have set up.',
+        placement: 'below'
+      },
+      stockCountList: {
+        target: '[data-stock-count-list-select]',
+        kicker: 'Step 3',
+        title: 'Choose the list',
+        copy: 'Pick the list your team is counting today.',
+        placement: 'below'
+      },
+      stockCountStart: {
+        target: '[data-start-stock-count]',
+        kicker: 'Step 4',
+        title: 'Begin counting',
+        copy: 'Open the count sheet and enter the quantities your team finds.',
+        placement: 'above'
+      },
+      handoff: {
+        target: '[data-sidebar-setup-card]',
+        kicker: 'Setup updated',
+        title: 'Inventory set up',
+        copy: 'Click the setup panel to continue with the next step.',
+        placement: 'right'
+      }
+    };
+
+    function resolveTourTarget(step) {
+      if (typeof step.target === 'function') return step.target();
+      return document.querySelector(step.target);
+    }
+
+    function placeTour() {
+      if (!tour || tour.hidden) return;
+      var step = tourSteps[currentTourStep];
+      if (!step) return;
+      var target = resolveTourTarget(step);
+      if (!target) return;
+      var rect = target.getBoundingClientRect();
+      var pad = 10;
+      tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
+      tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
+      tourHighlight.style.width = (rect.width + pad * 2) + 'px';
+      tourHighlight.style.height = (rect.height + pad * 2) + 'px';
+      tourCard.classList.remove('left', 'below', 'above');
+      var cardWidth = Math.min(380, window.innerWidth - 32);
+      var cardHeight = tourCard.getBoundingClientRect().height || 160;
+      var cardLeft = rect.right + 34;
+      var cardTop = rect.top - 14;
+      if (step.placement === 'below') {
+        cardLeft = Math.max(16, Math.min(rect.left, window.innerWidth - cardWidth - 16));
+        cardTop = Math.min(window.innerHeight - cardHeight - 16, rect.bottom + 24);
+        tourCard.classList.add('below');
+      }
+      if (step.placement === 'above') {
+        cardLeft = Math.max(16, Math.min(rect.right - cardWidth, window.innerWidth - cardWidth - 16));
+        cardTop = Math.max(16, rect.top - cardHeight - 24);
+        tourCard.classList.add('above');
+      }
+      if (step.placement === 'right') {
+        cardLeft = Math.min(window.innerWidth - cardWidth - 16, rect.right + 28);
+        var targetCenterY = rect.top + rect.height / 2;
+        cardTop = Math.max(16, Math.min(targetCenterY - 28, window.innerHeight - cardHeight - 16));
+      }
+      if (cardLeft + cardWidth > window.innerWidth - 16) {
+        cardLeft = Math.max(16, rect.left - cardWidth - 34);
+        tourCard.classList.add('left');
+      }
+      if (cardTop + cardHeight > window.innerHeight - 16) cardTop = Math.max(16, window.innerHeight - cardHeight - 16);
+      if (cardTop < 16) cardTop = 16;
+      tourCard.style.left = cardLeft + 'px';
+      tourCard.style.top = cardTop + 'px';
+    }
+
+    function renderTourStep(shouldScroll) {
+      var step = tourSteps[currentTourStep];
+      if (!step) return;
+      if (tourKicker) tourKicker.textContent = step.kicker;
+      if (tourTitle) tourTitle.textContent = step.title;
+      if (tourCopy) tourCopy.textContent = step.copy;
+      var target = resolveTourTarget(step);
+      if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(placeTour, shouldScroll ? 240 : 60);
+    }
+
+    function startTour(mode) {
+      tourActive = true;
+      currentTourStep = mode === 'stockCount' ? 'stockCountButton' : 'addItem';
+      if (tour) tour.hidden = false;
+      document.body.classList.add('tour-active');
+      renderTourStep(false);
+    }
+
+    function advanceTour(stepName, shouldScroll) {
+      if (!tourActive) return;
+      currentTourStep = stepName;
+      renderTourStep(shouldScroll);
+    }
+
+    function closeTour() {
+      tourActive = false;
+      if (tour) tour.hidden = true;
+      document.body.classList.remove('tour-active');
+    }
+
+    if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
+    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
+      link.addEventListener('click', function(event) {
+        var goal = params.get('primaryGoal') || 'Order faster';
+        if (inventorySetup && !stockCountDone && goal === 'Manage inventory') {
+          event.preventDefault();
+          startTour('stockCount');
+        } else if (marketListBuilt && !inventorySetup && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) {
+          event.preventDefault();
+          startTour('inventory');
+        }
+      });
+    });
+    window.addEventListener('resize', placeTour);
+    window.addEventListener('scroll', placeTour, { passive: true });
+
+    if (params.get('tour') === 'stockCount' && inventorySetup && !stockCountDone) {
+      startTour('stockCount');
+    } else if (params.has('tour') && !inventorySetup) {
+      startTour('inventory');
+    }
+
+    render();
   })();
 </script>
 </body>

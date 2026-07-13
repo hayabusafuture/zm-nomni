@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
 <style>
   :root {
     --nomni-green: #2AC864;
@@ -76,6 +77,25 @@
     line-height: 1;
   }
   .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  .help-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,.7);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
   .trial-status {
     min-height: 34px;
     display: inline-flex;
@@ -1254,7 +1274,8 @@
     </div>
     <div class="topbar-right">
       <div class="trial-status" aria-label="Trial status"><span class="trial-dot" aria-hidden="true"></span>Trial ends in 14 days</div>
-      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book setup</a>
+      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book a live demo</a>
+      <a class="help-btn" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank"><span class="material-symbols-outlined" aria-hidden="true">help</span>Help</a>
       <div class="user">
         <div class="avatar" data-avatar>TR</div>
         <span data-user-name>Trial user</span>
@@ -1320,7 +1341,7 @@
           </details>
           <div class="panel-actions" aria-label="Setup help">
             <button class="panel-action guide" type="button" data-dismiss-onboarding>Go to dashboard</button>
-            <a class="panel-action guide" href="https://support.zeemart.co/en/articles/9418174-navigating-the-nomni-procure-app" target="_blank">Explore our setup guide <span aria-hidden="true">→</span></a>
+            <a class="panel-action guide" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank">Explore our setup guide <span aria-hidden="true">→</span></a>
             <a class="panel-action demo" href="https://www.nomni.ai/lets-chat">Book a live demo <span aria-hidden="true">→</span></a>
           </div>
         </section>
@@ -1501,6 +1522,8 @@
     var createdSku = params.get('createdSku') || '';
     var invoiceItemsAdded = params.get('invoiceItemsAdded') === '1';
     var orderPlaced = params.get('orderPlaced') === '1';
+    var inventorySetup = params.get('inventorySetup') === '1';
+    var stockCountDone = params.get('stockCountDone') === '1';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
     var setupTitleNode = document.querySelector('[data-setup-title]');
@@ -1513,6 +1536,7 @@
     var outletsNavLink = document.querySelector('[data-nav-outlets]');
     var itemsNavLink = document.querySelector('[data-nav-items]');
     var ordersNavLink = document.querySelector('[data-nav-orders]');
+    var inventoryNavLink = document.querySelector('[data-nav-inventory]');
     var onboardingView = document.querySelector('[data-onboarding-view]');
     var mainNode = document.querySelector('.main');
     var dashboardView = document.querySelector('[data-dashboard-view]');
@@ -1525,7 +1549,6 @@
     var dashboardTourKicker = document.querySelector('[data-dashboard-tour-kicker]');
     var dashboardTourTitle = document.querySelector('[data-dashboard-tour-title]');
     var dashboardTourCopy = document.querySelector('[data-dashboard-tour-copy]');
-    var setupDismissedKey = 'nomniProcureSetupDismissed';
     var dashboardTourMode = 'supplier';
     var taskCatalog = {
       account: {
@@ -1596,6 +1619,8 @@
       stockCount: {
         title: 'Complete first stock count',
         copy: 'Record your first count once inventory lists are ready.',
+        cta: 'Start stock count',
+        ctaHref: 'procure-trial-inventory.html',
         locked: 'Set up inventory first',
         dependsOn: 'inventory',
         icon: 'assets/icons/1st stock ct.svg'
@@ -1615,6 +1640,12 @@
     }
     if (orderPlaced) {
       taskCatalog.order.completed = true;
+    }
+    if (inventorySetup) {
+      taskCatalog.inventory.completed = true;
+    }
+    if (stockCountDone) {
+      taskCatalog.stockCount.completed = true;
     }
 
     function initialsFromName(name) {
@@ -1704,12 +1735,18 @@
         if (taskKey === 'supplier') link.setAttribute('data-supplier-setup-link', '');
         if (taskKey === 'market') link.setAttribute('data-market-setup-link', '');
         if (taskKey === 'order') link.setAttribute('data-order-setup-link', '');
+        if (taskKey === 'inventory') link.setAttribute('data-inventory-setup-link', '');
+        if (taskKey === 'stockCount') link.setAttribute('data-stock-count-setup-link', '');
         link.href = taskKey === 'supplier'
           ? preserveParams(task.ctaHref, { tour: '2' })
           : taskKey === 'market'
             ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
             : taskKey === 'order'
               ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' })
+            : taskKey === 'inventory'
+              ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'inventory' })
+            : taskKey === 'stockCount'
+              ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'stockCount' })
             : preserveParams(task.ctaHref, {});
         link.textContent = task.cta;
         row.appendChild(link);
@@ -1767,6 +1804,8 @@
             ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
             : currentTaskKey === 'order'
               ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' })
+              : currentTaskKey === 'stockCount'
+                ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'stockCount' })
               : preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
       }
 
@@ -1845,7 +1884,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1856,6 +1895,23 @@
       });
       var query = nextParams.toString();
       return file + (query ? '?' + query : '');
+    }
+
+    function setupComplete() {
+      var selectedGoal = normaliseGoal(primaryGoal);
+      var countedTasks = ['account'].concat(goalChecklist[selectedGoal]);
+      return countedTasks.every(function(taskKey) {
+        return Boolean(taskCatalog[taskKey] && taskCatalog[taskKey].completed);
+      });
+    }
+
+    function setupDismissed() {
+      return params.get('setupDismissed') === '1';
+    }
+
+    function dashboardLandingUrl() {
+      if (setupComplete() || setupDismissed()) return preserveParams('Procure%20Trial%20Dashboard.html');
+      return preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
     }
 
     function showOnboarding() {
@@ -1873,7 +1929,7 @@
 
     function syncChromeLinks() {
       document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
-        link.href = preserveParams('Procure%20Trial%20Dashboard.html');
+        link.href = dashboardLandingUrl();
       });
       document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
         link.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1' });
@@ -1895,7 +1951,7 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1910,34 +1966,51 @@
       return preserveParams('procure-trial-orders.html', { tour: 'order' });
     }
 
+    function inventorySetupUrl() {
+      return preserveParams('procure-trial-inventory.html', { tour: '1' });
+    }
+
+    function stockCountSetupUrl() {
+      return preserveParams('procure-trial-inventory.html', { tour: 'stockCount' });
+    }
+
     function setDashboardTourMode(mode) {
-      dashboardTourMode = mode === 'market' || mode === 'order' ? mode : 'supplier';
+      dashboardTourMode = mode === 'market' || mode === 'order' || mode === 'inventory' || mode === 'stockCount' ? mode : 'supplier';
       if (dashboardTourKicker) dashboardTourKicker.textContent = 'Step 1';
       if (dashboardTourTitle) {
         dashboardTourTitle.textContent = dashboardTourMode === 'market'
           ? 'Start from Items'
           : dashboardTourMode === 'order'
             ? 'Start from Orders'
-            : 'Start from Outlets';
+            : dashboardTourMode === 'inventory' || dashboardTourMode === 'stockCount'
+              ? 'Start from Inventory'
+              : 'Start from Outlets';
       }
       if (dashboardTourCopy) {
         dashboardTourCopy.textContent = dashboardTourMode === 'market'
           ? 'Add the items your team orders most. Start from Items in the sidebar.'
           : dashboardTourMode === 'order'
             ? 'Open Orders to create your first purchase order for the items you need.'
+          : dashboardTourMode === 'inventory'
+            ? 'Create your first inventory list and add items to start tracking stock on hand. Start from Inventory in the sidebar.'
+          : dashboardTourMode === 'stockCount'
+            ? 'Open Inventory to start your first stock count from the list you set up.'
           : 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
       }
       if (itemsNavLink) itemsNavLink.href = dashboardTourMode === 'market' ? marketSetupUrl() : preserveParams('procure-trial-items.html');
       if (ordersNavLink) ordersNavLink.href = dashboardTourMode === 'order' ? orderSetupUrl() : preserveParams('procure-trial-orders.html');
+      if (inventoryNavLink) inventoryNavLink.href = dashboardTourMode === 'inventory' ? inventorySetupUrl() : dashboardTourMode === 'stockCount' ? stockCountSetupUrl() : preserveParams('procure-trial-inventory.html');
       if (outletsNavLink) outletsNavLink.href = supplierSetupUrl('2');
     }
 
     function placeDashboardTour() {
       var target = dashboardTourMode === 'market'
         ? itemsNavLink
-        : dashboardTourMode === 'order'
-          ? ordersNavLink
-          : outletsNavLink;
+          : dashboardTourMode === 'order'
+            ? ordersNavLink
+            : dashboardTourMode === 'inventory' || dashboardTourMode === 'stockCount'
+              ? inventoryNavLink
+              : outletsNavLink;
       if (!dashboardTour || dashboardTour.hidden || !target) return;
       var rect = target.getBoundingClientRect();
       var pad = 10;
@@ -1987,13 +2060,29 @@
         openDashboardTour('order');
       });
     }
+    var inventorySetupLink = document.querySelector('[data-inventory-setup-link]');
+    if (inventorySetupLink) {
+      inventorySetupLink.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'inventory' });
+      inventorySetupLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        openDashboardTour('inventory');
+      });
+    }
+    var stockCountSetupLink = document.querySelector('[data-stock-count-setup-link]');
+    if (stockCountSetupLink) {
+      stockCountSetupLink.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'stockCount' });
+      stockCountSetupLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        openDashboardTour('stockCount');
+      });
+    }
     if (sidebarNextAction) {
       sidebarNextAction.addEventListener('click', function(event) {
         if (!sidebarNextStep) return;
-        if (sidebarNextStep.textContent !== taskCatalog.supplier.title && sidebarNextStep.textContent !== taskCatalog.market.title && sidebarNextStep.textContent !== taskCatalog.order.title) return;
+        if (sidebarNextStep.textContent !== taskCatalog.supplier.title && sidebarNextStep.textContent !== taskCatalog.market.title && sidebarNextStep.textContent !== taskCatalog.order.title && sidebarNextStep.textContent !== taskCatalog.inventory.title && sidebarNextStep.textContent !== taskCatalog.stockCount.title) return;
         event.preventDefault();
         showOnboarding();
-        openDashboardTour(sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : sidebarNextStep.textContent === taskCatalog.order.title ? 'order' : 'supplier');
+        openDashboardTour(sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : sidebarNextStep.textContent === taskCatalog.order.title ? 'order' : sidebarNextStep.textContent === taskCatalog.inventory.title ? 'inventory' : sidebarNextStep.textContent === taskCatalog.stockCount.title ? 'stockCount' : 'supplier');
       });
     }
     if (outletsNavLink) {
@@ -2009,14 +2098,19 @@
         if (dashboardTourMode === 'order') ordersNavLink.href = orderSetupUrl();
       });
     }
+    if (inventoryNavLink) {
+      inventoryNavLink.addEventListener('click', function() {
+        if (dashboardTourMode === 'inventory') inventoryNavLink.href = inventorySetupUrl();
+        if (dashboardTourMode === 'stockCount') inventoryNavLink.href = stockCountSetupUrl();
+      });
+    }
     syncChromeLinks();
     if (dismissOnboarding) {
       dismissOnboarding.addEventListener('click', function() {
-        try {
-          window.localStorage.setItem(setupDismissedKey, '1');
-        } catch (error) {}
-        window.history.replaceState(null, '', preserveParams('Procure%20Trial%20Dashboard.html'));
+        params.set('setupDismissed', '1');
+        window.history.replaceState(null, '', preserveParams('Procure%20Trial%20Dashboard.html', { setupDismissed: '1' }));
         showDashboard();
+        syncChromeLinks();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     }
@@ -2025,18 +2119,14 @@
         dashboardTour.hidden = true;
       });
     }
-    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1' || params.get('tour') === 'order';
-    var setupDismissed = false;
-    try {
-      setupDismissed = window.localStorage.getItem(setupDismissedKey) === '1';
-    } catch (error) {}
-    if (setupDismissed && !forceSetup) {
+    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1' || params.get('tour') === 'order' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount';
+    if ((setupComplete() || setupDismissed()) && !forceSetup) {
       showDashboard();
     } else {
       showOnboarding();
     }
-    if (params.get('tour') === '1' || params.get('tour') === 'order') {
-      openDashboardTour(params.get('tour') === 'order' ? 'order' : supplierAdded && !marketListBuilt ? 'market' : 'supplier');
+    if (params.get('tour') === '1' || params.get('tour') === 'order' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount') {
+      openDashboardTour(params.get('tour') === 'order' ? 'order' : params.get('tour') === 'inventory' ? 'inventory' : params.get('tour') === 'stockCount' ? 'stockCount' : supplierAdded && !marketListBuilt ? 'market' : 'supplier');
     }
     window.addEventListener('resize', placeDashboardTour);
   })();

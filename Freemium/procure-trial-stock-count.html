@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
-<title>Nomni Procure — Orders</title>
+<title>Nomni Procure — New Stock Count</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
@@ -335,44 +335,51 @@
     grid-row: 2;
     min-width: 0;
     background: #fff;
+    padding-bottom: 96px;
   }
-  .page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 28px 40px 16px;
-    border-bottom: 1px solid var(--rule);
-    background: #fff;
-  }
-  .page-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .content { padding: 28px 40px 40px; }
   .page-title {
-    margin: 0;
+    margin: 0 0 22px;
     color: var(--ink);
     font-size: 24px;
     font-weight: 700;
     letter-spacing: -.03em;
   }
 
-  .content { padding: 32px 40px 56px; }
-  .toolbar {
+  .count-meta-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .count-meta-field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .count-meta-input {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    color: var(--ink);
+    background: #fff;
+  }
+  .count-meta-input .material-symbols-outlined { font-size: 17px; color: var(--ink-mute); }
+
+  .count-toolbar {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 16px;
-    margin: 8px 0 24px;
+    margin-bottom: 16px;
   }
-  .toolbar-left,
-  .toolbar-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-width: 0;
-  }
+  .count-toolbar-left { display: flex; align-items: center; gap: 16px; }
+  .count-toolbar-left strong { font-size: 15px; font-weight: 700; }
   .search-wrap {
     width: 230px;
     height: 36px;
@@ -392,14 +399,7 @@
     -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m21 19.6-5.2-5.2a7.2 7.2 0 1 0-1.4 1.4l5.2 5.2L21 19.6ZM4 10a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z'/%3E%3C/svg%3E") center / contain no-repeat;
     mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m21 19.6-5.2-5.2a7.2 7.2 0 1 0-1.4 1.4l5.2 5.2L21 19.6ZM4 10a6 6 0 1 1 12 0 6 6 0 0 1-12 0Z'/%3E%3C/svg%3E") center / contain no-repeat;
   }
-  .search-wrap input {
-    min-width: 0;
-    width: 100%;
-    border: 0;
-    outline: 0;
-    color: var(--ink);
-    background: transparent;
-  }
+  .search-wrap input { min-width: 0; width: 100%; border: 0; outline: 0; color: var(--ink); background: transparent; }
   .btn {
     min-height: 40px;
     display: inline-flex;
@@ -419,214 +419,92 @@
     transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .16s ease;
   }
   .btn:active { transform: scale(.96); }
+  .btn:disabled { cursor: not-allowed; opacity: .55; transform: none; }
   .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
   .btn-primary:hover { background: var(--seaweed); color: var(--nomni-green); border-color: var(--seaweed); }
-  .plus-icon {
-    width: 18px;
-    height: 18px;
-    position: relative;
-    display: inline-block;
-  }
-  .plus-icon::before,
-  .plus-icon::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 16px;
-    height: 2px;
-    border-radius: 2px;
-    background: currentColor;
-    transform: translate(-50%, -50%);
-  }
-  .plus-icon::after { transform: translate(-50%, -50%) rotate(90deg); }
-  .split-btn-wrap {
-    position: relative;
-    display: inline-flex;
-  }
-  .split-btn-main {
-    border-radius: 6px 0 0 6px;
-  }
-  .split-btn-caret {
-    width: 38px;
-    padding: 0;
-    border-left-color: rgba(14,55,39,.16);
-    border-radius: 0 6px 6px 0;
-  }
-  .chev {
-    width: 8px;
-    height: 8px;
-    display: inline-block;
-    border-right: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
-    transform: rotate(45deg) translate(-1px,-1px);
-  }
-  .split-dropdown {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    width: 190px;
-    padding: 6px 0;
-    border: 1px solid #E0E2E8;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 4px 16px rgba(0,0,0,.12);
-    z-index: 40;
-  }
-  .split-dropdown a {
-    display: block;
-    padding: 11px 16px;
-    color: var(--seaweed);
-    font-size: 14px;
-    font-weight: 600;
-  }
-  .split-dropdown a:hover { background: var(--mint); }
+  .btn-secondary { background: var(--mint); color: var(--seaweed); border-color: var(--mint); }
+  .btn-secondary:hover { background: #C6F2CE; }
 
-  .table-card {
-    border: 1px solid var(--rule);
-    border-radius: 8px;
-    overflow: hidden;
-    background: #fff;
-  }
-  .orders-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-  .orders-table th {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--rule);
-    color: var(--ink-mute);
-    font-size: 12px;
-    font-weight: 700;
+  .table-card { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: #fff; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  thead th {
     text-align: left;
-    background: #F9FAFB;
-  }
-  .orders-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--rule);
-    vertical-align: middle;
-  }
-  .orders-table tr:last-child td { border-bottom: 0; }
-  .order-code { color: var(--ink-mute); font-size: 12px; margin-top: 2px; }
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    min-height: 22px;
-    padding: 0 10px;
-    border-radius: 4px;
-    background: #D9F5E4;
-    color: #1A8040;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-  }
-  .empty-state {
-    min-height: 320px;
-    display: grid;
-    place-items: center;
-    padding: 40px 24px;
-    text-align: center;
-  }
-  .empty-state-inner {
-    max-width: 360px;
-  }
-  .empty-state-icon {
-    width: 48px;
-    height: 48px;
-    display: grid;
-    place-items: center;
-    margin: 0 auto 14px;
-    border-radius: 50%;
-    background: var(--mint);
-    color: var(--seaweed);
-    font-size: 22px;
-    font-weight: 800;
-  }
-  .empty-state-title {
-    margin: 0 0 6px;
-    color: var(--ink);
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: -.02em;
-  }
-  .empty-state-copy {
-    margin: 0;
+    font-weight: 600;
+    font-size: 12px;
     color: var(--ink-mute);
-    font-size: 14px;
-    line-height: 1.5;
+    padding: 12px 14px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: #fff;
+    white-space: nowrap;
   }
-  .tour-overlay {
+  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: var(--row-hover); }
+  .col-right { text-align: right; }
+  .item-name { font-weight: 500; color: var(--ink); font-size: 13px; }
+  .item-meta { font-size: 11px; color: var(--ink-mute); margin-top: 2px; }
+  .val-mute { color: var(--ink-mute); }
+  .counted-input {
+    width: 90px;
+    height: 34px;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    padding: 0 10px;
+    color: var(--ink);
+    outline: none;
+  }
+  .counted-input:focus { border-color: var(--nomni-green); }
+  .uom-inline { color: var(--spinach); font-weight: 600; font-size: 12px; margin-left: 6px; }
+
+  .count-footer-bar {
+    position: fixed;
+    left: 232px;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 40px;
+    background: #fff;
+    box-shadow: 0 -8px 22px rgba(10,20,15,.10);
+  }
+  .count-footer-left { display: flex; align-items: center; gap: 24px; }
+  .count-footer-left a { font-weight: 600; font-size: 14px; cursor: pointer; }
+  .count-footer-left a.cancel-link { color: #D0291E; }
+  .count-footer-left a.draft-link { color: var(--spinach); }
+  .count-footer-right { display: flex; align-items: center; gap: 20px; }
+  .count-tracker { font-size: 13px; color: var(--ink); }
+  .count-tracker b { font-weight: 700; }
+
+  /* Modals */
+  .modal-overlay {
     position: fixed;
     inset: 0;
     z-index: 900;
-    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: rgba(0,0,0,.54);
   }
-  .tour-highlight {
-    position: fixed;
-    border: 2px solid var(--nomni-green);
-    border-radius: 10px;
-    box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);
-    pointer-events: none;
-    transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
-  }
-  .tour-card {
-    position: fixed;
-    width: min(380px, calc(100vw - 32px));
-    padding: 20px;
-    border: 1px solid rgba(42,200,100,.24);
-    border-radius: 10px;
+  .modal-overlay[hidden] { display: none; }
+  .modal-card {
+    width: 440px;
+    max-width: calc(100vw - 32px);
+    border-radius: 18px;
     background: #fff;
-    box-shadow: 0 18px 48px rgba(10,20,15,.16);
-    pointer-events: auto;
+    box-shadow: 0 26px 70px rgba(0,0,0,.24);
+    padding: 32px 34px 30px;
   }
-  .tour-card::before {
-    content: "";
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    left: -9px;
-    top: 26px;
-    border-left: 1px solid rgba(42,200,100,.24);
-    border-bottom: 1px solid rgba(42,200,100,.24);
-    border-radius: 4px;
-    background: #fff;
-    transform: rotate(45deg);
-  }
-  .tour-card.left::before {
-    left: auto;
-    right: -9px;
-    border-left: 0;
-    border-right: 1px solid rgba(42,200,100,.24);
-  }
-  .tour-kicker {
-    margin: 0 0 6px;
-    color: var(--spinach);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-  }
-  .tour-title { margin: 0 0 6px; color: var(--ink); font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
-  .tour-copy { margin: 0 0 14px; color: #59606B; font-size: 14px; line-height: 1.5; }
-  .tour-dismiss {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 30px;
-    min-height: 30px;
-    border: 1px solid transparent;
-    border-radius: 50%;
-    padding: 0;
-    background: transparent;
-    color: #59606B;
-    font-size: 22px;
-    font-weight: 500;
-    line-height: 1;
-    cursor: pointer;
-  }
-  .tour-dismiss:hover { background: #F3F4F6; color: var(--ink); }
+  .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  .modal-title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  .modal-close { border: 0; background: transparent; color: var(--spinach); font-size: 26px; line-height: 1; cursor: pointer; }
+  .modal-intro { margin: 0 0 20px; color: var(--ink-mute); font-size: 13px; line-height: 1.5; }
+  .modal-foot .btn { width: 100%; }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -634,17 +512,15 @@
     .nav a { justify-content: center; padding: 10px; }
     .nav-label, .badge { display: none; }
     .sidebar-setup { display: none; }
-    .content, .page-header { padding-left: 24px; padding-right: 24px; }
+    .content { padding-left: 24px; padding-right: 24px; }
+    .count-footer-bar { left: 64px; }
   }
   @media (max-width: 760px) {
     .app { display: block; }
     .topbar { position: static; }
-    .trial-status,
-    .topbar-setup-link { display: none; }
+    .trial-status, .topbar-setup-link { display: none; }
     .sidebar { display: none; }
-    .toolbar { align-items: stretch; flex-direction: column; }
-    .toolbar-left, .toolbar-right { width: 100%; flex-wrap: wrap; }
-    .search-wrap { width: 100%; }
+    .count-footer-bar { left: 0; padding: 14px 24px; }
   }
 </style>
 </head>
@@ -670,10 +546,10 @@
     <nav class="nav" aria-label="Trial navigation">
       <a data-dashboard-link href="Procure%20Trial%20Dashboard.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
-      <a class="active" data-nav-orders href="procure-trial-orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a data-nav-orders href="procure-trial-orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
       <a data-nav-invoices href="procure-trial-invoices.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
       <a data-nav-items href="procure-trial-items.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
-      <a data-nav-inventory href="procure-trial-inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a class="active" data-nav-inventory href="procure-trial-inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
       <a data-nav-outlets href="procure-trial-outlet-suppliers.html"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
@@ -697,69 +573,73 @@
   </aside>
 
   <main class="main">
-    <section class="page-header">
-      <h1 class="page-title">Orders</h1>
-      <div class="page-actions">
-        <div class="split-btn-wrap" data-new-order-wrap>
-          <button class="btn btn-primary split-btn-main" data-new-order-main type="button"><span class="plus-icon" aria-hidden="true"></span>New order</button>
-          <button class="btn btn-primary split-btn-caret" data-new-order-caret type="button" aria-label="More order types"><span class="chev" aria-hidden="true"></span></button>
-          <div class="split-dropdown" data-new-order-menu hidden>
-            <a data-order-by-supplier href="#">Order by supplier</a>
-            <a data-order-by-item href="procure-trial-new-order-item.html">Order by item</a>
-          </div>
+    <div class="content">
+      <h1 class="page-title" data-page-title>New stock count</h1>
+
+      <div class="count-meta-row">
+        <div class="count-meta-field">
+          <label>Count date</label>
+          <div class="count-meta-input"><span class="material-symbols-outlined" aria-hidden="true">calendar_today</span><span data-count-date>—</span></div>
+        </div>
+        <div class="count-meta-field">
+          <label>&nbsp;</label>
+          <div class="count-meta-input"><span class="material-symbols-outlined" aria-hidden="true">schedule</span><span data-count-time>—</span></div>
         </div>
       </div>
-    </section>
 
-    <div class="content">
-      <div class="toolbar">
-        <div class="toolbar-left">
+      <div class="count-toolbar">
+        <div class="count-toolbar-left">
+          <strong><span data-count-item-count>0</span> items</strong>
           <label class="search-wrap">
             <span class="search-icon" aria-hidden="true"></span>
-            <input type="text" placeholder="Search orders" />
+            <input type="text" placeholder="SKU name" data-count-search />
           </label>
         </div>
+        <button class="btn btn-secondary" type="button" data-autofill>Auto-fill with last count data</button>
       </div>
+
       <div class="table-card">
-        <table class="orders-table" data-orders-table hidden aria-label="Orders">
+        <table>
           <thead>
             <tr>
-              <th>Delivery date</th>
+              <th>Name</th>
               <th>Supplier</th>
-              <th>Outlet</th>
-              <th>Amount</th>
-              <th>Status</th>
+              <th>UOM</th>
+              <th class="col-right">Last count</th>
+              <th class="col-right">On hand</th>
+              <th>Counted Qty</th>
+              <th class="col-right">Value</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td><strong>23 Apr 2026</strong><div class="order-code">Order #202604233182</div></td>
-              <td>Paranakan Trading Pte Ltd (T)</td>
-              <td data-order-venue>Trial Outlet</td>
-              <td>S$54.50</td>
-              <td><span class="chip">Placed</span></td>
-            </tr>
-          </tbody>
+          <tbody data-count-body></tbody>
         </table>
-        <div class="empty-state" data-empty-state>
-          <div class="empty-state-inner">
-            <div class="empty-state-icon" aria-hidden="true">+</div>
-            <h2 class="empty-state-title">No orders yet</h2>
-            <p class="empty-state-copy">Create your first order once your supplier and market list are ready.</p>
-          </div>
-        </div>
       </div>
     </div>
   </main>
 </div>
 
-<div class="tour-overlay" data-tour hidden>
-  <div class="tour-highlight" data-tour-highlight></div>
-  <section class="tour-card" data-tour-card aria-live="polite">
-    <p class="tour-kicker" data-tour-kicker>Step 2</p>
-    <h2 class="tour-title" data-tour-title>Create your first order</h2>
-    <p class="tour-copy" data-tour-copy>Open New order, then choose Order by item to build from the products you already added.</p>
-    <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
+<footer class="count-footer-bar">
+  <div class="count-footer-left">
+    <a class="cancel-link" data-cancel-count>Cancel</a>
+    <a class="draft-link" data-save-draft>Save as draft</a>
+    <a class="draft-link" data-save-draft-exit>Save as draft &amp; exit</a>
+  </div>
+  <div class="count-footer-right">
+    <span class="count-tracker">Est. value: <b data-count-est-value>A$0.00</b> • <b data-count-tracker>0/0</b> counted</span>
+    <button class="btn btn-primary" type="button" data-done-btn>Done</button>
+  </div>
+</footer>
+
+<div class="modal-overlay" data-confirm-modal hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal-head">
+      <h2 class="modal-title" id="confirm-title">Update stock count</h2>
+      <button class="modal-close" data-close-confirm type="button" aria-label="Close update stock count dialog">&times;</button>
+    </div>
+    <p class="modal-intro">The stock levels will be immediately updated upon saving.</p>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-save-stock-count type="button">Save stock count</button>
+    </div>
   </section>
 </div>
 
@@ -773,22 +653,23 @@
     var marketListBuilt = params.get('marketListBuilt') === '1';
     var orderPlaced = params.get('orderPlaced') === '1';
     var inventorySetup = params.get('inventorySetup') === '1';
-    var stockCountDone = params.get('stockCountDone') === '1';
-    var newOrderMain = document.querySelector('[data-new-order-main]');
-    var newOrderCaret = document.querySelector('[data-new-order-caret]');
-    var newOrderMenu = document.querySelector('[data-new-order-menu]');
-    var orderByItem = document.querySelector('[data-order-by-item]');
-    var ordersTable = document.querySelector('[data-orders-table]');
-    var emptyState = document.querySelector('[data-empty-state]');
-    var setupCard = document.querySelector('[data-sidebar-setup-card]');
-    var tour = document.querySelector('[data-tour]');
-    var tourHighlight = document.querySelector('[data-tour-highlight]');
-    var tourCard = document.querySelector('[data-tour-card]');
-    var tourKicker = document.querySelector('[data-tour-kicker]');
-    var tourTitle = document.querySelector('[data-tour-title]');
-    var tourCopy = document.querySelector('[data-tour-copy]');
-    var tourDismiss = document.querySelector('[data-tour-dismiss]');
-    var tourMode = 'order';
+    var listName = params.get('list') || '';
+
+    var storeKey = 'nomniProcureInventoryStore';
+    function loadStore() {
+      try {
+        var raw = window.localStorage.getItem(storeKey);
+        if (!raw) return { lists: [], items: [] };
+        var parsed = JSON.parse(raw);
+        return { lists: parsed.lists || [], items: parsed.items || [] };
+      } catch (error) {
+        return { lists: [], items: [] };
+      }
+    }
+    function saveStore(store) {
+      try { window.localStorage.setItem(storeKey, JSON.stringify(store)); } catch (error) {}
+    }
+    var store = loadStore();
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -799,7 +680,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -811,58 +692,34 @@
       return file + (query ? '?' + query : '');
     }
 
-
     function setupDismissed() {
       return params.get('setupDismissed') === '1';
     }
-
     function setupComplete() {
       return params.get('setupComplete') === '1';
     }
-
     function dashboardUrl(forceSetup) {
       var shouldShowSetup = forceSetup || (!setupDismissed() && !setupComplete());
       return withParams('Procure%20Trial%20Dashboard.html', shouldShowSetup ? { setup: '1' } : {});
     }
-
     function setupTourUrl(tour) {
       return withParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: tour || '1' });
     }
-
     function sidebarNextUrl() {
       var goal = params.get('primaryGoal') || 'Order faster';
       if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return setupTourUrl('stockCount');
       if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return setupTourUrl('order');
-      if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return setupTourUrl('inventory');
       if (!supplierAdded || (supplierAdded && !marketListBuilt)) return setupTourUrl('1');
       return dashboardUrl(true);
     }
 
-    document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
-      link.href = dashboardUrl(false);
-    });
-    document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
-      link.href = dashboardUrl(true);
-    });
-    document.querySelectorAll('[data-nav-items]').forEach(function(link) {
-      link.href = withParams('procure-trial-items.html');
-    });
-    document.querySelectorAll('[data-nav-outlets]').forEach(function(link) {
-      link.href = withParams('procure-trial-outlet-suppliers.html');
-    });
-    document.querySelectorAll('[data-nav-orders]').forEach(function(link) {
-      link.href = withParams('procure-trial-orders.html');
-    });
-    document.querySelectorAll('[data-nav-inventory]').forEach(function(link) {
-      link.href = withParams('procure-trial-inventory.html');
-    });
-    document.querySelectorAll('[data-nav-invoices]').forEach(function(link) {
-      link.href = withParams('procure-trial-invoices.html');
-    });
-    if (orderByItem) orderByItem.href = withParams('procure-trial-new-order-item.html', { tour: 'item' });
-    document.querySelectorAll('[data-order-venue]').forEach(function(node) {
-      node.textContent = params.get('venueName') || 'Trial Outlet';
-    });
+    document.querySelectorAll('[data-dashboard-link]').forEach(function(link) { link.href = dashboardUrl(false); });
+    document.querySelectorAll('[data-setup-home-link]').forEach(function(link) { link.href = dashboardUrl(true); });
+    document.querySelectorAll('[data-nav-items]').forEach(function(link) { link.href = withParams('procure-trial-items.html'); });
+    document.querySelectorAll('[data-nav-outlets]').forEach(function(link) { link.href = withParams('procure-trial-outlet-suppliers.html'); });
+    document.querySelectorAll('[data-nav-orders]').forEach(function(link) { link.href = withParams('procure-trial-orders.html'); });
+    document.querySelectorAll('[data-nav-inventory]').forEach(function(link) { link.href = withParams('procure-trial-inventory.html'); });
+    document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html'); });
 
     if (supplierAdded) {
       document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '40% done'; });
@@ -878,16 +735,12 @@
       });
     }
     if (orderPlaced) {
-      var primaryGoal = params.get('primaryGoal') || 'Order faster';
-      var orderProgress = primaryGoal === 'Order faster' ? '80% done' : '60% done';
-      var orderProgressWidth = primaryGoal === 'Order faster' ? '80%' : '60%';
-      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = orderProgress; });
-      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = orderProgressWidth; });
+      var orderGoal = params.get('primaryGoal') || 'Order faster';
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = (orderGoal === 'Order faster' ? '80%' : '60%') + ' done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = (orderGoal === 'Order faster' ? '80%' : '60%'); });
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
-        node.textContent = primaryGoal === 'Digitise invoices' ? 'Upload first invoice' : 'Set up inventory';
+        node.textContent = orderGoal === 'Digitise invoices' ? 'Upload first invoice' : 'Set up inventory';
       });
-      if (ordersTable) ordersTable.hidden = false;
-      if (emptyState) emptyState.hidden = true;
     }
     if (inventorySetup) {
       var invGoal = params.get('primaryGoal') || 'Order faster';
@@ -899,85 +752,154 @@
         node.textContent = invGoal === 'Manage inventory' ? 'Complete first stock count' : "You're all set";
       });
     }
-    if (stockCountDone && (params.get('primaryGoal') || 'Order faster') === 'Manage inventory') {
-      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '100% done'; });
-      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
-      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
-    }
-    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      link.href = sidebarNextUrl();
-    });
+    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) { link.href = sidebarNextUrl(); });
 
     if (userName && userNameNode) {
       userNameNode.textContent = userName;
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
 
-    function toggleNewOrderMenu(forceOpen) {
-      if (!newOrderMenu) return;
-      var open = typeof forceOpen === 'boolean' ? forceOpen : newOrderMenu.hidden;
-      newOrderMenu.hidden = !open;
-      placeTour();
+    var pageTitleNode = document.querySelector('[data-page-title]');
+    if (pageTitleNode) pageTitleNode.textContent = 'New stock count: ' + (listName || 'Inventory list');
+
+    var now = new Date();
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var dateText = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+    var hh = now.getHours();
+    var mm = now.getMinutes();
+    var timeText = (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+    var countDateNode = document.querySelector('[data-count-date]');
+    var countTimeNode = document.querySelector('[data-count-time]');
+    if (countDateNode) countDateNode.textContent = dateText;
+    if (countTimeNode) countTimeNode.textContent = timeText;
+
+    var listItems = store.items.filter(function(item) { return item.list === listName; });
+    var countBody = document.querySelector('[data-count-body]');
+    var itemCountNode = document.querySelector('[data-count-item-count]');
+    var searchInput = document.querySelector('[data-count-search]');
+    var estValueNode = document.querySelector('[data-count-est-value]');
+    var trackerNode = document.querySelector('[data-count-tracker]');
+
+    if (itemCountNode) itemCountNode.textContent = listItems.length;
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, function(ch) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+      });
     }
 
-    function setTourCopy(mode) {
-      tourMode = mode || 'order';
-      if (tourMode === 'handoff') {
-        var handoffGoal = params.get('primaryGoal') || 'Order faster';
-        var handoffProgress = handoffGoal === 'Order faster' ? '80%' : '60%';
-        if (tourKicker) tourKicker.textContent = 'Setup updated';
-        if (tourTitle) tourTitle.textContent = 'First order placed';
-        if (tourCopy) tourCopy.textContent = "You're " + handoffProgress + " done. Click the setup panel to continue with the next step.";
-      } else {
-        if (tourKicker) tourKicker.textContent = 'Step 2';
-        if (tourTitle) tourTitle.textContent = 'Create your first order';
-        if (tourCopy) tourCopy.textContent = 'Open New order, then choose Order by item to build from the products you already added.';
+    function renderRows(query) {
+      if (!countBody) return;
+      var q = (query || '').trim().toLowerCase();
+      countBody.innerHTML = '';
+      var visible = listItems.filter(function(item) { return !q || item.name.toLowerCase().indexOf(q) !== -1; });
+      if (!visible.length) {
+        countBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--ink-mute);padding:32px 0;">' + (listItems.length ? 'No items match your search.' : 'This list has no items yet.') + '</td></tr>';
+        return;
       }
+      visible.forEach(function(item, index) {
+        var tr = document.createElement('tr');
+        tr.setAttribute('data-row-name', item.name);
+        tr.innerHTML = '<td><div class="item-name">' + escapeHtml(item.name) + '</div>' + (item.tag ? '<div class="item-meta">' + escapeHtml(item.tag) + '</div>' : '') + '</td>' +
+          '<td>' + escapeHtml(item.supplier || '—') + '</td>' +
+          '<td>' + escapeHtml(item.uom || '—') + '</td>' +
+          '<td class="col-right val-mute">' + (item.lastCount != null ? item.lastCount.toFixed(1) : '0.0') + '</td>' +
+          '<td class="col-right val-mute">' + (item.onHand || 0).toFixed(1) + '</td>' +
+          '<td><input type="text" class="counted-input" data-counted-input inputmode="decimal" placeholder="0">' + (item.uom ? '<span class="uom-inline">' + escapeHtml(item.uom) + '</span>' : '') + '</td>' +
+          '<td class="col-right val-mute" data-value-cell>A$0.00</td>';
+        countBody.appendChild(tr);
+      });
+    }
+    renderRows('');
+    if (searchInput) searchInput.addEventListener('input', function() { renderRows(searchInput.value); });
+
+    function updateTracker() {
+      if (!countBody) return;
+      var rows = countBody.querySelectorAll('tr[data-row-name]');
+      var counted = 0;
+      var estTotal = 0;
+      rows.forEach(function(row) {
+        var input = row.querySelector('[data-counted-input]');
+        if (!input || input.value === '') return;
+        counted++;
+        var name = row.getAttribute('data-row-name');
+        var item = listItems.filter(function(entry) { return entry.name === name; })[0];
+        var qty = parseFloat(input.value) || 0;
+        var value = qty * (item && item.price ? item.price : 0);
+        estTotal += value;
+        var valueCell = row.querySelector('[data-value-cell]');
+        if (valueCell) valueCell.textContent = 'A$' + value.toFixed(2);
+      });
+      if (trackerNode) trackerNode.textContent = counted + '/' + listItems.length;
+      if (estValueNode) estValueNode.textContent = 'A$' + estTotal.toFixed(2);
+    }
+    if (countBody) {
+      countBody.addEventListener('input', function(event) {
+        if (event.target.matches('[data-counted-input]')) updateTracker();
+      });
     }
 
-    function placeTour() {
-      if (!tour || tour.hidden) return;
-      var target = tourMode === 'handoff' ? setupCard : document.querySelector('[data-new-order-wrap]');
-      if (!target) return;
-      var rect = target.getBoundingClientRect();
-      var pad = 10;
-      tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
-      tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
-      tourHighlight.style.width = (rect.width + pad * 2) + 'px';
-      tourHighlight.style.height = (rect.height + pad * 2) + 'px';
-      var cardWidth = Math.min(380, window.innerWidth - 32);
-      var cardHeight = tourCard.getBoundingClientRect().height || 200;
-      var cardLeft = rect.right + 28;
-      var cardTop = Math.max(16, Math.min(rect.top - 18, window.innerHeight - cardHeight - 16));
-      tourCard.classList.remove('left');
-      if (tourMode !== 'handoff' || cardLeft + cardWidth > window.innerWidth - 16) {
-        cardLeft = Math.max(16, rect.left - cardWidth - 34);
-        tourCard.classList.add('left');
+    var autofillBtn = document.querySelector('[data-autofill]');
+    if (autofillBtn) autofillBtn.addEventListener('click', function() {
+      if (!countBody) return;
+      countBody.querySelectorAll('tr[data-row-name]').forEach(function(row) {
+        var name = row.getAttribute('data-row-name');
+        var item = listItems.filter(function(entry) { return entry.name === name; })[0];
+        var input = row.querySelector('[data-counted-input]');
+        if (input && item) input.value = item.lastCount != null ? item.lastCount : (item.onHand || 0);
+      });
+      updateTracker();
+    });
+
+    var cancelLink = document.querySelector('[data-cancel-count]');
+    if (cancelLink) cancelLink.addEventListener('click', function() {
+      window.location.href = withParams('procure-trial-inventory.html');
+    });
+    var saveDraftLink = document.querySelector('[data-save-draft]');
+    if (saveDraftLink) saveDraftLink.addEventListener('click', function() {
+      saveDraftLink.textContent = 'Draft saved';
+      setTimeout(function() { saveDraftLink.textContent = 'Save as draft'; }, 1600);
+    });
+    var saveDraftExitLink = document.querySelector('[data-save-draft-exit]');
+    if (saveDraftExitLink) saveDraftExitLink.addEventListener('click', function() {
+      window.location.href = withParams('procure-trial-inventory.html');
+    });
+
+    var confirmModal = document.querySelector('[data-confirm-modal]');
+    var doneBtn = document.querySelector('[data-done-btn]');
+    if (doneBtn) doneBtn.addEventListener('click', function() {
+      if (confirmModal) confirmModal.hidden = false;
+    });
+    document.querySelectorAll('[data-close-confirm]').forEach(function(btn) {
+      btn.addEventListener('click', function() { if (confirmModal) confirmModal.hidden = true; });
+    });
+    if (confirmModal) {
+      confirmModal.addEventListener('click', function(event) {
+        if (event.target === confirmModal) confirmModal.hidden = true;
+      });
+    }
+
+    var saveStockCountBtn = document.querySelector('[data-save-stock-count]');
+    if (saveStockCountBtn) saveStockCountBtn.addEventListener('click', function() {
+      var fullStore = loadStore();
+      if (countBody) {
+        countBody.querySelectorAll('tr[data-row-name]').forEach(function(row) {
+          var input = row.querySelector('[data-counted-input]');
+          if (!input || input.value === '') return;
+          var name = row.getAttribute('data-row-name');
+          var qty = parseFloat(input.value) || 0;
+          var storedItem = fullStore.items.filter(function(entry) { return entry.name === name && entry.list === listName; })[0];
+          if (storedItem) {
+            storedItem.movement = qty - (storedItem.onHand || 0);
+            storedItem.onHand = qty;
+            storedItem.lastCount = qty;
+            storedItem.lastCountDate = dateText;
+          }
+        });
       }
-      tourCard.style.left = cardLeft + 'px';
-      tourCard.style.top = cardTop + 'px';
-    }
-
-    function openTour(mode) {
-      if (!tour) return;
-      setTourCopy(mode);
-      tour.hidden = false;
-      toggleNewOrderMenu(tourMode === 'order');
-      setTimeout(placeTour, 40);
-    }
-
-    if (newOrderMain) newOrderMain.addEventListener('click', function() { toggleNewOrderMenu(); });
-    if (newOrderCaret) newOrderCaret.addEventListener('click', function() { toggleNewOrderMenu(); });
-    document.addEventListener('click', function(event) {
-      if (!event.target.closest('[data-new-order-wrap]')) toggleNewOrderMenu(false);
+      saveStore(fullStore);
+      window.location.href = withParams('procure-trial-inventory.html', { stockCountDone: '1', inventoryList: listName });
     });
-    if (tourDismiss) tourDismiss.addEventListener('click', function() {
-      if (tour) tour.hidden = true;
-    });
-    window.addEventListener('resize', placeTour);
-    window.addEventListener('scroll', placeTour, { passive: true });
-    if (params.get('tour') === 'order' && marketListBuilt && !orderPlaced) openTour();
-    if (params.get('orderHandoff') === '1' && orderPlaced) openTour('handoff');
   })();
 </script>
 </body>
