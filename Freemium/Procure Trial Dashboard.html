@@ -163,9 +163,6 @@
   .nav {
     margin-top: 4px;
     padding: 6px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
   }
   .nav a {
     display: flex;
@@ -260,6 +257,21 @@
     font-size: 13px;
     font-weight: 700;
     line-height: 1.2;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .sidebar-setup-tick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
+    font-weight: 700;
   }
   .sidebar-setup-row::after {
     content: "↗";
@@ -287,6 +299,8 @@
     font-size: 11px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .sidebar-setup-next {
     color: #687080;
@@ -482,12 +496,23 @@
     --progress-value: 20%;
     width: 36px;
     height: 36px;
-    display: block;
+    display: inline-grid;
+    place-items: center;
     flex: 0 0 36px;
     border-radius: 50%;
     background:
       radial-gradient(circle at center, #fff 0 47%, transparent 48%),
       conic-gradient(var(--nomni-green) var(--progress-value), #E7E8EC 0);
+  }
+  .progress-ring.complete {
+    background: var(--nomni-green);
+    color: var(--seaweed);
+  }
+  .progress-ring.complete::before {
+    content: "✓";
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
   }
   .setup-grid {
     display: grid;
@@ -697,6 +722,39 @@
     color: var(--ink-mute);
     font-size: 13px;
   }
+  .checklist-wrap.is-collapsible {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .checklist-wrap.is-collapsible summary {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    color: var(--seaweed);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+  .checklist-wrap.is-collapsible summary::-webkit-details-marker { display: none; }
+  .checklist-wrap.is-collapsible summary::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--spinach);
+    border-bottom: 2px solid var(--spinach);
+    transform: rotate(45deg) translateY(-2px);
+    transform-origin: 60% 60%;
+    transition: transform .16s cubic-bezier(.2, 0, .2, 1);
+  }
+  .checklist-wrap.is-collapsible[open] summary::after { transform: rotate(225deg) translate(-1px, -1px); }
+  .checklist-wrap.is-collapsible[open] summary { border-bottom: 1px solid var(--rule); }
+  .checklist-wrap.is-collapsible .task-list { padding: 14px; }
   .more-setup {
     margin-top: 14px;
     border: 1px solid var(--rule);
@@ -1299,10 +1357,10 @@
     <div class="sidebar-setup">
       <div class="sidebar-setup-card" data-sidebar-setup-card>
         <a class="sidebar-setup-main" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
-          <span class="sidebar-setup-row"><span class="sidebar-setup-title">Get started</span><span class="sidebar-setup-copy">20% done</span></span>
+          <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong>Next</strong> • <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span data-sidebar-next-step>Add first supplier</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span data-sidebar-next-step>Add first supplier</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support">
@@ -1332,10 +1390,15 @@
             </div>
           </div>
 
-          <div class="task-list" data-checklist></div>
+          <details class="checklist-wrap" data-checklist-wrap open>
+            <summary hidden data-checklist-summary>
+              <span>Show completed steps</span>
+            </summary>
+            <div class="task-list" data-checklist></div>
+          </details>
           <details class="more-setup" data-extra-setup>
             <summary>
-              <span>More setup options</span>
+              <span data-extra-setup-label>More setup options</span>
             </summary>
             <div class="more-task-list" data-extra-checklist></div>
           </details>
@@ -1522,6 +1585,8 @@
     var createdSku = params.get('createdSku') || '';
     var invoiceItemsAdded = params.get('invoiceItemsAdded') === '1';
     var orderPlaced = params.get('orderPlaced') === '1';
+    var orderByItemDone = params.get('orderByItemDone') === '1';
+    var orderBySupplierDone = params.get('orderBySupplierDone') === '1';
     var inventorySetup = params.get('inventorySetup') === '1';
     var stockCountDone = params.get('stockCountDone') === '1';
     var userNameNode = document.querySelector('[data-user-name]');
@@ -1676,6 +1741,23 @@
       return null;
     }
 
+    function orderAlternatePath() {
+      if (!orderPlaced) return null;
+      if (orderByItemDone && !orderBySupplierDone) {
+        return {
+          label: 'Try ordering by supplier',
+          href: preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'orderSupplier' })
+        };
+      }
+      if (orderBySupplierDone && !orderByItemDone) {
+        return {
+          label: 'Try ordering by item',
+          href: preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' })
+        };
+      }
+      return null;
+    }
+
     function createTask(taskKey, index, counted, currentTaskKey) {
       var task = taskCatalog[taskKey];
       var isCompleted = Boolean(task.completed && counted);
@@ -1727,6 +1809,18 @@
             alternateLink.textContent = alternatePath.label;
             actionStack.appendChild(alternateLink);
             row.appendChild(actionStack);
+          }
+        } else if (taskKey === 'order') {
+          var alternateOrderPath = orderAlternatePath();
+          if (alternateOrderPath) {
+            var orderActionStack = document.createElement('div');
+            orderActionStack.className = 'task-action-stack';
+            var alternateOrderLink = document.createElement('a');
+            alternateOrderLink.className = 'task-secondary-action';
+            alternateOrderLink.href = alternateOrderPath.href;
+            alternateOrderLink.textContent = alternateOrderPath.label;
+            orderActionStack.appendChild(alternateOrderLink);
+            row.appendChild(orderActionStack);
           }
         }
       } else if (dependencyMet && task.cta) {
@@ -1785,7 +1879,10 @@
         var progressLabel = progressStat.querySelector('span:last-child');
         if (progressLabel) progressLabel.textContent = progressLabelText;
         progressStat.style.setProperty('--progress-value', progressValue + '%');
-        if (progressRing) progressRing.style.setProperty('--progress-value', progressValue + '%');
+        if (progressRing) {
+          progressRing.style.setProperty('--progress-value', progressValue + '%');
+          progressRing.classList.toggle('complete', progressValue === 100);
+        }
         progressStat.setAttribute('aria-label', progressLabelText);
       }
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) {
@@ -1821,6 +1918,46 @@
         extraTasks.forEach(function(taskKey, index) {
           extraChecklistNode.appendChild(createTask(taskKey, index, false, currentTaskKey));
         });
+      }
+
+      var isChecklistComplete = progressValue === 100;
+      var checklistWrap = document.querySelector('[data-checklist-wrap]');
+      var checklistSummary = document.querySelector('[data-checklist-summary]');
+      if (checklistSummary) checklistSummary.hidden = !isChecklistComplete;
+      if (checklistWrap) {
+        checklistWrap.classList.toggle('is-collapsible', isChecklistComplete);
+        if (isChecklistComplete && !checklistWrap.dataset.collapsedApplied) {
+          checklistWrap.open = false;
+          checklistWrap.dataset.collapsedApplied = '1';
+        }
+      }
+      var extraSetupNode = document.querySelector('[data-extra-setup]');
+      var extraSetupLabel = document.querySelector('[data-extra-setup-label]');
+      if (extraSetupLabel) extraSetupLabel.textContent = isChecklistComplete ? 'More things you can do' : 'More setup options';
+      if (extraSetupNode && isChecklistComplete && !extraSetupNode.dataset.autoOpened) {
+        extraSetupNode.open = true;
+        extraSetupNode.dataset.autoOpened = '1';
+      }
+
+      var sidebarTickNodes = document.querySelectorAll('[data-sidebar-setup-tick]');
+      var sidebarNextLabelNodes = document.querySelectorAll('[data-sidebar-next-label]');
+      sidebarTickNodes.forEach(function(node) { node.hidden = !isChecklistComplete; });
+      if (isChecklistComplete) {
+        var nextExtraKey = extraTasks.find(function(key) {
+          var task = taskCatalog[key];
+          var depMet = !task.dependsOn || (taskCatalog[task.dependsOn] && taskCatalog[task.dependsOn].completed);
+          return !task.completed && depMet;
+        });
+        if (nextExtraKey) {
+          var sidebarAlsoTryTitles = { stockCount: 'Complete a stock count', invoiceUpload: 'Upload an invoice' };
+          sidebarNextLabelNodes.forEach(function(node) { node.textContent = 'Also try:'; });
+          if (sidebarNextStep) sidebarNextStep.textContent = sidebarAlsoTryTitles[nextExtraKey] || taskCatalog[nextExtraKey].title;
+          if (sidebarNextAction) sidebarNextAction.href = preserveParams(taskCatalog[nextExtraKey].ctaHref || 'Procure%20Trial%20Dashboard.html', taskCatalog[nextExtraKey].ctaHref ? {} : { setup: '1' });
+        } else {
+          document.querySelectorAll('.sidebar-setup-next').forEach(function(node) { node.hidden = true; });
+        }
+      } else {
+        sidebarNextLabelNodes.forEach(function(node) { node.textContent = 'Next:'; });
       }
 
       supplierSetupLink = document.querySelector('[data-supplier-setup-link]');
@@ -1884,7 +2021,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1951,7 +2088,7 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1975,12 +2112,12 @@
     }
 
     function setDashboardTourMode(mode) {
-      dashboardTourMode = mode === 'market' || mode === 'order' || mode === 'inventory' || mode === 'stockCount' ? mode : 'supplier';
+      dashboardTourMode = mode === 'market' || mode === 'order' || mode === 'orderSupplier' || mode === 'inventory' || mode === 'stockCount' ? mode : 'supplier';
       if (dashboardTourKicker) dashboardTourKicker.textContent = 'Step 1';
       if (dashboardTourTitle) {
         dashboardTourTitle.textContent = dashboardTourMode === 'market'
           ? 'Start from Items'
-          : dashboardTourMode === 'order'
+          : dashboardTourMode === 'order' || dashboardTourMode === 'orderSupplier'
             ? 'Start from Orders'
             : dashboardTourMode === 'inventory' || dashboardTourMode === 'stockCount'
               ? 'Start from Inventory'
@@ -1991,14 +2128,16 @@
           ? 'Add the items your team orders most. Start from Items in the sidebar.'
           : dashboardTourMode === 'order'
             ? 'Open Orders to create your first purchase order for the items you need.'
+          : dashboardTourMode === 'orderSupplier'
+            ? 'Open Orders to place an order by choosing the supplier first.'
           : dashboardTourMode === 'inventory'
-            ? 'Create your first inventory list and add items to start tracking stock on hand. Start from Inventory in the sidebar.'
+            ? 'Create your first inventory list and add items to start tracking stock on hand.'
           : dashboardTourMode === 'stockCount'
             ? 'Open Inventory to start your first stock count from the list you set up.'
           : 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
       }
       if (itemsNavLink) itemsNavLink.href = dashboardTourMode === 'market' ? marketSetupUrl() : preserveParams('procure-trial-items.html');
-      if (ordersNavLink) ordersNavLink.href = dashboardTourMode === 'order' ? orderSetupUrl() : preserveParams('procure-trial-orders.html');
+      if (ordersNavLink) ordersNavLink.href = dashboardTourMode === 'order' ? orderSetupUrl() : dashboardTourMode === 'orderSupplier' ? preserveParams('procure-trial-orders.html', { tour: 'orderSupplier' }) : preserveParams('procure-trial-orders.html');
       if (inventoryNavLink) inventoryNavLink.href = dashboardTourMode === 'inventory' ? inventorySetupUrl() : dashboardTourMode === 'stockCount' ? stockCountSetupUrl() : preserveParams('procure-trial-inventory.html');
       if (outletsNavLink) outletsNavLink.href = supplierSetupUrl('2');
     }
@@ -2006,7 +2145,7 @@
     function placeDashboardTour() {
       var target = dashboardTourMode === 'market'
         ? itemsNavLink
-          : dashboardTourMode === 'order'
+            : dashboardTourMode === 'order' || dashboardTourMode === 'orderSupplier'
             ? ordersNavLink
             : dashboardTourMode === 'inventory' || dashboardTourMode === 'stockCount'
               ? inventoryNavLink
@@ -2096,6 +2235,7 @@
     if (ordersNavLink) {
       ordersNavLink.addEventListener('click', function() {
         if (dashboardTourMode === 'order') ordersNavLink.href = orderSetupUrl();
+        if (dashboardTourMode === 'orderSupplier') ordersNavLink.href = preserveParams('procure-trial-orders.html', { tour: 'orderSupplier' });
       });
     }
     if (inventoryNavLink) {
@@ -2119,14 +2259,14 @@
         dashboardTour.hidden = true;
       });
     }
-    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1' || params.get('tour') === 'order' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount';
+    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1' || params.get('tour') === 'order' || params.get('tour') === 'orderSupplier' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount';
     if ((setupComplete() || setupDismissed()) && !forceSetup) {
       showDashboard();
     } else {
       showOnboarding();
     }
-    if (params.get('tour') === '1' || params.get('tour') === 'order' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount') {
-      openDashboardTour(params.get('tour') === 'order' ? 'order' : params.get('tour') === 'inventory' ? 'inventory' : params.get('tour') === 'stockCount' ? 'stockCount' : supplierAdded && !marketListBuilt ? 'market' : 'supplier');
+    if (params.get('tour') === '1' || params.get('tour') === 'order' || params.get('tour') === 'orderSupplier' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount') {
+      openDashboardTour(params.get('tour') === 'order' ? 'order' : params.get('tour') === 'orderSupplier' ? 'orderSupplier' : params.get('tour') === 'inventory' ? 'inventory' : params.get('tour') === 'stockCount' ? 'stockCount' : supplierAdded && !marketListBuilt ? 'market' : 'supplier');
     }
     window.addEventListener('resize', placeDashboardTour);
   })();

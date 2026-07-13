@@ -160,9 +160,6 @@
   .nav {
     margin-top: 4px;
     padding: 6px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
   }
   .nav a {
     display: flex;
@@ -240,9 +237,27 @@
     gap: 10px;
   }
   .sidebar-setup-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 13px;
     font-weight: 700;
     line-height: 1.2;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .sidebar-setup-tick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
+    font-weight: 700;
   }
   .sidebar-setup-row::after {
     content: "↗";
@@ -270,6 +285,8 @@
     font-size: 11px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .sidebar-setup-next {
     color: #687080;
@@ -356,12 +373,44 @@
   }
   .page-actions { display: flex; align-items: center; gap: 10px; }
 
+  .tabs-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--rule);
+    min-height: 40px;
+  }
   .tabs {
     display: flex;
     gap: 28px;
-    border-bottom: 1px solid var(--rule);
     padding: 0 2px;
   }
+  .inv-pos-sync-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 11px;
+    white-space: nowrap;
+  }
+  .inv-pos-sync-icon {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    display: block;
+  }
+  .inv-pos-sync-text {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.4;
+    text-align: right;
+  }
+  .sync-now-link {
+    color: var(--spinach);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .sync-now-link:hover { text-decoration: underline; }
   .tab {
     position: relative;
     padding: 10px 2px 14px;
@@ -387,36 +436,58 @@
     border-radius: 2px;
   }
 
-  .content { padding: 24px 40px 56px; }
+  .content { padding: 0 40px 56px; }
 
-  .stat-cards { display: flex; gap: 16px; margin-bottom: 20px; }
+  .stat-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    column-gap: 34px;
+    background: #F5F6F8;
+    border-bottom: 1px solid var(--rule);
+    margin: 0 -40px 28px;
+    padding: 22px 40px;
+  }
   .stat-card {
-    flex: 1;
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 18px 20px;
-    border-radius: 10px;
-    border: 1px solid var(--rule);
-    background: #fff;
+    min-width: 0;
+    justify-content: flex-start;
+    padding-right: 38px;
+  }
+  .stat-body {
+    min-width: 0;
   }
   .stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 48px;
+    flex: 0 0 60px;
   }
-  .stat-icon.green { background: #D4F5E0; color: var(--spinach); }
-  .stat-icon.teal { background: #D4EDF5; color: #1A6080; }
-  .stat-icon.red { background: #FDE8E8; color: #C02020; }
-  .stat-label { font-size: 12px; color: var(--ink-mute); line-height: 1.4; }
-  .stat-value { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin-top: 3px; }
-  .stat-value.green { color: var(--spinach); }
-  .stat-value.teal { color: #1A6080; }
-  .stat-value.red { color: #C02020; }
+  .stat-icon img { width: 60px; height: 60px; display: block; }
+  .stat-label {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+  .stat-value {
+    color: var(--ink);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -.03em;
+    line-height: 1.15;
+    margin-top: 6px;
+    white-space: nowrap;
+  }
+  .stat-value.green,
+  .stat-value.teal { color: var(--ink); }
+  .stat-value.red { color: var(--spinach); }
 
   .toolbar {
     display: flex;
@@ -624,7 +695,7 @@
   .modal-title {
     margin: 0;
     font-size: 22px;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: -.02em;
   }
   .modal-close {
@@ -679,37 +750,39 @@
   /* Toast */
   .toast {
     position: fixed;
-    left: 50%;
-    bottom: 28px;
-    transform: translate(-50%, 16px);
+    right: 28px;
+    top: 78px;
+    z-index: 980;
+    min-width: 300px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: var(--mint);
-    border: 1px solid rgba(42,200,100,.3);
-    border-radius: 10px;
-    padding: 14px 20px;
-    box-shadow: 0 14px 34px rgba(10,20,15,.16);
+    gap: 14px;
+    padding: 15px 18px;
+    border-radius: 4px;
+    border: 1px solid #AFE7C2;
+    background: #E2FFE6;
+    box-shadow: 0 16px 44px rgba(10,20,15,.16);
+    color: var(--seaweed);
     opacity: 0;
+    transform: translateY(-8px);
     pointer-events: none;
-    transition: opacity .22s ease, transform .22s ease;
-    z-index: 950;
+    transition: opacity .2s ease, transform .2s ease;
   }
-  .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
   .toast-check {
-    width: 26px;
-    height: 26px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: var(--spinach);
     display: grid;
     place-items: center;
+    background: #0BBE3F;
     color: #fff;
-    font-size: 15px;
+    font-size: 27px;
     line-height: 1;
     flex: 0 0 auto;
   }
   .toast-title { font-weight: 800; margin-bottom: 2px; }
-  .toast-copy { color: var(--seaweed); font-size: 13px; }
+  .toast-copy { color: var(--seaweed); font-size: 14px; }
 
   /* Split button (Stock count) */
   .split-btn-wrap { position: relative; display: inline-flex; }
@@ -972,7 +1045,14 @@
     .nav-label, .badge { display: none; }
     .sidebar-setup { display: none; }
     .content, .page-header { padding-left: 24px; padding-right: 24px; }
-    .stat-cards { flex-wrap: wrap; }
+    .stat-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 18px;
+      margin-left: -24px;
+      margin-right: -24px;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
   }
   @media (max-width: 760px) {
     .app { display: block; }
@@ -984,7 +1064,10 @@
     .toolbar { align-items: stretch; flex-direction: column; }
     .toolbar-left, .toolbar-right { width: 100%; flex-wrap: wrap; }
     .search-wrap { width: 100%; }
-    .stat-cards { flex-direction: column; }
+    .stat-cards { grid-template-columns: 1fr; gap: 12px; }
+    .stat-card { width: 100%; padding-right: 0; }
+    .tabs-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .inv-pos-sync-bar { padding-bottom: 8px; white-space: normal; }
   }
 </style>
 </head>
@@ -1022,10 +1105,10 @@
     <div class="sidebar-setup">
       <div class="sidebar-setup-card" data-sidebar-setup-card>
         <a class="sidebar-setup-main" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
-          <span class="sidebar-setup-row"><span class="sidebar-setup-title">Get started</span><span class="sidebar-setup-copy">20% done</span></span>
+          <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong>Next</strong> • <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support">
@@ -1052,18 +1135,24 @@
           <button class="btn btn-secondary btn-sm" type="button">Adjustment/Production</button>
         </div>
       </div>
-      <nav class="tabs" aria-label="Inventory tabs">
-        <button class="tab active" data-tab-btn="items" type="button">Items</button>
-        <button class="tab" data-tab-btn="lists" type="button">Lists</button>
-      </nav>
+      <div class="tabs-row">
+        <nav class="tabs" aria-label="Inventory tabs">
+          <button class="tab active" data-tab-btn="items" type="button">Items</button>
+          <button class="tab" data-tab-btn="lists" type="button">Lists</button>
+        </nav>
+        <div class="inv-pos-sync-bar">
+          <svg class="inv-pos-sync-icon" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--nomni-green)"/><path d="M11.25 31.875L22.5 43.125L48.75 16.875" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          <span class="inv-pos-sync-text">Sync is active. Latest update from POS: <span data-sync-time>28 Jan 2025, 10:47</span> - <a class="sync-now-link" data-sync-now href="#">Sync now</a></span>
+        </div>
+      </div>
     </section>
 
     <div class="content">
 
       <div class="stat-cards" data-stat-cards="items">
         <div class="stat-card">
-          <div class="stat-icon green">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <div class="stat-icon">
+            <img src="assets/icons/inventory-est-value.svg" width="36" height="36" alt="" />
           </div>
           <div class="stat-body">
             <div class="stat-label" data-stat-value-label>Est. value on hand (0 Lists)</div>
@@ -1071,8 +1160,8 @@
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon teal">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <div class="stat-icon">
+            <img src="assets/icons/inventory-no-of-items.svg" width="36" height="36" alt="" />
           </div>
           <div class="stat-body">
             <div class="stat-label">No. of items</div>
@@ -1080,8 +1169,8 @@
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon red">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="stat-icon">
+            <img src="assets/icons/inventory-below-par.svg" width="36" height="36" alt="" />
           </div>
           <div class="stat-body">
             <div class="stat-label">Below PAR</div>
@@ -1092,8 +1181,8 @@
 
       <div class="stat-cards" data-stat-cards="lists" hidden>
         <div class="stat-card">
-          <div class="stat-icon green">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <div class="stat-icon">
+            <img src="assets/icons/inventory-est-value.svg" width="36" height="36" alt="" />
           </div>
           <div class="stat-body">
             <div class="stat-label" data-stat-value-label-lists>Est. value on hand (0 Lists)</div>
@@ -1101,8 +1190,8 @@
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon teal">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <div class="stat-icon">
+            <img src="assets/icons/inventory-no-of-items.svg" width="36" height="36" alt="" />
           </div>
           <div class="stat-body">
             <div class="stat-label">No. of items</div>
@@ -1395,7 +1484,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1412,7 +1501,16 @@
     }
 
     function setupComplete() {
-      return params.get('setupComplete') === '1';
+      if (params.get('setupComplete') === '1') return true;
+      var goal = params.get('primaryGoal') || 'Order faster';
+      var hasSupplier = params.get('supplierAdded') === '1';
+      var hasMarket = params.get('marketListBuilt') === '1';
+      var hasOrder = params.get('orderPlaced') === '1';
+      var hasInventory = params.get('inventorySetup') === '1';
+      var hasStockCount = params.get('stockCountDone') === '1';
+      if (goal === 'Digitise invoices') return false;
+      if (goal === 'Manage inventory') return hasSupplier && hasMarket && hasInventory && hasStockCount;
+      return hasSupplier && hasMarket && hasOrder && hasInventory;
     }
 
     function dashboardUrl(forceSetup) {
@@ -1494,9 +1592,26 @@
         document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
         document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
       }
+      var fullyDoneGoal = params.get('primaryGoal') || 'Order faster';
+      var isFullyDone = (fullyDoneGoal === 'Order faster' && inventorySetup) || (fullyDoneGoal === 'Manage inventory' && stockCountDone);
+      document.querySelectorAll('[data-sidebar-setup-tick]').forEach(function(node) { node.hidden = !isFullyDone; });
+      document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node) { node.hidden = false; node.textContent = isFullyDone ? 'Also try:' : 'Next:'; });
+      var extraTitles = { order: 'Place first order', invoiceUpload: 'Upload an invoice', invoiceDigitise: 'Digitise invoices', invoiceExport: 'Export invoices', stockCount: 'Complete a stock count' };
+      var extraHrefs = { order: 'procure-trial-orders.html', invoiceUpload: 'procure-trial-invoices.html', stockCount: 'procure-trial-inventory.html' };
+      var nextExtraKey = null;
+      if (isFullyDone) {
+        var extraGoalTask = fullyDoneGoal === 'Order faster' ? 'order' : 'stockCount';
+        var extraOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'stockCount'].filter(function(k) { return k !== extraGoalTask; });
+        var extraDone = { order: orderPlaced, invoiceUpload: false, invoiceDigitise: false, invoiceExport: false, stockCount: stockCountDone };
+        nextExtraKey = extraOrder.filter(function(k) { return !extraDone[k]; })[0] || null;
+        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = nextExtraKey ? extraTitles[nextExtraKey] : "You're all set"; });
+      }
       document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
         link.href = sidebarNextUrl();
       });
+      if (isFullyDone && nextExtraKey && extraHrefs[nextExtraKey]) {
+        document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) { link.href = withParams(extraHrefs[nextExtraKey]); });
+      }
     }
     syncSidebarSetup();
 
@@ -1691,7 +1806,7 @@
       activeListName = selectListDropdown.value;
       closeSelectListModal();
       openCatalogModal();
-      if (tourActive && currentTourStep === 'confirmList') advanceTour('pickItems');
+      if (tourActive && currentTourStep === 'awaitingConfirm') advanceTour('pickItems');
     });
 
     // ---- Create new list modal (stacks on top of Select inventory list) ----
@@ -1738,7 +1853,10 @@
       if (selectListDropdown) selectListDropdown.value = name;
       updateSelectListNextState();
       closeCreateListModal();
-      if (tourActive && currentTourStep === 'nameList') advanceTour('confirmList');
+      if (tourActive && currentTourStep === 'nameList') {
+        currentTourStep = 'awaitingConfirm';
+        if (tour) tour.hidden = true;
+      }
     });
 
     // ---- Add to list catalog picker modal ----
@@ -1832,7 +1950,11 @@
             if (parInput) parInput.hidden = true;
           }
           updateCatalogFootCount();
-          if (tourActive && currentTourStep === 'pickItems' && Object.keys(catalogSelection).length > 0) advanceTour('doneStep');
+          if (tourActive && currentTourStep === 'pickItems' && Object.keys(catalogSelection).length > 0) {
+            advanceTour('doneStep');
+          } else if (tourActive) {
+            setTimeout(placeTour, 30);
+          }
         } else if (target.matches('[data-catalog-par]')) {
           var parName = target.closest('tr').querySelector('[data-catalog-check]').value;
           catalogSelection[parName] = target.value;
@@ -1897,7 +2019,7 @@
       if (toast && addedCount >= 0) {
         showToast('Inventory Management', 'Products added to the shelve succesfully');
       }
-      if (store.items.length > 0) markInventorySetupComplete();
+      markInventorySetupComplete();
       if (tourActive && currentTourStep === 'doneStep') {
         currentTourStep = 'handoff';
         renderTourStep();
@@ -1953,11 +2075,11 @@
     }
     if (stockCountListSelect) stockCountListSelect.addEventListener('change', function() {
       if (startStockCountBtn) startStockCountBtn.disabled = !stockCountListSelect.value;
-      if (stockCountListSelect.value && tourActive && currentTourStep === 'stockCountList') advanceTour('stockCountStart', true);
     });
     if (startStockCountBtn) startStockCountBtn.addEventListener('click', function() {
       if (!stockCountListSelect || !stockCountListSelect.value) return;
-      window.location.href = withParams('procure-trial-stock-count.html', { list: stockCountListSelect.value });
+      var continuesTour = tourActive && currentTourStep === 'stockCountList';
+      window.location.href = withParams('procure-trial-stock-count.html', { list: stockCountListSelect.value, tour: continuesTour ? '1' : '' });
     });
 
     // ---- Toast ----
@@ -1978,6 +2100,19 @@
       showToast('Inventory Management', 'Stock count created successfully');
     }
 
+    // ---- POS sync bar ----
+    var syncNowLink = document.querySelector('[data-sync-now]');
+    var syncTimeNode = document.querySelector('[data-sync-time]');
+    if (syncNowLink) syncNowLink.addEventListener('click', function(event) {
+      event.preventDefault();
+      var now = new Date();
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var hh = now.getHours();
+      var mm = now.getMinutes();
+      if (syncTimeNode) syncTimeNode.textContent = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + ', ' + (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+      showToast('Inventory Management', 'Synced with POS successfully');
+    });
+
     // ---- Guided tour: create your first list, then add items ----
     var tour = document.querySelector('[data-tour]');
     var tourHighlight = document.querySelector('[data-tour-highlight]');
@@ -1991,28 +2126,22 @@
     var tourSteps = {
       addItem: {
         target: function() { return document.querySelector('[data-items-empty-nolist]:not([hidden]) [data-add-item-toggle]') || document.querySelector('.toolbar-right [data-add-item-toggle]'); },
-        kicker: 'Step 1',
+        kicker: 'Step 2',
         title: 'Add your first item',
         copy: 'Start by adding items your team wants to count during stocktake.'
       },
       createList: {
         target: '[data-open-create-list]',
-        kicker: 'Step 2',
+        kicker: 'Step 3',
         title: 'Create your first list',
         copy: 'Create a list for the area your team will count, such as Storeroom or Walk-in Fridge.',
         placement: 'below'
       },
       nameList: {
         target: '[data-new-list-name]',
-        kicker: 'Step 3',
+        kicker: 'Step 4',
         title: 'Name your list',
         copy: 'Give it a name your team will recognise, like Storeroom or Walk-in Fridge.'
-      },
-      confirmList: {
-        target: '[data-select-list-next]',
-        kicker: 'Step 4',
-        title: 'Choose items to track',
-        copy: 'Continue to choose the items that belong in this inventory list.'
       },
       pickItems: {
         target: '.catalog-table-wrap',
@@ -2030,31 +2159,23 @@
       },
       stockCountButton: {
         target: '[data-stock-count-toggle]',
-        kicker: 'Step 1',
+        kicker: 'Step 2',
         title: 'Start a stock count',
         copy: 'Use Stock count when your team is ready to record what is currently on hand.',
         placement: 'below'
       },
       stockCountNew: {
         target: '[data-new-stock-count]',
-        kicker: 'Step 2',
+        kicker: 'Step 3',
         title: 'Create a new count',
         copy: 'Start a fresh count from one of the inventory lists you have set up.',
         placement: 'below'
       },
       stockCountList: {
         target: '[data-stock-count-list-select]',
-        kicker: 'Step 3',
-        title: 'Choose the list',
-        copy: 'Pick the list your team is counting today.',
-        placement: 'below'
-      },
-      stockCountStart: {
-        target: '[data-start-stock-count]',
         kicker: 'Step 4',
-        title: 'Begin counting',
-        copy: 'Open the count sheet and enter the quantities your team finds.',
-        placement: 'above'
+        title: 'Choose the list',
+        copy: 'Pick the list your team is counting today.'
       },
       handoff: {
         target: '[data-sidebar-setup-card]',
@@ -2134,6 +2255,7 @@
     function advanceTour(stepName, shouldScroll) {
       if (!tourActive) return;
       currentTourStep = stepName;
+      if (tour) tour.hidden = false;
       renderTourStep(shouldScroll);
     }
 
@@ -2141,6 +2263,14 @@
       tourActive = false;
       if (tour) tour.hidden = true;
       document.body.classList.remove('tour-active');
+    }
+
+    function showHandoffOnly() {
+      tourActive = true;
+      currentTourStep = 'handoff';
+      if (tour) tour.hidden = false;
+      document.body.classList.add('tour-active');
+      renderTourStep(false);
     }
 
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
@@ -2159,7 +2289,9 @@
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
 
-    if (params.get('tour') === 'stockCount' && inventorySetup && !stockCountDone) {
+    if (params.get('tourHandoff') === '1') {
+      showHandoffOnly();
+    } else if (params.get('tour') === 'stockCount' && inventorySetup && !stockCountDone) {
       startTour('stockCount');
     } else if (params.has('tour') && !inventorySetup) {
       startTour('inventory');

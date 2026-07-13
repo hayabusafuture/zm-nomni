@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Nomni Procure — Create Order</title>
+<title>Nomni Procure — Order by Supplier</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
@@ -591,7 +591,7 @@
           </svg>
         </a>
         <div>
-          <h1 class="create-title">Create order</h1>
+          <h1 class="create-title" data-supplier-title>Create order</h1>
           <button class="outlet-selector-btn"><span data-venue-name>Trial Outlet</span> <span class="chev"></span></button>
         </div>
       </div>
@@ -861,8 +861,8 @@
   <div class="tour-highlight" data-tour-highlight></div>
   <section class="tour-card" data-tour-card aria-live="polite">
     <p class="tour-kicker" data-tour-kicker>Step 3</p>
-    <h2 class="tour-title" data-tour-title>Add an item to order</h2>
-    <p class="tour-copy" data-tour-copy>Choose an item from your market list. You can add a fixed quantity or use Fill to par when stock levels are set.</p>
+    <h2 class="tour-title" data-tour-title>Add an item from this supplier</h2>
+    <p class="tour-copy" data-tour-copy>Choose what you need from this supplier’s market list and add the quantity for this order.</p>
     <div class="tour-actions">
       <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
       <div class="tour-nav">
@@ -881,6 +881,7 @@
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
     var venueNode = document.querySelector('[data-venue-name]');
+    var supplierTitleNode = document.querySelector('[data-supplier-title]');
     var tour = document.querySelector('[data-tour]');
     var tourHighlight = document.querySelector('[data-tour-highlight]');
     var tourCard = document.querySelector('[data-tour-card]');
@@ -898,8 +899,8 @@
       addItem: {
         target: '[data-add-first-item]',
         kicker: 'Step 3',
-        title: 'Add what you need',
-        copy: 'Choose an item from your market list and add the quantity you want to order.',
+        title: 'Add an item from this supplier',
+        copy: 'Choose what you need from this supplier’s market list and add the quantity for this order.',
         placement: 'left',
         actionOnly: true
       },
@@ -907,7 +908,7 @@
         target: '[data-cart-group]',
         kicker: 'Step 4',
         title: 'Review the order',
-        copy: 'Items are grouped by supplier and delivery date. Select the order you are ready to send.',
+        copy: 'Check the delivery date, quantity, and total before sending this order.',
         placement: 'left',
         actionOnly: true
       },
@@ -1065,6 +1066,7 @@
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
     if (venueNode) venueNode.textContent = venueName;
+    if (supplierTitleNode) supplierTitleNode.textContent = params.get('createdSupplier') || params.get('supplierName') || 'Test Supplier';
     renderMarketItems();
     document.querySelectorAll('.back-btn').forEach(function(link) {
       link.href = withParams('procure-trial-orders.html');
@@ -1080,11 +1082,11 @@
     };
     document.getElementById('placeOrderBtn').addEventListener('click', function() {
       if (!this.classList.contains('enabled')) return;
-      window.location.href = withParams('procure-trial-orders.html', { orderPlaced: '1', orderByItemDone: '1', orderHandoff: '1' });
+      window.location.href = withParams('procure-trial-orders.html', { orderPlaced: '1', orderBySupplierDone: '1', orderHandoff: '1' });
     });
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
-    if (params.get('tour') === 'item') openTour();
+    if (params.get('tour') === 'supplier') openTour();
   })();
 
   /* App switcher */

@@ -160,9 +160,6 @@
   .nav {
     margin-top: 4px;
     padding: 6px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
   }
   .nav a {
     display: flex;
@@ -240,9 +237,27 @@
     gap: 10px;
   }
   .sidebar-setup-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 13px;
     font-weight: 700;
     line-height: 1.2;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .sidebar-setup-tick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
+    font-weight: 700;
   }
   .sidebar-setup-row::after {
     content: "↗";
@@ -270,6 +285,8 @@
     font-size: 11px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .sidebar-setup-next {
     color: #687080;
@@ -501,10 +518,114 @@
     padding: 32px 34px 30px;
   }
   .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
-  .modal-title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  .modal-title { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
   .modal-close { border: 0; background: transparent; color: var(--spinach); font-size: 26px; line-height: 1; cursor: pointer; }
   .modal-intro { margin: 0 0 20px; color: var(--ink-mute); font-size: 13px; line-height: 1.5; }
   .modal-foot .btn { width: 100%; }
+
+  /* Guided tour */
+  body.tour-open { overflow: hidden; }
+  .tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    pointer-events: none;
+  }
+  .tour-overlay[hidden] { display: none; }
+  .tour-highlight {
+    position: fixed;
+    border: 2px solid var(--nomni-green);
+    border-radius: 10px;
+    box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);
+    pointer-events: none;
+    transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
+  }
+  .tour-card {
+    position: fixed;
+    width: min(360px, calc(100vw - 32px));
+    padding: 18px 18px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(42,200,100,.24);
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(10,20,15,.18);
+    pointer-events: auto;
+  }
+  .tour-card::before {
+    content: "";
+    position: absolute;
+    left: -9px;
+    top: 28px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-left: 1px solid rgba(42,200,100,.24);
+    border-bottom: 1px solid rgba(42,200,100,.24);
+    transform: rotate(45deg);
+  }
+  .tour-card.left::before {
+    left: auto;
+    right: -9px;
+    border-left: 0;
+    border-bottom: 0;
+    border-right: 1px solid rgba(42,200,100,.24);
+    border-top: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-card.below::before {
+    left: 28px;
+    top: -9px;
+    border-left: 1px solid rgba(42,200,100,.24);
+    border-bottom: 0;
+    border-top: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-card.above::before {
+    left: auto;
+    right: 28px;
+    top: auto;
+    bottom: -9px;
+    border-left: 0;
+    border-bottom: 1px solid rgba(42,200,100,.24);
+    border-top: 0;
+    border-right: 1px solid rgba(42,200,100,.24);
+  }
+  .tour-kicker {
+    margin: 0 0 6px;
+    color: var(--spinach);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .tour-title {
+    margin: 0 0 6px;
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .tour-copy {
+    margin: 0;
+    color: #59606B;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .tour-dismiss {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    min-height: 30px;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    padding: 0;
+    background: transparent;
+    color: #59606B;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .tour-dismiss:hover { background: #F3F4F6; color: var(--ink); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -558,10 +679,10 @@
     <div class="sidebar-setup">
       <div class="sidebar-setup-card" data-sidebar-setup-card>
         <a class="sidebar-setup-main" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
-          <span class="sidebar-setup-row"><span class="sidebar-setup-title">Get started</span><span class="sidebar-setup-copy">20% done</span></span>
+          <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong>Next</strong> • <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support">
@@ -643,6 +764,16 @@
   </section>
 </div>
 
+<div class="tour-overlay" data-tour hidden>
+  <div class="tour-highlight" data-tour-highlight></div>
+  <section class="tour-card" data-tour-card aria-live="polite">
+    <p class="tour-kicker" data-tour-kicker>Step 5</p>
+    <h2 class="tour-title" data-tour-title>Enter what you counted</h2>
+    <p class="tour-copy" data-tour-copy>Type the quantity your team found for each item.</p>
+    <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
+  </section>
+</div>
+
 <script>
   (function() {
     var params = new URLSearchParams(window.location.search);
@@ -653,6 +784,7 @@
     var marketListBuilt = params.get('marketListBuilt') === '1';
     var orderPlaced = params.get('orderPlaced') === '1';
     var inventorySetup = params.get('inventorySetup') === '1';
+    var stockCountDone = params.get('stockCountDone') === '1';
     var listName = params.get('list') || '';
 
     var storeKey = 'nomniProcureInventoryStore';
@@ -680,7 +812,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -696,7 +828,16 @@
       return params.get('setupDismissed') === '1';
     }
     function setupComplete() {
-      return params.get('setupComplete') === '1';
+      if (params.get('setupComplete') === '1') return true;
+      var goal = params.get('primaryGoal') || 'Order faster';
+      var hasSupplier = params.get('supplierAdded') === '1';
+      var hasMarket = params.get('marketListBuilt') === '1';
+      var hasOrder = params.get('orderPlaced') === '1';
+      var hasInventory = params.get('inventorySetup') === '1';
+      var hasStockCount = params.get('stockCountDone') === '1';
+      if (goal === 'Digitise invoices') return false;
+      if (goal === 'Manage inventory') return hasSupplier && hasMarket && hasInventory && hasStockCount;
+      return hasSupplier && hasMarket && hasOrder && hasInventory;
     }
     function dashboardUrl(forceSetup) {
       var shouldShowSetup = forceSetup || (!setupDismissed() && !setupComplete());
@@ -752,7 +893,24 @@
         node.textContent = invGoal === 'Manage inventory' ? 'Complete first stock count' : "You're all set";
       });
     }
+    var fullyDoneGoal = params.get('primaryGoal') || 'Order faster';
+    var isFullyDone = (fullyDoneGoal === 'Order faster' && inventorySetup) || (fullyDoneGoal === 'Manage inventory' && stockCountDone);
+    document.querySelectorAll('[data-sidebar-setup-tick]').forEach(function(node) { node.hidden = !isFullyDone; });
+    document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node) { node.hidden = false; node.textContent = isFullyDone ? 'Also try:' : 'Next:'; });
+    var extraTitles = { order: 'Place first order', invoiceUpload: 'Upload an invoice', invoiceDigitise: 'Digitise invoices', invoiceExport: 'Export invoices', stockCount: 'Complete a stock count' };
+    var extraHrefs = { order: 'procure-trial-orders.html', invoiceUpload: 'procure-trial-invoices.html', stockCount: 'procure-trial-inventory.html' };
+    var nextExtraKey = null;
+    if (isFullyDone) {
+      var extraGoalTask = fullyDoneGoal === 'Order faster' ? 'order' : 'stockCount';
+      var extraOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'stockCount'].filter(function(k) { return k !== extraGoalTask; });
+      var extraDone = { order: orderPlaced, invoiceUpload: false, invoiceDigitise: false, invoiceExport: false, stockCount: stockCountDone };
+      nextExtraKey = extraOrder.filter(function(k) { return !extraDone[k]; })[0] || null;
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = nextExtraKey ? extraTitles[nextExtraKey] : "You're all set"; });
+    }
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) { link.href = sidebarNextUrl(); });
+    if (isFullyDone && nextExtraKey && extraHrefs[nextExtraKey]) {
+      document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) { link.href = withParams(extraHrefs[nextExtraKey]); });
+    }
 
     if (userName && userNameNode) {
       userNameNode.textContent = userName;
@@ -835,7 +993,9 @@
     }
     if (countBody) {
       countBody.addEventListener('input', function(event) {
-        if (event.target.matches('[data-counted-input]')) updateTracker();
+        if (!event.target.matches('[data-counted-input]')) return;
+        updateTracker();
+        if (tourActive && currentTourStep === 'countQty' && event.target.value !== '') advanceTour('doneStep');
       });
     }
 
@@ -869,6 +1029,10 @@
     var doneBtn = document.querySelector('[data-done-btn]');
     if (doneBtn) doneBtn.addEventListener('click', function() {
       if (confirmModal) confirmModal.hidden = false;
+      if (tourActive && currentTourStep === 'doneStep') {
+        currentTourStep = 'awaitingSave';
+        if (tour) tour.hidden = true;
+      }
     });
     document.querySelectorAll('[data-close-confirm]').forEach(function(btn) {
       btn.addEventListener('click', function() { if (confirmModal) confirmModal.hidden = true; });
@@ -898,8 +1062,110 @@
         });
       }
       saveStore(fullStore);
-      window.location.href = withParams('procure-trial-inventory.html', { stockCountDone: '1', inventoryList: listName });
+      var didTour = tourActive && currentTourStep === 'awaitingSave';
+      window.location.href = withParams('procure-trial-inventory.html', { stockCountDone: '1', inventoryList: listName, tourHandoff: didTour ? '1' : '' });
     });
+
+    // ---- Guided tour continuation (Steps 5-7) ----
+    var tour = document.querySelector('[data-tour]');
+    var tourHighlight = document.querySelector('[data-tour-highlight]');
+    var tourCard = document.querySelector('[data-tour-card]');
+    var tourDismiss = document.querySelector('[data-tour-dismiss]');
+    var tourKicker = document.querySelector('[data-tour-kicker]');
+    var tourTitle = document.querySelector('[data-tour-title]');
+    var tourCopy = document.querySelector('[data-tour-copy]');
+    var tourActive = false;
+    var currentTourStep = 'countQty';
+    var tourSteps = {
+      countQty: {
+        target: function() { return document.querySelector('[data-counted-input]'); },
+        kicker: 'Step 5',
+        title: 'Enter what you counted',
+        copy: 'Type the quantity your team found for each item.'
+      },
+      doneStep: {
+        target: '[data-done-btn]',
+        kicker: 'Step 6',
+        title: 'Finish the count',
+        copy: "Once you've counted everything on the list, click Done to finish up.",
+        placement: 'above'
+      }
+    };
+
+    function resolveTourTarget(step) {
+      if (typeof step.target === 'function') return step.target();
+      return document.querySelector(step.target);
+    }
+
+    function placeTour() {
+      if (!tour || tour.hidden) return;
+      var step = tourSteps[currentTourStep];
+      if (!step) return;
+      var target = resolveTourTarget(step);
+      if (!target) return;
+      var rect = target.getBoundingClientRect();
+      var pad = 10;
+      tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
+      tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
+      tourHighlight.style.width = (rect.width + pad * 2) + 'px';
+      tourHighlight.style.height = (rect.height + pad * 2) + 'px';
+      tourCard.classList.remove('left', 'below', 'above');
+      var cardWidth = Math.min(360, window.innerWidth - 32);
+      var cardHeight = tourCard.getBoundingClientRect().height || 160;
+      var cardLeft = rect.right + 34;
+      var cardTop = rect.top - 14;
+      if (step.placement === 'above') {
+        cardLeft = Math.max(16, Math.min(rect.right - cardWidth, window.innerWidth - cardWidth - 16));
+        cardTop = Math.max(16, rect.top - cardHeight - 24);
+        tourCard.classList.add('above');
+      }
+      if (cardLeft + cardWidth > window.innerWidth - 16) {
+        cardLeft = Math.max(16, rect.left - cardWidth - 34);
+        tourCard.classList.add('left');
+      }
+      if (cardTop + cardHeight > window.innerHeight - 16) cardTop = Math.max(16, window.innerHeight - cardHeight - 16);
+      if (cardTop < 16) cardTop = 16;
+      tourCard.style.left = cardLeft + 'px';
+      tourCard.style.top = cardTop + 'px';
+    }
+
+    function renderTourStep() {
+      var step = tourSteps[currentTourStep];
+      if (!step) return;
+      if (tourKicker) tourKicker.textContent = step.kicker;
+      if (tourTitle) tourTitle.textContent = step.title;
+      if (tourCopy) tourCopy.textContent = step.copy;
+      setTimeout(placeTour, 60);
+    }
+
+    function startTour() {
+      tourActive = true;
+      currentTourStep = 'countQty';
+      if (tour) tour.hidden = false;
+      document.body.classList.add('tour-open');
+      renderTourStep();
+    }
+
+    function advanceTour(stepName) {
+      if (!tourActive) return;
+      currentTourStep = stepName;
+      if (tour) tour.hidden = false;
+      renderTourStep();
+    }
+
+    function closeTour() {
+      tourActive = false;
+      if (tour) tour.hidden = true;
+      document.body.classList.remove('tour-open');
+    }
+
+    if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
+    window.addEventListener('resize', placeTour);
+    window.addEventListener('scroll', placeTour, { passive: true });
+
+    if (params.get('tour') === '1' && listItems.length > 0) {
+      startTour();
+    }
   })();
 </script>
 </body>

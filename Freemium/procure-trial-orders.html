@@ -160,9 +160,6 @@
   .nav {
     margin-top: 4px;
     padding: 6px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
   }
   .nav a {
     display: flex;
@@ -240,9 +237,27 @@
     gap: 10px;
   }
   .sidebar-setup-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 13px;
     font-weight: 700;
     line-height: 1.2;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .sidebar-setup-tick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
+    font-weight: 700;
   }
   .sidebar-setup-row::after {
     content: "↗";
@@ -270,6 +285,8 @@
     font-size: 11px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .sidebar-setup-next {
     color: #687080;
@@ -482,6 +499,117 @@
   }
   .split-dropdown a:hover { background: var(--mint); }
 
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 820;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 96px;
+    background: rgba(10,20,15,.46);
+  }
+  .modal-card {
+    width: 580px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 128px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 24px 64px rgba(0,0,0,.22);
+  }
+  .modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 22px 24px 12px;
+  }
+  .modal-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .modal-copy {
+    margin: 5px 0 0;
+    color: #59606B;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 32px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #59606B;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .modal-close:hover { background: #F3F4F6; color: var(--ink); }
+  .modal-search-row {
+    padding: 0 24px 14px;
+  }
+  .modal-search {
+    width: 100%;
+    height: 38px;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    padding: 0 12px;
+    outline: 0;
+  }
+  .modal-search:focus { border-color: var(--nomni-green); }
+  .supplier-list {
+    overflow-y: auto;
+    padding: 4px 0;
+  }
+  .supplier-choice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    border-top: 1px solid var(--rule);
+    color: var(--ink);
+  }
+  .supplier-choice:hover { background: #F7F8FA; }
+  .supplier-avatar {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    border-radius: 50%;
+    background: var(--mint);
+    color: var(--seaweed);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .supplier-choice-main { min-width: 0; flex: 1; }
+  .supplier-choice-name {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .supplier-choice-meta {
+    margin-top: 2px;
+    color: var(--ink-mute);
+    font-size: 12px;
+  }
+  .supplier-choice-date {
+    color: var(--spinach);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
   .table-card {
     border: 1px solid var(--rule);
     border-radius: 8px;
@@ -682,10 +810,10 @@
     <div class="sidebar-setup">
       <div class="sidebar-setup-card" data-sidebar-setup-card>
         <a class="sidebar-setup-main" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
-          <span class="sidebar-setup-row"><span class="sidebar-setup-title">Get started</span><span class="sidebar-setup-copy">20% done</span></span>
+          <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong>Next</strong> • <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support">
@@ -734,9 +862,9 @@
           <tbody>
             <tr>
               <td><strong>23 Apr 2026</strong><div class="order-code">Order #202604233182</div></td>
-              <td>Paranakan Trading Pte Ltd (T)</td>
+              <td data-order-supplier>Test Supplier</td>
               <td data-order-venue>Trial Outlet</td>
-              <td>S$54.50</td>
+              <td data-order-amount>S$2.00</td>
               <td><span class="chip">Placed</span></td>
             </tr>
           </tbody>
@@ -751,6 +879,31 @@
       </div>
     </div>
   </main>
+</div>
+
+<div class="modal-overlay" data-supplier-modal hidden role="dialog" aria-modal="true" aria-labelledby="supplierModalTitle">
+  <section class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h2 class="modal-title" id="supplierModalTitle">Select supplier</h2>
+        <p class="modal-copy">Choose who you want to order from. You’ll only see suppliers you’ve added to this outlet.</p>
+      </div>
+      <button class="modal-close" data-supplier-modal-close type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-search-row">
+      <input class="modal-search" type="text" placeholder="Search suppliers" />
+    </div>
+    <div class="supplier-list">
+      <a class="supplier-choice" data-supplier-choice href="procure-trial-new-order-supplier.html">
+        <span class="supplier-avatar" data-supplier-avatar>TS</span>
+        <span class="supplier-choice-main">
+          <span class="supplier-choice-name" data-supplier-choice-name>Test Supplier</span>
+          <span class="supplier-choice-meta" data-supplier-choice-meta>Items from your market list</span>
+        </span>
+        <span class="supplier-choice-date">Next delivery: Thu, 23 Apr</span>
+      </a>
+    </div>
+  </section>
 </div>
 
 <div class="tour-overlay" data-tour hidden>
@@ -772,13 +925,24 @@
     var supplierAdded = params.get('supplierAdded') === '1';
     var marketListBuilt = params.get('marketListBuilt') === '1';
     var orderPlaced = params.get('orderPlaced') === '1';
+    var orderByItemDone = params.get('orderByItemDone') === '1';
+    var orderBySupplierDone = params.get('orderBySupplierDone') === '1';
     var inventorySetup = params.get('inventorySetup') === '1';
     var stockCountDone = params.get('stockCountDone') === '1';
     var newOrderMain = document.querySelector('[data-new-order-main]');
     var newOrderCaret = document.querySelector('[data-new-order-caret]');
     var newOrderMenu = document.querySelector('[data-new-order-menu]');
     var orderByItem = document.querySelector('[data-order-by-item]');
+    var orderBySupplier = document.querySelector('[data-order-by-supplier]');
+    var supplierModal = document.querySelector('[data-supplier-modal]');
+    var supplierModalClose = document.querySelector('[data-supplier-modal-close]');
+    var supplierChoice = document.querySelector('[data-supplier-choice]');
+    var supplierChoiceName = document.querySelector('[data-supplier-choice-name]');
+    var supplierChoiceMeta = document.querySelector('[data-supplier-choice-meta]');
+    var supplierAvatar = document.querySelector('[data-supplier-avatar]');
     var ordersTable = document.querySelector('[data-orders-table]');
+    var orderSupplierNode = document.querySelector('[data-order-supplier]');
+    var orderAmountNode = document.querySelector('[data-order-amount]');
     var emptyState = document.querySelector('[data-empty-state]');
     var setupCard = document.querySelector('[data-sidebar-setup-card]');
     var tour = document.querySelector('[data-tour]');
@@ -799,7 +963,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -817,7 +981,16 @@
     }
 
     function setupComplete() {
-      return params.get('setupComplete') === '1';
+      if (params.get('setupComplete') === '1') return true;
+      var goal = params.get('primaryGoal') || 'Order faster';
+      var hasSupplier = params.get('supplierAdded') === '1';
+      var hasMarket = params.get('marketListBuilt') === '1';
+      var hasOrder = params.get('orderPlaced') === '1';
+      var hasInventory = params.get('inventorySetup') === '1';
+      var hasStockCount = params.get('stockCountDone') === '1';
+      if (goal === 'Digitise invoices') return false;
+      if (goal === 'Manage inventory') return hasSupplier && hasMarket && hasInventory && hasStockCount;
+      return hasSupplier && hasMarket && hasOrder && hasInventory;
     }
 
     function dashboardUrl(forceSetup) {
@@ -860,6 +1033,20 @@
       link.href = withParams('procure-trial-invoices.html');
     });
     if (orderByItem) orderByItem.href = withParams('procure-trial-new-order-item.html', { tour: 'item' });
+    if (supplierChoice) supplierChoice.href = withParams('procure-trial-new-order-supplier.html', { tour: 'supplier' });
+    var activeSupplierName = params.get('createdSupplier') || params.get('supplierName') || 'Test Supplier';
+    if (supplierChoiceName) supplierChoiceName.textContent = activeSupplierName;
+    if (supplierChoiceMeta) {
+      var createdCount = (params.get('createdSku') ? 1 : 0) + (params.get('invoiceItemsAdded') === '1' ? 4 : 0);
+      if (!createdCount) createdCount = 1;
+      supplierChoiceMeta.textContent = createdCount + (createdCount === 1 ? ' item' : ' items') + ' from your market list';
+    }
+    if (supplierAvatar) supplierAvatar.textContent = initialsFromName(activeSupplierName);
+    if (orderSupplierNode) orderSupplierNode.textContent = activeSupplierName;
+    if (orderAmountNode) {
+      var orderPrice = parseFloat(params.get('createdPrice') || (params.get('invoiceItemsAdded') === '1' ? '1.80' : '2.00'));
+      orderAmountNode.textContent = 'S$' + (isNaN(orderPrice) ? 2 : orderPrice).toFixed(2);
+    }
     document.querySelectorAll('[data-order-venue]').forEach(function(node) {
       node.textContent = params.get('venueName') || 'Trial Outlet';
     });
@@ -904,9 +1091,26 @@
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
     }
+    var fullyDoneGoal = params.get('primaryGoal') || 'Order faster';
+    var isFullyDone = (fullyDoneGoal === 'Order faster' && inventorySetup) || (fullyDoneGoal === 'Manage inventory' && stockCountDone);
+    document.querySelectorAll('[data-sidebar-setup-tick]').forEach(function(node) { node.hidden = !isFullyDone; });
+    document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node) { node.hidden = false; node.textContent = isFullyDone ? 'Also try:' : 'Next:'; });
+    var extraTitles = { order: 'Place first order', invoiceUpload: 'Upload an invoice', invoiceDigitise: 'Digitise invoices', invoiceExport: 'Export invoices', stockCount: 'Complete a stock count' };
+    var extraHrefs = { order: 'procure-trial-orders.html', invoiceUpload: 'procure-trial-invoices.html', stockCount: 'procure-trial-inventory.html' };
+    var nextExtraKey = null;
+    if (isFullyDone) {
+      var extraGoalTask = fullyDoneGoal === 'Order faster' ? 'order' : 'stockCount';
+      var extraOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'stockCount'].filter(function(k) { return k !== extraGoalTask; });
+      var extraDone = { order: orderPlaced, invoiceUpload: false, invoiceDigitise: false, invoiceExport: false, stockCount: stockCountDone };
+      nextExtraKey = extraOrder.filter(function(k) { return !extraDone[k]; })[0] || null;
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = nextExtraKey ? extraTitles[nextExtraKey] : "You're all set"; });
+    }
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
       link.href = sidebarNextUrl();
     });
+    if (isFullyDone && nextExtraKey && extraHrefs[nextExtraKey]) {
+      document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) { link.href = withParams(extraHrefs[nextExtraKey]); });
+    }
 
     if (userName && userNameNode) {
       userNameNode.textContent = userName;
@@ -920,24 +1124,48 @@
       placeTour();
     }
 
+    function openSupplierModal() {
+      if (!supplierModal) return;
+      supplierModal.hidden = false;
+      toggleNewOrderMenu(false);
+      if (tour && !tour.hidden && tourMode === 'orderSupplier') {
+        if (tourKicker) tourKicker.textContent = 'Step 3';
+        if (tourTitle) tourTitle.textContent = 'Choose the supplier';
+        if (tourCopy) tourCopy.textContent = 'Pick the supplier you want to order from first. Nomni will show the items you buy from them.';
+        setTimeout(placeTour, 40);
+      }
+    }
+
+    function closeSupplierModal() {
+      if (supplierModal) supplierModal.hidden = true;
+      if (tour && !tour.hidden) setTimeout(placeTour, 40);
+    }
+
     function setTourCopy(mode) {
       tourMode = mode || 'order';
       if (tourMode === 'handoff') {
         var handoffGoal = params.get('primaryGoal') || 'Order faster';
         var handoffProgress = handoffGoal === 'Order faster' ? '80%' : '60%';
+        var alternateOrder = '';
+        if (orderByItemDone && !orderBySupplierDone) alternateOrder = ' You can also try ordering by supplier.';
+        if (orderBySupplierDone && !orderByItemDone) alternateOrder = ' You can also try ordering by item.';
         if (tourKicker) tourKicker.textContent = 'Setup updated';
         if (tourTitle) tourTitle.textContent = 'First order placed';
-        if (tourCopy) tourCopy.textContent = "You're " + handoffProgress + " done. Click the setup panel to continue with the next step.";
+        if (tourCopy) tourCopy.textContent = "You're " + handoffProgress + " done. Click the setup panel to continue with the next step." + alternateOrder;
       } else {
         if (tourKicker) tourKicker.textContent = 'Step 2';
         if (tourTitle) tourTitle.textContent = 'Create your first order';
-        if (tourCopy) tourCopy.textContent = 'Open New order, then choose Order by item to build from the products you already added.';
+        if (tourCopy) {
+          tourCopy.textContent = tourMode === 'orderSupplier'
+            ? 'Open New order, then choose Order by supplier to start with who you buy from.'
+            : 'Open New order, then choose Order by item to build from the products you already added.';
+        }
       }
     }
 
     function placeTour() {
       if (!tour || tour.hidden) return;
-      var target = tourMode === 'handoff' ? setupCard : document.querySelector('[data-new-order-wrap]');
+      var target = tourMode === 'handoff' ? setupCard : tourMode === 'orderSupplier' && supplierModal && !supplierModal.hidden ? supplierChoice : document.querySelector('[data-new-order-wrap]');
       if (!target) return;
       var rect = target.getBoundingClientRect();
       var pad = 10;
@@ -962,21 +1190,39 @@
       if (!tour) return;
       setTourCopy(mode);
       tour.hidden = false;
-      toggleNewOrderMenu(tourMode === 'order');
+      toggleNewOrderMenu(tourMode === 'order' || tourMode === 'orderSupplier');
       setTimeout(placeTour, 40);
     }
 
     if (newOrderMain) newOrderMain.addEventListener('click', function() { toggleNewOrderMenu(); });
     if (newOrderCaret) newOrderCaret.addEventListener('click', function() { toggleNewOrderMenu(); });
+    if (orderBySupplier) orderBySupplier.addEventListener('click', function(event) {
+      event.preventDefault();
+      openSupplierModal();
+    });
+    if (supplierModalClose) supplierModalClose.addEventListener('click', closeSupplierModal);
+    if (supplierModal) supplierModal.addEventListener('click', function(event) {
+      if (event.target === supplierModal) closeSupplierModal();
+    });
     document.addEventListener('click', function(event) {
       if (!event.target.closest('[data-new-order-wrap]')) toggleNewOrderMenu(false);
     });
     if (tourDismiss) tourDismiss.addEventListener('click', function() {
       if (tour) tour.hidden = true;
     });
+    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
+      link.addEventListener('click', function(event) {
+        var goal = params.get('primaryGoal') || 'Order faster';
+        if (marketListBuilt && !orderPlaced && goal === 'Order faster') {
+          event.preventDefault();
+          openTour('order');
+        }
+      });
+    });
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
     if (params.get('tour') === 'order' && marketListBuilt && !orderPlaced) openTour();
+    if (params.get('tour') === 'orderSupplier' && marketListBuilt) openTour('orderSupplier');
     if (params.get('orderHandoff') === '1' && orderPlaced) openTour('handoff');
   })();
 </script>

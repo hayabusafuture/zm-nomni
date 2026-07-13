@@ -155,9 +155,6 @@
   .nav {
     margin-top: 4px;
     padding: 6px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
   }
   .nav a {
     display: flex;
@@ -218,7 +215,29 @@
     justify-content: space-between;
     gap: 10px;
   }
-  .sidebar-setup-title { font-size: 13px; font-weight: 700; line-height: 1.2; }
+  .sidebar-setup-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .sidebar-setup-tick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
+    font-weight: 700;
+  }
   .sidebar-setup-row::after {
     content: "->";
     color: var(--spinach);
@@ -245,6 +264,8 @@
     font-size: 11px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .sidebar-setup-next {
     color: #687080;
@@ -683,10 +704,10 @@
     <div class="sidebar-setup">
       <div class="sidebar-setup-card" data-sidebar-setup-card>
         <a class="sidebar-setup-main" data-setup-home-link href="Procure%20Trial%20Dashboard.html?setup=1">
-          <span class="sidebar-setup-row"><span class="sidebar-setup-title">Get started</span><span class="sidebar-setup-copy">40% done</span></span>
+          <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">40% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong>Next</strong> • <a class="sidebar-setup-next-link" data-sidebar-next-action href="procure-trial-items.html?tour=1"><span>Build market list</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="procure-trial-items.html?tour=1"><span>Build market list</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support"></button>
@@ -888,7 +909,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'invoiceItemsAdded', 'orderPlaced', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -906,7 +927,16 @@
     }
 
     function setupComplete() {
-      return params.get('setupComplete') === '1';
+      if (params.get('setupComplete') === '1') return true;
+      var goal = params.get('primaryGoal') || 'Order faster';
+      var hasSupplier = params.get('supplierAdded') === '1';
+      var hasMarket = params.get('marketListBuilt') === '1';
+      var hasOrder = params.get('orderPlaced') === '1';
+      var hasInventory = params.get('inventorySetup') === '1';
+      var hasStockCount = params.get('stockCountDone') === '1';
+      if (goal === 'Digitise invoices') return false;
+      if (goal === 'Manage inventory') return hasSupplier && hasMarket && hasInventory && hasStockCount;
+      return hasSupplier && hasMarket && hasOrder && hasInventory;
     }
 
     function dashboardUrl(forceSetup) {

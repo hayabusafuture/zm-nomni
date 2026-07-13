@@ -36,7 +36,7 @@ The opening email screen presents two paths after the user enters an email:
    - After verification, Step 1 asks for first name, last name, and password.
    - Password rule: minimum 8 characters with at least one lowercase letter, one uppercase letter, one number, and one symbol/special character.
    - Step 2 asks for company registered name, venue name, country, and structured venue address fields.
-   - Step 2 includes prototype-only duplicate company validation. Typing `Existing Company Pty Ltd`, `Kind Foods Pte Ltd`, or `Whole Foods Pte Ltd` into the company field and clicking `Continue` shows an inline `company already exists` card (validation runs on Continue, not while typing/on blur).
+   - Step 2 includes prototype-only duplicate company validation. Typing `Existing Company Pty Ltd`, `Kind Foods Pte Ltd`, or `Whole Foods Pte Ltd` into the company field and clicking `Continue` shows an inline `This company may already have a Nomni Procure account` card (validation runs on Continue, not while typing/on blur).
    - The company-exists card's only action is `Sign in instead`, linking to `https://buyer.zeemart.co/`. There is no `Contact support` option or "if this doesn't look right" copy on this state.
    - While the company-exists error is showing, the `Continue` button is disabled; it re-enables as soon as the user edits the company name field.
    - The entry dialog switches to a scrollable/top-aligned layout while this card is visible (an `is-overflowing` state) so the taller Step 2 content doesn't get clipped or overflow the viewport.
@@ -100,7 +100,9 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/procure-trial-review-invoice-items.html` — invoice-assisted item review page used after Items `Add > Add from invoice`.
 - `Freemium/procure-trial-orders.html` — Orders page and guided Place first order entry flow, including the `New order` split menu.
 - `Freemium/procure-trial-new-order-item.html` — order-by-item creation flow used for the first order onboarding path.
-- `Freemium/procure-trial-inventory.html`, `Freemium/procure-trial-invoices.html` — placeholder pages (empty state only) for the `Set up inventory` / `Upload first invoice` checklist CTAs.
+- `Freemium/procure-trial-new-order-supplier.html` — order-by-supplier creation flow used as the secondary first-order path.
+- `Freemium/procure-trial-inventory.html` — Inventory page and guided Set up inventory / stock-count onboarding flows.
+- `Freemium/procure-trial-invoices.html` — placeholder page (empty state only) for the `Upload first invoice` checklist CTA.
 
 Generated preview screenshots:
 
@@ -232,54 +234,6 @@ The prototypes were initially too large, like the browser was zoomed to roughly 
   - Zeemart hero card: `1200px`
   - Zeemart strip/nav/below content: `1360px`
 
-## Nomni Procure Page
-
-Current key visual structure:
-
-- Top green announcement bar
-- Cream navigation bar using the Nomni SVG logo from `_refs/Nomni - Procure_files/YrWX4pL0xkRKmYWVXyVDn3E.svg`
-- Left hero copy:
-  - “Daily ordering & inventory simplified.”
-  - `simplified.` uses italic Fraunces-style display treatment
-  - Four green check bullets
-- Hero CTA row:
-  - Primary CTA: `Get started →`
-    - Links to `procure-get-started.html?source=nomni`
-  - Secondary CTA: `Book a demo`
-    - Links to `https://www.nomni.ai/lets-chat`
-- Header CTA:
-  - `Let's Chat` links to `https://www.nomni.ai/lets-chat`
-- Right hero image uses dashboard mockup:
-  - `_refs/Nomni - Procure_files/8Qo0RnAz08WIcl17DKFpocOrvY.png`
-- Floating status cards:
-  - `ORDER # PO-2407381900`
-  - `Placed`
-  - `Received`
-  - `Invoiced`
-- Dark green band below the fold with small chat pill.
-
-## Zeemart Page
-
-Current key visual structure:
-
-- Dark green top strip:
-  - “Nomni is the new home of Zeemart.”
-  - Right CTA: “Visit Nomni to learn more →”
-- White nav:
-  - Zeemart wordmark approximated with text/icon
-  - Nav links: Restaurants, Suppliers, Pricing, News, Support
-  - `Get started` green filled button
-    - Replaces the previous `Get in touch` button
-    - Links to `procure-get-started.html?source=zeemart`
-- Large rounded hero card on grey background:
-  - Text overlay: “Nomni is the new home of Zeemart”
-  - Switch pill: `Zeemart → Now Nomni`
-  - CTAs: “Your questions answered” and “Explore Nomni.ai →”
-- Uses closest available local cafe/interior hero image:
-  - `_refs/Zeemart_files/taH1mkIbIe7ar657hVcmi9O2E.png`
-
-Note: the exact Zeemart screenshot hero photo was not found among downloaded reference assets. The current asset is the closest available local match.
-
 ## Trial Onboarding Current Behaviour
 
 `Freemium/Procure Trial Dashboard.html` is the destination after the user finishes the free signup flow.
@@ -320,7 +274,7 @@ Guided-tour standards:
 - Avoid technical/internal wording such as `SKU manually`, `OCR-assisted path`, `create form`, or copy that explains wiring.
 - Lead with the user's job: add items the team orders, link them to the right supplier, set buying details, decide whether to count them in inventory, then save.
 - Never start a checklist flow by automatically redirecting the user to another page. The CTA should first open the tour on the current page, point at the real sidenav or on-page control, and let the user click it to continue.
-- The sidebar `Next • ...` action follows the same rule: when a guided flow exists, it should open that flow's starting tour panel on the current page, not send users back to the checklist. Supplier, market-list, and order starts all begin by pointing at the relevant sidenav item; clicking that real nav item continues the flow.
+- The sidebar `Next: ...` action follows the same rule: when a guided flow exists, it should open that flow's starting tour panel on the current page, not send users back to the checklist. Supplier, market-list, and order starts all begin by pointing at the relevant sidenav item; clicking that real nav item continues the flow.
 - Users should advance by clicking highlighted product controls wherever possible.
 - Use `Prev` / `Next` only for same-page guidance where the real click target does not naturally advance. Show `Prev` only when the previous step is on the same page.
 - `Next` uses the primary green treatment and `Prev` uses the mint secondary treatment. Tour cards close with an X button in the top-right corner rather than a footer `Dismiss` button.
@@ -346,7 +300,7 @@ Add supplier flow:
 Build market list flow:
 
 - The dashboard `Build market list` row shows a real `Add items` CTA once the supplier prerequisite is complete.
-- The CTA and sidebar `Next • Build market list` both start Step 1 pointing at `Items` in the sidenav. Clicking it opens `Freemium/procure-trial-items.html?tour=1`.
+- The CTA and sidebar `Next: Build market list` both start Step 1 pointing at `Items` in the sidenav. Clicking it opens `Freemium/procure-trial-items.html?tour=1`.
 - `Freemium/procure-trial-items.html` stays locked without `supplierAdded=1`, because items must be linked to a supplier.
 - The Items page follows the real product shape: `Purchased` tab, outlet selector, `Search SKU`, table rows, and action bar. The outlet selector uses `venueName` or falls back to `Trial Outlet`.
 - Step 3 highlights the open `Add` menu as a choice point. Users can choose `Create new` for the manual path or `Add from invoice` for the upload-assisted path.
@@ -390,10 +344,13 @@ Set up inventory flow:
 
 Set up inventory guided tour:
 
-- Triggered by `?tour=1` on `procure-trial-inventory.html` whenever inventory is not yet marked complete. The tour is fully action-driven — there's no Next/Prev button, each step only advances when the user performs the real action, matching the "guided, but they do it themselves" rule used everywhere else in this trial.
-- Like the Items tour, the Inventory tour keeps page scrolling available and scrolls lower targets into view before positioning the popover. Step labels use `Step X`, not total counts.
-- Step 1 highlights `Add item` → user clicks it → Step 2 highlights the `+ Create new list` shortcut inside the Select inventory list modal → user clicks it → Step 3 highlights the list name field in the Create new list modal → user names it and clicks Next → Step 4 highlights the Select inventory list modal's own `Next` button (now enabled) → user clicks it → Step 5 highlights the Add to list catalog table → user checks an item → Step 6 highlights `Done` → user clicks it, which completes the tour and shows a brief "Inventory set up" handoff pointer at the sidebar `Get started` card.
-- Users are never redirected straight to `procure-trial-inventory.html` to start this tour. The dashboard's existing `dashboardTourMode` "Start from X" pointer system (previously `supplier`/`market`/`order`) gained a 4th `inventory` mode: pointer targets the `Inventory` sidenav link, "Start from Inventory" / "Create your first inventory list and add items to start tracking stock on hand." The dashboard checklist's `Set up inventory` CTA and every trial page's sidebar `Next` action now route through `setupTourUrl('inventory')` (reload the dashboard with the pointer) instead of linking directly to the Inventory page, whenever inventory is the actual next step for the user's goal — `Manage inventory` right after `Build market list`, or `Order faster` right after `Place first order`. The user still has to click Inventory in the sidebar themselves.
+- Triggered by `?tour=1` on `procure-trial-inventory.html`, only when the store has no lists and no items yet (returning users with existing data never see it). The tour is fully action-driven — there's no Next/Prev button, each step only advances when the user performs the real action, matching the "guided, but they do it themselves" rule used everywhere else in this trial.
+- Step 1 lives on the Dashboard's own pointer (see below), so the on-page tour continues the same sequence as `Step 2 of 6` rather than restarting at 1: Step 2 highlights `Add item` → user clicks it → Step 3 highlights the `+ Create new list` shortcut inside the Select inventory list modal → user clicks it → Step 4 highlights the list name field in the Create new list modal → user names it and clicks Next. The tour then goes quiet (no popover) until the user clicks the Select inventory list modal's own `Next` button themselves — there's no dedicated step for that click. Once the Add to list catalog modal opens, Step 5 highlights the item table → user checks an item → Step 6 highlights `Done` → user clicks it, which completes the tour and shows a brief "Inventory set up" handoff pointer at the sidebar `Get started` card.
+- The `Done` highlight repositions on every checkbox/par toggle while the tour is active, so it stays glued to the button instead of drifting as the user selects more items.
+- The completion toast ("Inventory Management" / "Products added to the shelve succesfully") uses the same top-right, `#E2FFE6` slide-down toast convention as every other trial page — not a bottom-center placement.
+- Users are never redirected straight to `procure-trial-inventory.html` to start this tour. The dashboard's existing `dashboardTourMode` "Start from X" pointer system (previously `supplier`/`market`/`order`) gained a 4th `inventory` mode: pointer targets the `Inventory` sidenav link, "Start from Inventory" / "Create your first inventory list and add items to start tracking stock on hand." (no "...in the sidebar" trailer — kept concise). The dashboard checklist's `Set up inventory` CTA and every trial page's sidebar `Next` action now route through `setupTourUrl('inventory')` (reload the dashboard with the pointer) instead of linking directly to the Inventory page, whenever inventory is the actual next step for the user's goal — `Manage inventory` right after `Build market list`, or `Order faster` right after `Place first order`. The user still has to click Inventory in the sidebar themselves.
+- The Items/Lists tab stat cards sit in a single continuous grey (`#F5F5F5`) strip flush against the tabs row (no gap), not individual bordered cards, matching the live product. Icons are the real product SVGs (`assets/icons/inventory-est-value.svg`, `-no-of-items.svg`, `-below-par.svg`, copied locally from the captured reference), not generic stroke icons.
+- The tabs row also carries a POS sync status bar on the right (`Sync is active. Latest update from POS: {date/time} - Sync now`), matching the live product's `.inv-pos-sync-bar` layout. The check icon is an inline SVG (green circle + white checkmark) rather than a new icon-font dependency — the real product uses a bundled Font Awesome `fa-check-circle` glyph, but this repo doesn't load Font Awesome anywhere else, so the shape is replicated locally instead. `Sync now` updates the timestamp to the real current time and shows a toast.
 
 Stock count flow:
 
@@ -405,18 +362,36 @@ Stock count flow:
 - Saving updates each counted item's `onHand`/`lastCount`/`lastCountDate`/`movement` in the shared store and redirects to `procure-trial-inventory.html?stockCountDone=1`, which shows an "Inventory Management" / "Stock count created successfully" toast.
 - `stockCountDone=1` is threaded through every trial page's param passthrough and marks the dashboard's `Complete first stock count` checklist task complete, advancing the `Manage inventory` goal to 100% (goal-gated — a no-op for other goals since `stockCount` isn't in their checklist).
 - Currency note: this flow uses `A$` throughout for consistency with the rest of the Inventory page's own store-derived values, even though the reference production screenshots for this specific flow show `S$` (different demo region) — an intentional internal-consistency choice over screenshot-literal fidelity on a cosmetic detail.
+- Guided tour: kickers are plain `Step X` (no `of N` count, matching the other tours). The Dashboard's "Start from Inventory" pointer is Step 1; the on-page steps on `procure-trial-inventory.html` continue as Step 2 (`Stock count` button) → Step 3 (`New stock count` menu item) → Step 4 (`Inventory list` dropdown, no `placement` override — it defaults to appearing beside the dropdown rather than below it, since `below` used to render the popover directly on top of the `Start stock count` button sitting right underneath in that small modal). Clicking `Start stock count` has no popover of its own (an obvious, single-button click doesn't need one) — the `tour` param carries through to `procure-trial-stock-count.html` in the navigation, not via a dedicated step.
+- The tour continues on `procure-trial-stock-count.html` (previously had no tour code at all) as Step 5 (first Counted Qty input — advances once the user types any value) → Step 6 (`Done` button; copy is forward-looking — "Once you've counted everything on the list, click Done to finish up." — not an assertion that counting is already finished, since the tour only requires one row filled in to get there). There's no Step 7 on `Save stock count` in the confirm modal — same reasoning as `Start stock count`, one obvious button doesn't need a popover. Saving still redirects with `tourHandoff=1` when the tour was active, which shows the sidebar "Inventory set up" handoff pointer back on Inventory.
 
 Place first order flow:
 
 - The `Order faster` checklist path unlocks `Place first order` after `marketListBuilt=1`.
-- The dashboard `Create order` CTA starts Step 1 on the dashboard, pointing at `Orders` in the sidenav. The sidebar `Next • Place first order` starts the same Step 1 pointer in place on whatever trial page the user is currently viewing; it must not redirect back to the dashboard first.
+- The dashboard `Create order` CTA starts Step 1 on the dashboard, pointing at `Orders` in the sidenav. The sidebar `Next: Place first order` starts the same Step 1 pointer in place on whatever trial page the user is currently viewing; it must not redirect back to the dashboard first.
 - After the user opens Orders, the next step highlights the `New order` split button and opens its menu. The first guided path chooses `Order by item`, because it reinforces the market list the user just built.
 - `Freemium/procure-trial-new-order-item.html` follows the existing product pattern: full-page create-order shell, market-list item table on the left, supplier-grouped cart on the right, and a fixed cart footer.
 - The order-by-item page should reflect what the user added while building the market list: manual `createdSku`/`createdSupplier` values and invoice-created items feed the orderable item list. The cart starts empty and only appears as a supplier-grouped order after the user clicks `Add to order`.
 - The guided order-by-item path covers: add an item to order, review/select the newly-created supplier cart group, then place the order.
-- Placing the order returns to Orders with `orderPlaced=1`, shows a placed order row, marks `Place first order` complete on the dashboard, and advances `Order faster` setup progress from 60% to 80%.
+- `Freemium/procure-trial-new-order-supplier.html` covers the secondary `Order by supplier` path: Orders opens a supplier picker first, then a supplier-specific item list. It uses the same created supplier and market-list items as the item path, and its cart also starts empty until the user adds an item.
+- Placing an order returns to Orders with `orderPlaced=1`, shows a placed order row using the created supplier, marks `Place first order` complete on the dashboard, and advances `Order faster` setup progress from 60% to 80%.
+- The order branch that was used is tracked separately with `orderByItemDone=1` or `orderBySupplierDone=1`. If one branch is complete and the other is not, the completed checklist row can show a secondary option to try the other path without making it part of checklist completion.
 - The return URL also includes `orderHandoff=1`, which opens a short setup-updated tour panel pointing at the sidebar `Get started` card so users know where to continue.
-- Supplier-based ordering remains the secondary path for later: `New order > Order by supplier` opens a supplier picker, then the supplier-specific item list and review modal.
+
+Checklist "100% done" state (`Procure Trial Dashboard.html`):
+
+- The primary checklist does not show a separate green success banner at 100%; at 100% the progress ring becomes a green tick icon and the completed rows carry the completion signal.
+- Once the primary 5-task checklist (`account` + the 4 goal-specific tasks) hits 100%, the 5 task rows collapse behind a `<details>` toggle ("Show completed steps") the first time 100% is reached — still viewable on demand, not hidden for good. While incomplete, this wrapper renders as a plain block with no visible chrome.
+- The "More setup options" `<details>` (tasks outside the user's chosen goal, e.g. invoice digitising/export, stock count — via `extraTaskOrder`) auto-opens itself the first time the primary checklist hits 100%, and its heading relabels from "More setup options" to "More things you can do", shifting visual focus there.
+- Known gap (pre-existing, not fixed by this): the `Upload invoice` and `Digitise invoice` onboarding flows are not built yet, and no page currently sets `invoiceUpload=1` or `invoiceDigitise=1`. The `Digitise invoices` primary goal is selectable, but cannot reach 100% until those flows are implemented. `invoiceExport` is also not wired to a completion param, so it remains incomplete when shown under "More things you can do".
+
+Sidebar "Get started" widget — tick icon and Next/Also try label:
+
+- A small 16px green-circle tick (`data-sidebar-setup-tick`, hidden by default) sits next to the "Get started" title in the widget on every trial page (12 files share this widget; `procure-trial-new-order-item.html` and `procure-trial-review-invoice-items.html` don't have it at all).
+- On the Dashboard (the only page with full `taskCatalog` knowledge): once the primary checklist is 100%, the tick shows and the label becomes `Also try:`, with the link text swapped to the first incomplete "extra" task's title (dependency-aware — e.g. won't suggest `Export invoices` before `Digitise invoices` is done). If literally nothing is left across both primary and extra tasks, the whole `Next:`/`Also try:` line hides instead of showing a dead label.
+- Every other page also shows a real, specific "Also try" task rather than a generic filler — computed from a small local lookup instead of the full `taskCatalog`, since the actually-reachable states are few: `invoiceUpload`/`invoiceDigitise`/`invoiceExport` never complete anywhere in this build (no param marks them done), and `order`/`stockCount` complete via the `orderPlaced`/`stockCountDone` params every page already tracks. So for `Order faster` (100% via `inventorySetup`) the answer is reliably "Upload an invoice" (linking to `procure-trial-invoices.html`); for `Manage inventory` (100% via `stockCountDone`) it's "Place first order" (linking to `procure-trial-orders.html`) unless `orderPlaced` is already true, in which case it also falls to "Upload an invoice". The href override runs *after* each page's existing final href-assignment (`sidebarNextUrl()` or the inline chain), since that assignment already runs unconditionally and would otherwise clobber it. `procure-trial-create-sku.html` was left out of this wiring since it never had dynamic sidebar-progress logic to begin with (static "40% done" only).
+- Layout fix: `.sidebar-setup-next` (the Next/Also try line) and the top `.sidebar-setup-row` (title + percentage) both use `white-space: nowrap` on their child spans now, since the sidebar is narrow (232px) and long strings would otherwise wrap awkwardly mid-word.
+- Label + action are always on the same line, separated by a colon (`Next: Build market list`, `Also try: Upload an invoice`) — the label is never hidden once the widget is showing a specific task, since hiding it only made sense for the old generic "Explore more setup options" filler, not a real named task. Two of the longer extra-task titles are shortened specifically for this line (the main checklist row keeps the original wording): `Complete first stock count` → `Complete a stock count`, `Upload first invoice` → `Upload an invoice`.
 
 Support links:
 
