@@ -965,7 +965,7 @@
           <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="procure-trial-outlet-suppliers.html?tour=2"><span>Add first supplier</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support">
@@ -1103,8 +1103,11 @@
     }
 
     function setupTourUrl(tour) {
-      var url = dashboardUrl(true);
-      return url + (url.indexOf('?') === -1 ? '?' : '&') + 'tour=' + encodeURIComponent(tour || '1');
+      if (tour === 'order') return withParams('procure-trial-orders.html', 'order');
+      if (tour === 'inventory') return withParams('procure-trial-inventory.html', 'inventory');
+      if (tour === 'stockCount') return withParams('procure-trial-inventory.html', 'stockCount');
+      if (tour === 'supplier') return withParams('procure-trial-outlet-suppliers.html', '2');
+      return withParams('procure-trial-items.html', '1');
     }
 
     document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
@@ -1186,20 +1189,34 @@
       var nextGoal = params.get('primaryGoal') || 'Order faster';
       if (inventorySetup && !stockCountDone && nextGoal === 'Manage inventory') {
         link.href = setupTourUrl('stockCount');
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startInventoryTourHere('stockCount');
+        });
       } else if (marketListBuilt && !inventorySetup && !stockCountDone && (nextGoal === 'Manage inventory' || (nextGoal === 'Order faster' && orderPlaced))) {
         link.href = setupTourUrl('inventory');
-      } else if (marketListBuilt && !orderPlaced && !inventorySetup) {
-        link.href = nextGoal === 'Order faster' ? setupTourUrl('order') : dashboardUrl(true);
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startInventoryTourHere('inventory');
+        });
+      } else if (marketListBuilt && !orderPlaced && !inventorySetup && nextGoal === 'Order faster') {
+        link.href = setupTourUrl('order');
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startOrderTourHere();
+        });
+      } else if (marketListBuilt && nextGoal === 'Digitise invoices') {
+        link.href = withParams('procure-trial-invoices.html');
       } else if (marketListBuilt) {
         link.href = dashboardUrl(true);
       } else if (supplierAdded) {
-        link.href = setupTourUrl('1');
+        link.href = setupTourUrl('market');
         link.addEventListener('click', function(event) {
           event.preventDefault();
           startMarketListTourHere();
         });
       } else {
-        link.href = setupTourUrl('1');
+        link.href = setupTourUrl('supplier');
         link.addEventListener('click', function(event) {
           event.preventDefault();
           startSupplierTourHere();
@@ -1259,9 +1276,12 @@
 
     function startSupplierTourHere() {
       tourStep = { target: '[data-nav-outlets]' };
+      document.querySelectorAll('[data-nav-outlets]').forEach(function(link) {
+        link.href = withParams('procure-trial-outlet-suppliers.html', '2');
+      });
       if (tourKicker) tourKicker.textContent = 'Step 1';
       if (tourTitle) tourTitle.textContent = 'Start from Outlets';
-      if (tourCopy) tourCopy.textContent = 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
+      if (tourCopy) tourCopy.textContent = 'Open Outlets to add the supplier you buy from first.';
       openTour();
     }
 
@@ -1272,7 +1292,32 @@
       });
       if (tourKicker) tourKicker.textContent = 'Step 1';
       if (tourTitle) tourTitle.textContent = 'Start from Items';
-      if (tourCopy) tourCopy.textContent = 'Add the items your team orders most. Start from Items in the sidebar.';
+      if (tourCopy) tourCopy.textContent = 'Open Items to build the list your team will order from.';
+      openTour();
+    }
+
+    function startOrderTourHere() {
+      tourStep = { target: '[data-nav-orders]' };
+      document.querySelectorAll('[data-nav-orders]').forEach(function(link) {
+        link.href = withParams('procure-trial-orders.html', 'order');
+      });
+      if (tourKicker) tourKicker.textContent = 'Step 1';
+      if (tourTitle) tourTitle.textContent = 'Start from Orders';
+      if (tourCopy) tourCopy.textContent = 'Open Orders when you’re ready to place your first order from the items you just added.';
+      openTour();
+    }
+
+    function startInventoryTourHere(mode) {
+      var nextTour = mode === 'stockCount' ? 'stockCount' : 'inventory';
+      tourStep = { target: '[data-nav-inventory]' };
+      document.querySelectorAll('[data-nav-inventory]').forEach(function(link) {
+        link.href = withParams('procure-trial-inventory.html', nextTour);
+      });
+      if (tourKicker) tourKicker.textContent = 'Step 1';
+      if (tourTitle) tourTitle.textContent = 'Start from Inventory';
+      if (tourCopy) tourCopy.textContent = mode === 'stockCount'
+        ? 'Open Inventory when you’re ready to start your first stock count.'
+        : 'Open Inventory to create your first inventory list and add items to track.';
       openTour();
     }
 

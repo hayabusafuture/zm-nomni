@@ -752,7 +752,7 @@
   .tour-overlay {
     position: fixed;
     inset: 0;
-    z-index: 940;
+    z-index: 970;
     pointer-events: none;
   }
   .tour-overlay[hidden] { display: none; }
@@ -1018,7 +1018,7 @@
           <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span>Add first supplier</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="procure-trial-outlet-suppliers.html?tour=2"><span>Add first supplier</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support"></button>
@@ -1051,8 +1051,10 @@
           <div class="add-menu-wrap">
             <button class="action-link" data-add-toggle type="button"><span class="action-icon" aria-hidden="true">+</span>Add</button>
             <div class="add-menu" data-add-menu hidden>
-              <button type="button" data-add-invoice>Add from invoice</button>
-              <button type="button" data-create-new>Create new</button>
+              <div data-add-menu-tour-target>
+                <button type="button" data-add-invoice>Add from invoice</button>
+                <button type="button" data-create-new>Create new</button>
+              </div>
               <button type="button">Bulk create new</button>
             </div>
           </div>
@@ -1218,6 +1220,7 @@
       },
       chooseMethod: {
         target: retryPath === 'invoice' ? '[data-add-invoice]' : retryPath === 'manual' ? '[data-create-new]' : '[data-add-menu]',
+        highlightTarget: retryPath === 'invoice' || retryPath === 'manual' ? null : '[data-add-menu-tour-target]',
         kicker: 'Step 3',
         title: retryPath === 'invoice' ? 'Try adding from invoice' : retryPath === 'manual' ? 'Try creating manually' : 'Choose how to add items',
         copy: retryPath === 'invoice'
@@ -1257,6 +1260,22 @@
         kicker: 'Step 1',
         title: 'Start from Orders',
         copy: 'Open Orders when you’re ready to place your first order from the items you just added.',
+        placement: 'right',
+        actionOnly: true
+      },
+      inventoryStart: {
+        target: '[data-nav-inventory]',
+        kicker: 'Step 1',
+        title: 'Start from Inventory',
+        copy: 'Open Inventory to create your first inventory list and add items to track.',
+        placement: 'right',
+        actionOnly: true
+      },
+      stockCountStart: {
+        target: '[data-nav-inventory]',
+        kicker: 'Step 1',
+        title: 'Start from Inventory',
+        copy: 'Open Inventory when you’re ready to start your first stock count.',
         placement: 'right',
         actionOnly: true
       },
@@ -1315,7 +1334,10 @@
     }
 
     function setupTourUrl(tour) {
-      return withParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: tour || '1' });
+      if (tour === 'order') return withParams('procure-trial-orders.html', { tour: 'order' });
+      if (tour === 'inventory') return withParams('procure-trial-inventory.html', { tour: 'inventory' });
+      if (tour === 'stockCount') return withParams('procure-trial-inventory.html', { tour: 'stockCount' });
+      return withParams('procure-trial-items.html', { tour: tour || '1' });
     }
 
     function sidebarNextUrl() {
@@ -1323,6 +1345,7 @@
       if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return setupTourUrl('stockCount');
       if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return setupTourUrl('order');
       if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return setupTourUrl('inventory');
+      if (marketListBuilt && goal === 'Digitise invoices') return withParams('procure-trial-invoices.html');
       if (!supplierAdded) return withParams('procure-trial-outlet-suppliers.html', { tour: '2' });
       if (supplierAdded && !marketListBuilt) return setupTourUrl('1');
       return dashboardUrl(true);
@@ -1588,11 +1611,13 @@
       var target = document.querySelector(step.target);
       if (!target) return;
       var rect = target.getBoundingClientRect();
+      var highlightEl = (step.highlightTarget && document.querySelector(step.highlightTarget)) || target;
+      var highlightRect = highlightEl.getBoundingClientRect();
       var pad = 10;
-      tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
-      tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
-      tourHighlight.style.width = (rect.width + pad * 2) + 'px';
-      tourHighlight.style.height = (rect.height + pad * 2) + 'px';
+      tourHighlight.style.top = Math.max(8, highlightRect.top - pad) + 'px';
+      tourHighlight.style.left = Math.max(8, highlightRect.left - pad) + 'px';
+      tourHighlight.style.width = (highlightRect.width + pad * 2) + 'px';
+      tourHighlight.style.height = (highlightRect.height + pad * 2) + 'px';
       tourCard.classList.remove('left', 'below');
       var cardWidth = Math.min(380, window.innerWidth - 32);
       var cardHeight = tourCard.getBoundingClientRect().height || 200;
@@ -1680,6 +1705,20 @@
       tour.hidden = false;
       document.body.classList.add('tour-active');
       setTourStep('orderStart', false);
+    }
+
+    function openInventoryStartTour(mode) {
+      if (!tour) return;
+      closeAddMenu();
+      closeSupplierModal();
+      closeInvoiceModal();
+      var nextTour = mode === 'stockCount' ? 'stockCount' : 'inventory';
+      document.querySelectorAll('[data-nav-inventory]').forEach(function(link) {
+        link.href = withParams('procure-trial-inventory.html', { tour: nextTour });
+      });
+      tour.hidden = false;
+      document.body.classList.add('tour-active');
+      setTourStep(mode === 'stockCount' ? 'stockCountStart' : 'inventoryStart', false);
     }
 
     function openSupplierStartTour() {
@@ -1773,6 +1812,16 @@
         if (!supplierAdded) {
           event.preventDefault();
           openSupplierStartTour();
+          return;
+        }
+        if (inventorySetup && !stockCountDone && goal === 'Manage inventory') {
+          event.preventDefault();
+          openInventoryStartTour('stockCount');
+          return;
+        }
+        if (marketListBuilt && !inventorySetup && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) {
+          event.preventDefault();
+          openInventoryStartTour('inventory');
           return;
         }
         if (marketListBuilt && goal === 'Order faster') {
