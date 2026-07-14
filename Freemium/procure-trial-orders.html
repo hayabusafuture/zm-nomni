@@ -1007,7 +1007,8 @@
       if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return setupTourUrl('stockCount');
       if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return setupTourUrl('order');
       if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return setupTourUrl('inventory');
-      if (!supplierAdded || (supplierAdded && !marketListBuilt)) return setupTourUrl('1');
+      if (!supplierAdded) return withParams('procure-trial-outlet-suppliers.html', { tour: '2' });
+      if (supplierAdded && !marketListBuilt) return setupTourUrl('1');
       return dashboardUrl(true);
     }
 
@@ -1153,19 +1154,25 @@
         if (tourTitle) tourTitle.textContent = 'First order placed';
         if (tourCopy) tourCopy.textContent = "You're " + handoffProgress + " done. Click the setup panel to continue with the next step." + alternateOrder;
       } else {
-        if (tourKicker) tourKicker.textContent = 'Step 2';
-        if (tourTitle) tourTitle.textContent = 'Create your first order';
-        if (tourCopy) {
-          tourCopy.textContent = tourMode === 'orderSupplier'
-            ? 'Open New order, then choose Order by supplier to start with who you buy from.'
-            : 'Open New order, then choose Order by item to build from the products you already added.';
+        if (tourMode === 'supplierStart') {
+          if (tourKicker) tourKicker.textContent = 'Step 1';
+          if (tourTitle) tourTitle.textContent = 'Start from Outlets';
+          if (tourCopy) tourCopy.textContent = 'Open Outlets to add the supplier you buy from first.';
+        } else {
+          if (tourKicker) tourKicker.textContent = 'Step 2';
+          if (tourTitle) tourTitle.textContent = 'Create your first order';
+          if (tourCopy) {
+            tourCopy.textContent = tourMode === 'orderSupplier'
+              ? 'Open New order, then choose Order by supplier to start with who you buy from.'
+              : 'Open New order, then choose Order by item to build from the products you already added.';
+          }
         }
       }
     }
 
     function placeTour() {
       if (!tour || tour.hidden) return;
-      var target = tourMode === 'handoff' ? setupCard : tourMode === 'orderSupplier' && supplierModal && !supplierModal.hidden ? supplierChoice : document.querySelector('[data-new-order-wrap]');
+      var target = tourMode === 'supplierStart' ? document.querySelector('[data-nav-outlets]') : tourMode === 'handoff' ? setupCard : tourMode === 'orderSupplier' && supplierModal && !supplierModal.hidden ? supplierChoice : document.querySelector('[data-new-order-wrap]');
       if (!target) return;
       var rect = target.getBoundingClientRect();
       var pad = 10;
@@ -1178,7 +1185,9 @@
       var cardLeft = rect.right + 28;
       var cardTop = Math.max(16, Math.min(rect.top - 18, window.innerHeight - cardHeight - 16));
       tourCard.classList.remove('left');
-      if (tourMode !== 'handoff' || cardLeft + cardWidth > window.innerWidth - 16) {
+      if (tourMode === 'supplierStart') {
+        cardLeft = Math.min(window.innerWidth - cardWidth - 16, rect.right + 28);
+      } else if (tourMode !== 'handoff' || cardLeft + cardWidth > window.innerWidth - 16) {
         cardLeft = Math.max(16, rect.left - cardWidth - 34);
         tourCard.classList.add('left');
       }
@@ -1189,6 +1198,11 @@
     function openTour(mode) {
       if (!tour) return;
       setTourCopy(mode);
+      if (tourMode === 'supplierStart') {
+        document.querySelectorAll('[data-nav-outlets]').forEach(function(link) {
+          link.href = withParams('procure-trial-outlet-suppliers.html', { tour: '2' });
+        });
+      }
       tour.hidden = false;
       toggleNewOrderMenu(tourMode === 'order' || tourMode === 'orderSupplier');
       setTimeout(placeTour, 40);
@@ -1213,6 +1227,11 @@
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
       link.addEventListener('click', function(event) {
         var goal = params.get('primaryGoal') || 'Order faster';
+        if (!supplierAdded) {
+          event.preventDefault();
+          openTour('supplierStart');
+          return;
+        }
         if (marketListBuilt && !orderPlaced && goal === 'Order faster') {
           event.preventDefault();
           openTour('order');

@@ -274,7 +274,7 @@ Guided-tour standards:
 - Avoid technical/internal wording such as `SKU manually`, `OCR-assisted path`, `create form`, or copy that explains wiring.
 - Lead with the user's job: add items the team orders, link them to the right supplier, set buying details, decide whether to count them in inventory, then save.
 - Never start a checklist flow by automatically redirecting the user to another page. The CTA should first open the tour on the current page, point at the real sidenav or on-page control, and let the user click it to continue.
-- The sidebar `Next: ...` action follows the same rule: when a guided flow exists, it should open that flow's starting tour panel on the current page, not send users back to the checklist. Supplier, market-list, and order starts all begin by pointing at the relevant sidenav item; clicking that real nav item continues the flow.
+- The sidebar `Next: ...` action follows the same rule: when a guided flow exists, it should open that flow's starting tour panel on the current page, not send users back to the checklist. Supplier, market-list, and order starts all begin by pointing at the relevant sidenav item; clicking that real nav item continues the flow. This includes the `Add first supplier` next action when the user is already on Items or Orders.
 - Users should advance by clicking highlighted product controls wherever possible.
 - Use `Prev` / `Next` only for same-page guidance where the real click target does not naturally advance. Show `Prev` only when the previous step is on the same page.
 - `Next` uses the primary green treatment and `Prev` uses the mint secondary treatment. Tour cards close with an X button in the top-right corner rather than a footer `Dismiss` button.
@@ -302,7 +302,8 @@ Build market list flow:
 - The dashboard `Build market list` row shows a real `Add items` CTA once the supplier prerequisite is complete.
 - The CTA and sidebar `Next: Build market list` both start Step 1 pointing at `Items` in the sidenav. Clicking it opens `Freemium/procure-trial-items.html?tour=1`.
 - `Freemium/procure-trial-items.html` stays locked without `supplierAdded=1`, because items must be linked to a supplier.
-- The Items page follows the real product shape: `Purchased` tab, outlet selector, `Search SKU`, table rows, and action bar. The outlet selector uses `venueName` or falls back to `Trial Outlet`.
+- The Items page follows the real product shape: `Purchased` tab, outlet selector, `Search SKU`, and action bar. The outlet selector uses `venueName` or falls back to `Trial Outlet`.
+- A fresh trial account starts with an empty Items page (`No items yet`). Item rows should only appear after the user builds the market list through the manual or invoice-assisted flow.
 - Step 3 highlights the open `Add` menu as a choice point. Users can choose `Create new` for the manual path or `Add from invoice` for the upload-assisted path.
 - Manual item creation follows: `Create new`, supplier selection, then `Freemium/procure-trial-create-sku.html`.
 - The Select supplier dialog defaults to `Select supplier`. Step 4 points only at the supplier dropdown; choosing a supplier closes the guidance so the dialog's `Create new` button is clearly visible and users can click the real CTA.
