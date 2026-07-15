@@ -100,6 +100,57 @@ Generated preview screenshots:
 - `Freemium/nomni-procure-top-preview.png`
 - `Freemium/zeemart-top-preview.png`
 
+## Asset downloads for devs
+
+Every page that already carries the Aa/Box handoff inspectors also has a third
+top-right pill, `↓ Assets`, opening a small dropdown with two downloads:
+
+- **This page** — a zip of only the local images that page actually references
+  (sidenav icon pairs, Freemium-specific icons, logo/favicon, etc.), scoped so a
+  dev doing a small update to one screen doesn't have to pull the whole set again.
+- **Whole flow** — one zip of every local image used anywhere across the
+  Freemium prototype pages (the union, deduped).
+
+Both are pre-built static zips (`Freemium/assets/downloads/<page-slug>.zip` and
+`Freemium/assets/downloads/all-pages.zip`), not generated on click — there's no
+backend, and these are plain self-contained HTML files, so a client-side zip
+library was intentionally avoided in favour of shipping the zip as a plain
+local asset file (same "only local files + Google Fonts" constraint every
+other prototype file follows).
+
+Two scripts regenerate everything and live at the top of `Freemium/`:
+
+- `build-asset-downloads.py` — scans every top-level `Freemium/*.html` file
+  for local image references (`src=`/`href=`/CSS `url()` pointing at
+  `.svg`/`.png`/`.jpg`/`.jpeg`/`.gif`/`.webp`, skipping `http(s)://` and the
+  `_refs/` reference captures), then writes the per-page zips, the `all-pages`
+  zip, and a `MANIFEST.txt` listing what each page pulled in (and flags any
+  reference that didn't resolve to a real file — eg.
+  `procure-trial-add-supplier-no-results.html` references
+  `assets/Nomni Procure-search no results_files/no-results-icon.svg`, which
+  doesn't exist in the repo; that's a pre-existing broken reference, not
+  something this tooling introduced, and is unrelated to the zip it still
+  produces from the rest of that page's images).
+- `inject_asset_widget.py` — adds the widget's CSS/HTML/JS into every page
+  that already has the handoff inspectors (idempotent — reruns skip pages
+  that already have it, so it's safe to run again after adding a new page).
+
+Run `build-asset-downloads.py` any time a page's local image references
+change, so the per-page zip and the counts shown in the dropdown stay accurate
+— the widget's file counts are baked into each page's HTML at injection time,
+not computed live, so re-run `inject_asset_widget.py` too if the counts drift
+enough to matter (it'll only touch pages where the counts actually change,
+since the marker-based skip only fires when the widget block is entirely
+absent — for a counts-only refresh, rerun after deleting the old widget block,
+or just re-derive by hand for a one-off correction).
+
+Deliberately out of scope for now: `freemium.html`, `nomni.html`, `Zeemart.html`
+(marketing landing pages), `procure-demo-email.html` /
+`procure-verification-email.html` (email mockups), and
+`procure-trial-add-supplier.html` (a redirect stub) — none of these carry the
+Aa/Box inspectors either, so the download widget follows the same "real
+dev-facing app screen" boundary that already exists in this codebase.
+
 ## Current Implementation Notes
 
 Both prototypes are standalone HTML files:
@@ -244,6 +295,7 @@ Trial app chrome:
 - `Help` and `Explore our setup guide` both point to the Restaurants / Nomni Procure knowledge-base collection.
 - Sidebar includes the Procure nav, the `Get started` card directly below `News`, and the lower-left Intercom-style launcher.
 - The sidebar card shows current setup progress, a progress bar, and one recommended next action. The card body returns to the checklist; only the next-action text starts the active guided flow.
+- The checklist panel includes a non-progress mobile-app helper card. It introduces the Nomni Procure mobile app and uses official App Store / Google Play badges. On mobile, the badges open the relevant store listing directly; on desktop, they open a QR modal for the selected store. This is informational only and must not count towards setup progress.
 - Signup details travel through URL params. Trial pages use the captured user name and `venueName`; direct file previews fall back to `Trial user` and `Trial Outlet`.
 - Orders, Invoices, Items, and Inventory nav links point to the trial placeholder/live pages instead of `#`.
 
@@ -411,8 +463,9 @@ HTML parsing and local image reference checks were run during development.
 
 - Define what “demo access” includes inside the stripped-down Nomni Procure prototype.
 - Decide how the demo dashboard works: what data appears, whether it is seeded, and how it differs from the guided trial checklist/dashboard.
-- Confirm Admin Panel support for extending a trial period when the Nomni team wants to give a prospect more time.
-- Define how trial accounts are flagged internally so the Nomni team can identify them, reach out during the trial, and follow up after the trial period ends.
+- Map and build the `Upload first invoice` onboarding flow. This is currently represented by an empty-state invoices page and no page sets `invoiceUpload=1`.
+- Map and build the `Digitise invoices` onboarding flow. Until this exists, the `Digitise invoices` primary goal is selectable but cannot reach 100% completion.
+- Wire the later `Export invoices` extra task if it remains in scope; it currently depends on `Digitise invoices` and has no completion param.
 - Decide how trial users are told they can contact support via live chat, beyond the persistent Intercom-style launcher.
 - Define the conversion path from trial to paid account: what users see before the trial ends, who they contact, and what in-product CTA or message explains the next step.
 - Decide which exact support article should be the primary support link.

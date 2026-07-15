@@ -645,6 +645,37 @@
   }
 
   /* Handoff inspectors */
+    /* Download-assets widget */
+  .asset-download-wrap { position: relative; }
+  .asset-download-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 168px;
+    background: #1a1f2b;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    padding: 6px;
+    z-index: 1001;
+  }
+  .asset-download-menu a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: monospace;
+    letter-spacing: .02em;
+    color: rgba(255,255,255,.85);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .asset-download-menu a:hover { background: rgba(255,255,255,.12); color: #fff; }
+  .asset-download-menu .count { color: rgba(255,255,255,.45); font-weight: 500; margin-left: 10px; }
   .handoff-inspector {
     position: fixed;
     top: 12px;
@@ -704,6 +735,14 @@
 </head>
 <body>
 <div class="handoff-inspector" aria-label="Handoff inspectors">
+  <div class="asset-download-wrap" data-asset-download>
+    <button class="handoff-inspector-btn" type="button" data-asset-download-toggle title="Download page assets">&#8595; Assets</button>
+    <div class="asset-download-menu" data-asset-download-menu hidden>
+      <a href="assets/downloads/procure-trial-stock-count.zip" download>This page<span class="count">22 files</span></a>
+      <a href="assets/downloads/all-pages.zip" download>Whole flow<span class="count">33 files</span></a>
+    </div>
+  </div>
+
   <button class="handoff-inspector-btn" id="fontInspectorBtn" title="Font size inspector">Aa</button>
   <button class="handoff-inspector-btn" id="boxInspectorBtn" title="Box model inspector">Box</button>
 </div>
@@ -1446,6 +1485,24 @@
     if (pinned) return;
     tip.style.display = 'none';
     highlightElement(null);
+  });
+})();
+</script>
+<script>
+(function(){
+  var wrap = document.querySelector('[data-asset-download]');
+  if (!wrap) return;
+  var toggle = wrap.querySelector('[data-asset-download-toggle]');
+  var menu = wrap.querySelector('[data-asset-download-menu]');
+  toggle.addEventListener('click', function(event){
+    event.stopPropagation();
+    menu.hidden = !menu.hidden;
+  });
+  document.addEventListener('click', function(event){
+    if (!menu.hidden && !event.target.closest('[data-asset-download]')) menu.hidden = true;
+  });
+  document.addEventListener('keydown', function(event){
+    if (event.key === 'Escape') menu.hidden = true;
   });
 })();
 </script>
