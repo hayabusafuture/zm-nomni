@@ -179,6 +179,7 @@
   }
   .invoice-card + .invoice-card { margin-top: 14px; }
   .invoice-card.active { border-color: #F4E6AA; }
+  .invoice-card.completed { border-color: #B9F0C5; }
   .invoice-card-head {
     display: flex;
     align-items: center;
@@ -189,6 +190,7 @@
     border-bottom: 1px solid #F0E7C0;
   }
   .invoice-card.collapsed .invoice-card-head { background: #fff; border-bottom: 0; }
+  .invoice-card.completed .invoice-card-head { background: #F7FFF8; border-bottom: 0; }
   .invoice-id-group { display: flex; align-items: center; gap: 14px; min-width: 0; }
   .invoice-index {
     width: 40px;
@@ -240,6 +242,7 @@
     padding: 0 18px;
     font-weight: 800;
   }
+  .complete-pill::before { content: "✓"; font-weight: 900; }
   .review-body { padding: 22px; }
   .review-top {
     display: flex;
@@ -665,7 +668,7 @@
     <a class="back-link" data-items-link href="procure-trial-items.html">‹ Items</a>
     <h1 class="page-title">Review items</h1>
 
-    <section class="invoice-card active" data-active-invoice>
+    <section class="invoice-card active" data-invoice-card="1" data-active-invoice>
       <div class="invoice-card-head">
         <div class="invoice-id-group">
           <span class="invoice-index">1</span>
@@ -707,16 +710,16 @@
       </div>
     </section>
 
-    <section class="invoice-card collapsed">
+    <section class="invoice-card collapsed" data-invoice-card="2">
       <div class="invoice-card-head">
         <div class="invoice-id-group"><span class="invoice-index">2</span><div><div class="invoice-number">INV-2026-0143</div><div class="invoice-date">8 Jul 2026 - Test Supplier</div></div></div>
-        <div class="invoice-actions"><button class="btn btn-secondary" type="button">View ›</button></div>
+        <div class="invoice-actions"><button class="btn btn-secondary" data-view-invoice="2" type="button">View ›</button></div>
       </div>
     </section>
-    <section class="invoice-card collapsed">
+    <section class="invoice-card collapsed" data-invoice-card="3">
       <div class="invoice-card-head">
         <div class="invoice-id-group"><span class="invoice-index">3</span><div><div class="invoice-number">INV-2026-0144</div><div class="invoice-date">9 Jul 2026 - Test Supplier</div></div></div>
-        <div class="invoice-actions"><button class="btn btn-secondary" type="button">View ›</button></div>
+        <div class="invoice-actions"><button class="btn btn-secondary" data-view-invoice="3" type="button">View ›</button></div>
       </div>
     </section>
   </main>
@@ -724,7 +727,7 @@
 
 <div class="toast" data-toast>
   <span class="toast-check" aria-hidden="true">✓</span>
-  <span><span class="toast-title">Success</span><br><span>4 items created or updated</span></span>
+  <span><span class="toast-title">Success</span><br><span data-toast-copy>4 items created or updated</span></span>
 </div>
 
 <div class="modal-overlay" data-save-modal hidden>
@@ -762,10 +765,12 @@
     var userName = params.get('userName') || '';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
-    var saveReview = document.querySelector('[data-save-review]');
     var saveModal = document.querySelector('[data-save-modal]');
     var confirmSave = document.querySelector('[data-confirm-save]');
     var toast = document.querySelector('[data-toast]');
+    var invoiceCount = document.querySelector('.invoice-count');
+    var invoicePane = document.querySelector('.invoice-pane');
+    var reviewBody = document.querySelector('.review-body');
     var tour = document.querySelector('[data-tour]');
     var tourHighlight = document.querySelector('[data-tour-highlight]');
     var tourCard = document.querySelector('[data-tour-card]');
@@ -776,6 +781,13 @@
     var tourTitle = document.querySelector('[data-tour-title]');
     var tourCopy = document.querySelector('[data-tour-copy]');
     var currentTourStep = 'overview';
+    var activeInvoiceIndex = 1;
+    var completedInvoices = [];
+    var invoiceData = {
+      1: { number: 'INV-2026-0142', date: '1 Jul 2026', fullDate: '01 Jul 2026', dueDate: '15 Jul 2026', count: '8 items', badge: '6 NEW/UPDATED', saveCount: 4 },
+      2: { number: 'INV-2026-0143', date: '8 Jul 2026', fullDate: '08 Jul 2026', dueDate: '22 Jul 2026', count: '7 items', badge: '7 NEW/UPDATED', saveCount: 7 },
+      3: { number: 'INV-2026-0144', date: '9 Jul 2026', fullDate: '09 Jul 2026', dueDate: '23 Jul 2026', count: '6 items', badge: '6 NEW/UPDATED', saveCount: 6 }
+    };
     var tourOrder = ['overview', 'save'];
     var tourSteps = {
       overview: {
@@ -823,6 +835,85 @@
         marketHandoff: '1',
         invoiceItemsAdded: '1'
       });
+    }
+
+    function isCompleted(index) {
+      return completedInvoices.indexOf(index) >= 0;
+    }
+
+    function nextPendingInvoice(afterIndex) {
+      var sequence = [1, 2, 3];
+      var after = sequence.filter(function(index) { return index > afterIndex && !isCompleted(index); })[0];
+      if (after) return after;
+      return sequence.filter(function(index) { return !isCompleted(index); })[0] || null;
+    }
+
+    function updateInvoicePreview() {
+      var data = invoiceData[activeInvoiceIndex] || invoiceData[1];
+      if (invoiceCount) invoiceCount.textContent = activeInvoiceIndex + ' of 3 - ' + data.number;
+      if (invoicePane) {
+        var metaValues = invoicePane.querySelectorAll('.invoice-meta strong');
+        if (metaValues[0]) metaValues[0].textContent = data.number;
+        if (metaValues[1]) metaValues[1].textContent = data.fullDate;
+        if (metaValues[2]) metaValues[2].textContent = data.dueDate;
+      }
+      document.querySelectorAll('.review-count').forEach(function(node) { node.textContent = data.count; });
+      document.querySelectorAll('.review-badge').forEach(function(node) { node.textContent = data.badge; });
+      document.querySelectorAll('.date-control').forEach(function(node) { node.textContent = '▣ ' + data.date; });
+      var modalCopy = document.querySelector('.modal-copy');
+      if (modalCopy) modalCopy.textContent = data.saveCount + ' items will be created or updated. This cannot be undone.';
+      var toastCopy = document.querySelector('[data-toast-copy]');
+      if (toastCopy) toastCopy.textContent = data.saveCount + ' items created or updated';
+    }
+
+    function renderInvoiceCards() {
+      var activeCard = document.querySelector('[data-invoice-card="' + activeInvoiceIndex + '"]');
+      document.querySelectorAll('[data-invoice-card]').forEach(function(card) {
+        var index = parseInt(card.getAttribute('data-invoice-card'), 10);
+        var actions = card.querySelector('.invoice-actions');
+        card.classList.toggle('completed', isCompleted(index));
+        card.classList.toggle('active', index === activeInvoiceIndex && !isCompleted(index));
+        card.classList.toggle('collapsed', index !== activeInvoiceIndex || isCompleted(index));
+        if (index === activeInvoiceIndex && !isCompleted(index)) {
+          card.setAttribute('data-active-invoice', '');
+        } else {
+          card.removeAttribute('data-active-invoice');
+        }
+        if (!actions) return;
+        if (isCompleted(index)) {
+          actions.innerHTML = '<span class="complete-pill">Completed</span>';
+        } else if (index === activeInvoiceIndex) {
+          actions.innerHTML = '<button class="link-button" type="button">Skip for later</button><button class="btn btn-primary" data-save-review type="button">Save</button>';
+        } else {
+          actions.innerHTML = '<button class="btn btn-secondary" data-view-invoice="' + index + '" type="button">View ›</button>';
+        }
+      });
+      if (activeCard && reviewBody && !activeCard.contains(reviewBody)) activeCard.appendChild(reviewBody);
+      updateInvoicePreview();
+    }
+
+    function activateInvoice(index) {
+      if (!invoiceData[index] || isCompleted(index)) return;
+      activeInvoiceIndex = index;
+      renderInvoiceCards();
+      var activeCard = document.querySelector('[data-active-invoice]');
+      if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (tour && !tour.hidden) setTourStep('overview', false);
+    }
+
+    function completeActiveInvoice() {
+      var completedIndex = activeInvoiceIndex;
+      if (!isCompleted(completedIndex)) completedInvoices.push(completedIndex);
+      var next = nextPendingInvoice(completedIndex);
+      if (!next) {
+        setTimeout(function() { window.location.href = finishUrl(); }, 750);
+        return;
+      }
+      activeInvoiceIndex = next;
+      renderInvoiceCards();
+      var activeCard = document.querySelector('[data-active-invoice]');
+      if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      closeTour();
     }
 
     function placeTour() {
@@ -901,9 +992,16 @@
     document.querySelectorAll('[data-items-link]').forEach(function(link) {
       link.href = withParams('procure-trial-items.html', { supplierAdded: '1' });
     });
-    if (saveReview) saveReview.addEventListener('click', function() {
-      if (saveModal) saveModal.hidden = false;
-      placeTour();
+    document.addEventListener('click', function(event) {
+      var saveButton = event.target.closest('[data-save-review]');
+      var viewButton = event.target.closest('[data-view-invoice]');
+      if (saveButton) {
+        if (saveModal) saveModal.hidden = false;
+        placeTour();
+      }
+      if (viewButton) {
+        activateInvoice(parseInt(viewButton.getAttribute('data-view-invoice'), 10));
+      }
     });
     document.querySelectorAll('[data-close-save]').forEach(function(button) {
       button.addEventListener('click', function() {
@@ -913,7 +1011,11 @@
     });
     if (confirmSave) confirmSave.addEventListener('click', function() {
       if (toast) toast.classList.add('show');
-      setTimeout(function() { window.location.href = finishUrl(); }, 750);
+      if (saveModal) saveModal.hidden = true;
+      setTimeout(function() {
+        if (toast) toast.classList.remove('show');
+        completeActiveInvoice();
+      }, 650);
     });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
     if (tourPrev) tourPrev.addEventListener('click', function() { goTour(-1); });
@@ -921,6 +1023,7 @@
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
     document.querySelector('.content-pane').addEventListener('scroll', placeTour, { passive: true });
+    renderInvoiceCards();
     if (params.get('tour') === '5') openTour();
   })();
 </script>

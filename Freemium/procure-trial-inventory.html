@@ -664,6 +664,29 @@
   .val-mute { color: var(--ink-mute); }
   .val-red { color: #C02020; font-weight: 600; }
   .list-name { font-weight: 600; color: var(--ink); }
+  .col-actions { width: 76px; text-align: right; }
+  .row-actions-wrap { position: relative; display: inline-block; }
+  .row-actions-toggle {
+    background: none; border: none; padding: 0; font: inherit;
+    font-size: 13px; font-weight: 600; color: var(--spinach); cursor: pointer;
+  }
+  .row-actions-toggle:hover { text-decoration: underline; }
+  .row-actions-menu {
+    position: fixed;
+    background: #fff;
+    border: 1px solid #e0e2e8;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    z-index: 400;
+    padding: 6px;
+  }
+  .row-actions-menu button {
+    display: block; width: 100%; text-align: left;
+    padding: 9px 12px; font-size: 13px; font-weight: 600;
+    border-radius: 6px; border: none; background: none; cursor: pointer;
+    color: #D0291E;
+  }
+  .row-actions-menu button:hover { background: #FDD6DC; }
 
   /* Modals */
   .modal-overlay {
@@ -1187,7 +1210,7 @@
       <div class="page-header-top">
         <h1 class="page-title" data-outlet-title>Test Outlet ZM</h1>
         <div class="page-actions">
-          <div class="split-btn-wrap">
+          <div class="split-btn-wrap" data-stock-count-wrap hidden>
             <button class="btn btn-primary btn-sm split-btn-main" data-stock-count-toggle type="button">Stock count</button>
             <button class="btn btn-primary btn-sm split-btn-caret" data-stock-count-toggle type="button" aria-label="Stock count options"><span class="caret-icon" aria-hidden="true"></span></button>
             <div class="stock-count-menu" data-stock-count-menu hidden>
@@ -1195,7 +1218,7 @@
               <button type="button" data-import-stock-count>Import stock count</button>
             </div>
           </div>
-          <button class="btn btn-secondary btn-sm" type="button">Adjustment/Production</button>
+          <button class="btn btn-secondary btn-sm" data-adjustment-btn hidden type="button">Adjustment/Production</button>
         </div>
       </div>
       <div class="tabs-row">
@@ -1315,6 +1338,7 @@
                 <th class="col-right">Last count</th>
                 <th class="col-right">Movement</th>
                 <th class="col-right">Incoming</th>
+                <th class="col-actions"></th>
               </tr>
             </thead>
             <tbody data-items-body></tbody>
@@ -1354,6 +1378,7 @@
                 <th class="col-right">Est. value</th>
                 <th class="col-right">Items</th>
                 <th class="col-right">Last counted</th>
+                <th class="col-actions"></th>
               </tr>
             </thead>
             <tbody data-lists-body></tbody>
@@ -1712,6 +1737,7 @@
       panels.forEach(function(panel) { panel.hidden = panel.getAttribute('data-tab-panel') !== name; });
       if (statCardsItems) statCardsItems.hidden = name !== 'items';
       if (statCardsLists) statCardsLists.hidden = name !== 'lists';
+      refreshTourVisibility();
     }
     tabBtns.forEach(function(btn) {
       btn.addEventListener('click', function() { activateTab(btn.getAttribute('data-tab-btn')); });
@@ -1725,6 +1751,8 @@
     var listsEmpty = document.querySelector('[data-lists-empty]');
     var listsTable = document.querySelector('[data-lists-table]');
     var listsBody = document.querySelector('[data-lists-body]');
+    var stockCountWrap = document.querySelector('[data-stock-count-wrap]');
+    var adjustmentBtn = document.querySelector('[data-adjustment-btn]');
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, function(ch) {
@@ -1733,8 +1761,12 @@
     }
 
     function render() {
+      closeRowActionsMenu();
       var listCount = store.lists.length;
       var itemCount = store.items.length;
+
+      if (stockCountWrap) stockCountWrap.hidden = itemCount === 0;
+      if (adjustmentBtn) adjustmentBtn.hidden = itemCount === 0;
 
       document.querySelectorAll('[data-stat-value-label], [data-stat-value-label-lists]').forEach(function(node) {
         node.textContent = 'Est. value on hand (' + listCount + (listCount === 1 ? ' List' : ' Lists') + ')';
@@ -1774,7 +1806,8 @@
               '<td class="col-right ' + onHandClass + '">' + onHand + '</td>' +
               '<td class="col-right val-mute">' + (item.lastCount != null ? item.lastCount : '—') + '</td>' +
               '<td class="col-right val-mute">' + movementText + '</td>' +
-              '<td class="col-right val-mute">—</td>';
+              '<td class="col-right val-mute">—</td>' +
+              '<td class="col-actions"><div class="row-actions-wrap"><button class="row-actions-toggle" type="button" data-row-actions-toggle>Actions</button><div class="row-actions-menu" data-row-actions-menu hidden><button type="button" data-delete-item-row>Delete</button></div></div></td>';
             itemsBody.appendChild(tr);
           });
         }
@@ -1796,7 +1829,8 @@
             tr.innerHTML = '<td class="list-name">' + escapeHtml(list.name) + '</td>' +
               '<td class="col-right val-mute">A$' + estValue.toFixed(2) + '</td>' +
               '<td class="col-right">' + listItems.length + '</td>' +
-              '<td class="col-right val-mute">' + (lastCounted ? escapeHtml(lastCounted) : 'Never') + '</td>';
+              '<td class="col-right val-mute">' + (lastCounted ? escapeHtml(lastCounted) : 'Never') + '</td>' +
+              '<td class="col-actions"><div class="row-actions-wrap"><button class="row-actions-toggle" type="button" data-row-actions-toggle>Actions</button><div class="row-actions-menu" data-row-actions-menu hidden><button type="button" data-delete-list-row>Delete</button></div></div></td>';
             listsBody.appendChild(tr);
           });
         }
@@ -1804,6 +1838,84 @@
 
       populateSelectListDropdown();
     }
+
+    // ---- Row actions (Items/Lists tables) ----
+    // Menus are `position: fixed` and positioned in JS (not CSS-anchored to the
+    // row) because `.table-card` uses `overflow: hidden` to clip the table's
+    // rounded corners, which would otherwise clip a dropdown opening from the
+    // last row.
+    var openRowActionsMenu = null;
+
+    function closeRowActionsMenu() {
+      if (openRowActionsMenu) {
+        openRowActionsMenu.hidden = true;
+        openRowActionsMenu = null;
+      }
+    }
+
+    function positionRowActionsMenu(menu, toggle) {
+      var rect = toggle.getBoundingClientRect();
+      var menuWidth = 150;
+      var menuHeight = menu.getBoundingClientRect().height || 44;
+      var left = Math.max(8, Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 8));
+      var top = rect.bottom + 4;
+      if (top + menuHeight > window.innerHeight - 8) top = rect.top - menuHeight - 4;
+      menu.style.left = left + 'px';
+      menu.style.top = Math.max(8, top) + 'px';
+      menu.style.width = menuWidth + 'px';
+    }
+
+    function toggleRowActionsMenu(toggle) {
+      var menu = toggle.parentElement.querySelector('[data-row-actions-menu]');
+      if (!menu) return;
+      var wasOpen = menu === openRowActionsMenu;
+      closeRowActionsMenu();
+      if (wasOpen) return;
+      menu.hidden = false;
+      positionRowActionsMenu(menu, toggle);
+      openRowActionsMenu = menu;
+    }
+
+    function bindRowActions(tbody, deleteSelector, onDelete) {
+      if (!tbody) return;
+      tbody.addEventListener('click', function(event) {
+        var toggle = event.target.closest('[data-row-actions-toggle]');
+        if (toggle) {
+          event.stopPropagation();
+          toggleRowActionsMenu(toggle);
+          return;
+        }
+        var deleteBtn = event.target.closest(deleteSelector);
+        if (deleteBtn) {
+          event.stopPropagation();
+          var tr = deleteBtn.closest('tr');
+          var index = Array.prototype.indexOf.call(tbody.children, tr);
+          closeRowActionsMenu();
+          if (index > -1) onDelete(index);
+        }
+      });
+    }
+
+    bindRowActions(itemsBody, '[data-delete-item-row]', function(index) {
+      store.items.splice(index, 1);
+      saveStore(store);
+      render();
+    });
+
+    bindRowActions(listsBody, '[data-delete-list-row]', function(index) {
+      var removed = store.lists.splice(index, 1)[0];
+      if (removed) {
+        store.items = store.items.filter(function(item) { return item.list !== removed.name; });
+      }
+      saveStore(store);
+      render();
+    });
+
+    document.addEventListener('click', function(event) {
+      if (openRowActionsMenu && !event.target.closest('.row-actions-wrap')) closeRowActionsMenu();
+    });
+    window.addEventListener('scroll', closeRowActionsMenu, true);
+    window.addEventListener('resize', closeRowActionsMenu);
 
     // ---- Add item menu ----
     var addItemToggles = document.querySelectorAll('[data-add-item-toggle]');
@@ -1850,12 +1962,22 @@
     function openSelectListModal(actionType) {
       pendingAddAction = actionType || 'sku';
       if (addItemMenu) addItemMenu.hidden = true;
+      if (!store.lists.length) {
+        // No lists exist yet — skip straight to "Create new list" instead of
+        // showing a "Select inventory list" dialog with nothing to select.
+        openCreateListModal(false, true);
+        return;
+      }
       populateSelectListDropdown();
       if (selectListModal) selectListModal.hidden = false;
-      if (tourActive && currentTourStep === 'addItem') advanceTour('createList');
+      if (tourActive && currentTourStep === 'addItem') {
+        sawCreateListStep = true;
+        advanceTour('createList');
+      }
     }
     function closeSelectListModal() {
       if (selectListModal) selectListModal.hidden = true;
+      refreshTourVisibility();
     }
 
     document.querySelectorAll('[data-close-select-list]').forEach(function(btn) {
@@ -1886,19 +2008,23 @@
     var newListNameInput = document.querySelector('[data-new-list-name]');
     var createListNext = document.querySelector('[data-create-list-next]');
     var reopenSelectListAfterCreate = false;
+    var creatingFirstListFromAddItem = false;
 
-    function openCreateListModal(reopenSelect) {
+    function openCreateListModal(reopenSelect, isFirstList) {
       reopenSelectListAfterCreate = !!reopenSelect;
+      creatingFirstListFromAddItem = !!isFirstList;
       if (reopenSelect && selectListModal) selectListModal.hidden = true;
       if (newListNameInput) newListNameInput.value = '';
       if (createListNext) createListNext.disabled = true;
       if (createListModal) createListModal.hidden = false;
       if (newListNameInput) setTimeout(function() { newListNameInput.focus(); }, 30);
-      if (tourActive && currentTourStep === 'createList') advanceTour('nameList');
+      if (tourActive && (currentTourStep === 'createList' || currentTourStep === 'addItem')) advanceTour('nameList');
     }
     function closeCreateListModal() {
+      creatingFirstListFromAddItem = false;
       if (createListModal) createListModal.hidden = true;
       if (reopenSelectListAfterCreate && selectListModal) selectListModal.hidden = false;
+      refreshTourVisibility();
     }
 
     document.querySelectorAll('[data-close-create-list]').forEach(function(btn) {
@@ -1922,6 +2048,14 @@
         saveStore(store);
       }
       render();
+      if (creatingFirstListFromAddItem) {
+        creatingFirstListFromAddItem = false;
+        activeListName = name;
+        closeCreateListModal();
+        openCatalogModal();
+        if (tourActive && currentTourStep === 'nameList') advanceTour('pickItems');
+        return;
+      }
       if (selectListDropdown) selectListDropdown.value = name;
       updateSelectListNextState();
       closeCreateListModal();
@@ -2070,6 +2204,7 @@
     }
     function closeCatalogModal() {
       if (catalogModal) catalogModal.hidden = true;
+      refreshTourVisibility();
     }
     document.querySelectorAll('[data-close-catalog]').forEach(function(btn) {
       btn.addEventListener('click', closeCatalogModal);
@@ -2133,6 +2268,7 @@
     }
     function closeNewStockCountModal() {
       if (newStockCountModal) newStockCountModal.hidden = true;
+      refreshTourVisibility();
     }
     document.querySelectorAll('[data-new-stock-count]').forEach(function(btn) {
       btn.addEventListener('click', openNewStockCountModal);
@@ -2195,6 +2331,10 @@
     var tourCopy = document.querySelector('[data-tour-copy]');
     var tourActive = false;
     var currentTourStep = 'addItem';
+    // True only when a returning user already has a list and the "createList" step
+    // (Step 3, inside the Select inventory list modal) actually gets shown — shifts
+    // every step after it by one so numbering stays sequential either way.
+    var sawCreateListStep = false;
     var tourSteps = {
       supplierStart: {
         target: '[data-nav-outlets]',
@@ -2232,20 +2372,20 @@
       },
       nameList: {
         target: '[data-new-list-name]',
-        kicker: 'Step 4',
+        kicker: function() { return 'Step ' + (sawCreateListStep ? 4 : 3); },
         title: 'Name your list',
         copy: 'Give it a name your team will recognise, like Storeroom or Walk-in Fridge.'
       },
       pickItems: {
         target: '.catalog-table-wrap',
-        kicker: 'Step 5',
+        kicker: function() { return 'Step ' + (sawCreateListStep ? 5 : 4); },
         title: 'Pick your items',
         copy: 'Check the items or recipes you want to track stock for.',
         placement: 'below'
       },
       doneStep: {
         target: '[data-catalog-done]',
-        kicker: 'Step 6',
+        kicker: function() { return 'Step ' + (sawCreateListStep ? 6 : 5); },
         title: 'Save your list',
         copy: 'Save the selected items so your team can start counting them.',
         placement: 'above'
@@ -2284,12 +2424,37 @@
       return document.querySelector(step.target);
     }
 
+    function isTourTargetVisible(target) {
+      if (!target || !target.isConnected) return false;
+      var rect = target.getBoundingClientRect();
+      return rect.width > 0 || rect.height > 0;
+    }
+
+    // Re-checks whether the current step's target is still on screen (eg. after a
+    // tab switch or a modal being dismissed without completing the step) and hides
+    // the popover instead of leaving it pointing at stale coordinates when it isn't.
+    function refreshTourVisibility() {
+      if (!tourActive || !tour) return;
+      var step = tourSteps[currentTourStep];
+      if (!step) return;
+      var target = resolveTourTarget(step);
+      if (!isTourTargetVisible(target)) {
+        tour.hidden = true;
+        return;
+      }
+      tour.hidden = false;
+      placeTour();
+    }
+
     function placeTour() {
       if (!tour || tour.hidden) return;
       var step = tourSteps[currentTourStep];
       if (!step) return;
       var target = resolveTourTarget(step);
-      if (!target) return;
+      if (!isTourTargetVisible(target)) {
+        tour.hidden = true;
+        return;
+      }
       var rect = target.getBoundingClientRect();
       var pad = 10;
       tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
@@ -2329,7 +2494,7 @@
     function renderTourStep(shouldScroll) {
       var step = tourSteps[currentTourStep];
       if (!step) return;
-      if (tourKicker) tourKicker.textContent = step.kicker;
+      if (tourKicker) tourKicker.textContent = typeof step.kicker === 'function' ? step.kicker() : step.kicker;
       if (tourTitle) tourTitle.textContent = step.title;
       if (tourCopy) tourCopy.textContent = step.copy;
       var target = resolveTourTarget(step);
@@ -2358,6 +2523,10 @@
         currentTourStep = 'stockCountButton';
       } else {
         currentTourStep = 'addItem';
+        // Step 2's target only exists in the Items tab — force it active in case
+        // the user launched this tour (eg. via the sidebar "Set up inventory" link)
+        // while sitting on the Lists tab, so the popover has something to point at.
+        activateTab('items');
       }
       if (tour) tour.hidden = false;
       document.body.classList.add('tour-active');

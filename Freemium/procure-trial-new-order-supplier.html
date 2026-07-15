@@ -148,6 +148,47 @@
   }
   .search-item-wrap input::placeholder { color: var(--ink-mute); }
 
+  /* ---------- Supplier order header ---------- */
+  .order-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 20px 32px 18px;
+    border-bottom: 1px solid var(--rule);
+    background: #fff;
+  }
+  .order-header-left { display: flex; align-items: flex-start; gap: 14px; min-width: 0; }
+  .order-header-title { font-size: 21px; font-weight: 700; color: var(--ink); margin: 0 0 4px; letter-spacing: -.01em; }
+  .order-header-sub { font-size: 14px; color: var(--ink-mute); margin: 0; }
+  .order-header-right { display: flex; align-items: center; gap: 14px; flex: 0 0 auto; }
+  .subtotal-label { font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+  .subtotal-label span { font-weight: 700; color: var(--ink); }
+
+  .btn {
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    border-radius: 6px; padding: 9px 16px; border: 1px solid transparent;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    line-height: 1; white-space: nowrap;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+  .btn-primary:hover { background: var(--seaweed); color: var(--nomni-green); border-color: var(--seaweed); }
+  .btn-primary:disabled {
+    background: #C7EFD1;
+    border-color: #C7EFD1;
+    color: rgba(14,55,39,.55);
+    cursor: not-allowed;
+  }
+  .btn-primary:disabled:hover { background: #C7EFD1; border-color: #C7EFD1; color: rgba(14,55,39,.55); }
+  .btn-tertiary {
+    background: #f3f4f6; color: var(--ink-2); border-color: transparent;
+    font-size: 14px; padding: 7px 12px;
+  }
+  .btn-tertiary:hover { background: #e6e8ec; color: var(--ink); border-color: transparent; }
+  .btn-tertiary svg { width: 14px; height: 14px; color: var(--ink-mute); flex: 0 0 14px; }
+
   /* ---------- Filter bar ---------- */
   .filter-bar {
     flex: 0 0 auto;
@@ -167,10 +208,29 @@
   .item-range { margin-left: auto; font-size: 14px; color: var(--ink-mute); }
 
   /* ---------- Order body split ---------- */
-  .order-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+  .order-body { flex: 1; overflow-y: auto; min-height: 0; }
 
   /* ---------- Product list (left) ---------- */
-  .order-main { flex: 1; overflow-y: auto; min-width: 0; }
+  .order-main { min-width: 0; }
+  .order-filters {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--rule);
+    background: #fff;
+  }
+  .entry-count { font-size: 14px; color: var(--ink-mute); margin-left: auto; }
+  .entry-count b { color: var(--ink-2); }
+  .input {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fff; border: 1px solid #dcdee3; border-radius: 6px;
+    padding: 7px 12px; font-size: 14px; color: var(--ink-2); min-height: 34px;
+  }
+  .input svg { color: var(--ink-mute); flex: 0 0 auto; }
+  .input input {
+    border: 0; outline: 0; background: transparent; font: inherit; color: var(--ink); width: 160px;
+  }
+  .input input::placeholder { color: var(--ink-mute); }
+  .table-wrap { overflow-x: auto; }
   table.products {
     width: 100%; border-collapse: separate; border-spacing: 0;
   }
@@ -180,15 +240,15 @@
     border-bottom: 2px solid var(--rule);
     background: #f9fafb; position: sticky; top: 0; z-index: 1;
   }
-  .products thead th.col-qty { text-align: right; }
-  .products tbody td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .products thead th.col-amount { text-align: right; }
+  .products tbody td { padding: 14px 16px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
   .products tbody tr:hover td { background: var(--row-hover); }
-  .col-check { width: 32px; padding-right: 4px; }
-  .col-name { min-width: 210px; }
-  .col-price { width: 90px; }
+  .col-name { min-width: 240px; }
+  .col-uom, .col-price { width: 110px; }
   .col-onhand { width: 80px; }
   .col-par { width: 70px; }
-  .col-qty { width: 150px; text-align: right; }
+  .col-qty { width: 210px; }
+  .col-amount { width: 130px; text-align: right; }
   .row-check {
     appearance: none; -webkit-appearance: none;
     width: 15px; height: 15px; border: 1.5px solid #c7c9cf; border-radius: 3px;
@@ -211,6 +271,15 @@
   .add-link:hover { text-decoration: underline; }
   .fill-link { color: #1A8040; font-weight: 600; text-decoration: none; cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
   .fill-link:hover { text-decoration: underline; }
+  .amount-cell { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+  .amount-val { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .amount-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--nomni-green);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: 0 0 20px;
+  }
+  .amount-check svg { width: 11px; height: 11px; color: #fff; }
   .qty-stepper { display: inline-flex; align-items: center; border: 1px solid #d0d2d8; border-radius: 5px; overflow: hidden; }
   .qty-stepper button {
     width: 26px; height: 26px; background: #f3f4f6; border: none; cursor: pointer;
@@ -234,6 +303,7 @@
     display: flex; flex-direction: column;
     overflow: hidden; background: #fff;
   }
+  .order-cart { display: none; }
   .cart-head {
     display: flex; align-items: center; justify-content: space-between;
     padding: 13px 16px 11px; border-bottom: 1px solid var(--rule); flex: 0 0 auto;
@@ -314,6 +384,121 @@
     background: var(--nomni-green); color: var(--seaweed); cursor: pointer;
   }
   .btn-place.enabled:hover { background: var(--seaweed); color: var(--nomni-green); }
+
+  /* ---------- Review modal ---------- */
+  .review-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 860;
+  }
+  .review-modal.hidden { display: none; }
+  .modal-dialog {
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    width: 760px; max-width: calc(100vw - 32px);
+    display: flex; flex-direction: column;
+    max-height: calc(100vh - 48px); overflow: hidden;
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px 16px; border-bottom: 1px solid var(--rule);
+    flex: 0 0 auto;
+  }
+  .modal-title { font-size: 21px; font-weight: 700; color: var(--ink); margin: 0; }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: transparent; border: none; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink-mute); transition: background .12s, color .12s; flex: 0 0 32px;
+  }
+  .modal-close:hover { background: #f3f4f6; color: var(--ink); }
+  .modal-close svg { width: 16px; height: 16px; }
+  .modal-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+  .modal-left {
+    flex: 1; padding: 20px 24px; overflow-y: auto;
+    border-right: 1px solid var(--rule);
+  }
+  .modal-right { width: 230px; flex: 0 0 230px; padding: 20px; overflow-y: auto; }
+  .modal-items-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .modal-items-count { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .modal-fill-par { color: #1A8040; font-weight: 600; text-decoration: none; font-size: 14px; }
+  .modal-fill-par:hover { text-decoration: underline; }
+  .modal-item-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 6px;
+  }
+  .modal-item-name { flex: 1; font-size: 14px; color: var(--ink); }
+  .modal-item-amount { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; min-width: 64px; text-align: right; }
+  .modal-item-meta {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+  }
+  .modal-item-price-unit { font-size: 12px; color: var(--ink-mute); }
+  .modal-item-add-notes,
+  .modal-item-delete,
+  .modal-add-more,
+  .modal-save-draft,
+  .modal-delete-link,
+  .modal-promo-link,
+  .modal-summary-date-link {
+    color: #1A8040;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .modal-item-add-notes { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-2); font-size: 12px; }
+  .modal-item-delete, .modal-delete-link { color: #D0291E; font-size: 12px; }
+  .modal-add-more { display: inline-block; margin-bottom: 18px; }
+  .modal-section-rule,
+  .modal-summary-divider { border: none; border-top: 1px solid var(--rule); margin: 14px 0; }
+  .modal-section-title { font-size: 14px; font-weight: 700; margin: 0 0 14px; }
+  .modal-field { margin-bottom: 14px; }
+  .modal-field label { display: block; margin-bottom: 6px; color: var(--ink-2); font-size: 12px; font-weight: 600; }
+  .modal-select,
+  .modal-textarea {
+    width: 100%;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    outline: 0;
+  }
+  .modal-select { height: 36px; padding: 0 10px; }
+  .modal-textarea { min-height: 74px; padding: 10px; resize: vertical; }
+  .modal-char-counter { margin-top: 4px; color: var(--ink-mute); font-size: 11px; text-align: right; }
+  .modal-summary-title { font-size: 14px; font-weight: 600; color: var(--ink); margin: 0 0 14px; }
+  .modal-summary-outlet,
+  .modal-summary-date {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 13px; color: var(--ink-2); margin-bottom: 10px; line-height: 1.35;
+  }
+  .modal-summary-outlet .material-symbols-outlined,
+  .modal-summary-date .material-symbols-outlined { font-size: 18px; color: var(--ink-mute); }
+  .modal-summary-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; color: var(--ink-mute); margin-bottom: 10px; gap: 12px;
+  }
+  .modal-summary-row .val { font-variant-numeric: tabular-nums; color: var(--ink); }
+  .modal-promo-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; margin: 2px 0 12px;
+  }
+  .modal-promo-link .material-symbols-outlined { font-size: 16px; }
+  .modal-summary-total-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 14px; font-weight: 700; color: var(--ink); gap: 12px;
+  }
+  .modal-summary-total-row .val { font-variant-numeric: tabular-nums; }
+  .modal-summary-disclaimer { font-size: 11px; color: var(--ink-mute); line-height: 1.4; margin-top: 8px; }
+  .modal-footer {
+    flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-top: 1px solid var(--rule); background: #fff;
+  }
+  .modal-footer-left,
+  .modal-footer-right { display: flex; align-items: center; gap: 16px; }
+  .modal-footer-total { font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+  .modal-footer-total strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 
   /* User menu dropdown */
   .user-wrap { position: relative; }
@@ -410,7 +595,7 @@
     width: 18px;
     height: 18px;
     left: -9px;
-    top: 26px;
+    top: var(--tour-arrow-offset, 26px);
     border-left: 1px solid rgba(42,200,100,.24);
     border-bottom: 1px solid rgba(42,200,100,.24);
     border-radius: 4px;
@@ -424,7 +609,7 @@
     border-right: 1px solid rgba(42,200,100,.24);
   }
   .tour-card.below::before {
-    left: 28px;
+    left: var(--tour-arrow-offset, 28px);
     top: -9px;
     border-bottom: 0;
     border-top: 1px solid rgba(42,200,100,.24);
@@ -645,280 +830,143 @@
   <!-- ===== CONTENT ===== -->
   <div class="content">
 
-    <!-- Order top bar -->
-    <div class="order-top">
-      <div class="order-top-left">
+    <div class="order-header">
+      <div class="order-header-left">
         <a href="procure-trial-orders.html" class="back-btn" aria-label="Back to orders">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
         </a>
         <div>
-          <h1 class="create-title" data-supplier-title>Create order</h1>
-          <button class="outlet-selector-btn"><span data-venue-name>Trial Outlet</span> <span class="chev"></span></button>
+          <h1 class="order-header-title" data-supplier-title>Test Supplier</h1>
+          <p class="order-header-sub"><span data-supplier-company>Supplier name</span> &bull; Min. order: S$10.00 &bull; Next delivery: 23 Apr (Thu)</p>
         </div>
       </div>
-      <div class="order-top-right">
-        <div class="search-item-wrap">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" placeholder="Search item" />
-        </div>
+      <div class="order-header-right">
+        <div class="subtotal-label">Subtotal: <span data-subtotal-display>S$0.00</span></div>
+        <button class="btn btn-primary" data-review-btn type="button" disabled>Review (0 items)</button>
       </div>
     </div>
 
-    <!-- Body split -->
     <div class="order-body">
-
-      <!-- Left: product list -->
       <div class="order-main">
-
-        <!-- Filter bar -->
-        <div class="filter-bar">
-          <button class="filter-pill">
+        <div class="order-filters">
+          <button class="btn btn-tertiary" type="button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
-            Filters
+            Show filters
           </button>
-          <button class="filter-pill">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            Bought recently
-          </button>
-          <button class="filter-pill">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            Favourites
-          </button>
-          <button class="filter-pill">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            Below par
-          </button>
-          <span class="item-range">1–178 of 178</span>
-        </div>
-
-        <!-- Product table -->
-        <table class="products">
-          <thead>
-            <tr>
-              <th class="col-check"></th>
-              <th class="col-name">Name</th>
-              <th class="col-price">Unit price</th>
-              <th class="col-onhand">On hand</th>
-              <th class="col-par">Par</th>
-              <th class="col-qty">Quantity</th>
-            </tr>
-          </thead>
-          <tbody data-products-body>
-
-            <!-- Row 1: Blueberry (Add to order) -->
-            <tr>
-              <td class="col-check"><input type="checkbox" class="row-check" /></td>
-              <td>
-                <div class="prod-code">Buyer product code Mohan</div>
-                <div class="prod-name">
-                  Blueberry Custom Name Mohan
-                  <span class="info-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg></span>
-                </div>
-                <div class="prod-supplier">Good Tiding Pte Ltd (T)</div>
-              </td>
-              <td><div class="price-val">S$4.00</div><div class="price-unit">per pun</div></td>
-              <td><span>3</span> <span class="price-unit">+10</span></td>
-              <td class="muted-val">–</td>
-              <td class="col-qty" id="qty-blueberry">
-                <button class="add-link" data-add-first-item data-row="blueberry" data-price="4" data-qty="1">Add to order</button>
-              </td>
-            </tr>
-
-            <!-- Row 2: Cake Boxes (already has stepper) -->
-            <tr>
-              <td class="col-check"><input type="checkbox" class="row-check" checked /></td>
-              <td>
-                <div class="prod-name">
-                  Cake Boxes – Pack of 200
-                  <span class="info-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg></span>
-                </div>
-                <div class="prod-supplier">Paranakan Trading Pte Ltd (T)</div>
-              </td>
-              <td><div class="price-val">S$50.00</div><div class="price-unit">per ctn</div></td>
-              <td>1</td>
-              <td>2.00</td>
-              <td class="col-qty" id="qty-cake-boxes">
-                <div class="qty-stepper">
-                  <button type="button" data-row="cake-boxes" data-action="dec">−</button>
-                  <input type="number" value="1" min="1" data-row="cake-boxes" data-price="50" />
-                  <button type="button" data-row="cake-boxes" data-action="inc">+</button>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Row 3: Fanta (Add to order) -->
-            <tr>
-              <td class="col-check"><input type="checkbox" class="row-check" /></td>
-              <td>
-                <div class="prod-code">103644</div>
-                <div class="prod-name">
-                  A1 – 10L CDBBN 1x1 Fanta GrpRCMS
-                  <span class="info-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg></span>
-                </div>
-                <div class="prod-supplier">Coca-Cola (T)</div>
-              </td>
-              <td><div class="price-val">S$3.00</div><div class="price-unit">per ea</div></td>
-              <td>664</td>
-              <td class="muted-val">–</td>
-              <td class="col-qty" id="qty-fanta">
-                <button class="add-link" data-row="fanta" data-price="3" data-qty="1">Add to order</button>
-              </td>
-            </tr>
-
-            <!-- Row 4: AAA_901 (Fill to par 123) -->
-            <tr>
-              <td class="col-check"><input type="checkbox" class="row-check" /></td>
-              <td>
-                <div class="prod-code">M_CODE_001 &middot; Goa-BIGzest</div>
-                <div class="prod-name">
-                  AAA_Mohan_001_901
-                  <span class="info-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg></span>
-                </div>
-                <div class="prod-supplier">Test Supplier2</div>
-              </td>
-              <td><div class="price-val">S$200.50</div><div class="price-unit">per bag</div></td>
-              <td>7</td>
-              <td>130.00</td>
-              <td class="col-qty" id="qty-901">
-                <button class="fill-link" data-row="901" data-price="200.50" data-qty="123">Fill to par (123)</button>
-              </td>
-            </tr>
-
-            <!-- Row 5: AAA_902 (Fill to par 13) -->
-            <tr>
-              <td class="col-check"><input type="checkbox" class="row-check" /></td>
-              <td>
-                <div class="prod-code">M_CODE_002 &middot; Goa-BIG</div>
-                <div class="prod-name">
-                  AAA_Mohan_001_902
-                  <span class="info-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg></span>
-                </div>
-                <div class="prod-supplier">Test Supplier2</div>
-              </td>
-              <td><div class="price-val">S$200.00</div><div class="price-unit">per box</div></td>
-              <td>52</td>
-              <td>65.00</td>
-              <td class="col-qty" id="qty-902">
-                <button class="fill-link" data-row="902" data-price="200" data-qty="13">Fill to par (13)</button>
-              </td>
-            </tr>
-
-            <!-- Row 6: AAA_903 (Fill to par 63) -->
-            <tr>
-              <td class="col-check"><input type="checkbox" class="row-check" /></td>
-              <td>
-                <div class="prod-code">M_CODE_003 &middot; Goa-BIG</div>
-                <div class="prod-name">
-                  AAA_Mohan_001_903
-                  <span class="info-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg></span>
-                </div>
-                <div class="prod-supplier">Test Supplier2</div>
-              </td>
-              <td><div class="price-val">S$210.00</div><div class="price-unit">per kg</div></td>
-              <td>2</td>
-              <td>65.00</td>
-              <td class="col-qty" id="qty-903">
-                <button class="fill-link" data-row="903" data-price="210" data-qty="63">Fill to par (63)</button>
-              </td>
-            </tr>
-
-            <!-- Row 7: AAA_904 (Fill to par 126) -->
-            <tr>
-              <td class="col-check"><input type="checkbox" class="row-check" /></td>
-              <td>
-                <div class="prod-code">M_CODE_004 &middot; Goa-BIG</div>
-                <div class="prod-name">
-                  AAA_Mohan_001_904
-                  <span class="info-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg></span>
-                </div>
-                <div class="prod-supplier">Test Supplier2</div>
-              </td>
-              <td><div class="price-val">S$200.00</div><div class="price-unit">per bag</div></td>
-              <td>4</td>
-              <td>130.00</td>
-              <td class="col-qty" id="qty-904">
-                <button class="fill-link" data-row="904" data-price="200" data-qty="126">Fill to par (126)</button>
-              </td>
-            </tr>
-
-          </tbody>
-        </table>
-      </div><!-- /order-main -->
-
-      <!-- Right: cart panel -->
-      <div class="order-cart">
-        <div class="cart-head">
-          <div class="cart-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          <div class="input">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
             </svg>
-            <span id="cartCount">0</span> items
+            <input type="text" placeholder="Search SKU" />
           </div>
-          <button class="select-all-btn" id="selectAllBtn">Select all</button>
+          <span class="entry-count" data-entry-count>Showing <b>1 to 1</b> of 1 entry</span>
         </div>
 
-        <div class="cart-body" data-cart-body>
-
-          <!-- Group 1: GMP Packaging -->
-          <div class="cart-group" data-cart-group>
-            <div class="cart-group-head">
-              <input type="checkbox" class="cart-group-check" data-amount="194.02" id="check-gmp" />
-              <div class="cart-group-info">
-                <div class="cart-group-name">GMP Packaging(T1)</div>
-                <div class="cart-group-meta">
-                  Thu, 23 Apr 2026
-                  <span class="badge-add-on">Add on Order</span>
-                </div>
-              </div>
-              <div class="cart-group-amount">S$194.02</div>
-            </div>
-            <div class="cart-items">
-              <div class="cart-item">
-                <div class="cart-item-name">BOPP Env Bag 80mmX110mm with Tape (Approx 90pcs/pkt)</div>
-                <div class="cart-item-qty">1 bdl</div>
-              </div>
-              <div class="cart-item">
-                <div class="cart-item-name">Banana custom</div>
-                <div class="cart-item-qty">4 bag</div>
-              </div>
-            </div>
-            <a href="#" class="cart-view-edit">View/edit</a>
-          </div>
-
-          <!-- Group 2: Paranakan Trading -->
-          <div class="cart-group">
-            <div class="cart-group-head">
-              <input type="checkbox" class="cart-group-check" data-cart-check data-amount="54.50" id="check-paranakan" />
-              <div class="cart-group-info">
-                <div class="cart-group-name">Paranakan Trading Pte Ltd (T)</div>
-                <div class="cart-group-meta">Thu, 23 Apr 2026</div>
-              </div>
-              <div class="cart-group-amount">S$54.50</div>
-            </div>
-            <div class="cart-items">
-              <div class="cart-item">
-                <div class="cart-item-name">Cake Boxes – Pack of 200</div>
-                <div class="cart-item-qty" id="paranakan-cake-qty">1 ctn</div>
-              </div>
-            </div>
-            <a href="#" class="cart-view-edit">View/edit</a>
-          </div>
-
-        </div><!-- /cart-body -->
-
-        <div class="cart-foot">
-          <button class="btn-save">Save</button>
-          <button class="btn-place" id="placeOrderBtn">Place order</button>
+        <div class="table-wrap">
+          <table class="products">
+            <thead>
+              <tr>
+                <th class="col-name">Name</th>
+                <th class="col-uom">UOM</th>
+                <th class="col-price">Unit price</th>
+                <th class="col-onhand">On hand</th>
+                <th class="col-par">Par</th>
+                <th class="col-qty">Quantity &nbsp;&middot;&nbsp; <a href="#" class="fill-par-link">Fill all to par</a></th>
+                <th class="col-amount">Amount (S$)</th>
+              </tr>
+            </thead>
+            <tbody data-products-body></tbody>
+          </table>
         </div>
-      </div><!-- /order-cart -->
-
-    </div><!-- /order-body -->
+      </div>
+    </div>
   </div><!-- /content -->
 
 </div><!-- /app -->
+
+<div class="review-modal hidden" data-review-modal role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h2 class="modal-title" id="reviewModalTitle">Review order: <span data-review-supplier>Test Supplier</span></h2>
+      <button class="modal-close" data-review-close type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-left">
+        <div class="modal-items-header">
+          <span class="modal-items-count" data-modal-item-count>0 items</span>
+          <a href="#" class="modal-fill-par">Fill all to par</a>
+        </div>
+        <div data-modal-items></div>
+        <a href="#" class="modal-add-more">+ Add more</a>
+        <hr class="modal-section-rule" />
+        <p class="modal-section-title">Notes/requests</p>
+        <div class="modal-field">
+          <label for="deliveryInstruction">Delivery instruction</label>
+          <select class="modal-select" id="deliveryInstruction">
+            <option value="">Select</option>
+            <option>Leave at door</option>
+            <option>Call on arrival</option>
+            <option>Ring doorbell</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label for="specialRequests">Special requests</label>
+          <textarea class="modal-textarea" id="specialRequests" maxlength="150"></textarea>
+          <div class="modal-char-counter" data-char-counter>150 characters remaining</div>
+        </div>
+      </div>
+      <div class="modal-right">
+        <p class="modal-summary-title">Order summary</p>
+        <div class="modal-summary-outlet">
+          <span class="material-symbols-outlined">location_on</span>
+          <span data-modal-venue>Trial Outlet</span>
+        </div>
+        <div class="modal-summary-date">
+          <span class="material-symbols-outlined">calendar_today</span>
+          <a href="#" class="modal-summary-date-link">Tue, 28 Apr 2026 <span class="chev" aria-hidden="true"></span></a>
+        </div>
+        <hr class="modal-summary-divider" />
+        <div class="modal-summary-row">
+          <span>Est. subtotal</span>
+          <span class="val" data-summary-subtotal>S$0.00</span>
+        </div>
+        <a href="#" class="modal-promo-link">
+          <span class="material-symbols-outlined">local_offer</span>
+          Use promo code
+        </a>
+        <div class="modal-summary-row">
+          <span>GST</span>
+          <span class="val" data-summary-gst>S$0.00</span>
+        </div>
+        <hr class="modal-summary-divider" />
+        <div class="modal-summary-total-row">
+          <span>Est. total</span>
+          <span class="val" data-summary-total>S$0.00</span>
+        </div>
+        <p class="modal-summary-disclaimer">Prices &amp; calculations are estimates and not final.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <a href="#" class="modal-delete-link">Delete</a>
+        <a href="#" class="modal-save-draft">Save draft</a>
+      </div>
+      <div class="modal-footer-right">
+        <span class="modal-footer-total" data-footer-total>Total (0 items) &middot; <strong>S$0.00</strong></span>
+        <button class="btn btn-primary" data-place-order-btn type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Place order
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="tour-overlay" data-tour hidden>
   <div class="tour-highlight" data-tour-highlight></div>
@@ -941,10 +989,26 @@
     var params = new URLSearchParams(window.location.search);
     var userName = params.get('userName') || '';
     var venueName = params.get('venueName') || 'Trial Outlet';
+    var supplierName = params.get('createdSupplier') || params.get('supplierName') || 'Test Supplier';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
-    var venueNode = document.querySelector('[data-venue-name]');
     var supplierTitleNode = document.querySelector('[data-supplier-title]');
+    var supplierCompanyNode = document.querySelector('[data-supplier-company]');
+    var reviewSupplierNode = document.querySelector('[data-review-supplier]');
+    var modalVenueNode = document.querySelector('[data-modal-venue]');
+    var subtotalDisplay = document.querySelector('[data-subtotal-display]');
+    var reviewBtn = document.querySelector('[data-review-btn]');
+    var reviewModal = document.querySelector('[data-review-modal]');
+    var reviewClose = document.querySelector('[data-review-close]');
+    var modalItems = document.querySelector('[data-modal-items]');
+    var modalItemCount = document.querySelector('[data-modal-item-count]');
+    var summarySubtotal = document.querySelector('[data-summary-subtotal]');
+    var summaryGst = document.querySelector('[data-summary-gst]');
+    var summaryTotal = document.querySelector('[data-summary-total]');
+    var footerTotal = document.querySelector('[data-footer-total]');
+    var placeOrderBtn = document.querySelector('[data-place-order-btn]');
+    var charCounter = document.querySelector('[data-char-counter]');
+    var specialRequests = document.getElementById('specialRequests');
     var tour = document.querySelector('[data-tour]');
     var tourHighlight = document.querySelector('[data-tour-highlight]');
     var tourCard = document.querySelector('[data-tour-card]');
@@ -955,33 +1019,30 @@
     var tourPrev = document.querySelector('[data-tour-prev]');
     var tourNext = document.querySelector('[data-tour-next]');
     var productsBody = document.querySelector('[data-products-body]');
-    var itemRange = document.querySelector('.item-range');
+    var entryCount = document.querySelector('[data-entry-count]');
     var currentTourStep = 'addItem';
-    var tourOrder = ['addItem', 'cart', 'place'];
+    var selectedItems = [];
     var tourSteps = {
       addItem: {
         target: '[data-add-first-item]',
         kicker: 'Step 3',
         title: 'Add an item from this supplier',
         copy: 'Choose what you need from this supplier’s market list and add the quantity for this order.',
-        placement: 'left',
-        actionOnly: true
+        placement: 'left'
       },
-      cart: {
-        target: '[data-cart-group]',
+      review: {
+        target: '[data-review-btn]',
         kicker: 'Step 4',
         title: 'Review the order',
-        copy: 'Check the delivery date, quantity, and total before sending this order.',
-        placement: 'left',
-        actionOnly: true
+        copy: 'Check the items, delivery details, and estimated total before sending this order.',
+        placement: 'left'
       },
       place: {
-        target: '#placeOrderBtn',
+        target: '[data-place-order-btn]',
         kicker: 'Step 5',
         title: 'Send it to the supplier',
         copy: 'Once the order looks right, place it and Nomni will send it to the supplier.',
-        placement: 'left',
-        actionOnly: true
+        placement: 'left'
       }
     };
 
@@ -1011,13 +1072,16 @@
       return isNaN(number) ? '2.00' : number.toFixed(2);
     }
 
+    function dollars(value) {
+      return 'S$' + (parseFloat(value) || 0).toFixed(2);
+    }
+
     function marketItems() {
       var items = [];
-      var supplier = params.get('createdSupplier') || params.get('supplierName') || 'Test Supplier';
       if (params.get('createdSku')) {
         items.push({
           name: params.get('createdSku'),
-          supplier: supplier,
+          supplier: supplierName,
           uom: params.get('createdUom') || 'box',
           price: money(params.get('createdPrice') || '2.00')
         });
@@ -1029,32 +1093,31 @@
           ['Spring onions', 'g', '1.50'],
           ['Rice', 'kg', '1.20']
         ].forEach(function(item) {
-          items.push({ name: item[0], supplier: supplier, uom: item[1], price: item[2] });
+          items.push({ name: item[0], supplier: supplierName, uom: item[1], price: item[2] });
         });
       }
       if (!items.length) {
-        items.push({ name: 'APPLE TESTING', supplier: params.get('supplierName') || 'Test Supplier2', uom: 'box', price: '1.00' });
+        items.push({ name: 'APPLE TESTING', supplier: supplierName, uom: 'box', price: '1.00' });
       }
       return items;
     }
 
     function itemRow(item, index) {
       var row = document.createElement('tr');
-      row.innerHTML = '<td class="col-check"><input type="checkbox" class="row-check" /></td>' +
-        '<td><div class="prod-name"></div><div class="prod-supplier"></div></td>' +
-        '<td><div class="price-val"></div><div class="price-unit"></div></td>' +
-        '<td class="muted-val">-</td><td class="muted-val">-</td>' +
-        '<td class="col-qty"><button class="add-link" type="button" data-price="" data-qty="1" data-name="" data-supplier="" data-uom="">Add to order</button></td>';
-      row.querySelector('.prod-name').textContent = item.name;
-      row.querySelector('.prod-supplier').textContent = item.supplier;
-      row.querySelector('.price-val').textContent = 'S$' + item.price;
-      row.querySelector('.price-unit').textContent = 'per ' + item.uom;
-      var button = row.querySelector('.add-link');
+      row.dataset.itemIndex = String(index);
+      row.innerHTML =
+        '<td><div class="prod-name"><span></span><span class="info-icon" title="Item info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg></span></div></td>' +
+        '<td></td>' +
+        '<td></td>' +
+        '<td class="muted-val">-</td>' +
+        '<td class="muted-val">-</td>' +
+        '<td class="col-qty"><button class="add-link" type="button" data-add-item>Add to order</button></td>' +
+        '<td class="col-amount" data-amount-cell></td>';
+      row.querySelector('.prod-name span').textContent = item.name;
+      row.children[1].textContent = item.uom;
+      row.children[2].textContent = 'S$' + item.price;
+      var button = row.querySelector('[data-add-item]');
       if (index === 0) button.setAttribute('data-add-first-item', '');
-      button.dataset.price = item.price;
-      button.dataset.name = item.name;
-      button.dataset.supplier = item.supplier;
-      button.dataset.uom = item.uom;
       return row;
     }
 
@@ -1065,9 +1128,110 @@
       items.forEach(function(item, index) {
         productsBody.appendChild(itemRow(item, index));
       });
-      if (itemRange) {
-        itemRange.textContent = '1-' + items.length + ' of ' + items.length;
+      if (entryCount) {
+        entryCount.innerHTML = 'Showing <b>1 to ' + items.length + '</b> of ' + items.length + (items.length === 1 ? ' entry' : ' entries');
       }
+    }
+
+    function selectedCount() {
+      return selectedItems.filter(Boolean).length;
+    }
+
+    function subtotal() {
+      return selectedItems.reduce(function(sum, item) {
+        return item ? sum + item.qty * parseFloat(item.price) : sum;
+      }, 0);
+    }
+
+    function renderStepper(row, qty) {
+      var cell = row.querySelector('.col-qty');
+      cell.innerHTML = '<div class="qty-stepper"><button type="button" data-qty-dec>-</button><input type="number" value="' + qty + '" min="1" data-qty-input /><button type="button" data-qty-inc>+</button></div>';
+      var input = cell.querySelector('[data-qty-input]');
+      cell.querySelector('[data-qty-dec]').addEventListener('click', function() {
+        input.value = Math.max(1, (parseInt(input.value, 10) || 1) - 1);
+        syncQuantity(row, parseInt(input.value, 10) || 1);
+      });
+      cell.querySelector('[data-qty-inc]').addEventListener('click', function() {
+        input.value = (parseInt(input.value, 10) || 1) + 1;
+        syncQuantity(row, parseInt(input.value, 10) || 1);
+      });
+      input.addEventListener('change', function() {
+        input.value = Math.max(1, parseInt(input.value, 10) || 1);
+        syncQuantity(row, parseInt(input.value, 10) || 1);
+      });
+    }
+
+    function syncQuantity(row, qty) {
+      var index = parseInt(row.dataset.itemIndex, 10);
+      if (!selectedItems[index]) return;
+      selectedItems[index].qty = qty;
+      renderAmount(row, selectedItems[index]);
+      updateSummary();
+    }
+
+    function renderAmount(row, item) {
+      var amountCell = row.querySelector('[data-amount-cell]');
+      amountCell.innerHTML = '<div class="amount-cell"><span class="amount-val"></span><span class="amount-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>';
+      amountCell.querySelector('.amount-val').textContent = dollars(item.qty * parseFloat(item.price));
+    }
+
+    function addRowToOrder(row) {
+      var index = parseInt(row.dataset.itemIndex, 10);
+      var item = marketItems()[index];
+      selectedItems[index] = {
+        name: item.name,
+        supplier: item.supplier,
+        uom: item.uom,
+        price: parseFloat(item.price),
+        qty: 1
+      };
+      renderStepper(row, 1);
+      renderAmount(row, selectedItems[index]);
+      updateSummary();
+      if (tour && !tour.hidden) setTimeout(function() { setTourStep('review', true); }, 100);
+    }
+
+    function updateSummary() {
+      var count = selectedCount();
+      var sub = subtotal();
+      if (subtotalDisplay) subtotalDisplay.textContent = dollars(sub);
+      if (reviewBtn) {
+        reviewBtn.textContent = 'Review (' + count + (count === 1 ? ' item)' : ' items)');
+        reviewBtn.disabled = count === 0;
+      }
+      if (modalItemCount) modalItemCount.textContent = count + (count === 1 ? ' item' : ' items');
+      if (summarySubtotal) summarySubtotal.textContent = dollars(sub);
+      if (summaryGst) summaryGst.textContent = dollars(sub * 0.09);
+      if (summaryTotal) summaryTotal.textContent = dollars(sub * 1.09);
+      if (footerTotal) footerTotal.innerHTML = 'Total (' + count + (count === 1 ? ' item' : ' items') + ') &middot; <strong>' + dollars(sub * 1.09) + '</strong>';
+    }
+
+    function renderModalItems() {
+      if (!modalItems) return;
+      modalItems.innerHTML = '';
+      selectedItems.filter(Boolean).forEach(function(item) {
+        var row = document.createElement('div');
+        row.innerHTML =
+          '<div class="modal-item-row"><span class="modal-item-name"></span><div class="qty-stepper"><button type="button">-</button><input type="number" value="" min="1" /><button type="button">+</button></div><span class="modal-item-amount"></span></div>' +
+          '<div class="modal-item-meta"><span class="modal-item-price-unit"></span><a href="#" class="modal-item-add-notes">Add notes</a><a href="#" class="modal-item-delete">Delete</a></div>';
+        row.querySelector('.modal-item-name').textContent = item.name;
+        row.querySelector('input').value = item.qty;
+        row.querySelector('.modal-item-amount').textContent = dollars(item.qty * item.price);
+        row.querySelector('.modal-item-price-unit').textContent = dollars(item.price) + '/' + item.uom;
+        modalItems.appendChild(row);
+      });
+      updateSummary();
+    }
+
+    function openReviewModal() {
+      if (!reviewModal || !selectedCount()) return;
+      renderModalItems();
+      reviewModal.classList.remove('hidden');
+      if (tour && !tour.hidden) setTimeout(function() { setTourStep('place', true); }, 80);
+    }
+
+    function closeReviewModal() {
+      if (reviewModal) reviewModal.classList.add('hidden');
     }
 
     function placeTour() {
@@ -1098,6 +1262,14 @@
       }
       tourCard.style.left = cardLeft + 'px';
       tourCard.style.top = cardTop + 'px';
+      var arrowOffset;
+      if (step.placement === 'below') {
+        var targetCenterX = rect.left + rect.width / 2;
+        arrowOffset = Math.max(20, Math.min(targetCenterX - cardLeft - 9, cardWidth - 20));
+      } else {
+        arrowOffset = Math.max(20, Math.min(targetCenterY - cardTop - 9, cardHeight - 20));
+      }
+      tourCard.style.setProperty('--tour-arrow-offset', arrowOffset + 'px');
     }
 
     function setTourStep(stepName, shouldScroll) {
@@ -1108,9 +1280,8 @@
       if (tourCopy) tourCopy.textContent = step.copy;
       var target = document.querySelector(step.target);
       if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      var index = tourOrder.indexOf(currentTourStep);
       if (tourPrev) tourPrev.hidden = true;
-      if (tourNext) tourNext.hidden = !!step.actionOnly;
+      if (tourNext) tourNext.hidden = true;
       setTimeout(placeTour, shouldScroll ? 240 : 40);
     }
 
@@ -1128,24 +1299,40 @@
       userNameNode.textContent = userName;
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
-    if (venueNode) venueNode.textContent = venueName;
-    if (supplierTitleNode) supplierTitleNode.textContent = params.get('createdSupplier') || params.get('supplierName') || 'Test Supplier';
+    if (supplierTitleNode) supplierTitleNode.textContent = supplierName;
+    if (supplierCompanyNode) supplierCompanyNode.textContent = supplierName;
+    if (reviewSupplierNode) reviewSupplierNode.textContent = supplierName;
+    if (modalVenueNode) modalVenueNode.textContent = venueName;
     renderMarketItems();
     document.querySelectorAll('.back-btn').forEach(function(link) {
       link.href = withParams('procure-trial-orders.html');
     });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
-    if (tourPrev) tourPrev.addEventListener('click', function() {});
-    if (tourNext) tourNext.addEventListener('click', function() {});
-    window.__nomniOrderItemAdded = function() {
-      if (tour && !tour.hidden) setTimeout(function() { setTourStep('cart', true); }, 80);
-    };
-    window.__nomniOrderTourStep = function(isChecked) {
-      if (tour && !tour.hidden && isChecked) setTourStep('place', true);
-    };
-    document.getElementById('placeOrderBtn').addEventListener('click', function() {
-      if (!this.classList.contains('enabled')) return;
+    if (productsBody) {
+      productsBody.addEventListener('click', function(event) {
+        var button = event.target.closest('[data-add-item]');
+        if (!button) return;
+        addRowToOrder(button.closest('tr'));
+      });
+    }
+    if (reviewBtn) reviewBtn.addEventListener('click', openReviewModal);
+    if (reviewClose) reviewClose.addEventListener('click', closeReviewModal);
+    if (reviewModal) {
+      reviewModal.addEventListener('click', function(event) {
+        if (event.target === reviewModal) closeReviewModal();
+      });
+    }
+    if (specialRequests && charCounter) {
+      specialRequests.addEventListener('input', function() {
+        charCounter.textContent = (150 - specialRequests.value.length) + ' characters remaining';
+      });
+    }
+    if (placeOrderBtn) placeOrderBtn.addEventListener('click', function() {
+      if (!selectedCount()) return;
       window.location.href = withParams('procure-trial-orders.html', { orderPlaced: '1', orderBySupplierDone: '1', orderHandoff: '1' });
+    });
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') closeReviewModal();
     });
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
@@ -1171,171 +1358,7 @@
   })();
 */
 
-  /* Add to order / Fill to par -> cart */
-  (function(){
-    var cartBody = document.querySelector('[data-cart-body]');
-    var cartCount = document.getElementById('cartCount');
-    var selectAllBtn = document.getElementById('selectAllBtn');
-    var placeBtn = document.getElementById('placeOrderBtn');
-    var cartItems = [];
-
-    function makeStepperHTML(qty) {
-      return '<div class="qty-stepper">'
-        + '<button type="button" data-action="dec">−</button>'
-        + '<input type="number" value="' + qty + '" min="1" />'
-        + '<button type="button" data-action="inc">+</button>'
-        + '</div>';
-    }
-
-    function attachStepperEvents(cell) {
-      var input = cell.querySelector('input');
-      function syncCartQuantity() {
-        if (!cell.dataset.cartName) return;
-        addCartItem({
-          dataset: {
-            name: cell.dataset.cartName,
-            supplier: cell.dataset.cartSupplier,
-            uom: cell.dataset.cartUom,
-            price: cell.dataset.cartPrice
-          }
-        }, parseInt(input.value, 10) || 1);
-      }
-      cell.querySelector('[data-action="dec"]').addEventListener('click', function(){
-        var v = parseInt(input.value, 10);
-        if (v > 1) { input.value = v - 1; }
-        syncCartQuantity();
-      });
-      cell.querySelector('[data-action="inc"]').addEventListener('click', function(){
-        input.value = parseInt(input.value, 10) + 1;
-        syncCartQuantity();
-      });
-      input.addEventListener('change', function(){
-        var v = parseInt(this.value, 10);
-        if (isNaN(v) || v < 1) this.value = 1;
-        syncCartQuantity();
-      });
-    }
-
-    function updatePlaceOrder() {
-      var checks = document.querySelectorAll('.cart-group-check');
-      var total = 0;
-      var anyChecked = false;
-      checks.forEach(function(c) {
-        if (c.checked) {
-          total += parseFloat(c.dataset.amount);
-          anyChecked = true;
-        }
-      });
-      if (anyChecked) {
-        placeBtn.classList.add('enabled');
-        placeBtn.textContent = 'Place order (S$' + total.toFixed(2) + ')';
-      } else {
-        placeBtn.classList.remove('enabled');
-        placeBtn.textContent = 'Place order';
-      }
-      var allNowChecked = checks.length > 0 && Array.from(checks).every(function(c){ return c.checked; });
-      if (selectAllBtn) {
-        selectAllBtn.hidden = checks.length === 0;
-        selectAllBtn.textContent = allNowChecked ? 'Deselect all' : 'Select all';
-      }
-    }
-
-    function renderCart() {
-      if (!cartBody) return;
-      if (cartCount) cartCount.textContent = cartItems.length;
-      if (!cartItems.length) {
-        cartBody.innerHTML = '<div class="cart-empty"><div><strong>Your cart is empty</strong>Add an item from your market list to start your order.</div></div>';
-        updatePlaceOrder();
-        return;
-      }
-      var bySupplier = {};
-      cartItems.forEach(function(item) {
-        if (!bySupplier[item.supplier]) bySupplier[item.supplier] = [];
-        bySupplier[item.supplier].push(item);
-      });
-      cartBody.innerHTML = '';
-      Object.keys(bySupplier).forEach(function(supplier, supplierIndex) {
-        var items = bySupplier[supplier];
-        var total = items.reduce(function(sum, item) { return sum + item.price * item.qty; }, 0);
-        var group = document.createElement('div');
-        group.className = 'cart-group';
-        if (supplierIndex === 0) group.setAttribute('data-cart-group', '');
-        group.innerHTML = '<div class="cart-group-head">' +
-          '<input type="checkbox" class="cart-group-check" data-cart-check data-amount="' + total.toFixed(2) + '" />' +
-          '<div class="cart-group-info"><div class="cart-group-name"></div><div class="cart-group-meta">Thu, 23 Apr 2026</div></div>' +
-          '<div class="cart-group-amount">S$' + total.toFixed(2) + '</div></div>' +
-          '<div class="cart-items"></div><a href="#" class="cart-view-edit">View/edit</a>';
-        group.querySelector('.cart-group-name').textContent = supplier;
-        var itemsNode = group.querySelector('.cart-items');
-        items.forEach(function(item) {
-          var itemNode = document.createElement('div');
-          itemNode.className = 'cart-item';
-          itemNode.innerHTML = '<div class="cart-item-name"></div><div class="cart-item-qty"></div>';
-          itemNode.querySelector('.cart-item-name').textContent = item.name;
-          itemNode.querySelector('.cart-item-qty').textContent = item.qty + ' ' + item.uom;
-          itemsNode.appendChild(itemNode);
-        });
-        cartBody.appendChild(group);
-      });
-      document.querySelectorAll('.cart-group-check').forEach(function(check) {
-        check.addEventListener('change', function() {
-          updatePlaceOrder();
-          if (window.__nomniOrderTourStep) window.__nomniOrderTourStep(check.checked);
-        });
-      });
-      updatePlaceOrder();
-    }
-
-    function addCartItem(button, qty) {
-      var name = button.dataset.name || 'Item';
-      var supplier = button.dataset.supplier || 'Test Supplier';
-      var uom = button.dataset.uom || 'box';
-      var price = parseFloat(button.dataset.price || '0') || 0;
-      var existing = cartItems.find(function(item) {
-        return item.name === name && item.supplier === supplier && item.uom === uom;
-      });
-      if (existing) existing.qty = qty;
-      else cartItems.push({ name: name, supplier: supplier, uom: uom, price: price, qty: qty });
-      renderCart();
-    }
-
-    renderCart();
-
-    if (selectAllBtn) {
-      selectAllBtn.addEventListener('click', function(){
-        var checks = document.querySelectorAll('.cart-group-check');
-        var shouldCheck = !Array.from(checks).every(function(c){ return c.checked; });
-        checks.forEach(function(c){ c.checked = shouldCheck; });
-        updatePlaceOrder();
-      });
-    }
-
-    /* Add to order */
-    document.querySelectorAll('.add-link').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        var cell = this.parentElement;
-        var qty = parseInt(this.dataset.qty, 10) || 1;
-        addCartItem(this, qty);
-        cell.dataset.cartName = this.dataset.name || 'Item';
-        cell.dataset.cartSupplier = this.dataset.supplier || 'Test Supplier';
-        cell.dataset.cartUom = this.dataset.uom || 'box';
-        cell.dataset.cartPrice = this.dataset.price || '0';
-        cell.innerHTML = makeStepperHTML(qty);
-        attachStepperEvents(cell);
-        if (window.__nomniOrderItemAdded) window.__nomniOrderItemAdded();
-      });
-    });
-
-    /* Fill to par */
-    document.querySelectorAll('.fill-link').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        var cell = this.parentElement;
-        var qty = parseInt(this.dataset.qty, 10) || 1;
-        cell.innerHTML = makeStepperHTML(qty);
-        attachStepperEvents(cell);
-      });
-    });
-  })();
+  /* Supplier ordering uses the table and review modal above; no cart panel in this path. */
 </script>
 <script>
 (function(){

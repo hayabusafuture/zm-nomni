@@ -410,7 +410,7 @@
     width: 18px;
     height: 18px;
     left: -9px;
-    top: 26px;
+    top: var(--tour-arrow-offset, 26px);
     border-left: 1px solid rgba(42,200,100,.24);
     border-bottom: 1px solid rgba(42,200,100,.24);
     border-radius: 4px;
@@ -424,7 +424,7 @@
     border-right: 1px solid rgba(42,200,100,.24);
   }
   .tour-card.below::before {
-    left: 28px;
+    left: var(--tour-arrow-offset, 28px);
     top: -9px;
     border-bottom: 0;
     border-top: 1px solid rgba(42,200,100,.24);
@@ -1097,6 +1097,14 @@
       }
       tourCard.style.left = cardLeft + 'px';
       tourCard.style.top = cardTop + 'px';
+      var arrowOffset;
+      if (step.placement === 'below') {
+        var targetCenterX = rect.left + rect.width / 2;
+        arrowOffset = Math.max(20, Math.min(targetCenterX - cardLeft - 9, cardWidth - 20));
+      } else {
+        arrowOffset = Math.max(20, Math.min(targetCenterY - cardTop - 9, cardHeight - 20));
+      }
+      tourCard.style.setProperty('--tour-arrow-offset', arrowOffset + 'px');
     }
 
     function setTourStep(stepName, shouldScroll) {
