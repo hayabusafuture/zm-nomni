@@ -52,15 +52,6 @@ The opening email screen presents two paths after the user enters an email:
 
 The current landing-page work is the top-of-funnel UI for this flow. The above-the-fold sections should make the “try Nomni Procure” action feel immediate and low-friction.
 
-## Current Page Recreation Goal
-
-Recreate the above-the-fold sections of two marketing websites for prototyping:
-
-- Nomni Procure landing page
-- Zeemart transition/home page
-
-Only the top portion is needed for now. Content below the fold is represented only as a small visual preview/hint where useful.
-
 ## Source References
 
 Original saved site captures are in:
