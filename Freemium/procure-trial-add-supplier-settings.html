@@ -1161,7 +1161,7 @@
     <button class="handoff-inspector-btn" type="button" data-asset-download-toggle title="Download page assets">&#8595; Assets</button>
     <div class="asset-download-menu" data-asset-download-menu hidden>
       <a href="assets/downloads/procure-trial-add-supplier-settings.zip" download>This page<span class="count">22 files</span></a>
-      <a href="assets/downloads/all-pages.zip" download>Whole flow<span class="count">33 files</span></a>
+      <a href="assets/downloads/all-pages.zip" download>Whole flow<span class="count">34 files</span></a>
     </div>
   </div>
 
@@ -1206,7 +1206,7 @@
           <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="procure-trial-outlet-suppliers.html?tour=2"><span>Add first supplier</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="procure-trial-outlet-suppliers.html?tour=2"><span>Add supplier</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support">
@@ -1386,6 +1386,9 @@
 <script>
   (function() {
     var params = new URLSearchParams(window.location.search);
+    if (params.get('setupPanelDismissed') === '1') {
+      document.querySelectorAll('.sidebar-setup').forEach(function(node) { node.hidden = true; });
+    }
     var userName = params.get('userName') || '';
     var venueName = params.get('venueName') || '';
     var userNameNode = document.querySelector('[data-user-name]');
@@ -1453,7 +1456,7 @@
     function withParams(file, step, extras) {
       var nextParams = new URLSearchParams();
       if (step) nextParams.set('tour', step);
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierCreated', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierCreated', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1486,7 +1489,7 @@
 
     function dashboardUrl(forceSetup) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierCreated', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierCreated', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1536,7 +1539,7 @@
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '60%'; });
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
         var goal = params.get('primaryGoal') || 'Order faster';
-        node.textContent = goal === 'Digitise invoices' ? 'Upload first invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place first order';
+        node.textContent = goal === 'Digitise invoices' ? 'Upload invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place order';
       });
     }
     if (sidebarOrderPlaced) {
@@ -1546,7 +1549,7 @@
       document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = orderProgress; });
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = orderProgressWidth; });
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
-        node.textContent = orderGoal === 'Digitise invoices' ? 'Upload first invoice' : 'Set up inventory';
+        node.textContent = orderGoal === 'Digitise invoices' ? 'Upload invoice' : 'Set up inventory';
       });
     }
     if (sidebarInventorySetup) {
@@ -1556,7 +1559,7 @@
       document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = invProgress; });
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = invProgressWidth; });
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
-        node.textContent = invGoal === 'Manage inventory' ? 'Complete first stock count' : "You're all set";
+        node.textContent = invGoal === 'Manage inventory' ? 'Complete stock count' : "You're all set";
       });
     }
     if (sidebarStockCountDone && (params.get('primaryGoal') || 'Order faster') === 'Manage inventory') {
@@ -1568,7 +1571,7 @@
     var isFullyDone = (fullyDoneGoal === 'Order faster' && sidebarOrderPlaced && sidebarInventorySetup) || (fullyDoneGoal === 'Manage inventory' && sidebarStockCountDone);
     document.querySelectorAll('[data-sidebar-setup-tick]').forEach(function(node) { node.hidden = !isFullyDone; });
     document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node) { node.hidden = false; node.textContent = isFullyDone ? 'Also try:' : 'Next:'; });
-    var extraTitles = { order: 'Place first order', invoiceUpload: 'Upload an invoice', invoiceDigitise: 'Digitise invoices', invoiceExport: 'Export invoices', stockCount: 'Complete a stock count' };
+    var extraTitles = { order: 'Place order', invoiceUpload: 'Upload an invoice', invoiceDigitise: 'Digitise invoices', invoiceExport: 'Export invoices', stockCount: 'Complete a stock count' };
     var extraHrefs = { order: 'procure-trial-orders.html', invoiceUpload: 'procure-trial-invoices.html', stockCount: 'procure-trial-inventory.html' };
     var nextExtraKey = null;
     if (isFullyDone) {

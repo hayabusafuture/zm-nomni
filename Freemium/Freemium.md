@@ -81,12 +81,12 @@ Primary visual references are:
 - `Freemium/procure-trial-items.html` — Items page and guided Add item / Build market list onboarding flow, linked from the `Items` sidenav entry and the checklist's `Add items` CTA.
 - `Freemium/procure-trial-create-sku.html` — full-page manual `Create SKU` form used after selecting a supplier from the Items `Add > Create new` path.
 - `Freemium/procure-trial-review-invoice-items.html` — invoice-assisted item review page used after Items `Add > Add from invoice`.
-- `Freemium/procure-trial-orders.html` — Orders page and guided Place first order entry flow, including the `New order` split menu.
+- `Freemium/procure-trial-orders.html` — Orders page and guided Place order entry flow, including the `New order` split menu.
 - `Freemium/procure-trial-new-order-item.html` — order-by-item creation flow used for the first order onboarding path.
 - `Freemium/procure-trial-new-order-supplier.html` — order-by-supplier creation flow used as the secondary first-order path.
 - `Freemium/procure-trial-inventory.html` — Inventory page and guided Set up inventory / stock-count onboarding flows.
 - `Freemium/procure-trial-stock-count.html` — stock-count flow linked from Inventory onboarding and the Manage inventory checklist path.
-- `Freemium/procure-trial-invoices.html` — placeholder page (empty state only) for the `Upload first invoice` checklist CTA.
+- `Freemium/procure-trial-invoices.html` — placeholder page (empty state only) for the `Upload invoice` checklist CTA.
 
 Generated preview screenshots:
 
@@ -106,14 +106,22 @@ top-right pill, `↓ Assets`, with two downloads:
 The downloads are pre-built static zips at
 `Freemium/assets/downloads/<page-slug>.zip` and
 `Freemium/assets/downloads/all-pages.zip`.
+They are not continuously updated in the browser; they only change after the
+asset-build script is re-run. The scan includes local image references
+(`.svg`, `.png`, `.jpg`, `.webp`, etc.) and does not include CSS-generated
+icons or Material Symbols.
 
 Two scripts maintain them:
 
 - `build-asset-downloads.py` rebuilds the page zips, full-flow zip, and manifest.
 - `inject_asset_widget.py` injects the Assets widget into pages that already have the handoff inspectors.
 
-Run `build-asset-downloads.py` whenever local image references change. Re-run
-`inject_asset_widget.py` if the widget counts need refreshing.
+Run `build-asset-downloads.py` whenever local image references change. If file
+counts change on pages that already have the widget, update the visible count
+labels in those pages too; `inject_asset_widget.py` only adds missing widgets.
+There is also a daily Codex reminder, "Regenerate Freemium asset downloads if
+needed", which should only prompt when Freemium prototype work has been
+completed that day.
 
 The widget follows the same boundary as the handoff inspectors, so marketing
 pages, email mockups, and redirect stubs remain out of scope.
@@ -209,7 +217,7 @@ Dashboard states:
 
 - First visit, or `?setup=1`, shows the onboarding checklist.
 - Dashboard sidenav clicks also open the onboarding checklist by default until setup is 100% done or the user explicitly chooses `Dismiss setup`.
-- `Dismiss setup` dismisses onboarding by adding `setupDismissed=1` to the prototype URL state, so the regular dashboard remains the default target while navigating without relying on stale browser storage.
+- `Dismiss setup` opens a short choice dialog. `Keep setup shortcut` adds `setupDismissed=1`, so Dashboard opens the regular dashboard while the sidebar `Get started` card remains available. `Hide everywhere` also adds `setupPanelDismissed=1`, hiding the sidebar card across trial pages.
 - After dismissal, Dashboard shows the regular empty trial dashboard with zero-value cards and empty spending sections.
 - The persistent sidebar `Get started` card reopens the onboarding checklist with `?setup=1`.
 
@@ -228,13 +236,13 @@ Checklist logic:
 
 - `Create account` is complete for every trial, so progress starts at 20%.
 - Goal-dependent primary paths:
-  - `Order faster`: Add first supplier, Build market list, Place first order, Set up inventory.
-  - `Digitise invoices`: Add first supplier, Build market list, Upload first invoice, Digitise invoices.
-  - `Manage inventory`: Add first supplier, Build market list, Set up inventory, Complete first stock count.
-- `Add first supplier` is required before `Build market list`.
+  - `Order faster`: Add supplier, Build market list, Place order, Set up inventory.
+  - `Digitise invoices`: Add supplier, Build market list, Upload invoice, Digitise invoices.
+  - `Manage inventory`: Add supplier, Build market list, Set up inventory, Complete stock count.
+- `Add supplier` is required before `Build market list`.
 - `Build market list` is required before `order`, `inventory`, and `invoiceUpload`.
 - Checklist row unlocking uses each task's `dependsOn` field, not strict list position. After the market list is built, `Create order`, `Set up inventory`, and `Upload invoice` all unlock with real CTA buttons.
-- Chained tasks keep real prerequisites: `invoiceDigitise` depends on `invoiceUpload`, `invoiceExport` depends on `invoiceDigitise`, and `stockCount` depends on `inventory`.
+- Chained tasks keep real prerequisites: `invoiceDigitise` depends on `invoiceUpload`, and `stockCount` depends on `inventory`. `invoiceExport` remains defined in the prototype data for later but is currently coded out of the visible setup list.
 - The sidebar still recommends exactly one next action based on the selected goal, even when several checklist actions are unlocked.
 
 Guided-tour standards:
@@ -281,8 +289,8 @@ Build market list flow:
 - Once the mandatory item fields are complete, `Add to Inventory` turns on by default, matching the live product. The inventory tour is one step that explains how stock is counted and notes that users can turn `Add to Inventory` off for order-only items.
 - Saving returns to Items with a created row, success toast (`added to market list`), and `marketListBuilt=1`.
 - `marketListBuilt=1` advances setup progress from 40% to 60%, completes `Build market list`, and moves the sidebar next action to the goal-dependent step:
-  - `Order faster`: `Place first order`
-  - `Digitise invoices`: `Upload first invoice`
+  - `Order faster`: `Place order`
+  - `Digitise invoices`: `Upload invoice`
   - `Manage inventory`: `Set up inventory`
 - After save, the return URL includes `marketHandoff=1`; the Items page uses the same tour panel style for the one-time completion handoff, pointing at the sidebar `Get started` card so users know where to continue. Normal later navigation to Items must not replay this handoff.
 - If only one item-creation branch has been explored, the completion handoff shows a low-emphasis inline link for the untried path, while the completed dashboard checklist row keeps the secondary CTA on the right. Completed checklist rows show the tick on the left in place of the setup illustration.
@@ -333,26 +341,26 @@ Set up inventory guided tour:
 Stock count flow:
 
 - The page header's `Stock count` button is a split button (`Stock count` + caret) opening a small menu: `New stock count` / `Import stock count` (decorative stub).
-- The `Complete first stock count` checklist CTA uses the same guided-start convention as the other flows: first show the dashboard pointer at `Inventory`; clicking Inventory opens `procure-trial-inventory.html?tour=stockCount`, which points at the real Stock count controls. If the user is already on Inventory, the sidebar `Next` action starts the stock-count pointer in place instead of bouncing them back to the dashboard.
+- The `Complete stock count` checklist CTA uses the same guided-start convention as the other flows: first show the dashboard pointer at `Inventory`; clicking Inventory opens `procure-trial-inventory.html?tour=stockCount`, which points at the real Stock count controls. If the user is already on Inventory, the sidebar `Next` action starts the stock-count pointer in place instead of bouncing them back to the dashboard.
 - `New stock count` opens a modal: `Inventory list` dropdown (populated from the store's lists) + `Start stock count` button, disabled until a list is chosen. Starting navigates to the new `Freemium/procure-trial-stock-count.html?list=<name>`.
 - That page mirrors the live product: `New stock count: {list}` header, count date/time (real `Date()`, not hardcoded), an item count + `SKU name` search, an `Auto-fill with last count data` shortcut, and a table (Name/Supplier/UOM/Last count/On hand/**Counted Qty** input/Value) sourced from the chosen list's items in the shared store. Value recalculates live per row (`counted qty × item price`) and the footer tracks `Est. value` + `N/M counted`.
 - Footer actions: `Cancel` and `Save as draft & exit` return to Inventory without persisting; `Save as draft` is a decorative no-op (shows "Draft saved" inline); `Done` opens the `Update stock count` confirm modal ("The stock levels will be immediately updated upon saving.") → `Save stock count`.
 - Saving updates each counted item's `onHand`/`lastCount`/`lastCountDate`/`movement` in the shared store and redirects to `procure-trial-inventory.html?stockCountDone=1`, which shows an "Inventory Management" / "Stock count created successfully" toast.
-- `stockCountDone=1` is threaded through every trial page's param passthrough and marks the dashboard's `Complete first stock count` checklist task complete, advancing the `Manage inventory` goal to 100% (goal-gated — a no-op for other goals since `stockCount` isn't in their checklist).
+- `stockCountDone=1` is threaded through every trial page's param passthrough and marks the dashboard's `Complete stock count` checklist task complete, advancing the `Manage inventory` goal to 100% (goal-gated — a no-op for other goals since `stockCount` isn't in their checklist).
 - Currency note: this flow uses `A$` throughout for consistency with the rest of the Inventory page's own store-derived values, even though the reference production screenshots for this specific flow show `S$` (different demo region) — an intentional internal-consistency choice over screenshot-literal fidelity on a cosmetic detail.
 - Guided tour: kickers are plain `Step X` (no `of N` count, matching the other tours). The Dashboard's "Start from Inventory" pointer is Step 1; the on-page steps on `procure-trial-inventory.html` continue as Step 2 (`Stock count` button) → Step 3 (`New stock count` menu item) → Step 4 (`Inventory list` dropdown, no `placement` override — it defaults to appearing beside the dropdown rather than below it, since `below` used to render the popover directly on top of the `Start stock count` button sitting right underneath in that small modal). Clicking `Start stock count` has no popover of its own (an obvious, single-button click doesn't need one) — the `tour` param carries through to `procure-trial-stock-count.html` in the navigation, not via a dedicated step.
 - The tour continues on `procure-trial-stock-count.html` (previously had no tour code at all) as Step 5 (first Counted Qty input — advances once the user types any value) → Step 6 (`Done` button; copy is forward-looking — "Once you've counted everything on the list, click Done to finish up." — not an assertion that counting is already finished, since the tour only requires one row filled in to get there). There's no Step 7 on `Save stock count` in the confirm modal — same reasoning as `Start stock count`, one obvious button doesn't need a popover. Saving still redirects with `tourHandoff=1` when the tour was active, which shows the sidebar "Inventory set up" handoff pointer back on Inventory.
 
-Place first order flow:
+Place order flow:
 
-- The `Order faster` checklist path unlocks `Place first order` after `marketListBuilt=1`.
-- The dashboard `Create order` CTA starts Step 1 on the dashboard, pointing at `Orders` in the sidenav. The sidebar `Next: Place first order` starts the same Step 1 pointer in place on whatever trial page the user is currently viewing; it must not redirect back to the dashboard first.
+- The `Order faster` checklist path unlocks `Place order` after `marketListBuilt=1`.
+- The dashboard `Create order` CTA starts Step 1 on the dashboard, pointing at `Orders` in the sidenav. The sidebar `Next: Place order` starts the same Step 1 pointer in place on whatever trial page the user is currently viewing; it must not redirect back to the dashboard first.
 - After the user opens Orders, the next step highlights the `New order` split button and opens its menu. The first guided path chooses `Order by item`, because it reinforces the market list the user just built.
 - `Freemium/procure-trial-new-order-item.html` follows the existing product pattern: full-page create-order shell, market-list item table on the left, supplier-grouped cart on the right, and a fixed cart footer.
 - The order-by-item page should reflect what the user added while building the market list: manual `createdSku`/`createdSupplier` values and invoice-created items feed the orderable item list. The cart starts empty and only appears as a supplier-grouped order after the user clicks `Add to order`.
 - The guided order-by-item path covers: add an item to order, review/select the newly-created supplier cart group, then place the order.
 - `Freemium/procure-trial-new-order-supplier.html` covers the secondary `Order by supplier` path: Orders opens the real-style supplier picker modal first, then a supplier-specific item table with a review modal. It uses the same created supplier and market-list items as the item path; the order starts empty until the user adds an item.
-- Placing an order returns to Orders with `orderPlaced=1`, shows a placed order row using the created supplier, marks `Place first order` complete on the dashboard, and advances `Order faster` setup progress from 60% to 80%.
+- Placing an order returns to Orders with `orderPlaced=1`, shows a placed order row using the created supplier, marks `Place order` complete on the dashboard, and advances `Order faster` setup progress from 60% to 80%.
 - The order branch that was used is tracked separately with `orderByItemDone=1` or `orderBySupplierDone=1`. If one branch is complete and the other is not, the completed checklist row can show a secondary option to try the other path without making it part of checklist completion.
 - The return URL also includes `orderHandoff=1`, which opens a short setup-updated tour panel pointing at the sidebar `Get started` card so users know where to continue. When only one order branch has been tried, this handoff also includes a low-emphasis inline link to start the other order path from the Orders page tour.
 
@@ -360,16 +368,18 @@ Checklist "100% done" state (`Procure Trial Dashboard.html`):
 
 - The primary checklist does not show a separate green success banner at 100%; at 100% the progress ring becomes a green tick icon and the completed rows carry the completion signal.
 - Once the primary 5-task checklist (`account` + the 4 goal-specific tasks) hits 100%, the 5 task rows collapse behind a `<details>` toggle ("Show completed steps") the first time 100% is reached — still viewable on demand, not hidden for good. While incomplete, this wrapper renders as a plain block with no visible chrome.
-- The "More setup options" `<details>` (tasks outside the user's chosen goal, e.g. invoice digitising/export, stock count — via `extraTaskOrder`) auto-opens itself the first time the primary checklist hits 100%, and its heading relabels from "More setup options" to "More things you can do", shifting visual focus there.
-- Known gap (pre-existing, not fixed by this): the `Upload invoice` and `Digitise invoice` onboarding flows are not built yet, and no page currently sets `invoiceUpload=1` or `invoiceDigitise=1`. The `Digitise invoices` primary goal is selectable, but cannot reach 100% until those flows are implemented. `invoiceExport` is also not wired to a completion param, so it remains incomplete when shown under "More things you can do".
+- The "More setup options" `<details>` (tasks outside the user's chosen goal, e.g. invoice upload/digitising, stock count — via `extraTaskOrder`) keeps the same "More setup options" heading across states and auto-opens itself the first time the primary checklist hits 100%.
+- Mock final state: `allSetupDone=1` marks the primary and More tasks complete for review, replaces the progress header with a centred `You're all set` message, hides the sidebar `Also try` line, and combines primary + More rows behind one `Show completed steps` details toggle.
+- Completed rows first show unfinished secondary onboarding paths where they exist, for example `Try adding from invoice`, `Try creating manually`, or `Try ordering by supplier/item`. If no secondary path remains and a relevant article exists, the row shows a low-emphasis `View guide` support-article link. `Create account` does not show a repeat or article action because signup is not repeatable.
+- Known gap (pre-existing, not fixed by this): the `Upload invoice` and `Digitise invoice` onboarding flows are not built yet, and no page currently sets `invoiceUpload=1` or `invoiceDigitise=1`. The `Digitise invoices` primary goal is selectable, but cannot reach 100% until those flows are implemented. `invoiceExport` remains defined in the prototype data but is coded out of the visible "More setup options" list for now.
 
 Sidebar "Get started" widget — tick icon and Next/Also try label:
 
 - A small 16px green-circle tick (`data-sidebar-setup-tick`, hidden by default) sits next to the "Get started" title in the widget on every trial page (12 files share this widget; `procure-trial-new-order-item.html` and `procure-trial-review-invoice-items.html` don't have it at all).
-- On the Dashboard (the only page with full `taskCatalog` knowledge): once the primary checklist is 100%, the tick shows and the label becomes `Also try:`, with the link text swapped to the first incomplete "extra" task's title (dependency-aware — e.g. won't suggest `Export invoices` before `Digitise invoices` is done). If literally nothing is left across both primary and extra tasks, the whole `Next:`/`Also try:` line hides instead of showing a dead label.
-- Every other page also shows a real, specific "Also try" task rather than a generic filler — computed from a small local lookup instead of the full `taskCatalog`, since the actually-reachable states are few: `invoiceUpload`/`invoiceDigitise`/`invoiceExport` never complete anywhere in this build (no param marks them done), and `order`/`stockCount` complete via the `orderPlaced`/`stockCountDone` params every page already tracks. So for `Order faster` (100% via `orderPlaced=1` plus `inventorySetup=1`) the answer is reliably "Upload an invoice" (linking to `procure-trial-invoices.html`); for `Manage inventory` (100% via `stockCountDone`) it's "Place first order" (linking to `procure-trial-orders.html`) unless `orderPlaced` is already true, in which case it also falls to "Upload an invoice". The href override runs *after* each page's existing final href-assignment (`sidebarNextUrl()` or the inline chain), since that assignment already runs unconditionally and would otherwise clobber it.
+- On the Dashboard (the only page with full `taskCatalog` knowledge): once the primary checklist is 100%, the tick shows and the label becomes `Also try:`, with the link text swapped to the first incomplete visible "extra" task's title. If literally nothing is left across both primary and visible extra tasks, the whole `Next:`/`Also try:` line hides instead of showing a dead label.
+- Every other page also shows a real, specific "Also try" task rather than a generic filler — computed from a small local lookup instead of the full `taskCatalog`, since the actually-reachable states are few: `invoiceUpload`/`invoiceDigitise` never complete anywhere in this build (no param marks them done), and `order`/`stockCount` complete via the `orderPlaced`/`stockCountDone` params every page already tracks. So for `Order faster` (100% via `orderPlaced=1` plus `inventorySetup=1`) the answer is reliably "Upload an invoice" (linking to `procure-trial-invoices.html`); for `Manage inventory` (100% via `stockCountDone`) it's "Place order" (linking to `procure-trial-orders.html`) unless `orderPlaced` is already true, in which case it also falls to "Upload an invoice". The href override runs *after* each page's existing final href-assignment (`sidebarNextUrl()` or the inline chain), since that assignment already runs unconditionally and would otherwise clobber it.
 - Layout fix: `.sidebar-setup-next` (the Next/Also try line) and the top `.sidebar-setup-row` (title + percentage) both use `white-space: nowrap` on their child spans now, since the sidebar is narrow (232px) and long strings would otherwise wrap awkwardly mid-word.
-- Label + action are always on the same line, separated by a colon (`Next: Build market list`, `Also try: Upload an invoice`) — the label is never hidden once the widget is showing a specific task, since hiding it only made sense for the old generic "Explore more setup options" filler, not a real named task. Two of the longer extra-task titles are shortened specifically for this line (the main checklist row keeps the original wording): `Complete first stock count` → `Complete a stock count`, `Upload first invoice` → `Upload an invoice`.
+- Label + action are always on the same line, separated by a colon (`Next: Build market list`, `Also try: Upload an invoice`) — the label is never hidden once the widget is showing a specific task, since hiding it only made sense for the old generic "Explore more setup options" filler, not a real named task. Two of the longer extra-task titles are shortened specifically for this line (the main checklist row keeps the original wording): `Complete stock count` → `Complete a stock count`, `Upload invoice` → `Upload an invoice`.
 
 Support links:
 
@@ -388,10 +398,10 @@ Local image reference checks were run during development.
 
 - Define what “demo access” includes inside the stripped-down Nomni Procure prototype.
 - Decide how the demo dashboard works: what data appears, whether it is seeded, and how it differs from the guided trial checklist/dashboard.
-- Map and build the `Upload first invoice` onboarding flow. This is currently represented by an empty-state invoices page and no page sets `invoiceUpload=1`.
+- Map and build the `Upload invoice` onboarding flow. This is currently represented by an empty-state invoices page and no page sets `invoiceUpload=1`.
 - Map and build the `Digitise invoices` onboarding flow. Until this exists, the `Digitise invoices` primary goal is selectable but cannot reach 100% completion.
-- Wire the later `Export invoices` extra task if it remains in scope; it currently depends on `Digitise invoices` and has no completion param.
+- Decide whether the later `Export invoices` extra task remains in scope. It is still defined in prototype data for future wiring, but is currently coded out of the visible "More setup options" list.
 - Decide how trial users are told they can contact support via live chat, beyond the persistent Intercom-style launcher.
 - Define the conversion path from trial to paid account: what users see before the trial ends, who they contact, and what in-product CTA or message explains the next step.
-- Decide which exact support article should be the primary support link.
+- Decide the final lifecycle for the sidebar `Get started` widget after every setup task is complete. Current recommendation: keep it visible for a short grace period so users can reopen completed steps, then hide it either after an explicit "dismiss forever" action or automatically after a defined number of days from full completion.
 - Continue keeping this document updated as visual or content changes are made.

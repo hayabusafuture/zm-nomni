@@ -489,6 +489,7 @@
   .progress-card {
     margin-bottom: 18px;
   }
+  .progress-card[hidden] { display: none; }
   .progress-stat {
     display: inline-flex;
     align-items: center;
@@ -589,6 +590,50 @@
     color: var(--ink-mute);
     font-size: 14px;
   }
+  .all-set-card {
+    margin: 0 0 24px;
+    padding: 4px 24px 2px;
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+  .all-set-card[hidden] { display: none; }
+  .all-set-icon {
+    width: 36px;
+    height: 36px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .all-set-title {
+    margin: 0 0 6px;
+    color: var(--ink);
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    text-wrap: balance;
+  }
+  .all-set-copy {
+    margin: 0;
+    color: var(--ink-mute);
+    font-size: 14px;
+    line-height: 1.45;
+    text-wrap: pretty;
+    max-width: 640px;
+  }
+  .all-set-card .panel-actions {
+    width: 100%;
+    margin-top: 8px;
+    padding-top: 4px;
+    border-top: 0;
+  }
   .task-list {
     display: grid;
     gap: 12px;
@@ -674,6 +719,22 @@
   .task-secondary-action:hover {
     background: #C6F2CE;
     border-color: #C6F2CE;
+    color: var(--seaweed);
+  }
+  .task-secondary-action.support-guide-action {
+    min-height: 34px;
+    padding: 8px 12px;
+    border-color: transparent;
+    background: transparent;
+    color: var(--spinach);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .task-secondary-action.support-guide-action:hover {
+    border-color: transparent;
+    background: rgba(42,200,100,.08);
     color: var(--seaweed);
   }
   .task-status::before {
@@ -995,6 +1056,46 @@
     font-weight: 700;
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+  .dismiss-choice-list {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .dismiss-choice {
+    width: 100%;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 16px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--seaweed);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .18s ease, border-color .18s ease, transform .14s ease;
+  }
+  .dismiss-choice:hover {
+    border-color: #B9F0C5;
+    background: var(--mint);
+  }
+  .dismiss-choice:active { transform: scale(.98); }
+  .dismiss-choice.primary {
+    border-color: var(--nomni-green);
+    background: var(--nomni-green);
+  }
+  .dismiss-choice.primary:hover {
+    border-color: var(--seaweed);
+    background: var(--seaweed);
+    color: var(--nomni-green);
+  }
+  @media (max-width: 560px) {
+    .dismiss-choice-list { grid-template-columns: 1fr; }
   }
   .support-card {
     display: grid;
@@ -1586,8 +1687,8 @@
   <div class="asset-download-wrap" data-asset-download>
     <button class="handoff-inspector-btn" type="button" data-asset-download-toggle title="Download page assets">&#8595; Assets</button>
     <div class="asset-download-menu" data-asset-download-menu hidden>
-      <a href="assets/downloads/procure-trial-dashboard.zip" download>This page<span class="count">27 files</span></a>
-      <a href="assets/downloads/all-pages.zip" download>Whole flow<span class="count">33 files</span></a>
+      <a href="assets/downloads/procure-trial-dashboard.zip" download>This page<span class="count">28 files</span></a>
+      <a href="assets/downloads/all-pages.zip" download>Whole flow<span class="count">34 files</span></a>
     </div>
   </div>
 
@@ -1634,7 +1735,7 @@
           <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
           <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
         </a>
-        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span data-sidebar-next-step>Add first supplier</span></a></span>
+        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Procure%20Trial%20Dashboard.html?setup=1&tour=1"><span data-sidebar-next-step>Add supplier</span></a></span>
       </div>
     </div>
     <button class="intercom-launcher" type="button" aria-label="Open chat support">
@@ -1657,10 +1758,17 @@
 
       <div class="setup-grid">
         <section class="panel" aria-label="Onboarding checklist">
-          <div class="progress-card">
+          <div class="progress-card" data-progress-card>
             <div class="panel-head">
               <h2 class="panel-title" data-setup-title>Get started with just a few steps</h2>
               <div class="progress-stat" data-progress-stat aria-label="20% done"><span class="progress-ring" aria-hidden="true"></span><span>20% done</span></div>
+            </div>
+          </div>
+          <div class="all-set-card" data-all-set-card hidden>
+            <span class="all-set-icon" aria-hidden="true">✓</span>
+            <div>
+              <p class="all-set-title">You're all set</p>
+              <p class="all-set-copy">You're ready to keep using Nomni Procure. To move from trial to a paid account, book a live demo or message our team in chat.</p>
             </div>
           </div>
 
@@ -1693,11 +1801,12 @@
               </a>
             </div>
           </aside>
-          <div class="panel-actions" aria-label="Setup help">
+          <div class="panel-actions" aria-label="Setup help" data-panel-actions>
             <button class="panel-action guide" type="button" data-dismiss-onboarding><span class="material-symbols-outlined" aria-hidden="true">visibility_off</span>Dismiss setup</button>
             <a class="panel-action guide" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank">View support articles <span aria-hidden="true">→</span></a>
             <a class="panel-action demo" href="https://www.nomni.ai/lets-chat">Book a live demo <span aria-hidden="true">→</span></a>
           </div>
+          <span data-panel-actions-anchor hidden></span>
         </section>
       </div>
     </div>
@@ -1874,6 +1983,24 @@
   </section>
 </div>
 
+<div class="app-modal-overlay" data-dismiss-setup-modal hidden>
+  <section class="app-modal-card" role="dialog" aria-modal="true" aria-labelledby="dismiss-setup-title">
+    <div class="app-modal-head">
+      <div>
+        <h2 class="app-modal-title" id="dismiss-setup-title">Dismiss setup?</h2>
+        <p class="app-modal-copy">Keep the shortcut, or hide setup everywhere.</p>
+      </div>
+      <button class="app-modal-close" type="button" data-close-dismiss-setup-modal aria-label="Close">&times;</button>
+    </div>
+    <div class="app-modal-body">
+      <div class="dismiss-choice-list">
+        <button class="dismiss-choice" type="button" data-dismiss-setup-choice="dashboard">Keep setup shortcut</button>
+        <button class="dismiss-choice primary" type="button" data-dismiss-setup-choice="everywhere">Hide everywhere</button>
+      </div>
+    </div>
+  </section>
+</div>
+
 <div class="tour-overlay" data-dashboard-tour hidden>
   <div class="tour-highlight" data-tour-highlight></div>
   <section class="tour-card" data-tour-card aria-live="polite">
@@ -1886,6 +2013,9 @@
 <script>
   (function() {
     var params = new URLSearchParams(window.location.search);
+    if (params.get('setupPanelDismissed') === '1') {
+      document.querySelectorAll('.sidebar-setup').forEach(function(node) { node.hidden = true; });
+    }
     var userName = params.get('userName') || '';
     var firstName = params.get('firstName') || '';
     var venueName = params.get('venueName') || '';
@@ -1899,6 +2029,7 @@
     var orderBySupplierDone = params.get('orderBySupplierDone') === '1';
     var inventorySetup = params.get('inventorySetup') === '1';
     var stockCountDone = params.get('stockCountDone') === '1';
+    var previewAllSetupDone = params.get('allSetupDone') === '1';
     var trialDaysLeftParam = parseInt(params.get('trialDaysLeft') || '14', 10);
     var trialDaysLeft = Number.isFinite(trialDaysLeftParam) ? Math.max(0, trialDaysLeftParam) : 14;
     var userNameNode = document.querySelector('[data-user-name]');
@@ -1906,10 +2037,14 @@
     var trialStatusNode = document.querySelector('[data-trial-status]');
     var trialStatusCopyNode = document.querySelector('[data-trial-status-copy]');
     var setupTitleNode = document.querySelector('[data-setup-title]');
+    var allSetCard = document.querySelector('[data-all-set-card]');
+    var progressCard = document.querySelector('[data-progress-card]');
     var supplierSetupLink = document.querySelector('[data-supplier-setup-link]');
     var checklistNode = document.querySelector('[data-checklist]');
     var extraChecklistNode = document.querySelector('[data-extra-checklist]');
     var progressStat = document.querySelector('[data-progress-stat]');
+    var panelActions = document.querySelector('[data-panel-actions]');
+    var panelActionsAnchor = document.querySelector('[data-panel-actions-anchor]');
     var sidebarNextStep = document.querySelector('[data-sidebar-next-step]');
     var sidebarNextAction = document.querySelector('[data-sidebar-next-action]');
     var outletsNavLink = document.querySelector('[data-nav-outlets]');
@@ -1921,6 +2056,9 @@
     var dashboardView = document.querySelector('[data-dashboard-view]');
     var dashboardWelcome = document.querySelector('[data-dashboard-welcome]');
     var dismissOnboarding = document.querySelector('[data-dismiss-onboarding]');
+    var dismissSetupModal = document.querySelector('[data-dismiss-setup-modal]');
+    var dismissSetupChoices = document.querySelectorAll('[data-dismiss-setup-choice]');
+    var closeDismissSetupButtons = document.querySelectorAll('[data-close-dismiss-setup-modal]');
     var dashboardTour = document.querySelector('[data-dashboard-tour]');
     var tourHighlight = document.querySelector('[data-tour-highlight]');
     var tourCard = document.querySelector('[data-tour-card]');
@@ -1956,7 +2094,7 @@
         icon: 'assets/icons/create acc.svg'
       },
       supplier: {
-        title: 'Add first supplier',
+        title: 'Add supplier',
         copy: 'Start here. Market lists and the rest of setup unlock after you add a supplier.',
         cta: 'Add supplier',
         ctaHref: 'procure-trial-outlet-suppliers.html',
@@ -1973,8 +2111,8 @@
         icon: 'assets/icons/build mkt list.svg'
       },
       order: {
-        title: 'Place first order',
-        copy: 'Create your first order once your supplier and market list are ready.',
+        title: 'Place order',
+        copy: 'Create an order once your supplier and market list are ready.',
         cta: 'Create order',
         ctaHref: 'procure-trial-orders.html',
         locked: 'Build market list first',
@@ -1991,7 +2129,7 @@
         icon: 'assets/icons/setup inv v2.svg'
       },
       invoiceUpload: {
-        title: 'Upload first invoice',
+        title: 'Upload invoice',
         copy: 'Upload a supplier invoice to start capturing purchasing records.',
         cta: 'Upload invoice',
         ctaHref: 'procure-trial-invoices.html',
@@ -2002,7 +2140,7 @@
       invoiceDigitise: {
         title: 'Digitise invoices',
         copy: 'Review extracted invoice details and turn uploads into structured records.',
-        locked: 'Upload first invoice first',
+        locked: 'Upload invoice before digitising',
         dependsOn: 'invoiceUpload',
         icon: 'assets/icons/digitise inv.svg'
       },
@@ -2014,8 +2152,8 @@
         icon: 'assets/icons/export inv.svg'
       },
       stockCount: {
-        title: 'Complete first stock count',
-        copy: 'Record your first count once inventory lists are ready.',
+        title: 'Complete stock count',
+        copy: 'Record a stock count once inventory lists are ready.',
         cta: 'Start stock count',
         ctaHref: 'procure-trial-inventory.html',
         locked: 'Set up inventory first',
@@ -2028,7 +2166,7 @@
       'Digitise invoices': ['supplier', 'market', 'invoiceUpload', 'invoiceDigitise'],
       'Manage inventory': ['supplier', 'market', 'inventory', 'stockCount']
     };
-    var extraTaskOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'inventory', 'stockCount'];
+    var extraTaskOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'inventory', 'stockCount'];
     if (supplierAdded) {
       taskCatalog.supplier.completed = true;
     }
@@ -2043,6 +2181,11 @@
     }
     if (stockCountDone) {
       taskCatalog.stockCount.completed = true;
+    }
+    if (previewAllSetupDone) {
+      ['supplier', 'market', 'order', 'inventory', 'stockCount', 'invoiceUpload', 'invoiceDigitise'].forEach(function(taskKey) {
+        if (taskCatalog[taskKey]) taskCatalog[taskKey].completed = true;
+      });
     }
 
     function initialsFromName(name) {
@@ -2090,9 +2233,22 @@
       return null;
     }
 
+    function supportArticleForTask(taskKey) {
+      var articles = {
+        supplier: 'https://support.zeemart.co/en/articles/9417996-adding-suppliers',
+        market: 'https://support.zeemart.co/en/articles/9418027-adding-or-removing-items-in-the-market-lists',
+        order: 'https://support.zeemart.co/en/articles/9418149-creating-an-order',
+        invoiceUpload: 'https://support.zeemart.co/en/articles/9418159-how-to-upload-invoices',
+        invoiceDigitise: 'https://support.zeemart.co/en/articles/10598144-how-to-digitise-invoices',
+        inventory: 'https://support.zeemart.co/en/articles/9418088-managing-inventory-lists',
+        stockCount: 'https://support.zeemart.co/en/articles/9418086-performing-a-stock-count-stocktake'
+      };
+      return articles[taskKey] || null;
+    }
+
     function createTask(taskKey, index, counted, currentTaskKey) {
       var task = taskCatalog[taskKey];
-      var isCompleted = Boolean(task.completed && counted);
+      var isCompleted = Boolean(task.completed);
       var isCurrent = counted && !isCompleted && taskKey === currentTaskKey;
       var dependencyMet = !task.dependsOn || Boolean(taskCatalog[task.dependsOn] && taskCatalog[task.dependsOn].completed);
       var row = document.createElement('div');
@@ -2130,30 +2286,38 @@
       row.appendChild(copyWrap);
 
       if (isCompleted) {
-        if (taskKey === 'market') {
-          var alternatePath = marketAlternatePath();
-          if (alternatePath) {
-            var actionStack = document.createElement('div');
-            actionStack.className = 'task-action-stack';
-            var alternateLink = document.createElement('a');
-            alternateLink.className = 'task-secondary-action';
-            alternateLink.href = alternatePath.href;
-            alternateLink.textContent = alternatePath.label;
-            actionStack.appendChild(alternateLink);
-            row.appendChild(actionStack);
-          }
-        } else if (taskKey === 'order') {
-          var alternateOrderPath = orderAlternatePath();
-          if (alternateOrderPath) {
-            var orderActionStack = document.createElement('div');
-            orderActionStack.className = 'task-action-stack';
-            var alternateOrderLink = document.createElement('a');
-            alternateOrderLink.className = 'task-secondary-action';
-            alternateOrderLink.href = alternateOrderPath.href;
-            alternateOrderLink.textContent = alternateOrderPath.label;
-            orderActionStack.appendChild(alternateOrderLink);
-            row.appendChild(orderActionStack);
-          }
+        var marketOtherPath = taskKey === 'market' ? marketAlternatePath() : null;
+        var orderOtherPath = taskKey === 'order' ? orderAlternatePath() : null;
+        var supportArticle = !marketOtherPath && !orderOtherPath ? supportArticleForTask(taskKey) : null;
+        if (marketOtherPath) {
+          var actionStack = document.createElement('div');
+          actionStack.className = 'task-action-stack';
+          var alternateLink = document.createElement('a');
+          alternateLink.className = 'task-secondary-action';
+          alternateLink.href = marketOtherPath.href;
+          alternateLink.textContent = marketOtherPath.label;
+          actionStack.appendChild(alternateLink);
+          row.appendChild(actionStack);
+        } else if (orderOtherPath) {
+          var orderActionStack = document.createElement('div');
+          orderActionStack.className = 'task-action-stack';
+          var alternateOrderLink = document.createElement('a');
+          alternateOrderLink.className = 'task-secondary-action';
+          alternateOrderLink.href = orderOtherPath.href;
+          alternateOrderLink.textContent = orderOtherPath.label;
+          orderActionStack.appendChild(alternateOrderLink);
+          row.appendChild(orderActionStack);
+        } else if (supportArticle) {
+          var supportActionStack = document.createElement('div');
+          supportActionStack.className = 'task-action-stack';
+          var supportLink = document.createElement('a');
+          supportLink.className = 'task-secondary-action support-guide-action';
+          supportLink.href = supportArticle;
+          supportLink.target = '_blank';
+          supportLink.rel = 'noopener';
+          supportLink.textContent = 'View guide';
+          supportActionStack.appendChild(supportLink);
+          row.appendChild(supportActionStack);
         }
       } else if (dependencyMet && task.cta) {
         var link = document.createElement('a');
@@ -2205,6 +2369,26 @@
       var extraTasks = extraTaskOrder.filter(function(key) {
         return countedTasks.indexOf(key) === -1;
       });
+      var isChecklistComplete = progressValue === 100;
+      var nextExtraKey = null;
+      if (isChecklistComplete) {
+        nextExtraKey = extraTasks.find(function(key) {
+          var task = taskCatalog[key];
+          var depMet = !task.dependsOn || (taskCatalog[task.dependsOn] && taskCatalog[task.dependsOn].completed);
+          return !task.completed && depMet;
+        });
+      }
+      var isAllSetupComplete = isChecklistComplete && !nextExtraKey && extraTasks.every(function(key) {
+        return Boolean(taskCatalog[key] && taskCatalog[key].completed);
+      });
+      var checklistTasks = isAllSetupComplete ? countedTasks.concat(extraTasks) : countedTasks;
+      if (panelActions && panelActionsAnchor) {
+        if (isAllSetupComplete && allSetCard) {
+          allSetCard.appendChild(panelActions);
+        } else if (panelActionsAnchor.parentNode) {
+          panelActionsAnchor.parentNode.insertBefore(panelActions, panelActionsAnchor);
+        }
+      }
 
       if (progressStat) {
         var progressRing = progressStat.querySelector('.progress-ring');
@@ -2230,7 +2414,7 @@
         sidebarNextAction.href = currentTaskKey === 'supplier'
           ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
           : currentTaskKey === 'market'
-            ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' })
+            ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'market' })
             : currentTaskKey === 'order'
               ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' })
               : currentTaskKey === 'inventory'
@@ -2242,19 +2426,21 @@
 
       if (checklistNode) {
         checklistNode.innerHTML = '';
-        countedTasks.forEach(function(taskKey, index) {
+        checklistTasks.forEach(function(taskKey, index) {
           checklistNode.appendChild(createTask(taskKey, index, true, currentTaskKey));
         });
       }
 
       if (extraChecklistNode) {
         extraChecklistNode.innerHTML = '';
-        extraTasks.forEach(function(taskKey, index) {
-          extraChecklistNode.appendChild(createTask(taskKey, index, false, currentTaskKey));
-        });
+        if (!isAllSetupComplete) {
+          extraTasks.forEach(function(taskKey, index) {
+            extraChecklistNode.appendChild(createTask(taskKey, index, false, currentTaskKey));
+          });
+        }
       }
-
-      var isChecklistComplete = progressValue === 100;
+      if (allSetCard) allSetCard.hidden = !isAllSetupComplete;
+      if (progressCard) progressCard.hidden = isAllSetupComplete;
       var checklistWrap = document.querySelector('[data-checklist-wrap]');
       var checklistSummary = document.querySelector('[data-checklist-summary]');
       if (checklistSummary) checklistSummary.hidden = !isChecklistComplete;
@@ -2267,8 +2453,12 @@
       }
       var extraSetupNode = document.querySelector('[data-extra-setup]');
       var extraSetupLabel = document.querySelector('[data-extra-setup-label]');
-      if (extraSetupLabel) extraSetupLabel.textContent = isChecklistComplete ? 'More things you can do' : 'More setup options';
-      if (extraSetupNode && isChecklistComplete && !extraSetupNode.dataset.autoOpened) {
+      if (extraSetupLabel) extraSetupLabel.textContent = 'More setup options';
+      if (extraSetupNode) extraSetupNode.hidden = isAllSetupComplete;
+      if (extraSetupNode && isAllSetupComplete && !extraSetupNode.dataset.allDoneCollapsed) {
+        extraSetupNode.open = false;
+        extraSetupNode.dataset.allDoneCollapsed = '1';
+      } else if (extraSetupNode && isChecklistComplete && !extraSetupNode.dataset.autoOpened) {
         extraSetupNode.open = true;
         extraSetupNode.dataset.autoOpened = '1';
       }
@@ -2277,11 +2467,6 @@
       var sidebarNextLabelNodes = document.querySelectorAll('[data-sidebar-next-label]');
       sidebarTickNodes.forEach(function(node) { node.hidden = !isChecklistComplete; });
       if (isChecklistComplete) {
-        var nextExtraKey = extraTasks.find(function(key) {
-          var task = taskCatalog[key];
-          var depMet = !task.dependsOn || (taskCatalog[task.dependsOn] && taskCatalog[task.dependsOn].completed);
-          return !task.completed && depMet;
-        });
         if (nextExtraKey) {
           var sidebarAlsoTryTitles = { stockCount: 'Complete a stock count', invoiceUpload: 'Upload an invoice' };
           sidebarNextLabelNodes.forEach(function(node) { node.textContent = 'Also try:'; });
@@ -2355,7 +2540,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'trialDaysLeft'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed', 'trialDaysLeft'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -2378,6 +2563,16 @@
 
     function setupDismissed() {
       return params.get('setupDismissed') === '1';
+    }
+
+    function setupPanelDismissed() {
+      return params.get('setupPanelDismissed') === '1';
+    }
+
+    function syncSetupPanelVisibility() {
+      document.querySelectorAll('.sidebar-setup').forEach(function(node) {
+        node.hidden = setupPanelDismissed();
+      });
     }
 
     function dashboardLandingUrl() {
@@ -2422,7 +2617,7 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'trialDaysLeft'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed', 'trialDaysLeft'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -2537,7 +2732,34 @@
       if (appInstallModal) appInstallModal.hidden = true;
     }
 
+    function openDismissSetupModal() {
+      if (!dismissSetupModal) return;
+      dismissSetupModal.hidden = false;
+      var firstChoice = dismissSetupModal.querySelector('[data-dismiss-setup-choice]');
+      if (firstChoice) firstChoice.focus();
+    }
+
+    function closeDismissSetupModal() {
+      if (dismissSetupModal) dismissSetupModal.hidden = true;
+    }
+
+    function applyDismissSetup(choice) {
+      params.set('setupDismissed', '1');
+      if (choice === 'everywhere') {
+        params.set('setupPanelDismissed', '1');
+      } else {
+        params.delete('setupPanelDismissed');
+      }
+      window.history.replaceState(null, '', preserveParams('Procure%20Trial%20Dashboard.html', { setupDismissed: '1' }));
+      closeDismissSetupModal();
+      syncSetupPanelVisibility();
+      showDashboard();
+      syncChromeLinks();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     renderChecklist();
+    syncSetupPanelVisibility();
 
     if (supplierSetupLink) {
       supplierSetupLink.href = supplierSetupUrl('2');
@@ -2548,7 +2770,7 @@
     }
     var marketSetupLink = document.querySelector('[data-market-setup-link]');
     if (marketSetupLink) {
-      marketSetupLink.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: '1' });
+      marketSetupLink.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'market' });
       marketSetupLink.addEventListener('click', function(event) {
         event.preventDefault();
         openDashboardTour('market');
@@ -2609,12 +2831,19 @@
     }
     syncChromeLinks();
     if (dismissOnboarding) {
-      dismissOnboarding.addEventListener('click', function() {
-        params.set('setupDismissed', '1');
-        window.history.replaceState(null, '', preserveParams('Procure%20Trial%20Dashboard.html', { setupDismissed: '1' }));
-        showDashboard();
-        syncChromeLinks();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      dismissOnboarding.addEventListener('click', openDismissSetupModal);
+    }
+    dismissSetupChoices.forEach(function(button) {
+      button.addEventListener('click', function() {
+        applyDismissSetup(button.getAttribute('data-dismiss-setup-choice'));
+      });
+    });
+    closeDismissSetupButtons.forEach(function(button) {
+      button.addEventListener('click', closeDismissSetupModal);
+    });
+    if (dismissSetupModal) {
+      dismissSetupModal.addEventListener('click', function(event) {
+        if (event.target === dismissSetupModal) closeDismissSetupModal();
       });
     }
     if (tourDismiss && dashboardTour) {
@@ -2638,16 +2867,19 @@
       });
     }
     document.addEventListener('keydown', function(event) {
-      if (event.key === 'Escape') closeAppInstallModal();
+      if (event.key === 'Escape') {
+        closeAppInstallModal();
+        closeDismissSetupModal();
+      }
     });
-    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1' || params.get('tour') === 'order' || params.get('tour') === 'orderSupplier' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount';
+    var forceSetup = params.get('setup') === '1' || params.get('tour') === '1' || params.get('tour') === 'market' || params.get('tour') === 'order' || params.get('tour') === 'orderSupplier' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount';
     if ((setupComplete() || setupDismissed()) && !forceSetup) {
       showDashboard();
     } else {
       showOnboarding();
     }
-    if (params.get('tour') === '1' || params.get('tour') === 'order' || params.get('tour') === 'orderSupplier' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount') {
-      openDashboardTour(params.get('tour') === 'order' ? 'order' : params.get('tour') === 'orderSupplier' ? 'orderSupplier' : params.get('tour') === 'inventory' ? 'inventory' : params.get('tour') === 'stockCount' ? 'stockCount' : supplierAdded && !marketListBuilt ? 'market' : 'supplier');
+    if (params.get('tour') === '1' || params.get('tour') === 'market' || params.get('tour') === 'order' || params.get('tour') === 'orderSupplier' || params.get('tour') === 'inventory' || params.get('tour') === 'stockCount') {
+      openDashboardTour(params.get('tour') === 'market' ? 'market' : params.get('tour') === 'order' ? 'order' : params.get('tour') === 'orderSupplier' ? 'orderSupplier' : params.get('tour') === 'inventory' ? 'inventory' : params.get('tour') === 'stockCount' ? 'stockCount' : supplierAdded && !marketListBuilt ? 'market' : 'supplier');
     }
     if (params.get('appQr') === 'ios' || params.get('appQr') === '1') {
       openAppInstallModal(document.querySelector('[data-app-badge][data-store-name="App Store"]'));
