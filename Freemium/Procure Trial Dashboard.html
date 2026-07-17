@@ -2025,6 +2025,8 @@
     var marketListBuilt = params.get('marketListBuilt') === '1';
     var createdSku = params.get('createdSku') || '';
     var invoiceItemsAdded = params.get('invoiceItemsAdded') === '1';
+    var invoiceUpload = params.get('invoiceUpload') === '1';
+    var invoiceDigitise = params.get('invoiceDigitise') === '1';
     var orderPlaced = params.get('orderPlaced') === '1';
     var orderByItemDone = params.get('orderByItemDone') === '1';
     var orderBySupplierDone = params.get('orderBySupplierDone') === '1';
@@ -2182,6 +2184,12 @@
     }
     if (stockCountDone) {
       taskCatalog.stockCount.completed = true;
+    }
+    if (invoiceUpload) {
+      taskCatalog.invoiceUpload.completed = true;
+    }
+    if (invoiceDigitise) {
+      taskCatalog.invoiceDigitise.completed = true;
     }
     if (previewAllSetupDone) {
       ['supplier', 'market', 'order', 'inventory', 'stockCount', 'invoiceUpload', 'invoiceDigitise'].forEach(function(taskKey) {
@@ -2371,20 +2379,24 @@
         return countedTasks.indexOf(key) === -1;
       });
       var isChecklistComplete = progressValue === 100;
+      var completedExtraTasks = extraTasks.filter(function(key) {
+        return Boolean(taskCatalog[key] && taskCatalog[key].completed);
+      });
+      var incompleteExtraTasks = extraTasks.filter(function(key) {
+        return !(taskCatalog[key] && taskCatalog[key].completed);
+      });
       var nextExtraKey = null;
       if (isChecklistComplete) {
-        nextExtraKey = extraTasks.find(function(key) {
+        nextExtraKey = incompleteExtraTasks.find(function(key) {
           var task = taskCatalog[key];
           var depMet = !task.dependsOn || (taskCatalog[task.dependsOn] && taskCatalog[task.dependsOn].completed);
           return !task.completed && depMet;
         });
       }
-      var isAllSetupComplete = isChecklistComplete && !nextExtraKey && extraTasks.every(function(key) {
-        return Boolean(taskCatalog[key] && taskCatalog[key].completed);
-      });
-      var checklistTasks = isAllSetupComplete ? countedTasks.concat(extraTasks) : countedTasks;
+      var isAllSetupComplete = isChecklistComplete && incompleteExtraTasks.length === 0;
+      var checklistTasks = isChecklistComplete ? countedTasks.concat(completedExtraTasks) : countedTasks;
       if (panelActions && panelActionsAnchor) {
-        if (isAllSetupComplete && allSetCard) {
+        if (isChecklistComplete && allSetCard) {
           allSetCard.appendChild(panelActions);
         } else if (panelActionsAnchor.parentNode) {
           panelActionsAnchor.parentNode.insertBefore(panelActions, panelActionsAnchor);
@@ -2434,14 +2446,18 @@
 
       if (extraChecklistNode) {
         extraChecklistNode.innerHTML = '';
-        if (!isAllSetupComplete) {
+        if (isChecklistComplete) {
+          incompleteExtraTasks.forEach(function(taskKey, index) {
+            extraChecklistNode.appendChild(createTask(taskKey, index, false, currentTaskKey));
+          });
+        } else {
           extraTasks.forEach(function(taskKey, index) {
             extraChecklistNode.appendChild(createTask(taskKey, index, false, currentTaskKey));
           });
         }
       }
-      if (allSetCard) allSetCard.hidden = !isAllSetupComplete;
-      if (progressCard) progressCard.hidden = isAllSetupComplete;
+      if (allSetCard) allSetCard.hidden = !isChecklistComplete;
+      if (progressCard) progressCard.hidden = isChecklistComplete;
       var checklistWrap = document.querySelector('[data-checklist-wrap]');
       var checklistSummary = document.querySelector('[data-checklist-summary]');
       if (checklistSummary) checklistSummary.hidden = !isChecklistComplete;
@@ -2455,7 +2471,7 @@
       var extraSetupNode = document.querySelector('[data-extra-setup]');
       var extraSetupLabel = document.querySelector('[data-extra-setup-label]');
       if (extraSetupLabel) extraSetupLabel.textContent = 'More setup options';
-      if (extraSetupNode) extraSetupNode.hidden = isAllSetupComplete;
+      if (extraSetupNode) extraSetupNode.hidden = isChecklistComplete && incompleteExtraTasks.length === 0;
       if (extraSetupNode && isAllSetupComplete && !extraSetupNode.dataset.allDoneCollapsed) {
         extraSetupNode.open = false;
         extraSetupNode.dataset.allDoneCollapsed = '1';
@@ -2541,7 +2557,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed', 'trialDaysLeft'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'invoiceUpload', 'invoiceDigitise', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed', 'trialDaysLeft'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -2618,7 +2634,7 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed', 'trialDaysLeft'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'invoiceUpload', 'invoiceDigitise', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed', 'trialDaysLeft'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
