@@ -54,21 +54,13 @@ The current landing-page work is the top-of-funnel UI for this flow. The above-t
 
 ## Source References
 
-Original saved site captures are in:
+Primary visual references are:
 
 - `Freemium/_refs/Nomni - Procure.html`
 - `Freemium/_refs/Nomni - Procure_files/`
 - `Freemium/_refs/Zeemart.html`
 - `Freemium/_refs/Zeemart_files/`
-
-User-provided screenshots used as the strongest visual references:
-
-- `/Users/williamarya/Desktop/Screenshot 2026-07-01 at 12.26.39.png`
-  - Nomni Procure hero
-  - Cream background, top green announcement bar, centered nav, large left headline, right dashboard mockup, dark green next-section band
-- `/Users/williamarya/Desktop/Screenshot 2026-07-01 at 12.26.51.png`
-  - Zeemart page
-  - Dark green top strip, white nav, large rounded image hero card, “Nomni is the new home of Zeemart” message
+- the current Freemium prototype HTML files in this folder
 
 ## Prototype Files
 
@@ -93,6 +85,7 @@ User-provided screenshots used as the strongest visual references:
 - `Freemium/procure-trial-new-order-item.html` — order-by-item creation flow used for the first order onboarding path.
 - `Freemium/procure-trial-new-order-supplier.html` — order-by-supplier creation flow used as the secondary first-order path.
 - `Freemium/procure-trial-inventory.html` — Inventory page and guided Set up inventory / stock-count onboarding flows.
+- `Freemium/procure-trial-stock-count.html` — stock-count flow linked from Inventory onboarding and the Manage inventory checklist path.
 - `Freemium/procure-trial-invoices.html` — placeholder page (empty state only) for the `Upload first invoice` checklist CTA.
 
 Generated preview screenshots:
@@ -102,54 +95,28 @@ Generated preview screenshots:
 
 ## Asset downloads for devs
 
-Every page that already carries the Aa/Box handoff inspectors also has a third
-top-right pill, `↓ Assets`, opening a small dropdown with two downloads:
+Pages that already carry the Aa/Box handoff inspectors also include a third
+top-right pill, `↓ Assets`, with two downloads:
 
 - **This page** — a zip of only the local images that page actually references
-  (sidenav icon pairs, Freemium-specific icons, logo/favicon, etc.), scoped so a
-  dev doing a small update to one screen doesn't have to pull the whole set again.
+  for that specific screen
 - **Whole flow** — one zip of every local image used anywhere across the
   Freemium prototype pages (the union, deduped).
 
-Both are pre-built static zips (`Freemium/assets/downloads/<page-slug>.zip` and
-`Freemium/assets/downloads/all-pages.zip`), not generated on click — there's no
-backend, and these are plain self-contained HTML files, so a client-side zip
-library was intentionally avoided in favour of shipping the zip as a plain
-local asset file (same "only local files + Google Fonts" constraint every
-other prototype file follows).
+The downloads are pre-built static zips at
+`Freemium/assets/downloads/<page-slug>.zip` and
+`Freemium/assets/downloads/all-pages.zip`.
 
-Two scripts regenerate everything and live at the top of `Freemium/`:
+Two scripts maintain them:
 
-- `build-asset-downloads.py` — scans every top-level `Freemium/*.html` file
-  for local image references (`src=`/`href=`/CSS `url()` pointing at
-  `.svg`/`.png`/`.jpg`/`.jpeg`/`.gif`/`.webp`, skipping `http(s)://` and the
-  `_refs/` reference captures), then writes the per-page zips, the `all-pages`
-  zip, and a `MANIFEST.txt` listing what each page pulled in (and flags any
-  reference that didn't resolve to a real file — eg.
-  `procure-trial-add-supplier-no-results.html` references
-  `assets/Nomni Procure-search no results_files/no-results-icon.svg`, which
-  doesn't exist in the repo; that's a pre-existing broken reference, not
-  something this tooling introduced, and is unrelated to the zip it still
-  produces from the rest of that page's images).
-- `inject_asset_widget.py` — adds the widget's CSS/HTML/JS into every page
-  that already has the handoff inspectors (idempotent — reruns skip pages
-  that already have it, so it's safe to run again after adding a new page).
+- `build-asset-downloads.py` rebuilds the page zips, full-flow zip, and manifest.
+- `inject_asset_widget.py` injects the Assets widget into pages that already have the handoff inspectors.
 
-Run `build-asset-downloads.py` any time a page's local image references
-change, so the per-page zip and the counts shown in the dropdown stay accurate
-— the widget's file counts are baked into each page's HTML at injection time,
-not computed live, so re-run `inject_asset_widget.py` too if the counts drift
-enough to matter (it'll only touch pages where the counts actually change,
-since the marker-based skip only fires when the widget block is entirely
-absent — for a counts-only refresh, rerun after deleting the old widget block,
-or just re-derive by hand for a one-off correction).
+Run `build-asset-downloads.py` whenever local image references change. Re-run
+`inject_asset_widget.py` if the widget counts need refreshing.
 
-Deliberately out of scope for now: `freemium.html`, `nomni.html`, `Zeemart.html`
-(marketing landing pages), `procure-demo-email.html` /
-`procure-verification-email.html` (email mockups), and
-`procure-trial-add-supplier.html` (a redirect stub) — none of these carry the
-Aa/Box inspectors either, so the download widget follows the same "real
-dev-facing app screen" boundary that already exists in this codebase.
+The widget follows the same boundary as the handoff inspectors, so marketing
+pages, email mockups, and redirect stubs remain out of scope.
 
 ## Current Implementation Notes
 
@@ -167,17 +134,6 @@ Lowercase helper URLs:
 - `Freemium/freemium.html` redirects to `Freemium/nomni.html`
 - `Freemium/zeemart.html` redirects to `Freemium/Zeemart.html`
 
-Important casing/deploy note:
-
-- GitHub Pages is case-sensitive, so users typing lowercase `Freemium/zeemart.html` will not reach uppercase `Freemium/Zeemart.html` unless a redirect exists.
-- GitHub can store both `Zeemart.html` and `zeemart.html`, but a typical macOS checkout is case-insensitive and can confuse or collapse those two paths locally.
-- Long-term recommendation: avoid keeping both case variants in the repo. Keep canonical `Freemium/Zeemart.html`, and use a hosting redirect instead.
-- If moving to Cloudflare Pages, add a redirect rule or `_redirects` entry:
-  - `/freemium.html /Freemium/nomni.html 301`
-  - `/Freemium/zeemart.html /Freemium/Zeemart.html 301`
-  - `/Freemium/freemium.html /Freemium/nomni.html 301`
-- Cloudflare Pages redirect setup has been added in the repo-root `_redirects` file. This assumes the Pages project publishes the repository root as the static output directory, preserving URLs like `/Freemium/nomni.html`.
-
 The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html`:
 
 - Email screen headline: `What's your email address?`
@@ -192,19 +148,12 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - The toast opens `Freemium/procure-verification-email.html` in a new tab.
   - Mock verification code: `123456`.
 - The page reads `?source=nomni` or `?source=zeemart` so the back link can return to the relevant marketing prototype.
-- On page load, the blurred Procure dashboard background appears first. The dialog then fades/settles in softly, shows a short `Opening Nomni Procure` transition, and crossfades into the email step. Step changes also animate the dialog height so the card shape does not snap between forms.
-- Background treatment uses the actual dashboard pattern rather than the trial setup dashboard. It is intentionally very blurred with a cream-led overlay so it gives product context without competing with the dialog, while making the move from the Nomni marketing page feel less abrupt.
-- The page behind the entry dialog is locked; only the dialog card itself scrolls when needed.
-- The entry dialog does not show an `X` close button; returning to the marketing site is reserved for explicit confirmation states.
-- CTA and form label weights are semibold to reduce visual heaviness.
-- Dialog width: `540px` max on desktop.
+- The page opens on a blurred Procure background and keeps the focus on the dialog flow.
 - Trial dashboard and onboarding behaviour is documented in `Trial Onboarding Current Behaviour` below.
 - Demo confirmation:
   - `Check your inbox`
   - Private demo link sent to the captured email, expiring in 14 days.
-  - Animated email notification appears after a small delay on the confirmation state.
-  - Notification uses a red email icon so it is easier to notice.
-  - Notification opens the demo email mockup in a new tab.
+  - A delayed notification opens the demo email mockup in a new tab.
 - Duplicate demo request state:
   - Triggered when the page has a prefilled `?email=...` value and the user clicks `Try the demo account` while that same email is still in the field.
   - Heading: `Demo already requested`
@@ -221,16 +170,11 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - `Start my FREE trial` links back to `procure-get-started.html?source=demo&email=...` when an email is available.
 - Email validation is enabled on the first email screen, the verification step checks for the mock 6-digit code, and Step 1 validates the password rule. The venue details step also uses required fields so the trial dashboard can receive meaningful venue context.
 - Signup Step 1:
-  - A compact 3-part visual stepper appears above the title: 1 Account, 2 Venue, 3 Business.
-  - No helper/body text below the title.
   - First name
   - Last name
   - Create password
-  - Password field includes an inline eye icon toggle to show or hide the password.
 - Signup Step 2:
-  - The stepper marks Account complete and Venue current.
   - Heading: `Add your venue details`
-  - No helper/body text below the title.
   - Company registered name
   - Venue name
   - Country
@@ -239,19 +183,9 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Suburb, only when Australia is selected
   - Australian state, only when Australia is selected
 - Address autocomplete note:
-  - Suburb lookup is wired into the static prototype using a trimmed Matthew Proctor Australian Postcodes CSV at `Freemium/assets/australian_postcodes.csv`.
-  - The CSV keeps only `locality`, `state`, and `postcode`; selecting a suburb or postcode suggestion fills the matching postcode, suburb, and state.
-  - Search matches suburb, state, and postcode together, so entries like `Armadale`, `Armadale VIC`, and `Armadale 3143` can return the same result.
-  - Postcode search is also wired to the same CSV so users can type a postcode first and choose the matching locality.
-  - Postcode/suburb suggestions float over the dialog instead of expanding the dialog height, so longer match lists do not make Step 2 scroll.
-  - The state and postcode fields remain editable because this is locality lookup, not full address validation.
+  - Australia uses a postcode/suburb lookup backed by `Freemium/assets/australian_postcodes.csv`.
   - Singapore currently uses a plain postal code field with no autocomplete.
-  - If the CSV cannot load, the prototype falls back to a small demo suburb list.
-  - Browser autofill can still help through standard autocomplete attributes.
-  - Public OpenStreetMap/Nominatim is not suitable for production autocomplete because its public usage policy forbids autocomplete-style use.
-  - Google Places and Mapbox are better production candidates, but both require reviewing billing/free-tier limits.
 - Signup Step 3 optional questions:
-  - The stepper marks Account and Venue complete, with Business current.
   - Heading: `Tell us about your business`
   - Body: `A few quick details to help us understand your business.`
   - Primary goal
@@ -262,20 +196,10 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
   - Body: `Setting up Nomni Procure for your venue.`
   - Redirects to `Freemium/Procure Trial Dashboard.html` after a short loading state.
   - Carries the entered email, first/last name, and venue name into the trial dashboard URL so the dashboard can personalize the topbar user and setup panel.
-- Dialog padding: `36px` on desktop, reduced slightly on mobile.
 - The signup flow includes handoff inspectors in the top-right corner:
   - `Aa` enables hover inspection for font size/token, font weight, colour, and font family.
   - `Box` enables hover inspection for dimensions, padding, margin, corner radius, border, background, display/gap, positioning, and box sizing.
   - Clicking while an inspector is active pins the tooltip; pressing `Escape` clears inspector mode.
-
-The prototypes were initially too large, like the browser was zoomed to roughly 125%. We adjusted:
-
-- Desktop typography down by roughly 15-20%
-- Zeemart nav font specifically to `16px`
-- Desktop max-widths:
-  - Nomni nav and hero: `1200px`
-  - Zeemart hero card: `1200px`
-  - Zeemart strip/nav/below content: `1360px`
 
 ## Trial Onboarding Current Behaviour
 
@@ -284,15 +208,16 @@ The prototypes were initially too large, like the browser was zoomed to roughly 
 Dashboard states:
 
 - First visit, or `?setup=1`, shows the onboarding checklist.
-- Dashboard sidenav clicks also open the onboarding checklist by default until setup is 100% done or the user explicitly chooses `Go to dashboard`.
-- `Go to dashboard` dismisses onboarding by adding `setupDismissed=1` to the prototype URL state, so the regular dashboard remains the default target while navigating without relying on stale browser storage.
+- Dashboard sidenav clicks also open the onboarding checklist by default until setup is 100% done or the user explicitly chooses `Dismiss setup`.
+- `Dismiss setup` dismisses onboarding by adding `setupDismissed=1` to the prototype URL state, so the regular dashboard remains the default target while navigating without relying on stale browser storage.
 - After dismissal, Dashboard shows the regular empty trial dashboard with zero-value cards and empty spending sections.
 - The persistent sidebar `Get started` card reopens the onboarding checklist with `?setup=1`.
 
 Trial app chrome:
 
 - Topbar shows `Trial ends in 14 days`, `Book a live demo`, the real-site `Help` link, and the trial user.
-- `Help` and `Explore our setup guide` both point to the Restaurants / Nomni Procure knowledge-base collection.
+- `Trial ends in 14 days` switches to an amber warning treatment when the prototype receives `trialDaysLeft=3` or fewer, so the near-expiry state can be reviewed.
+- `Help` and `View support articles` both point to the Restaurants / Nomni Procure knowledge-base collection.
 - Sidebar includes the Procure nav, the `Get started` card directly below `News`, and the lower-left Intercom-style launcher.
 - The sidebar card shows current setup progress, a progress bar, and one recommended next action. The card body returns to the checklist; only the next-action text starts the active guided flow.
 - The checklist panel includes a non-progress mobile-app helper card. It introduces the Nomni Procure mobile app and uses official App Store / Google Play badges. On mobile, the badges open the relevant store listing directly; on desktop, they open a QR modal for the selected store. This is informational only and must not count towards setup progress.
@@ -452,12 +377,12 @@ Support links:
 
 ## Verification
 
-Chrome headless was used to regenerate previews at:
+Preview screenshots are kept in:
 
-- Nomni: `2048x1117`
-- Zeemart: `2048x1123`
+- `Freemium/nomni-procure-top-preview.png`
+- `Freemium/zeemart-top-preview.png`
 
-HTML parsing and local image reference checks were run during development.
+Local image reference checks were run during development.
 
 ## Open Follow-Ups
 

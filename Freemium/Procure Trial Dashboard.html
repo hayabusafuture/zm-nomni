@@ -109,12 +109,21 @@
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
+  .trial-status.urgent {
+    background: #FFF3CD;
+    color: #7A4E00;
+    border: 1px solid #F2D27A;
+  }
   .trial-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background: var(--nomni-green);
     box-shadow: 0 0 0 4px rgba(42,200,100,.16);
+  }
+  .trial-status.urgent .trial-dot {
+    background: #F59E0B;
+    box-shadow: 0 0 0 4px rgba(245,158,11,.18);
   }
   .topbar-setup-link {
     min-height: 34px;
@@ -813,6 +822,10 @@
     font-size: 14px;
     font-weight: 600;
     transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .16s ease;
+  }
+  .panel-action .material-symbols-outlined {
+    font-size: 18px;
+    line-height: 1;
   }
   .panel-action:active { transform: scale(.96); }
   .panel-action.guide {
@@ -1592,7 +1605,7 @@
       </div>
     </div>
     <div class="topbar-right">
-      <div class="trial-status" aria-label="Trial status"><span class="trial-dot" aria-hidden="true"></span>Trial ends in 14 days</div>
+      <div class="trial-status" aria-label="Trial status" data-trial-status><span class="trial-dot" aria-hidden="true"></span><span data-trial-status-copy>Trial ends in 14 days</span></div>
       <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book a live demo</a>
       <a class="help-btn" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank"><span class="material-symbols-outlined" aria-hidden="true">help</span>Help</a>
       <div class="user">
@@ -1681,8 +1694,8 @@
             </div>
           </aside>
           <div class="panel-actions" aria-label="Setup help">
-            <button class="panel-action guide" type="button" data-dismiss-onboarding>Go to dashboard</button>
-            <a class="panel-action guide" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank">Explore our setup guide <span aria-hidden="true">→</span></a>
+            <button class="panel-action guide" type="button" data-dismiss-onboarding><span class="material-symbols-outlined" aria-hidden="true">visibility_off</span>Dismiss setup</button>
+            <a class="panel-action guide" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank">View support articles <span aria-hidden="true">→</span></a>
             <a class="panel-action demo" href="https://www.nomni.ai/lets-chat">Book a live demo <span aria-hidden="true">→</span></a>
           </div>
         </section>
@@ -1886,8 +1899,12 @@
     var orderBySupplierDone = params.get('orderBySupplierDone') === '1';
     var inventorySetup = params.get('inventorySetup') === '1';
     var stockCountDone = params.get('stockCountDone') === '1';
+    var trialDaysLeftParam = parseInt(params.get('trialDaysLeft') || '14', 10);
+    var trialDaysLeft = Number.isFinite(trialDaysLeftParam) ? Math.max(0, trialDaysLeftParam) : 14;
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
+    var trialStatusNode = document.querySelector('[data-trial-status]');
+    var trialStatusCopyNode = document.querySelector('[data-trial-status-copy]');
     var setupTitleNode = document.querySelector('[data-setup-title]');
     var supplierSetupLink = document.querySelector('[data-supplier-setup-link]');
     var checklistNode = document.querySelector('[data-checklist]');
@@ -1920,6 +1937,16 @@
     var appBadgeLinks = document.querySelectorAll('[data-app-badge]');
     var closeAppInstallButtons = document.querySelectorAll('[data-close-app-install-modal]');
     var dashboardTourMode = 'supplier';
+
+    function renderTrialStatus() {
+      if (!trialStatusNode || !trialStatusCopyNode) return;
+      var dayLabel = trialDaysLeft === 1 ? 'day' : 'days';
+      trialStatusCopyNode.textContent = trialDaysLeft <= 0 ? 'Trial ends today' : 'Trial ends in ' + trialDaysLeft + ' ' + dayLabel;
+      trialStatusNode.classList.toggle('urgent', trialDaysLeft <= 3);
+    }
+
+    renderTrialStatus();
+
     var taskCatalog = {
       account: {
         title: 'Create account',
@@ -2328,7 +2355,7 @@
 
     function preserveParams(file, extra) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'trialDaysLeft'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -2395,7 +2422,7 @@
     function supplierSetupUrl(tourStep) {
       var nextParams = new URLSearchParams();
       nextParams.set('tour', tourStep || '1');
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'trialDaysLeft'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
