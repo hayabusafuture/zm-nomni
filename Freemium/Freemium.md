@@ -225,6 +225,7 @@ Dashboard states:
 Trial app chrome:
 
 - Trial-page topbars show an interactive `Trial ends in 14 days` countdown, the real-site `Help` link, and the trial user. The countdown opens a conversion/support popover on hover, click, or keyboard focus, with `Book a live demo` and `Chat with us` actions; this replaces the former separate adjacent demo link across the trial prototype.
+- Trial Dashboard page-first prototype: its `Book a live demo` actions now open an in-product two-step request dialog instead of leaving for the Nomni contact page. Step 1 asks for preferred contact method, contact details, and timing. Step 2 asks the user to confirm `locations`, choose one or more current ordering methods (prefilled from `orderingNow` when available), and add optional questions. Primary goal is not repeated in this dialog. The current signup handoff only carries `primaryGoal` and `email`; if this treatment is approved for the full flow, `locations` and `orderingNow` must also be added to the signup/dashboard parameter handoff.
 - `Trial ends in 14 days` switches to an amber warning treatment when the prototype receives `trialDaysLeft=3` or fewer, so the near-expiry state can be reviewed.
 - `Help` and `View support articles` both point to the Restaurants / Nomni Procure knowledge-base collection.
 - Sidebar includes the Procure nav, the `Get started` card directly below `News`, and the lower-left Intercom-style launcher.
