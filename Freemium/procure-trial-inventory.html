@@ -1784,7 +1784,7 @@
       if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return setupTourUrl('order');
       if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return setupTourUrl('stockCount');
       if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return setupTourUrl('inventory');
-      if (marketListBuilt && goal === 'Digitise invoices') return withParams('procure-trial-invoices.html');
+      if (marketListBuilt && goal === 'Digitise invoices') return withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' });
       if (!supplierAdded) return setupTourUrl('supplier');
       if (supplierAdded && !marketListBuilt) return setupTourUrl('market');
       return dashboardUrl(true);
@@ -2523,6 +2523,13 @@
         copy: 'Open Orders when you’re ready to place your first order from the items you just added.',
         placement: 'right'
       },
+      invoiceStart: {
+        target: '[data-nav-invoices]',
+        kicker: 'Step 1',
+        title: 'Open Invoices',
+        copy: 'Go to Invoices to continue with the next invoice setup task.',
+        placement: 'right'
+      },
       addItem: {
         target: function() { return document.querySelector('[data-items-empty-nolist]:not([hidden]) [data-add-item-toggle]') || document.querySelector('.toolbar-right [data-add-item-toggle]'); },
         kicker: 'Step 2',
@@ -2685,6 +2692,9 @@
         document.querySelectorAll('[data-nav-orders]').forEach(function(link) {
           link.href = withParams('procure-trial-orders.html', { tour: 'order' });
         });
+      } else if (mode === 'invoiceStart') {
+        currentTourStep = 'invoiceStart';
+        document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload', tourOffset: '1' }); });
       } else if (mode === 'stockCount') {
         currentTourStep = 'stockCountButton';
       } else {
@@ -2724,6 +2734,7 @@
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
       link.addEventListener('click', function(event) {
         var goal = params.get('primaryGoal') || 'Order faster';
+        if (marketListBuilt && goal === 'Digitise invoices') { event.preventDefault(); startTour('invoiceStart'); return; }
         if (!supplierAdded) {
           event.preventDefault();
           startTour('supplierStart');

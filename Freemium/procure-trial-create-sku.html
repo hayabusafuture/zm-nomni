@@ -1131,6 +1131,13 @@
         copy: 'Open Inventory when you are ready to start your first stock count.',
         placement: 'right'
       },
+      invoiceStart: {
+        target: '[data-nav-invoices]',
+        kicker: 'Step 1',
+        title: 'Open Invoices',
+        copy: 'Go to Invoices to continue with the next invoice setup task.',
+        placement: 'right'
+      },
       name: {
         target: '[data-field-name]',
         kicker: 'Step 5',
@@ -1169,7 +1176,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'invoiceUpload', 'invoiceDigitise', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1447,7 +1454,7 @@
       var target = document.querySelector(step.target);
       if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       var index = tourOrder.indexOf(currentTourStep);
-      var isStartPointer = ['supplierStart', 'marketStart', 'orderStart', 'inventoryStart', 'stockCountStart'].indexOf(currentTourStep) !== -1;
+      var isStartPointer = ['supplierStart', 'marketStart', 'orderStart', 'inventoryStart', 'stockCountStart', 'invoiceStart'].indexOf(currentTourStep) !== -1;
       if (tourPrev) {
         tourPrev.hidden = isStartPointer;
         tourPrev.disabled = index <= 0;
@@ -1505,6 +1512,11 @@
       setTourStep(mode === 'stockCount' ? 'stockCountStart' : 'inventoryStart', false);
     }
 
+    function startInvoiceTourHere(mode) {
+      document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: mode, tourOffset: '1' }); });
+      if (!tour) return; tour.hidden = false; setTourStep('invoiceStart', false);
+    }
+
     function goTour(delta) {
       var index = tourOrder.indexOf(currentTourStep);
       if (index < 0) index = 0;
@@ -1558,8 +1570,9 @@
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
       link.addEventListener('click', function(event) {
         var state = nextSetupState();
-        if (state.mode === 'invoiceUpload' || state.mode === 'invoiceDigitise') return;
         event.preventDefault();
+        if (state.mode === 'invoiceUpload') { startInvoiceTourHere('upload'); return; }
+        if (state.mode === 'invoiceDigitise') { startInvoiceTourHere('digitise'); return; }
         if (state.mode === 'supplier') startSupplierTourHere();
         if (state.mode === 'market') startMarketListTourHere();
         if (state.mode === 'order') startOrderTourHere();

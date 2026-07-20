@@ -2456,6 +2456,7 @@
     var itemsNavLink = document.querySelector('[data-nav-items]');
     var ordersNavLink = document.querySelector('[data-nav-orders]');
     var inventoryNavLink = document.querySelector('[data-nav-inventory]');
+    var invoicesNavLink = document.querySelector('[data-nav-invoices]');
     var onboardingView = document.querySelector('[data-onboarding-view]');
     var mainNode = document.querySelector('.main');
     var dashboardView = document.querySelector('[data-dashboard-view]');
@@ -2770,6 +2771,8 @@
         if (taskKey === 'order') link.setAttribute('data-order-setup-link', '');
         if (taskKey === 'inventory') link.setAttribute('data-inventory-setup-link', '');
         if (taskKey === 'stockCount') link.setAttribute('data-stock-count-setup-link', '');
+        if (taskKey === 'invoiceUpload') link.setAttribute('data-invoice-upload-setup-link', '');
+        if (taskKey === 'invoiceDigitise') link.setAttribute('data-invoice-digitise-setup-link', '');
         link.href = taskKey === 'supplier'
           ? preserveParams(task.ctaHref, { tour: '2' })
           : taskKey === 'market'
@@ -2780,6 +2783,10 @@
               ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'inventory' })
             : taskKey === 'stockCount'
               ? preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'stockCount' })
+            : taskKey === 'invoiceUpload'
+              ? preserveParams(task.ctaHref, { tour: 'upload' })
+            : taskKey === 'invoiceDigitise'
+              ? preserveParams(task.ctaHref, { tour: 'digitise' })
             : preserveParams(task.ctaHref, {});
         link.textContent = task.cta;
         row.appendChild(link);
@@ -3092,14 +3099,16 @@
     }
 
     function setDashboardTourMode(mode) {
-      dashboardTourMode = mode === 'market' || mode === 'order' || mode === 'orderSupplier' || mode === 'inventory' || mode === 'stockCount' ? mode : 'supplier';
+      dashboardTourMode = mode === 'market' || mode === 'order' || mode === 'orderSupplier' || mode === 'inventory' || mode === 'stockCount' || mode === 'invoiceUpload' || mode === 'invoiceDigitise' ? mode : 'supplier';
       if (dashboardTourKicker) dashboardTourKicker.textContent = 'Step 1';
       if (dashboardTourTitle) {
         dashboardTourTitle.textContent = dashboardTourMode === 'market'
           ? 'Start from Items'
           : dashboardTourMode === 'order' || dashboardTourMode === 'orderSupplier'
             ? 'Start from Orders'
-            : dashboardTourMode === 'inventory' || dashboardTourMode === 'stockCount'
+          : dashboardTourMode === 'invoiceUpload' || dashboardTourMode === 'invoiceDigitise'
+              ? 'Open Invoices'
+          : dashboardTourMode === 'inventory' || dashboardTourMode === 'stockCount'
               ? 'Start from Inventory'
               : 'Start from Outlets';
       }
@@ -3110,6 +3119,8 @@
             ? 'Open Orders to create your first purchase order for the items you need.'
           : dashboardTourMode === 'orderSupplier'
             ? 'Open Orders to place an order by choosing the supplier first.'
+          : dashboardTourMode === 'invoiceUpload' || dashboardTourMode === 'invoiceDigitise'
+            ? 'Open Invoices from the sidebar to continue with this setup task.'
           : dashboardTourMode === 'inventory'
             ? 'Create your first inventory list and add items to start tracking stock on hand.'
           : dashboardTourMode === 'stockCount'
@@ -3119,6 +3130,7 @@
       if (itemsNavLink) itemsNavLink.href = dashboardTourMode === 'market' ? marketSetupUrl() : preserveParams('procure-trial-items.html');
       if (ordersNavLink) ordersNavLink.href = dashboardTourMode === 'order' ? orderSetupUrl() : dashboardTourMode === 'orderSupplier' ? preserveParams('procure-trial-orders.html', { tour: 'orderSupplier' }) : preserveParams('procure-trial-orders.html');
       if (inventoryNavLink) inventoryNavLink.href = dashboardTourMode === 'inventory' ? inventorySetupUrl() : dashboardTourMode === 'stockCount' ? stockCountSetupUrl() : preserveParams('procure-trial-inventory.html');
+      if (invoicesNavLink) invoicesNavLink.href = dashboardTourMode === 'invoiceUpload' ? preserveParams('procure-trial-invoices.html', { tour:'upload', tourOffset:'1' }) : dashboardTourMode === 'invoiceDigitise' ? preserveParams('procure-trial-invoices.html', { tour:'digitise', tourOffset:'1' }) : preserveParams('procure-trial-invoices.html');
       if (outletsNavLink) outletsNavLink.href = supplierSetupUrl('2');
     }
 
@@ -3127,6 +3139,8 @@
         ? itemsNavLink
             : dashboardTourMode === 'order' || dashboardTourMode === 'orderSupplier'
             ? ordersNavLink
+            : dashboardTourMode === 'invoiceUpload' || dashboardTourMode === 'invoiceDigitise'
+              ? invoicesNavLink
             : dashboardTourMode === 'inventory' || dashboardTourMode === 'stockCount'
               ? inventoryNavLink
               : outletsNavLink;
@@ -3251,13 +3265,17 @@
         openDashboardTour('stockCount');
       });
     }
+    var invoiceUploadSetupLink = document.querySelector('[data-invoice-upload-setup-link]');
+    if (invoiceUploadSetupLink) invoiceUploadSetupLink.addEventListener('click', function(event) { event.preventDefault(); openDashboardTour('invoiceUpload'); });
+    var invoiceDigitiseSetupLink = document.querySelector('[data-invoice-digitise-setup-link]');
+    if (invoiceDigitiseSetupLink) invoiceDigitiseSetupLink.addEventListener('click', function(event) { event.preventDefault(); openDashboardTour('invoiceDigitise'); });
     if (sidebarNextAction) {
       sidebarNextAction.addEventListener('click', function(event) {
         if (!sidebarNextStep) return;
-        if (sidebarNextStep.textContent !== taskCatalog.supplier.title && sidebarNextStep.textContent !== taskCatalog.market.title && sidebarNextStep.textContent !== taskCatalog.order.title && sidebarNextStep.textContent !== taskCatalog.inventory.title && sidebarNextStep.textContent !== taskCatalog.stockCount.title) return;
+        if (sidebarNextStep.textContent !== taskCatalog.supplier.title && sidebarNextStep.textContent !== taskCatalog.market.title && sidebarNextStep.textContent !== taskCatalog.order.title && sidebarNextStep.textContent !== taskCatalog.inventory.title && sidebarNextStep.textContent !== taskCatalog.stockCount.title && sidebarNextStep.textContent !== taskCatalog.invoiceUpload.title && sidebarNextStep.textContent !== taskCatalog.invoiceDigitise.title) return;
         event.preventDefault();
         showOnboarding();
-        openDashboardTour(sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : sidebarNextStep.textContent === taskCatalog.order.title ? 'order' : sidebarNextStep.textContent === taskCatalog.inventory.title ? 'inventory' : sidebarNextStep.textContent === taskCatalog.stockCount.title ? 'stockCount' : 'supplier');
+        openDashboardTour(sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : sidebarNextStep.textContent === taskCatalog.order.title ? 'order' : sidebarNextStep.textContent === taskCatalog.inventory.title ? 'inventory' : sidebarNextStep.textContent === taskCatalog.stockCount.title ? 'stockCount' : sidebarNextStep.textContent === taskCatalog.invoiceUpload.title ? 'invoiceUpload' : sidebarNextStep.textContent === taskCatalog.invoiceDigitise.title ? 'invoiceDigitise' : 'supplier');
       });
     }
     if (outletsNavLink) {

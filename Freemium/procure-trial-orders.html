@@ -1328,6 +1328,7 @@
       if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return withParams('procure-trial-inventory.html', { tour: 'stockCount' });
       if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return withParams('procure-trial-orders.html', { tour: 'order' });
       if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return withParams('procure-trial-inventory.html', { tour: 'inventory' });
+      if (marketListBuilt && goal === 'Digitise invoices') return withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' });
       if (!supplierAdded) return withParams('procure-trial-outlet-suppliers.html', { tour: '2' });
       if (supplierAdded && !marketListBuilt) return withParams('procure-trial-items.html', { tour: '1' });
       return dashboardUrl(true);
@@ -1502,6 +1503,10 @@
           if (tourKicker) tourKicker.textContent = 'Step 1';
           if (tourTitle) tourTitle.textContent = 'Start from Items';
           if (tourCopy) tourCopy.textContent = 'Open Items to build the list your team will order from.';
+        } else if (tourMode === 'invoiceStart') {
+          if (tourKicker) tourKicker.textContent = 'Step 1';
+          if (tourTitle) tourTitle.textContent = 'Open Invoices';
+          if (tourCopy) tourCopy.textContent = 'Go to Invoices to continue with the next invoice setup task.';
         } else if (tourMode === 'inventoryStart') {
           if (tourKicker) tourKicker.textContent = 'Step 1';
           if (tourTitle) tourTitle.textContent = 'Start from Inventory';
@@ -1525,7 +1530,7 @@
 
     function placeTour() {
       if (!tour || tour.hidden) return;
-      var target = tourMode === 'supplierStart' ? document.querySelector('[data-nav-outlets]') : tourMode === 'marketStart' ? document.querySelector('[data-nav-items]') : tourMode === 'inventoryStart' ? document.querySelector('[data-nav-inventory]') : tourMode === 'handoff' ? setupCard : tourMode === 'orderSupplier' && supplierModal && !supplierModal.hidden ? supplierChoice : document.querySelector('[data-new-order-wrap]');
+      var target = tourMode === 'supplierStart' ? document.querySelector('[data-nav-outlets]') : tourMode === 'marketStart' ? document.querySelector('[data-nav-items]') : tourMode === 'invoiceStart' ? document.querySelector('[data-nav-invoices]') : tourMode === 'inventoryStart' ? document.querySelector('[data-nav-inventory]') : tourMode === 'handoff' ? setupCard : tourMode === 'orderSupplier' && supplierModal && !supplierModal.hidden ? supplierChoice : document.querySelector('[data-new-order-wrap]');
       if (!target) return;
       var rect = target.getBoundingClientRect();
       var pad = 10;
@@ -1538,7 +1543,7 @@
       var cardLeft = rect.right + 28;
       var cardTop = Math.max(16, Math.min(rect.top - 18, window.innerHeight - cardHeight - 16));
       tourCard.classList.remove('left');
-      if (tourMode === 'supplierStart' || tourMode === 'marketStart' || tourMode === 'inventoryStart') {
+      if (tourMode === 'supplierStart' || tourMode === 'marketStart' || tourMode === 'invoiceStart' || tourMode === 'inventoryStart') {
         cardLeft = Math.min(window.innerWidth - cardWidth - 16, rect.right + 28);
       } else if (tourMode !== 'handoff' || cardLeft + cardWidth > window.innerWidth - 16) {
         cardLeft = Math.max(16, rect.left - cardWidth - 34);
@@ -1565,6 +1570,8 @@
         document.querySelectorAll('[data-nav-inventory]').forEach(function(link) {
           link.href = withParams('procure-trial-inventory.html', { tour: inventoryTour });
         });
+      } else if (tourMode === 'invoiceStart') {
+        document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload', tourOffset: '1' }); });
       }
       tour.hidden = false;
       toggleNewOrderMenu(tourMode === 'order' || tourMode === 'orderSupplier');
@@ -1590,6 +1597,7 @@
     document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
       link.addEventListener('click', function(event) {
         var goal = params.get('primaryGoal') || 'Order faster';
+        if (marketListBuilt && goal === 'Digitise invoices') { event.preventDefault(); openTour('invoiceStart'); return; }
         if (!supplierAdded) {
           event.preventDefault();
           openTour('supplierStart');

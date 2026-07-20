@@ -1083,7 +1083,7 @@
       if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return setupTourUrl('stockCount');
       if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return setupTourUrl('order');
       if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return setupTourUrl('inventory');
-      if (marketListBuilt && goal === 'Digitise invoices') return withParams('procure-trial-invoices.html');
+      if (marketListBuilt && goal === 'Digitise invoices') return withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' });
       if (!supplierAdded) return setupTourUrl('supplier');
       if (supplierAdded && !marketListBuilt) return setupTourUrl('market');
       return dashboardUrl(true);
@@ -1324,6 +1324,12 @@
         title: 'Finish the count',
         copy: "Once you've counted everything on the list, click Done to finish up.",
         placement: 'above'
+      },
+      invoiceStart: {
+        target: '[data-nav-invoices]',
+        kicker: 'Step 1',
+        title: 'Open Invoices',
+        copy: 'Go to Invoices to continue with the next invoice setup task.'
       }
     };
 
@@ -1373,9 +1379,10 @@
       setTimeout(placeTour, 60);
     }
 
-    function startTour() {
+    function startTour(mode) {
       tourActive = true;
-      currentTourStep = 'countQty';
+      currentTourStep = mode === 'invoiceStart' ? 'invoiceStart' : 'countQty';
+      if (mode === 'invoiceStart') document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload', tourOffset: '1' }); });
       if (tour) tour.hidden = false;
       document.body.classList.add('tour-open');
       renderTourStep();
@@ -1395,6 +1402,7 @@
     }
 
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
+    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) { link.addEventListener('click', function(event) { var goal=params.get('primaryGoal')||'Order faster'; if (marketListBuilt && goal==='Digitise invoices') { event.preventDefault(); startTour('invoiceStart'); } }); });
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
 

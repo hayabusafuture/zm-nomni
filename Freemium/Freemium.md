@@ -86,7 +86,7 @@ Primary visual references are:
 - `Freemium/procure-trial-new-order-supplier.html` — order-by-supplier creation flow used as the secondary first-order path.
 - `Freemium/procure-trial-inventory.html` — Inventory page and guided Set up inventory / stock-count onboarding flows.
 - `Freemium/procure-trial-stock-count.html` — stock-count flow linked from Inventory onboarding and the Manage inventory checklist path.
-- `Freemium/procure-trial-invoices.html` — placeholder page (empty state only) for the `Upload invoice` checklist CTA.
+- `Freemium/procure-trial-invoices.html` — interactive invoice onboarding page for the `Upload invoice` and `Digitise invoices` checklist CTAs. It starts empty, accepts one or more JPG/PNG/PDF uploads, lists them under Uploads with the live-style five-part completeness status, and opens an OCR-prefilled review form through `View/edit`. Saving moves the record into Invoices. `Pay online` is intentionally omitted.
 
 Generated preview screenshots:
 
@@ -309,9 +309,22 @@ Invoice item creation:
 - After the final pending invoice is saved, the flow returns to Items with `marketListBuilt=1`, `invoiceItemsAdded=1`, and `marketHandoff=1`, appends invoice-created rows, and opens the same one-time 60% completion handoff to the sidebar setup card.
 - Per Jira `PWF-1511`, a fuller future branch can add OCR error states, date/supplier editing, and pending-review skip flows.
 
-Placeholder pages:
+Invoice digitisation:
 
-- `Freemium/procure-trial-invoices.html` is an empty-state page for the unlocked `Upload invoice` CTA.
+- `Freemium/procure-trial-invoices.html` starts with no records. Uploading one or more invoices sets `invoiceUpload=1`, switches to Uploads, and creates a pending row for each file. `View/edit` opens a live-style split digitisation workspace: required invoice fields and line items on the left, uploaded document preview on the right.
+- OCR may pre-fill supplier, invoice number, invoice date, and payment terms. It only surfaces invoice line items that match items the user has already created; unmatched products do not automatically appear as line items. If the supplier cannot be matched, line-item editing may remain unavailable until the user selects or creates the supplier. Payment terms remains required even when OCR supplies it.
+- `Add SKU` appends a blank row, so invoices can contain any number of line items. `Add new` contains Create new SKU, Add custom item, and Add free SKU.
+- Create new SKU reuses the fields from `procure-trial-create-sku.html`: SKU name, supplier/my product codes, UOM, minimum order quantity, price before tax, tax rate, and optional inventory setup. `Add to Inventory` is off by default and its Inventory list/UOM/par fields remain hidden until selected. Saving creates the SKU and applies it to the next blank invoice line.
+- Publishing sets `invoiceDigitise=1`, removes the pending upload, and adds the processed record to Invoices.
+
+Invoice tours:
+
+- Uploading and digitising are separate tours. From the Dashboard checklist or small Get started widget on Dashboard, Create SKU, Items, Orders, Inventory, or Stock count, Step 1 stays on the current page and highlights the Invoices navigation; clicking it carries the tour into the appropriate invoice flow with subsequent step numbers offset correctly. When launched while already on Invoices, Step 1 starts directly at Upload invoice or View/edit.
+- **Upload tour:** Upload invoice → choose one or more files in the dropzone → the user clicks Done without an additional explanatory step → brief Uploads-table completion handoff. Instructional kickers use the existing `Step N` format only.
+- **Digitise tour:** Open the pending invoice with View/edit, then four review areas: (1) check all invoice details and mandatory payment terms, including missing/incorrect OCR matches; (2) review all matched line items; (3) learn that Add SKU/Add new can handle missing items without entering a Create SKU sub-tour; (4) publish only when the complete invoice is valid.
+- When `invoiceUpload=1` is carried into a fresh page load without in-memory uploaded files, the digitise tour creates one pending sample upload so the checklist CTA still has a record to open in this static prototype.
+
+Tour behaviour: the digitise tour is explanatory rather than forcing field-by-field actions; users can dismiss or go back; adding/removing rows does not reset it; it never implies that OCR found every product or that reviewing one row completes the invoice; the Create SKU dialog is outside the guided sequence.
 
 Set up inventory flow:
 
@@ -374,13 +387,13 @@ Checklist "100% done" state (`Procure Trial Dashboard.html`):
 - If every visible optional task is also complete, the "More setup options" section is hidden and all completed rows are combined behind the single "Show completed steps" toggle. `allSetupDone=1` remains a preview shortcut for this fully complete review state.
 - Completed rows first show unfinished secondary onboarding paths where they exist, for example `Try adding from invoice`, `Try creating manually`, or `Try ordering by supplier/item`. If no secondary path remains and a relevant article exists, the row shows a low-emphasis `View guide` support-article link. `Create account` does not show a repeat or article action because signup is not repeatable.
 - Tasks with secondary paths are still considered complete after one path is finished; the alternate path is optional and does not affect checklist progress.
-- Known gap (pre-existing, not fixed by this): the `Upload invoice` and `Digitise invoice` onboarding flows are not built yet. `Procure Trial Dashboard.html` accepts `invoiceUpload=1` and `invoiceDigitise=1` as preview-only completion params so devs can review checklist states, but no real flow currently sets those params. Until the digitise flow exists, its unlocked checklist CTA points to the `procure-trial-invoices.html` placeholder. The `Digitise invoices` primary goal is selectable, but cannot reach 100% through real user actions until those flows are implemented. `invoiceExport` remains defined in the prototype data but is coded out of the visible "More setup options" list for now.
+- The invoice page now sets the Dashboard's existing `invoiceUpload=1` and `invoiceDigitise=1` completion parameters through real prototype actions. `invoiceExport` remains defined in the prototype data but is coded out of the visible "More setup options" list for now.
 
 Sidebar "Get started" widget — tick icon and Next/Also try label:
 
 - A small 16px green-circle tick (`data-sidebar-setup-tick`, hidden by default) sits next to the "Get started" title in the widget on every trial page (12 files share this widget; `procure-trial-new-order-item.html` and `procure-trial-review-invoice-items.html` don't have it at all).
 - On the Dashboard (the only page with full `taskCatalog` knowledge): once the primary checklist is 100%, the tick shows and the label becomes `Also try:`, with the link text swapped to the first incomplete visible "extra" task's title. If literally nothing is left across both primary and visible extra tasks, the whole `Next:`/`Also try:` line hides instead of showing a dead label.
-- Every other page also shows a real, specific "Also try" task rather than a generic filler — computed from a small local lookup instead of the full `taskCatalog`, since the actually-reachable states are few: `invoiceUpload`/`invoiceDigitise` never complete anywhere in this build (no param marks them done), and `order`/`stockCount` complete via the `orderPlaced`/`stockCountDone` params every page already tracks. So for `Order faster` (100% via `orderPlaced=1` plus `inventorySetup=1`) the answer is reliably "Upload an invoice" (linking to `procure-trial-invoices.html`); for `Manage inventory` (100% via `stockCountDone`) it's "Place order" (linking to `procure-trial-orders.html`) unless `orderPlaced` is already true, in which case it also falls to "Upload an invoice". The href override runs *after* each page's existing final href-assignment (`sidebarNextUrl()` or the inline chain), since that assignment already runs unconditionally and would otherwise clobber it.
+- Every other page also shows a real, specific "Also try" task rather than a generic filler, computed from a small local lookup instead of the full `taskCatalog`. The invoice page now sets `invoiceUpload` and `invoiceDigitise`; order and stock-count completion continue to use `orderPlaced` and `stockCountDone`. The href override runs *after* each page's existing final href-assignment (`sidebarNextUrl()` or the inline chain), since that assignment already runs unconditionally and would otherwise clobber it.
 - Layout fix: `.sidebar-setup-next` (the Next/Also try line) and the top `.sidebar-setup-row` (title + percentage) both use `white-space: nowrap` on their child spans now, since the sidebar is narrow (232px) and long strings would otherwise wrap awkwardly mid-word.
 - Label + action are always on the same line, separated by a colon (`Next: Build market list`, `Also try: Upload an invoice`) — the label is never hidden once the widget is showing a specific task, since hiding it only made sense for the old generic "Explore more setup options" filler, not a real named task. Two of the longer extra-task titles are shortened specifically for this line (the main checklist row keeps the original wording): `Complete stock count` → `Complete a stock count`, `Upload invoice` → `Upload an invoice`.
 
@@ -400,7 +413,5 @@ Local image reference checks were run during development.
 ## Open Follow-Ups
 
 - Decide how the demo dashboard works: what data appears, whether it is seeded, and how it differs from the guided trial checklist/dashboard.
-- Map and build the `Upload invoice` onboarding flow. This is currently represented by an empty-state invoices page and no page sets `invoiceUpload=1`.
-- Map and build the `Digitise invoices` onboarding flow. Until this exists, the `Digitise invoices` primary goal is selectable but cannot reach 100% completion.
 - Decide whether the later `Export invoices` extra task remains in scope. It is still defined in prototype data for future wiring, but is currently coded out of the visible "More setup options" list.
 - Continue keeping this document updated as visual or content changes are made.
