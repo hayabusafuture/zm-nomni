@@ -171,6 +171,7 @@ The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html
 - Demo email:
   - Subject-style page: `Your private Nomni Procure demo link`.
   - Main CTA opens the demo account dashboard.
+  - A separated secondary section beneath the main CTA offers a guided walkthrough, with a `Book a live demo` action linking to `https://www.nomni.ai/lets-chat`.
 - Demo dashboard:
   - Uses sample Procure dashboard data.
   - Topbar includes `Demo link expires in 14 days`.
@@ -223,7 +224,7 @@ Dashboard states:
 
 Trial app chrome:
 
-- Topbar shows `Trial ends in 14 days`, `Book a live demo`, the real-site `Help` link, and the trial user.
+- Trial-page topbars show an interactive `Trial ends in 14 days` countdown, the real-site `Help` link, and the trial user. The countdown opens a conversion/support popover on hover, click, or keyboard focus, with `Book a live demo` and `Chat with us` actions; this replaces the former separate adjacent demo link across the trial prototype.
 - `Trial ends in 14 days` switches to an amber warning treatment when the prototype receives `trialDaysLeft=3` or fewer, so the near-expiry state can be reviewed.
 - `Help` and `View support articles` both point to the Restaurants / Nomni Procure knowledge-base collection.
 - Sidebar includes the Procure nav, the `Get started` card directly below `News`, and the lower-left Intercom-style launcher.
@@ -397,12 +398,8 @@ Local image reference checks were run during development.
 
 ## Open Follow-Ups
 
-- Define what “demo access” includes inside the stripped-down Nomni Procure prototype.
 - Decide how the demo dashboard works: what data appears, whether it is seeded, and how it differs from the guided trial checklist/dashboard.
 - Map and build the `Upload invoice` onboarding flow. This is currently represented by an empty-state invoices page and no page sets `invoiceUpload=1`.
 - Map and build the `Digitise invoices` onboarding flow. Until this exists, the `Digitise invoices` primary goal is selectable but cannot reach 100% completion.
 - Decide whether the later `Export invoices` extra task remains in scope. It is still defined in prototype data for future wiring, but is currently coded out of the visible "More setup options" list.
-- Decide how trial users are told they can contact support via live chat, beyond the persistent Intercom-style launcher.
-- Define the conversion path from trial to paid account: what users see before the trial ends, who they contact, and what in-product CTA or message explains the next step.
-- Decide the final lifecycle for the sidebar `Get started` widget after every setup task is complete. Current recommendation: keep it visible for a short grace period so users can reopen completed steps, then hide it either after an explicit "dismiss forever" action or automatically after a defined number of days from full completion.
 - Continue keeping this document updated as visual or content changes are made.

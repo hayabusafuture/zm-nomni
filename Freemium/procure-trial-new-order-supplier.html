@@ -530,18 +530,45 @@
   .user-menu-item.supplier-hub svg { color: #1a6fcc; }
   .user-menu-item.logout { color: #e53535; }
 
+  .trial-conversion {
+    position: relative;
+  }
+  .trial-conversion::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    height: 12px;
+  }
   .trial-status {
-    min-height: 34px;
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 0 12px;
+    border: 0;
     border-radius: 999px;
     background: rgba(226,255,230,.96);
     color: var(--seaweed);
+    font-family: inherit;
     font-size: 13px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: background-color .16s ease, box-shadow .16s ease;
+  }
+  .trial-status:hover,
+  .trial-status:focus-visible,
+  .trial-conversion.open .trial-status {
+    background: var(--mint);
+    box-shadow: 0 0 0 2px rgba(42,200,100,.24);
+    outline: none;
+  }
+  .trial-status.urgent {
+    background: #FFF3CD;
+    color: #7A4E00;
+    border: 1px solid #F2D27A;
   }
   .trial-dot {
     width: 8px;
@@ -550,21 +577,107 @@
     background: var(--nomni-green);
     box-shadow: 0 0 0 4px rgba(42,200,100,.16);
   }
-  .topbar-setup-link {
-    min-height: 34px;
+  .trial-status.urgent .trial-dot {
+    background: #F59E0B;
+    box-shadow: 0 0 0 4px rgba(245,158,11,.18);
+  }
+  .trial-status-caret {
+    margin-left: -2px;
+    font-size: 17px;
+    line-height: 1;
+    transition: transform .16s ease;
+  }
+  .trial-conversion.open .trial-status-caret,
+  .trial-conversion:focus-within .trial-status-caret,
+  .trial-conversion:hover .trial-status-caret { transform: rotate(180deg); }
+  .trial-conversion-popover {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 220;
+    width: 330px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #fff;
+    color: var(--ink);
+    box-shadow: 0 0 0 1px rgba(0,0,0,.06), 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity .16s ease, visibility .16s ease, transform .16s ease;
+  }
+  .trial-conversion-popover::before {
+    content: "";
+    position: absolute;
+    right: 24px;
+    bottom: 100%;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    box-shadow: -1px -1px 0 rgba(0,0,0,.05);
+    transform: translateY(7px) rotate(45deg);
+  }
+  .trial-conversion:hover .trial-conversion-popover,
+  .trial-conversion:focus-within .trial-conversion-popover,
+  .trial-conversion.open .trial-conversion-popover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .trial-conversion-kicker {
+    margin: 0 0 6px;
+    color: var(--spinach);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .trial-conversion-title {
+    margin: 0 0 8px;
+    color: var(--seaweed);
+    font-size: 18px;
+    line-height: 1.25;
+    letter-spacing: -.02em;
+    text-wrap: balance;
+  }
+  .trial-conversion-copy {
+    margin: 0 0 18px;
+    color: #687080;
+    font-size: 13px;
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .trial-conversion-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .trial-conversion-action {
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 12px;
+    padding: 0 14px;
+    border: 1px solid var(--rule);
     border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .16s ease, border-color .16s ease, transform .14s ease;
+  }
+  .trial-conversion-action.primary {
+    border-color: var(--nomni-green);
     background: var(--nomni-green);
     color: var(--seaweed);
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
   }
-  .topbar-setup-link:hover { background: var(--mint); }
-
+  .trial-conversion-action:hover { background: #F3F4F6; }
+  .trial-conversion-action.primary:hover { background: var(--mint); }
+  .trial-conversion-action:active { transform: scale(.96); }
   .tour-overlay {
     position: fixed;
     inset: 0;
@@ -821,8 +934,18 @@
       </div>
     </div>
     <div class="topbar-right">
-      <div class="trial-status" aria-label="Trial status"><span class="trial-dot" aria-hidden="true"></span>Trial ends in 14 days</div>
-      <a class="topbar-setup-link" href="https://www.nomni.ai/lets-chat">Book a live demo</a>
+      <div class="trial-conversion" data-trial-conversion>
+        <button class="trial-status" type="button" aria-label="Trial status and account options" aria-expanded="false" aria-controls="trial-conversion-popover" data-trial-status data-trial-conversion-toggle><span class="trial-dot" aria-hidden="true"></span><span data-trial-status-copy>Trial ends in 14 days</span><span class="material-symbols-outlined trial-status-caret" aria-hidden="true">expand_more</span></button>
+        <section class="trial-conversion-popover" id="trial-conversion-popover" aria-label="Trial account options" data-trial-conversion-popover>
+          <p class="trial-conversion-kicker">Your trial</p>
+          <h2 class="trial-conversion-title" data-trial-conversion-title>Ready to continue with Nomni Procure?</h2>
+          <p class="trial-conversion-copy" data-trial-conversion-copy>Talk to our team about your venues, suppliers, and the right plan for your business.</p>
+          <div class="trial-conversion-actions">
+            <a class="trial-conversion-action primary" href="https://www.nomni.ai/lets-chat">Book a live demo</a>
+            <button class="trial-conversion-action" type="button" data-trial-chat>Chat with us</button>
+          </div>
+        </section>
+      </div>
       <a class="help-btn" href="https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure" target="_blank"><span class="material-symbols-outlined" aria-hidden="true">help</span>Help</a>
       <div class="user-wrap">
         <div class="user" id="userMenuBtn" role="button" aria-haspopup="true" aria-expanded="false">
@@ -1645,6 +1768,51 @@
   });
   document.addEventListener('keydown', function(event){
     if (event.key === 'Escape') menu.hidden = true;
+  });
+})();
+</script>
+
+<script>
+(function() {
+  var conversion = document.querySelector('[data-trial-conversion]');
+  if (!conversion) return;
+  var toggle = conversion.querySelector('[data-trial-conversion-toggle]');
+  var status = conversion.querySelector('[data-trial-status]');
+  var statusCopy = conversion.querySelector('[data-trial-status-copy]');
+  var title = conversion.querySelector('[data-trial-conversion-title]');
+  var copy = conversion.querySelector('[data-trial-conversion-copy]');
+  var chatButton = conversion.querySelector('[data-trial-chat]');
+  var daysParam = parseInt(new URLSearchParams(window.location.search).get('trialDaysLeft') || '14', 10);
+  var daysLeft = Number.isFinite(daysParam) ? Math.max(0, daysParam) : 14;
+  var dayLabel = daysLeft === 1 ? 'day' : 'days';
+
+  statusCopy.textContent = daysLeft <= 0 ? 'Trial ends today' : 'Trial ends in ' + daysLeft + ' ' + dayLabel;
+  status.classList.toggle('urgent', daysLeft <= 3);
+  if (daysLeft <= 3) {
+    title.textContent = 'Your trial ends soon';
+    copy.textContent = 'Book a live demo or chat with our team if you would like to keep using Nomni Procure.';
+  }
+
+  toggle.addEventListener('click', function() {
+    var isOpen = conversion.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  });
+  document.addEventListener('click', function(event) {
+    if (!conversion.contains(event.target)) {
+      conversion.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && conversion.classList.contains('open')) {
+      conversion.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    }
+  });
+  chatButton.addEventListener('click', function() {
+    var launcher = document.querySelector('.intercom-launcher');
+    if (launcher) launcher.click();
   });
 })();
 </script>
