@@ -243,7 +243,11 @@
     color: var(--seaweed);
   }
   .trial-conversion-action:hover { background: #F3F4F6; }
-  .trial-conversion-action.primary:hover { background: var(--mint); }
+  .trial-conversion-action.primary:hover {
+    border-color: var(--seaweed);
+    background: var(--seaweed);
+    color: var(--nomni-green);
+  }
   .trial-conversion-action:active { transform: scale(.96); }
   .user { display: flex; align-items: center; gap: 10px; color: #fff; }
   .avatar {
@@ -938,10 +942,11 @@
   .tour-overlay[hidden] { display: none; }
   .tour-highlight { position: fixed; border: 2px solid var(--nomni-green); border-radius: 10px; box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12); pointer-events: none; transition: top .18s ease,left .18s ease,width .18s ease,height .18s ease; }
   .tour-card { position: fixed; width: min(380px,calc(100vw - 32px)); padding: 18px 18px 16px; border: 1px solid rgba(42,200,100,.24); border-radius: 12px; background: #fff; box-shadow: 0 18px 50px rgba(10,20,15,.18); pointer-events: auto; }
-  .tour-card::before { content:""; position:absolute; left:-9px; top:28px; width:16px; height:16px; background:#fff; border-left:1px solid rgba(42,200,100,.24); border-bottom:1px solid rgba(42,200,100,.24); transform:rotate(45deg); }
-  .tour-card.left::before { left:auto; right:-9px; border:0; border-right:1px solid rgba(42,200,100,.24); border-top:1px solid rgba(42,200,100,.24); }
-  .tour-card.below::before { left:28px; top:-9px; border:0; border-left:1px solid rgba(42,200,100,.24); border-top:1px solid rgba(42,200,100,.24); }
-  .tour-card.above::before { left:auto; right:28px; top:auto; bottom:-9px; border:0; border-right:1px solid rgba(42,200,100,.24); border-bottom:1px solid rgba(42,200,100,.24); }
+  .tour-card.compact { width: min(260px,calc(100vw - 32px)); }
+  .tour-card::before { content:""; position:absolute; left:-9px; top:var(--tour-arrow-y,28px); width:16px; height:16px; background:#fff; border-left:1px solid rgba(42,200,100,.24); border-bottom:1px solid rgba(42,200,100,.24); transform:rotate(45deg); }
+  .tour-card.left::before { left:auto; right:-9px; top:var(--tour-arrow-y,28px); border:0; border-right:1px solid rgba(42,200,100,.24); border-top:1px solid rgba(42,200,100,.24); }
+  .tour-card.below::before { left:var(--tour-arrow-x,28px); top:-9px; border:0; border-left:1px solid rgba(42,200,100,.24); border-top:1px solid rgba(42,200,100,.24); }
+  .tour-card.above::before { left:var(--tour-arrow-x,calc(100% - 44px)); right:auto; top:auto; bottom:-9px; border:0; border-right:1px solid rgba(42,200,100,.24); border-bottom:1px solid rgba(42,200,100,.24); }
   .tour-kicker { margin:0 0 6px; color:var(--spinach); font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
   .tour-title { margin:0 28px 6px 0; color:var(--ink); font-size:21px; font-weight:700; letter-spacing:-.02em; }
   .tour-copy { margin:0; color:#59606B; font-size:14px; line-height:1.5; }
@@ -1268,6 +1273,8 @@
     var orderPlaced = params.get('orderPlaced') === '1';
     var inventorySetup = params.get('inventorySetup') === '1';
     var stockCountDone = params.get('stockCountDone') === '1';
+    var invoiceUpload = params.get('invoiceUpload') === '1';
+    var invoiceDigitise = params.get('invoiceDigitise') === '1';
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -1303,7 +1310,9 @@
       var hasOrder = params.get('orderPlaced') === '1';
       var hasInventory = params.get('inventorySetup') === '1';
       var hasStockCount = params.get('stockCountDone') === '1';
-      if (goal === 'Digitise invoices') return false;
+      var hasInvoiceUpload = params.get('invoiceUpload') === '1';
+      var hasInvoiceDigitise = params.get('invoiceDigitise') === '1';
+      if (goal === 'Digitise invoices') return hasSupplier && hasMarket && hasInvoiceUpload && hasInvoiceDigitise;
       if (goal === 'Manage inventory') return hasSupplier && hasMarket && hasInventory && hasStockCount;
       return hasSupplier && hasMarket && hasOrder && hasInventory;
     }
@@ -1392,8 +1401,18 @@
       document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
     }
+    if (invoiceUpload && (params.get('primaryGoal') || 'Order faster') === 'Digitise invoices') {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '80% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '80%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = 'Digitise invoices'; });
+    }
+    if (invoiceDigitise && (params.get('primaryGoal') || 'Order faster') === 'Digitise invoices') {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '100% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
+    }
     var fullyDoneGoal = params.get('primaryGoal') || 'Order faster';
-    var isFullyDone = (fullyDoneGoal === 'Order faster' && orderPlaced && inventorySetup) || (fullyDoneGoal === 'Manage inventory' && stockCountDone);
+    var isFullyDone = (fullyDoneGoal === 'Order faster' && orderPlaced && inventorySetup) || (fullyDoneGoal === 'Manage inventory' && stockCountDone) || (fullyDoneGoal === 'Digitise invoices' && invoiceUpload && invoiceDigitise);
     document.querySelectorAll('[data-sidebar-setup-tick]').forEach(function(node) { node.hidden = !isFullyDone; });
     document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node) { node.hidden = false; node.textContent = isFullyDone ? 'Also try:' : 'Next:'; });
     var extraTitles = { order: 'Place order', invoiceUpload: 'Upload an invoice', invoiceDigitise: 'Digitise invoices', invoiceExport: 'Export invoices', stockCount: 'Complete a stock count' };
@@ -1402,7 +1421,7 @@
     if (isFullyDone) {
       var extraGoalTask = fullyDoneGoal === 'Order faster' ? 'order' : 'stockCount';
       var extraOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'stockCount'].filter(function(k) { return k !== extraGoalTask; });
-      var extraDone = { order: orderPlaced, invoiceUpload: false, invoiceDigitise: false, invoiceExport: false, stockCount: stockCountDone };
+      var extraDone = { order: orderPlaced, invoiceUpload: invoiceUpload, invoiceDigitise: invoiceDigitise, invoiceExport: false, stockCount: stockCountDone };
       nextExtraKey = extraOrder.filter(function(k) { return !extraDone[k]; })[0] || null;
       document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = nextExtraKey ? extraTitles[nextExtraKey] : "You're all set"; });
     }
@@ -1721,16 +1740,17 @@
   var invoiceTourMode = '';
   var invoiceTourStep = '';
   var invoiceTourSteps = {
-    uploadStart: { target:'[data-upload-invoice]', kicker:'Step 1', title:'Upload an invoice', copy:'Start by choosing one or more supplier invoices from your device.', placement:'below', action:true },
-    uploadChoose: { target:'[data-dropzone]', kicker:'Step 2', title:'Choose your files', copy:'Add JPG, PNG or PDF invoices here. You can upload more than one at a time.', placement:'below', action:true },
-    uploadComplete: { target:'[data-uploads-table]', kicker:'Upload complete', title:'Your invoice is ready', copy:'The uploaded invoice now appears here. Digitising it is a separate setup task.', placement:'above', final:true },
+    uploadStart: { target:function(){ return document.querySelector('.invoice-head-actions [data-upload-invoice]'); }, kicker:'Step 1', title:'Upload an invoice', copy:'Select one or more supplier invoices to add to Nomni Procure.', placement:'left', action:true },
+    uploadChoose: { target:'[data-dropzone]', kicker:'Step 2', title:'Choose your files', copy:'Add JPG, PNG or PDF invoices here. You can upload more than one at a time.', placement:'left', compact:true, action:true },
+    uploadComplete: { target:function(){ return document.querySelector('[data-upload-rows] tr'); }, kicker:'Step 3', title:'Review your uploads', copy:'Your uploaded invoices appear here. Review the list, then select View/edit when you are ready to digitise each invoice.', placement:'above', final:true },
     digitiseOpen: { target:function(){ return document.querySelector('[data-upload-rows] .view-edit'); }, kicker:'Step 1', title:'Open an uploaded invoice', copy:'Choose View/edit to check the extracted details and turn this upload into an invoice record.', placement:'left', action:true },
     digitiseDetails: { target:'.invoice-details', kicker:'Step 2', title:'Check the invoice details', copy:'OCR may be wrong or may not find a match. Confirm the supplier, invoice number, date, outlet and mandatory payment terms before continuing.', placement:'below' },
     digitiseLines: { target:'.line-items', kicker:'Step 3', title:'Review the matched line items', copy:'Only products matching items already created in Nomni Procure appear here. Check every visible row against the uploaded invoice.', placement:'below' },
-    digitiseCreate: { target:'.line-controls', kicker:'Step 4', title:'Create missing items when needed', copy:'Use Add SKU for another row, or Add new to create an item without leaving the invoice. The Create SKU form is not part of this tour.', placement:'above' },
-    digitisePublish: { target:'.publish-row', kicker:'Step 5', title:'Publish the completed invoice', copy:'Once all required details and every visible line item are complete, publish the invoice to add it to your records.', placement:'above', final:true }
+    digitiseCreate: { target:'.line-controls', kicker:'Step 4', title:'Create missing items when needed', copy:'Use Add SKU for another row, or Add new to create an item without leaving the invoice.', placement:'above' },
+    digitisePublish: { target:'.publish-row', kicker:'Step 5', title:'Publish the completed invoice', copy:'Once all required details and every visible line item are complete, publish the invoice to add it to your records.', placement:'above', action:true },
+    digitiseComplete: { target:function(){ return document.querySelector('[data-invoice-rows] tr'); }, kicker:'Step 6', title:'Invoice digitised', copy:'The published invoice now appears in your Invoices list, and your setup progress is complete.', placement:'above', final:true }
   };
-  var digitiseTourOrder = ['digitiseDetails','digitiseLines','digitiseCreate','digitisePublish'];
+  var digitiseTourOrder = ['digitiseDetails','digitiseLines','digitiseCreate','digitisePublish','digitiseComplete'];
 
   document.querySelectorAll('[data-invoice-outlet]').forEach(function(node){
     if (node.tagName === 'INPUT') node.value = venueName;
@@ -1754,16 +1774,21 @@
     var rect = target.getBoundingClientRect(); if (!rect.width && !rect.height) { invoiceTour.hidden = true; return; }
     invoiceTour.hidden = false; var pad = 9;
     invoiceTourHighlight.style.top = Math.max(8,rect.top-pad)+'px'; invoiceTourHighlight.style.left = Math.max(8,rect.left-pad)+'px'; invoiceTourHighlight.style.width = (rect.width+pad*2)+'px'; invoiceTourHighlight.style.height = (rect.height+pad*2)+'px';
-    invoiceTourCard.classList.remove('left','below','above'); var width = Math.min(380,window.innerWidth-32); var height = invoiceTourCard.getBoundingClientRect().height || 170; var left = rect.right+30; var top = rect.top-10;
+    invoiceTourCard.classList.remove('left','below','above','compact');
+    if (step.compact) invoiceTourCard.classList.add('compact');
+    var width = invoiceTourCard.getBoundingClientRect().width || Math.min(step.compact ? 260 : 380,window.innerWidth-32); var height = invoiceTourCard.getBoundingClientRect().height || 170; var left = rect.right+30; var top = rect.top-10;
     if (step.placement === 'below') { left=Math.max(16,Math.min(rect.left,window.innerWidth-width-16)); top=Math.min(window.innerHeight-height-16,rect.bottom+22); invoiceTourCard.classList.add('below'); }
     if (step.placement === 'above') { left=Math.max(16,Math.min(rect.right-width,window.innerWidth-width-16)); top=Math.max(16,rect.top-height-22); invoiceTourCard.classList.add('above'); }
     if (step.placement === 'left' || left+width>window.innerWidth-16) { left=Math.max(16,rect.left-width-30); invoiceTourCard.classList.add('left'); }
     top=Math.max(16,Math.min(top,window.innerHeight-height-16)); invoiceTourCard.style.left=left+'px'; invoiceTourCard.style.top=top+'px';
+    var arrowX=Math.max(14,Math.min(width-30,(rect.left+rect.width/2)-left-8));
+    var arrowY=Math.max(14,Math.min(height-30,(rect.top+rect.height/2)-top-8));
+    invoiceTourCard.style.setProperty('--tour-arrow-x',arrowX+'px'); invoiceTourCard.style.setProperty('--tour-arrow-y',arrowY+'px');
   }
   function renderInvoiceTourStep(scroll) {
     var step = invoiceTourSteps[invoiceTourStep]; if (!step) return;
     var offset = Number(params.get('tourOffset') || 0); var kickerMatch = step.kicker.match(/^Step (\d+)$/); invoiceTourKicker.textContent = kickerMatch ? 'Step ' + (Number(kickerMatch[1]) + offset) : step.kicker; invoiceTourTitle.textContent=step.title; invoiceTourCopy.textContent=step.copy;
-    invoiceTourPrev.hidden = invoiceTourMode === 'upload' || invoiceTourStep === 'digitiseOpen' || invoiceTourStep === 'digitiseDetails';
+    invoiceTourPrev.hidden = invoiceTourMode === 'upload' || invoiceTourStep === 'digitiseOpen' || invoiceTourStep === 'digitiseDetails' || invoiceTourStep === 'digitiseComplete';
     invoiceTourNext.hidden = Boolean(step.action); invoiceTourNext.textContent = step.final ? 'Done' : 'Next';
     var target=resolveInvoiceTourTarget(step); if (scroll && target) target.scrollIntoView({behavior:'smooth',block:'center'});
     invoiceTour.hidden=false; setTimeout(placeInvoiceTour,scroll?260:50);
@@ -1796,7 +1821,7 @@
     });
   }
   function openModal() { modal.hidden = false; document.body.style.overflow = 'hidden'; if (invoiceTourActive && invoiceTourMode === 'upload') advanceInvoiceTour('uploadChoose',false); }
-  function closeModal() { modal.hidden = true; document.body.style.overflow = ''; fileInput.value = ''; selectedFiles.innerHTML = ''; doneButton.hidden = true; if (invoiceTourActive && invoiceTourMode === 'upload' && invoiceTourStep !== 'uploadComplete') advanceInvoiceTour('uploadStart',false); }
+  function closeModal(keepTourStep) { modal.hidden = true; document.body.style.overflow = ''; fileInput.value = ''; selectedFiles.innerHTML = ''; doneButton.hidden = true; if (keepTourStep !== true && invoiceTourActive && invoiceTourMode === 'upload' && invoiceTourStep !== 'uploadComplete') advanceInvoiceTour('uploadStart',false); }
   document.querySelectorAll('[data-upload-invoice]').forEach(function(button){ button.addEventListener('click', openModal); });
   document.querySelector('[data-upload-close]').addEventListener('click', closeModal);
   modal.addEventListener('click', function(event){ if (event.target === modal) closeModal(); });
@@ -1840,9 +1865,13 @@
   }
   doneButton.addEventListener('click', function(){
     Array.from(doneButton._files || []).forEach(function(file){ uploads.push({name:file.name, time:dateTimeNow(), processed:false, previewUrl: /^image\//.test(file.type) ? URL.createObjectURL(file) : ''}); });
-    updateProgressParams('invoiceUpload'); closeModal(); renderUploads(); setTab('uploads');
-    var sidebarAction = document.querySelector('[data-sidebar-next-action]');
-    if (sidebarAction && params.get('primaryGoal') === 'Digitise invoices') { var sidebarText=sidebarAction.querySelector('span') || sidebarAction; sidebarText.textContent='Digitise invoices'; sidebarAction.href='#'; }
+    updateProgressParams('invoiceUpload'); closeModal(true); renderUploads(); setTab('uploads');
+    if (params.get('primaryGoal') === 'Digitise invoices') {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node){ node.textContent='80% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node){ node.style.width='80%'; });
+      document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node){ node.hidden=false; node.textContent='Next:'; });
+      document.querySelectorAll('[data-sidebar-next-action]').forEach(function(action){ var sidebarText=action.querySelector('span') || action; sidebarText.textContent='Digitise invoices'; action.href='#'; });
+    }
     if (invoiceTourActive && invoiceTourMode === 'upload') advanceInvoiceTour('uploadComplete',false);
   });
 
@@ -1946,7 +1975,19 @@
     row.innerHTML = '<td><input class="invoice-checkbox" type="checkbox" /></td><td>' + safe(data.get('invoiceDate')) + '</td><td class="invoice-number">' + safe(data.get('invoiceNumber')) + '</td><td>' + safe(data.get('supplier')) + '</td><td>' + safe(venueName) + '</td><td>' + safe(data.get('invoiceDate')) + '</td><td class="invoice-total"><span class="invoice-total-check">' + safe(total) + ' <span class="material-symbols-outlined">check_circle</span></span></td><td><span class="export-chip">Ready</span></td><td><button class="invoice-actions" type="button">Actions <span class="material-symbols-outlined">expand_more</span></button></td>';
     document.querySelector('[data-invoice-rows]').prepend(row);
     document.querySelector('[data-processed-empty]').hidden = true; document.querySelector('[data-processed-table]').hidden = false;
-    updateProgressParams('invoiceDigitise'); renderUploads(); editor.hidden = true; pageHeader.hidden = false; pageContent.hidden = false; document.body.classList.remove('digitise-active'); setTab('invoices'); closeInvoiceTour();
+    updateProgressParams('invoiceDigitise'); renderUploads(); editor.hidden = true; pageHeader.hidden = false; pageContent.hidden = false; document.body.classList.remove('digitise-active'); setTab('invoices');
+    if (params.get('primaryGoal') === 'Digitise invoices') {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node){ node.textContent='100% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node){ node.style.width='100%'; });
+      document.querySelectorAll('[data-sidebar-setup-tick]').forEach(function(node){ node.hidden=false; });
+      document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node){ node.hidden=false; node.textContent='Also try:'; });
+      document.querySelectorAll('[data-sidebar-next-action]').forEach(function(action){
+        var sidebarText=action.querySelector('span') || action; sidebarText.textContent='Place order';
+        action.href='procure-trial-orders.html?' + params.toString();
+      });
+    }
+    if (invoiceTourActive && invoiceTourMode === 'digitise') advanceInvoiceTour('digitiseComplete',false);
+    else closeInvoiceTour();
     var toast = document.querySelector('[data-invoice-toast]'); toast.hidden = false; setTimeout(function(){ toast.hidden = true; }, 3000);
   });
   document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link){ link.addEventListener('click',function(event){ var label=(link.textContent||'').toLowerCase(); if (label.indexOf('digitis')>=0 || (params.get('invoiceUpload')==='1' && params.get('invoiceDigitise')!=='1' && params.get('primaryGoal')==='Digitise invoices')) { event.preventDefault(); startInvoiceTour('digitise'); } else if (label.indexOf('upload')>=0) { event.preventDefault(); startInvoiceTour('upload'); } }); });
