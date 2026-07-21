@@ -13,7 +13,7 @@ The `Get started` CTA on the Nomni and Zeemart marketing pages redirects to a Pr
 
 That page shows the lead-capture and signup dialog over a heavily blurred Procure dashboard background with a cream-led brand wash. The intent is that the marketing sites only need to own a simple link, while the Procure product owns the lead capture, demo request, signup, onboarding transition, and dashboard handoff.
 
-The first screen captures the user's work email and shows the two path CTAs in the same view.
+The first screen captures the user's work email and country, and shows the two path CTAs in the same view. The full-width country selector appears directly below the email field. It defaults to Singapore or Australia when either can be identified from the browser locale/timezone; users elsewhere see `Select country` and must choose before continuing.
 
 The opening email screen presents two paths after the user enters an email:
 
@@ -35,12 +35,12 @@ The opening email screen presents two paths after the user enters an email:
    - Prototype verification code: `123456`.
    - After verification, Step 1 asks for first name, last name, and password.
    - Password rule: minimum 8 characters with at least one lowercase letter, one uppercase letter, one number, and one symbol/special character.
-   - Step 2 asks for company registered name, venue name, country, and structured venue address fields.
+   - Step 2 asks for company registered name, venue name, and structured venue address fields. Country is shown as a read-only label using the selection made on the opening email screen.
    - Step 2 includes prototype-only duplicate company validation. Typing `Existing Company Pty Ltd`, `Kind Foods Pte Ltd`, or `Whole Foods Pte Ltd` into the company field and clicking `Continue` shows an inline `This company may already have a Nomni Procure account` card (validation runs on Continue, not while typing/on blur).
    - The company-exists card's only action is `Sign in instead`, linking to `https://buyer.zeemart.co/`. There is no `Contact support` option or "if this doesn't look right" copy on this state.
    - While the company-exists error is showing, the `Continue` button is disabled; it re-enables as soon as the user edits the company name field.
    - The entry dialog switches to a scrollable/top-aligned layout while this card is visible (an `is-overflowing` state) so the taller Step 2 content doesn't get clipped or overflow the viewport.
-   - Supported prototype countries are Australia and Singapore. The country selector auto-detects Singapore from browser locale/timezone; all other detected countries default to Australia.
+   - Supported prototype countries are Australia and Singapore. Changing the country requires returning to the opening email screen, keeping the address fields and validation aligned with the selected market.
    - For Australia, address entry is ordered as postcode, suburb, then state. For Singapore, only postal code is shown after street address and autocomplete is disabled for now.
    - Step 3 asks optional setup questions: primary goal, number of locations, and current ordering method.
    - The primary goal is shown as a stacked list of three selectable rows with large icons: `Order faster`, `Digitise invoices`, and `Manage inventory`. Users can click a row once to select it, or click the selected row again to clear it.

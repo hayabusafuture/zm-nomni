@@ -855,6 +855,28 @@
   .email-step .lead-form {
     gap: 20px;
   }
+  .lead-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .lead-country-row {
+    width: 100%;
+  }
+  .lead-country-row .dialog-select {
+    width: 100%;
+    min-height: 54px;
+    border-radius: 999px;
+    padding: 0 44px 0 20px;
+    font-size: 16px;
+    background-color: var(--cream);
+    background-position: calc(100% - 24px) 24px, calc(100% - 18px) 24px;
+    cursor: pointer;
+  }
+  .lead-country-row .dialog-select:hover {
+    border-color: rgba(42,200,100,.42);
+    background-color: var(--cream);
+  }
   .verify-form {
     display: grid;
     gap: 18px;
@@ -915,6 +937,18 @@
     border-color: rgba(208,41,30,.58);
     background: #FFF7F5;
     box-shadow: 0 0 0 4px rgba(208,41,30,.08);
+  }
+  .country-value {
+    min-height: 54px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-radius: 14px;
+    background: var(--cream);
+    color: var(--seaweed);
+    font-size: 16px;
+    font-weight: 600;
   }
   .company-exists-card {
     display: none;
@@ -1462,6 +1496,7 @@
     .address-grid,
     .business-form.is-singapore .address-grid,
     .goal-options,
+    .lead-fields,
     .lead-actions { grid-template-columns: 1fr; }
     .dialog-row { flex-direction: column-reverse; align-items: stretch; }
     .dialog-title { font-size: 28px; }
@@ -1682,7 +1717,16 @@
         <h2 class="dialog-title" id="dialog-title">What's your email address?</h2>
         <p class="dialog-copy">Start free, or take a quick look around first.</p>
         <form class="lead-form" data-next-step="verify-email" novalidate>
-          <input class="email-field" type="email" name="email" placeholder="Work email" autocomplete="email" required />
+          <div class="lead-fields">
+            <input class="email-field" id="signup-email" type="email" name="email" placeholder="Work email" autocomplete="email" required aria-label="Work email" />
+            <div class="lead-country-row">
+              <select class="dialog-select" id="country" name="country" autocomplete="country-name" required aria-label="Country">
+                <option value="" disabled>Select country</option>
+                <option value="Australia">🇦🇺 Australia</option>
+                <option value="Singapore">🇸🇬 Singapore</option>
+              </select>
+            </div>
+          </div>
           <div class="lead-actions">
             <button class="dialog-submit" type="submit" data-next-step="verify-email">Sign up for FREE</button>
             <button class="dialog-secondary" type="button" data-next-step="demo-sent" data-requires-email>Try the demo account</button>
@@ -1796,11 +1840,8 @@
               <p class="field-hint">Example: Garden Bistro - Surry Hills</p>
             </div>
             <div class="field full">
-              <label for="country">Country</label>
-              <select class="dialog-select" id="country" name="country" autocomplete="country-name" required>
-                <option value="Australia">Australia</option>
-                <option value="Singapore">Singapore</option>
-              </select>
+              <label>Country</label>
+              <p class="country-value" data-country-output>Australia</p>
             </div>
             <div class="field full">
               <label for="street-name">Street address</label>
@@ -1956,6 +1997,7 @@
     const primaryGoalInput = document.getElementById('primary-goal');
     const goalOptions = root.querySelectorAll('[data-goal-option]');
     const countrySelect = root.querySelector('select[name="country"]');
+    const countryOutput = root.querySelector('[data-country-output]');
     const suburbInput = root.querySelector('input[name="suburb"]');
     const stateSelect = root.querySelector('select[name="ausState"]');
     const postcodeInput = root.querySelector('input[name="postcode"]');
@@ -2023,7 +2065,9 @@
     function detectedCountry() {
       const languages = [navigator.language, ...(navigator.languages || [])].filter(Boolean).join(' ').toLowerCase();
       const timeZone = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
-      return languages.includes('-sg') || timeZone.includes('singapore') ? 'Singapore' : 'Australia';
+      if (languages.includes('-sg') || timeZone.includes('singapore')) return 'Singapore';
+      if (languages.includes('-au') || timeZone.startsWith('australia/')) return 'Australia';
+      return '';
     }
 
     function isAustraliaSelected() {
@@ -2219,6 +2263,7 @@
 
     function applyCountryMode() {
       const isAustralia = isAustraliaSelected();
+      if (countryOutput && countrySelect) countryOutput.textContent = countrySelect.value;
       businessForm?.classList.toggle('is-singapore', !isAustralia);
       if (postcodeLabel) postcodeLabel.textContent = isAustralia ? 'Postcode' : 'Postal code';
       suburbInput?.closest('.field')?.classList.toggle('is-hidden', !isAustralia);
@@ -2494,7 +2539,7 @@
     });
 
     if (countrySelect) {
-      countrySelect.value = detectedCountry();
+      if (!usePrototypePrefill) countrySelect.value = detectedCountry();
       applyCountryMode();
       countrySelect.addEventListener('change', applyCountryMode);
     }
