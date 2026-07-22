@@ -557,8 +557,7 @@
   .tour-title { margin: 0 0 6px; color: var(--ink); font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
   .tour-copy { margin: 0 0 14px; color: #59606B; font-size: 14px; line-height: 1.5; }
   .tour-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-  .tour-dismiss,
-  .tour-step-btn {
+  .tour-dismiss {
     min-height: 34px;
     border: 1px solid transparent;
     border-radius: 6px;
@@ -582,10 +581,6 @@
     line-height: 1;
   }
   .tour-dismiss:hover { background: #F3F4F6; color: var(--ink); }
-  .tour-step-btn { background: var(--nomni-green); color: var(--seaweed); }
-  .tour-step-btn[data-tour-prev] { background: var(--mint); border-color: var(--mint); color: var(--seaweed); }
-  .tour-step-btn[data-tour-prev]:hover { background: #C6F2CE; border-color: #C6F2CE; }
-  .tour-step-btn[data-tour-next]:hover { background: var(--seaweed); border-color: var(--seaweed); color: var(--nomni-green); }
 
   
   /* ── HQ Mgmt nav section ── */
@@ -1094,10 +1089,6 @@
     <p class="tour-copy" data-tour-copy>Choose an item from your market list. You can add a fixed quantity or use Fill to par when stock levels are set.</p>
     <div class="tour-actions">
       <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
-      <div class="tour-nav">
-        <button class="tour-step-btn" data-tour-prev type="button">Prev</button>
-        <button class="tour-step-btn" data-tour-next type="button">Next</button>
-      </div>
     </div>
   </section>
 </div>
@@ -1120,12 +1111,9 @@
     var tourTitle = document.querySelector('[data-tour-title]');
     var tourCopy = document.querySelector('[data-tour-copy]');
     var tourDismiss = document.querySelector('[data-tour-dismiss]');
-    var tourPrev = document.querySelector('[data-tour-prev]');
-    var tourNext = document.querySelector('[data-tour-next]');
     var productsBody = document.querySelector('[data-products-body]');
     var itemRange = document.querySelector('.item-range');
     var currentTourStep = 'addItem';
-    var tourOrder = ['addItem', 'cart', 'place'];
     var tourSteps = {
       addItem: {
         target: '[data-add-first-item]',
@@ -1284,9 +1272,6 @@
       if (tourCopy) tourCopy.textContent = step.copy;
       var target = document.querySelector(step.target);
       if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      var index = tourOrder.indexOf(currentTourStep);
-      if (tourPrev) tourPrev.hidden = true;
-      if (tourNext) tourNext.hidden = !!step.actionOnly;
       setTimeout(placeTour, shouldScroll ? 240 : 40);
     }
 
@@ -1310,8 +1295,6 @@
       link.href = withParams('procure-trial-orders.html');
     });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
-    if (tourPrev) tourPrev.addEventListener('click', function() {});
-    if (tourNext) tourNext.addEventListener('click', function() {});
     window.__nomniOrderItemAdded = function() {
       if (tour && !tour.hidden) setTimeout(function() { setTourStep('cart', true); }, 80);
     };
