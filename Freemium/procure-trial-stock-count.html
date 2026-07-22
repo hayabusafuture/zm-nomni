@@ -996,7 +996,7 @@
 <div class="tour-overlay" data-tour hidden>
   <div class="tour-highlight" data-tour-highlight></div>
   <section class="tour-card" data-tour-card aria-live="polite">
-    <p class="tour-kicker" data-tour-kicker>Step 5</p>
+    <p class="tour-kicker" data-tour-kicker>Step 4</p>
     <h2 class="tour-title" data-tour-title>Enter what you counted</h2>
     <p class="tour-copy" data-tour-copy>Type the quantity your team found for each item.</p>
     <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
@@ -1318,22 +1318,22 @@
     var tourSteps = {
       countQty: {
         target: function() { return document.querySelector('[data-counted-input]'); },
-        kicker: 'Step 5',
+        kicker: 'Step 4',
         title: 'Enter what you counted',
         copy: 'Type the quantity your team found for each item.'
       },
       doneStep: {
         target: '[data-done-btn]',
-        kicker: 'Step 6',
+        kicker: 'Step 5',
         title: 'Finish the count',
-        copy: "Once you've counted everything on the list, click Done to finish up.",
+        copy: "Once you’ve counted everything on the list, click Done to finish up.",
         placement: 'above'
       },
       invoiceStart: {
         target: '[data-nav-invoices]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Open Invoices',
-        copy: 'Go to Invoices to continue with the next invoice setup task.'
+        copy: function() { return params.get('invoiceUpload') === '1' ? 'Go to Invoices to digitise your uploaded invoice.' : 'Go to Invoices to upload your first invoice.'; }
       }
     };
 
@@ -1379,14 +1379,14 @@
       if (!step) return;
       if (tourKicker) tourKicker.textContent = step.kicker;
       if (tourTitle) tourTitle.textContent = step.title;
-      if (tourCopy) tourCopy.textContent = step.copy;
+      if (tourCopy) tourCopy.textContent = typeof step.copy === 'function' ? step.copy() : step.copy;
       setTimeout(placeTour, 60);
     }
 
     function startTour(mode) {
       tourActive = true;
       currentTourStep = mode === 'invoiceStart' ? 'invoiceStart' : 'countQty';
-      if (mode === 'invoiceStart') document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload', tourOffset: '1' }); });
+      if (mode === 'invoiceStart') document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' }); });
       if (tour) tour.hidden = false;
       document.body.classList.add('tour-open');
       renderTourStep();

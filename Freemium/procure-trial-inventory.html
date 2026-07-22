@@ -2508,82 +2508,82 @@
     var tourSteps = {
       supplierStart: {
         target: '[data-nav-outlets]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Start from Outlets',
         copy: 'Open Outlets to add the supplier you buy from first.',
         placement: 'right'
       },
       marketStart: {
         target: '[data-nav-items]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Start from Items',
         copy: 'Open Items to build the list your team will order from.',
         placement: 'right'
       },
       orderStart: {
         target: '[data-nav-orders]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Start from Orders',
         copy: 'Open Orders when you’re ready to place your first order from the items you just added.',
         placement: 'right'
       },
       invoiceStart: {
         target: '[data-nav-invoices]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Open Invoices',
-        copy: 'Go to Invoices to continue with the next invoice setup task.',
+        copy: function() { return params.get('invoiceUpload') === '1' ? 'Go to Invoices to digitise your uploaded invoice.' : 'Go to Invoices to upload your first invoice.'; },
         placement: 'right'
       },
       addItem: {
         target: function() { return document.querySelector('[data-items-empty-nolist]:not([hidden]) [data-add-item-toggle]') || document.querySelector('.toolbar-right [data-add-item-toggle]'); },
-        kicker: 'Step 2',
+        kicker: 'Step 1',
         title: 'Add your first item',
         copy: 'Start by adding items your team wants to count during stocktake.'
       },
       createList: {
         target: '[data-open-create-list]',
-        kicker: 'Step 3',
+        kicker: 'Step 2',
         title: 'Create your first list',
         copy: 'Create a list for the area your team will count, such as Storeroom or Walk-in Fridge.',
         placement: 'below'
       },
       nameList: {
         target: '[data-new-list-name]',
-        kicker: function() { return 'Step ' + (sawCreateListStep ? 4 : 3); },
+        kicker: function() { return 'Step ' + (sawCreateListStep ? 3 : 2); },
         title: 'Name your list',
-        copy: 'Give it a name your team will recognise, like Storeroom or Walk-in Fridge.'
+        copy: 'Give it a name your team will recognise.'
       },
       pickItems: {
         target: '.catalog-table-wrap',
-        kicker: function() { return 'Step ' + (sawCreateListStep ? 5 : 4); },
+        kicker: function() { return 'Step ' + (sawCreateListStep ? 4 : 3); },
         title: 'Pick your items',
         copy: 'Check the items or recipes you want to track stock for.',
         placement: 'below'
       },
       doneStep: {
         target: '[data-catalog-done]',
-        kicker: function() { return 'Step ' + (sawCreateListStep ? 6 : 5); },
+        kicker: function() { return 'Step ' + (sawCreateListStep ? 5 : 4); },
         title: 'Save your list',
         copy: 'Save the selected items so your team can start counting them.',
         placement: 'above'
       },
       stockCountButton: {
         target: '[data-stock-count-toggle]',
-        kicker: 'Step 2',
+        kicker: 'Step 1',
         title: 'Start a stock count',
         copy: 'Use Stock count when your team is ready to record what is currently on hand.',
         placement: 'below'
       },
       stockCountNew: {
         target: '[data-new-stock-count]',
-        kicker: 'Step 3',
+        kicker: 'Step 2',
         title: 'Create a new count',
         copy: 'Start a fresh count from one of the inventory lists you have set up.',
         placement: 'below'
       },
       stockCountList: {
         target: '[data-stock-count-list-select]',
-        kicker: 'Step 4',
+        kicker: 'Step 3',
         title: 'Choose the list',
         copy: 'Pick the list your team is counting today.'
       },
@@ -2591,7 +2591,11 @@
         target: '[data-sidebar-setup-card]',
         kicker: 'Setup updated',
         title: 'Inventory set up',
-        copy: 'Click the setup panel to continue with the next step.',
+        copy: function() {
+          var handoffGoal = params.get('primaryGoal') || 'Order faster';
+          var handoffProgress = handoffGoal === 'Order faster' ? '100%' : handoffGoal === 'Manage inventory' ? '80%' : '60%';
+          return 'You’re ' + handoffProgress + ' done. Click the setup panel to continue with the next step.';
+        },
         placement: 'right'
       }
     };
@@ -2673,7 +2677,7 @@
       if (!step) return;
       if (tourKicker) tourKicker.textContent = typeof step.kicker === 'function' ? step.kicker() : step.kicker;
       if (tourTitle) tourTitle.textContent = step.title;
-      if (tourCopy) tourCopy.textContent = step.copy;
+      if (tourCopy) tourCopy.textContent = typeof step.copy === 'function' ? step.copy() : step.copy;
       var target = resolveTourTarget(step);
       if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(placeTour, shouldScroll ? 240 : 60);
@@ -2698,7 +2702,7 @@
         });
       } else if (mode === 'invoiceStart') {
         currentTourStep = 'invoiceStart';
-        document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload', tourOffset: '1' }); });
+        document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' }); });
       } else if (mode === 'stockCount') {
         currentTourStep = 'stockCountButton';
       } else {

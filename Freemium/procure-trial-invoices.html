@@ -1744,9 +1744,9 @@
     uploadChoose: { target:'[data-dropzone]', kicker:'Step 2', title:'Choose your files', copy:'Add JPG, PNG or PDF invoices here. You can upload more than one at a time.', placement:'left', compact:true, action:true },
     uploadComplete: { target:function(){ return document.querySelector('[data-upload-rows] tr'); }, kicker:'Step 3', title:'Review your uploads', copy:'Your uploaded invoices appear here. Review the list, then select View/edit when you are ready to digitise each invoice.', placement:'above', final:true },
     digitiseOpen: { target:function(){ return document.querySelector('[data-upload-rows] .view-edit'); }, kicker:'Step 1', title:'Open an uploaded invoice', copy:'Choose View/edit to check the extracted details and turn this upload into an invoice record.', placement:'left', action:true },
-    digitiseDetails: { target:'.invoice-details', kicker:'Step 2', title:'Check the invoice details', copy:'OCR may be wrong or may not find a match. Confirm the supplier, invoice number, date, outlet and mandatory payment terms before continuing.', placement:'below' },
-    digitiseLines: { target:'.line-items', kicker:'Step 3', title:'Review the matched line items', copy:'Only products matching items already created in Nomni Procure appear here. Check every visible row against the uploaded invoice.', placement:'below' },
-    digitiseCreate: { target:'.line-controls', kicker:'Step 4', title:'Create missing items when needed', copy:'Use Add SKU for another row, or Add new to create an item without leaving the invoice.', placement:'above' },
+    digitiseDetails: { target:'.invoice-details', kicker:'Step 2', title:'Check the invoice details', copy:'Some details may be missing or incorrect. Confirm the supplier, invoice number, date, outlet and payment terms before continuing.', placement:'below' },
+    digitiseLines: { target:'.line-items', kicker:'Step 3', title:'Review the matched line items', copy:'These are the items we could match to your market list. Check every row against the uploaded invoice.', placement:'below' },
+    digitiseCreate: { target:'.line-controls', kicker:'Step 4', title:'Create missing items when needed', copy:'Use Add SKU for another row, or Add new to create a missing item without leaving the invoice.', placement:'above' },
     digitisePublish: { target:'.publish-row', kicker:'Step 5', title:'Publish the completed invoice', copy:'Once all required details and every visible line item are complete, publish the invoice to add it to your records.', placement:'above', action:true },
     digitiseComplete: { target:function(){ return document.querySelector('[data-invoice-rows] tr'); }, kicker:'Step 6', title:'Invoice digitised', copy:'The published invoice now appears in your Invoices list, and your setup progress is complete.', placement:'above', final:true }
   };
@@ -1787,7 +1787,7 @@
   }
   function renderInvoiceTourStep(scroll) {
     var step = invoiceTourSteps[invoiceTourStep]; if (!step) return;
-    var offset = Number(params.get('tourOffset') || 0); var kickerMatch = step.kicker.match(/^Step (\d+)$/); invoiceTourKicker.textContent = kickerMatch ? 'Step ' + (Number(kickerMatch[1]) + offset) : step.kicker; invoiceTourTitle.textContent=step.title; invoiceTourCopy.textContent=step.copy;
+    invoiceTourKicker.textContent = step.kicker; invoiceTourTitle.textContent=step.title; invoiceTourCopy.textContent=step.copy;
     invoiceTourPrev.hidden = invoiceTourMode === 'upload' || invoiceTourStep === 'digitiseOpen' || invoiceTourStep === 'digitiseDetails' || invoiceTourStep === 'digitiseComplete';
     invoiceTourNext.hidden = Boolean(step.action); invoiceTourNext.textContent = step.final ? 'Done' : 'Next';
     var target=resolveInvoiceTourTarget(step); if (scroll && target) target.scrollIntoView({behavior:'smooth',block:'center'});

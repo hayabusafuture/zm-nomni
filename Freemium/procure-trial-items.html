@@ -1308,7 +1308,7 @@
 <div class="tour-overlay" data-tour hidden>
   <div class="tour-highlight" data-tour-highlight></div>
   <section class="tour-card" data-tour-card aria-live="polite">
-    <p class="tour-kicker" data-tour-kicker>Step 2</p>
+    <p class="tour-kicker" data-tour-kicker>Step 1</p>
     <h2 class="tour-title" data-tour-title>Add your first item</h2>
     <p class="tour-copy" data-tour-copy>Your market list is where your team will find items to order. Start by opening Add.</p>
     <a class="tour-branch-link" data-tour-branch-link hidden href="#"></a>
@@ -1382,7 +1382,7 @@
     var tourSteps = {
       add: {
         target: '[data-add-toggle]',
-        kicker: 'Step 2',
+        kicker: 'Step 1',
         title: 'Add your first item',
         copy: 'Your market list is where your team will find items to order. Start by opening Add.',
         actionOnly: true
@@ -1390,7 +1390,7 @@
       chooseMethod: {
         target: retryPath === 'invoice' ? '[data-add-invoice]' : retryPath === 'manual' ? '[data-create-new]' : '[data-add-menu]',
         highlightTarget: retryPath === 'invoice' || retryPath === 'manual' ? null : '[data-add-menu-tour-target]',
-        kicker: 'Step 3',
+        kicker: 'Step 2',
         title: retryPath === 'invoice' ? 'Try adding from invoice' : retryPath === 'manual' ? 'Try creating manually' : 'Choose how to add items',
         copy: retryPath === 'invoice'
           ? 'Use invoices to build the list faster when you already have supplier invoices ready.'
@@ -1402,7 +1402,7 @@
       },
       supplier: {
         target: '[data-supplier-select]',
-        kicker: 'Step 4',
+        kicker: 'Step 3',
         title: 'Link it to a supplier',
         copy: 'Choose the supplier this item belongs to.',
         placement: 'below',
@@ -1410,7 +1410,7 @@
       },
       upload: {
         target: '[data-invoice-upload-step]',
-        kicker: 'Step 4',
+        kicker: 'Step 3',
         title: 'Upload invoices',
         copy: 'Choose the invoice files, then click Upload. Nomni will read them and prepare the items for review.',
         placement: 'below',
@@ -1426,7 +1426,7 @@
       },
       orderStart: {
         target: '[data-nav-orders]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Start from Orders',
         copy: 'Open Orders when you’re ready to place your first order from the items you just added.',
         placement: 'right',
@@ -1434,7 +1434,7 @@
       },
       inventoryStart: {
         target: '[data-nav-inventory]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Start from Inventory',
         copy: 'Open Inventory to create your first inventory list and add items to track.',
         placement: 'right',
@@ -1442,7 +1442,7 @@
       },
       stockCountStart: {
         target: '[data-nav-inventory]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Start from Inventory',
         copy: 'Open Inventory when you’re ready to start your first stock count.',
         placement: 'right',
@@ -1450,7 +1450,7 @@
       },
       supplierStart: {
         target: '[data-nav-outlets]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Start from Outlets',
         copy: 'Open Outlets to add the supplier you buy from first.',
         placement: 'right',
@@ -1458,9 +1458,9 @@
       },
       invoiceStart: {
         target: '[data-nav-invoices]',
-        kicker: 'Step 1',
+        kicker: 'START HERE',
         title: 'Open Invoices',
-        copy: 'Go to Invoices to continue with the next invoice setup task.',
+        copy: function() { return params.get('invoiceUpload') === '1' ? 'Go to Invoices to digitise your uploaded invoice.' : 'Go to Invoices to upload your first invoice.'; },
         placement: 'right',
         actionOnly: true
       }
@@ -1834,7 +1834,7 @@
       var step = tourSteps[currentTourStep] || tourSteps.add;
       if (tourKicker) tourKicker.textContent = step.kicker;
       if (tourTitle) tourTitle.textContent = step.title;
-      if (tourCopy) tourCopy.textContent = step.copy;
+      if (tourCopy) tourCopy.textContent = typeof step.copy === 'function' ? step.copy() : step.copy;
       if (tourBranchLink) {
         var hasManualPath = !!createdSku;
         var hasInvoicePath = invoiceItemsAdded;
@@ -1914,7 +1914,7 @@
     function openInvoiceStartTour() {
       if (!tour) return;
       closeAddMenu(); closeSupplierModal(); closeInvoiceModal();
-      document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload', tourOffset: '1' }); });
+      document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' }); });
       tour.hidden = false; document.body.classList.add('tour-active'); setTourStep('invoiceStart', false);
     }
 

@@ -1223,7 +1223,7 @@
 <div class="tour-overlay" data-tour hidden>
   <div class="tour-highlight" data-tour-highlight></div>
   <section class="tour-card" data-tour-card aria-live="polite">
-    <p class="tour-kicker" data-tour-kicker>Step 2</p>
+    <p class="tour-kicker" data-tour-kicker>Step 1</p>
     <h2 class="tour-title" data-tour-title>Create an order</h2>
     <p class="tour-copy" data-tour-copy>Open New order, then choose Order by item to build from the products you already added.</p>
     <a class="tour-branch-link" data-tour-branch-link hidden href="#"></a>
@@ -1459,7 +1459,7 @@
       toggleNewOrderMenu(false);
       if (tour && !tour.hidden) {
         tourMode = 'orderSupplier';
-        if (tourKicker) tourKicker.textContent = 'Step 3';
+        if (tourKicker) tourKicker.textContent = 'Step 2';
         if (tourTitle) tourTitle.textContent = 'Choose the supplier';
         if (tourCopy) tourCopy.textContent = 'Pick the supplier you want to order from first. Nomni will show the items you buy from them.';
         setTimeout(placeTour, 40);
@@ -1492,7 +1492,7 @@
         }
         if (tourKicker) tourKicker.textContent = 'Setup updated';
         if (tourTitle) tourTitle.textContent = 'First order placed';
-        if (tourCopy) tourCopy.textContent = "You're " + handoffProgress + " done. Click the setup panel to continue with the next step.";
+        if (tourCopy) tourCopy.textContent = "You’re " + handoffProgress + " done. Click the setup panel to continue with the next step.";
         if (tourBranchLink && alternateOrderText && alternateOrderUrl) {
           tourBranchLink.textContent = alternateOrderText;
           tourBranchLink.href = alternateOrderUrl;
@@ -1500,19 +1500,19 @@
         }
       } else {
         if (tourMode === 'supplierStart') {
-          if (tourKicker) tourKicker.textContent = 'Step 1';
+          if (tourKicker) tourKicker.textContent = 'START HERE';
           if (tourTitle) tourTitle.textContent = 'Start from Outlets';
           if (tourCopy) tourCopy.textContent = 'Open Outlets to add the supplier you buy from first.';
         } else if (tourMode === 'marketStart') {
-          if (tourKicker) tourKicker.textContent = 'Step 1';
+          if (tourKicker) tourKicker.textContent = 'START HERE';
           if (tourTitle) tourTitle.textContent = 'Start from Items';
           if (tourCopy) tourCopy.textContent = 'Open Items to build the list your team will order from.';
         } else if (tourMode === 'invoiceStart') {
-          if (tourKicker) tourKicker.textContent = 'Step 1';
+          if (tourKicker) tourKicker.textContent = 'START HERE';
           if (tourTitle) tourTitle.textContent = 'Open Invoices';
-          if (tourCopy) tourCopy.textContent = 'Go to Invoices to continue with the next invoice setup task.';
+          if (tourCopy) tourCopy.textContent = params.get('invoiceUpload') === '1' ? 'Go to Invoices to digitise your uploaded invoice.' : 'Go to Invoices to upload your first invoice.';
         } else if (tourMode === 'inventoryStart') {
-          if (tourKicker) tourKicker.textContent = 'Step 1';
+          if (tourKicker) tourKicker.textContent = 'START HERE';
           if (tourTitle) tourTitle.textContent = 'Start from Inventory';
           if (tourCopy) {
             var inventoryGoal = params.get('primaryGoal') || 'Order faster';
@@ -1521,7 +1521,7 @@
               : 'Open Inventory to organise the items you want to track in stock.';
           }
         } else {
-          if (tourKicker) tourKicker.textContent = 'Step 2';
+          if (tourKicker) tourKicker.textContent = 'Step 1';
           if (tourTitle) tourTitle.textContent = 'Create an order';
           if (tourCopy) {
             tourCopy.textContent = tourMode === 'orderSupplier'
@@ -1575,7 +1575,7 @@
           link.href = withParams('procure-trial-inventory.html', { tour: inventoryTour });
         });
       } else if (tourMode === 'invoiceStart') {
-        document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload', tourOffset: '1' }); });
+        document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' }); });
       }
       tour.hidden = false;
       toggleNewOrderMenu(tourMode === 'order' || tourMode === 'orderSupplier');
