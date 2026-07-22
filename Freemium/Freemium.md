@@ -87,6 +87,7 @@ Primary visual references are:
 - `Freemium/procure-trial-inventory.html` — Inventory page and guided Set up inventory / stock-count onboarding flows.
 - `Freemium/procure-trial-stock-count.html` — stock-count flow linked from Inventory onboarding and the Manage inventory checklist path.
 - `Freemium/procure-trial-invoices.html` — interactive invoice onboarding page for the `Upload invoice` and `Digitise invoices` checklist CTAs. It starts empty, accepts one or more JPG/PNG/PDF uploads, lists them under Uploads with the live-style five-part completeness status, and opens an OCR-prefilled review form through `View/edit`. Saving moves the record into Invoices. `Pay online` is intentionally omitted.
+  - The Upload invoice tour ends with a `Digitise invoices` hand-off rather than a generic `Done` action. The hand-off starts Digitise Step 1 on the existing `View/edit` control; selecting `View/edit` directly also dismisses the upload popover and continues at Digitise Step 2 in the editor.
 
 Generated preview screenshots:
 

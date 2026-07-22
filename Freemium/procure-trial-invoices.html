@@ -1781,7 +1781,7 @@
   var invoiceTourSteps = {
     uploadStart: { target:function(){ return document.querySelector('.invoice-head-actions [data-upload-invoice]'); }, kicker:'Step 1', title:'Upload an invoice', copy:'Select one or more supplier invoices to add to Nomni Procure.', placement:'left', action:true },
     uploadChoose: { target:'[data-dropzone]', kicker:'Step 2', title:'Choose your files', copy:'Add JPG, PNG or PDF invoices here. You can upload more than one at a time.', placement:'left', compact:true, action:true },
-    uploadComplete: { target:function(){ return document.querySelector('[data-upload-rows] tr'); }, kicker:'Step 3', title:'Review your uploads', copy:'Your uploaded invoices appear here. Review the list, then select View/edit when you are ready to digitise each invoice.', placement:'above', final:true },
+    uploadComplete: { target:function(){ return document.querySelector('[data-upload-rows] tr'); }, kicker:'Step 3', title:'Review your uploads', copy:'Your uploaded invoices appear here. Review the list, then continue when you are ready to digitise an invoice.', placement:'above', nextLabel:'Digitise invoices' },
     digitiseOpen: { target:function(){ return document.querySelector('[data-upload-rows] .view-edit'); }, kicker:'Step 1', title:'Open an uploaded invoice', copy:'Choose View/edit to check the extracted details and turn this upload into an invoice record.', placement:'left', action:true },
     digitiseDetails: { target:'.invoice-details', kicker:'Step 2', title:'Check the invoice details', copy:'Some details may be missing or incorrect. Confirm the supplier, invoice number, date, outlet and payment terms before continuing.', placement:'below' },
     digitiseLines: { target:'.line-items', kicker:'Step 3', title:'Review the matched line items', copy:'These are the items we could match to your market list. Check every row against the uploaded invoice.', placement:'below' },
@@ -1830,7 +1830,7 @@
     var step = invoiceTourSteps[invoiceTourStep]; if (!step) return;
     invoiceTourKicker.textContent = step.kicker; invoiceTourTitle.textContent=step.title; invoiceTourCopy.textContent=step.copy;
     invoiceTourPrev.hidden = invoiceTourMode === 'upload' || invoiceTourStep === 'digitiseOpen' || invoiceTourStep === 'digitiseDetails' || invoiceTourStep === 'digitiseComplete' || invoiceTourStep === 'handoff';
-    invoiceTourNext.hidden = Boolean(step.action); invoiceTourNext.textContent = step.final ? 'Done' : 'Next';
+    invoiceTourNext.hidden = Boolean(step.action); invoiceTourNext.textContent = step.nextLabel || (step.final ? 'Done' : 'Next');
     var target=resolveInvoiceTourTarget(step); if (scroll && target) target.scrollIntoView({behavior:'smooth',block:'center'});
     invoiceTour.hidden=false; setTimeout(placeInvoiceTour,scroll?260:50);
   }
@@ -1849,6 +1849,10 @@
   document.querySelector('[data-invoice-tour-dismiss]').addEventListener('click',closeInvoiceTour);
   invoiceTourNext.addEventListener('click',function(){
     var step=invoiceTourSteps[invoiceTourStep];
+    if (invoiceTourStep === 'uploadComplete') {
+      invoiceTourMode='digitise'; invoiceTourStep='digitiseOpen';
+      renderInvoiceTourStep(true); return;
+    }
     if (step.final) {
       if (invoiceTourStep === 'digitiseComplete' && invoiceGoalJustCompleted) { invoiceGoalJustCompleted=false; showInvoiceSetupHandoff(); return; }
       closeInvoiceTour(); return;
@@ -1982,6 +1986,10 @@
     }
     var editButton = event.target.closest('[data-view-edit]');
     if (!editButton) return;
+    if (invoiceTourActive && invoiceTourMode === 'upload' && invoiceTourStep === 'uploadComplete') {
+      invoiceTourMode = 'digitise';
+      invoiceTourStep = 'digitiseOpen';
+    }
     activeUpload = uploads.filter(function(item){ return !item.processed; })[Number(editButton.getAttribute('data-view-edit'))];
     document.querySelector('[data-editor-file-name]').textContent = activeUpload.name;
     var preview = document.querySelector('[data-upload-preview]'); var placeholder = document.querySelector('[data-preview-placeholder]');
