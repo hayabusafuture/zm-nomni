@@ -407,6 +407,7 @@ Preview screenshots are kept in:
 
 - `Freemium/nomni-procure-top-preview.png`
 - `Freemium/zeemart-top-preview.png`
+- `Freemium/assets/tour-screenshots/PWF-1702/` contains the public, stable tour-step screenshots used as clickable thumbnails in Jira story PWF-1702.
 
 Local image reference checks were run during development.
 
