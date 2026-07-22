@@ -2390,6 +2390,7 @@
       renderCatalogRows();
     });
     if (catalogDone) catalogDone.addEventListener('click', function() {
+      var wasInventorySetupAlreadyDone = inventorySetup;
       var addedCount = commitCatalogSelection();
       render();
       closeCatalogModal();
@@ -2400,6 +2401,8 @@
       if (tourActive && currentTourStep === 'doneStep') {
         currentTourStep = 'handoff';
         renderTourStep();
+      } else if (!wasInventorySetupAlreadyDone && inventorySetup) {
+        showHandoffOnly();
       }
     });
 
@@ -2590,10 +2593,14 @@
       handoff: {
         target: '[data-sidebar-setup-card]',
         kicker: 'Setup updated',
-        title: 'Inventory set up',
+        title: function() { return stockCountDone ? 'Stock count complete' : 'Inventory set up'; },
         copy: function() {
           var handoffGoal = params.get('primaryGoal') || 'Order faster';
-          var handoffProgress = handoffGoal === 'Order faster' ? '100%' : handoffGoal === 'Manage inventory' ? '80%' : '60%';
+          var handoffProgress = handoffGoal === 'Order faster'
+            ? (Math.round(((1 + [supplierAdded, marketListBuilt, orderPlaced, inventorySetup].filter(Boolean).length) / 5) * 100) + '%')
+            : handoffGoal === 'Manage inventory'
+              ? (Math.round(((1 + [supplierAdded, marketListBuilt, inventorySetup, stockCountDone].filter(Boolean).length) / 5) * 100) + '%')
+              : '60%';
           return 'You’re ' + handoffProgress + ' done. Click the setup panel to continue with the next step.';
         },
         placement: 'right'
@@ -2676,7 +2683,7 @@
       var step = tourSteps[currentTourStep];
       if (!step) return;
       if (tourKicker) tourKicker.textContent = typeof step.kicker === 'function' ? step.kicker() : step.kicker;
-      if (tourTitle) tourTitle.textContent = step.title;
+      if (tourTitle) tourTitle.textContent = typeof step.title === 'function' ? step.title() : step.title;
       if (tourCopy) tourCopy.textContent = typeof step.copy === 'function' ? step.copy() : step.copy;
       var target = resolveTourTarget(step);
       if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });

@@ -874,8 +874,44 @@
   .form-field input, .form-field select { height: 42px; padding: 0 12px; border: 1px solid #DCDEE3; border-radius: 6px; background: #fff; font: inherit; color: var(--ink); }
   .ocr-tag { color: var(--spinach); font-size: 11px; font-weight: 600; }
   .editor-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--rule); }
-  .toast { position: fixed; z-index: 950; right: 28px; bottom: 28px; padding: 13px 18px; border-radius: 8px; background: var(--seaweed); color: #fff; box-shadow: 0 10px 28px rgba(0,0,0,.2); }
-  .toast[hidden] { display: none; }
+  .toast {
+    position: fixed;
+    right: 28px;
+    top: 78px;
+    z-index: 980;
+    min-width: 300px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 18px;
+    border-radius: 4px;
+    border: 1px solid #AFE7C2;
+    background: #E2FFE6;
+    box-shadow: 0 16px 44px rgba(10,20,15,.16);
+    color: var(--seaweed);
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .toast-check {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #0BBE3F;
+    color: #fff;
+    font-size: 27px;
+    line-height: 1;
+    flex: 0 0 auto;
+  }
+  .toast-title { font-weight: 800; margin-bottom: 2px; }
+  .toast-copy { color: var(--seaweed); font-size: 14px; }
   body.digitise-active .app { grid-template-columns: 1fr; }
   body.digitise-active .sidebar { display: none; }
   body.digitise-active .main { grid-column: 1; }
@@ -1256,7 +1292,10 @@
   <div class="sku-field full"><label class="sku-check"><input type="checkbox" name="addInventory" data-modal-add-inventory />Add to Inventory</label></div>
   <div class="sku-inventory-fields full" data-modal-inventory-fields hidden><div class="sku-field"><label for="modal-list">Inventory list</label><select id="modal-list"><option>Uncategorised</option><option>Ingredients</option></select></div><div class="sku-field"><label for="modal-inventory-uom">Inventory UOM</label><select id="modal-inventory-uom"><option>kg</option><option>g</option><option>pcs</option><option>box</option></select></div><div class="sku-field"><label for="modal-par">Inventory par</label><input id="modal-par" inputmode="decimal" /></div></div>
 </div><div class="field-error" data-sku-error hidden>Enter the SKU name, UOM and price before saving.</div><div class="sku-foot"><button class="btn btn-tertiary" type="button" data-sku-close>Cancel</button><button class="btn btn-primary" type="submit">Save SKU</button></div></form></div></div>
-<div class="toast" role="status" data-invoice-toast hidden>Invoice digitised successfully</div>
+<div class="toast" role="status" data-invoice-toast>
+  <span class="toast-check" aria-hidden="true">✓</span>
+  <span><span class="toast-title" data-invoice-toast-title>Invoice digitised</span><br><span class="toast-copy" data-invoice-toast-copy>Successfully saved to your records</span></span>
+</div>
 <div class="tour-overlay" data-invoice-tour hidden><div class="tour-highlight" data-invoice-tour-highlight></div><section class="tour-card" data-invoice-tour-card aria-live="polite"><p class="tour-kicker" data-invoice-tour-kicker>Step 1</p><h2 class="tour-title" data-invoice-tour-title>Upload an invoice</h2><p class="tour-copy" data-invoice-tour-copy></p><button class="tour-dismiss" data-invoice-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button><div class="tour-nav"><button class="tour-step-btn" data-invoice-tour-prev type="button">Prev</button><button class="tour-step-btn primary" data-invoice-tour-next type="button">Next</button></div></section></div>
 
 <script>
@@ -1748,9 +1787,11 @@
     digitiseLines: { target:'.line-items', kicker:'Step 3', title:'Review the matched line items', copy:'These are the items we could match to your market list. Check every row against the uploaded invoice.', placement:'below' },
     digitiseCreate: { target:'.line-controls', kicker:'Step 4', title:'Create missing items when needed', copy:'Use Add SKU for another row, or Add new to create a missing item without leaving the invoice.', placement:'above' },
     digitisePublish: { target:'.publish-row', kicker:'Step 5', title:'Publish the completed invoice', copy:'Once all required details and every visible line item are complete, publish the invoice to add it to your records.', placement:'above', action:true },
-    digitiseComplete: { target:function(){ return document.querySelector('[data-invoice-rows] tr'); }, kicker:'Step 6', title:'Invoice digitised', copy:'The published invoice now appears in your Invoices list, and your setup progress is complete.', placement:'above', final:true }
+    digitiseComplete: { target:function(){ return document.querySelector('[data-invoice-rows] tr'); }, kicker:'Step 6', title:'Invoice digitised', copy:'The published invoice now appears in your Invoices list, and your setup progress is complete.', placement:'above', final:true },
+    handoff: { target:'[data-sidebar-setup-card]', kicker:'Setup updated', title:'Invoice digitised', copy:'You’re 100% done. Click the setup panel to continue with the next step.', placement:'right', final:true }
   };
   var digitiseTourOrder = ['digitiseDetails','digitiseLines','digitiseCreate','digitisePublish','digitiseComplete'];
+  var invoiceGoalJustCompleted = false;
 
   document.querySelectorAll('[data-invoice-outlet]').forEach(function(node){
     if (node.tagName === 'INPUT') node.value = venueName;
@@ -1788,7 +1829,7 @@
   function renderInvoiceTourStep(scroll) {
     var step = invoiceTourSteps[invoiceTourStep]; if (!step) return;
     invoiceTourKicker.textContent = step.kicker; invoiceTourTitle.textContent=step.title; invoiceTourCopy.textContent=step.copy;
-    invoiceTourPrev.hidden = invoiceTourMode === 'upload' || invoiceTourStep === 'digitiseOpen' || invoiceTourStep === 'digitiseDetails' || invoiceTourStep === 'digitiseComplete';
+    invoiceTourPrev.hidden = invoiceTourMode === 'upload' || invoiceTourStep === 'digitiseOpen' || invoiceTourStep === 'digitiseDetails' || invoiceTourStep === 'digitiseComplete' || invoiceTourStep === 'handoff';
     invoiceTourNext.hidden = Boolean(step.action); invoiceTourNext.textContent = step.final ? 'Done' : 'Next';
     var target=resolveInvoiceTourTarget(step); if (scroll && target) target.scrollIntoView({behavior:'smooth',block:'center'});
     invoiceTour.hidden=false; setTimeout(placeInvoiceTour,scroll?260:50);
@@ -1801,8 +1842,19 @@
     else { if (!uploads.some(function(item){return !item.processed;})) uploads.push({name:'sample-invoice.pdf',time:dateTimeNow(),processed:false,previewUrl:''}); renderUploads(); showInvoiceList(); setTab('uploads'); invoiceTourStep='digitiseOpen'; }
     renderInvoiceTourStep(false);
   }
+  function showInvoiceSetupHandoff() {
+    invoiceTourActive=true; invoiceTourMode='digitise'; invoiceTourStep='handoff'; document.body.classList.add('tour-active');
+    renderInvoiceTourStep(false);
+  }
   document.querySelector('[data-invoice-tour-dismiss]').addEventListener('click',closeInvoiceTour);
-  invoiceTourNext.addEventListener('click',function(){ var step=invoiceTourSteps[invoiceTourStep]; if (step.final) { closeInvoiceTour(); return; } var index=digitiseTourOrder.indexOf(invoiceTourStep); if (index>=0 && index<digitiseTourOrder.length-1) advanceInvoiceTour(digitiseTourOrder[index+1],true); });
+  invoiceTourNext.addEventListener('click',function(){
+    var step=invoiceTourSteps[invoiceTourStep];
+    if (step.final) {
+      if (invoiceTourStep === 'digitiseComplete' && invoiceGoalJustCompleted) { invoiceGoalJustCompleted=false; showInvoiceSetupHandoff(); return; }
+      closeInvoiceTour(); return;
+    }
+    var index=digitiseTourOrder.indexOf(invoiceTourStep); if (index>=0 && index<digitiseTourOrder.length-1) advanceInvoiceTour(digitiseTourOrder[index+1],true);
+  });
   invoiceTourPrev.addEventListener('click',function(){ var index=digitiseTourOrder.indexOf(invoiceTourStep); if(index>0) advanceInvoiceTour(digitiseTourOrder[index-1],true); });
   window.addEventListener('resize',placeInvoiceTour); document.querySelector('.digitise-workspace').addEventListener('scroll',placeInvoiceTour);
   tabs.forEach(function(tab){
@@ -1961,10 +2013,23 @@
     if (!name || !uom || !price) { document.querySelector('[data-sku-error]').hidden = false; return; }
     if (!skuTargetRow) skuTargetRow = addLineItem(); var select = skuTargetRow.querySelector('[data-line-description]'); var option = document.createElement('option'); option.textContent = name; option.value = name; select.appendChild(option); select.value = name; skuTargetRow.querySelector('[data-line-uom]').value = uom; skuTargetRow.querySelector('[data-line-price]').value = price; calculateTotals(); closeSkuModal();
   });
-  document.querySelector('[data-save-draft]').addEventListener('click', function(){ var toast = document.querySelector('[data-invoice-toast]'); toast.textContent = 'Invoice draft saved'; toast.hidden = false; setTimeout(function(){ toast.hidden = true; toast.textContent = 'Invoice digitised successfully'; }, 2200); });
+  document.querySelector('[data-save-draft]').addEventListener('click', function(){
+    var toast = document.querySelector('[data-invoice-toast]');
+    var toastTitle = document.querySelector('[data-invoice-toast-title]');
+    var toastCopy = document.querySelector('[data-invoice-toast-copy]');
+    if (toastTitle) toastTitle.textContent = 'Draft saved';
+    if (toastCopy) toastCopy.textContent = 'Invoice draft saved';
+    toast.classList.add('show');
+    setTimeout(function(){
+      toast.classList.remove('show');
+      if (toastTitle) toastTitle.textContent = 'Invoice digitised';
+      if (toastCopy) toastCopy.textContent = 'Successfully saved to your records';
+    }, 4200);
+  });
   document.querySelector('[data-discard-invoice]').addEventListener('click', function(){ if (activeUpload) activeUpload.processed = true; renderUploads(); closeInvoiceTour(); showInvoiceList(); });
   document.querySelector('[data-digitise-form]').addEventListener('submit', function(event){
     event.preventDefault();
+    var wasInvoiceDigitiseAlreadyDone = params.get('invoiceDigitise') === '1';
     var form = event.currentTarget; var linesValid = true;
     lineItems.querySelectorAll('[data-line-item]').forEach(function(row){ if (!row.querySelector('[data-line-description]').value || !(Number(row.querySelector('[data-line-qty]').value) > 0) || !row.querySelector('[data-line-uom]').value || !(Number(row.querySelector('[data-line-price]').value) >= 0)) linesValid = false; });
     if (!form.checkValidity() || !linesValid || !lineItems.children.length) { document.querySelector('[data-digitise-error]').hidden = false; form.reportValidity(); return; }
@@ -1985,10 +2050,18 @@
         var sidebarText=action.querySelector('span') || action; sidebarText.textContent='Place order';
         action.href='procure-trial-orders.html?' + params.toString();
       });
+      if (!wasInvoiceDigitiseAlreadyDone) invoiceGoalJustCompleted = true;
     }
     if (invoiceTourActive && invoiceTourMode === 'digitise') advanceInvoiceTour('digitiseComplete',false);
+    else if (invoiceGoalJustCompleted) { invoiceGoalJustCompleted=false; showInvoiceSetupHandoff(); }
     else closeInvoiceTour();
-    var toast = document.querySelector('[data-invoice-toast]'); toast.hidden = false; setTimeout(function(){ toast.hidden = true; }, 3000);
+    var toast = document.querySelector('[data-invoice-toast]');
+    var toastTitle = document.querySelector('[data-invoice-toast-title]');
+    var toastCopy = document.querySelector('[data-invoice-toast-copy]');
+    if (toastTitle) toastTitle.textContent = 'Invoice digitised';
+    if (toastCopy) toastCopy.textContent = 'Successfully saved to your records';
+    toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 4200);
   });
   document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link){ link.addEventListener('click',function(event){ var label=(link.textContent||'').toLowerCase(); if (label.indexOf('digitis')>=0 || (params.get('invoiceUpload')==='1' && params.get('invoiceDigitise')!=='1' && params.get('primaryGoal')==='Digitise invoices')) { event.preventDefault(); startInvoiceTour('digitise'); } else if (label.indexOf('upload')>=0) { event.preventDefault(); startInvoiceTour('upload'); } }); });
   if (params.get('tour') === 'upload') startInvoiceTour('upload');
