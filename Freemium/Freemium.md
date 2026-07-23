@@ -227,6 +227,7 @@ Trial app chrome:
 
 - Trial-page topbars show an interactive `Trial ends in 14 days` countdown, the real-site `Help` link, and the trial user. The countdown opens a conversion/support popover on hover, click, or keyboard focus, with `Book a live demo` and `Chat with us` actions; this replaces the former separate adjacent demo link across the trial prototype. The demo action follows the standard primary-button hover treatment across every trial page: dark seaweed background and border with green text.
 - Trial Dashboard page-first prototype: its `Book a live demo` actions now open an in-product two-step request dialog instead of leaving for the Nomni contact page. Step 1 asks for preferred contact method, contact details, and timing. Step 2 asks the user to confirm `locations`, choose one or more current ordering methods (prefilled from `orderingNow` when available), and add optional questions. Primary goal is not repeated in this dialog. The current signup handoff only carries `primaryGoal` and `email`; if this treatment is approved for the full flow, `locations` and `orderingNow` must also be added to the signup/dashboard parameter handoff.
+- The same two-step `Book a live demo` request dialog is now used by the countdown popover across every authenticated `procure-trial-*` page. These in-product trial buttons no longer link to `nomni.ai/lets-chat`. Marketing-page CTAs and the mock email remain external links because they sit outside the authenticated trial product.
 - `Trial ends in 14 days` switches to an amber warning treatment when the prototype receives `trialDaysLeft=3` or fewer, so the near-expiry state can be reviewed.
 - `Help` and `View support articles` both point to the Restaurants / Nomni Procure knowledge-base collection.
 - Sidebar includes the Procure nav, the `Get started` card directly below `News`, and the lower-left Intercom-style launcher.
@@ -238,6 +239,14 @@ Trial app chrome:
 Checklist logic:
 
 - `Create account` is complete for every trial, so progress starts at 20%.
+- Prerequisite recovery states can be reviewed directly on the checklist. Each page initially shows the normal checklist; click the affected flow CTA or its sidebar `Next` action to open the compact prerequisite modal:
+  - `?setup=1&primaryGoal=Order%20faster&prerequisite=order` — no orderable market-list items; offers `Go to Items` and `View guide`.
+  - `?setup=1&primaryGoal=Digitise%20invoices&prerequisite=digitise` — no uploaded invoice awaiting review; offers `Upload invoice` and `View guide`.
+  - `?setup=1&primaryGoal=Manage%20inventory&prerequisite=stockCount` — no inventory list containing items; offers `Go to Inventory` and `View guide`.
+- These recovery states deliberately do not start or restart another guided tour. The same compact modal appears after the user attempts to start the unavailable flow from either the checklist or persistent sidebar widget, keeps them on their current page, explains the missing prerequisite, and provides a direct product action alongside the existing support guide.
+- Cross-page widget example: open `procure-trial-outlet-suppliers.html` with `supplierAdded=1&marketListBuilt=1&primaryGoal=Order%20faster&prerequisite=order`, then select `Next: Place order`.
+- The `Dismiss setup?` dialog treats `Keep setup shortcut` as the primary action and `Hide everywhere` as the secondary action.
+- In a recovery warning, `View guide` points to the missing prerequisite rather than the unavailable task: managing market-list items for Place order, uploading invoices for Digitise invoices, and managing items in inventory lists for Complete stock count.
 - Goal-dependent primary paths:
   - `Order faster`: Add supplier, Build market list, Place order, Set up inventory.
   - `Digitise invoices`: Add supplier, Build market list, Upload invoice, Digitise invoices.

@@ -1159,6 +1159,16 @@
     gap: 16px;
     justify-items: center;
   }
+  .prerequisite-modal-body {
+    justify-items: stretch;
+    padding-top: 18px;
+  }
+  .prerequisite-modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
   .app-qr-box {
     width: 204px;
     height: 204px;
@@ -2385,6 +2395,24 @@
   </section>
 </div>
 
+<div class="app-modal-overlay" data-prerequisite-modal hidden>
+  <section class="app-modal-card" role="dialog" aria-modal="true" aria-labelledby="prerequisite-modal-title" aria-describedby="prerequisite-modal-copy">
+    <div class="app-modal-head">
+      <div>
+        <h2 class="app-modal-title" id="prerequisite-modal-title" data-prerequisite-title></h2>
+        <p class="app-modal-copy" id="prerequisite-modal-copy" data-prerequisite-copy></p>
+      </div>
+      <button class="app-modal-close" type="button" data-close-prerequisite-modal aria-label="Close">&times;</button>
+    </div>
+    <div class="app-modal-body prerequisite-modal-body">
+      <div class="prerequisite-modal-actions">
+        <a class="btn btn-secondary" data-prerequisite-guide target="_blank" rel="noopener">View guide</a>
+        <a class="btn btn-primary" data-prerequisite-action></a>
+      </div>
+    </div>
+  </section>
+</div>
+
 <div class="app-modal-overlay" data-dismiss-setup-modal hidden>
   <section class="app-modal-card" role="dialog" aria-modal="true" aria-labelledby="dismiss-setup-title">
     <div class="app-modal-head">
@@ -2396,8 +2424,8 @@
     </div>
     <div class="app-modal-body">
       <div class="dismiss-choice-list">
-        <button class="dismiss-choice" type="button" data-dismiss-setup-choice="dashboard">Keep setup shortcut</button>
-        <button class="dismiss-choice primary" type="button" data-dismiss-setup-choice="everywhere">Hide everywhere</button>
+        <button class="dismiss-choice primary" type="button" data-dismiss-setup-choice="dashboard">Keep setup shortcut</button>
+        <button class="dismiss-choice" type="button" data-dismiss-setup-choice="everywhere">Hide everywhere</button>
       </div>
     </div>
   </section>
@@ -2603,6 +2631,34 @@
         icon: 'assets/icons/1st stock ct.svg'
       }
     };
+    var prerequisiteCase = params.get('prerequisite') || '';
+    var prerequisiteStates = {
+      order: {
+        taskKey: 'order',
+        title: 'Add an item before placing an order',
+        copy: 'There are no orderable items in your market list. Add at least one item before starting this flow.',
+        action: 'Go to Items',
+        href: 'procure-trial-items.html',
+        guide: 'https://support.zeemart.co/en/articles/9418027-adding-or-removing-items-in-the-market-lists'
+      },
+      digitise: {
+        taskKey: 'invoiceDigitise',
+        title: 'Upload an invoice before digitising',
+        copy: 'There are no uploaded invoices waiting for review. Upload an invoice before starting this flow.',
+        action: 'Upload invoice',
+        href: 'procure-trial-invoices.html',
+        guide: 'https://support.zeemart.co/en/articles/9418159-how-to-upload-invoices'
+      },
+      stockCount: {
+        taskKey: 'stockCount',
+        title: 'Add an item before counting stock',
+        copy: 'None of your inventory lists contain items. Add at least one item before starting this flow.',
+        action: 'Go to Inventory',
+        href: 'procure-trial-inventory.html',
+        guide: 'https://support.zeemart.co/en/articles/9418087-managing-items-in-inventory-lists'
+      }
+    };
+    var activePrerequisite = prerequisiteStates[prerequisiteCase] || null;
     var goalChecklist = {
       'Order faster': ['supplier', 'market', 'order', 'inventory'],
       'Digitise invoices': ['supplier', 'market', 'invoiceUpload', 'invoiceDigitise'],
@@ -2634,6 +2690,20 @@
       ['supplier', 'market', 'order', 'inventory', 'stockCount', 'invoiceUpload', 'invoiceDigitise'].forEach(function(taskKey) {
         if (taskCatalog[taskKey]) taskCatalog[taskKey].completed = true;
       });
+    }
+    if (activePrerequisite) {
+      if (prerequisiteCase === 'order') {
+        taskCatalog.supplier.completed = true;
+        taskCatalog.market.completed = true;
+      } else if (prerequisiteCase === 'digitise') {
+        taskCatalog.supplier.completed = true;
+        taskCatalog.market.completed = true;
+        taskCatalog.invoiceUpload.completed = true;
+      } else if (prerequisiteCase === 'stockCount') {
+        taskCatalog.supplier.completed = true;
+        taskCatalog.market.completed = true;
+        taskCatalog.inventory.completed = true;
+      }
     }
 
     function initialsFromName(name) {
@@ -2944,6 +3014,30 @@
       supplierSetupLink = document.querySelector('[data-supplier-setup-link]');
     }
 
+    function revealPrerequisite(taskKey, event) {
+      if (!activePrerequisite || activePrerequisite.taskKey !== taskKey) return false;
+      if (event) event.preventDefault();
+      var modal = document.querySelector('[data-prerequisite-modal]');
+      if (!modal) return false;
+      modal.querySelector('[data-prerequisite-title]').textContent = activePrerequisite.title;
+      modal.querySelector('[data-prerequisite-copy]').textContent = activePrerequisite.copy;
+      modal.querySelector('[data-prerequisite-guide]').href = activePrerequisite.guide;
+      var action = modal.querySelector('[data-prerequisite-action]');
+      action.href = preserveParams(activePrerequisite.href, prerequisiteCase === 'digitise' ? { tour: 'upload' } : {});
+      action.textContent = activePrerequisite.action;
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      modal.querySelector('[data-close-prerequisite-modal]').focus();
+      return true;
+    }
+
+    function closePrerequisiteModal() {
+      var modal = document.querySelector('[data-prerequisite-modal]');
+      if (!modal || modal.hidden) return;
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    }
+
     if (userName && userNameNode) {
       userNameNode.textContent = userName;
     }
@@ -3249,6 +3343,7 @@
     if (orderSetupLink) {
       orderSetupLink.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' });
       orderSetupLink.addEventListener('click', function(event) {
+        if (revealPrerequisite('order', event)) return;
         event.preventDefault();
         openDashboardTour('order');
       });
@@ -3265,6 +3360,7 @@
     if (stockCountSetupLink) {
       stockCountSetupLink.href = preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'stockCount' });
       stockCountSetupLink.addEventListener('click', function(event) {
+        if (revealPrerequisite('stockCount', event)) return;
         event.preventDefault();
         openDashboardTour('stockCount');
       });
@@ -3272,16 +3368,34 @@
     var invoiceUploadSetupLink = document.querySelector('[data-invoice-upload-setup-link]');
     if (invoiceUploadSetupLink) invoiceUploadSetupLink.addEventListener('click', function(event) { event.preventDefault(); openDashboardTour('invoiceUpload'); });
     var invoiceDigitiseSetupLink = document.querySelector('[data-invoice-digitise-setup-link]');
-    if (invoiceDigitiseSetupLink) invoiceDigitiseSetupLink.addEventListener('click', function(event) { event.preventDefault(); openDashboardTour('invoiceDigitise'); });
+    if (invoiceDigitiseSetupLink) invoiceDigitiseSetupLink.addEventListener('click', function(event) {
+      if (revealPrerequisite('invoiceDigitise', event)) return;
+      event.preventDefault();
+      openDashboardTour('invoiceDigitise');
+    });
     if (sidebarNextAction) {
       sidebarNextAction.addEventListener('click', function(event) {
         if (!sidebarNextStep) return;
         if (sidebarNextStep.textContent !== taskCatalog.supplier.title && sidebarNextStep.textContent !== taskCatalog.market.title && sidebarNextStep.textContent !== taskCatalog.order.title && sidebarNextStep.textContent !== taskCatalog.inventory.title && sidebarNextStep.textContent !== taskCatalog.stockCount.title && sidebarNextStep.textContent !== taskCatalog.invoiceUpload.title && sidebarNextStep.textContent !== taskCatalog.invoiceDigitise.title) return;
         event.preventDefault();
         showOnboarding();
-        openDashboardTour(sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : sidebarNextStep.textContent === taskCatalog.order.title ? 'order' : sidebarNextStep.textContent === taskCatalog.inventory.title ? 'inventory' : sidebarNextStep.textContent === taskCatalog.stockCount.title ? 'stockCount' : sidebarNextStep.textContent === taskCatalog.invoiceUpload.title ? 'invoiceUpload' : sidebarNextStep.textContent === taskCatalog.invoiceDigitise.title ? 'invoiceDigitise' : 'supplier');
+        var sidebarTaskKey = sidebarNextStep.textContent === taskCatalog.market.title ? 'market' : sidebarNextStep.textContent === taskCatalog.order.title ? 'order' : sidebarNextStep.textContent === taskCatalog.inventory.title ? 'inventory' : sidebarNextStep.textContent === taskCatalog.stockCount.title ? 'stockCount' : sidebarNextStep.textContent === taskCatalog.invoiceUpload.title ? 'invoiceUpload' : sidebarNextStep.textContent === taskCatalog.invoiceDigitise.title ? 'invoiceDigitise' : 'supplier';
+        if (revealPrerequisite(sidebarTaskKey, event)) return;
+        openDashboardTour(sidebarTaskKey);
       });
     }
+    document.querySelectorAll('[data-close-prerequisite-modal]').forEach(function(button) {
+      button.addEventListener('click', closePrerequisiteModal);
+    });
+    var prerequisiteModal = document.querySelector('[data-prerequisite-modal]');
+    if (prerequisiteModal) {
+      prerequisiteModal.addEventListener('click', function(event) {
+        if (event.target === prerequisiteModal) closePrerequisiteModal();
+      });
+    }
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') closePrerequisiteModal();
+    });
     if (outletsNavLink) {
       outletsNavLink.href = supplierSetupUrl('2');
     }
