@@ -96,120 +96,25 @@ Generated preview screenshots:
 
 ## Asset downloads for devs
 
-Pages that already carry the Aa/Box handoff inspectors also include a third
-top-right pill, `↓ Assets`, with two downloads:
+Handoff-enabled pages expose `↓ Assets` downloads for that page and for the
+whole flow. The static archives live in `Freemium/assets/downloads/`.
 
-- **This page** — a zip of only the local images that page actually references
-  for that specific screen
-- **Whole flow** — one zip of every local image used anywhere across the
-  Freemium prototype pages (the union, deduped).
+After changing local image references, run `build-asset-downloads.py` to
+regenerate the archives and manifest. Run `inject_asset_widget.py` only when a
+new handoff-enabled page needs the widget. Marketing pages, email mockups, and
+redirect stubs remain out of scope.
 
-The downloads are pre-built static zips at
-`Freemium/assets/downloads/<page-slug>.zip` and
-`Freemium/assets/downloads/all-pages.zip`.
-They are not continuously updated in the browser; they only change after the
-asset-build script is re-run. The scan includes local image references
-(`.svg`, `.png`, `.jpg`, `.webp`, etc.) and does not include CSS-generated
-icons or Material Symbols.
+## Implementation Notes
 
-Two scripts maintain them:
+All prototypes are standalone HTML files with inline CSS and JavaScript,
+Google Fonts, and local assets. Handoff-enabled trial pages include the `Aa`
+and `Box` inspectors.
 
-- `build-asset-downloads.py` rebuilds the page zips, full-flow zip, and manifest.
-- `inject_asset_widget.py` injects the Assets widget into pages that already have the handoff inspectors.
-
-Run `build-asset-downloads.py` whenever local image references change. If file
-counts change on pages that already have the widget, update the visible count
-labels in those pages too; `inject_asset_widget.py` only adds missing widgets.
-There is also a daily Codex reminder, "Regenerate Freemium asset downloads if
-needed", which should only prompt when Freemium prototype work has been
-completed that day.
-
-The widget follows the same boundary as the handoff inspectors, so marketing
-pages, email mockups, and redirect stubs remain out of scope.
-
-## Current Implementation Notes
-
-Both prototypes are standalone HTML files:
-
-- Inline CSS in `<style>`
-- No external JavaScript
-- Google Fonts only
-- Local assets referenced from `_refs`
-- Top-level Freemium pages use the root favicon at `../assets/favicon.svg` so Cloudflare-served `/Freemium/...` URLs show the Nomni tab icon.
-- Trial onboarding pages include the top-right `Aa` typography inspector and `Box` layout/style inspector for handoff review.
-
-Lowercase helper URLs:
-
-- `Freemium/freemium.html` redirects to `Freemium/nomni.html`
-- `Freemium/zeemart.html` redirects to `Freemium/Zeemart.html`
-
-The shared `Get started` dialog flow lives on `Freemium/procure-get-started.html`:
-
-- Email screen headline: `What's your email address?`
-- Email screen body: `Start free, or take a quick look around first.`
-- Email screen field: `Work email`
-- Email screen CTAs:
-  - Primary: `Sign up for FREE`
-  - Secondary: `Try the demo account`
-- Signup verification:
-  - `Sign up for FREE` moves to a verification step before collecting account details.
-  - The page shows a delayed email notification toast for the verification code.
-  - The toast opens `Freemium/procure-verification-email.html` in a new tab.
-  - Mock verification code: `123456`.
-- The page reads `?source=nomni` or `?source=zeemart` so the back link can return to the relevant marketing prototype.
-- The page opens on a blurred Procure background and keeps the focus on the dialog flow.
-- Trial dashboard and onboarding behaviour is documented in `Trial Onboarding Current Behaviour` below.
-- Demo confirmation:
-  - `Check your inbox`
-  - Private demo link sent to the captured email, expiring in 14 days.
-  - A delayed notification opens the demo email mockup in a new tab.
-- Duplicate demo request state:
-  - Triggered when the page has a prefilled `?email=...` value and the user clicks `Try the demo account` while that same email is still in the field.
-  - Heading: `Demo already requested`
-  - Body tells the user a private demo link has already been sent to that email.
-  - Primary action: `Speak to Nomni's team`, linking to `https://www.nomni.ai/lets-chat`.
-  - Secondary action: `Use another email`, returning to the email step.
-- Demo email:
-  - Subject-style page: `Your private Nomni Procure demo link`.
-  - Main CTA opens the demo account dashboard.
-  - A separated secondary section beneath the main CTA offers a guided walkthrough, with a `Book a live demo` action linking to `https://www.nomni.ai/lets-chat`.
-- Demo dashboard:
-  - Uses sample Procure dashboard data.
-  - Topbar includes `Demo link expires in 14 days`.
-  - Topbar CTAs: `Start my FREE trial` and `Book a demo`.
-  - `Start my FREE trial` links back to `procure-get-started.html?source=demo&email=...` when an email is available.
-- Email validation is enabled on the first email screen, the verification step checks for the mock 6-digit code, and Step 1 validates the password rule. The venue details step also uses required fields so the trial dashboard can receive meaningful venue context.
-- Signup Step 1:
-  - First name
-  - Last name
-  - Create password
-- Signup Step 2:
-  - Heading: `Add your venue details`
-  - Company registered name
-  - Venue name
-  - Country
-  - Street address
-  - Postcode
-  - Suburb, only when Australia is selected
-  - Australian state, only when Australia is selected
-- Address autocomplete note:
-  - Australia uses a postcode/suburb lookup backed by `Freemium/assets/australian_postcodes.csv`.
-  - Singapore currently uses a plain postal code field with no autocomplete.
-- Signup Step 3 optional questions:
-  - Heading: `Tell us about your business`
-  - Body: `A few quick details to help us understand your business.`
-  - Primary goal
-  - Number of locations
-  - Current ordering method
-- Finish transition:
-  - Heading: `Creating your account`
-  - Body: `Setting up Nomni Procure for your venue.`
-  - Redirects to `Freemium/Procure Trial Dashboard.html` after a short loading state.
-  - Carries the entered email, first/last name, and venue name into the trial dashboard URL so the dashboard can personalize the topbar user and setup panel.
-- The signup flow includes handoff inspectors in the top-right corner:
-  - `Aa` enables hover inspection for font size/token, font weight, colour, and font family.
-  - `Box` enables hover inspection for dimensions, padding, margin, corner radius, border, background, display/gap, positioning, and box sizing.
-  - Clicking while an inspector is active pins the tooltip; pressing `Escape` clears inspector mode.
+`freemium.html` and `zeemart.html` are compatibility redirects to the current
+Nomni and Zeemart marketing prototypes. The shared entry flow reads
+`?source=nomni` or `?source=zeemart` for its back link, and passes identity,
+venue, and primary-goal context to the trial dashboard. Australia uses the
+local postcode/suburb lookup; Singapore uses manual postal-code entry.
 
 ## Trial Onboarding Current Behaviour
 
@@ -267,14 +172,9 @@ Guided-tour standards:
 - Users should advance by clicking highlighted product controls wherever possible.
 - Use `Prev` / `Next` only for same-page guidance where the real click target does not naturally advance. Show `Prev` only when the previous step is on the same page.
 - `Next` uses the primary green treatment and `Prev` uses the mint secondary treatment. Tour cards close with an X button in the top-right corner rather than a footer `Dismiss` button.
-- Standard tour visual treatment (same across every guided page): the `STEP X` kicker is `var(--spinach)` (not `var(--nomni-green)`); the highlight ring is `border: 2px solid var(--nomni-green); border-radius: 10px; box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);` with no background fill; the tour card border is `1px solid rgba(42,200,100,.24)`. Every flow's step numbering is a single continuous sequence with no repeats or gaps — verify this whenever a flow spans more than one file, since the count easily drifts when steps get merged or split across a page boundary.
-- Popovers must not cover the control users need to click. Tour placement measures the rendered popover height and keeps arrows aligned, with adaptive clamping near viewport edges.
-- The tour uses lightweight highlight rings/cards without a full-page dark overlay, except where the underlying product control is a modal.
-- Tour instructions describe the user action and resulting product behaviour directly. Avoid referring to `Nomni` or `Nomni Procure` in the third person inside step copy.
-- Shared `START HERE` pointers must use the exact PWF-1702 title and copy on the Dashboard and every sidebar-widget entry page: `Start from Outlets` / `Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.`; `Start from Items` / `Open Items to build the list your team will order from.`; `Start from Orders` / `Open Orders to create and send your first order.`; `Start from Inventory` / either `Open Inventory to organise the items your team will count.` or `Open Inventory to record a stock count.`; and `Start from Invoices` / either `Open Invoices to upload supplier invoices.` or `Open Invoices to review and digitise an uploaded invoice.`
-- Every tour that exposes explicit navigation uses Nomni Green for `Next` and Mint for `Previous`/`Prev`, including Add supplier settings, manual Create SKU, invoice-assisted market-list review, and Upload/Digitise invoice.
-- Completion hand-offs use the kicker `Setup updated` and point to the sidebar setup card. When setup remains incomplete, the shared body pattern is `Your setup progress is now [progress]%. Open the setup panel to see what’s next.` At 100%, use `Your setup is complete. Open the setup panel to explore other things you can try.` instead of referring to a nonexistent next setup step.
-- Guided pages should preserve the real product layout before adding tour affordances. For example, Orders keeps `New order` in the page header actions, not in the search/filter toolbar.
+- Tours use lightweight highlight cards, continuous step numbering, and copy that describes the user's action and outcome. They must not obstruct the control being explained.
+- Shared `START HERE` pointers and detailed tour copy are maintained against Jira `PWF-1702`; retain the current-page start convention and the real product layout when changing them.
+- Completion hand-offs point to the sidebar setup card and use `Setup updated` until the selected goal is complete.
 
 Add supplier flow:
 
@@ -328,16 +228,18 @@ Invoice item creation:
 Invoice digitisation:
 
 - `Freemium/procure-trial-invoices.html` starts with no records. Uploading one or more invoices sets `invoiceUpload=1`, switches to Uploads, and creates a pending row for each file. `View/edit` opens a live-style split digitisation workspace: required invoice fields and line items on the left, uploaded document preview on the right.
-- OCR may pre-fill supplier, invoice number, invoice date, and payment terms. It only surfaces invoice line items that match items the user has already created; unmatched products do not automatically appear as line items. If the supplier cannot be matched, line-item editing may remain unavailable until the user selects or creates the supplier. Payment terms remains required even when OCR supplies it.
+- OCR may pre-fill supplier, invoice number, invoice date, and payment terms. Matched products appear as invoice lines, while unmatched products and matched products with a missing order UOM appear together in one `Items require setup` list. If the supplier cannot be matched, line-item editing may remain unavailable until the user selects or creates the supplier. Payment terms remains required even when OCR supplies it.
+- Selecting an unmatched-product suggestion immediately adds it as a provisional invoice line using the available OCR name, code, quantity, UOM, price, and tax. The line includes an edit action that opens the SKU form only when the buyer wants to review or change the catalogue details. Removing an unpublished provisional line does not create an orphaned catalogue SKU.
+- Selecting a missing-UOM suggestion opens `Add new UOM`, because the buyer must enter the conversion rate against the SKU's base UOM before the item can be added. Both suggestion types use the same completed treatment after resolution. The older Admin-only behaviour that exposes every possible UOM in the normal line dropdown is not included.
 - `Add SKU` appends a blank row, so invoices can contain any number of line items. `Add new` contains Create new SKU, Add custom item, and Add free SKU.
-- Create new SKU reuses the fields from `procure-trial-create-sku.html`: SKU name, supplier/my product codes, UOM, minimum order quantity, price before tax, tax rate, and optional inventory setup. `Add to Inventory` is off by default and its Inventory list/UOM/par fields remain hidden until selected. Saving creates the SKU and applies it to the next blank invoice line.
+- Manual Create new SKU and the optional edit action reuse the fields from `procure-trial-create-sku.html`: SKU name, supplier/my product codes, UOM, minimum order quantity, price before tax, tax rate, and optional inventory setup. `Add to Inventory` is off by default and its Inventory list/UOM/par fields remain hidden until selected.
 - Publishing sets `invoiceDigitise=1`, removes the pending upload, and adds the processed record to Invoices.
 
 Invoice tours:
 
 - Uploading and digitising are separate tours. From the Dashboard checklist or small Get started widget on Dashboard, Create SKU, Items, Orders, Inventory, or Stock count, Step 1 stays on the current page and highlights the Invoices navigation; clicking it carries the tour into the appropriate invoice flow with subsequent step numbers offset correctly. When launched while already on Invoices, Step 1 starts directly at Upload invoice or View/edit.
 - **Upload tour:** Upload invoice → choose one or more files in the dropzone → the user clicks Done without an additional explanatory step → `Review your uploads` handoff pointing at the newly added row and explaining that `View/edit` starts digitisation. The first pointer uses device-neutral copy, popover arrows align to their target, and the file-selection pointer sits beside the dropzone so it does not cover the upload controls. Completing the upload updates the sidebar widget immediately from 60% to 80% and changes its next action to `Digitise invoices`. Instructional kickers use the existing `Step N` format only.
-- **Digitise tour:** Open the pending invoice with View/edit, then four review areas: (1) check all invoice details and mandatory payment terms, including missing/incorrect OCR matches; (2) review all matched line items; (3) learn that Add SKU/Add new can handle missing items; (4) publish only when the complete invoice is valid. Publishing continues to a final `Invoice digitised` handoff pointing at the new processed row instead of ending abruptly. It also updates the sidebar widget immediately to 100%, shows its completion tick, and moves the widget to the first optional `Also try` action.
+- **Digitise tour:** Open the pending invoice with View/edit, then four review areas: (1) check all invoice details and mandatory payment terms, including missing/incorrect OCR matches; (2) review all matched line items; (3) learn that Add SKU/Add new can handle missing items; (4) publish only when the complete invoice is valid. The newer OCR suggestions remain available in the prototype but are outside the guided sequence. Publishing continues to a final `Invoice digitised` handoff pointing at the new processed row instead of ending abruptly. It also updates the sidebar widget immediately to 100%, shows its completion tick, and moves the widget to the first optional `Also try` action.
 - When `invoiceUpload=1` is carried into a fresh page load without in-memory uploaded files, the digitise tour creates one pending sample upload so the checklist CTA still has a record to open in this static prototype.
 
 Tour behaviour: the digitise tour is explanatory rather than forcing field-by-field actions; users can dismiss or go back; adding/removing rows does not reset it; it never implies that OCR found every product or that reviewing one row completes the invoice; the Create SKU dialog is outside the guided sequence.
@@ -411,28 +313,18 @@ Checklist "100% done" state (`Procure Trial Dashboard.html`):
 
 Sidebar "Get started" widget — tick icon and Next/Also try label:
 
-- A small 16px green-circle tick (`data-sidebar-setup-tick`, hidden by default) sits next to the "Get started" title in the widget on every trial page (12 files share this widget; `procure-trial-new-order-item.html` and `procure-trial-review-invoice-items.html` don't have it at all).
-- On the Dashboard (the only page with full `taskCatalog` knowledge): once the primary checklist is 100%, the tick shows and the label becomes `Also try:`, with the link text swapped to the first incomplete visible "extra" task's title. If literally nothing is left across both primary and visible extra tasks, the whole `Next:`/`Also try:` line hides instead of showing a dead label.
-- Every other page also shows a real, specific "Also try" task rather than a generic filler, computed from a small local lookup instead of the full `taskCatalog`. The invoice page now sets `invoiceUpload` and `invoiceDigitise`; order and stock-count completion continue to use `orderPlaced` and `stockCountDone`. The href override runs *after* each page's existing final href-assignment (`sidebarNextUrl()` or the inline chain), since that assignment already runs unconditionally and would otherwise clobber it.
-- Layout fix: `.sidebar-setup-next` (the Next/Also try line) and the top `.sidebar-setup-row` (title + percentage) both use `white-space: nowrap` on their child spans now, since the sidebar is narrow (232px) and long strings would otherwise wrap awkwardly mid-word.
-- Label + action are always on the same line, separated by a colon (`Next: Build market list`, `Also try: Upload an invoice`) — the label is never hidden once the widget is showing a specific task, since hiding it only made sense for the old generic "Explore more setup options" filler, not a real named task. Two of the longer extra-task titles are shortened specifically for this line (the main checklist row keeps the original wording): `Complete stock count` → `Complete a stock count`, `Upload invoice` → `Upload an invoice`.
+- The widget shows current progress and a single specific next action. After the primary goal is complete, it switches to an optional `Also try:` action; it hides the action line when nothing remains.
 
 Support links:
 
 - Nomni Procure help collection for restaurants: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`
 
-## Verification
+## Further detail
 
-Preview screenshots are kept in:
-
-- `Freemium/nomni-procure-top-preview.png`
-- `Freemium/zeemart-top-preview.png`
-- `Freemium/assets/tour-screenshots/PWF-1702/` contains the public, stable tour-step screenshots used as clickable thumbnails in Jira story PWF-1702.
-
-Local image reference checks were run during development.
+- **Jira PWF-1702** — guided-tour copy, sequence, and stable review screenshots in `Freemium/assets/tour-screenshots/PWF-1702/`.
+- **Jira PWF-1511** — future invoice-review states, including OCR errors and deferred-review handling.
 
 ## Open Follow-Ups
 
 - Decide how the demo dashboard works: what data appears, whether it is seeded, and how it differs from the guided trial checklist/dashboard.
 - Decide whether the later `Export invoices` extra task remains in scope. It is still defined in prototype data for future wiring, but is currently coded out of the visible "More setup options" list.
-- Continue keeping this document updated as visual or content changes are made.
