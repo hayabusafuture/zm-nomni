@@ -261,6 +261,8 @@ Guided-tour standards:
 - Standard tour visual treatment (same across every guided page): the `STEP X` kicker is `var(--spinach)` (not `var(--nomni-green)`); the highlight ring is `border: 2px solid var(--nomni-green); border-radius: 10px; box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);` with no background fill; the tour card border is `1px solid rgba(42,200,100,.24)`. Every flow's step numbering is a single continuous sequence with no repeats or gaps — verify this whenever a flow spans more than one file, since the count easily drifts when steps get merged or split across a page boundary.
 - Popovers must not cover the control users need to click. Tour placement measures the rendered popover height and keeps arrows aligned, with adaptive clamping near viewport edges.
 - The tour uses lightweight highlight rings/cards without a full-page dark overlay, except where the underlying product control is a modal.
+- Tour instructions describe the user action and resulting product behaviour directly. Avoid referring to `Nomni` or `Nomni Procure` in the third person inside step copy.
+- Completion hand-offs use the kicker `Setup updated` and point to the sidebar setup card. When setup remains incomplete, the shared body pattern is `Your setup progress is now [progress]%. Open the setup panel to see what’s next.` At 100%, use `Your setup is complete. Open the setup panel to explore other things you can try.` instead of referring to a nonexistent next setup step.
 - Guided pages should preserve the real product layout before adding tour affordances. For example, Orders keeps `New order` in the page header actions, not in the search/filter toolbar.
 
 Add supplier flow:
@@ -270,6 +272,7 @@ Add supplier flow:
 - The Suppliers tab starts empty and reads the signup `venueName`.
 - Search outcomes:
   - Searching `23` shows demo supplier results and continues through `Add to My Supplier`.
+  - The matching-results tour step highlights the complete results table rather than the first supplier or its action button. This keeps the choice neutral: the user may select any result that matches their records, and choosing any `Add to My Supplier` action advances the flow.
   - Any other nonblank search shows the no-results path with `Try expanded search` and `Or create new`.
   - Blank search stays on the search page.
 - The no-results branch opens a `Create supplier` dialog with the supplier name prefilled from the search term.
@@ -281,6 +284,7 @@ Build market list flow:
 
 - The dashboard `Build market list` row shows a real `Add items` CTA once the supplier prerequisite is complete.
 - The CTA and sidebar `Next: Build market list` both start Step 1 pointing at `Items` in the sidenav. Clicking it opens `Freemium/procure-trial-items.html?tour=1`.
+- The START HERE copy is standardised across Dashboard and same-page starts: `Open Items to build the list your team will order from.`
 - `Freemium/procure-trial-items.html` stays locked without `supplierAdded=1`, because items must be linked to a supplier.
 - The Items page follows the real product shape: `Purchased` tab, outlet selector, `Search SKU`, and action bar. The outlet selector uses `venueName` or falls back to `Trial Outlet`.
 - A fresh trial account starts with an empty Items page (`No items yet`). Item rows should only appear after the user builds the market list through the manual or invoice-assisted flow.
