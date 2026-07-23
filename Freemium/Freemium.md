@@ -381,7 +381,7 @@ Place order flow:
 - The guided order-by-item path covers: add an item to order, review/select the newly-created supplier cart group, then place the order.
 - `Freemium/procure-trial-new-order-supplier.html` covers the secondary `Order by supplier` path: Orders opens the real-style supplier picker modal first, then a supplier-specific item table with a review modal. It uses the same created supplier and market-list items as the item path; the order starts empty until the user adds an item.
 - The Order by supplier branch uses one continuous sequence across pages: Step 1 `Create an order`, Step 2 `Choose the supplier`, Step 3 `Add an item from this supplier`, Step 4 `Review the order`, and Step 5 `Send it to the supplier`.
-- Step 3 highlights the complete supplier item list rather than the first row’s action. Selecting `Add to order` on any item advances the tour.
+- Step 3 highlights the visible `Add to order` buttons as one Quantity-column target rather than favouring the first item. Selecting any highlighted action advances the tour.
 - The supplier-specific order page shows at least four market-list items in the prototype, retaining any item created earlier in the flow, so the list-level highlight and free item choice are clear during review.
 - Placing an order returns to Orders with `orderPlaced=1`, shows a placed order row using the created supplier, marks `Place order` complete on the dashboard, and advances `Order faster` setup progress from 60% to 80%.
 - The order branch that was used is tracked separately with `orderByItemDone=1` or `orderBySupplierDone=1`. If one branch is complete and the other is not, the completed checklist row can show a secondary option to try the other path without making it part of checklist completion.

@@ -1025,7 +1025,7 @@
           <span class="entry-count" data-entry-count>Showing <b>1 to 1</b> of 1 entry</span>
         </div>
 
-        <div class="table-wrap" data-supplier-item-list>
+        <div class="table-wrap">
           <table class="products">
             <thead>
               <tr>
@@ -1182,7 +1182,8 @@
     var selectedItems = [];
     var tourSteps = {
       addItem: {
-        target: '[data-supplier-item-list]',
+        target: '[data-add-item]',
+        targetAll: true,
         kicker: 'Step 3',
         title: 'Add an item from this supplier',
         copy: 'Choose what you need from this supplier’s market list and add the quantity for this order.',
@@ -1406,9 +1407,28 @@
     function placeTour() {
       if (!tour || tour.hidden) return;
       var step = tourSteps[currentTourStep] || tourSteps.addItem;
-      var target = document.querySelector(step.target);
-      if (!target) return;
-      var rect = target.getBoundingClientRect();
+      var targets = step.targetAll ? Array.from(document.querySelectorAll(step.target)) : [document.querySelector(step.target)];
+      var visibleRects = targets.filter(Boolean).map(function(target) {
+        return target.getBoundingClientRect();
+      }).filter(function(rect) {
+        return rect.width > 0 && rect.height > 0;
+      });
+      if (!visibleRects.length) return;
+      var bounds = visibleRects.reduce(function(result, rect) {
+        result.top = Math.min(result.top, rect.top);
+        result.left = Math.min(result.left, rect.left);
+        result.right = Math.max(result.right, rect.right);
+        result.bottom = Math.max(result.bottom, rect.bottom);
+        return result;
+      }, { top: Infinity, left: Infinity, right: -Infinity, bottom: -Infinity });
+      var rect = {
+        top: bounds.top,
+        left: bounds.left,
+        right: bounds.right,
+        bottom: bounds.bottom,
+        width: bounds.right - bounds.left,
+        height: bounds.bottom - bounds.top
+      };
       var pad = 10;
       tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
       tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
