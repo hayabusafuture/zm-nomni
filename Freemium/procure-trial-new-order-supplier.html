@@ -1254,8 +1254,21 @@
           items.push({ name: item[0], supplier: supplierName, uom: item[1], price: item[2] });
         });
       }
-      if (!items.length) {
-        items.push({ name: 'APPLE TESTING', supplier: supplierName, uom: 'box', price: '1.00' });
+      if (items.length < 4) {
+        [
+          ['Whole milk', 'ctn', '4.20'],
+          ['Eggs', 'tray', '6.80'],
+          ['Cooking oil', 'btl', '12.50'],
+          ['Rice', 'kg', '1.20']
+        ].some(function(item) {
+          var alreadyListed = items.some(function(existing) {
+            return existing.name.toLowerCase() === item[0].toLowerCase();
+          });
+          if (!alreadyListed) {
+            items.push({ name: item[0], supplier: supplierName, uom: item[1], price: item[2] });
+          }
+          return items.length >= 4;
+        });
       }
       return items;
     }
