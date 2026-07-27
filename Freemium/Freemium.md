@@ -234,6 +234,7 @@ Invoice digitisation:
 - The conversion dialog also offers `Flip units`, so buyers can enter either direction — for example, cartons per kilogram instead of kilograms per carton. The prototype converts either entry to the same saved conversion.
 - Until the invoice is published, a line created through the missing-UOM path uses the same edit icon as a provisional SKU line. Its icon reopens the conversion dialog, while a provisional SKU's icon opens the SKU form. Buyers can correct that invoice-specific value in the same dialog; publishing exits the workspace, so the conversion is no longer editable in this flow.
 - `Add SKU` appends a blank row, so invoices can contain any number of line items. `Add new` contains Create new SKU, Add custom item, and Add free SKU.
+- Every invoice line has a left-side drag handle for reordering and an adjacent delete action. Reordering changes only the line-item display order and does not affect invoice totals.
 - Manual Create new SKU and the optional edit action reuse the fields from `procure-trial-create-sku.html`: SKU name, supplier/my product codes, UOM, minimum order quantity, price before tax, tax rate, and optional inventory setup. `Add to Inventory` is off by default and its Inventory list/UOM/par fields remain hidden until selected.
 - The workspace has a sticky bottom footer with the live invoice total and `Publish invoice` action. Extra bottom padding keeps the final line items visible above it.
 - Publishing sets `invoiceDigitise=1`, removes the pending upload, and adds the processed record to Invoices.

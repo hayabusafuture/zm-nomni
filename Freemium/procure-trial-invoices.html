@@ -933,7 +933,7 @@
   .detail-field .readonly-value { font-weight: 600; }
   .required-mark { color: #D0291E; }
   .line-items { padding: 28px 30px 96px; }
-  .line-items-header, .line-item-row { display: grid; grid-template-columns: minmax(250px, 4fr) 70px 90px 90px 70px 65px 105px 34px; gap: 8px; align-items: center; }
+  .line-items-header, .line-item-row { display: grid; grid-template-columns: 80px minmax(250px, 4fr) 70px 90px 90px 70px 65px 105px; gap: 8px; align-items: center; }
   .line-items-header { padding: 0 0 10px; border-bottom: 1px solid var(--rule); color: var(--ink); font-size: 12px; font-weight: 700; }
   .line-item-row { padding: 10px 0; border-bottom: 1px solid var(--rule); }
   .line-item-row input, .line-item-row select { width: 100%; height: 40px; min-width: 0; padding: 0 9px; border: 1px solid #D8DAE0; border-radius: 6px; background: #fff; font: inherit; }
@@ -945,7 +945,15 @@
   .edit-created-sku:active { transform: scale(.96); }
   .edit-created-sku .material-symbols-outlined { font-size: 17px; }
   .line-amount { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
-  .remove-line { width: 32px; height: 32px; border: 0; background: transparent; color: var(--spinach); cursor: pointer; }
+  .line-row-actions { display: flex; align-items: center; }
+  .drag-handle, .remove-line { width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--spinach); cursor: pointer; }
+  .drag-handle { color: var(--ink-mute); cursor: grab; }
+  .drag-handle:hover, .remove-line:hover { background: var(--mint); color: var(--spinach); }
+  .drag-handle:active { cursor: grabbing; transform: scale(.96); }
+  .remove-line:active { transform: scale(.96); }
+  .drag-handle .material-symbols-outlined, .remove-line .material-symbols-outlined { font-size: 19px; }
+  .line-item-row.is-dragging { opacity: .45; }
+  .line-item-row.is-drop-target { border-top: 2px solid var(--nomni-green); }
   .line-controls { position: relative; display: flex; align-items: center; gap: 8px; margin-top: 12px; }
   .add-new-wrap { position: relative; }
   .add-new-menu { position: absolute; z-index: 30; top: calc(100% + 5px); left: 0; width: 176px; padding: 5px 0; border: 1px solid var(--rule); border-radius: 8px; background: #fff; box-shadow: 0 8px 22px rgba(0,0,0,.14); }
@@ -1036,7 +1044,7 @@
   @media (max-width: 1180px) {
     .digitise-layout { grid-template-columns: 1fr; height: auto; }
     .invoice-preview { min-height: 620px; }
-    .line-items-header, .line-item-row { grid-template-columns: minmax(220px, 3fr) 65px 80px 85px 65px 60px 90px 32px; }
+    .line-items-header, .line-item-row { grid-template-columns: 80px minmax(220px, 3fr) 65px 80px 85px 65px 60px 90px; }
   }
 
   @media (max-width: 1100px) {
@@ -1565,7 +1573,7 @@
               <div class="detail-field"><label for="digitise-terms">Payment terms <span class="required-mark">*</span></label><select id="digitise-terms" name="paymentTerms" required><option value="">Select payment terms</option><option>Bank transfer</option><option>By month end</option><option>Cash &amp; carry</option><option>Cheque</option><option selected>COD</option><option>NET 7</option><option>NET 14</option><option>NET 30</option><option>NET 60</option><option>Not specified</option></select></div>
             </div>
             <div class="line-items">
-              <div class="line-items-header"><span>Description</span><span>Qty</span><span>Unit size</span><span>Unit price</span><span>Disc</span><span>GST %</span><span style="text-align:right">Amount (S$)</span><span></span></div>
+              <div class="line-items-header"><span aria-hidden="true"></span><span>Description</span><span>Qty</span><span>Unit size</span><span>Unit price</span><span>Disc</span><span>GST %</span><span style="text-align:right">Amount (S$)</span></div>
               <div data-line-items></div>
               <div class="line-controls">
                 <button class="btn btn-primary" type="button" data-add-line><span class="material-symbols-outlined">add</span>Add SKU</button>
@@ -2362,7 +2370,7 @@
     lineSequence += 1;
     var row = document.createElement('div');
     row.className = 'line-item-row'; row.setAttribute('data-line-item', String(lineSequence));
-    row.innerHTML = '<div class="line-description-cell"><select aria-label="SKU description" data-line-description><option value="">Select SKU</option><option>Frozen Atlantic salmon</option><option>Cooking cream 1 litre</option><option>Bean curd (tofu)</option><option>Chicken broth</option><option>Cooking oil</option></select><button class="edit-created-sku" type="button" data-edit-created-sku aria-label="Review created SKU" title="Review SKU details" hidden><span class="material-symbols-outlined">edit</span></button></div><input aria-label="Quantity" data-line-qty type="number" min="0.01" step="0.01" value="' + safe(values.qty) + '"><select aria-label="Unit size" data-line-uom><option value="">Select</option><option>kg</option><option>g</option><option>ctn</option><option>box</option><option>pcs</option><option>litre</option></select><input aria-label="Unit price" data-line-price type="number" min="0" step="0.01" value="' + safe(values.price) + '"><input aria-label="Discount" data-line-discount type="number" min="0" step="0.01" value="' + safe(values.discount || 0) + '"><input aria-label="GST percentage" data-line-gst type="number" min="0" step="0.01" value="' + safe(values.gst === undefined ? 9 : values.gst) + '"><span class="line-amount" data-line-amount>S$0.00</span><button class="remove-line" type="button" aria-label="Remove line item"><span class="material-symbols-outlined">delete</span></button>';
+    row.innerHTML = '<div class="line-row-actions"><button class="drag-handle" type="button" draggable="true" aria-label="Drag to reorder line item" title="Drag to reorder"><span class="material-symbols-outlined">drag_indicator</span></button><button class="remove-line" type="button" aria-label="Remove line item" title="Remove line item"><span class="material-symbols-outlined">delete</span></button></div><div class="line-description-cell"><select aria-label="SKU description" data-line-description><option value="">Select SKU</option><option>Frozen Atlantic salmon</option><option>Cooking cream 1 litre</option><option>Bean curd (tofu)</option><option>Chicken broth</option><option>Cooking oil</option></select><button class="edit-created-sku" type="button" data-edit-created-sku aria-label="Review created SKU" title="Review SKU details" hidden><span class="material-symbols-outlined">edit</span></button></div><input aria-label="Quantity" data-line-qty type="number" min="0.01" step="0.01" value="' + safe(values.qty) + '"><select aria-label="Unit size" data-line-uom><option value="">Select</option><option>kg</option><option>g</option><option>ctn</option><option>box</option><option>pcs</option><option>litre</option></select><input aria-label="Unit price" data-line-price type="number" min="0" step="0.01" value="' + safe(values.price) + '"><input aria-label="Discount" data-line-discount type="number" min="0" step="0.01" value="' + safe(values.discount || 0) + '"><input aria-label="GST percentage" data-line-gst type="number" min="0" step="0.01" value="' + safe(values.gst === undefined ? 9 : values.gst) + '"><span class="line-amount" data-line-amount>S$0.00</span>';
     lineItems.appendChild(row);
     if (values.description) {
       var descriptionSelect = row.querySelector('[data-line-description]');
@@ -2444,6 +2452,32 @@
     if (!remove) return;
     if (lineItems.children.length > 1) remove.closest('[data-line-item]').remove();
     calculateTotals();
+  });
+  var draggedLineItem = null;
+  function clearLineDropTargets() { lineItems.querySelectorAll('.is-drop-target').forEach(function(row){ row.classList.remove('is-drop-target'); }); }
+  lineItems.addEventListener('dragstart', function(event){
+    var handle = event.target.closest('.drag-handle');
+    if (!handle) return;
+    draggedLineItem = handle.closest('[data-line-item]');
+    draggedLineItem.classList.add('is-dragging');
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', draggedLineItem.getAttribute('data-line-item'));
+  });
+  lineItems.addEventListener('dragover', function(event){
+    if (!draggedLineItem) return;
+    event.preventDefault();
+    var target = event.target.closest('[data-line-item]');
+    clearLineDropTargets();
+    if (!target || target === draggedLineItem) return;
+    target.classList.add('is-drop-target');
+    var targetBounds = target.getBoundingClientRect();
+    lineItems.insertBefore(draggedLineItem, event.clientY > targetBounds.top + targetBounds.height / 2 ? target.nextSibling : target);
+  });
+  lineItems.addEventListener('drop', function(event){ event.preventDefault(); clearLineDropTargets(); });
+  lineItems.addEventListener('dragend', function(){
+    if (draggedLineItem) draggedLineItem.classList.remove('is-dragging');
+    clearLineDropTargets();
+    draggedLineItem = null;
   });
   document.querySelector('[data-add-new-toggle]').addEventListener('click', function(event){ event.stopPropagation(); addNewMenu.hidden = !addNewMenu.hidden; });
   document.addEventListener('click', function(event){ if (!event.target.closest('.add-new-wrap')) addNewMenu.hidden = true; });
