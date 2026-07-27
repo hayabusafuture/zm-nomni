@@ -965,7 +965,9 @@
   .ocr-suggestion:active { transform: scale(.99); }
   .ocr-suggestion-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
   .ocr-suggestion-meta { color: var(--ink-mute); font-size: 12px; }
-  .ocr-suggestion-action { color: var(--spinach); font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .ocr-suggestion-action { display: grid; justify-items: end; gap: 2px; color: var(--spinach); font-size: 12px; font-weight: 700; text-align: right; }
+  .ocr-suggestion-action strong { font: inherit; white-space: nowrap; }
+  .ocr-suggestion-action small { max-width: 190px; color: var(--ink-mute); font-size: 11px; font-weight: 500; line-height: 1.3; }
   .ocr-suggestion.done { border-color: #DCE3DE; background: #F4F6F4; color: var(--ink-mute); cursor: default; }
   .ocr-suggestion.done:hover { border-color: #DCE3DE; background: #F4F6F4; }
   .ocr-suggestion.done .ocr-suggestion-action { color: var(--spinach); }
@@ -1580,10 +1582,10 @@
                     <span class="ocr-suggestion-meta">5 kg · S$12.95</span>
                     <span class="ocr-suggestion-action">Add to invoice</span>
                   </button>
-                  <button class="ocr-suggestion" type="button" data-ocr-suggestion="missing-uom" data-name="Envy USA Apple" data-code="AB-100" data-uom="ctn" data-uom-display="carton" data-qty="5" data-price="4.00" data-gst="9">
+                  <button class="ocr-suggestion" type="button" data-ocr-suggestion="missing-uom" data-name="Envy USA Apple" data-code="AB-100" data-uom="ctn" data-uom-display="carton" data-uom-cta-title="Add carton" data-uom-cta-detail="Enter how many kilograms are in one carton" data-qty="5" data-price="4.00" data-gst="9">
                     <span class="ocr-suggestion-name">AB-100 · Envy USA Apple</span>
                     <span class="ocr-suggestion-meta">5 cartons · S$4.00</span>
-                    <span class="ocr-suggestion-action">Set up carton to add</span>
+                    <span class="ocr-suggestion-action"><strong>Add carton</strong><small>Enter how many kilograms are in one carton</small></span>
                   </button>
                   <button class="ocr-suggestion" type="button" data-ocr-suggestion="new-sku" data-name="Heinz Less Salt Tomato Ketchup 473ml" data-code="PX9100" data-uom="box" data-qty="2" data-price="18.50" data-gst="9">
                     <span class="ocr-suggestion-name">PX9100 · Heinz Less Salt Tomato Ketchup 473ml</span>
@@ -2393,7 +2395,11 @@
       suggestion.classList.remove('done');
       suggestion.disabled = false;
       var action = suggestion.querySelector('.ocr-suggestion-action');
-      action.textContent = suggestion.dataset.ocrSuggestion === 'missing-uom' ? 'Set up ' + (suggestion.dataset.uomDisplay || suggestion.dataset.uom) + ' to add' : 'Add to invoice';
+      if (suggestion.dataset.ocrSuggestion === 'missing-uom') {
+        action.innerHTML = '<strong>' + safe(suggestion.dataset.uomCtaTitle || ('Add ' + (suggestion.dataset.uomDisplay || suggestion.dataset.uom))) + '</strong><small>' + safe(suggestion.dataset.uomCtaDetail || '') + '</small>';
+      } else {
+        action.textContent = 'Add to invoice';
+      }
     });
     document.querySelector('[data-digitise-error]').hidden = true;
   }
