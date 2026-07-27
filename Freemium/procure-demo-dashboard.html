@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
 <title>Nomni Procure — Demo Account</title>
+<script>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var next = new URLSearchParams();
+    next.set('demo', '1');
+    if (params.get('email')) next.set('email', params.get('email'));
+    window.location.replace('../Procure%20-%20Dashboard.html?' + next.toString());
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
@@ -137,7 +146,9 @@
     padding: 10px 12px;
     border-radius: 6px;
     font-size: 14px;
+    cursor: pointer;
   }
+  .nav a:hover { background: rgba(0,0,0,.05); }
   .nav a.active {
     background: var(--sidebar-item-active);
     color: var(--seaweed);
@@ -152,6 +163,11 @@
     font-size: 13px;
     font-weight: 800;
   }
+  .icon-wrap { width: 18px; height: 18px; position: relative; flex: 0 0 18px; }
+  .icon-wrap img { position: absolute; inset: 0; width: 18px; height: 18px; }
+  .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
   .main {
     grid-column: 2;
     grid-row: 2;
@@ -279,13 +295,76 @@
   .order-row strong { color: var(--ink); }
   .order-row span { color: var(--ink-mute); font-size: 13px; }
   .chip {
-    border-radius: 999px;
+    border-radius: 4px;
     background: var(--mint);
     color: var(--spinach);
     padding: 5px 10px;
     font-size: 12px;
     font-weight: 800;
   }
+  .chip.amber { background: #FFF3CD; color: #7A5F00; }
+  .chip.grey { background: #F0F0F2; color: #555; }
+  .chip.blue { background: #E8F1FF; color: #315FA5; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .page-title { margin: 0 0 5px; font-size: 24px; font-weight: 700; letter-spacing: -.03em; }
+  .page-subtitle { margin: 0; color: var(--ink-mute); }
+  .page-actions { display: flex; gap: 10px; }
+  .main .btn-secondary { background: var(--mint); color: var(--seaweed); border-color: var(--mint); }
+  .main .btn-secondary:hover { background: #C6F2CE; }
+  .main .btn-tertiary { background: #F3F4F6; color: var(--ink); border-color: transparent; }
+  .tabs { display: flex; gap: 28px; border-bottom: 1px solid var(--rule); margin: 4px 0 18px; padding: 0 2px; }
+  .tab { position: relative; padding: 10px 2px 14px; border: 0; background: none; color: var(--ink); font-weight: 600; cursor: pointer; }
+  .tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--nomni-green); border-radius: 2px; }
+  .tab-count { margin-left: 5px; background: var(--nomni-green); color: var(--seaweed); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .search-wrap { width: 250px; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid #DCDEE3; border-radius: 6px; background: #fff; }
+  .search-wrap:focus-within { border-color: var(--nomni-green); }
+  .search-wrap input { min-width: 0; width: 100%; border: 0; outline: 0; color: var(--ink); }
+  .search-icon { width: 14px; height: 14px; border: 1.5px solid var(--ink-mute); border-radius: 50%; position: relative; flex: 0 0 14px; }
+  .search-icon::after { content: ""; position: absolute; width: 6px; height: 1.5px; background: var(--ink-mute); right: -5px; bottom: -3px; transform: rotate(45deg); }
+  .filter-select { height: 36px; padding: 0 28px 0 11px; border: 1px solid #DCDEE3; border-radius: 6px; background: #fff; color: var(--ink); }
+  .table-wrap { overflow-x: auto; border-top: 1px solid var(--rule); }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  thead th { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--rule); background: #F9FAFB; color: var(--ink-mute); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  tbody td { padding: 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  tbody tr:hover td { background: #F7F8FA; }
+  .cell-main { font-weight: 600; }
+  .cell-sub { margin-top: 3px; color: var(--ink-mute); font-size: 12px; }
+  .money { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pager { display: flex; align-items: center; justify-content: space-between; padding: 16px 4px; color: var(--ink-mute); font-size: 12px; }
+  .pager-buttons { display: flex; gap: 4px; }
+  .pager button { width: 30px; height: 30px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; }
+  .pager button.active { background: var(--seaweed); color: #fff; border-color: var(--seaweed); }
+  .safety-note { display: flex; gap: 11px; padding: 13px 15px; margin-bottom: 20px; border: 1px solid #B9F0C5; border-radius: 8px; background: var(--mint); color: var(--seaweed); }
+  .safety-icon { width: 20px; height: 20px; border: 2px solid var(--spinach); border-radius: 50%; display: grid; place-items: center; flex: 0 0 20px; font-size: 11px; font-weight: 700; }
+  .safety-note strong { display: block; }
+  .safety-note p { margin: 3px 0 0; color: rgba(14,55,39,.72); font-size: 12px; }
+  .modal-overlay { position: fixed; inset: 0; z-index: 900; display: none; align-items: flex-start; justify-content: center; padding-top: 72px; background: rgba(10,20,15,.46); }
+  .modal-overlay.open { display: flex; }
+  .modal-card { width: 580px; max-width: calc(100vw - 32px); max-height: calc(100vh - 100px); overflow: hidden; border-radius: 12px; background: #fff; box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+  .modal-head { display: flex; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--rule); }
+  .modal-head h2 { margin: 0; font-size: 18px; }
+  .modal-head p { margin: 4px 0 0; color: var(--ink-mute); font-size: 12px; }
+  .close-btn { width: 40px; height: 40px; border: 0; border-radius: 6px; background: transparent; cursor: pointer; font-size: 22px; }
+  .close-btn:hover { background: #F3F4F6; }
+  .modal-body { padding: 20px 24px 24px; }
+  .modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 24px 18px; border-top: 1px solid var(--rule); }
+  .supplier-options { display: grid; gap: 10px; }
+  .supplier-option { display: flex; align-items: center; justify-content: space-between; min-height: 58px; padding: 0 14px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; }
+  .supplier-option:hover { border-color: var(--nomni-green); background: #F8FFF9; }
+  .dropzone { min-height: 190px; border: 1.5px dashed #C7C9CF; border-radius: 10px; display: grid; place-items: center; text-align: center; color: var(--ink-mute); cursor: pointer; }
+  .dropzone:hover { border-color: var(--nomni-green); background: #F8FFF9; }
+  .dropzone strong { color: var(--spinach); }
+  .toast { position: fixed; right: 24px; bottom: 24px; z-index: 1000; min-width: 320px; padding: 14px 16px; border-radius: 8px; background: var(--seaweed); color: #fff; box-shadow: 0 14px 36px rgba(14,55,39,.25); opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast strong { display: block; }
+  .toast span { color: rgba(255,255,255,.72); font-size: 12px; }
+  .inspectors { position: fixed; top: 64px; right: 12px; z-index: 850; display: flex; gap: 6px; }
+  .inspect-btn { min-width: 38px; height: 32px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.08); font-weight: 700; cursor: pointer; }
+  .inspect-btn.active { background: var(--seaweed); color: #fff; }
+  .inspect-tip { position: fixed; z-index: 860; display: none; max-width: 300px; padding: 10px 12px; border-radius: 7px; background: #111; color: #fff; font-size: 11px; line-height: 1.55; pointer-events: none; }
+  .inspect-outline { outline: 2px solid rgba(42,200,100,.75)!important; outline-offset: 2px; }
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
     .sidebar { width: 64px; overflow: hidden; }
@@ -314,7 +393,7 @@
       <img class="brand-logo-img" src="../assets/nomni-logo-light.svg" alt="nomni" />
       <div class="brand-sub">Procure</div>
     </div>
-    <div class="demo-status">Demo link expires in 14 days</div>
+    <div class="demo-status">Demo expires in 14 days</div>
     <div class="top-actions">
       <a class="btn btn-primary" href="procure-get-started.html?source=demo" data-start-trial>Start my FREE trial</a>
       <a class="btn btn-secondary" href="https://www.nomni.ai/lets-chat">Book a demo</a>
@@ -324,94 +403,198 @@
   <aside class="sidebar">
     <div class="demo-pill">Demo account</div>
     <nav class="nav" aria-label="Demo navigation">
-      <a class="active" href="#"><span class="nav-icon">●</span><span class="nav-label">Dashboard</span></a>
-      <a href="#"><span class="nav-icon">O</span><span class="nav-label">Orders</span></a>
-      <a href="#"><span class="nav-icon">I</span><span class="nav-label">Invoices</span></a>
-      <a href="#"><span class="nav-icon">S</span><span class="nav-label">Suppliers</span></a>
-      <a href="#"><span class="nav-icon">P</span><span class="nav-label">Products</span></a>
-      <a href="#"><span class="nav-icon">R</span><span class="nav-label">Reports</span></a>
+      <a href="#dashboard" data-route="dashboard"><span class="icon-wrap"><img class="icon-grey" src="../sidenav icons/Dashboard - grey.png" alt=""><img class="icon-green" src="../sidenav icons/Dashboard - green.png" alt=""></span><span class="nav-label">Dashboard</span></a>
+      <a href="#orders" data-route="orders"><span class="icon-wrap"><img class="icon-grey" src="../sidenav icons/Orders - grey.png" alt=""><img class="icon-green" src="../sidenav icons/Orders - green.png" alt=""></span><span class="nav-label">Orders</span></a>
+      <a href="#invoices" data-route="invoices"><span class="icon-wrap"><img class="icon-grey" src="../sidenav icons/Invoice - grey.png" alt=""><img class="icon-green" src="../sidenav icons/Invoice - green.png" alt=""></span><span class="nav-label">Invoices</span></a>
+      <a href="#users" data-route="users"><span class="icon-wrap"><img class="icon-grey" src="../sidenav icons/Users - grey.png" alt=""><img class="icon-green" src="../sidenav icons/Users - green.png" alt=""></span><span class="nav-label">Users</span></a>
     </nav>
   </aside>
 
   <main class="main">
     <section class="demo-banner">
       <div>
-        <h1>Explore with sample data.</h1>
-        <p>This demo account uses sample suppliers, orders, invoices, and spend reports so you can see how Procure feels in motion.</p>
+        <h1>Explore freely with sample data.</h1>
+        <p>Changes stay in this demo account. Nothing is sent to suppliers, and all demo data is deleted when access expires.</p>
       </div>
       <a class="btn btn-primary" href="procure-get-started.html?source=demo" data-start-trial>Start my FREE trial</a>
     </section>
 
-    <div class="page-head">
-      <div>
-        <h1 class="dash-welcome">Welcome to your Nomni Procure demo.</h1>
-        <p class="dash-subtitle">Today’s sample outlets have placed <strong>S$4,890.40</strong> worth of orders and are expecting <strong>12 deliveries</strong>.</p>
+    <section class="view" data-view="dashboard">
+      <div class="page-head">
+        <div>
+          <h1 class="dash-welcome">Welcome to your Nomni Procure demo.</h1>
+          <p class="dash-subtitle">Today’s sample outlets have placed <strong>S$4,890.40</strong> worth of orders and are expecting <strong>12 deliveries</strong>.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary" data-open-upload>Upload invoice</button>
+          <button class="btn btn-primary" data-open-order>New order</button>
+        </div>
       </div>
-    </div>
 
-    <section class="metrics-section" aria-label="Demo metrics">
-      <div class="metric-card">
-        <p class="metric-label">Weekly orders</p>
-        <p class="metric-value">S$4,890.40</p>
-        <p class="metric-note">24 sample orders</p>
-      </div>
-      <div class="metric-card">
-        <p class="metric-label">Monthly spend</p>
-        <p class="metric-value">S$37,805.21</p>
-        <p class="metric-note">Across 5 venues</p>
-      </div>
-      <div class="metric-card">
-        <p class="metric-label">Invoices digitised</p>
-        <p class="metric-value">128</p>
-        <p class="metric-note">This month</p>
-      </div>
-      <div class="metric-card">
-        <p class="metric-label">Price changes</p>
-        <p class="metric-value">17</p>
-        <p class="metric-note">Needs review</p>
+      <section class="metrics-section" aria-label="Demo metrics">
+        <div class="metric-card"><p class="metric-label">Weekly orders</p><p class="metric-value">S$4,890.40</p><p class="metric-note">24 sample orders</p></div>
+        <div class="metric-card"><p class="metric-label">Monthly spend</p><p class="metric-value">S$37,805.21</p><p class="metric-note">Across 3 venues</p></div>
+        <div class="metric-card"><p class="metric-label">Invoices digitised</p><p class="metric-value">128</p><p class="metric-note">This month</p></div>
+        <div class="metric-card"><p class="metric-label">Price changes</p><p class="metric-value">17</p><p class="metric-note">Needs review</p></div>
+      </section>
+
+      <div class="content-grid">
+        <section class="panel">
+          <h2 class="panel-title">Spending overview</h2>
+          <div class="chart" aria-hidden="true">
+            <div class="bar" style="height:55%"></div><div class="bar" style="height:72%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:88%"></div><div class="bar" style="height:62%"></div><div class="bar" style="height:76%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:94%"></div><div class="bar" style="height:68%"></div><div class="bar" style="height:82%"></div><div class="bar" style="height:38%"></div><div class="bar" style="height:71%"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="panel-title">Recent sample orders</h2>
+          <div class="order-list">
+            <div class="order-row"><div><strong>Fresh Harvest Pte Ltd</strong><br><span>Produce and dairy</span></div><span class="chip">Placed</span></div>
+            <div class="order-row"><div><strong>Ocean Catch Seafood</strong><br><span>Seafood delivery</span></div><span class="chip blue">Received</span></div>
+            <div class="order-row"><div><strong>Morning Roast Co.</strong><br><span>Coffee and pantry</span></div><span class="chip amber">Invoiced</span></div>
+            <div class="order-row"><div><strong>Golden Grain Foods</strong><br><span>Weekly standing order</span></div><span class="chip">Approved</span></div>
+          </div>
+        </section>
       </div>
     </section>
 
-    <div class="content-grid">
-      <section class="panel">
-        <h2 class="panel-title">Spending overview</h2>
-        <div class="chart" aria-hidden="true">
-          <div class="bar" style="height:55%"></div>
-          <div class="bar" style="height:72%"></div>
-          <div class="bar" style="height:45%"></div>
-          <div class="bar" style="height:88%"></div>
-          <div class="bar" style="height:62%"></div>
-          <div class="bar" style="height:76%"></div>
-          <div class="bar" style="height:50%"></div>
-          <div class="bar" style="height:94%"></div>
-          <div class="bar" style="height:68%"></div>
-          <div class="bar" style="height:82%"></div>
-          <div class="bar" style="height:38%"></div>
-          <div class="bar" style="height:71%"></div>
-        </div>
-      </section>
+    <section class="view" data-view="orders">
+      <div class="page-head">
+        <div><h1 class="page-title">Orders</h1><p class="page-subtitle">Manage sample purchase orders and upcoming deliveries.</p></div>
+        <button class="btn btn-primary" data-open-order>New order</button>
+      </div>
+      <div class="tabs"><button class="tab active">All orders <span class="tab-count">24</span></button><button class="tab">Drafts</button><button class="tab">Pending approval</button><button class="tab">Upcoming deliveries</button></div>
+      <div class="filter-row">
+        <label class="search-wrap"><span class="search-icon"></span><input placeholder="Search orders"></label>
+        <select class="filter-select"><option>All suppliers</option><option>Fresh Harvest Pte Ltd</option><option>Ocean Catch Seafood</option></select>
+        <select class="filter-select"><option>Past 30 days</option><option>This week</option></select>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Order</th><th>Supplier</th><th>Delivery</th><th>Status</th><th>Total</th></tr></thead>
+        <tbody id="orders-body">
+          <tr><td><div class="cell-main">PO-10846</div><div class="cell-sub">27 Jul 2026 · Demo user</div></td><td>Fresh Harvest Pte Ltd</td><td>29 Jul 2026</td><td><span class="chip">Placed</span></td><td class="money">S$684.20</td></tr>
+          <tr><td><div class="cell-main">PO-10845</div><div class="cell-sub">27 Jul 2026 · Maya Lim</div></td><td>Ocean Catch Seafood</td><td>28 Jul 2026</td><td><span class="chip amber">Needs approval</span></td><td class="money">S$1,248.00</td></tr>
+          <tr><td><div class="cell-main">PO-10844</div><div class="cell-sub">26 Jul 2026 · Demo user</div></td><td>Golden Grain Foods</td><td>28 Jul 2026</td><td><span class="chip grey">Draft</span></td><td class="money">S$392.60</td></tr>
+          <tr><td><div class="cell-main">PO-10842</div><div class="cell-sub">25 Jul 2026 · Aaron Tan</div></td><td>Ocean Catch Seafood</td><td>27 Jul 2026</td><td><span class="chip blue">Received</span></td><td class="money">S$932.40</td></tr>
+        </tbody>
+      </table></div>
+      <div class="pager"><span>Showing 1–4 of 24 orders</span><div class="pager-buttons"><button class="active">1</button><button>2</button><button>3</button></div></div>
+    </section>
 
-      <section class="panel">
-        <h2 class="panel-title">Recent sample orders</h2>
-        <div class="order-list">
-          <div class="order-row"><div><strong>Fresh Direct</strong><br><span>Produce and dairy</span></div><span class="chip">Placed</span></div>
-          <div class="order-row"><div><strong>Ocean Catch</strong><br><span>Seafood delivery</span></div><span class="chip">Received</span></div>
-          <div class="order-row"><div><strong>Morning Roast Co.</strong><br><span>Coffee and pantry</span></div><span class="chip">Invoiced</span></div>
-          <div class="order-row"><div><strong>Greenfield Meats</strong><br><span>Weekly standing order</span></div><span class="chip">Approved</span></div>
-        </div>
-      </section>
-    </div>
+    <section class="view" data-view="invoices">
+      <div class="page-head">
+        <div><h1 class="page-title">Invoices</h1><p class="page-subtitle">Upload, review and digitise invoices within the demo account.</p></div>
+        <button class="btn btn-primary" data-open-upload>Upload invoice</button>
+      </div>
+      <div class="tabs"><button class="tab active">Invoices <span class="tab-count">50</span></button><button class="tab">Uploads <span class="tab-count">3</span></button></div>
+      <div class="filter-row">
+        <label class="search-wrap"><span class="search-icon"></span><input placeholder="Search invoices"></label>
+        <select class="filter-select"><option>All suppliers</option><option>Fresh Harvest Pte Ltd</option></select>
+        <select class="filter-select"><option>All statuses</option><option>Approved</option><option>Review</option></select>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Invoice</th><th>Supplier</th><th>Invoice date</th><th>Match</th><th>Status</th><th>Total</th></tr></thead>
+        <tbody id="invoice-body">
+          <tr><td><div class="cell-main">INV-20491</div><div class="cell-sub">Linked to PO-10842</div></td><td>Fresh Harvest Pte Ltd</td><td>26 Jul 2026</td><td><span class="chip">3-way matched</span></td><td><span class="chip">Approved</span></td><td class="money">S$684.20</td></tr>
+          <tr><td><div class="cell-main">OC-77219</div><div class="cell-sub">Linked to PO-10839</div></td><td>Ocean Catch Seafood</td><td>25 Jul 2026</td><td><span class="chip amber">Check quantity</span></td><td><span class="chip amber">Review</span></td><td class="money">S$1,128.50</td></tr>
+          <tr><td><div class="cell-main">GG-29184</div><div class="cell-sub">No order linked</div></td><td>Golden Grain Foods</td><td>24 Jul 2026</td><td><span class="chip grey">Not matched</span></td><td><span class="chip">Approved</span></td><td class="money">S$448.80</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="view" data-view="users">
+      <div class="page-head">
+        <div><h1 class="page-title">Users</h1><p class="page-subtitle">See how teams, outlet access and roles are managed.</p></div>
+        <button class="btn btn-tertiary" data-open-locked>🔒&nbsp; Add user</button>
+      </div>
+      <div class="safety-note"><span class="safety-icon">i</span><div><strong>User management is view-only in the demo</strong><p>Start a free trial to invite your team, assign outlets and configure permissions.</p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>User</th><th>Role</th><th>Outlet access</th><th>Last active</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><div class="cell-main">Maya Lim</div><div class="cell-sub">maya.lim@example.com</div></td><td>Admin</td><td>All sample outlets</td><td>18 minutes ago</td><td><span class="chip">Active</span></td></tr>
+          <tr><td><div class="cell-main">Aaron Tan</div><div class="cell-sub">aaron.tan@example.com</div></td><td>Standard user</td><td>Tanjong Pagar, Novena</td><td>1 hour ago</td><td><span class="chip">Active</span></td></tr>
+          <tr><td><div class="cell-main">Sarah Ong</div><div class="cell-sub">sarah.ong@example.com</div></td><td>Approver</td><td>All sample outlets</td><td>Yesterday</td><td><span class="chip">Active</span></td></tr>
+          <tr><td><div class="cell-main">Demo user</div><div class="cell-sub">Private demo access</div></td><td>Admin preview</td><td>All sample outlets</td><td>Now</td><td><span class="chip blue">Demo</span></td></tr>
+        </tbody>
+      </table></div>
+    </section>
   </main>
 </div>
+
+<div class="modal-overlay" id="order-modal">
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="order-title">
+    <div class="modal-head"><div><h2 id="order-title">Create a sample order</h2><p>Select a sample supplier. The order will remain inside this demo.</p></div><button class="close-btn" data-close-modal aria-label="Close">×</button></div>
+    <div class="modal-body"><div class="supplier-options">
+      <div class="supplier-option" data-place-order data-supplier="Fresh Harvest Pte Ltd" data-total="184.60"><div><strong>Fresh Harvest Pte Ltd</strong><div class="cell-sub">Produce, dairy and eggs · 42 items</div></div><span>›</span></div>
+      <div class="supplier-option" data-place-order data-supplier="Ocean Catch Seafood" data-total="326.40"><div><strong>Ocean Catch Seafood</strong><div class="cell-sub">Fresh and frozen seafood · 28 items</div></div><span>›</span></div>
+      <div class="supplier-option" data-place-order data-supplier="Golden Grain Foods" data-total="142.80"><div><strong>Golden Grain Foods</strong><div class="cell-sub">Rice, flour and dry goods · 36 items</div></div><span>›</span></div>
+    </div></div>
+  </section>
+</div>
+
+<div class="modal-overlay" id="upload-modal">
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="upload-title">
+    <div class="modal-head"><div><h2 id="upload-title">Upload invoice</h2><p>JPG, PNG or PDF · maximum 2MB. Demo uploads are deleted when access expires.</p></div><button class="close-btn" data-close-modal aria-label="Close">×</button></div>
+    <div class="modal-body"><label class="dropzone"><input id="invoice-file" type="file" accept=".jpg,.jpeg,.png,.pdf" hidden><span>Drop an invoice here or <strong>choose a file</strong><br><small>You can also upload a sample document.</small></span></label></div>
+  </section>
+</div>
+
+<div class="modal-overlay" id="locked-modal">
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="locked-title">
+    <div class="modal-head"><div><h2 id="locked-title">Adding users isn’t available in the demo</h2><p>Start a free trial to invite your team and configure access.</p></div><button class="close-btn" data-close-modal aria-label="Close">×</button></div>
+    <div class="modal-body"><div class="safety-note" style="margin:0"><span class="safety-icon">✓</span><div><strong>Your demo stays safely isolated</strong><p>No invitation emails or account changes can be made from this demo.</p></div></div></div>
+    <div class="modal-foot"><button class="btn btn-tertiary" data-close-modal>Close</button><a class="btn btn-primary" href="procure-get-started.html?source=demo" data-start-trial>Start my FREE trial</a></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"><strong id="toast-title">Done</strong><span id="toast-copy">Your sample data was updated.</span></div>
+<div class="inspectors"><button class="inspect-btn" data-inspector="type">Aa</button><button class="inspect-btn" data-inspector="box">Box</button></div>
+<div class="inspect-tip" id="inspect-tip"></div>
+
 <script>
-  (() => {
-    const params = new URLSearchParams(window.location.search);
-    const email = params.get('email');
-    if (!email) return;
-    document.querySelectorAll('[data-start-trial]').forEach((link) => {
-      link.href = `procure-get-started.html?source=demo&email=${encodeURIComponent(email)}`;
-    });
-  })();
+(function(){
+  var views=['dashboard','orders','invoices','users'];
+  function route(){
+    var name=location.hash.slice(1)||'dashboard';
+    if(views.indexOf(name)<0)name='dashboard';
+    document.querySelectorAll('[data-view]').forEach(function(el){el.classList.toggle('active',el.dataset.view===name)});
+    document.querySelectorAll('[data-route]').forEach(function(el){el.classList.toggle('active',el.dataset.route===name)});
+    document.title='Nomni Procure — '+name.charAt(0).toUpperCase()+name.slice(1)+' Demo';
+    window.scrollTo(0,0);
+  }
+  addEventListener('hashchange',route);route();
+
+  var params=new URLSearchParams(location.search),email=params.get('email');
+  if(email)document.querySelectorAll('[data-start-trial]').forEach(function(link){link.href='procure-get-started.html?source=demo&email='+encodeURIComponent(email)});
+  function openModal(id){document.getElementById(id).classList.add('open')}
+  function closeModals(){document.querySelectorAll('.modal-overlay').forEach(function(el){el.classList.remove('open')})}
+  document.querySelectorAll('[data-open-order]').forEach(function(el){el.addEventListener('click',function(){openModal('order-modal')})});
+  document.querySelectorAll('[data-open-upload]').forEach(function(el){el.addEventListener('click',function(){openModal('upload-modal')})});
+  document.querySelector('[data-open-locked]').addEventListener('click',function(){openModal('locked-modal')});
+  document.querySelectorAll('[data-close-modal]').forEach(function(el){el.addEventListener('click',closeModals)});
+  document.querySelectorAll('.modal-overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el)closeModals()})});
+
+  document.querySelectorAll('[data-place-order]').forEach(function(el){el.addEventListener('click',function(){
+    var row='<tr><td><div class="cell-main">PO-10847</div><div class="cell-sub">Just now · Demo user</div></td><td>'+el.dataset.supplier+'</td><td>30 Jul 2026</td><td><span class="chip">Placed</span></td><td class="money">S$'+el.dataset.total+'</td></tr>';
+    document.getElementById('orders-body').insertAdjacentHTML('afterbegin',row);closeModals();location.hash='orders';showToast('Sample order placed','Nothing was sent to the supplier.');
+  })});
+  document.getElementById('invoice-file').addEventListener('change',function(e){
+    if(!e.target.files.length)return;
+    document.getElementById('invoice-body').insertAdjacentHTML('afterbegin','<tr><td><div class="cell-main">'+e.target.files[0].name+'</div><div class="cell-sub">Uploaded just now</div></td><td>Detecting supplier…</td><td>—</td><td><span class="chip grey">Processing</span></td><td><span class="chip amber">Review</span></td><td>—</td></tr>');
+    closeModals();location.hash='invoices';showToast('Invoice uploaded','The file is processing inside your private demo account.');e.target.value='';
+  });
+  document.querySelectorAll('.tab').forEach(function(tab){tab.addEventListener('click',function(){tab.parentElement.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});tab.classList.add('active')})});
+  var toastTimer;
+  function showToast(title,copy){var el=document.getElementById('toast');document.getElementById('toast-title').textContent=title;document.getElementById('toast-copy').textContent=copy;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.remove('show')},3500)}
+
+  var mode='',pinned=false,last=null,tip=document.getElementById('inspect-tip');
+  function stopInspector(){mode='';pinned=false;document.querySelectorAll('[data-inspector]').forEach(function(b){b.classList.remove('active')});if(last)last.classList.remove('inspect-outline');tip.style.display='none'}
+  document.querySelectorAll('[data-inspector]').forEach(function(btn){btn.addEventListener('click',function(){var next=btn.dataset.inspector;if(mode===next){stopInspector();return}stopInspector();mode=next;btn.classList.add('active')})});
+  document.addEventListener('mousemove',function(e){if(!mode||pinned||e.target.closest('.inspectors,.inspect-tip'))return;inspect(e.target,e.clientX,e.clientY)});
+  document.addEventListener('click',function(e){if(!mode||e.target.closest('.inspectors,.inspect-tip'))return;e.preventDefault();e.stopPropagation();pinned=true;inspect(e.target,e.clientX,e.clientY)},true);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModals();stopInspector()}});
+  function inspect(el,x,y){if(last)last.classList.remove('inspect-outline');last=el;el.classList.add('inspect-outline');var c=getComputedStyle(el),r=el.getBoundingClientRect();tip.innerHTML=mode==='type'?'<b>Typography</b><br>'+c.fontSize+' · '+c.fontWeight+'<br>'+c.fontFamily+'<br>'+c.color:'<b>Layout</b><br>'+Math.round(r.width)+' × '+Math.round(r.height)+' px<br>Padding: '+c.padding+'<br>Margin: '+c.margin+'<br>Radius: '+c.borderRadius+'<br>Display: '+c.display+' · gap '+c.gap+'<br>Background: '+c.backgroundColor;tip.style.display='block';tip.style.left=Math.min(x+14,innerWidth-310)+'px';tip.style.top=Math.min(y+14,innerHeight-180)+'px'}
+})();
 </script>
 </body>
 </html>

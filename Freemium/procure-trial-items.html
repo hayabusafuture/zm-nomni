@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
 <title>Nomni Procure - Items</title>
+<script>if(new URLSearchParams(location.search).get('demo')==='1')document.documentElement.classList.add('demo-boot')</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
@@ -1644,8 +1645,8 @@
     }
     var userName = params.get('userName') || '';
     var venueName = params.get('venueName') || '';
-    var supplierAdded = params.get('supplierAdded') === '1';
-    var marketListBuilt = params.get('marketListBuilt') === '1';
+    var supplierAdded = params.get('supplierAdded') === '1' || params.get('demo') === '1';
+    var marketListBuilt = params.get('marketListBuilt') === '1' || params.get('demo') === '1';
     var orderPlaced = params.get('orderPlaced') === '1';
     var inventorySetup = params.get('inventorySetup') === '1';
     var stockCountDone = params.get('stockCountDone') === '1';
@@ -2244,6 +2245,22 @@
     syncChrome();
     addCreatedSkuRow();
     addInvoiceItemRows();
+    if (params.get('demo') === '1' && itemsBody) {
+      [
+        ['Tiger prawns 21/25','Harbour Seafood Co.','S$22.40/kg','MOQ: 2 kg','Seafood','24 Jul 2026'],
+        ['Chicken thigh boneless','Fresh Fields Produce','S$8.90/kg','MOQ: 5 kg','Food ingredients','25 Jul 2026'],
+        ['Coconut milk 1L','Paranakan Trading Pte Ltd (T)','S$3.20/pkt','MOQ: 12 pkt','Food ingredients','23 Jul 2026'],
+        ['Jasmine rice 25kg','Pantry Provisions Pte Ltd','S$39.80/bag','MOQ: 1 bag','Food ingredients','22 Jul 2026'],
+        ['Baby kailan','Fresh Fields Produce','S$4.60/kg','MOQ: 2 kg','Fresh produce','25 Jul 2026'],
+        ['Cooking oil 5L','Pantry Provisions Pte Ltd','S$18.75/tin','MOQ: 2 tin','Food ingredients','21 Jul 2026'],
+        ['House lager keg','Lion City Beverages','S$168.00/keg','MOQ: 1 keg','Beverages','20 Jul 2026'],
+        ['Soda water 24 × 325ml','Lion City Beverages','S$16.20/ctn','MOQ: 1 ctn','Beverages','24 Jul 2026']
+      ].forEach(function(item) {
+        var row=document.createElement('tr');
+        row.innerHTML='<td><span class="fake-check" aria-hidden="true"></span></td><td><div class="sku-name"></div><div class="sku-meta"><em></em> • <span></span></div></td><td><div class="price-main"></div><div class="price-sub"></div></td><td></td><td class="last-cell"></td>';
+        row.querySelector('.sku-name').textContent=item[0];row.querySelector('em').textContent=item[0];row.querySelector('.sku-meta span').textContent=item[1];row.querySelector('.price-main').textContent=item[2];row.querySelector('.price-sub').textContent=item[3];row.children[3].textContent=item[4];row.querySelector('.last-cell').textContent=item[5];itemsBody.appendChild(row);
+      });
+    }
     syncItemsEmptyState();
     showToast();
     showCompletionHandoff();
@@ -2698,6 +2715,31 @@
     if (modalCard) modalCard.classList.add('is-success');
     success.querySelector('button').focus();
   });
+})();
+</script>
+<style>
+html.demo-boot:not(.demo-ready) .main,html.demo-boot:not(.demo-ready) .nav{visibility:hidden}
+body.demo-mode .trial-conversion,body.demo-mode .sidebar-setup,body.demo-mode .handoff-inspector,body.demo-mode .tour-overlay{display:none!important}
+body.demo-mode .nav{margin-top:12px}
+body.demo-mode .page-header{padding-top:32px}
+body.demo-mode .page-title{font:800 26px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:-.03em}
+body.demo-mode .demo-brand-pill{--demo-amber:#F5B731;height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:4px;background:var(--demo-amber);color:var(--seaweed);font-size:10px;font-weight:800;letter-spacing:.06em}
+body.demo-mode .demo-top-status{height:32px;display:inline-flex;align-items:center;padding:0 11px;border:1px solid rgba(42,200,100,.35);border-radius:6px;background:rgba(42,200,100,.1);color:#BFF6CF;font-size:12px;font-weight:600}
+body.demo-mode .demo-top-actions{display:flex;align-items:center;gap:8px;margin-right:4px}
+body.demo-mode .demo-top-btn{height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:transparent;color:#fff;font:600 12px "Inter",sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+body.demo-mode .demo-top-btn.primary{border-color:var(--nomni-green);background:var(--nomni-green);color:var(--seaweed)}
+</style>
+<script>
+(function(){
+  var p=new URLSearchParams(location.search);if(p.get('demo')!=='1')return;
+  document.body.classList.add('demo-mode');var email=p.get('email')||'';
+  function u(path){return path+'?demo=1'+(email?'&email='+encodeURIComponent(email):'')}
+  var allowed={Dashboard:u('../Procure%20-%20Dashboard.html'),Orders:u('../Procure%20-%20Orders.html'),Invoices:u('procure-trial-invoices.html'),Items:u('procure-trial-items.html'),Inventory:u('procure-trial-inventory.html'),Users:u('../Procure%20-%20Users.html')};
+  document.querySelectorAll('.nav a').forEach(function(link){var label=link.querySelector('.nav-label'),name=label?label.textContent.trim():'';if(!allowed[name]){link.remove();return}link.href=allowed[name];link.classList.toggle('active',name==='Items')});
+  document.querySelectorAll('[data-venue-option]').forEach(function(node){node.textContent='Nomni Kitchen — Tanjong Pagar'});
+  var brand=document.querySelector('.brand');if(brand){var pill=document.createElement('span');pill.className='demo-brand-pill';pill.textContent='DEMO';brand.appendChild(pill);var status=document.createElement('span');status.className='demo-top-status';status.textContent='Expires in 14 days';brand.appendChild(status)}
+  var right=document.querySelector('.topbar-right'),actions=document.createElement('div');actions.className='demo-top-actions';actions.innerHTML='<button class="demo-top-btn" type="button">Book a live demo</button><a class="demo-top-btn primary" href="procure-get-started.html?source=demo'+(email?'&email='+encodeURIComponent(email):'')+'">Start my FREE trial</a>';actions.querySelector('button').onclick=function(){var trigger=document.querySelector('[data-book-demo]');if(trigger)trigger.click()};if(right)right.insertBefore(actions,right.firstChild);
+  document.title='Nomni Procure — Demo Items';document.documentElement.classList.add('demo-ready');
 })();
 </script>
 </body>

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
 <title>Nomni Procure — Invoices</title>
+<script>(function(){var p=new URLSearchParams(location.search);if(p.get('demo')==='1')document.documentElement.classList.add('demo-boot');if(p.get('dialogOnly')==='1')document.documentElement.classList.add('dialog-only')})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
@@ -2173,7 +2174,7 @@
 <script>
 (function(){
   var params = new URLSearchParams(window.location.search);
-  var venueName = params.get('venueName') || 'Trial Outlet';
+  var venueName = params.get('venueName') || (params.get('demo') === '1' ? 'Nomni Kitchen — Tanjong Pagar' : 'Trial Outlet');
   var tabs = document.querySelectorAll('[data-invoice-tab]');
   var views = document.querySelectorAll('[data-invoice-view]');
   var pageHeader = document.querySelector('.invoice-page-header');
@@ -2184,7 +2185,11 @@
   var dropzone = document.querySelector('[data-dropzone]');
   var selectedFiles = document.querySelector('[data-selected-files]');
   var doneButton = document.querySelector('[data-upload-done]');
-  var uploads = [];
+  var uploads = params.get('demo') === '1' ? [
+    {name:'harbour-seafood-inv-10482.pdf',time:'27/07/2026 09:42',processed:false,previewUrl:'',invoiceNumber:'INV-10482',invoiceDate:'26/07/2026',supplier:'Harbour Seafood Co.',reviewed:true},
+    {name:'fresh-fields-ff-8931.pdf',time:'26/07/2026 16:18',processed:false,previewUrl:'',invoiceNumber:'FF-8931',invoiceDate:'25/07/2026',supplier:'Fresh Fields Produce',reviewed:true},
+    {name:'pantry-provisions-22071.pdf',time:'24/07/2026 11:06',processed:false,previewUrl:'',invoiceNumber:'PP-22071',invoiceDate:'23/07/2026',supplier:'Pantry Provisions Pte Ltd',reviewed:false}
+  ] : [];
   var activeUpload = null;
   var invoiceTour = document.querySelector('[data-invoice-tour]');
   var invoiceTourHighlight = document.querySelector('[data-invoice-tour-highlight]');
@@ -2326,9 +2331,10 @@
   }
   function renderUploads() {
     var body = document.querySelector('[data-upload-rows]'); body.innerHTML = '';
-    uploads.filter(function(item){ return !item.processed; }).forEach(function(item, index){
+    uploads.forEach(function(item, index){
+      if (item.processed) return;
       var row = document.createElement('tr');
-      row.innerHTML = '<td><input class="invoice-checkbox" type="checkbox" /></td><td class="upload-meta"><strong>' + item.time + '</strong><small>Uploaded from desktop</small></td><td class="muted-value">N/A</td><td class="muted-value">N/A</td><td>' + venueName.replace(/[<>]/g, '') + '</td><td class="muted-value">N/A</td><td><div class="completion"><div class="completion-track"><div class="completion-fill"></div></div><div class="completion-copy"><span>In progress</span><button class="completion-toggle" type="button" data-completion-toggle>' + (item.reviewed ? '4' : '0') + ' of 5⌄</button></div><div class="completion-popover" hidden><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>Supplier name</div><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>Invoice number</div><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>Invoice date</div><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>Total matched order</div><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>All details verified</div></div></div></td><td><button class="view-edit" type="button" data-view-edit="' + index + '">View/edit</button></td>';
+      row.innerHTML = '<td><input class="invoice-checkbox" type="checkbox" /></td><td class="upload-meta"><strong>' + item.time + '</strong><small>Uploaded from desktop</small></td><td class="' + (item.invoiceNumber ? '' : 'muted-value') + '">' + (item.invoiceNumber || 'N/A') + '</td><td class="' + (item.invoiceDate ? '' : 'muted-value') + '">' + (item.invoiceDate || 'N/A') + '</td><td>' + venueName.replace(/[<>]/g, '') + '</td><td class="' + (item.supplier ? '' : 'muted-value') + '">' + (item.supplier || 'N/A') + '</td><td><div class="completion"><div class="completion-track"><div class="completion-fill"></div></div><div class="completion-copy"><span>In progress</span><button class="completion-toggle" type="button" data-completion-toggle>' + (item.reviewed ? '4' : '0') + ' of 5⌄</button></div><div class="completion-popover" hidden><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>Supplier name</div><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>Invoice number</div><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>Invoice date</div><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>Total matched order</div><div class="completion-step"><span class="material-symbols-outlined">check_circle</span>All details verified</div></div></div></td><td><button class="view-edit" type="button" data-view-edit="' + index + '">View/edit</button></td>';
       body.appendChild(row);
     });
     var pending = uploads.filter(function(item){ return !item.processed; }).length;
@@ -2338,6 +2344,7 @@
     var count = document.querySelector('[data-upload-count]'); count.textContent = pending; count.hidden = pending === 0;
     document.querySelector('[data-this-week-count]').textContent = '(' + pending + ')';
   }
+  renderUploads();
   doneButton.addEventListener('click', function(){
     Array.from(doneButton._files || []).forEach(function(file){ uploads.push({name:file.name, time:dateTimeNow(), processed:false, previewUrl: /^image\//.test(file.type) ? URL.createObjectURL(file) : ''}); });
     updateProgressParams('invoiceUpload'); closeModal(true); renderUploads(); setTab('uploads');
@@ -2732,6 +2739,7 @@
   var contactMethodFields = form.querySelectorAll('input[name="contactMethod"]');
   var contactDetailLabel = form.querySelector('[data-contact-detail-label]');
   var signupEmail = params.get('email') || '';
+  var dialogOnly = params.get('dialogOnly') === '1';
 
   function setPrefill(field, value) {
     if (field && value) field.value = value;
@@ -2774,6 +2782,7 @@
     modal.hidden = true;
     document.body.style.overflow = '';
     if (lastTrigger) lastTrigger.focus();
+    if (dialogOnly && window.parent !== window) window.parent.postMessage('close-demo-request', '*');
   }
 
   document.querySelectorAll('[data-book-demo]').forEach(function(trigger) {
@@ -2824,6 +2833,52 @@
     if (modalCard) modalCard.classList.add('is-success');
     success.querySelector('button').focus();
   });
+  if (dialogOnly) openDemoRequest(null);
+})();
+</script>
+<style>
+  html.demo-boot:not(.demo-ready) .main, html.demo-boot:not(.demo-ready) .nav { visibility: hidden; }
+  html.demo-boot .sidebar-mode-wrap { display: none !important; }
+  body.demo-mode .trial-conversion, body.demo-mode .sidebar-setup-card { display:none!important; }
+  body.demo-mode .nav { margin-top: 12px; }
+  body.demo-mode .demo-only-banner { min-height: 44px; margin: 0 0 24px; padding: 0 40px; background: var(--mint); border-bottom: 1px solid #B9F0C5; color: var(--seaweed); font-size: 13px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  body.demo-mode .page-header { padding-top: 32px; }
+  body.demo-mode .page-title { font: 800 26px/1 "Hanken Grotesk", system-ui, sans-serif; letter-spacing: -.03em; }
+  html.dialog-only, html.dialog-only body { background:transparent; }
+  html.dialog-only body > .app, html.dialog-only .handoff-inspector, html.dialog-only .tour-panel, html.dialog-only .tour-backdrop { display:none!important; }
+  html.dialog-only .app-modal-overlay { background:rgba(10,20,15,.46); }
+  body.demo-mode .demo-only-banner a { color:var(--spinach);font-weight:700; }
+  body.demo-mode .demo-top-status { height:32px;display:inline-flex;align-items:center;padding:0 11px;border:1px solid rgba(42,200,100,.35);border-radius:6px;background:rgba(42,200,100,.1);color:#BFF6CF;font-size:12px;font-weight:600; }
+  body.demo-mode .demo-brand-pill{--demo-amber:#F5B731;height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:4px;background:var(--demo-amber);color:var(--seaweed);font-size:10px;font-weight:800;letter-spacing:.06em}
+  body.demo-mode .demo-top-actions{display:flex;align-items:center;gap:8px;margin-right:4px}
+  body.demo-mode .demo-top-btn{height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:transparent;color:#fff;font:600 12px "Inter",sans-serif;cursor:pointer;white-space:nowrap}
+  body.demo-mode .demo-top-btn:hover{background:rgba(255,255,255,.1)}
+  body.demo-mode .demo-top-btn.primary{border-color:var(--nomni-green);background:var(--nomni-green);color:var(--seaweed)}
+</style>
+<script>
+(function(){
+  var demoParams=new URLSearchParams(location.search);if(demoParams.get('demo')!=='1')return;
+  document.body.classList.add('demo-mode');var demoEmail=demoParams.get('email')||'';
+  function demoUrl(path){return path+'?demo=1'+(demoEmail?'&email='+encodeURIComponent(demoEmail):'')}
+  var allowed={Dashboard:demoUrl('../Procure%20-%20Dashboard.html'),Orders:demoUrl('../Procure%20-%20Orders.html'),Invoices:demoUrl('procure-trial-invoices.html'),Items:demoUrl('../Procure%20-%20Items.html'),Inventory:demoUrl('../Procure%20-%20Inventory.html'),Users:demoUrl('../Procure%20-%20Users.html')};
+  document.querySelectorAll('.nav a').forEach(function(link){var label=link.querySelector('.nav-label'),name=label?label.textContent.trim():'';if(!allowed[name]){link.remove();return}link.href=allowed[name];link.classList.toggle('active',name==='Invoices')});
+  var processedRows=document.querySelector('[data-invoice-rows]');
+  if(processedRows){
+    processedRows.innerHTML=[
+      ['25/07/2026','FF-8874','Fresh Fields Produce','02/08/2026','S$684.20','Ready'],
+      ['24/07/2026','HS-10461','Harbour Seafood Co.','31/07/2026','S$1,248.60','Synced'],
+      ['22/07/2026','PT-59208','Paranakan Trading Pte Ltd (T)','29/07/2026','S$436.80','Ready'],
+      ['19/07/2026','DP-31094','Dairy Partners Singapore','26/07/2026','S$297.45','Synced'],
+      ['17/07/2026','PP-21986','Pantry Provisions Pte Ltd','24/07/2026','S$512.10','Ready']
+    ].map(function(item){return '<tr data-invoice-row data-invoice-number="'+item[1]+'"><td><input class="invoice-checkbox" type="checkbox" /></td><td>'+item[0]+'</td><td class="invoice-number">'+item[1]+'</td><td>'+item[2]+'</td><td>Nomni Kitchen — Tanjong Pagar</td><td>'+item[3]+'</td><td class="invoice-total"><span class="invoice-total-check">'+item[4]+' <span class="material-symbols-outlined">check_circle</span></span></td><td><span class="export-chip">'+item[5]+'</span></td><td><button class="invoice-actions" type="button">Actions <span class="material-symbols-outlined">expand_more</span></button></td></tr>'}).join('');
+    document.querySelector('[data-processed-empty]').hidden=true;
+    document.querySelector('[data-processed-table]').hidden=false;
+  }
+  var right=document.querySelector('.topbar-right');
+  var brand=document.querySelector('.brand');if(brand){var pill=document.createElement('span');pill.className='demo-brand-pill';pill.textContent='DEMO';brand.appendChild(pill);var status=document.createElement('span');status.className='demo-top-status';status.textContent='Expires in 14 days';brand.appendChild(status)}
+  var actions=document.createElement('div');actions.className='demo-top-actions';actions.innerHTML='<button class="demo-top-btn" type="button">Book a live demo</button><a class="demo-top-btn primary" href="procure-get-started.html?source=demo'+(demoEmail?'&email='+encodeURIComponent(demoEmail):'')+'">Start my FREE trial</a>';actions.querySelector('button').addEventListener('click',function(){var existing=document.querySelector('[data-book-demo]');if(existing)existing.click()});if(right)right.insertBefore(actions,right.firstChild);
+  document.title='Nomni Procure — Demo Invoices';
+  document.documentElement.classList.add('demo-ready');
 })();
 </script>
 </body>

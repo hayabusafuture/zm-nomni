@@ -87,6 +87,27 @@ Primary visual references are:
 - `Freemium/procure-trial-inventory.html` — Inventory page and guided Set up inventory / stock-count onboarding flows.
 - `Freemium/procure-trial-stock-count.html` — stock-count flow linked from Inventory onboarding and the Manage inventory checklist path.
 - `Freemium/procure-trial-invoices.html` — interactive invoice onboarding page for the `Upload invoice` and `Digitise invoices` checklist CTAs. It starts empty, accepts one or more JPG/PNG/PDF uploads, lists them under Uploads with the live-style five-part completeness status, and opens an OCR-prefilled review form through `View/edit`. Saving moves the record into Invoices. `Pay online` is intentionally omitted.
+
+## Demo Account Current Behaviour
+
+The dedicated source of truth for demo scope, safety rules, section capabilities, planned work, and the implementation change log is [`Demo Dashboard.md`](Demo%20Dashboard.md). Keep that file updated alongside this overview.
+
+`Freemium/procure-demo-dashboard.html` is the destination from the private demo email. It is a freely explorable seeded account, not a guided tour or trial-onboarding checklist.
+
+- The implemented scope contains Dashboard, Orders, Invoices, Items, Inventory, and Users. Payments and News are omitted entirely. Items and Inventory use their richer freemium-flow layouts in demo mode rather than the older root prototypes.
+- `procure-demo-dashboard.html` preserves the emailed entry URL, then redirects into demo mode on the real `Procure - Dashboard.html` prototype.
+- Dashboard uses `Procure - Dashboard.html?demo=1`, Orders uses `Procure - Orders.html?demo=1`, Invoices uses `procure-trial-invoices.html?demo=1`, Items uses `Procure - Items.html?demo=1`, Inventory uses `Procure - Inventory.html?demo=1`, and Users uses `Procure - Users.html?demo=1`. Demo mode preserves each source page's real shell, spacing, controls, tables, and responsive behaviour while restricting its sidenav to the six approved sections.
+- Dashboard shows realistic sample spend, order, invoice, delivery, and price-change data, with direct `New order` and `Upload invoice` actions.
+- Orders includes seeded order states and a safe sample-order interaction. Creating a sample order adds it to the demo table and confirms that nothing was sent to the supplier.
+- Demo Orders now links to both existing root creation prototypes: `Procure - New Order - Item.html?demo=1` and `Procure - New Order - Supplier.html?demo=1`. Both retain their real item, supplier, quantity, cart, review, and order-total UI.
+- Demo Orders omits the Purchase requisitions tab. Demo Invoices opens with realistic sample records in both Invoices and Uploads; the freemium onboarding journey still starts empty.
+- Demo Inventory includes Items, Lists, and Activity. Activity shows sample stock counts, production, wastage, and adjustments with date, filter, export, and record-download controls. The demo uses `Nomni Kitchen — Tanjong Pagar` consistently as its outlet name.
+- Placing from either branch returns to `Procure - Orders.html?demo=1` with the completed sample-order payload. The Orders page prepends the new placed record(s) to its existing table and shows a top-right success toast confirming that nothing was sent to suppliers.
+- Invoices includes seeded matched and unmatched records plus local JPG/PNG/PDF upload. An uploaded file appears as a processing row and remains within the demo context.
+- Users is visible but read-only. Sample roles and outlet access can be inspected, while `Add user` opens a locked-action conversion dialog; no invitation email can be sent.
+- There are no tours, numbered steps, setup tasks, forced paths, or highlighted walkthrough controls.
+- Demo screens do not use the earlier full-width mint banner. An amber `DEMO` pill (`#F5B731`) sits beside the Procure wordmark instead.
+- The topbar carries `Demo expires in 14 days`, `Book a live demo`, and `Start my FREE trial`. `Book a live demo` opens the same two-step in-product request pattern as the freemium trial flow; the signup action preserves the captured email query parameter.
   - The Upload invoice tour ends with a `Digitise invoices` hand-off rather than a generic `Done` action. The hand-off starts Digitise Step 1 on the existing `View/edit` control; selecting `View/edit` directly also dismisses the upload popover and continues at Digitise Step 2 in the editor.
 
 Generated preview screenshots:

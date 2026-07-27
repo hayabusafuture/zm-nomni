@@ -5,6 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Procure — Create Order</title>
+<script>if(new URLSearchParams(location.search).get('demo')==='1')document.documentElement.classList.add('demo-order-mode')</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
@@ -901,6 +902,23 @@
     btn.setAttribute('aria-expanded', 'false');
   });
   menu.addEventListener('click', function(e){ e.stopPropagation(); });
+})();
+</script>
+<style>
+  html.demo-order-mode .demo-brand-pill{--demo-amber:#F5B731;height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:4px;background:var(--demo-amber);color:var(--seaweed);font-size:10px;font-weight:800;letter-spacing:.06em}
+  html.demo-order-mode .demo-top-status{height:32px;display:inline-flex;align-items:center;padding:0 11px;border:1px solid rgba(42,200,100,.35);border-radius:6px;background:rgba(42,200,100,.1);color:#BFF6CF;font-size:12px;font-weight:600}
+</style>
+<script>
+(function(){
+  var params=new URLSearchParams(location.search);if(params.get('demo')!=='1')return;var email=params.get('email')||'';
+  var brand=document.querySelector('.brand');if(brand){var pill=document.createElement('span');pill.className='demo-brand-pill';pill.textContent='DEMO';brand.appendChild(pill)}
+  var right=document.querySelector('.topbar-right');if(right){var status=document.createElement('span');status.className='demo-top-status';status.textContent='Nothing will be sent';right.insertBefore(status,right.firstChild)}
+  var back=document.querySelector('.back-btn');if(back)back.href='Procure%20-%20Orders.html?demo=1'+(email?'&email='+encodeURIComponent(email):'');
+  var place=document.getElementById('placeOrderBtn');if(place)place.addEventListener('click',function(event){
+    if(!place.classList.contains('enabled'))return;event.preventDefault();
+    var orders=[];document.querySelectorAll('.cart-group-check:checked').forEach(function(check){var group=check.closest('.cart-group');var name=group&&group.querySelector('.cart-group-name');orders.push({supplier:name?name.textContent.trim():'Sample supplier',amount:Number(check.dataset.amount)||0,flow:'item'})});
+    if(!orders.length)return;var target=new URLSearchParams();target.set('demo','1');if(email)target.set('email',email);target.set('demoOrders',JSON.stringify(orders));location.href='Procure%20-%20Orders.html?'+target.toString();
+  });
 })();
 </script>
 </body>
