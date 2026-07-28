@@ -1348,6 +1348,7 @@
 <script>
   (function() {
     var params = new URLSearchParams(window.location.search);
+    var isDemo = params.get('demo') === '1';
     if (params.get('setupPanelDismissed') === '1') {
       document.querySelectorAll('.sidebar-setup').forEach(function(node) { node.hidden = true; });
     }
@@ -1361,7 +1362,8 @@
     var stockCountDone = params.get('stockCountDone') === '1';
     var listName = params.get('list') || '';
 
-    var storeKey = 'nomniProcureInventoryStore';
+    var storeKey = isDemo ? 'nomniProcureDemoInventoryStore' : 'nomniProcureInventoryStore';
+    var inventoryReturnFile = isDemo ? '../Procure%20-%20Inventory.html' : 'procure-trial-inventory.html';
     function loadStore() {
       try {
         var raw = window.localStorage.getItem(storeKey);
@@ -1386,7 +1388,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
+      ['demo', 'email', 'userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -1497,6 +1499,11 @@
       userNameNode.textContent = userName;
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
+    if (isDemo) {
+      if (userNameNode) userNameNode.textContent = 'William Arya';
+      if (avatarNode) avatarNode.textContent = 'WA';
+      document.querySelectorAll('.sidebar-setup, [data-tour]').forEach(function(node){ node.hidden = true; });
+    }
 
     var pageTitleNode = document.querySelector('[data-page-title]');
     if (pageTitleNode) pageTitleNode.textContent = 'New stock count: ' + (listName || 'Inventory list');
@@ -1594,7 +1601,7 @@
 
     var cancelLink = document.querySelector('[data-cancel-count]');
     if (cancelLink) cancelLink.addEventListener('click', function() {
-      window.location.href = withParams('procure-trial-inventory.html');
+      window.location.href = withParams(inventoryReturnFile);
     });
     var saveDraftLink = document.querySelector('[data-save-draft]');
     if (saveDraftLink) saveDraftLink.addEventListener('click', function() {
@@ -1603,7 +1610,7 @@
     });
     var saveDraftExitLink = document.querySelector('[data-save-draft-exit]');
     if (saveDraftExitLink) saveDraftExitLink.addEventListener('click', function() {
-      window.location.href = withParams('procure-trial-inventory.html');
+      window.location.href = withParams(inventoryReturnFile);
     });
 
     var confirmModal = document.querySelector('[data-confirm-modal]');
@@ -1643,9 +1650,17 @@
         });
       }
       saveStore(fullStore);
+      if (isDemo) {
+        try {
+          var demoActivities = JSON.parse(localStorage.getItem('nomniProcureDemoInventoryActivities') || '[]');
+          var listValue = fullStore.items.filter(function(entry){ return entry.list === listName; }).reduce(function(sum,entry){ return sum + ((Number(entry.onHand)||0) * (Number(entry.price)||0)); },0);
+          demoActivities.unshift({type:'Stock count',list:listName,value:listValue,date:new Date().toISOString(),createdBy:'William Arya'});
+          localStorage.setItem('nomniProcureDemoInventoryActivities', JSON.stringify(demoActivities.slice(0,20)));
+        } catch (error) {}
+      }
       var didTour = tourActive && currentTourStep === 'awaitingSave';
       var justCompletedStockCount = !stockCountDone;
-      window.location.href = withParams('procure-trial-inventory.html', { stockCountDone: '1', inventoryList: listName, tourHandoff: (didTour || justCompletedStockCount) ? '1' : '' });
+      window.location.href = withParams(inventoryReturnFile, { stockCountDone: '1', inventoryList: listName, tourHandoff: isDemo ? '' : ((didTour || justCompletedStockCount) ? '1' : '') });
     });
 
     // ---- Guided tour continuation (Steps 5-7) ----
@@ -2143,6 +2158,27 @@
     if (modalCard) modalCard.classList.add('is-success');
     success.querySelector('button').focus();
   });
+})();
+</script>
+<style>
+body.demo-workflow .sidebar-setup,body.demo-workflow .tour-overlay,body.demo-workflow .trial-conversion{display:none!important}
+body.demo-workflow .nav{margin-top:12px}
+body.demo-workflow .demo-brand-pill{--demo-amber:#F5B731;height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:4px;background:var(--demo-amber);color:var(--seaweed);font-size:10px;font-weight:800;letter-spacing:.06em}
+body.demo-workflow .demo-top-status{height:32px;display:inline-flex;align-items:center;padding:0 11px;border:1px solid rgba(42,200,100,.35);border-radius:6px;background:rgba(42,200,100,.1);color:#BFF6CF;font-size:12px;font-weight:600}
+body.demo-workflow .demo-top-actions{display:flex;align-items:center;gap:8px;margin-right:4px}
+body.demo-workflow .demo-top-btn{height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:transparent;color:#fff;font:600 12px "Inter",sans-serif;text-decoration:none;cursor:pointer}
+body.demo-workflow .demo-top-btn.primary{border-color:var(--nomni-green);background:var(--nomni-green);color:var(--seaweed)}
+</style>
+<script>
+(function(){
+  var p=new URLSearchParams(location.search);if(p.get('demo')!=='1')return;
+  document.body.classList.add('demo-workflow');var email=p.get('email')||'';function u(path){return path+'?demo=1'+(email?'&email='+encodeURIComponent(email):'')}
+  var allowed={Dashboard:u('../Procure%20-%20Dashboard.html'),Orders:u('../Procure%20-%20Orders.html'),Invoices:u('procure-trial-invoices.html'),Items:u('../Procure%20-%20Items.html'),Inventory:u('../Procure%20-%20Inventory.html'),Recipes:u('../Procure%20-%20Recipes.html'),Outlets:u('../Procure%20-%20Outlets.html'),Users:u('../Procure%20-%20Users.html')};
+  document.querySelectorAll('.nav a').forEach(function(link){var label=link.querySelector('.nav-label'),name=label?label.textContent.trim():'';if(!allowed[name]){link.remove();return}link.href=allowed[name];link.classList.toggle('active',name==='Inventory')});
+  document.querySelectorAll('[data-user-name]').forEach(function(node){node.textContent='William Arya'});document.querySelectorAll('[data-avatar]').forEach(function(node){node.textContent='WA'});
+  var brand=document.querySelector('.brand');if(brand&&!brand.querySelector('.demo-brand-pill')){var pill=document.createElement('span');pill.className='demo-brand-pill';pill.textContent='DEMO';brand.appendChild(pill);var status=document.createElement('span');status.className='demo-top-status';status.textContent='Expires in 14 days';brand.appendChild(status)}
+  var right=document.querySelector('.topbar-right');if(right&&!right.querySelector('.demo-top-actions')){var actions=document.createElement('div');actions.className='demo-top-actions';actions.innerHTML='<button class="demo-top-btn" type="button">Book a live demo</button><a class="demo-top-btn primary" href="procure-get-started.html?source=demo'+(email?'&email='+encodeURIComponent(email):'')+'">Start my FREE trial</a>';actions.querySelector('button').onclick=function(){var trigger=document.querySelector('[data-book-demo]');if(trigger)trigger.click()};right.insertBefore(actions,right.firstChild)}
+  document.title='Nomni Procure — Demo stock count';
 })();
 </script>
 </body>

@@ -1833,7 +1833,7 @@
         <div class="table-card activity-table">
           <table>
             <thead><tr><th class="activity-check"></th><th>Date</th><th>Type</th><th>List</th><th>SKU</th><th>Qty</th><th>Est. value</th><th>Created</th><th></th></tr></thead>
-            <tbody>
+            <tbody data-activity-body>
               <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">26/07/2026<small>19:31</small></td><td>Stock count</td><td>Main kitchen</td><td></td><td></td><td>S$1,086.43</td><td class="activity-created"><strong>26/07/2026 19:31</strong><small>Michelle Tan</small></td><td><button class="activity-download" aria-label="Download stock count"><span class="material-symbols-outlined">download</span></button></td></tr>
               <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">24/07/2026<small>16:24</small></td><td>Stock count</td><td>Dry store</td><td></td><td></td><td>S$906.95</td><td class="activity-created"><strong>24/07/2026 16:24</strong><small>William Arya</small></td><td><button class="activity-download" aria-label="Download stock count"><span class="material-symbols-outlined">download</span></button></td></tr>
               <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">23/07/2026<small>14:18</small></td><td>Production</td><td>Main kitchen</td><td>House laksa paste</td><td>4 tub</td><td></td><td class="activity-created"><strong>23/07/2026 14:18</strong><small>Michelle Tan</small></td><td></td></tr>
@@ -2119,6 +2119,36 @@
       };
       saveStore(store);
     }
+    if (params.get('demo') === '1') {
+      try {
+        var pendingDemoInventoryItems = JSON.parse(localStorage.getItem('nomniProcureDemoPendingInventoryItems') || '[]');
+        pendingDemoInventoryItems.forEach(function(item) {
+          if (!store.lists.some(function(list){ return list.name === item.list; })) store.lists.push({name:item.list});
+          if (!store.items.some(function(existing){ return existing.name === item.name && existing.list === item.list; })) store.items.push(item);
+        });
+        if (pendingDemoInventoryItems.length) {
+          saveStore(store);
+          localStorage.removeItem('nomniProcureDemoPendingInventoryItems');
+        }
+      } catch (error) {}
+    }
+    if (params.get('demo') === '1') {
+      try {
+        var activityBody = document.querySelector('[data-activity-body]');
+        var demoActivities = JSON.parse(localStorage.getItem('nomniProcureDemoInventoryActivities') || '[]');
+        demoActivities.forEach(function(activity) {
+          if (!activityBody) return;
+          var when = new Date(activity.date);
+          var datePart = new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}).format(when);
+          var timePart = new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}).format(when);
+          var row = document.createElement('tr');
+          row.innerHTML = '<td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">'+datePart+'<small>'+timePart+'</small></td><td>Stock count</td><td></td><td></td><td></td><td>S$'+Number(activity.value||0).toLocaleString('en-SG',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td><td class="activity-created"><strong>'+datePart+' '+timePart+'</strong><small></small></td><td><button class="activity-download" aria-label="Download stock count"><span class="material-symbols-outlined">download</span></button></td>';
+          row.children[3].textContent = activity.list || '';
+          row.querySelector('.activity-created small').textContent = activity.createdBy || 'William Arya';
+          activityBody.insertBefore(row, activityBody.firstChild);
+        });
+      } catch (error) {}
+    }
 
     if (pendingSku && pendingListKey) {
       var alreadyAdded = store.items.some(function(item) { return item.name === pendingSku && item.list === pendingListKey; });
@@ -2137,7 +2167,7 @@
 
     function withParams(file, extras) {
       var nextParams = new URLSearchParams();
-      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
+      ['demo', 'email', 'userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
       });
@@ -3585,9 +3615,10 @@ body.demo-mode .demo-top-btn.primary{border-color:var(--nomni-green);background:
   var p=new URLSearchParams(location.search);if(p.get('demo')!=='1')return;
   document.body.classList.add('demo-mode');var email=p.get('email')||'';
   function u(path){return path+'?demo=1'+(email?'&email='+encodeURIComponent(email):'')}
-  var allowed={Dashboard:u('Procure%20-%20Dashboard.html'),Orders:u('Procure%20-%20Orders.html'),Invoices:u('Freemium/procure-trial-invoices.html'),Items:u('Procure%20-%20Items.html'),Inventory:u('Procure%20-%20Inventory.html'),Users:u('Procure%20-%20Users.html')};
+  var allowed={Dashboard:u('Procure%20-%20Dashboard.html'),Orders:u('Procure%20-%20Orders.html'),Invoices:u('Freemium/procure-trial-invoices.html'),Items:u('Procure%20-%20Items.html'),Inventory:u('Procure%20-%20Inventory.html'),Recipes:u('Procure%20-%20Recipes.html'),Outlets:u('Procure%20-%20Outlets.html'),Users:u('Procure%20-%20Users.html')};
   document.querySelectorAll('.nav a').forEach(function(link){var label=link.querySelector('.nav-label'),name=label?label.textContent.trim():'';if(!allowed[name]){link.remove();return}link.href=allowed[name];link.classList.toggle('active',name==='Inventory')});
-  var title=document.querySelector('[data-outlet-title]');if(title)title.textContent='Nomni Kitchen — Tanjong Pagar';
+  document.querySelectorAll('[data-user-name]').forEach(function(node){node.textContent='William Arya'});document.querySelectorAll('[data-avatar]').forEach(function(node){node.textContent='WA'});
+  var title=document.querySelector('[data-outlet-title]');if(title)title.textContent='Inventory';
   var brand=document.querySelector('.brand');if(brand){var pill=document.createElement('span');pill.className='demo-brand-pill';pill.textContent='DEMO';brand.appendChild(pill);var status=document.createElement('span');status.className='demo-top-status';status.textContent='Expires in 14 days';brand.appendChild(status)}
   var right=document.querySelector('.topbar-right'),actions=document.createElement('div');actions.className='demo-top-actions';actions.innerHTML='<button class="demo-top-btn" type="button">Book a live demo</button><a class="demo-top-btn primary" href="procure-get-started.html?source=demo'+(email?'&email='+encodeURIComponent(email):'')+'">Start my FREE trial</a>';actions.querySelector('button').onclick=function(){var trigger=document.querySelector('[data-book-demo]');if(trigger)trigger.click()};if(right)right.insertBefore(actions,right.firstChild);
   document.title='Nomni Procure — Demo Inventory';document.documentElement.classList.add('demo-ready');

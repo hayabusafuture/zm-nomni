@@ -92,19 +92,26 @@ Primary visual references are:
 
 The dedicated source of truth for demo scope, safety rules, section capabilities, planned work, and the implementation change log is [`Demo Dashboard.md`](Demo%20Dashboard.md). Keep that file updated alongside this overview.
 
+Each relevant section in `Demo Dashboard.md` also records the buttons, tabs, navigation entries and other UI removed or hidden to keep the demo focused.
+
 `Freemium/procure-demo-dashboard.html` is the destination from the private demo email. It is a freely explorable seeded account, not a guided tour or trial-onboarding checklist.
 
-- The implemented scope contains Dashboard, Orders, Invoices, Items, Inventory, and Users. Payments and News are omitted entirely. Items and Inventory use their richer freemium-flow layouts in demo mode rather than the older root prototypes.
+- The implemented scope contains Dashboard, Orders, Invoices, Items, Inventory, Recipes, Outlets, and Users. Payments and News are omitted entirely. Items, Inventory, and Outlets use their richer freemium-flow layouts in demo mode rather than the older root prototypes.
 - `procure-demo-dashboard.html` preserves the emailed entry URL, then redirects into demo mode on the real `Procure - Dashboard.html` prototype.
-- Dashboard uses `Procure - Dashboard.html?demo=1`, Orders uses `Procure - Orders.html?demo=1`, Invoices uses `procure-trial-invoices.html?demo=1`, Items uses `Procure - Items.html?demo=1`, Inventory uses `Procure - Inventory.html?demo=1`, and Users uses `Procure - Users.html?demo=1`. Demo mode preserves each source page's real shell, spacing, controls, tables, and responsive behaviour while restricting its sidenav to the six approved sections.
+- Dashboard uses `Procure - Dashboard.html?demo=1`, Orders uses `Procure - Orders.html?demo=1`, Invoices uses `procure-trial-invoices.html?demo=1`, Items uses `Procure - Items.html?demo=1`, Inventory uses `Procure - Inventory.html?demo=1`, Recipes uses `Procure - Recipes.html?demo=1`, Outlets uses `Procure - Outlets.html?demo=1`, and Users uses `Procure - Users.html?demo=1`. Demo mode preserves each source page's real shell, spacing, controls, tables, and responsive behaviour while restricting its sidenav to the eight approved sections.
 - Dashboard shows realistic sample spend, order, invoice, delivery, and price-change data, with direct `New order` and `Upload invoice` actions.
 - Orders includes seeded order states and a safe sample-order interaction. Creating a sample order adds it to the demo table and confirms that nothing was sent to the supplier.
 - Demo Orders now links to both existing root creation prototypes: `Procure - New Order - Item.html?demo=1` and `Procure - New Order - Supplier.html?demo=1`. Both retain their real item, supplier, quantity, cart, review, and order-total UI.
 - Demo Orders omits the Purchase requisitions tab. Demo Invoices opens with realistic sample records in both Invoices and Uploads; the freemium onboarding journey still starts empty.
 - Demo Inventory includes Items, Lists, and Activity. Activity shows sample stock counts, production, wastage, and adjustments with date, filter, export, and record-download controls. The demo uses `Nomni Kitchen — Tanjong Pagar` consistently as its outlet name.
+- Demo Inventory supports temporary list creation, adding sample-catalogue items, creating a local SKU and completing stock counts. All changes use `nomniProcureDemoInventoryStore`; completed counts update quantities and prepend a local Activity record.
 - Placing from either branch returns to `Procure - Orders.html?demo=1` with the completed sample-order payload. The Orders page prepends the new placed record(s) to its existing table and shows a top-right success toast confirming that nothing was sent to suppliers.
-- Invoices includes seeded matched and unmatched records plus local JPG/PNG/PDF upload. An uploaded file appears as a processing row and remains within the demo context.
+- Invoices includes seeded matched and unmatched records plus two downloadable fictional sample PDFs. Users can load either or both samples into the local digitisation workflow; personal invoice uploads and drag-and-drop are disabled in demo mode.
+- Recipes uses the detailed outlet recipe-table layout with realistic sample costs, retail prices, food-cost percentages and dates. Search and favourites filtering work. Existing recipes open in a read-only detail view, while Create new saves temporary recipes locally in the demo account.
 - Users is visible but read-only. Sample roles and outlet access can be inspected, while `Add user` opens a locked-action conversion dialog; no invitation email can be sent.
+- Outlets exposes read-only Details, Users, Settings, Suppliers and Integration tabs. Supplier details can be inspected, while adding or editing suppliers and connecting integrations are locked.
+- Locked or limited demo pages use a shared cream banner with the copy `Some features are unavailable in the demo account` and `You can view sample data, but changes are disabled.` Locked actions retain their normal icon and label, then open the standard unavailable-in-demo modal.
+- The shared cream banner copy is centred across limited pages.
 - There are no tours, numbered steps, setup tasks, forced paths, or highlighted walkthrough controls.
 - Demo screens do not use the earlier full-width mint banner. An amber `DEMO` pill (`#F5B731`) sits beside the Procure wordmark instead.
 - The topbar carries `Demo expires in 14 days`, `Book a live demo`, and `Start my FREE trial`. `Book a live demo` opens the same two-step in-product request pattern as the freemium trial flow; the signup action preserves the captured email query parameter.
@@ -343,6 +350,12 @@ Sidebar "Get started" widget — tick icon and Next/Also try label:
 Support links:
 
 - Nomni Procure help collection for restaurants: `https://support.zeemart.co/en/collections/9530788-for-restaurants-nomni-procure`
+
+Demo Outlets:
+
+- The Outlets page opens on a production-aligned Details tab based on the saved real page.
+- Company, outlet name, address, logo, outlet email and subscription data are populated with read-only sample content.
+- Billing management, logo upload and saving outlet changes are unavailable in the demo; their production-style controls remain visible but inactive.
 
 ## Further detail
 

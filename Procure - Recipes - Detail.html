@@ -548,5 +548,46 @@
     window.location.href = 'Procure - HQ - Dashboard.html';
   });
 </script>
+<style>
+body.demo-mode .sidebar-mode-wrap,body.demo-mode .font-inspector-btn{display:none!important}
+body.demo-mode .nav{margin-top:12px}
+body.demo-mode .ing-actions,body.demo-mode .del-btn{display:none!important}
+body.demo-mode input:disabled,body.demo-mode select:disabled,body.demo-mode textarea:disabled{opacity:1;color:var(--ink);cursor:default;background:#F7F8FA}
+body.demo-mode .demo-brand-pill{--demo-amber:#F5B731;height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:4px;background:var(--demo-amber);color:var(--seaweed);font-size:10px;font-weight:800;letter-spacing:.06em}
+body.demo-mode .demo-top-status{height:32px;display:inline-flex;align-items:center;padding:0 11px;border:1px solid rgba(42,200,100,.35);border-radius:6px;background:rgba(42,200,100,.1);color:#BFF6CF;font-size:12px;font-weight:600}
+body.demo-mode .demo-top-actions{display:flex;align-items:center;gap:8px;margin-right:4px}
+body.demo-mode .demo-top-btn{height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:transparent;color:#fff;font:600 12px "Inter",sans-serif;text-decoration:none;cursor:pointer}
+body.demo-mode .demo-top-btn.primary{border-color:var(--nomni-green);background:var(--nomni-green);color:var(--seaweed)}
+body.demo-mode .approved-demo-dialog{position:fixed;inset:0;z-index:950;width:100%;height:100%;border:0;background:transparent}
+body.demo-mode .demo-lock-overlay{position:fixed;inset:0;z-index:900;display:none;align-items:flex-start;justify-content:center;padding-top:72px;background:rgba(10,20,15,.46)}
+body.demo-mode .demo-lock-overlay.open{display:flex}
+body.demo-mode .demo-lock-card{width:560px;max-width:calc(100vw - 32px);overflow:hidden;border-radius:12px;background:#fff;box-shadow:0 24px 64px rgba(0,0,0,.22)}
+body.demo-mode .demo-lock-head{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--rule)}
+body.demo-mode .demo-lock-head h2{margin:0;font-size:18px}
+body.demo-mode .demo-lock-close{width:32px;height:32px;border:0;background:transparent;font-size:22px;cursor:pointer}
+body.demo-mode .demo-lock-body{padding:20px 24px;color:var(--ink)}
+body.demo-mode .demo-lock-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px 18px;border-top:1px solid var(--rule)}
+</style>
+<script>
+(function(){
+  var params=new URLSearchParams(location.search);if(params.get('demo')!=='1')return;
+  document.body.classList.add('demo-mode');var email=params.get('email')||'',recipe=null;
+  try{recipe=JSON.parse(sessionStorage.getItem('nomniProcureDemoSelectedRecipe')||'null')}catch(error){}
+  if(!Array.isArray(recipe))recipe=['Signature laksa','Recipe','RCP-LAK-014','S$57.84','S$216.00','26.8%','25 Jul 2026',true];
+  var ingredients=recipe[8]||[{name:'House laksa paste',qty:1,unit:'batch',price:28.46},{name:'Coconut milk',qty:4,unit:'pkt',price:3.20},{name:'Tiger prawns 21/25',qty:.6,unit:'kg',price:22.40},{name:'Rice vermicelli',qty:1.5,unit:'kg',price:2.10}],yieldData=recipe[9]||{amount:recipe[1]==='Sub-recipe'?1:12,unit:recipe[1]==='Sub-recipe'?'batch':'portions',tags:''};
+  var nameInputs=document.querySelectorAll('.recipe-name-input,.field-input');if(nameInputs[0])nameInputs[0].value=recipe[0];if(nameInputs[1])nameInputs[1].value=recipe[0];if(nameInputs[2])nameInputs[2].value=yieldData.tags||'';
+  var badge=document.querySelector('.recipe-badge');if(badge)badge.textContent=recipe[1];var current=document.querySelector('.breadcrumb-current');if(current)current.textContent=recipe[0];var outletCrumb=document.querySelector('.breadcrumb a[href*="Recipes - Outlet"]');if(outletCrumb){outletCrumb.textContent='Nomni Kitchen — Tanjong Pagar';outletCrumb.href='Procure%20-%20Recipes.html?demo=1'+(email?'&email='+encodeURIComponent(email):'')};var recipesCrumb=document.querySelector('.breadcrumb a[href="Procure - Recipes.html"]');if(recipesCrumb)recipesCrumb.href='Procure%20-%20Recipes.html?demo=1'+(email?'&email='+encodeURIComponent(email):'');
+  var yieldInput=document.querySelector('.yield-input');if(yieldInput)yieldInput.value=yieldData.amount;var yieldUnit=document.querySelector('.yield-unit-select');if(yieldUnit){var option=document.createElement('option');option.value=yieldData.unit;option.textContent=yieldData.unit;yieldUnit.appendChild(option);yieldUnit.value=yieldData.unit}
+  var ingredientBody=document.querySelector('.ing-table tbody');if(ingredientBody){ingredientBody.innerHTML='';ingredients.forEach(function(item){var row=document.createElement('tr'),amount=(Number(item.qty)||0)*(Number(item.price)||0);row.innerHTML='<td></td><td><div class="ing-name"></div><div class="ing-supplier">Demo ingredient</div></td><td><input type="number" class="ing-input" disabled></td><td><select class="ing-unit-select" disabled></select></td><td><span class="uprice-val"></span></td><td><span class="amount-val"></span></td>';row.querySelector('.ing-name').textContent=item.name;row.querySelector('.ing-input').value=item.qty;var unitOption=document.createElement('option');unitOption.textContent=item.unit;row.querySelector('select').appendChild(unitOption);row.querySelector('.uprice-val').textContent='S$'+Number(item.price||0).toFixed(2);row.querySelector('.amount-val').textContent='S$'+amount.toFixed(2);ingredientBody.appendChild(row)})}
+  var costNodes=document.querySelectorAll('.cost-val,.cost-unit-val');costNodes.forEach(function(node){node.textContent=recipe[3]});var unitDescription=document.querySelector('.cost-unit-desc');if(unitDescription)unitDescription.textContent='per '+yieldData.unit;
+  document.querySelectorAll('input,select,textarea').forEach(function(field){field.disabled=true});
+  function demoUrl(path){return path+'?demo=1'+(email?'&email='+encodeURIComponent(email):'')}var allowed={Dashboard:demoUrl('Procure%20-%20Dashboard.html'),Orders:demoUrl('Procure%20-%20Orders.html'),Invoices:demoUrl('Freemium/procure-trial-invoices.html'),Items:demoUrl('Procure%20-%20Items.html'),Inventory:demoUrl('Procure%20-%20Inventory.html'),Recipes:demoUrl('Procure%20-%20Recipes.html'),Outlets:demoUrl('Procure%20-%20Outlets.html'),Users:demoUrl('Procure%20-%20Users.html')};document.querySelectorAll('.nav a').forEach(function(link){var label=link.querySelector('.nav-label'),name=label?label.textContent.trim():'';if(!allowed[name]){link.remove();return}link.href=allowed[name];link.classList.toggle('active',name==='Recipes')});
+  var brand=document.querySelector('.brand');if(brand){var pill=document.createElement('span');pill.className='demo-brand-pill';pill.textContent='DEMO';brand.appendChild(pill);var status=document.createElement('span');status.className='demo-top-status';status.textContent='Expires in 14 days';brand.appendChild(status)}
+  function openDemoDialog(){var frame=document.createElement('iframe');frame.className='approved-demo-dialog';frame.title='Book a live demo';frame.src='Freemium/procure-trial-invoices.html?dialogOnly=1'+(email?'&email='+encodeURIComponent(email):'');document.body.appendChild(frame);function close(event){if(event.source===frame.contentWindow&&event.data==='close-demo-request'){frame.remove();window.removeEventListener('message',close)}}window.addEventListener('message',close)}
+  var right=document.querySelector('.topbar-right'),actions=document.createElement('div');actions.className='demo-top-actions';actions.innerHTML='<button class="demo-top-btn" type="button">Book a live demo</button><a class="demo-top-btn primary" href="Freemium/procure-get-started.html?source=demo'+(email?'&email='+encodeURIComponent(email):'')+'">Start my FREE trial</a>';actions.querySelector('button').onclick=openDemoDialog;if(right)right.insertBefore(actions,right.firstChild);
+  var lock=document.createElement('div');lock.className='demo-lock-overlay';lock.innerHTML='<section class="demo-lock-card" role="dialog" aria-modal="true"><div class="demo-lock-head"><h2>Feature unavailable in demo</h2><button class="demo-lock-close" type="button" data-lock-close>&times;</button></div><div class="demo-lock-body">Start a free trial to edit, duplicate or delete existing recipes. Recipes created during this demo remain temporary.</div><div class="demo-lock-foot"><button class="btn-ghost" type="button" data-lock-close>Close</button><a class="btn-primary" href="Freemium/procure-get-started.html?source=demo'+(email?'&email='+encodeURIComponent(email):'')+'">Start my FREE trial</a></div></section>';document.body.appendChild(lock);function closeLock(){lock.classList.remove('open')}lock.querySelectorAll('[data-lock-close]').forEach(function(button){button.onclick=closeLock});lock.onclick=function(event){if(event.target===lock)closeLock()};document.querySelectorAll('.recipe-actions button').forEach(function(button){button.onclick=function(){lock.classList.add('open')}});
+  document.title='Nomni Procure — Demo recipe details';
+})();
+</script>
 </body>
 </html>

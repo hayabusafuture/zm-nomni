@@ -2190,6 +2190,10 @@
     {name:'fresh-fields-ff-8931.pdf',time:'26/07/2026 16:18',processed:false,previewUrl:'',invoiceNumber:'FF-8931',invoiceDate:'25/07/2026',supplier:'Fresh Fields Produce',reviewed:true},
     {name:'pantry-provisions-22071.pdf',time:'24/07/2026 11:06',processed:false,previewUrl:'',invoiceNumber:'PP-22071',invoiceDate:'23/07/2026',supplier:'Pantry Provisions Pte Ltd',reviewed:false}
   ] : [];
+  var demoSampleCatalog = {
+    'nomni-demo-invoice-fresh-fields.pdf': {invoiceNumber:'FF-8931',invoiceDate:'25/07/2026',supplier:'Fresh Fields Produce',sampleKey:'fresh',reviewed:true},
+    'nomni-demo-invoice-harbour-seafood.pdf': {invoiceNumber:'HS-10482',invoiceDate:'26/07/2026',supplier:'Harbour Seafood Co.',sampleKey:'harbour',reviewed:true}
+  };
   var activeUpload = null;
   var invoiceTour = document.querySelector('[data-invoice-tour]');
   var invoiceTourHighlight = document.querySelector('[data-invoice-tour-highlight]');
@@ -2301,7 +2305,18 @@
     });
   }
   function openModal() { modal.hidden = false; document.body.style.overflow = 'hidden'; if (invoiceTourActive && invoiceTourMode === 'upload') advanceInvoiceTour('uploadChoose',false); }
-  function closeModal(keepTourStep) { modal.hidden = true; document.body.style.overflow = ''; fileInput.value = ''; selectedFiles.innerHTML = ''; doneButton.hidden = true; if (keepTourStep !== true && invoiceTourActive && invoiceTourMode === 'upload' && invoiceTourStep !== 'uploadComplete') advanceInvoiceTour('uploadStart',false); }
+  function closeModal(keepTourStep) {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+    fileInput.value = '';
+    selectedFiles.innerHTML = '';
+    doneButton.hidden = true;
+    if (modal._demoSamples) {
+      modal._demoSamples.length = 0;
+      modal.querySelectorAll('[data-load-sample]').forEach(function(button){ button.textContent = 'Use sample'; button.disabled = false; });
+    }
+    if (keepTourStep !== true && invoiceTourActive && invoiceTourMode === 'upload' && invoiceTourStep !== 'uploadComplete') advanceInvoiceTour('uploadStart',false);
+  }
   document.querySelectorAll('[data-upload-invoice]').forEach(function(button){ button.addEventListener('click', openModal); });
   document.querySelector('[data-upload-close]').addEventListener('click', closeModal);
   modal.addEventListener('click', function(event){ if (event.target === modal) closeModal(); });
@@ -2323,7 +2338,27 @@
   fileInput.addEventListener('change', function(){ showFiles(fileInput.files); });
   ['dragenter','dragover'].forEach(function(type){ dropzone.addEventListener(type, function(event){ event.preventDefault(); dropzone.classList.add('dragging'); }); });
   ['dragleave','drop'].forEach(function(type){ dropzone.addEventListener(type, function(event){ event.preventDefault(); dropzone.classList.remove('dragging'); }); });
-  dropzone.addEventListener('drop', function(event){ showFiles(event.dataTransfer.files); });
+  dropzone.addEventListener('drop', function(event){ if (params.get('demo') !== '1') showFiles(event.dataTransfer.files); });
+  if (params.get('demo') === '1') {
+    fileInput.disabled = true;
+    dropzone.classList.add('sample-only');
+    dropzone.querySelector('span').innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">lock</span><br />Use the fictional sample invoices above';
+    var samplePanel = document.createElement('div');
+    samplePanel.className = 'demo-invoice-samples';
+    samplePanel.innerHTML = '<div class="demo-invoice-sample-intro"><strong>Try invoice digitisation with sample documents</strong><p>For privacy, this demo does not accept your own invoices. Download either fictional invoice, or load one or both directly into the demo.</p></div><div class="demo-invoice-sample-grid"><article><span class="material-symbols-outlined">description</span><div><strong>Fresh Fields Produce</strong><small>FF-8931 · S$255.33</small></div><div class="demo-invoice-sample-actions"><a href="../output/pdf/nomni-demo-invoice-fresh-fields.pdf" download>Download PDF</a><button type="button" data-load-sample="nomni-demo-invoice-fresh-fields.pdf">Use sample</button></div></article><article><span class="material-symbols-outlined">description</span><div><strong>Harbour Seafood Co.</strong><small>HS-10482 · S$831.32</small></div><div class="demo-invoice-sample-actions"><a href="../output/pdf/nomni-demo-invoice-harbour-seafood.pdf" download>Download PDF</a><button type="button" data-load-sample="nomni-demo-invoice-harbour-seafood.pdf">Use sample</button></div></article></div>';
+    dropzone.parentNode.insertBefore(samplePanel, dropzone);
+    var selectedDemoSamples = [];
+    modal._demoSamples = selectedDemoSamples;
+    samplePanel.querySelectorAll('[data-load-sample]').forEach(function(button){
+      button.addEventListener('click', function(){
+        var name = button.getAttribute('data-load-sample');
+        if (!selectedDemoSamples.some(function(file){ return file.name === name; })) selectedDemoSamples.push(new File(['Nomni fictional demo invoice'], name, {type:'application/pdf'}));
+        showFiles(selectedDemoSamples);
+        button.textContent = 'Added';
+        button.disabled = true;
+      });
+    });
+  }
 
   function dateTimeNow() {
     var now = new Date();
@@ -2346,7 +2381,7 @@
   }
   renderUploads();
   doneButton.addEventListener('click', function(){
-    Array.from(doneButton._files || []).forEach(function(file){ uploads.push({name:file.name, time:dateTimeNow(), processed:false, previewUrl: /^image\//.test(file.type) ? URL.createObjectURL(file) : ''}); });
+    Array.from(doneButton._files || []).forEach(function(file){ var sample=demoSampleCatalog[file.name]||{};uploads.push({name:file.name,time:dateTimeNow(),processed:false,previewUrl:/^image\//.test(file.type)?URL.createObjectURL(file):'',invoiceNumber:sample.invoiceNumber||'',invoiceDate:sample.invoiceDate||'',supplier:sample.supplier||'',sampleKey:sample.sampleKey||'',reviewed:Boolean(sample.reviewed)}); });
     updateProgressParams('invoiceUpload'); closeModal(true); renderUploads(); setTab('uploads');
     if (params.get('primaryGoal') === 'Digitise invoices') {
       document.querySelectorAll('.sidebar-setup-copy').forEach(function(node){ node.textContent='80% done'; });
@@ -2414,8 +2449,25 @@
   }
   function resetDigitiseForm() {
     lineItems.innerHTML = '';
-    addLineItem({description:'Frozen Atlantic salmon', qty:2, uom:'kg', price:18.40, gst:9});
-    addLineItem({description:'Cooking cream 1 litre', qty:3, uom:'ctn', price:6.75, gst:9});
+    if (activeUpload && activeUpload.sampleKey === 'harbour') {
+      addLineItem({description:'Tiger prawns 21/25', qty:9.2, uom:'kg', price:22.40, gst:9});
+      addLineItem({description:'Barramundi fillet', qty:14, uom:'kg', price:18.60, gst:9});
+      addLineItem({description:'Blue swimmer crab meat', qty:6, uom:'kg', price:31.80, gst:9});
+      addLineItem({description:'Squid tubes', qty:8.5, uom:'kg', price:12.40, gst:9});
+    } else if (activeUpload && activeUpload.sampleKey === 'fresh') {
+      addLineItem({description:'Chicken thigh boneless', qty:12.5, uom:'kg', price:8.90, gst:9});
+      addLineItem({description:'Baby kailan', qty:8, uom:'kg', price:4.60, gst:9});
+      addLineItem({description:'Spring onions', qty:5, uom:'kg', price:6.20, gst:9});
+      addLineItem({description:'Fresh coconut', qty:24, uom:'unit', price:2.30, gst:9});
+    } else {
+      addLineItem({description:'Frozen Atlantic salmon', qty:2, uom:'kg', price:18.40, gst:9});
+      addLineItem({description:'Cooking cream 1 litre', qty:3, uom:'ctn', price:6.75, gst:9});
+    }
+    if (activeUpload) {
+      document.querySelector('#digitise-supplier').value = activeUpload.supplier || 'Fresh Fields Produce';
+      document.querySelector('#digitise-number').value = activeUpload.invoiceNumber || 'INV-2026-0720';
+      document.querySelector('#digitise-date').value = activeUpload.invoiceDate || '20/07/2026';
+    }
     document.querySelectorAll('[data-ocr-suggestion]').forEach(function(suggestion){
       suggestion.classList.remove('done');
       suggestion.disabled = false;
@@ -2443,7 +2495,7 @@
       invoiceTourMode = 'digitise';
       invoiceTourStep = 'digitiseOpen';
     }
-    activeUpload = uploads.filter(function(item){ return !item.processed; })[Number(editButton.getAttribute('data-view-edit'))];
+    activeUpload = uploads[Number(editButton.getAttribute('data-view-edit'))];
     document.querySelector('[data-editor-file-name]').textContent = activeUpload.name;
     var preview = document.querySelector('[data-upload-preview]'); var placeholder = document.querySelector('[data-preview-placeholder]');
     if (activeUpload.previewUrl) { preview.src = activeUpload.previewUrl; preview.hidden = false; placeholder.hidden = true; }
@@ -2854,14 +2906,31 @@
   body.demo-mode .demo-top-btn{height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:transparent;color:#fff;font:600 12px "Inter",sans-serif;cursor:pointer;white-space:nowrap}
   body.demo-mode .demo-top-btn:hover{background:rgba(255,255,255,.1)}
   body.demo-mode .demo-top-btn.primary{border-color:var(--nomni-green);background:var(--nomni-green);color:var(--seaweed)}
+  body.demo-mode .demo-invoice-samples{margin-bottom:16px;padding:16px;border:1px solid #E8DDAF;border-radius:10px;background:var(--cream)}
+  body.demo-mode .demo-invoice-sample-intro strong{display:block;font-size:14px;color:var(--ink)}
+  body.demo-mode .demo-invoice-sample-intro p{margin:5px 0 14px;color:#666;font-size:12px;line-height:1.5}
+  body.demo-mode .demo-invoice-sample-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  body.demo-mode .demo-invoice-sample-grid article{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;align-items:start;padding:12px;border:1px solid var(--rule);border-radius:8px;background:#fff}
+  body.demo-mode .demo-invoice-sample-grid article>.material-symbols-outlined{color:var(--spinach);font-size:24px}
+  body.demo-mode .demo-invoice-sample-grid article strong{display:block;font-size:13px}
+  body.demo-mode .demo-invoice-sample-grid article small{display:block;margin-top:3px;color:var(--ink-mute);font-size:11px}
+  body.demo-mode .demo-invoice-sample-actions{grid-column:1/-1;display:flex;gap:8px}
+  body.demo-mode .demo-invoice-sample-actions a,
+  body.demo-mode .demo-invoice-sample-actions button{flex:1;min-height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--rule);border-radius:6px;background:#fff;color:var(--seaweed);font:600 12px "Inter",sans-serif;text-decoration:none;cursor:pointer}
+  body.demo-mode .demo-invoice-sample-actions button{border-color:var(--nomni-green);background:var(--nomni-green)}
+  body.demo-mode .demo-invoice-sample-actions button:disabled{border-color:#D8DADD;background:#ECEDEF;color:#777;cursor:default}
+  body.demo-mode .dropzone.sample-only{min-height:88px;border-style:solid;background:#F7F7F8;color:#777;cursor:not-allowed}
+  body.demo-mode .dropzone.sample-only strong{display:none}
+  @media(max-width:760px){body.demo-mode .demo-invoice-sample-grid{grid-template-columns:1fr}}
 </style>
 <script>
 (function(){
   var demoParams=new URLSearchParams(location.search);if(demoParams.get('demo')!=='1')return;
   document.body.classList.add('demo-mode');var demoEmail=demoParams.get('email')||'';
   function demoUrl(path){return path+'?demo=1'+(demoEmail?'&email='+encodeURIComponent(demoEmail):'')}
-  var allowed={Dashboard:demoUrl('../Procure%20-%20Dashboard.html'),Orders:demoUrl('../Procure%20-%20Orders.html'),Invoices:demoUrl('procure-trial-invoices.html'),Items:demoUrl('../Procure%20-%20Items.html'),Inventory:demoUrl('../Procure%20-%20Inventory.html'),Users:demoUrl('../Procure%20-%20Users.html')};
+  var allowed={Dashboard:demoUrl('../Procure%20-%20Dashboard.html'),Orders:demoUrl('../Procure%20-%20Orders.html'),Invoices:demoUrl('procure-trial-invoices.html'),Items:demoUrl('../Procure%20-%20Items.html'),Inventory:demoUrl('../Procure%20-%20Inventory.html'),Recipes:demoUrl('../Procure%20-%20Recipes.html'),Outlets:demoUrl('../Procure%20-%20Outlets.html'),Users:demoUrl('../Procure%20-%20Users.html')};
   document.querySelectorAll('.nav a').forEach(function(link){var label=link.querySelector('.nav-label'),name=label?label.textContent.trim():'';if(!allowed[name]){link.remove();return}link.href=allowed[name];link.classList.toggle('active',name==='Invoices')});
+  document.querySelectorAll('[data-user-name]').forEach(function(node){node.textContent='William Arya'});document.querySelectorAll('[data-avatar]').forEach(function(node){node.textContent='WA'});document.querySelectorAll('[data-editor-uploader]').forEach(function(node){node.textContent='William Arya'});
   var processedRows=document.querySelector('[data-invoice-rows]');
   if(processedRows){
     processedRows.innerHTML=[

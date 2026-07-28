@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-<title>Nomni Procure - Items</title>
+<title>Nomni Procure — Outlet Suppliers</title>
 <script>if(new URLSearchParams(location.search).get('demo')==='1')document.documentElement.classList.add('demo-boot')</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,6 +43,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  body.tour-open { overflow: hidden; }
   a { color: inherit; text-decoration: none; }
   button, input, select { font: inherit; }
 
@@ -52,6 +53,7 @@
     grid-template-rows: 56px 1fr;
     min-height: 100vh;
   }
+
   .topbar {
     grid-column: 1 / -1;
     grid-row: 1;
@@ -76,6 +78,7 @@
     font-weight: 400;
     line-height: 1;
   }
+
   .topbar-right { display: flex; align-items: center; gap: 12px; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 
@@ -300,7 +303,12 @@
     position: relative;
     display: block;
   }
-  .icon { position: absolute; inset: 0; width: 18px; height: 18px; }
+  .icon {
+    position: absolute;
+    inset: 0;
+    width: 18px;
+    height: 18px;
+  }
   .icon-green { display: none; }
   .active .icon-grey { display: none; }
   .active .icon-green { display: block; }
@@ -318,7 +326,10 @@
     font-size: 10px;
     font-weight: 700;
   }
-  .sidebar-setup { padding: 10px 10px 78px; }
+
+  .sidebar-setup {
+    padding: 10px 10px 78px;
+  }
   .sidebar-setup-card {
     display: grid;
     gap: 10px;
@@ -333,7 +344,11 @@
     background: var(--mint);
     border-color: rgba(42,200,100,.24);
   }
-  .sidebar-setup-main { display: grid; gap: 10px; color: inherit; }
+  .sidebar-setup-main {
+    display: grid;
+    gap: 10px;
+    color: inherit;
+  }
   .sidebar-setup-row {
     display: flex;
     align-items: center;
@@ -343,7 +358,7 @@
   .sidebar-setup-title {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-size: 13px;
     font-weight: 700;
     line-height: 1.2;
@@ -364,7 +379,7 @@
     font-weight: 700;
   }
   .sidebar-setup-row::after {
-    content: "->";
+    content: "↗";
     color: var(--spinach);
     font-size: 13px;
     line-height: 1;
@@ -413,6 +428,9 @@
     color: var(--seaweed);
     transform: translateX(2px);
   }
+  .sidebar-setup-next {
+    transition: color .16s ease;
+  }
   .intercom-launcher {
     position: absolute;
     left: 18px;
@@ -420,6 +438,13 @@
     width: 48px;
     height: 48px;
     padding: 0;
+    min-width: 48px;
+    min-height: 48px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    font: inherit;
+    line-height: 0;
     border: 0;
     border-radius: 50%;
     display: grid;
@@ -439,6 +464,10 @@
     border-radius: 5px;
     clip-path: polygon(0 0, 100% 0, 100% 76%, 63% 76%, 45% 100%, 45% 76%, 0 76%);
   }
+  .intercom-launcher:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 24px rgba(108,77,242,.42);
+  }
 
   .main {
     grid-column: 2;
@@ -447,12 +476,17 @@
     background: #fff;
   }
   .page-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 32px 40px 0;
+    padding: 28px 40px 16px;
+    border-bottom: 1px solid var(--rule);
     background: #fff;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    color: var(--spinach);
+    font-weight: 700;
   }
   .page-title {
     margin: 0;
@@ -461,41 +495,20 @@
     font-weight: 700;
     letter-spacing: -.03em;
   }
-  .outlet-picker {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding-top: 2px;
-  }
-  .outlet-picker label {
-    color: var(--ink);
-    font-weight: 700;
-  }
-  .outlet-picker select,
-  .select-control {
-    height: 38px;
-    min-width: 270px;
-    border: 1px solid #DCDEE3;
-    border-radius: 6px;
-    background: #fff;
-    color: var(--ink);
-    padding: 0 12px;
-    outline: none;
-  }
   .tabs {
     display: flex;
     gap: 28px;
-    border-bottom: 1px solid var(--rule);
-    margin: 30px 0 0;
-    padding: 0 40px;
+    margin: 26px 0 -17px;
+    padding: 0;
   }
   .tab {
     position: relative;
-    padding: 10px 2px 14px;
+    padding: 10px 0 14px;
     color: var(--ink-2);
     font-weight: 600;
     font-size: 14px;
   }
+  .tab.active { color: var(--ink); }
   .tab.active::after {
     content: "";
     position: absolute;
@@ -506,26 +519,16 @@
     background: var(--primary);
     border-radius: 2px;
   }
-  .content { padding: 42px 40px 56px; }
-  .info-banner {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin: 0 0 18px;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #B9F0C5;
-    background: var(--mint);
-    color: var(--seaweed);
-    font-size: 13px;
-    font-weight: 600;
-  }
+
+  .content { padding: 32px 40px 56px; }
+  .view { display: none; }
+  .view.active { display: block; }
   .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 18px;
+    margin: 8px 0 24px;
   }
   .toolbar-left,
   .toolbar-right {
@@ -535,8 +538,8 @@
     min-width: 0;
   }
   .search-wrap {
-    width: 320px;
-    height: 38px;
+    width: 230px;
+    height: 36px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -545,6 +548,7 @@
     border-radius: 6px;
     padding: 0 12px;
   }
+  .search-wrap.wide { width: min(650px, 100%); }
   .search-icon {
     width: 17px;
     height: 17px;
@@ -561,8 +565,20 @@
     color: var(--ink);
     background: transparent;
   }
+  .checkbox-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+  }
+  .fake-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #C9CCD3;
+    background: #fff;
+  }
   .btn {
-    min-height: 38px;
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -580,105 +596,37 @@
     transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .16s ease;
   }
   .btn:active { transform: scale(.96); }
-  .btn:disabled {
-    cursor: not-allowed;
-    opacity: .55;
-    transform: none;
-  }
   .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
   .btn-primary:hover { background: var(--seaweed); color: var(--nomni-green); border-color: var(--seaweed); }
-  .btn-primary:disabled:hover { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
   .btn-secondary { background: var(--mint); color: var(--seaweed); border-color: var(--mint); }
   .btn-secondary:hover { background: #C6F2CE; }
-  .action-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    border: 0;
-    background: transparent;
-    color: var(--spinach);
-    font-weight: 700;
-    cursor: pointer;
-    padding: 6px 2px;
+  .btn-ghost { color: var(--spinach); padding: 0 6px; }
+  .btn-ghost:hover { color: var(--seaweed); }
+  .plus-icon {
+    width: 18px;
+    height: 18px;
+    position: relative;
+    display: inline-block;
   }
-  .action-icon {
-    color: var(--spinach);
-    font-size: 20px;
-    line-height: 1;
-    font-weight: 400;
-  }
-  .add-menu-wrap { position: relative; }
-  .add-menu {
+  .plus-icon::before,
+  .plus-icon::after {
+    content: "";
     position: absolute;
-    top: calc(100% + 12px);
-    left: -4px;
-    z-index: 50;
-    width: 164px;
-    padding: 8px 0;
-    border-radius: 4px;
-    border: 1px solid #DCDEE3;
-    background: #fff;
-    box-shadow: 0 8px 18px rgba(10,20,15,.12);
+    left: 50%;
+    top: 50%;
+    width: 16px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transform: translate(-50%, -50%);
   }
-  .add-menu button {
-    width: 100%;
-    min-height: 29px;
-    border: 0;
-    background: transparent;
-    color: var(--spinach);
-    text-align: left;
-    padding: 6px 24px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .add-menu button:hover { background: var(--mint); }
-  body.tour-active .add-menu {
-    z-index: 960;
-  }
+  .plus-icon::after { transform: translate(-50%, -50%) rotate(90deg); }
+
   .table-card {
     border: 1px solid var(--rule);
     border-radius: 8px;
     overflow: hidden;
     background: #fff;
-  }
-  .table-card[hidden] { display: none; }
-  .items-empty-state {
-    min-height: 320px;
-    display: grid;
-    place-items: center;
-    border: 1px solid var(--rule);
-    border-radius: 8px;
-    background: #fff;
-  }
-  .items-empty-state[hidden] { display: none; }
-  .items-empty-state-inner {
-    max-width: 360px;
-    text-align: center;
-  }
-  .items-empty-icon {
-    width: 52px;
-    height: 52px;
-    margin: 0 auto 16px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--mint);
-    color: var(--spinach);
-    font-size: 26px;
-    font-weight: 700;
-  }
-  .items-empty-title {
-    margin: 0 0 6px;
-    color: var(--ink);
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -.02em;
-  }
-  .items-empty-copy {
-    margin: 0;
-    color: #687080;
-    font-size: 14px;
-    line-height: 1.45;
   }
   table {
     width: 100%;
@@ -687,44 +635,221 @@
     font-size: 14px;
   }
   thead th {
-    padding: 14px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink);
+    padding: 14px 14px;
     border-bottom: 1px solid var(--rule);
     background: #fff;
-    color: var(--ink);
-    font-size: 12px;
-    font-weight: 700;
-    text-align: left;
     white-space: nowrap;
   }
   tbody td {
-    padding: 12px;
+    padding: 14px;
     border-bottom: 1px solid var(--rule);
     vertical-align: middle;
   }
-  tbody tr:hover td { background: var(--row-hover); }
   tbody tr:last-child td { border-bottom: 0; }
-  .check-cell { width: 42px; }
-  .fake-check {
-    width: 19px;
-    height: 19px;
-    display: inline-block;
-    border: 1px solid #C7CDD5;
+  tbody tr:hover td { background: var(--row-hover); }
+  .cell-title { font-weight: 700; }
+  .cell-sub {
+    margin-top: 2px;
+    color: var(--ink-mute);
+    font-size: 12px;
+  }
+  .actions-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--spinach);
+    font-weight: 600;
+  }
+  .empty-state {
+    min-height: 260px;
+    display: grid;
+    place-items: center;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .empty-state-inner {
+    max-width: 360px;
+  }
+  .empty-state-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: var(--mint);
+    color: var(--seaweed);
+    font-size: 22px;
+    font-weight: 800;
+  }
+  .empty-state-title {
+    margin: 0 0 6px;
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .empty-state-copy {
+    margin: 0;
+    color: var(--ink-mute);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .download-link {
+    color: var(--spinach);
+    font-weight: 700;
+  }
+  .results-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 26px 0 10px;
+  }
+  .results-count {
+    margin: 0;
+    font-weight: 700;
+  }
+  .results-help {
+    margin: 0;
+    color: var(--ink);
+  }
+  .results-help a {
+    color: var(--spinach);
+    font-weight: 500;
+  }
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    padding: 10px 40px;
+    background: var(--mint);
+    border-bottom: 1px solid #C9F6D3;
+  }
+  .step {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-mute);
+    font-weight: 700;
+  }
+  .step-number {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(26,128,64,.45);
+    color: #fff;
+  }
+  .step.active { color: var(--ink); }
+  .step.active .step-number { background: var(--spinach); }
+  .tip-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border-radius: 6px;
+    background: #FFF9DE;
+    box-shadow: 0 6px 18px rgba(90,70,10,.06);
+  }
+  .tip-icon {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #B9BCC3;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--spinach);
+    font-size: 18px;
+  }
+  .tip-card p { margin: 0; }
+  .tip-card strong { display: block; margin-bottom: 2px; }
+  .helper-text {
+    margin: 8px 0 0;
+    color: #6F7784;
+    font-size: 12px;
+  }
+  .form-panel {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 34px 0 0;
+  }
+  .form-title {
+    margin: 0 0 22px;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  .form-grid {
+    display: grid;
+    gap: 16px;
+  }
+  .field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .field input,
+  .field select {
+    width: 100%;
+    height: 38px;
+    border: 1px solid #DCDEE3;
+    border-radius: 6px;
+    padding: 0 12px;
+    color: var(--ink);
+    outline: none;
     background: #fff;
   }
-  .sku-cell { width: 40%; }
-  .sku-name { color: var(--ink); font-weight: 500; }
-  .sku-meta { margin-top: 3px; color: #687080; font-size: 12px; }
-  .sku-meta em { font-style: italic; }
-  .price-cell { width: 20%; }
-  .price-main { color: var(--ink); }
-  .price-sub { margin-top: 3px; color: #687080; font-size: 12px; }
-  .expense-cell { width: 24%; color: #687080; }
-  .last-cell { width: 16%; color: #687080; }
-  .toast {
+  .field input:focus,
+  .field select:focus {
+    border-color: var(--nomni-green);
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .bottom-bar {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 42px -40px -56px;
+    padding: 16px 40px;
+    border-top: 1px solid var(--rule);
+    background: rgba(255,255,255,.94);
+    box-shadow: 0 -8px 20px rgba(10,20,15,.06);
+    backdrop-filter: blur(12px);
+  }
+  .success-note {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border: 1px solid #B9F0C5;
+    border-radius: 8px;
+    background: var(--mint);
+    color: var(--seaweed);
+    font-weight: 700;
+  }
+  .success-note.show { display: flex; }
+
+  .success-toast {
     position: fixed;
     right: 28px;
     top: 78px;
-    z-index: 980;
+    z-index: 1100;
     min-width: 300px;
     display: flex;
     align-items: center;
@@ -736,15 +861,15 @@
     box-shadow: 0 16px 44px rgba(10,20,15,.16);
     color: var(--seaweed);
     opacity: 0;
-    transform: translateY(-8px);
     pointer-events: none;
+    transform: translateY(-8px);
     transition: opacity .2s ease, transform .2s ease;
   }
-  .toast.show {
+  .success-toast.visible {
     opacity: 1;
     transform: translateY(0);
   }
-  .toast-check {
+  .success-toast-icon {
     width: 42px;
     height: 42px;
     border-radius: 50%;
@@ -756,205 +881,153 @@
     line-height: 1;
     flex: 0 0 auto;
   }
-  .toast-title { font-weight: 800; margin-bottom: 2px; }
-  .toast-copy { color: var(--seaweed); font-size: 14px; }
+  .success-toast-title { font-weight: 800; margin-bottom: 2px; }
+  .success-toast-copy { color: var(--seaweed); font-size: 14px; }
 
-  .modal-overlay {
+  .prerequisite-modal-overlay {
     position: fixed;
     inset: 0;
     z-index: 900;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px;
-    background: rgba(0,0,0,.54);
+    padding: 24px 18px;
+    background: rgba(10,20,15,.46);
   }
-  .modal-overlay[hidden] { display: none; }
-  .supplier-modal {
-    width: 500px;
-    max-width: calc(100vw - 32px);
-    border-radius: 18px;
-    background: #fff;
-    box-shadow: 0 26px 70px rgba(0,0,0,.24);
-    padding: 38px 40px 36px;
+  .prerequisite-modal-overlay[hidden] { display: none; }
+  .prerequisite-modal-card {
+    width: 440px;
+    max-width: calc(100vw - 36px);
+    border-radius: 12px;
+    background: var(--panel);
+    box-shadow: 0 24px 64px rgba(0,0,0,.22);
+    overflow: hidden;
   }
-  .modal-head {
+  .prerequisite-modal-head {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 20px;
+    padding: 22px 24px 0;
   }
-  .modal-title {
+  .prerequisite-modal-title {
     margin: 0;
-    font-size: 24px;
-    font-weight: 700;
-    letter-spacing: -.03em;
-  }
-  .modal-close {
-    border: 0;
-    background: transparent;
-    color: var(--spinach);
-    font-size: 28px;
-    line-height: 1;
-    cursor: pointer;
-  }
-  .field { display: grid; gap: 9px; }
-  .field label {
     color: var(--ink);
-    font-size: 14px;
+    font-size: 21px;
     font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.2;
   }
-  .modal-foot { margin-top: 30px; }
-  .field-help {
-    margin: 3px 0 0;
+  .prerequisite-modal-copy {
+    margin: 7px 0 0;
     color: var(--ink-mute);
-    font-size: 12px;
+    font-size: 14px;
+    line-height: 1.5;
   }
-  .invoice-modal {
-    width: 660px;
-    max-width: calc(100vw - 32px);
-    border-radius: 18px;
-    background: #fff;
-    box-shadow: 0 26px 70px rgba(0,0,0,.24);
-    padding: 38px 40px 36px;
-  }
-  .upload-subtitle {
-    margin: -12px 0 14px;
-    color: var(--ink);
-    font-weight: 700;
-  }
-  .drop-zone {
-    width: 100%;
-    min-height: 106px;
-    display: grid;
+  .prerequisite-modal-close {
+    width: 40px;
+    height: 40px;
+    display: inline-grid;
     place-items: center;
-    border: 1px dashed #D8DCE3;
-    border-radius: 18px;
-    background: #fff;
-    color: var(--spinach);
-    cursor: pointer;
-    font-weight: 500;
-  }
-  .drop-zone:hover { background: #FBFFFC; border-color: #B9F0C5; }
-  .upload-table {
-    width: 100%;
-    margin-top: 14px;
-    border-top: 1px solid var(--rule);
-  }
-  .upload-table th,
-  .upload-table td {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--rule);
-    text-align: left;
-  }
-  .upload-table th {
-    color: var(--ink);
-    font-size: 13px;
-    font-weight: 700;
-  }
-  .upload-table .progress-cell,
-  .upload-table .action-cell {
-    width: 104px;
-    text-align: center;
-  }
-  .trash-button {
-    border: 0;
+    flex: 0 0 40px;
+    border: 1px solid transparent;
+    border-radius: 50%;
     background: transparent;
-    color: #F2385A;
-    cursor: pointer;
-    font-size: 18px;
+    color: var(--ink-mute);
+    font-size: 24px;
     line-height: 1;
+    cursor: pointer;
+  }
+  .prerequisite-modal-close:hover { background: var(--row-hover); color: var(--ink); }
+  .prerequisite-modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 24px 24px;
   }
 
   .tour-overlay {
     position: fixed;
     inset: 0;
-    z-index: 970;
+    z-index: 1000;
     pointer-events: none;
   }
   .tour-overlay[hidden] { display: none; }
+  .tour-scrim {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+  }
   .tour-highlight {
-    position: fixed;
+    position: absolute;
     border: 2px solid var(--nomni-green);
     border-radius: 10px;
     box-shadow: 0 0 0 4px rgba(42,200,100,.18), 0 14px 36px rgba(10,20,15,.12);
-    pointer-events: none;
-    transition: top .18s ease, left .18s ease, width .18s ease, height .18s ease;
+    transition: top .2s cubic-bezier(.2, 0, .2, 1), left .2s cubic-bezier(.2, 0, .2, 1), width .2s cubic-bezier(.2, 0, .2, 1), height .2s cubic-bezier(.2, 0, .2, 1);
   }
   .tour-card {
-    position: fixed;
+    position: absolute;
     width: min(380px, calc(100vw - 32px));
-    padding: 18px 18px 16px;
-    border-radius: 12px;
+    padding: 20px 22px;
     border: 1px solid rgba(42,200,100,.24);
+    border-radius: 12px;
     background: #fff;
-    box-shadow: 0 18px 50px rgba(10,20,15,.18);
+    color: var(--ink);
+    box-shadow:
+      0 18px 46px rgba(10,20,15,.18),
+      0 4px 16px rgba(10,20,15,.08),
+      0 1px 0 rgba(255,255,255,.8) inset;
     pointer-events: auto;
+    transition: top .2s cubic-bezier(.2, 0, .2, 1), left .2s cubic-bezier(.2, 0, .2, 1), transform .18s ease;
   }
   .tour-card::before {
     content: "";
     position: absolute;
-    left: -9px;
-    top: 28px;
-    width: 16px;
-    height: 16px;
+    width: 22px;
+    height: 22px;
+    left: -10px;
+    top: 42px;
     background: #fff;
-    border-left: 1px solid rgba(42,200,100,.24);
-    border-bottom: 1px solid rgba(42,200,100,.24);
     transform: rotate(45deg);
+    border-radius: 4px;
+  }
+  .tour-card.above::before {
+    left: 42px;
+    top: auto;
+    bottom: -10px;
+  }
+  .tour-card.below::before {
+    left: 42px;
+    top: -10px;
+    bottom: auto;
   }
   .tour-card.left::before {
     left: auto;
-    right: -9px;
-    border-left: 0;
-    border-bottom: 0;
-    border-right: 1px solid rgba(42,200,100,.24);
-    border-top: 1px solid rgba(42,200,100,.24);
-  }
-  .tour-card.below::before {
-    left: 28px;
-    top: -9px;
-    border-left: 1px solid rgba(42,200,100,.24);
-    border-bottom: 0;
-    border-top: 1px solid rgba(42,200,100,.24);
+    right: -10px;
   }
   .tour-kicker {
     margin: 0 0 6px;
     color: var(--spinach);
     font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .04em;
+    font-weight: 700;
+    letter-spacing: .06em;
     text-transform: uppercase;
   }
   .tour-title {
-    margin: 0 0 6px;
-    color: var(--ink);
+    margin: 0 0 8px;
     font-size: 21px;
     font-weight: 700;
     letter-spacing: -.02em;
+    line-height: 1.18;
+    text-wrap: balance;
   }
   .tour-copy {
-    margin: 0 0 14px;
-    color: #59606B;
+    margin: 0 0 16px;
+    color: #687080;
     font-size: 14px;
     line-height: 1.5;
-  }
-  .tour-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  .tour-dismiss {
-    min-height: 34px;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 0 12px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+    text-wrap: pretty;
   }
   .tour-dismiss {
     position: absolute;
@@ -962,33 +1035,18 @@
     right: 12px;
     width: 30px;
     min-height: 30px;
-    padding: 0;
+    border: 1px solid transparent;
     border-radius: 50%;
+    padding: 0;
     background: transparent;
     color: #59606B;
     font-size: 22px;
     font-weight: 500;
     line-height: 1;
+    cursor: pointer;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease;
   }
-  .tour-dismiss:hover {
-    background: #F3F4F6;
-    color: var(--ink);
-  }
-  .tour-branch-link {
-    display: inline;
-    width: max-content;
-    margin: -4px 0 14px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: var(--spinach);
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .tour-branch-link:hover { color: var(--seaweed); }
+  .tour-dismiss:hover { background: #F3F4F6; color: var(--ink); }
 
   @media (max-width: 1100px) {
     .app { grid-template-columns: 64px 1fr; }
@@ -996,9 +1054,8 @@
     .nav a { justify-content: center; padding: 10px; }
     .nav-label, .badge { display: none; }
     .sidebar-setup { display: none; }
-    .content, .page-header, .tabs { padding-left: 24px; padding-right: 24px; }
-    .toolbar { align-items: stretch; flex-direction: column; }
-    .toolbar-left, .toolbar-right { width: 100%; flex-wrap: wrap; }
+    .content, .page-header, .steps { padding-left: 24px; padding-right: 24px; }
+    .bottom-bar { margin-left: -24px; margin-right: -24px; padding-left: 24px; padding-right: 24px; }
   }
   @media (max-width: 760px) {
     .app { display: block; }
@@ -1006,9 +1063,25 @@
     .trial-status,
     .topbar-setup-link { display: none; }
     .sidebar { display: none; }
-    .page-header { flex-direction: column; }
-    .search-wrap, .outlet-picker select { width: 100%; min-width: 0; }
-    .outlet-picker { width: 100%; align-items: stretch; flex-direction: column; }
+    .toolbar, .results-head { align-items: stretch; flex-direction: column; }
+    .toolbar-left, .toolbar-right { width: 100%; flex-wrap: wrap; }
+    .search-wrap, .search-wrap.wide { width: 100%; }
+    .steps { overflow-x: auto; }
+    .two-col { grid-template-columns: 1fr; }
+    .tour-card {
+      left: 16px !important;
+      right: 16px;
+      top: auto !important;
+      bottom: 18px;
+      width: auto;
+      padding: 24px;
+    }
+    .tour-card::before { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn,
+    .tour-highlight,
+    .tour-card { transition: none; }
   }
 
   /* Handoff inspectors */
@@ -1365,7 +1438,7 @@
   <div class="asset-download-wrap" data-asset-download>
     <button class="handoff-inspector-btn" type="button" data-asset-download-toggle title="Download page assets">&#8595; Assets</button>
     <div class="asset-download-menu" data-asset-download-menu hidden>
-      <a href="Freemium/assets/downloads/procure-trial-items.zip" download>This page<span class="count">22 files</span></a>
+      <a href="Freemium/assets/downloads/procure-trial-outlet-suppliers.zip" download>This page<span class="count">22 files</span></a>
       <a href="Freemium/assets/downloads/all-pages.zip" download>Whole flow<span class="count">34 files</span></a>
     </div>
   </div>
@@ -1408,10 +1481,10 @@
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
       <a data-nav-orders href="Freemium/procure-trial-orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
       <a data-nav-invoices href="Freemium/procure-trial-invoices.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
-      <a class="active" data-nav-items href="Freemium/procure-trial-items.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a data-nav-items href="Freemium/procure-trial-items.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
       <a data-nav-inventory href="Freemium/procure-trial-inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
-      <a data-nav-outlets href="Freemium/procure-trial-outlet-suppliers.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span></a>
+      <a class="active" data-nav-outlets href="Freemium/procure-trial-outlet-suppliers.html"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
     </nav>
@@ -1424,134 +1497,110 @@
         <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Freemium/procure-trial-outlet-suppliers.html?tour=2"><span>Add supplier</span></a></span>
       </div>
     </div>
-    <button class="intercom-launcher" type="button" aria-label="Open chat support"></button>
+    <button class="intercom-launcher" type="button" aria-label="Open chat support">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M5.5 6.5A2.5 2.5 0 0 1 8 4h8a2.5 2.5 0 0 1 2.5 2.5v6A2.5 2.5 0 0 1 16 15H9.25L5.8 18.13A.75.75 0 0 1 4.55 17.5V6.5h.95Zm2.5-1A1 1 0 0 0 7 6.5v8.74l1.46-1.32a.75.75 0 0 1 .5-.19H16a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H8Z"/>
+        <path fill="currentColor" d="M8.7 8.7h6.6v1.4H8.7V8.7Zm0 2.8h4.8v1.4H8.7v-1.4Z"/>
+      </svg>
+    </button>
   </aside>
 
   <main class="main">
-    <section class="page-header">
-      <h1 class="page-title">Items</h1>
-      <div class="outlet-picker">
-        <label for="outlet">Outlet</label>
-        <select id="outlet">
-          <option data-venue-option>Trial Outlet</option>
-        </select>
-      </div>
+    <section class="page-header" data-standard-header>
+      <h1 class="page-title" data-outlet-title>Test Outlet ZM</h1>
+      <nav class="tabs" aria-label="Outlet setup tabs">
+        <a class="tab" href="#">Details</a>
+        <a class="tab" href="#">Users</a>
+        <a class="tab" href="#">Settings</a>
+        <a class="tab active" href="#">Suppliers</a>
+        <a class="tab" href="#">Integration</a>
+      </nav>
     </section>
-    <nav class="tabs" aria-label="Item tabs">
-      <span class="tab active">Purchased</span>
-    </nav>
+
+    <section class="page-header" data-add-header hidden>
+      <a class="back-link" href="Freemium/procure-trial-outlet-suppliers.html" data-back-suppliers>‹ Suppliers</a>
+      <h1 class="page-title">Add supplier</h1>
+    </section>
+    <div class="steps" data-add-header hidden>
+      <div class="step active"><span class="step-number">1</span><span>Search supplier</span></div>
+      <div class="step" data-configure-step><span class="step-number">2</span><span>Configure supplier settings</span></div>
+    </div>
 
     <div class="content">
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <label class="search-wrap">
-            <span class="search-icon" aria-hidden="true"></span>
-            <input type="text" placeholder="Search SKU" />
-          </label>
-          <button class="btn btn-primary" type="button">Search</button>
+      <section class="view active" data-view="suppliers">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <label class="search-wrap">
+              <span class="search-icon" aria-hidden="true"></span>
+              <input type="text" placeholder="Search suppliers" />
+            </label>
+            <label class="checkbox-row"><span class="fake-checkbox" aria-hidden="true"></span>Show Archived suppliers</label>
+          </div>
+          <div class="toolbar-right">
+            <a class="download-link" href="#">Download</a>
+            <button class="btn btn-primary" data-add-new><span class="plus-icon" aria-hidden="true"></span>Add new</button>
+          </div>
         </div>
-        <div class="toolbar-right">
-          <div class="add-menu-wrap">
-            <button class="action-link" data-add-toggle type="button"><span class="action-icon" aria-hidden="true">+</span>Add</button>
-            <div class="add-menu" data-add-menu hidden>
-              <div data-add-menu-tour-target>
-                <button type="button" data-add-invoice>Add from invoice</button>
-                <button type="button" data-create-new>Create new</button>
-              </div>
-              <button type="button">Bulk create new</button>
+        <div class="table-card">
+          <div class="success-note" data-supplier-added-note hidden><span aria-hidden="true">✓</span><span data-added-copy>Supplier added.</span></div>
+          <div class="empty-state" data-empty-suppliers>
+            <div class="empty-state-inner">
+              <div class="empty-state-icon" aria-hidden="true">+</div>
+              <h2 class="empty-state-title">No suppliers yet</h2>
+              <p class="empty-state-copy">Add the suppliers this outlet orders from most often.</p>
             </div>
           </div>
-          <button class="action-link" type="button"><span class="action-icon" aria-hidden="true">^</span>Bulk update</button>
-          <button class="action-link" type="button"><span class="action-icon" aria-hidden="true">o</span>Activity log</button>
-          <button class="action-link" type="button"><span class="action-icon" aria-hidden="true">v</span>Export</button>
-          <button class="action-link" type="button"><span class="action-icon" aria-hidden="true">Y</span>Filter</button>
+          <table data-supplier-table hidden>
+            <thead>
+              <tr>
+                <th>Supplier name</th>
+                <th>Last ordered</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong data-added-supplier-name>KPP Pte Ltd</strong><div class="cell-sub">Active</div></td>
+                <td>-</td>
+                <td><a class="actions-link" href="#">Actions⌄</a></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-      <div class="table-card" data-items-table-card hidden>
-        <table>
-          <thead>
-            <tr>
-              <th class="check-cell"><span class="fake-check" aria-hidden="true"></span></th>
-              <th class="sku-cell">SKU</th>
-              <th class="price-cell">Price (S$)</th>
-              <th class="expense-cell">Expense category</th>
-              <th class="last-cell">Last ordered</th>
-            </tr>
-          </thead>
-          <tbody data-items-body></tbody>
-        </table>
-      </div>
-      <div class="items-empty-state" data-items-empty>
-        <div class="items-empty-state-inner">
-          <div class="items-empty-icon" aria-hidden="true">+</div>
-          <h2 class="items-empty-title">No items yet</h2>
-          <p class="items-empty-copy" data-items-empty-copy>Add your first supplier, then build the market list your team will order from.</p>
-        </div>
-      </div>
+      </section>
     </div>
   </main>
 </div>
 
-<div class="toast" data-toast>
-  <span class="toast-check" aria-hidden="true">✓</span>
-  <span><span class="toast-title" data-toast-title>New item</span><br><span class="toast-copy">added to market list</span></span>
+<div class="success-toast" data-success-toast>
+  <span class="success-toast-icon" aria-hidden="true">✓</span>
+  <span><span class="success-toast-title" data-success-toast-text>Supplier</span><br><span class="success-toast-copy">created</span></span>
 </div>
 
-<div class="modal-overlay" data-supplier-modal hidden>
-  <section class="supplier-modal" role="dialog" aria-modal="true" aria-labelledby="select-supplier-title">
-    <div class="modal-head">
-      <h2 class="modal-title" id="select-supplier-title">Select supplier</h2>
-      <button class="modal-close" data-close-supplier type="button" aria-label="Close select supplier dialog">&times;</button>
+<div class="prerequisite-modal-overlay" data-prerequisite-modal hidden>
+  <section class="prerequisite-modal-card" role="dialog" aria-modal="true" aria-labelledby="prerequisite-modal-title" aria-describedby="prerequisite-modal-copy">
+    <div class="prerequisite-modal-head">
+      <div>
+        <h2 class="prerequisite-modal-title" id="prerequisite-modal-title" data-prerequisite-title></h2>
+        <p class="prerequisite-modal-copy" id="prerequisite-modal-copy" data-prerequisite-copy></p>
+      </div>
+      <button class="prerequisite-modal-close" type="button" data-close-prerequisite-modal aria-label="Close">&times;</button>
     </div>
-    <div class="field">
-      <label for="supplierSelect">Supplier</label>
-      <select class="select-control" id="supplierSelect" data-supplier-select>
-        <option value="" selected>Select supplier</option>
-        <option>Test Supplier</option>
-        <option>Test Supplier2</option>
-      </select>
-      <p class="field-help" data-supplier-help hidden>Please select a supplier first</p>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-primary" data-create-sku type="button">Create new</button>
-    </div>
-  </section>
-</div>
-
-<div class="modal-overlay" data-invoice-modal hidden>
-  <section class="invoice-modal" data-invoice-upload-step role="dialog" aria-modal="true" aria-labelledby="add-invoice-title">
-    <div class="modal-head">
-      <h2 class="modal-title" id="add-invoice-title">Add from invoice</h2>
-      <button class="modal-close" data-close-invoice type="button" aria-label="Close add from invoice dialog">&times;</button>
-    </div>
-    <p class="upload-subtitle">Upload up to 5 files (PDF/JPEG/PNG)</p>
-    <button class="drop-zone" data-drop-zone type="button">Drag &amp; drop files here or click to browse</button>
-    <table class="upload-table" data-upload-table hidden>
-      <thead>
-        <tr>
-          <th>Filename</th>
-          <th class="progress-cell">Progress</th>
-          <th class="action-cell">Actions</th>
-        </tr>
-      </thead>
-      <tbody data-upload-body></tbody>
-    </table>
-    <div class="modal-foot">
-      <button class="btn btn-primary" data-upload-invoices type="button" disabled>Upload</button>
+    <div class="prerequisite-modal-actions">
+      <a class="btn btn-secondary" data-prerequisite-guide target="_blank" rel="noopener">View guide</a>
+      <a class="btn btn-primary" data-prerequisite-action></a>
     </div>
   </section>
 </div>
 
 <div class="tour-overlay" data-tour hidden>
+  <div class="tour-scrim"></div>
   <div class="tour-highlight" data-tour-highlight></div>
   <section class="tour-card" data-tour-card aria-live="polite">
-    <p class="tour-kicker" data-tour-kicker>Step 1</p>
-    <h2 class="tour-title" data-tour-title>Add your first item</h2>
-    <p class="tour-copy" data-tour-copy>Your market list is where your team will find items to order. Start by opening Add.</p>
-    <a class="tour-branch-link" data-tour-branch-link hidden href="#"></a>
-    <div class="tour-actions">
-      <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
-    </div>
+    <p class="tour-kicker">Step 1</p>
+    <h2 class="tour-title">Add a supplier</h2>
+    <p class="tour-copy">Add your first supplier here. Once they’re saved, you can link items to them and start building orders.</p>
+    <button class="tour-dismiss" data-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button>
   </section>
 </div>
 
@@ -1645,137 +1694,75 @@
     }
     var userName = params.get('userName') || '';
     var venueName = params.get('venueName') || '';
-    var supplierAdded = params.get('supplierAdded') === '1' || params.get('demo') === '1';
-    var marketListBuilt = params.get('marketListBuilt') === '1' || params.get('demo') === '1';
-    var orderPlaced = params.get('orderPlaced') === '1';
-    var inventorySetup = params.get('inventorySetup') === '1';
-    var stockCountDone = params.get('stockCountDone') === '1';
-    var createdSku = params.get('createdSku') || '';
-    var invoiceItemsAdded = params.get('invoiceItemsAdded') === '1';
-    var marketHandoff = params.get('marketHandoff') === '1';
-    var createdSupplier = params.get('createdSupplier') || params.get('supplierName') || 'Test Supplier';
-    var createdUom = params.get('createdUom') || 'blk';
-    var createdPrice = params.get('createdPrice') || '2.00';
     var userNameNode = document.querySelector('[data-user-name]');
     var avatarNode = document.querySelector('[data-avatar]');
-    var addToggle = document.querySelector('[data-add-toggle]');
-    var addMenu = document.querySelector('[data-add-menu]');
-    var addInvoice = document.querySelector('[data-add-invoice]');
-    var createNew = document.querySelector('[data-create-new]');
-    var supplierModal = document.querySelector('[data-supplier-modal]');
-    var supplierSelect = document.querySelector('[data-supplier-select]');
-    var createSku = document.querySelector('[data-create-sku]');
-    var supplierHelp = document.querySelector('[data-supplier-help]');
-    var invoiceModal = document.querySelector('[data-invoice-modal]');
-    var dropZone = document.querySelector('[data-drop-zone]');
-    var uploadTable = document.querySelector('[data-upload-table]');
-    var uploadBody = document.querySelector('[data-upload-body]');
-    var uploadInvoices = document.querySelector('[data-upload-invoices]');
-    var toast = document.querySelector('[data-toast]');
-    var toastTitle = document.querySelector('[data-toast-title]');
-    var itemsBody = document.querySelector('[data-items-body]');
-    var itemsTableCard = document.querySelector('[data-items-table-card]');
-    var itemsEmpty = document.querySelector('[data-items-empty]');
-    var itemsEmptyCopy = document.querySelector('[data-items-empty-copy]');
+    var outletTitle = document.querySelector('[data-outlet-title]');
     var tour = document.querySelector('[data-tour]');
     var tourHighlight = document.querySelector('[data-tour-highlight]');
     var tourCard = document.querySelector('[data-tour-card]');
     var tourDismiss = document.querySelector('[data-tour-dismiss]');
-    var tourKicker = document.querySelector('[data-tour-kicker]');
-    var tourTitle = document.querySelector('[data-tour-title]');
-    var tourCopy = document.querySelector('[data-tour-copy]');
-    var tourBranchLink = document.querySelector('[data-tour-branch-link]');
-    var currentTourStep = 'add';
-    var invoiceMode = params.get('tour') === 'invoice';
-    var retryPath = params.get('retryPath') || '';
-    var branchReplay = retryPath === 'invoice' || retryPath === 'manual';
-    var selectedItemFlow = branchReplay ? retryPath : invoiceMode ? 'invoice' : '';
-    var tourSteps = {
-      add: {
-        target: '[data-add-toggle]',
-        kicker: 'Step 1',
-        title: 'Add your first item',
-        copy: 'Your market list is where your team will find items to order. Start by opening Add.',
-        actionOnly: true
+    var tourKicker = document.querySelector('.tour-kicker');
+    var tourTitle = document.querySelector('.tour-title');
+    var tourCopy = document.querySelector('.tour-copy');
+    var outletsNavLink = document.querySelector('[data-nav-outlets]');
+    var tourStep = { target: '[data-add-new]' };
+    var supplierAdded = params.get('supplierAdded') === '1';
+    var marketListBuilt = params.get('marketListBuilt') === '1';
+    var orderPlaced = params.get('orderPlaced') === '1';
+    var inventorySetup = params.get('inventorySetup') === '1';
+    var stockCountDone = params.get('stockCountDone') === '1';
+    var supplierName = params.get('supplierName') || 'KPP Pte Ltd';
+    var prerequisiteStates = {
+      order: {
+        label: 'Place order',
+        title: 'Add an item before placing an order',
+        copy: 'There are no orderable items in your market list. Add at least one item before starting this flow.',
+        action: 'Go to Items',
+        href: 'Freemium/procure-trial-items.html',
+        guide: 'https://support.zeemart.co/en/articles/9418027-adding-or-removing-items-in-the-market-lists'
       },
-      chooseMethod: {
-        target: retryPath === 'invoice' ? '[data-add-invoice]' : retryPath === 'manual' ? '[data-create-new]' : '[data-add-menu]',
-        highlightTarget: retryPath === 'invoice' || retryPath === 'manual' ? null : '[data-add-menu-tour-target]',
-        kicker: 'Step 2',
-        title: retryPath === 'invoice' ? 'Try adding from invoice' : retryPath === 'manual' ? 'Try creating manually' : 'Choose how to add items',
-        copy: retryPath === 'invoice'
-          ? 'Use invoices to build the list faster when you already have supplier invoices ready.'
-          : retryPath === 'manual'
-            ? 'Create one item by hand when you want to add a specific product yourself.'
-            : 'Create one item manually, or upload invoices to build the list faster. Choose the path that fits what you have ready.',
-        placement: 'below',
-        actionOnly: true
+      digitise: {
+        label: 'Digitise invoices',
+        title: 'Upload an invoice before digitising',
+        copy: 'There are no uploaded invoices waiting for review. Upload an invoice before starting this flow.',
+        action: 'Upload invoice',
+        href: 'Freemium/procure-trial-invoices.html',
+        guide: 'https://support.zeemart.co/en/articles/9418159-how-to-upload-invoices'
       },
-      supplier: {
-        target: '[data-supplier-select]',
-        kicker: 'Step 3',
-        title: 'Link it to a supplier',
-        copy: 'Choose the supplier this item belongs to.',
-        placement: 'below',
-        actionOnly: true
-      },
-      upload: {
-        target: '[data-invoice-upload-step]',
-        kicker: 'Step 3',
-        title: 'Upload invoices',
-        copy: 'Choose the invoice files, then click Upload. The invoice contents will be read and the items prepared for review.',
-        placement: 'below',
-        actionOnly: true
-      },
-      complete: {
-        target: '[data-sidebar-setup-card]',
-        kicker: 'Setup updated',
-        title: 'Market list built',
-        copy: 'Your setup progress is now 60%. Open the setup panel to see what’s next.',
-        placement: 'right',
-        actionOnly: true
-      },
-      orderStart: {
-        target: '[data-nav-orders]',
-        kicker: 'START HERE',
-        title: 'Start from Orders',
-        copy: 'Open Orders to create and send your first order.',
-        placement: 'right',
-        actionOnly: true
-      },
-      inventoryStart: {
-        target: '[data-nav-inventory]',
-        kicker: 'START HERE',
-        title: 'Start from Inventory',
-        copy: 'Open Inventory to organise the items your team will count.',
-        placement: 'right',
-        actionOnly: true
-      },
-      stockCountStart: {
-        target: '[data-nav-inventory]',
-        kicker: 'START HERE',
-        title: 'Start from Inventory',
-        copy: 'Open Inventory to record a stock count.',
-        placement: 'right',
-        actionOnly: true
-      },
-      supplierStart: {
-        target: '[data-nav-outlets]',
-        kicker: 'START HERE',
-        title: 'Start from Outlets',
-        copy: 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.',
-        placement: 'right',
-        actionOnly: true
-      },
-      invoiceStart: {
-        target: '[data-nav-invoices]',
-        kicker: 'START HERE',
-        title: 'Start from Invoices',
-        copy: function() { return params.get('invoiceUpload') === '1' ? 'Open Invoices to review and digitise an uploaded invoice.' : 'Open Invoices to upload supplier invoices.'; },
-        placement: 'right',
-        actionOnly: true
+      stockCount: {
+        label: 'Complete stock count',
+        title: 'Add an item before counting stock',
+        copy: 'None of your inventory lists contain items. Add at least one item before starting this flow.',
+        action: 'Go to Inventory',
+        href: 'Freemium/procure-trial-inventory.html',
+        guide: 'https://support.zeemart.co/en/articles/9418087-managing-items-in-inventory-lists'
       }
     };
+    var activePrerequisite = prerequisiteStates[params.get('prerequisite') || ''] || null;
+
+    function openPrerequisiteModal(event) {
+      if (!activePrerequisite) return false;
+      if (event) event.preventDefault();
+      var modal = document.querySelector('[data-prerequisite-modal]');
+      if (!modal) return false;
+      modal.querySelector('[data-prerequisite-title]').textContent = activePrerequisite.title;
+      modal.querySelector('[data-prerequisite-copy]').textContent = activePrerequisite.copy;
+      modal.querySelector('[data-prerequisite-guide]').href = activePrerequisite.guide;
+      var action = modal.querySelector('[data-prerequisite-action]');
+      action.href = withParams(activePrerequisite.href);
+      action.textContent = activePrerequisite.action;
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      modal.querySelector('[data-close-prerequisite-modal]').focus();
+      return true;
+    }
+
+    function closePrerequisiteModal() {
+      var modal = document.querySelector('[data-prerequisite-modal]');
+      if (!modal || modal.hidden) return;
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    }
 
     function initialsFromName(name) {
       var parts = name.trim().split(/\s+/).filter(Boolean);
@@ -1784,15 +1771,12 @@
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-    function withParams(file, extras) {
+    function withParams(file, step) {
       var nextParams = new URLSearchParams();
-      ['demo', 'email', 'userName', 'firstName', 'venueName', 'primaryGoal', 'supplierAdded', 'supplierName', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
+      if (step) nextParams.set('tour', step);
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierCreated', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
         var value = params.get(key);
         if (value) nextParams.set(key, value);
-      });
-      Object.keys(extras || {}).forEach(function(key) {
-        var value = extras[key];
-        if (value !== null && value !== undefined && value !== '') nextParams.set(key, value);
       });
       var query = nextParams.toString();
       return file + (query ? '?' + query : '');
@@ -1817,317 +1801,187 @@
     }
 
     function dashboardUrl(forceSetup) {
-      var shouldShowSetup = forceSetup || (!setupDismissed() && !setupComplete());
-      return withParams('Freemium/Procure%20Trial%20Dashboard.html', shouldShowSetup ? { setup: '1' } : {});
+      var nextParams = new URLSearchParams();
+      ['userName', 'firstName', 'venueName', 'primaryGoal', 'supplierQuery', 'supplierName', 'supplierCreated', 'supplierAdded', 'marketListBuilt', 'createdSku', 'createdSupplier', 'createdUom', 'createdPrice', 'invoiceItemsAdded', 'orderPlaced', 'orderByItemDone', 'orderBySupplierDone', 'inventorySetup', 'stockCountDone', 'setupComplete', 'setupDismissed', 'setupPanelDismissed'].forEach(function(key) {
+        var value = params.get(key);
+        if (value) nextParams.set(key, value);
+      });
+      if (forceSetup || (!setupDismissed() && !setupComplete())) nextParams.set('setup', '1');
+      var query = nextParams.toString();
+      return 'Freemium/Procure%20Trial%20Dashboard.html' + (query ? '?' + query : '');
     }
 
     function setupTourUrl(tour) {
-      if (tour === 'order') return withParams('Freemium/procure-trial-orders.html', { tour: 'order' });
-      if (tour === 'inventory') return withParams('Freemium/procure-trial-inventory.html', { tour: 'inventory' });
-      if (tour === 'stockCount') return withParams('Freemium/procure-trial-inventory.html', { tour: 'stockCount' });
-      return withParams('Freemium/procure-trial-items.html', { tour: tour || '1' });
+      if (tour === 'order') return withParams('Freemium/procure-trial-orders.html', 'order');
+      if (tour === 'inventory') return withParams('Freemium/procure-trial-inventory.html', 'inventory');
+      if (tour === 'stockCount') return withParams('Freemium/procure-trial-inventory.html', 'stockCount');
+      if (tour === 'supplier') return withParams('Freemium/procure-trial-outlet-suppliers.html', '2');
+      return withParams('Freemium/procure-trial-items.html', '1');
     }
 
-    function sidebarNextUrl() {
-      var goal = params.get('primaryGoal') || 'Order faster';
-      if (inventorySetup && !stockCountDone && goal === 'Manage inventory') return setupTourUrl('stockCount');
-      if (marketListBuilt && !orderPlaced && !inventorySetup && goal === 'Order faster') return setupTourUrl('order');
-      if (marketListBuilt && !inventorySetup && !stockCountDone && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) return setupTourUrl('inventory');
-      if (marketListBuilt && goal === 'Digitise invoices') return withParams('Freemium/procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' });
-      if (!supplierAdded) return withParams('Freemium/procure-trial-outlet-suppliers.html', { tour: '2' });
-      if (supplierAdded && !marketListBuilt) return setupTourUrl('1');
-      return dashboardUrl(true);
+    document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
+      link.href = dashboardUrl(false);
+    });
+    document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
+      link.href = dashboardUrl(true);
+    });
+    document.querySelectorAll('[data-nav-items]').forEach(function(link) {
+      link.href = withParams('Freemium/procure-trial-items.html');
+    });
+    document.querySelectorAll('[data-nav-orders]').forEach(function(link) {
+      link.href = withParams('Freemium/procure-trial-orders.html');
+    });
+    document.querySelectorAll('[data-nav-inventory]').forEach(function(link) {
+      link.href = withParams('Freemium/procure-trial-inventory.html');
+    });
+    document.querySelectorAll('[data-nav-invoices]').forEach(function(link) {
+      link.href = withParams('Freemium/procure-trial-invoices.html');
+    });
+    if (supplierAdded) {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '40% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '40%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = 'Build market list'; });
     }
-
-    function createSkuUrl() {
-      return withParams('Freemium/procure-trial-create-sku.html', {
-        tour: '5',
-        selectedSupplier: supplierSelect ? supplierSelect.value : 'Test Supplier'
+    if (marketListBuilt) {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '60% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '60%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+        var goal = params.get('primaryGoal') || 'Order faster';
+        node.textContent = goal === 'Digitise invoices' ? 'Upload invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place order';
       });
     }
-
-    function reviewInvoiceUrl() {
-      return withParams('Freemium/procure-trial-review-invoice-items.html', {
-        tour: '5',
-        supplierAdded: '1'
+    if (orderPlaced) {
+      var orderGoal = params.get('primaryGoal') || 'Order faster';
+      var orderProgress = orderGoal === 'Order faster' ? '80% done' : '60% done';
+      var orderProgressWidth = orderGoal === 'Order faster' ? '80%' : '60%';
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = orderProgress; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = orderProgressWidth; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+        node.textContent = orderGoal === 'Digitise invoices' ? 'Upload invoice' : 'Set up inventory';
       });
     }
-
-    function branchReplayUrl(path) {
-      var extras = {
-        supplierAdded: '1',
-        marketListBuilt: '1',
-        retryPath: path
-      };
-      if (createdSku) extras.createdSku = createdSku;
-      if (createdSupplier) extras.createdSupplier = createdSupplier;
-      if (createdUom) extras.createdUom = createdUom;
-      if (createdPrice) extras.createdPrice = createdPrice;
-      if (invoiceItemsAdded) extras.invoiceItemsAdded = '1';
-      return withParams('Freemium/procure-trial-items.html', extras);
-    }
-
-    function syncChrome() {
-      document.querySelectorAll('[data-dashboard-link]').forEach(function(link) {
-        link.href = dashboardUrl(false);
-      });
-      document.querySelectorAll('[data-setup-home-link]').forEach(function(link) {
-        link.href = dashboardUrl(true);
-      });
-      document.querySelectorAll('[data-nav-items]').forEach(function(link) {
-        link.href = withParams('Freemium/procure-trial-items.html');
-      });
-      document.querySelectorAll('[data-nav-outlets]').forEach(function(link) {
-        link.href = withParams('Freemium/procure-trial-outlet-suppliers.html');
-      });
-      document.querySelectorAll('[data-nav-orders]').forEach(function(link) {
-        link.href = withParams('Freemium/procure-trial-orders.html');
-      });
-      document.querySelectorAll('[data-nav-inventory]').forEach(function(link) {
-        link.href = withParams('Freemium/procure-trial-inventory.html');
-      });
-      document.querySelectorAll('[data-nav-invoices]').forEach(function(link) {
-        link.href = withParams('Freemium/procure-trial-invoices.html');
-      });
-      if (supplierAdded) {
-        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '40% done'; });
-        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '40%'; });
-        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = 'Build market list'; });
-      }
-      if (marketListBuilt) {
-        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '60% done'; });
-        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '60%'; });
-        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
-          var goal = params.get('primaryGoal') || 'Order faster';
-          node.textContent = goal === 'Digitise invoices' ? 'Upload invoice' : goal === 'Manage inventory' ? 'Set up inventory' : 'Place order';
-        });
-      }
-      if (orderPlaced) {
-        var orderGoal = params.get('primaryGoal') || 'Order faster';
-        var orderProgress = orderGoal === 'Order faster' ? '80% done' : '60% done';
-        var orderProgressWidth = orderGoal === 'Order faster' ? '80%' : '60%';
-        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = orderProgress; });
-        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = orderProgressWidth; });
-        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
-          node.textContent = orderGoal === 'Digitise invoices' ? 'Upload invoice' : 'Set up inventory';
-        });
-      }
-      if (inventorySetup) {
-        var invGoal = params.get('primaryGoal') || 'Order faster';
-        var invProgress = invGoal === 'Order faster' ? '100% done' : invGoal === 'Manage inventory' ? '80% done' : '60% done';
-        var invProgressWidth = invGoal === 'Order faster' ? '100%' : invGoal === 'Manage inventory' ? '80%' : '60%';
-        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = invProgress; });
-        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = invProgressWidth; });
-        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
-          node.textContent = invGoal === 'Manage inventory' ? 'Complete stock count' : "You're all set";
-        });
-      }
-      if (stockCountDone && (params.get('primaryGoal') || 'Order faster') === 'Manage inventory') {
-        document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '100% done'; });
-        document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
-        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
-      }
-      var fullyDoneGoal = params.get('primaryGoal') || 'Order faster';
-      var isFullyDone = (fullyDoneGoal === 'Order faster' && orderPlaced && inventorySetup) || (fullyDoneGoal === 'Manage inventory' && stockCountDone);
-      document.querySelectorAll('[data-sidebar-setup-tick]').forEach(function(node) { node.hidden = !isFullyDone; });
-      document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node) { node.hidden = false; node.textContent = isFullyDone ? 'Also try:' : 'Next:'; });
-      var extraTitles = { order: 'Place order', invoiceUpload: 'Upload an invoice', invoiceDigitise: 'Digitise invoices', invoiceExport: 'Export invoices', stockCount: 'Complete a stock count' };
-      var extraHrefs = { order: 'Freemium/procure-trial-orders.html', invoiceUpload: 'Freemium/procure-trial-invoices.html', stockCount: 'Freemium/procure-trial-inventory.html' };
-      var nextExtraKey = null;
-      if (isFullyDone) {
-        var extraGoalTask = fullyDoneGoal === 'Order faster' ? 'order' : 'stockCount';
-        var extraOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'stockCount'].filter(function(k) { return k !== extraGoalTask; });
-        var extraDone = { order: orderPlaced, invoiceUpload: false, invoiceDigitise: false, invoiceExport: false, stockCount: stockCountDone };
-        nextExtraKey = extraOrder.filter(function(k) { return !extraDone[k]; })[0] || null;
-        document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = nextExtraKey ? extraTitles[nextExtraKey] : "You're all set"; });
-      }
-      document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-        link.href = sidebarNextUrl();
-      });
-      if (isFullyDone && nextExtraKey && extraHrefs[nextExtraKey]) {
-        document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) { link.href = withParams(extraHrefs[nextExtraKey]); });
-      }
-    }
-
-    function addCreatedSkuRow() {
-      if (!createdSku || !itemsBody) return;
-      var row = document.createElement('tr');
-      row.innerHTML = '<td><span class="fake-check" aria-hidden="true"></span></td>' +
-        '<td><div class="sku-name"></div><div class="sku-meta"><em></em> • <span></span></div></td>' +
-        '<td><div class="price-main"></div><div class="price-sub"></div></td><td></td><td class="last-cell">Never</td>';
-      row.querySelector('.sku-name').textContent = createdSku;
-      row.querySelector('em').textContent = createdSku;
-      row.querySelector('.sku-meta span').textContent = createdSupplier;
-      row.querySelector('.price-main').textContent = 'S$' + createdPrice + '/' + createdUom;
-      row.querySelector('.price-sub').textContent = 'MOQ: 1 ' + createdUom;
-      itemsBody.appendChild(row);
-    }
-
-    function syncItemsEmptyState() {
-      var hasItems = !!(itemsBody && itemsBody.children.length);
-      if (itemsTableCard) itemsTableCard.hidden = !hasItems;
-      if (itemsEmpty) itemsEmpty.hidden = hasItems;
-      if (itemsEmptyCopy) {
-        itemsEmptyCopy.textContent = supplierAdded
-          ? 'Use Add to create an item or upload invoices to build your market list.'
-          : 'Add your first supplier, then build the market list your team will order from.';
-      }
-    }
-
-    function addInvoiceItemRows() {
-      if (!invoiceItemsAdded || !itemsBody) return;
-      [
-        ['Garlic', 'S$1.80/g', 'MOQ: 1 g'],
-        ['Soy sauce', 'S$3.50/btl', 'MOQ: 1 btl'],
-        ['Spring onions', 'S$1.50/g', 'MOQ: 1 g'],
-        ['Rice', 'S$1.20/kg', 'MOQ: 1 kg']
-      ].forEach(function(item) {
-        var row = document.createElement('tr');
-        row.innerHTML = '<td><span class="fake-check" aria-hidden="true"></span></td>' +
-          '<td><div class="sku-name"></div><div class="sku-meta"><em></em> • <span>Test Supplier</span></div></td>' +
-          '<td><div class="price-main"></div><div class="price-sub"></div></td><td></td><td class="last-cell">Never</td>';
-        row.querySelector('.sku-name').textContent = item[0];
-        row.querySelector('em').textContent = item[0];
-        row.querySelector('.price-main').textContent = item[1];
-        row.querySelector('.price-sub').textContent = item[2];
-        itemsBody.appendChild(row);
+    if (inventorySetup) {
+      var invGoal = params.get('primaryGoal') || 'Order faster';
+      var invProgress = invGoal === 'Order faster' ? '100% done' : invGoal === 'Manage inventory' ? '80% done' : '60% done';
+      var invProgressWidth = invGoal === 'Order faster' ? '100%' : invGoal === 'Manage inventory' ? '80%' : '60%';
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = invProgress; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = invProgressWidth; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) {
+        node.textContent = invGoal === 'Manage inventory' ? 'Complete stock count' : "You're all set";
       });
     }
-
-    function showToast() {
-      if (branchReplay) return;
-      if (!marketHandoff) return;
-      if (!toast || (!createdSku && !invoiceItemsAdded)) return;
-      if (toastTitle) toastTitle.textContent = invoiceItemsAdded ? 'Success' : createdSku;
-      var toastCopy = toast.querySelector('.toast-copy');
-      if (toastCopy && invoiceItemsAdded) toastCopy.textContent = '4 items created or updated';
-      toast.classList.add('show');
-      setTimeout(function() { toast.classList.remove('show'); }, 4200);
+    if (stockCountDone && (params.get('primaryGoal') || 'Order faster') === 'Manage inventory') {
+      document.querySelectorAll('.sidebar-setup-copy').forEach(function(node) { node.textContent = '100% done'; });
+      document.querySelectorAll('.sidebar-setup-progress span').forEach(function(node) { node.style.width = '100%'; });
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = "You're all set"; });
     }
-
-    function showCompletionHandoff() {
-      if (branchReplay) return;
-      if (!marketListBuilt || !marketHandoff || !tour) return;
-      tour.hidden = false;
-      document.body.classList.add('tour-active');
-      setTourStep('complete', false);
+    var fullyDoneGoal = params.get('primaryGoal') || 'Order faster';
+    var isFullyDone = (fullyDoneGoal === 'Order faster' && orderPlaced && inventorySetup) || (fullyDoneGoal === 'Manage inventory' && stockCountDone);
+    document.querySelectorAll('[data-sidebar-setup-tick]').forEach(function(node) { node.hidden = !isFullyDone; });
+    document.querySelectorAll('[data-sidebar-next-label]').forEach(function(node) { node.hidden = false; node.textContent = isFullyDone ? 'Also try:' : 'Next:'; });
+    var extraTitles = { order: 'Place order', invoiceUpload: 'Upload an invoice', invoiceDigitise: 'Digitise invoices', invoiceExport: 'Export invoices', stockCount: 'Complete a stock count' };
+    var extraHrefs = { order: 'Freemium/procure-trial-orders.html', invoiceUpload: 'Freemium/procure-trial-invoices.html', stockCount: 'Freemium/procure-trial-inventory.html' };
+    var nextExtraKey = null;
+    if (isFullyDone) {
+      var extraGoalTask = fullyDoneGoal === 'Order faster' ? 'order' : 'stockCount';
+      var extraOrder = ['order', 'invoiceUpload', 'invoiceDigitise', 'invoiceExport', 'stockCount'].filter(function(k) { return k !== extraGoalTask; });
+      var extraDone = { order: orderPlaced, invoiceUpload: false, invoiceDigitise: false, invoiceExport: false, stockCount: stockCountDone };
+      nextExtraKey = extraOrder.filter(function(k) { return !extraDone[k]; })[0] || null;
+      document.querySelectorAll('[data-sidebar-next-action] span').forEach(function(node) { node.textContent = nextExtraKey ? extraTitles[nextExtraKey] : "You're all set"; });
     }
-
-    function openAddMenu() {
-      if (!supplierAdded) return;
-      if (addMenu) addMenu.hidden = false;
-      if (tour && !tour.hidden) setTourStep('chooseMethod', false);
-    }
-
-    function closeAddMenu(resetTour) {
-      if (addMenu) addMenu.hidden = true;
-      if (resetTour && tour && !tour.hidden && currentTourStep === 'chooseMethod') {
-        setTourStep('add', false);
-      }
-    }
-
-    function openSupplierModal() {
-      if (!supplierAdded) return;
-      selectedItemFlow = 'manual';
-      closeAddMenu();
-      if (supplierModal) supplierModal.hidden = false;
-      if (tour && !tour.hidden) setTourStep('supplier', false);
-    }
-
-    function closeSupplierModal() {
-      if (supplierModal) supplierModal.hidden = true;
-      placeTour();
-    }
-
-    function openInvoiceModal() {
-      if (!supplierAdded) return;
-      selectedItemFlow = 'invoice';
-      closeAddMenu();
-      updateInvoiceUploadTourTarget(false);
-      if (invoiceModal) invoiceModal.hidden = false;
-      if (tour && !tour.hidden) setTourStep('upload', false);
-    }
-
-    function closeInvoiceModal() {
-      if (invoiceModal) invoiceModal.hidden = true;
-      placeTour();
-    }
-
-    function updateInvoiceUploadTourTarget(hasFiles) {
-      if (!tourSteps.upload) return;
-      tourSteps.upload.target = '[data-invoice-upload-step]';
-      tourSteps.upload.title = 'Upload invoices';
-      tourSteps.upload.copy = 'Choose the invoice files, then click Upload. The invoice contents will be read and the items prepared for review.';
-      tourSteps.upload.placement = 'below';
-    }
-
-    function addDemoInvoiceFiles() {
-      if (!uploadBody) return;
-      var files = ['Invoice_INV-2026-0142.pdf', 'Invoice_INV-2026-0143.pdf', 'Invoice_INV-2026-0144.pdf'];
-      uploadBody.innerHTML = files.map(function(file) {
-        return '<tr><td>' + file + '</td><td class="progress-cell" data-upload-progress>0%</td><td class="action-cell"><button class="trash-button" type="button" aria-label="Remove ' + file + '">&times;</button></td></tr>';
-      }).join('');
-      if (uploadTable) uploadTable.hidden = false;
-      if (uploadInvoices) uploadInvoices.disabled = false;
-      setTimeout(placeTour, 80);
-    }
-
-    function uploadDemoInvoices() {
-      document.querySelectorAll('[data-upload-progress]').forEach(function(node) {
-        node.textContent = '99%';
-      });
-      if (uploadInvoices) {
-        uploadInvoices.textContent = 'Uploading...';
-        uploadInvoices.disabled = true;
-      }
-      setTimeout(function() {
-        window.location.href = reviewInvoiceUrl();
-      }, 700);
-    }
-
-    function goCreateSku() {
-      if (!supplierSelect || !supplierSelect.value) {
-        if (supplierHelp) supplierHelp.hidden = false;
+    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
+      var nextGoal = params.get('primaryGoal') || 'Order faster';
+      var nextLabel = (link.textContent || '').trim();
+      if (activePrerequisite && nextLabel.indexOf(activePrerequisite.label) !== -1) {
+        link.href = '#';
+        link.addEventListener('click', openPrerequisiteModal);
         return;
       }
-      window.location.href = createSkuUrl();
+      if (inventorySetup && !stockCountDone && nextGoal === 'Manage inventory') {
+        link.href = setupTourUrl('stockCount');
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startInventoryTourHere('stockCount');
+        });
+      } else if (marketListBuilt && !inventorySetup && !stockCountDone && (nextGoal === 'Manage inventory' || (nextGoal === 'Order faster' && orderPlaced))) {
+        link.href = setupTourUrl('inventory');
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startInventoryTourHere('inventory');
+        });
+      } else if (marketListBuilt && !orderPlaced && !inventorySetup && nextGoal === 'Order faster') {
+        link.href = setupTourUrl('order');
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startOrderTourHere();
+        });
+      } else if (marketListBuilt && nextGoal === 'Digitise invoices') {
+        link.href = withParams('Freemium/procure-trial-invoices.html');
+      } else if (marketListBuilt) {
+        link.href = dashboardUrl(true);
+      } else if (supplierAdded) {
+        link.href = setupTourUrl('market');
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startMarketListTourHere();
+        });
+      } else {
+        link.href = setupTourUrl('supplier');
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          startSupplierTourHere();
+        });
+      }
+    });
+    if (isFullyDone && nextExtraKey && extraHrefs[nextExtraKey]) {
+      document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) { link.href = withParams(extraHrefs[nextExtraKey]); });
     }
+    document.querySelectorAll('[data-close-prerequisite-modal]').forEach(function(button) {
+      button.addEventListener('click', closePrerequisiteModal);
+    });
+    var prerequisiteModal = document.querySelector('[data-prerequisite-modal]');
+    if (prerequisiteModal) {
+      prerequisiteModal.addEventListener('click', function(event) {
+        if (event.target === prerequisiteModal) closePrerequisiteModal();
+      });
+    }
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') closePrerequisiteModal();
+    });
+    if (outletsNavLink) outletsNavLink.href = withParams('Freemium/procure-trial-outlet-suppliers.html', '2');
 
     function placeTour() {
       if (!tour || tour.hidden) return;
-      var step = tourSteps[currentTourStep] || tourSteps.add;
-      var target = document.querySelector(step.target);
+      var target = document.querySelector(tourStep.target);
       if (!target) return;
       var rect = target.getBoundingClientRect();
-      var highlightEl = (step.highlightTarget && document.querySelector(step.highlightTarget)) || target;
-      var highlightRect = highlightEl.getBoundingClientRect();
       var pad = 10;
-      tourHighlight.style.top = Math.max(8, highlightRect.top - pad) + 'px';
-      tourHighlight.style.left = Math.max(8, highlightRect.left - pad) + 'px';
-      tourHighlight.style.width = (highlightRect.width + pad * 2) + 'px';
-      tourHighlight.style.height = (highlightRect.height + pad * 2) + 'px';
-      tourCard.classList.remove('left', 'below');
+      tourHighlight.style.top = Math.max(8, rect.top - pad) + 'px';
+      tourHighlight.style.left = Math.max(8, rect.left - pad) + 'px';
+      tourHighlight.style.width = (rect.width + pad * 2) + 'px';
+      tourHighlight.style.height = (rect.height + pad * 2) + 'px';
+      tourCard.classList.remove('above', 'below', 'left');
       var cardWidth = Math.min(380, window.innerWidth - 32);
       var cardHeight = tourCard.getBoundingClientRect().height || 200;
       var cardLeft = rect.right + 34;
       var cardTop = rect.top - 28;
-      if (step.placement === 'below') {
+      if (tourStep.placement === 'below') {
         cardLeft = Math.max(16, Math.min(rect.left, window.innerWidth - cardWidth - 16));
-        cardTop = Math.min(window.innerHeight - cardHeight - 16, rect.bottom + 24);
+        cardTop = Math.min(window.innerHeight - cardHeight - 16, rect.bottom + 26);
         tourCard.classList.add('below');
       }
-      if (step.placement === 'above') {
-        cardLeft = Math.max(16, Math.min(rect.left - 120, window.innerWidth - cardWidth - 16));
-        cardTop = Math.max(16, rect.top - cardHeight - 24);
-      }
-      if (step.placement === 'right') {
-        cardLeft = Math.min(window.innerWidth - cardWidth - 16, rect.right + 28);
-        var targetCenterY = rect.top + rect.height / 2;
-        cardTop = Math.max(16, Math.min(targetCenterY - 28, window.innerHeight - cardHeight - 16));
+      if (tourStep.placement === 'right') {
+        cardLeft = rect.right + 34;
+        cardTop = Math.max(16, Math.min(rect.top + rect.height / 2 - 42, window.innerHeight - cardHeight - 16));
       }
       if (cardLeft + cardWidth > window.innerWidth - 16) {
         cardLeft = Math.max(16, rect.left - cardWidth - 34);
         tourCard.classList.add('left');
+      }
+      if (cardLeft < 16) cardLeft = 16;
+      if (tourStep.placement !== 'right' && cardTop + cardHeight > window.innerHeight - 16) {
+        cardTop = Math.max(16, rect.top - cardHeight - 20);
+        tourCard.classList.add('above');
       }
       if (cardTop + cardHeight > window.innerHeight - 16) cardTop = Math.max(16, window.innerHeight - cardHeight - 16);
       if (cardTop < 16) cardTop = 16;
@@ -2135,213 +1989,114 @@
       tourCard.style.top = cardTop + 'px';
     }
 
-    function setTourStep(stepName, shouldScroll) {
-      currentTourStep = stepName;
-      if (currentTourStep === 'upload' && invoiceModal && invoiceModal.hidden) {
-        selectedItemFlow = 'invoice';
-        closeAddMenu();
-        invoiceModal.hidden = false;
-      }
-      var step = tourSteps[currentTourStep] || tourSteps.add;
-      if (tourKicker) tourKicker.textContent = step.kicker;
-      if (tourTitle) tourTitle.textContent = step.title;
-      if (tourCopy) tourCopy.textContent = typeof step.copy === 'function' ? step.copy() : step.copy;
-      if (tourBranchLink) {
-        var hasManualPath = !!createdSku;
-        var hasInvoicePath = invoiceItemsAdded;
-        var otherPath = currentTourStep === 'complete' && hasManualPath && !hasInvoicePath ? 'invoice' : currentTourStep === 'complete' && hasInvoicePath && !hasManualPath ? 'manual' : '';
-        if (otherPath) {
-          tourBranchLink.hidden = false;
-          tourBranchLink.textContent = otherPath === 'invoice' ? 'You can also try adding from invoice.' : 'You can also try creating manually.';
-          tourBranchLink.href = branchReplayUrl(otherPath);
-        } else {
-          tourBranchLink.hidden = true;
-          tourBranchLink.removeAttribute('href');
-          tourBranchLink.textContent = '';
-        }
-      }
-      var target = document.querySelector(step.target);
-      if (shouldScroll && target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setTimeout(placeTour, shouldScroll ? 240 : 40);
-    }
-
     function openTour() {
       if (!tour) return;
       tour.hidden = false;
-      document.body.classList.add('tour-active');
-      setTourStep('add', false);
-    }
-
-    function openOrderStartTour() {
-      if (!tour) return;
-      closeAddMenu();
-      closeSupplierModal();
-      closeInvoiceModal();
-      document.querySelectorAll('[data-nav-orders]').forEach(function(link) {
-        link.href = withParams('Freemium/procure-trial-orders.html', { tour: 'order' });
-      });
-      tour.hidden = false;
-      document.body.classList.add('tour-active');
-      setTourStep('orderStart', false);
-    }
-
-    function openInventoryStartTour(mode) {
-      if (!tour) return;
-      closeAddMenu();
-      closeSupplierModal();
-      closeInvoiceModal();
-      var nextTour = mode === 'stockCount' ? 'stockCount' : 'inventory';
-      document.querySelectorAll('[data-nav-inventory]').forEach(function(link) {
-        link.href = withParams('Freemium/procure-trial-inventory.html', { tour: nextTour });
-      });
-      tour.hidden = false;
-      document.body.classList.add('tour-active');
-      setTourStep(mode === 'stockCount' ? 'stockCountStart' : 'inventoryStart', false);
-    }
-
-    function openSupplierStartTour() {
-      if (!tour) return;
-      closeAddMenu();
-      closeSupplierModal();
-      closeInvoiceModal();
-      document.querySelectorAll('[data-nav-outlets]').forEach(function(link) {
-        link.href = withParams('Freemium/procure-trial-outlet-suppliers.html', { tour: '2' });
-      });
-      tour.hidden = false;
-      document.body.classList.add('tour-active');
-      setTourStep('supplierStart', false);
-    }
-
-    function openInvoiceStartTour() {
-      if (!tour) return;
-      closeAddMenu(); closeSupplierModal(); closeInvoiceModal();
-      document.querySelectorAll('[data-nav-invoices]').forEach(function(link) { link.href = withParams('Freemium/procure-trial-invoices.html', { tour: params.get('invoiceUpload') === '1' ? 'digitise' : 'upload' }); });
-      tour.hidden = false; document.body.classList.add('tour-active'); setTourStep('invoiceStart', false);
-    }
-
-    function openBranchReplayTour() {
-      if (!tour) return;
-      tour.hidden = false;
-      document.body.classList.add('tour-active');
-      openAddMenu();
+      document.body.classList.add('tour-open');
+      setTimeout(placeTour, 80);
     }
 
     function closeTour() {
-      if (tour) tour.hidden = true;
-      document.body.classList.remove('tour-active');
+      if (!tour) return;
+      tour.hidden = true;
+      document.body.classList.remove('tour-open');
     }
 
+    function startSupplierTourHere() {
+      tourStep = { target: '[data-nav-outlets]' };
+      document.querySelectorAll('[data-nav-outlets]').forEach(function(link) {
+        link.href = withParams('Freemium/procure-trial-outlet-suppliers.html', '2');
+      });
+      if (tourKicker) tourKicker.textContent = 'START HERE';
+      if (tourTitle) tourTitle.textContent = 'Start from Outlets';
+      if (tourCopy) tourCopy.textContent = 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
+      openTour();
+    }
+
+    function startMarketListTourHere() {
+      tourStep = { target: '[data-nav-items]' };
+      document.querySelectorAll('[data-nav-items]').forEach(function(link) {
+        link.href = withParams('Freemium/procure-trial-items.html', '1');
+      });
+      if (tourKicker) tourKicker.textContent = 'START HERE';
+      if (tourTitle) tourTitle.textContent = 'Start from Items';
+      if (tourCopy) tourCopy.textContent = 'Open Items to build the list your team will order from.';
+      openTour();
+    }
+
+    function startOrderTourHere() {
+      tourStep = { target: '[data-nav-orders]' };
+      document.querySelectorAll('[data-nav-orders]').forEach(function(link) {
+        link.href = withParams('Freemium/procure-trial-orders.html', 'order');
+      });
+      if (tourKicker) tourKicker.textContent = 'START HERE';
+      if (tourTitle) tourTitle.textContent = 'Start from Orders';
+      if (tourCopy) tourCopy.textContent = 'Open Orders to create and send your first order.';
+      openTour();
+    }
+
+    function startInventoryTourHere(mode) {
+      var nextTour = mode === 'stockCount' ? 'stockCount' : 'inventory';
+      tourStep = { target: '[data-nav-inventory]' };
+      document.querySelectorAll('[data-nav-inventory]').forEach(function(link) {
+        link.href = withParams('Freemium/procure-trial-inventory.html', nextTour);
+      });
+      if (tourKicker) tourKicker.textContent = 'START HERE';
+      if (tourTitle) tourTitle.textContent = 'Start from Inventory';
+      if (tourCopy) tourCopy.textContent = mode === 'stockCount'
+        ? 'Open Inventory to record a stock count.'
+        : 'Open Inventory to organise the items your team will count.';
+      openTour();
+    }
+
+    function showSupplierCompletionHandoff() {
+      tourStep = { target: '[data-sidebar-setup-card]', placement: 'right' };
+      if (tourKicker) tourKicker.textContent = 'Setup updated';
+      if (tourTitle) tourTitle.textContent = 'Supplier added';
+      if (tourCopy) tourCopy.textContent = 'Your setup progress is now 40%. Open the setup panel to see what’s next.';
+      openTour();
+    }
 
     if (userName && userNameNode) {
       userNameNode.textContent = userName;
       if (avatarNode) avatarNode.textContent = initialsFromName(userName);
     }
-    document.querySelectorAll('[data-venue-option]').forEach(function(option) {
-      option.textContent = venueName || 'Trial Outlet';
-    });
-    if (!supplierAdded) {
-      if (addToggle) addToggle.disabled = true;
+    if (venueName && outletTitle) outletTitle.textContent = venueName;
+    if (supplierAdded) {
+      var emptySuppliers = document.querySelector('[data-empty-suppliers]');
+      var supplierTable = document.querySelector('[data-supplier-table]');
+      var supplierNameNode = document.querySelector('[data-added-supplier-name]');
+      var note = document.querySelector('[data-supplier-added-note]');
+      var noteCopy = document.querySelector('[data-added-copy]');
+      if (emptySuppliers) emptySuppliers.hidden = true;
+      if (supplierTable) supplierTable.hidden = false;
+      if (supplierNameNode) supplierNameNode.textContent = supplierName;
+      if (noteCopy) noteCopy.textContent = supplierName + ' has been added to this outlet.';
+      if (note) note.hidden = false;
+
+      var toast = document.querySelector('[data-success-toast]');
+      var toastText = document.querySelector('[data-success-toast-text]');
+      if (toast && toastText) {
+        toastText.textContent = supplierName;
+        requestAnimationFrame(function() { toast.classList.add('visible'); });
+        setTimeout(function() { toast.classList.remove('visible'); }, 4200);
+      }
     }
-    syncChrome();
-    addCreatedSkuRow();
-    addInvoiceItemRows();
-    if (params.get('demo') === '1' && itemsBody) {
-      [
-        ['Tiger prawns 21/25','Harbour Seafood Co.','S$22.40/kg','MOQ: 2 kg','Seafood','24 Jul 2026'],
-        ['Chicken thigh boneless','Fresh Fields Produce','S$8.90/kg','MOQ: 5 kg','Food ingredients','25 Jul 2026'],
-        ['Coconut milk 1L','Paranakan Trading Pte Ltd (T)','S$3.20/pkt','MOQ: 12 pkt','Food ingredients','23 Jul 2026'],
-        ['Jasmine rice 25kg','Pantry Provisions Pte Ltd','S$39.80/bag','MOQ: 1 bag','Food ingredients','22 Jul 2026'],
-        ['Baby kailan','Fresh Fields Produce','S$4.60/kg','MOQ: 2 kg','Fresh produce','25 Jul 2026'],
-        ['Cooking oil 5L','Pantry Provisions Pte Ltd','S$18.75/tin','MOQ: 2 tin','Food ingredients','21 Jul 2026'],
-        ['House lager keg','Lion City Beverages','S$168.00/keg','MOQ: 1 keg','Beverages','20 Jul 2026'],
-        ['Soda water 24 × 325ml','Lion City Beverages','S$16.20/ctn','MOQ: 1 ctn','Beverages','24 Jul 2026']
-      ].forEach(function(item) {
-        var row=document.createElement('tr');
-        row.innerHTML='<td><span class="fake-check" aria-hidden="true"></span></td><td><div class="sku-name"></div><div class="sku-meta"><em></em> • <span></span></div></td><td><div class="price-main"></div><div class="price-sub"></div></td><td></td><td class="last-cell"></td>';
-        row.querySelector('.sku-name').textContent=item[0];row.querySelector('em').textContent=item[0];row.querySelector('.sku-meta span').textContent=item[1];row.querySelector('.price-main').textContent=item[2];row.querySelector('.price-sub').textContent=item[3];row.children[3].textContent=item[4];row.querySelector('.last-cell').textContent=item[5];itemsBody.appendChild(row);
-      });
-      try {
-        var demoCreatedItems=JSON.parse(localStorage.getItem('nomniProcureDemoCreatedItems')||'[]');
-        demoCreatedItems.forEach(function(item) {
-          if (itemsBody.textContent.indexOf(item.name) !== -1) return;
-          var row=document.createElement('tr');
-          row.innerHTML='<td><span class="fake-check" aria-hidden="true"></span></td><td><div class="sku-name"></div><div class="sku-meta"><em></em> • <span></span></div></td><td><div class="price-main"></div><div class="price-sub"></div></td><td>Food ingredients</td><td class="last-cell">Just now</td>';
-          row.querySelector('.sku-name').textContent=item.name;
-          row.querySelector('em').textContent=item.name;
-          row.querySelector('.sku-meta span').textContent=item.supplier||'Demo supplier';
-          row.querySelector('.price-main').textContent='S$'+Number(item.price||0).toFixed(2)+'/'+(item.uom||'unit');
-          row.querySelector('.price-sub').textContent='MOQ: '+Number(item.moq||1)+' '+(item.uom||'unit');
-          itemsBody.insertBefore(row,itemsBody.firstChild);
-        });
-      } catch (error) {}
-    }
-    syncItemsEmptyState();
-    showToast();
-    showCompletionHandoff();
-    if (addToggle) addToggle.addEventListener('click', function(event) {
-      event.stopPropagation();
-      if (addMenu && !addMenu.hidden) closeAddMenu(); else openAddMenu();
+
+    document.querySelectorAll('[data-back-suppliers]').forEach(function(link) {
+      link.href = withParams('Freemium/procure-trial-outlet-suppliers.html', '2');
     });
-    if (addInvoice) addInvoice.addEventListener('click', function(event) {
-      event.stopPropagation();
-      openInvoiceModal();
-    });
-    if (createNew) createNew.addEventListener('click', function(event) {
-      event.stopPropagation();
-      openSupplierModal();
-    });
-    document.querySelectorAll('[data-close-supplier]').forEach(function(button) {
-      button.addEventListener('click', closeSupplierModal);
-    });
-    document.querySelectorAll('[data-close-invoice]').forEach(function(button) {
-      button.addEventListener('click', closeInvoiceModal);
-    });
-    if (dropZone) dropZone.addEventListener('click', addDemoInvoiceFiles);
-    if (uploadInvoices) uploadInvoices.addEventListener('click', uploadDemoInvoices);
-    if (supplierSelect) supplierSelect.addEventListener('change', function() {
-      if (supplierHelp) supplierHelp.hidden = !!supplierSelect.value;
-      if (supplierSelect.value && tour && !tour.hidden && currentTourStep === 'supplier') closeTour();
-    });
-    if (createSku) createSku.addEventListener('click', goCreateSku);
-    document.addEventListener('click', function(event) {
-      if (event.target.closest('.add-menu-wrap') || event.target.closest('[data-tour-card]')) return;
-      closeAddMenu(true);
-    });
+
+    var addNew = document.querySelector('[data-add-new]');
+    if (addNew) addNew.addEventListener('click', function() { window.location.href = withParams('Freemium/procure-trial-add-supplier-search.html', '3'); });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
-    document.querySelectorAll('[data-sidebar-next-action]').forEach(function(link) {
-      link.addEventListener('click', function(event) {
-        var goal = params.get('primaryGoal') || 'Order faster';
-        if (marketListBuilt && goal === 'Digitise invoices') { event.preventDefault(); openInvoiceStartTour(); return; }
-        if (!supplierAdded) {
-          event.preventDefault();
-          openSupplierStartTour();
-          return;
-        }
-        if (inventorySetup && !stockCountDone && goal === 'Manage inventory') {
-          event.preventDefault();
-          openInventoryStartTour('stockCount');
-          return;
-        }
-        if (marketListBuilt && !inventorySetup && (goal === 'Manage inventory' || (goal === 'Order faster' && orderPlaced))) {
-          event.preventDefault();
-          openInventoryStartTour('inventory');
-          return;
-        }
-        if (marketListBuilt && goal === 'Order faster') {
-          event.preventDefault();
-          openOrderStartTour();
-          return;
-        }
-        if (supplierAdded && !marketListBuilt) {
-          event.preventDefault();
-          openTour();
-        }
-      });
-    });
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
-    if (branchReplay && supplierAdded) openBranchReplayTour();
-    else if ((params.get('tour') === '1' || invoiceMode) && supplierAdded && !marketListBuilt) openTour();
+    if (params.has('tour')) {
+      openTour();
+    } else if (supplierAdded && !marketListBuilt) {
+      showSupplierCompletionHandoff();
+    }
   })();
 </script>
 <script>
@@ -2733,8 +2488,7 @@
 </script>
 <style>
 html.demo-boot:not(.demo-ready) .main,html.demo-boot:not(.demo-ready) .nav{visibility:hidden}
-body:not(.demo-mode) .trial-conversion,body:not(.demo-mode) .sidebar-setup{display:none!important}
-body.demo-mode .trial-conversion,body.demo-mode .sidebar-setup,body.demo-mode .handoff-inspector,body.demo-mode .tour-overlay{display:none!important}
+body.demo-mode .trial-conversion,body.demo-mode .sidebar-setup,body.demo-mode .handoff-inspector,body.demo-mode .tour-overlay,body.demo-mode [data-add-header]{display:none!important}
 body.demo-mode .nav{margin-top:12px}
 body.demo-mode .page-header{padding-top:32px}
 body.demo-mode .page-title{font:800 26px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:-.03em}
@@ -2743,6 +2497,46 @@ body.demo-mode .demo-top-status{height:32px;display:inline-flex;align-items:cent
 body.demo-mode .demo-top-actions{display:flex;align-items:center;gap:8px;margin-right:4px}
 body.demo-mode .demo-top-btn{height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:transparent;color:#fff;font:600 12px "Inter",sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
 body.demo-mode .demo-top-btn.primary{border-color:var(--nomni-green);background:var(--nomni-green);color:var(--seaweed)}
+body.demo-mode .demo-limit-banner{padding:13px 40px;border-top:1px solid #E8D98F;border-bottom:1px solid #E8D98F;background:var(--cream);color:var(--ink);font-size:13px;text-align:center}
+body.demo-mode .demo-limit-banner strong{display:block;margin-bottom:2px}
+body.demo-mode .demo-limit-banner p{margin:0;color:var(--ink-mute)}
+body.demo-mode .supplier-demo-row{cursor:pointer}
+body.demo-mode .demo-readonly-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+body.demo-mode .demo-readonly-grid .full{grid-column:1/-1}
+body.demo-mode .demo-readonly-field{width:100%;padding:9px 12px;border:1px solid #E0E0E0;border-radius:6px;background:#F5F5F5;color:#666;cursor:not-allowed}
+body.demo-mode .demo-panel{padding-top:8px}
+body.demo-mode .demo-panel-card{border:1px solid var(--rule);border-radius:8px;padding:24px;background:#fff}
+body.demo-mode .demo-panel-title{margin:0 0 20px;font-size:18px;font-weight:700}
+body.demo-mode .demo-outlet-details{width:min(644px,calc(100% - 48px));margin:0 auto;padding:26px 0 112px}
+body.demo-mode .demo-outlet-section{padding:0 0 46px}
+body.demo-mode .demo-outlet-section+.demo-outlet-section{padding-top:46px;border-top:1px solid var(--rule)}
+body.demo-mode .demo-outlet-section-title{margin:0 0 24px;font-size:18px;font-weight:700;letter-spacing:-.02em}
+body.demo-mode .demo-form-field{display:grid;gap:7px;margin-bottom:20px;font-size:13px;font-weight:600}
+body.demo-mode .demo-form-field:last-child{margin-bottom:0}
+body.demo-mode .demo-form-field small{font-size:12px;font-weight:400;line-height:1.5;color:var(--ink-mute)}
+body.demo-mode .demo-address-label{display:block;margin-bottom:7px;font-size:13px;font-weight:600}
+body.demo-mode .demo-address-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-bottom:20px}
+body.demo-mode .demo-address-grid .wide{grid-column:1/-1}
+body.demo-mode .demo-readonly-field{height:42px;background:#fff;color:var(--ink);cursor:default}
+body.demo-mode .demo-file-control{display:grid;grid-template-columns:1fr 106px;height:38px;border:1px solid #DCDEE3;border-radius:6px;overflow:hidden;background:#fff}
+body.demo-mode .demo-file-action{display:grid;place-items:center;border:0;border-left:1px solid var(--nomni-green);background:var(--nomni-green);color:var(--seaweed);font:600 13px "Inter",sans-serif;cursor:not-allowed}
+body.demo-mode .demo-subscription-card{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:26px 32px;border-radius:9px;background:#F4F4F4;color:var(--ink-mute);font-size:12px;font-weight:700}
+body.demo-mode .demo-subscription-copy{margin:16px 0 0;color:var(--ink-mute);font-size:12px;line-height:1.55}
+body.demo-mode .demo-form-actions{position:fixed;z-index:4;left:232px;right:0;bottom:0;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-top:1px solid var(--rule);background:#fff;box-shadow:0 -4px 12px rgba(10,20,15,.05)}
+body.demo-mode .demo-cancel-action{border:0;background:transparent;color:var(--spinach);font:600 14px "Inter",sans-serif}
+@media(max-width:1280px){body.demo-mode .demo-form-actions{left:64px}}
+@media(max-width:760px){body.demo-mode .demo-outlet-details{width:calc(100% - 32px)}body.demo-mode .demo-address-grid{grid-template-columns:1fr}body.demo-mode .demo-address-grid .wide{grid-column:auto}}
+body.demo-mode .demo-mini-table{width:100%;border-collapse:separate;border-spacing:0}
+body.demo-mode .demo-mini-table th,body.demo-mode .demo-mini-table td{padding:13px 14px;border-bottom:1px solid var(--rule);text-align:left}
+body.demo-mode .demo-mini-table th{font-size:12px;color:var(--ink-mute)}
+body.demo-mode .demo-integration-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border-bottom:1px solid var(--rule)}
+body.demo-mode .demo-integration-row:last-child{border-bottom:0}
+body.demo-mode .demo-switch{width:36px;height:20px;border:0;border-radius:10px;background:#DCDEE3;position:relative}
+body.demo-mode .demo-switch::after{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;border-radius:50%;background:#fff}
+body.demo-mode .approved-demo-dialog{position:fixed;inset:0;z-index:900;border:0;width:100%;height:100%;background:transparent}
+body.demo-mode .app-modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px 18px;border-top:1px solid var(--rule)}
+body.demo-mode .app-modal-body label{display:grid;gap:6px;font-size:13px;font-weight:600}
+body.demo-mode .btn:disabled{background:#D8DADD;color:#8A8F98;border-color:#D8DADD;cursor:not-allowed;transform:none}
 </style>
 <script>
 (function(){
@@ -2750,16 +2544,33 @@ body.demo-mode .demo-top-btn.primary{border-color:var(--nomni-green);background:
   document.body.classList.add('demo-mode');var email=p.get('email')||'';
   function u(path){return path+'?demo=1'+(email?'&email='+encodeURIComponent(email):'')}
   var allowed={Dashboard:u('Procure%20-%20Dashboard.html'),Orders:u('Procure%20-%20Orders.html'),Invoices:u('Freemium/procure-trial-invoices.html'),Items:u('Procure%20-%20Items.html'),Inventory:u('Procure%20-%20Inventory.html'),Recipes:u('Procure%20-%20Recipes.html'),Outlets:u('Procure%20-%20Outlets.html'),Users:u('Procure%20-%20Users.html')};
-  document.querySelectorAll('.nav a').forEach(function(link){var label=link.querySelector('.nav-label'),name=label?label.textContent.trim():'';if(!allowed[name]){link.remove();return}link.href=allowed[name];link.classList.toggle('active',name==='Items')});
+  document.querySelectorAll('.nav a').forEach(function(link){var label=link.querySelector('.nav-label'),name=label?label.textContent.trim():'';if(!allowed[name]){link.remove();return}link.href=allowed[name];link.classList.toggle('active',name==='Outlets')});
   document.querySelectorAll('[data-user-name]').forEach(function(node){node.textContent='William Arya'});document.querySelectorAll('[data-avatar]').forEach(function(node){node.textContent='WA'});
-  document.querySelectorAll('[data-venue-option]').forEach(function(node){node.textContent='Nomni Kitchen — Tanjong Pagar'});
+  var title=document.querySelector('[data-outlet-title]');if(title)title.textContent='Nomni Kitchen — Tanjong Pagar';
+  var main=document.querySelector('.main'),banner=document.createElement('div');banner.className='demo-limit-banner';banner.innerHTML='<strong>Some features are unavailable in the demo account</strong><p>You can view sample data, but changes are disabled.</p>';if(main)main.insertBefore(banner,main.firstChild);
   var brand=document.querySelector('.brand');if(brand){var pill=document.createElement('span');pill.className='demo-brand-pill';pill.textContent='DEMO';brand.appendChild(pill);var status=document.createElement('span');status.className='demo-top-status';status.textContent='Expires in 14 days';brand.appendChild(status)}
-  var right=document.querySelector('.topbar-right'),actions=document.createElement('div');actions.className='demo-top-actions';actions.innerHTML='<button class="demo-top-btn" type="button">Book a live demo</button><a class="demo-top-btn primary" href="procure-get-started.html?source=demo'+(email?'&email='+encodeURIComponent(email):'')+'">Start my FREE trial</a>';actions.querySelector('button').onclick=function(){var trigger=document.querySelector('[data-book-demo]');if(trigger)trigger.click()};if(right)right.insertBefore(actions,right.firstChild);
-  document.title='Nomni Procure — Demo Items';document.documentElement.classList.add('demo-ready');
+  function openApprovedDemoDialog(){var frame=document.createElement('iframe');frame.className='approved-demo-dialog';frame.title='Book a live demo';frame.src='Freemium/procure-trial-invoices.html?dialogOnly=1'+(email?'&email='+encodeURIComponent(email):'');document.body.appendChild(frame);function close(event){if(event.source===frame.contentWindow&&event.data==='close-demo-request'){frame.remove();window.removeEventListener('message',close)}}window.addEventListener('message',close)}
+  var right=document.querySelector('.topbar-right'),actions=document.createElement('div');actions.className='demo-top-actions';actions.innerHTML='<button class="demo-top-btn" type="button">Book a live demo</button><a class="demo-top-btn primary" href="Freemium/procure-get-started.html?source=demo'+(email?'&email='+encodeURIComponent(email):'')+'">Start my FREE trial</a>';actions.querySelector('button').onclick=openApprovedDemoDialog;if(right)right.insertBefore(actions,right.firstChild);
+  var content=document.querySelector('.content'),supplierView=document.querySelector('[data-view="suppliers"]'),supplierTable=document.querySelector('[data-supplier-table]'),empty=document.querySelector('[data-empty-suppliers]');
+  var supplierRows=[
+    ['Fresh Fields Produce','25 Jul 2026','orders@freshfields.sg','+65 6123 4801'],
+    ['Harbour Seafood Co.','24 Jul 2026','sales@harbourseafood.sg','+65 6298 1140'],
+    ['Paranakan Trading Pte Ltd (T)','22 Jul 2026','orders@paranakantrading.sg','+65 6742 9055'],
+    ['Pantry Provisions Pte Ltd','21 Jul 2026','hello@pantryprovisions.sg','+65 6281 7734'],
+    ['Lion City Beverages','20 Jul 2026','trade@lioncitybev.sg','+65 6863 2218']
+  ];
+  if(empty)empty.hidden=true;if(supplierTable){supplierTable.hidden=false;var body=supplierTable.querySelector('tbody');body.innerHTML=supplierRows.map(function(s,i){return '<tr class="supplier-demo-row" data-supplier-index="'+i+'"><td><strong>'+s[0]+'</strong><div class="cell-sub">Active</div></td><td>'+s[1]+'</td><td><button class="actions-link" type="button">View details</button></td></tr>'}).join('')}
+  var lock=document.createElement('div');lock.className='app-modal-overlay';lock.hidden=true;lock.innerHTML='<section class="app-modal-card" role="dialog" aria-modal="true"><div class="app-modal-head"><div><h2 class="app-modal-title">Feature unavailable in demo</h2></div><button class="app-modal-close" type="button" data-lock-close>&times;</button></div><div class="app-modal-body"><p>Start a free trial to add suppliers, change ordering settings or connect an integration.</p></div><div class="app-modal-foot"><button class="btn btn-tertiary" type="button" data-lock-close>Close</button><a class="btn btn-primary" href="Freemium/procure-get-started.html?source=demo'+(email?'&email='+encodeURIComponent(email):'')+'">Start my FREE trial</a></div></section>';document.body.appendChild(lock);function openLock(){lock.hidden=false}function closeLock(){lock.hidden=true}lock.querySelectorAll('[data-lock-close]').forEach(function(b){b.onclick=closeLock});lock.onclick=function(e){if(e.target===lock)closeLock()};
+  var originalAdd=document.querySelector('[data-add-new]');if(originalAdd){var add=originalAdd.cloneNode(true);originalAdd.replaceWith(add);add.onclick=openLock}
+  var detail=document.createElement('div');detail.className='app-modal-overlay';detail.hidden=true;detail.innerHTML='<section class="app-modal-card" role="dialog" aria-modal="true"><div class="app-modal-head"><div><h2 class="app-modal-title">Supplier details</h2><p class="app-modal-copy">Details are read-only in the demo account.</p></div><button class="app-modal-close" type="button" data-supplier-close>&times;</button></div><div class="app-modal-body"><div class="demo-readonly-grid"><label class="full">Supplier name<input class="demo-readonly-field" data-supplier-name disabled></label><label>Email<input class="demo-readonly-field" data-supplier-email disabled></label><label>Phone<input class="demo-readonly-field" data-supplier-phone disabled></label><label>Ordering status<input class="demo-readonly-field" value="Active" disabled></label><label>Outlet<input class="demo-readonly-field" value="Nomni Kitchen — Tanjong Pagar" disabled></label></div></div><div class="app-modal-foot"><button class="btn btn-primary" type="button" disabled>Edit supplier</button><button class="btn btn-tertiary" type="button" data-supplier-close>Close</button></div></section>';document.body.appendChild(detail);function closeDetail(){detail.hidden=true}detail.querySelectorAll('[data-supplier-close]').forEach(function(b){b.onclick=closeDetail});
+  document.querySelectorAll('.supplier-demo-row').forEach(function(row){row.onclick=function(){var s=supplierRows[Number(row.dataset.supplierIndex)];detail.querySelector('[data-supplier-name]').value=s[0];detail.querySelector('[data-supplier-email]').value=s[2];detail.querySelector('[data-supplier-phone]').value=s[3];detail.hidden=false}});
+  var supplierMarkup=supplierView?supplierView.cloneNode(true):null;
+  function showPanel(name){if(!content)return;document.querySelectorAll('[data-standard-header] .tab').forEach(function(tab){tab.classList.toggle('active',tab.textContent.trim().toLowerCase()===name)});if(name==='suppliers'&&supplierMarkup){content.innerHTML='';content.appendChild(supplierMarkup.cloneNode(true));var addAgain=content.querySelector('[data-add-new]');if(addAgain)addAgain.onclick=openLock;content.querySelectorAll('.supplier-demo-row').forEach(function(row){row.onclick=function(){var s=supplierRows[Number(row.dataset.supplierIndex)];detail.querySelector('[data-supplier-name]').value=s[0];detail.querySelector('[data-supplier-email]').value=s[2];detail.querySelector('[data-supplier-phone]').value=s[3];detail.hidden=false}});return}
+    var html='';if(name==='details')html='<section class="demo-outlet-details"><div class="demo-outlet-section"><h2 class="demo-outlet-section-title">Basic information</h2><label class="demo-form-field">Company<input class="demo-readonly-field" value="Nomni Kitchen Pte Ltd" disabled></label><label class="demo-form-field">Outlet name<input class="demo-readonly-field" value="Nomni Kitchen — Tanjong Pagar" disabled><small>Use “Brand Name (Outlet Name)” format if there are multiple outlets under the same brand.</small></label><span class="demo-address-label">Address</span><div class="demo-address-grid"><input class="demo-readonly-field" aria-label="Country" value="Singapore" disabled><input class="demo-readonly-field" aria-label="Post code" value="088441" disabled><input class="demo-readonly-field wide" aria-label="Address Line 1" value="18 Tanjong Pagar Road" disabled><input class="demo-readonly-field wide" aria-label="Address Line 2" placeholder="Address Line 2" disabled></div><div class="demo-form-field"><span>Logo</span><div class="demo-file-control" aria-label="Logo file upload"><span></span><button class="demo-file-action" type="button" disabled>Browse</button></div><small>JPEG, PNG files only — max 5MB</small></div><label class="demo-form-field">Outlet email<input class="demo-readonly-field" value="hello@nomnikitchen.sg" disabled></label></div><div class="demo-outlet-section"><h2 class="demo-outlet-section-title">Nomni subscription</h2><div class="demo-subscription-card"><span>Premium</span><span>Manage subscription</span></div><p class="demo-subscription-copy"><strong>To view invoices for subscription payments,</strong> go to ‘Invoices’, then click ‘Filter’ &gt; ‘Supplier’ and select ‘Nomni Pte Ltd’</p></div><div class="demo-form-actions"><button class="demo-cancel-action" type="button">Cancel</button><button class="btn btn-primary" type="button" disabled>Save</button></div></section>';if(name==='users')html='<section class="demo-panel"><div class="demo-panel-card"><h2 class="demo-panel-title">Outlet users</h2><table class="demo-mini-table"><thead><tr><th>Name</th><th>Role</th><th>Email</th></tr></thead><tbody><tr><td>William Arya</td><td>Owner</td><td>william@nomnikitchen.sg</td></tr><tr><td>Michelle Tan</td><td>Admin</td><td>michelle@nomnikitchen.sg</td></tr><tr><td>Adeline Kusuma</td><td>Standard</td><td>adeline@nomnikitchen.sg</td></tr></tbody></table></div></section>';if(name==='settings')html='<section class="demo-panel"><div class="demo-panel-card"><h2 class="demo-panel-title">Outlet settings</h2><div class="demo-integration-row"><div><strong>Order approval</strong><div class="cell-sub">Require approval before orders are placed</div></div><button class="demo-switch" disabled></button></div><div class="demo-integration-row"><div><strong>Invoice approval</strong><div class="cell-sub">Require approval before invoices are exported</div></div><button class="demo-switch" disabled></button></div><div class="demo-integration-row"><div><strong>Price-change notifications</strong><div class="cell-sub">Notify outlet admins when supplier prices change</div></div><button class="demo-switch" disabled></button></div></div></section>';if(name==='integration')html='<section class="demo-panel"><div class="demo-panel-card"><h2 class="demo-panel-title">Integrations</h2><div class="demo-integration-row"><div><strong>Accounting software</strong><div class="cell-sub">Connect Xero, QuickBooks Online or MYOB</div></div><button class="btn btn-secondary" data-connect>Connect</button></div><div class="demo-integration-row"><div><strong>Point of sale</strong><div class="cell-sub">Connect sales data for inventory and COGS reporting</div></div><button class="btn btn-secondary" data-connect>Connect</button></div></div></section>';content.innerHTML=html;content.querySelectorAll('[data-connect]').forEach(function(b){b.onclick=openLock})}
+  document.querySelectorAll('[data-standard-header] .tab').forEach(function(tab){tab.addEventListener('click',function(e){e.preventDefault();showPanel(tab.textContent.trim().toLowerCase())})});
+  showPanel('details');
+  document.title='Nomni Procure — Demo Outlets';document.documentElement.classList.add('demo-ready');
 })();
-</script>
-<script>
-(function(){if(new URLSearchParams(location.search).get('demo')==='1')return;document.querySelectorAll('[data-user-name]').forEach(function(node){node.textContent='William Arya'});document.querySelectorAll('[data-avatar]').forEach(function(node){node.textContent='WA'});document.querySelectorAll('[data-venue-option]').forEach(function(node){node.textContent='Test Outlet ZM'})})();
 </script>
 </body>
 </html>

@@ -18,6 +18,21 @@ The demo should help users understand the value of Procure, complete a small num
 - Never contact real suppliers, invite real users, connect integrations, move money, or create lasting external records.
 - All demo-created data is temporary and is deleted when the demo period ends.
 
+## Locked-feature pattern
+
+Use the same treatment wherever a demo page contains locked or limited functionality.
+
+- Show a full-width light cream banner at the top of the content area, above the page title.
+- Do not include an icon in the banner.
+- Banner title: `Some features are unavailable in the demo account`
+- Banner copy: `You can view sample data, but changes are disabled.`
+- Keep the normal action label and icon, such as `+ Add user`; do not put a lock icon in the button.
+- Selecting a locked action opens a standard modal titled `Feature unavailable in demo`.
+- Briefly explain what becomes available in a free trial or live account.
+- Keep sample lists short.
+- Allow users to open record details.
+- Detail views are read-only: fields and mutation buttons are disabled, while navigation and Close remain available.
+
 ## Demo shell
 
 - Entry page: `Freemium/procure-demo-dashboard.html`
@@ -31,6 +46,13 @@ The demo should help users understand the value of Procure, complete a small num
   - `Book a live demo` opens the same two-step request dialog used by the freemium flow.
   - `Start my FREE trial` opens the freemium signup flow and preserves the captured email address.
 
+Hidden or removed:
+
+- Payments and News sidenav entries.
+- Outlet/HQ mode switcher.
+- `Aa` and `Box` handoff inspectors.
+- Earlier full-width mint demo banners.
+
 ## Current demo navigation
 
 The implemented demo navigation contains:
@@ -40,7 +62,9 @@ The implemented demo navigation contains:
 3. Invoices
 4. Items
 5. Inventory
-6. Users
+6. Recipes
+7. Outlets
+8. Users
 
 Payments and News are removed entirely.
 
@@ -78,9 +102,14 @@ Available:
 - See the newly created order at the top of the table.
 - Receive a top-right success toast confirming that nothing was sent.
 
-Demo-specific rules:
+Hidden or removed:
 
 - The Purchase requisitions tab is removed.
+- The Needs approval tab is removed.
+- The `Nothing will be sent` topbar label is removed from both order-creation branches.
+
+Demo-specific rules:
+
 - New recurring and weekly order actions are not part of the implemented demo journey.
 - Placing an order creates only temporary local demo data.
 - No order is transmitted to a supplier.
@@ -108,14 +137,22 @@ Uploads tab:
 - Shows three sample uploads in progress.
 - Includes realistic filenames, upload times, invoice numbers, invoice dates and suppliers.
 - Keeps the existing completeness and `View/edit` interaction.
-- Allows local JPG, PNG and PDF uploads.
-- A newly uploaded file remains inside the demo context.
+- Offers two downloadable, clearly fictional sample invoice PDFs.
+- Allows the user to load either sample or both samples together.
+- Carries the selected samples through the digitisation review form with matching supplier, invoice and line-item data.
+- Keeps newly digitised records inside the local demo context.
 
 Unavailable:
 
+- Uploading the user’s own invoice, including by file picker or drag and drop.
 - Payments and `Pay online`.
 - Sending data to accounting integrations.
 - Creating a lasting invoice record outside the demo.
+
+Hidden or removed:
+
+- Payments and `Pay online`.
+- Personal invoice file selection and drag-and-drop controls. Only the fictional sample-invoice controls are shown.
 
 ## Users
 
@@ -133,6 +170,42 @@ Unavailable:
 - Change access in a way that affects a real account.
 
 The Add user action is locked and should explain that user management becomes available in a trial or live account.
+
+Hidden or removed:
+
+- User-row avatars. The signed-in account avatar remains in the topbar.
+
+## Outlets
+
+Source: `../Procure - Outlets.html?demo=1`
+
+Available:
+
+- View the sample outlet’s Details, Users, Settings, Suppliers and Integration tabs.
+- Open the Details tab by default, using the saved production outlet-details layout.
+- Inspect a short list of five realistic suppliers.
+- Open read-only supplier details.
+- View the company, outlet name, structured Singapore address, logo, outlet email and current subscription plan.
+- View the users assigned to the outlet.
+- Review outlet settings and available integration categories.
+- Downloading or exporting sample-only information may be allowed where it has no external effect.
+
+Unavailable:
+
+- Add or connect a real supplier.
+- Edit supplier contact or ordering settings.
+- Archive or remove suppliers.
+- Change outlet details, users or settings.
+- Connect accounting or POS integrations.
+- Send supplier invitations, emails, orders or notifications.
+
+The page uses the shared cream locked-feature banner. `Add new` keeps its standard plus icon and opens the shared unavailable-in-demo modal. Integration `Connect` actions use the same modal.
+
+Hidden or removed:
+
+- Interactive `Manage subscription` behaviour. The label remains visible inside the production-style subscription card, but is not actionable.
+- Editable logo upload. The real file field and `Browse` control remain visible but disabled.
+- Active Save behaviour. The production-style Cancel and Save actions remain visible for layout fidelity, with Save disabled.
 
 ## Items
 
@@ -172,14 +245,48 @@ Available:
 
 - Browse inventory lists and tracked items.
 - Inspect stock on hand and inventory values.
+- Create temporary inventory lists.
+- Add items from the sample catalogue to any demo list.
+- Create a temporary SKU from Items and optionally assign it to a demo inventory list.
 - Start and complete a temporary sample stock count.
-- Save a demo stock count locally.
+- Save a demo stock count locally, update stock-on-hand values and add a new Activity record.
 
 Unavailable:
 
 - Import live stock data.
 - Transfer stock to a real outlet.
 - Update production inventory.
+
+## Recipes
+
+Status: implemented.
+
+Source: `../Procure - Recipes.html?demo=1`
+
+Available:
+
+- Browse the outlet-level recipe table used by `Procure - Recipes - Outlet.html`.
+- Search recipes and filter the list to favourites.
+- Review recipe type, recipe code, cost, retail price, food-cost percentage and last-modified date.
+- Open an existing recipe to inspect its yield, cost summary and ingredients.
+- Create a temporary recipe with type, tags, yield, retail price and sample ingredients.
+- Save the new recipe to the local demo account and see it appear in the table.
+
+Unavailable:
+
+- Edit or delete existing recipes.
+- Publish recipe changes to inventory or a live outlet.
+
+Existing sample recipe data remains read-only. Newly created recipes are temporary and remain within the local demo account.
+Delete, Duplicate, Save & create another and Save remain visible on the full detail page and open the standard unavailable-in-demo dialog.
+
+Recipe detail source: `../Procure - Recipes - Detail.html?demo=1`
+
+Hidden or removed:
+
+- Settings and Help actions.
+- On existing recipe details: Add ingredient and Copy data from.
+- Existing-recipe editing controls are hidden or rendered read-only; temporary recipe creation remains available.
 
 ## Data and safety rules
 
@@ -214,12 +321,32 @@ Unavailable:
 - Added Items and Inventory to the demo sidenav, expanding it to six sections.
 - Seeded eight purchased items, three inventory lists and seven tracked inventory items.
 - Isolated Inventory demo records in a separate local store so they do not affect freemium trial data.
-- Standardised all six demo page titles to Hanken Grotesk with consistent 32px top spacing.
+- Standardised all demo page titles to Hanken Grotesk with consistent 32px top spacing.
 - Removed the POS syncing status line from the demo Inventory page.
 - Added the Inventory Activity tab with date filtering, filter/export actions, and realistic stock-count, production, wastage and adjustment history.
 - Standardised the demo outlet name as `Nomni Kitchen — Tanjong Pagar`, including seeded Orders and order-creation screens.
 - Changed the DEMO pill from Nomni green to amber (`#F5B731`) across all demo pages and order flows.
 - Corrected the Inventory metric-icon paths after moving the richer layout into the root page.
+- Standardised the demo topbar identity as `William Arya` with the initials `WA` across every section.
+- Established the cream locked-feature banner, shared copy and unavailable-action modal pattern.
+- Shortened the Users demo list to five records and added clickable, read-only user details.
+- Added Outlets as the seventh demo section using the freemium outlet/supplier layout.
+- Added read-only outlet Details, Users, Settings, Suppliers and Integration tabs.
+- Seeded five sample suppliers and locked supplier creation, editing and integration connections.
+- Added Recipes as the eighth demo section with a read-only outlet summary and recipe details.
+- Replaced unrestricted demo invoice upload with two downloadable fictional sample PDFs.
+- Allowed either or both sample invoices to pass through the local digitisation review flow while blocking personal invoice uploads.
+- Made inventory-list creation, sample-catalogue additions and temporary SKU creation persist in the demo-only browser store.
+- Connected the full stock-count flow to the demo store, including updated quantities, an Activity entry and a success toast on return.
+- Centred the shared cream locked-feature banner copy.
+- Removed avatars from the Users table across all page modes while retaining the account avatar in the topbar.
+- Removed the redundant `Nothing will be sent` label from the order-creation topbar; safety confirmation remains at order completion.
+- Standardised the outlet selector and supplier-order summary across both order branches as `Nomni Kitchen — Tanjong Pagar`.
+- Replaced the Recipes outlet-summary screen with the detailed outlet recipe-table layout.
+- Simplified the demo Inventory page title to `Inventory`.
+- Removed Settings and Help from Recipes, added read-only recipe details and enabled temporary recipe creation.
+- Replaced the interim recipe-details popup with demo mode on the existing full recipe-detail prototype.
+- Added hidden-or-removed control notes under each relevant demo section so simplification decisions remain auditable in context.
 
 ## Maintenance
 
@@ -233,4 +360,5 @@ Update this file whenever any of the following changes:
 - Demo duration or expiry treatment.
 - Source prototype pages.
 - New demo flows, dialogs, tables, charts or screenshots.
+- Buttons, tabs, navigation items or other controls that are hidden, removed or restored.
 - A planned item moves into implementation or completion.
