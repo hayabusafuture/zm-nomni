@@ -2826,13 +2826,13 @@
       if (orderByItemDone && !orderBySupplierDone) {
         return {
           label: 'Try ordering by supplier',
-          href: preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'orderSupplier' })
+          href: preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'orderSupplier', retryPath: 'orderSupplier' })
         };
       }
       if (orderBySupplierDone && !orderByItemDone) {
         return {
           label: 'Try ordering by item',
-          href: preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order' })
+          href: preserveParams('Procure%20Trial%20Dashboard.html', { setup: '1', tour: 'order', retryPath: 'orderItem' })
         };
       }
       return null;
@@ -3313,7 +3313,11 @@
           : 'Suppliers are managed by outlet. Start from Outlets so we can add this supplier to the right venue.';
       }
       if (itemsNavLink) itemsNavLink.href = dashboardTourMode === 'market' ? marketSetupUrl() : preserveParams('procure-trial-items.html');
-      if (ordersNavLink) ordersNavLink.href = dashboardTourMode === 'order' ? orderSetupUrl() : dashboardTourMode === 'orderSupplier' ? preserveParams('procure-trial-orders.html', { tour: 'orderSupplier' }) : preserveParams('procure-trial-orders.html');
+      if (ordersNavLink) ordersNavLink.href = dashboardTourMode === 'order'
+        ? preserveParams('procure-trial-orders.html', { tour: 'order', retryPath: params.get('retryPath') || '' })
+        : dashboardTourMode === 'orderSupplier'
+          ? preserveParams('procure-trial-orders.html', { tour: 'orderSupplier', retryPath: params.get('retryPath') || '' })
+          : preserveParams('procure-trial-orders.html');
       if (inventoryNavLink) inventoryNavLink.href = dashboardTourMode === 'inventory' ? inventorySetupUrl() : dashboardTourMode === 'stockCount' ? stockCountSetupUrl() : preserveParams('procure-trial-inventory.html');
       if (invoicesNavLink) invoicesNavLink.href = dashboardTourMode === 'invoiceUpload' ? preserveParams('procure-trial-invoices.html', { tour:'upload' }) : dashboardTourMode === 'invoiceDigitise' ? preserveParams('procure-trial-invoices.html', { tour:'digitise' }) : preserveParams('procure-trial-invoices.html');
       if (outletsNavLink) outletsNavLink.href = supplierSetupUrl('2');

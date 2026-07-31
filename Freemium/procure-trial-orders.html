@@ -1587,6 +1587,7 @@
     var orderPlaced = params.get('orderPlaced') === '1';
     var orderByItemDone = params.get('orderByItemDone') === '1';
     var orderBySupplierDone = params.get('orderBySupplierDone') === '1';
+    var retryPath = params.get('retryPath') || '';
     var inventorySetup = params.get('inventorySetup') === '1';
     var stockCountDone = params.get('stockCountDone') === '1';
     var newOrderMain = document.querySelector('[data-new-order-main]');
@@ -1826,11 +1827,11 @@
         var alternateOrderUrl = '';
         if (orderByItemDone && !orderBySupplierDone) {
           alternateOrderText = 'You can also try ordering by supplier.';
-          alternateOrderUrl = withParams('procure-trial-orders.html', { tour: 'orderSupplier' });
+          alternateOrderUrl = withParams('procure-trial-orders.html', { tour: 'orderSupplier', retryPath: 'orderSupplier' });
         }
         if (orderBySupplierDone && !orderByItemDone) {
           alternateOrderText = 'You can also try ordering by item.';
-          alternateOrderUrl = withParams('procure-trial-orders.html', { tour: 'order' });
+          alternateOrderUrl = withParams('procure-trial-orders.html', { tour: 'order', retryPath: 'orderItem' });
         }
         if (tourKicker) tourKicker.textContent = 'Setup updated';
         if (tourTitle) tourTitle.textContent = 'First order placed';
@@ -1974,7 +1975,7 @@
     });
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
-    if (params.get('tour') === 'order' && marketListBuilt && !orderPlaced) openTour();
+    if (params.get('tour') === 'order' && marketListBuilt && (!orderPlaced || retryPath === 'orderItem')) openTour();
     if (params.get('tour') === 'orderSupplier' && marketListBuilt) openTour('orderSupplier');
     if (params.get('orderHandoff') === '1' && orderPlaced) openTour('handoff');
   })();
