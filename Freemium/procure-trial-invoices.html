@@ -1586,8 +1586,8 @@
               <section class="ocr-suggestions" data-ocr-suggestions>
                 <button class="ocr-suggestions-head" type="button" data-suggestions-toggle aria-expanded="true">
                   <img class="ocr-suggestions-ai-icon" src="assets/sparkelai22.svg" alt="" aria-hidden="true" />
-                  <strong>3 items need your attention</strong>
-                  <small>Review and add them to this invoice</small>
+                  <strong data-suggestions-count>3 items need your attention</strong>
+                  <small data-suggestions-copy>Review and add them to this invoice</small>
                   <span class="material-symbols-outlined suggestions-caret" aria-hidden="true">expand_less</span>
                 </button>
                 <div class="ocr-suggestions-body">
@@ -2468,12 +2468,15 @@
       document.querySelector('#digitise-number').value = activeUpload.invoiceNumber || 'INV-2026-0720';
       document.querySelector('#digitise-date').value = activeUpload.invoiceDate || '20/07/2026';
     }
+    document.querySelector('[data-ocr-suggestions]').hidden = false;
     document.querySelectorAll('[data-ocr-suggestion]').forEach(function(suggestion){
       suggestion.classList.remove('done');
+      suggestion.hidden = false;
       suggestion.disabled = false;
       var action = suggestion.querySelector('.ocr-suggestion-action');
       action.textContent = 'Add to invoice';
     });
+    updateSuggestionList();
     document.querySelector('[data-digitise-error]').hidden = true;
   }
   function showInvoiceList() {
@@ -2604,10 +2607,17 @@
     }, true);
   });
 
-  function markSuggestionDone(suggestion, label) {
-    suggestion.classList.add('done');
-    suggestion.disabled = true;
-    suggestion.querySelector('.ocr-suggestion-action').textContent = label || 'Added';
+  function updateSuggestionList() {
+    var section = document.querySelector('[data-ocr-suggestions]');
+    var remaining = Array.from(section.querySelectorAll('[data-ocr-suggestion]')).filter(function(suggestion){ return !suggestion.hidden; });
+    section.hidden = remaining.length === 0;
+    if (!remaining.length) return;
+    document.querySelector('[data-suggestions-count]').textContent = remaining.length + ' item' + (remaining.length === 1 ? '' : 's') + ' need' + (remaining.length === 1 ? 's' : '') + ' your attention';
+    document.querySelector('[data-suggestions-copy]').textContent = remaining.length === 1 ? 'Review and add it to this invoice' : 'Review and add them to this invoice';
+  }
+  function markSuggestionDone(suggestion) {
+    suggestion.hidden = true;
+    updateSuggestionList();
   }
   function showInvoiceToast(title, copy) {
     var toast = document.querySelector('[data-invoice-toast]');
