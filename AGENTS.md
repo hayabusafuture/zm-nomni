@@ -583,6 +583,12 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Welcome to Nomni: SendGrid - Welcome - Freemium.html
+- Continue setting up Nomni Procure: SendGrid - Trial - Setup Reminder.html
+- A personal welcome to Nomni Procure: SendGrid - Trial - Personal Welcome - Paran.html
+- I’ve extended your Nomni Procure trial: SendGrid - Trial - Extended - Personal.html
+- Your Nomni Procure trial ends in 3 days: SendGrid - Trial - Ending Soon.html
+- Your Nomni Procure trial has ended: SendGrid - Trial - Ended.html
 - Nomni Procure — Outlet Suppliers: Procure - Outlets.html
 - Nomni Procure — Order by Supplier: Freemium/procure-trial-new-order-supplier.html
 - Nomni Procure — New Stock Count: Freemium/procure-trial-stock-count.html
