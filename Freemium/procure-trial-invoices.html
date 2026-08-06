@@ -932,9 +932,18 @@
   .detail-field label { font-weight: 700; }
   .detail-field input, .detail-field select { height: 40px; min-width: 0; padding: 0 12px; border: 1px solid #D8DAE0; border-radius: 6px; background: #fff; color: var(--ink); font: inherit; }
   .detail-field input:focus, .detail-field select:focus { border-color: var(--nomni-green); outline: 0; box-shadow: 0 0 0 3px rgba(42,200,100,.12); }
+  .detail-field[hidden] { display: none; }
+  .detail-field.custom-due-date { grid-column: 2; }
+  .detail-field input[type="date"] { color-scheme: light; }
   .detail-field .readonly-value { font-weight: 600; }
   .required-mark { color: #D0291E; }
-  .line-items { padding: 28px 30px 96px; }
+  .line-items { position: relative; padding: 28px 30px 96px; min-height: 260px; }
+  .line-items-blocker { display: none; position: absolute; inset: 72px 30px 34px; z-index: 3; align-items: flex-start; justify-content: center; padding-top: 34px; text-align: center; color: var(--ink); }
+  .line-items-blocker strong { display: block; font-size: 16px; font-style: italic; }
+  .line-items-blocker span { display: block; margin-top: 4px; color: var(--ink-mute); }
+  [data-digitise-form].is-supplier-unresolved .line-items > :not(.line-items-blocker) { opacity: .12; pointer-events: none; user-select: none; }
+  [data-digitise-form].is-supplier-unresolved .line-items-blocker { display: flex; }
+  [data-digitise-form].is-supplier-unresolved .publish-row { opacity: .42; pointer-events: none; }
   .line-items-header, .line-item-row { display: grid; grid-template-columns: 80px minmax(250px, 4fr) 70px 90px 90px 70px 65px 105px; gap: 8px; align-items: center; }
   .line-items-header { padding: 0 0 10px; border-bottom: 1px solid var(--rule); color: var(--ink); font-size: 12px; font-weight: 700; }
   .line-item-row { padding: 10px 0; border-bottom: 1px solid var(--rule); }
@@ -1035,6 +1044,12 @@
   .tour-kicker { margin:0 0 6px; color:var(--spinach); font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
   .tour-title { margin:0 28px 6px 0; color:var(--ink); font-size:21px; font-weight:700; letter-spacing:-.02em; }
   .tour-copy { margin:0; color:#59606B; font-size:14px; line-height:1.5; }
+  .tour-supplier-guidance { margin-top:14px; color:#59606B; font-size:14px; line-height:1.45; }
+  .tour-supplier-guidance strong, .tour-supplier-guidance span { display:inline; }
+  .tour-supplier-guidance strong { margin-right:4px; color:var(--ink); }
+  .tour-supplier-guidance[hidden] { display:none; }
+  .tour-inline-link { color:var(--spinach); font-weight:700; text-decoration:none; }
+  .tour-inline-link:hover { color:var(--seaweed); text-decoration:underline; }
   .tour-dismiss { position:absolute; top:10px; right:10px; width:30px; height:30px; border:0; border-radius:50%; background:transparent; color:var(--ink-mute); font-size:22px; cursor:pointer; }
   .tour-nav { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:14px; }
   .tour-step-btn { min-width:72px; min-height:34px; padding:0 12px; border:1px solid transparent; border-radius:6px; background:var(--nomni-green); color:var(--seaweed); font:inherit; font-weight:600; cursor:pointer; }
@@ -1561,20 +1576,22 @@
     <section class="invoice-editor" data-invoice-editor hidden>
       <div class="digitise-ribbon">
         <div class="digitise-file"><span data-editor-file-name>invoice.pdf</span><small>Uploaded today by <span data-editor-uploader>Trial user</span></small></div>
-        <div class="digitise-actions"><button class="digitise-action" type="button" data-discard-invoice><span class="material-symbols-outlined">undo</span>Discard processing</button><button class="digitise-action" type="button" data-editor-back><span class="material-symbols-outlined">close</span>Cancel</button><button class="digitise-action" type="button" data-save-draft><span class="material-symbols-outlined">save</span>Save</button></div>
+        <div class="digitise-actions"><button class="digitise-action" type="button" data-reprocess-invoice><span class="material-symbols-outlined">refresh</span>Refresh pre-filled data</button><button class="digitise-action" type="button" data-discard-invoice><span class="material-symbols-outlined">undo</span>Discard processing</button><button class="digitise-action" type="button" data-editor-back><span class="material-symbols-outlined">close</span>Cancel</button><button class="digitise-action" type="button" data-save-draft><span class="material-symbols-outlined">save</span>Save</button></div>
       </div>
       <div class="digitise-layout">
         <div class="digitise-workspace">
           <form data-digitise-form novalidate>
             <div class="invoice-details">
-              <div class="detail-field"><label for="digitise-supplier">Supplier <span class="required-mark">*</span></label><select id="digitise-supplier" name="supplier" required><option value="">Select supplier</option><option selected>Fresh Fields Produce</option><option>Harbour Seafood Co.</option><option>Test Supplier</option></select></div>
+              <div class="detail-field" data-supplier-field><label for="digitise-supplier">Supplier <span class="required-mark">*</span></label><select id="digitise-supplier" name="supplier" required><option value="">Select supplier</option><option selected>Fresh Fields Produce</option><option>Harbour Seafood Co.</option><option>Test Supplier</option></select></div>
               <div class="detail-field"><label>Delivered to</label><span class="readonly-value" data-invoice-outlet>Trial Outlet</span></div>
               <div class="detail-field"><label for="digitise-number">Invoice number <span class="required-mark">*</span></label><input id="digitise-number" name="invoiceNumber" value="INV-2026-0720" required /></div>
               <div class="detail-field"><label for="digitise-order">Order number</label><select id="digitise-order"><option value="">Order number</option><option>PO-1048 · S$286.40</option></select></div>
               <div class="detail-field"><label for="digitise-date">Invoice date <span class="required-mark">*</span></label><input id="digitise-date" name="invoiceDate" value="20/07/2026" required /></div>
-              <div class="detail-field"><label for="digitise-terms">Payment terms <span class="required-mark">*</span></label><select id="digitise-terms" name="paymentTerms" required><option value="">Select payment terms</option><option>Bank transfer</option><option>By month end</option><option>Cash &amp; carry</option><option>Cheque</option><option selected>COD</option><option>NET 7</option><option>NET 14</option><option>NET 30</option><option>NET 60</option><option>Not specified</option></select></div>
+              <div class="detail-field"><label for="digitise-terms">Payment terms <span class="required-mark">*</span></label><select id="digitise-terms" name="paymentTerms" required aria-controls="digitise-due-date-field" aria-expanded="false"><option value="">Select payment terms</option><option>Bank transfer</option><option>By month end</option><option>Cash &amp; carry</option><option>Cheque</option><option selected>COD</option><option>NET 7</option><option>NET 14</option><option>NET 30</option><option>NET 60</option><option>Not specified</option><option value="custom">Custom…</option></select></div>
+              <div class="detail-field custom-due-date" id="digitise-due-date-field" data-due-date-field hidden><label for="digitise-due-date">Due date <span class="required-mark">*</span></label><input id="digitise-due-date" name="dueDate" type="date" /></div>
             </div>
             <div class="line-items">
+              <div class="line-items-blocker" aria-live="polite"><div><strong>Please enter the supplier, invoice number, invoice date and payment terms</strong><span>More options will appear once these details are complete.</span></div></div>
               <div class="line-items-header"><span aria-hidden="true"></span><span>Description</span><span>Qty</span><span>Unit size</span><span>Unit price</span><span>Disc</span><span>GST %</span><span style="text-align:right">Amount (S$)</span></div>
               <div data-line-items></div>
               <div class="line-controls">
@@ -1634,7 +1651,7 @@
   <span class="toast-check" aria-hidden="true">✓</span>
   <span><span class="toast-title" data-invoice-toast-title>Invoice digitised</span><br><span class="toast-copy" data-invoice-toast-copy>Successfully saved to your records</span></span>
 </div>
-<div class="tour-overlay" data-invoice-tour hidden><div class="tour-highlight" data-invoice-tour-highlight></div><section class="tour-card" data-invoice-tour-card aria-live="polite"><p class="tour-kicker" data-invoice-tour-kicker>Step 1</p><h2 class="tour-title" data-invoice-tour-title>Upload an invoice</h2><p class="tour-copy" data-invoice-tour-copy></p><button class="tour-dismiss" data-invoice-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button><div class="tour-nav"><button class="tour-step-btn" data-invoice-tour-prev type="button">Prev</button><button class="tour-step-btn primary" data-invoice-tour-next type="button">Next</button></div></section></div>
+<div class="tour-overlay" data-invoice-tour hidden><div class="tour-highlight" data-invoice-tour-highlight></div><section class="tour-card" data-invoice-tour-card aria-live="polite"><p class="tour-kicker" data-invoice-tour-kicker>Step 1</p><h2 class="tour-title" data-invoice-tour-title>Upload an invoice</h2><p class="tour-copy" data-invoice-tour-copy></p><div class="tour-supplier-guidance" data-invoice-tour-supplier-guidance hidden><strong>Supplier not listed?</strong><span>Click <a class="tour-inline-link" data-invoice-tour-link href="#" target="_blank" rel="noopener">here</a> to add it, then return and select ‘Refresh pre-filled data’ above.</span></div><button class="tour-dismiss" data-invoice-tour-dismiss type="button" aria-label="Dismiss tour">&times;</button><div class="tour-nav"><button class="tour-step-btn" data-invoice-tour-prev type="button">Prev</button><button class="tour-step-btn primary" data-invoice-tour-next type="button">Next</button></div></section></div>
 
 <div class="app-modal-overlay" data-demo-request-modal hidden>
   <section class="app-modal-card demo-request-card" role="dialog" aria-modal="true" aria-labelledby="demo-request-title">
@@ -2174,6 +2191,13 @@
 <script>
 (function(){
   var params = new URLSearchParams(window.location.search);
+  function invoiceFlowUrl(file, extras) {
+    var nextParams = new URLSearchParams(params);
+    nextParams.delete('tour');
+    nextParams.delete('supplierResolved');
+    Object.keys(extras || {}).forEach(function(key){ nextParams.set(key, extras[key]); });
+    return file + '?' + nextParams.toString();
+  }
   var venueName = params.get('venueName') || (params.get('demo') === '1' ? 'Nomni Kitchen — Tanjong Pagar' : 'Trial Outlet');
   var tabs = document.querySelectorAll('[data-invoice-tab]');
   var views = document.querySelectorAll('[data-invoice-view]');
@@ -2201,6 +2225,8 @@
   var invoiceTourKicker = document.querySelector('[data-invoice-tour-kicker]');
   var invoiceTourTitle = document.querySelector('[data-invoice-tour-title]');
   var invoiceTourCopy = document.querySelector('[data-invoice-tour-copy]');
+  var invoiceTourLink = document.querySelector('[data-invoice-tour-link]');
+  var invoiceTourSupplierGuidance = document.querySelector('[data-invoice-tour-supplier-guidance]');
   var invoiceTourPrev = document.querySelector('[data-invoice-tour-prev]');
   var invoiceTourNext = document.querySelector('[data-invoice-tour-next]');
   var invoiceTourActive = false;
@@ -2211,15 +2237,28 @@
     uploadChoose: { target:'[data-dropzone]', kicker:'Step 2', title:'Choose your files', copy:'Add JPG, PNG or PDF invoices here. You can upload more than one at a time.', placement:'left', compact:true, action:true },
     uploadComplete: { target:function(){ return document.querySelector('[data-upload-rows] tr'); }, kicker:'Step 3', title:'Review your uploads', copy:'Your uploaded invoices appear here. Review the list, then continue when you are ready to digitise an invoice.', placement:'above', nextLabel:'Digitise invoices' },
     digitiseOpen: { target:function(){ return document.querySelector('[data-upload-rows] .view-edit'); }, kicker:'Step 1', title:'Open an uploaded invoice', copy:'Choose View/edit to check the extracted details and turn this upload into an invoice record.', placement:'left', action:true },
-    digitiseDetails: { target:'.invoice-details', kicker:'Step 2', title:'Check the invoice details', copy:'Some details may be missing or incorrect. Confirm the supplier, invoice number, date, outlet and payment terms before continuing.', placement:'below' },
+    digitiseDetails: { target:'.invoice-details', kicker:'Step 2', title:'Check the invoice details', copy:'Confirm or enter the supplier, invoice number, invoice date and payment terms to continue.', placement:'below', addSupplierLink:true },
+    digitiseDetailsFallback: { target:'.invoice-details', kicker:'Step 2', title:'Check the invoice details', copy:'Confirm or enter the supplier, invoice number, invoice date and payment terms to continue.', placement:'below', action:true, addSupplierLink:true },
     digitiseLines: { target:'.line-items', kicker:'Step 3', title:'Review the matched line items', copy:'These are the items we could match to your market list. Check every row against the uploaded invoice.', placement:'below' },
     digitiseCreate: { target:'.line-controls', kicker:'Step 4', title:'Create missing items when needed', copy:'Use Add SKU for another row, or Add new to create a missing item without leaving the invoice.', placement:'above' },
     digitisePublish: { target:'.publish-row', kicker:'Step 5', title:'Publish the completed invoice', copy:'Once all required details and every visible line item are complete, publish the invoice to add it to your records.', placement:'above', action:true },
     digitiseComplete: { target:function(){ return document.querySelector('[data-invoice-rows] tr'); }, kicker:'Step 6', title:'Invoice digitised', copy:'The published invoice now appears in your Invoices list, and your setup progress is complete.', placement:'above', final:true },
+    digitiseUnmatched: { target:'[data-ocr-suggestions]', kicker:'Step 3', title:'Review items that need attention', copy:'No line items could be matched. Check each suggestion against the invoice and add the items that belong to it.', placement:'above' },
+    digitiseFallbackCreate: { target:'.line-controls', kicker:'Step 4', title:'Add anything else from the invoice', copy:'If an item was not detected, use Add SKU or Add new to enter it without leaving the invoice.', placement:'above' },
+    digitiseFallbackPublish: { target:'.publish-row', kicker:'Step 5', title:'Publish the completed invoice', copy:'Once all required details and every invoice item are complete, publish the invoice to add it to your records.', placement:'above', action:true },
+    digitiseFallbackComplete: { target:function(){ return document.querySelector('[data-invoice-rows] tr'); }, kicker:'Step 6', title:'Invoice digitised', copy:'The published invoice now appears in your Invoices list, and your setup progress is complete.', placement:'above', final:true },
     handoff: { target:'[data-sidebar-setup-card]', kicker:'Setup updated', title:'Invoice digitised', copy:'Your setup is complete. Open the setup panel to explore other things you can try.', placement:'right', final:true }
   };
   var digitiseTourOrder = ['digitiseDetails','digitiseLines','digitiseCreate','digitisePublish','digitiseComplete'];
+  var digitiseFallbackTourOrder = ['digitiseDetailsFallback','digitiseUnmatched','digitiseFallbackCreate','digitiseFallbackPublish','digitiseFallbackComplete'];
+  var ocrFallbackVariation = params.get('ocrFallback') === '1';
+  var supplierResolvedVariation = params.get('supplierResolved') === '1';
   var invoiceGoalJustCompleted = false;
+
+  function getDigitiseTourOrder() {
+    if (!ocrFallbackVariation) return digitiseTourOrder;
+    return supplierResolvedVariation ? digitiseFallbackTourOrder.slice(1) : digitiseFallbackTourOrder;
+  }
 
   document.querySelectorAll('[data-invoice-outlet]').forEach(function(node){
     if (node.tagName === 'INPUT') node.value = venueName;
@@ -2257,7 +2296,10 @@
   function renderInvoiceTourStep(scroll) {
     var step = invoiceTourSteps[invoiceTourStep]; if (!step) return;
     invoiceTourKicker.textContent = step.kicker; invoiceTourTitle.textContent=step.title; invoiceTourCopy.textContent=step.copy;
-    invoiceTourPrev.hidden = invoiceTourMode === 'upload' || invoiceTourStep === 'digitiseOpen' || invoiceTourStep === 'digitiseDetails' || invoiceTourStep === 'digitiseComplete' || invoiceTourStep === 'handoff';
+    invoiceTourSupplierGuidance.hidden = !step.addSupplierLink;
+    if (step.addSupplierLink) invoiceTourLink.href = invoiceFlowUrl('procure-trial-add-supplier-search.html', {});
+    var currentDigitiseOrder = getDigitiseTourOrder();
+    invoiceTourPrev.hidden = invoiceTourMode === 'upload' || invoiceTourStep === 'digitiseOpen' || currentDigitiseOrder.indexOf(invoiceTourStep) === 0 || invoiceTourStep === 'digitiseDetails' || invoiceTourStep === 'digitiseComplete' || invoiceTourStep === 'digitiseFallbackComplete' || invoiceTourStep === 'handoff';
     invoiceTourNext.hidden = Boolean(step.action); invoiceTourNext.textContent = step.nextLabel || (step.final ? 'Done' : 'Next');
     var target=resolveInvoiceTourTarget(step); if (scroll && target) target.scrollIntoView({behavior:'smooth',block:'center'});
     invoiceTour.hidden=false; setTimeout(placeInvoiceTour,scroll?260:50);
@@ -2282,12 +2324,12 @@
       renderInvoiceTourStep(true); return;
     }
     if (step.final) {
-      if (invoiceTourStep === 'digitiseComplete' && invoiceGoalJustCompleted) { invoiceGoalJustCompleted=false; showInvoiceSetupHandoff(); return; }
+      if ((invoiceTourStep === 'digitiseComplete' || invoiceTourStep === 'digitiseFallbackComplete') && invoiceGoalJustCompleted) { invoiceGoalJustCompleted=false; showInvoiceSetupHandoff(); return; }
       closeInvoiceTour(); return;
     }
-    var index=digitiseTourOrder.indexOf(invoiceTourStep); if (index>=0 && index<digitiseTourOrder.length-1) advanceInvoiceTour(digitiseTourOrder[index+1],true);
+    var order=getDigitiseTourOrder(); var index=order.indexOf(invoiceTourStep); if (index>=0 && index<order.length-1) advanceInvoiceTour(order[index+1],true);
   });
-  invoiceTourPrev.addEventListener('click',function(){ var index=digitiseTourOrder.indexOf(invoiceTourStep); if(index>0) advanceInvoiceTour(digitiseTourOrder[index-1],true); });
+  invoiceTourPrev.addEventListener('click',function(){ var order=getDigitiseTourOrder(); var index=order.indexOf(invoiceTourStep); if(index>0) advanceInvoiceTour(order[index-1],true); });
   window.addEventListener('resize',placeInvoiceTour); document.querySelector('.digitise-workspace').addEventListener('scroll',placeInvoiceTour);
   tabs.forEach(function(tab){
     tab.addEventListener('click', function(){ setTab(tab.getAttribute('data-invoice-tab')); });
@@ -2449,7 +2491,9 @@
   }
   function resetDigitiseForm() {
     lineItems.innerHTML = '';
-    if (activeUpload && activeUpload.sampleKey === 'harbour') {
+    if (ocrFallbackVariation) {
+      addLineItem({description:'', qty:1, uom:'unit', price:0, gst:9});
+    } else if (activeUpload && activeUpload.sampleKey === 'harbour') {
       addLineItem({description:'Tiger prawns 21/25', qty:9.2, uom:'kg', price:22.40, gst:9});
       addLineItem({description:'Barramundi fillet', qty:14, uom:'kg', price:18.60, gst:9});
       addLineItem({description:'Blue swimmer crab meat', qty:6, uom:'kg', price:31.80, gst:9});
@@ -2464,10 +2508,23 @@
       addLineItem({description:'Cooking cream 1 litre', qty:3, uom:'ctn', price:6.75, gst:9});
     }
     if (activeUpload) {
-      document.querySelector('#digitise-supplier').value = activeUpload.supplier || 'Fresh Fields Produce';
-      document.querySelector('#digitise-number').value = activeUpload.invoiceNumber || 'INV-2026-0720';
-      document.querySelector('#digitise-date').value = activeUpload.invoiceDate || '20/07/2026';
+      var supplier = document.querySelector('#digitise-supplier');
+      var resolvedSupplierName = params.get('supplierName') || 'Supplier XYZ';
+      if (supplierResolvedVariation && !Array.from(supplier.options).some(function(item){ return item.value === resolvedSupplierName; })) {
+        var resolvedOption = document.createElement('option');
+        resolvedOption.value = resolvedSupplierName;
+        resolvedOption.textContent = resolvedSupplierName;
+        supplier.appendChild(resolvedOption);
+      }
+      supplier.value = ocrFallbackVariation ? (supplierResolvedVariation ? resolvedSupplierName : '') : (activeUpload.supplier || 'Fresh Fields Produce');
+      document.querySelector('#digitise-number').value = ocrFallbackVariation && !supplierResolvedVariation ? '' : (activeUpload.invoiceNumber || 'INV-2026-0720');
+      document.querySelector('#digitise-date').value = ocrFallbackVariation && !supplierResolvedVariation ? '' : (activeUpload.invoiceDate || '20/07/2026');
     }
+    document.querySelector('#digitise-terms').value = ocrFallbackVariation ? '' : 'COD';
+    updateSupplierDependentFields();
+    document.querySelector('#digitise-due-date').value = '';
+    updateCustomDueDate();
+    document.querySelector('[data-preview-placeholder] strong').textContent = ocrFallbackVariation ? 'Supplier XYZ' : 'Fresh Fields Produce';
     document.querySelector('[data-ocr-suggestions]').hidden = false;
     document.querySelectorAll('[data-ocr-suggestion]').forEach(function(suggestion){
       suggestion.classList.remove('done');
@@ -2478,6 +2535,22 @@
     });
     updateSuggestionList();
     document.querySelector('[data-digitise-error]').hidden = true;
+  }
+  function updateSupplierDependentFields() {
+    var supplierUnresolved = ocrFallbackVariation && (!document.querySelector('#digitise-supplier').value || !document.querySelector('#digitise-number').value.trim() || !document.querySelector('#digitise-date').value.trim() || !document.querySelector('#digitise-terms').value);
+    document.querySelector('[data-digitise-form]').classList.toggle('is-supplier-unresolved', supplierUnresolved);
+    document.querySelector('.invoice-details').classList.toggle('is-supplier-unresolved', supplierUnresolved);
+    return supplierUnresolved;
+  }
+  function updateCustomDueDate() {
+    var terms = document.querySelector('#digitise-terms');
+    var field = document.querySelector('[data-due-date-field]');
+    var dueDate = document.querySelector('#digitise-due-date');
+    var isCustom = terms.value === 'custom';
+    field.hidden = !isCustom;
+    dueDate.required = isCustom;
+    terms.setAttribute('aria-expanded', String(isCustom));
+    if (!isCustom) dueDate.value = '';
   }
   function showInvoiceList() {
     editor.hidden = true; pageHeader.hidden = false; pageContent.hidden = false; document.body.classList.remove('digitise-active'); setTab('uploads');
@@ -2504,9 +2577,41 @@
     if (activeUpload.previewUrl) { preview.src = activeUpload.previewUrl; preview.hidden = false; placeholder.hidden = true; }
     else { preview.hidden = true; placeholder.hidden = false; }
     resetDigitiseForm(); pageHeader.hidden = true; pageContent.hidden = true; editor.hidden = false; document.body.classList.add('digitise-active'); window.scrollTo(0,0);
-    if (invoiceTourActive && invoiceTourMode === 'digitise') advanceInvoiceTour('digitiseDetails',false);
+    if (invoiceTourActive && invoiceTourMode === 'digitise') {
+      advanceInvoiceTour(ocrFallbackVariation ? (supplierResolvedVariation ? 'digitiseUnmatched' : 'digitiseDetailsFallback') : 'digitiseDetails', false);
+    }
   });
   document.querySelectorAll('[data-editor-back]').forEach(function(button){ button.addEventListener('click', showInvoiceList); });
+  document.querySelector('#digitise-terms').addEventListener('change', function(){
+    updateCustomDueDate();
+    if (this.value === 'custom') document.querySelector('#digitise-due-date').focus();
+    var detailsIncomplete = updateSupplierDependentFields();
+    if (invoiceTourActive && invoiceTourStep === 'digitiseDetailsFallback') {
+      invoiceTourNext.hidden = detailsIncomplete;
+      setTimeout(placeInvoiceTour, 0);
+    }
+  });
+  document.querySelector('#digitise-supplier').addEventListener('change', function(){
+    var detailsIncomplete = updateSupplierDependentFields();
+    if (invoiceTourActive && invoiceTourStep === 'digitiseDetailsFallback') {
+      invoiceTourNext.hidden = detailsIncomplete;
+      setTimeout(placeInvoiceTour, 0);
+    }
+  });
+  document.querySelector('#digitise-number').addEventListener('input', function(){
+    var detailsIncomplete = updateSupplierDependentFields();
+    if (invoiceTourActive && invoiceTourStep === 'digitiseDetailsFallback') {
+      invoiceTourNext.hidden = detailsIncomplete;
+      setTimeout(placeInvoiceTour, 0);
+    }
+  });
+  document.querySelector('#digitise-date').addEventListener('input', function(){
+    var detailsIncomplete = updateSupplierDependentFields();
+    if (invoiceTourActive && invoiceTourStep === 'digitiseDetailsFallback') {
+      invoiceTourNext.hidden = detailsIncomplete;
+      setTimeout(placeInvoiceTour, 0);
+    }
+  });
   document.querySelector('[data-add-line]').addEventListener('click', function(){ addLineItem(); });
   lineItems.addEventListener('input', calculateTotals);
   lineItems.addEventListener('change', calculateTotals);
@@ -2726,6 +2831,26 @@
     showInvoiceToast('Added to invoice', uomTargetSuggestion.dataset.name + ' was added to this invoice.');
     closeUomModal();
   });
+  document.querySelector('[data-reprocess-invoice]').addEventListener('click', function(){
+    if (ocrFallbackVariation) {
+      supplierResolvedVariation = true;
+      var supplier = document.querySelector('#digitise-supplier');
+      var resolvedSupplierName = params.get('supplierName') || 'Supplier XYZ';
+      if (!Array.from(supplier.options).some(function(option){ return option.value === resolvedSupplierName; })) {
+        var resolvedOption = document.createElement('option');
+        resolvedOption.value = resolvedSupplierName;
+        resolvedOption.textContent = resolvedSupplierName;
+        supplier.appendChild(resolvedOption);
+      }
+      supplier.value = resolvedSupplierName;
+      document.querySelector('#digitise-number').value = activeUpload && activeUpload.invoiceNumber ? activeUpload.invoiceNumber : 'INV-2026-0720';
+      document.querySelector('#digitise-date').value = activeUpload && activeUpload.invoiceDate ? activeUpload.invoiceDate : '20/07/2026';
+      document.querySelector('#digitise-terms').value = 'NET 14';
+      updateSupplierDependentFields();
+      if (invoiceTourActive && invoiceTourStep === 'digitiseDetailsFallback') advanceInvoiceTour('digitiseUnmatched', true);
+    }
+    showInvoiceToast('Pre-filled data refreshed', 'The invoice details have been checked again and updated.');
+  });
   document.querySelector('[data-save-draft]').addEventListener('click', function(){
     var toast = document.querySelector('[data-invoice-toast]');
     var toastTitle = document.querySelector('[data-invoice-toast-title]');
@@ -2748,9 +2873,15 @@
     if (!form.checkValidity() || !linesValid || !lineItems.children.length) { document.querySelector('[data-digitise-error]').hidden = false; form.reportValidity(); return; }
     if (activeUpload) { activeUpload.processed = true; activeUpload.reviewed = true; }
     var data = new FormData(form); var total = document.querySelector('[data-grand-total]').textContent;
+    var dueDate = data.get('dueDate');
+    var dueDateDisplay = data.get('invoiceDate');
+    if (dueDate) {
+      var dueParts = dueDate.split('-');
+      dueDateDisplay = dueParts[2] + '/' + dueParts[1] + '/' + dueParts[0];
+    }
     var row = document.createElement('tr');
     row.setAttribute('data-invoice-row', ''); row.setAttribute('data-invoice-number', data.get('invoiceNumber'));
-    row.innerHTML = '<td><input class="invoice-checkbox" type="checkbox" /></td><td>' + safe(data.get('invoiceDate')) + '</td><td class="invoice-number">' + safe(data.get('invoiceNumber')) + '</td><td>' + safe(data.get('supplier')) + '</td><td>' + safe(venueName) + '</td><td>' + safe(data.get('invoiceDate')) + '</td><td class="invoice-total"><span class="invoice-total-check">' + safe(total) + ' <span class="material-symbols-outlined">check_circle</span></span></td><td><span class="export-chip">Ready</span></td><td><button class="invoice-actions" type="button">Actions <span class="material-symbols-outlined">expand_more</span></button></td>';
+    row.innerHTML = '<td><input class="invoice-checkbox" type="checkbox" /></td><td>' + safe(data.get('invoiceDate')) + '</td><td class="invoice-number">' + safe(data.get('invoiceNumber')) + '</td><td>' + safe(data.get('supplier')) + '</td><td>' + safe(venueName) + '</td><td>' + safe(dueDateDisplay) + '</td><td class="invoice-total"><span class="invoice-total-check">' + safe(total) + ' <span class="material-symbols-outlined">check_circle</span></span></td><td><span class="export-chip">Ready</span></td><td><button class="invoice-actions" type="button">Actions <span class="material-symbols-outlined">expand_more</span></button></td>';
     document.querySelector('[data-invoice-rows]').prepend(row);
     document.querySelector('[data-processed-empty]').hidden = true; document.querySelector('[data-processed-table]').hidden = false;
     updateProgressParams('invoiceDigitise'); renderUploads(); editor.hidden = true; pageHeader.hidden = false; pageContent.hidden = false; document.body.classList.remove('digitise-active'); setTab('invoices');
@@ -2765,7 +2896,7 @@
       });
       if (!wasInvoiceDigitiseAlreadyDone) invoiceGoalJustCompleted = true;
     }
-    if (invoiceTourActive && invoiceTourMode === 'digitise') advanceInvoiceTour('digitiseComplete',false);
+    if (invoiceTourActive && invoiceTourMode === 'digitise') advanceInvoiceTour(ocrFallbackVariation ? 'digitiseFallbackComplete' : 'digitiseComplete',false);
     else if (invoiceGoalJustCompleted) { invoiceGoalJustCompleted=false; showInvoiceSetupHandoff(); }
     else closeInvoiceTour();
     var toast = document.querySelector('[data-invoice-toast]');
