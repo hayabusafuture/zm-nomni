@@ -673,18 +673,6 @@
   .empty-state-inner {
     max-width: 360px;
   }
-  .empty-state-icon {
-    width: 48px;
-    height: 48px;
-    display: grid;
-    place-items: center;
-    margin: 0 auto 14px;
-    border-radius: 50%;
-    background: var(--mint);
-    color: var(--seaweed);
-    font-size: 22px;
-    font-weight: 800;
-  }
   .empty-state-title {
     margin: 0 0 6px;
     color: var(--ink);
@@ -693,10 +681,14 @@
     letter-spacing: -.02em;
   }
   .empty-state-copy {
-    margin: 0;
+    margin: 0 auto;
     color: var(--ink-mute);
     font-size: 14px;
     line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .empty-state-action {
+    margin-top: 18px;
   }
   .download-link {
     color: var(--spinach);
@@ -1544,9 +1536,12 @@
           <div class="success-note" data-supplier-added-note hidden><span aria-hidden="true">✓</span><span data-added-copy>Supplier added.</span></div>
           <div class="empty-state" data-empty-suppliers>
             <div class="empty-state-inner">
-              <div class="empty-state-icon" aria-hidden="true">+</div>
               <h2 class="empty-state-title">No suppliers yet</h2>
-              <p class="empty-state-copy">Add the suppliers this outlet orders from most often.</p>
+              <p class="empty-state-copy">Click Add new to add a supplier this outlet orders from.</p>
+              <button class="btn btn-primary empty-state-action" data-add-new type="button">
+                <span class="plus-icon" aria-hidden="true"></span>
+                Add new
+              </button>
             </div>
           </div>
           <table data-supplier-table hidden>
@@ -2086,8 +2081,11 @@
       link.href = withParams('procure-trial-outlet-suppliers.html', '2');
     });
 
-    var addNew = document.querySelector('[data-add-new]');
-    if (addNew) addNew.addEventListener('click', function() { window.location.href = withParams('procure-trial-add-supplier-search.html', '3'); });
+    document.querySelectorAll('[data-add-new]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        window.location.href = withParams('procure-trial-add-supplier-search.html', '3');
+      });
+    });
     if (tourDismiss) tourDismiss.addEventListener('click', closeTour);
     window.addEventListener('resize', placeTour);
     window.addEventListener('scroll', placeTour, { passive: true });
