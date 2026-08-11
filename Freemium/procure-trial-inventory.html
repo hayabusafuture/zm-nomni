@@ -2650,8 +2650,9 @@
         saveStore(store);
       }
       render();
-      if (creatingFirstListFromAddItem) {
+      if (creatingFirstListFromAddItem || reopenSelectListAfterCreate) {
         creatingFirstListFromAddItem = false;
+        reopenSelectListAfterCreate = false;
         activeListName = name;
         closeCreateListModal();
         openCatalogModal();
@@ -2662,14 +2663,11 @@
       if (selectListDropdown) selectListDropdown.value = name;
       updateSelectListNextState();
       closeCreateListModal();
-      if (tourActive && currentTourStep === 'nameList') {
-        currentTourStep = 'awaitingConfirm';
-        if (tour) tour.hidden = true;
-      }
     });
 
     // ---- Add to list catalog picker modal ----
     var catalogModal = document.querySelector('[data-catalog-modal]');
+    var catalogTitle = document.querySelector('#catalog-title');
     var catalogBody = document.querySelector('[data-catalog-body]');
     var catalogSearch = document.querySelector('[data-catalog-search]');
     var catalogSupplierSelect = document.querySelector('[data-catalog-supplier-select]');
@@ -2800,6 +2798,7 @@
     }
 
     function openCatalogModal() {
+      if (catalogTitle) catalogTitle.textContent = 'Add to list: ' + activeListName;
       populateCatalogSupplierSelect();
       catalogSelection = {};
       renderCatalogRows();

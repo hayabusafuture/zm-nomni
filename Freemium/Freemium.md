@@ -249,6 +249,7 @@ Tour behaviour: the digitise tour is explanatory rather than forcing field-by-fi
 Set up inventory flow:
 
 - `Freemium/procure-trial-inventory.html` provides Items, Lists, and Activity views with live summary metrics and empty states. The header also shows the active POS sync status, latest update time, and a `Sync now` action. Users can create or select an inventory list, choose catalogue items, set PAR values, and save them to the list.
+- When a list is created from the `Add item` flow, the prototype selects it automatically and opens the item picker immediately. The picker heading identifies the destination as `Add to list: <LIST NAME>`.
 - Each item row's `Actions` menu mirrors the live-product options: `Add stock adjustment`, `Edit settings`, `Change list`, and `Delete`. The first three provide prototype feedback; `Delete` retains its existing local-store behaviour.
 - On a first visit, creating a list is the direct next step; otherwise users choose a list before adding items. Inventory actions become available once items exist, and users can delete items or lists to return to an empty state.
 - Saving selected items updates the trial checklist's `Set up inventory` task and the sidebar recommendation. The prototype uses static catalogue data; the extra catalogue filters remain visual-only.
