@@ -569,6 +569,18 @@
     background: var(--primary);
     border-radius: 2px;
   }
+  .activity-toolbar { display:flex;align-items:center;justify-content:space-between;gap:16px;margin:40px 0 18px; }
+  .activity-date { width:270px;height:38px;display:flex;align-items:center;gap:10px;padding:0 12px;border:1px solid #DCDEE3;border-radius:6px;background:#fff;color:var(--ink-mute); }
+  .activity-date .material-symbols-outlined { font-size:18px; }
+  .activity-actions { display:flex;align-items:center;gap:24px; }
+  .activity-action { display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--spinach);font:600 14px "Inter",sans-serif;cursor:pointer; }
+  .activity-action .material-symbols-outlined { font-size:20px; }
+  .activity-table td { height:64px; }
+  .activity-table .activity-check { width:34px; }
+  .activity-table .activity-date-cell small,.activity-created small { display:block;color:var(--ink-mute);font-size:11px;line-height:1.35; }
+  .activity-created strong { display:block;font-size:13px; }
+  .activity-download { width:32px;height:32px;border:0;background:transparent;color:var(--spinach);cursor:pointer; }
+  .activity-download .material-symbols-outlined { font-size:22px; }
 
   .content { padding: 0 40px 56px; }
 
@@ -818,9 +830,11 @@
     display: block; width: 100%; text-align: left;
     padding: 9px 12px; font-size: 13px; font-weight: 600;
     border-radius: 6px; border: none; background: none; cursor: pointer;
-    color: #D0291E;
+    color: var(--spinach);
   }
-  .row-actions-menu button:hover { background: #FDD6DC; }
+  .row-actions-menu button:hover { background: var(--mint); }
+  .row-actions-menu button.row-action-delete { color: #D0291E; }
+  .row-actions-menu button.row-action-delete:hover { background: #FDD6DC; }
 
   /* Modals */
   .modal-overlay {
@@ -1669,6 +1683,7 @@
         <nav class="tabs" aria-label="Inventory tabs">
           <button class="tab active" data-tab-btn="items" type="button">Items</button>
           <button class="tab" data-tab-btn="lists" type="button">Lists</button>
+          <button class="tab" data-tab-btn="activity" type="button">Activity</button>
         </nav>
         <div class="inv-pos-sync-bar">
           <svg class="inv-pos-sync-icon" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="30" fill="var(--nomni-green)"/><path d="M11.25 31.875L22.5 43.125L48.75 16.875" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
@@ -1826,6 +1841,30 @@
               </tr>
             </thead>
             <tbody data-lists-body></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div data-tab-panel="activity" hidden>
+        <div class="activity-toolbar">
+          <button class="activity-date" type="button"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span><span>Select range</span></button>
+          <div class="activity-actions">
+            <button class="activity-action" type="button"><span class="material-symbols-outlined" aria-hidden="true">filter_alt</span>Filter</button>
+            <button class="activity-action" type="button"><span class="material-symbols-outlined" aria-hidden="true">download</span>Export all</button>
+          </div>
+        </div>
+        <div class="table-card activity-table">
+          <table>
+            <thead><tr><th class="activity-check"></th><th>Date</th><th>Type</th><th>List</th><th>SKU</th><th>Qty</th><th>Est. value</th><th>Created</th><th></th></tr></thead>
+            <tbody data-activity-body>
+              <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">26/07/2026<small>19:31</small></td><td>Stock count</td><td>Main kitchen</td><td></td><td></td><td>S$1,086.43</td><td class="activity-created"><strong>26/07/2026 19:31</strong><small>Michelle Tan</small></td><td><button class="activity-download" aria-label="Download stock count"><span class="material-symbols-outlined">download</span></button></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">24/07/2026<small>16:24</small></td><td>Stock count</td><td>Dry store</td><td></td><td></td><td>S$906.95</td><td class="activity-created"><strong>24/07/2026 16:24</strong><small>William Arya</small></td><td><button class="activity-download" aria-label="Download stock count"><span class="material-symbols-outlined">download</span></button></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">23/07/2026<small>14:18</small></td><td>Production</td><td>Main kitchen</td><td>House laksa paste</td><td>4 tub</td><td></td><td class="activity-created"><strong>23/07/2026 14:18</strong><small>Michelle Tan</small></td><td></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">23/07/2026<small>14:18</small></td><td>Production</td><td>Main kitchen</td><td>Chicken stock</td><td>12 ltr</td><td></td><td class="activity-created"><strong>23/07/2026 14:18</strong><small>Michelle Tan</small></td><td></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">22/07/2026<small>10:10</small></td><td>Wastage</td><td>Main kitchen</td><td>Chicken thigh boneless</td><td>1.5 kg</td><td>S$13.35</td><td class="activity-created"><strong>22/07/2026 10:10</strong><small>William Arya</small></td><td></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">22/07/2026<small>10:10</small></td><td>Wastage</td><td>Main kitchen</td><td>Baby kailan</td><td>2 kg</td><td>S$9.20</td><td class="activity-created"><strong>22/07/2026 10:10</strong><small>William Arya</small></td><td></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select activity"></td><td class="activity-date-cell">20/07/2026<small>17:06</small></td><td>Adjustment</td><td>Bar and beverages</td><td>House lager keg</td><td>-1 keg</td><td>S$168.00</td><td class="activity-created"><strong>20/07/2026 17:06</strong><small>Michelle Tan</small></td><td></td></tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -2356,7 +2395,7 @@
               '<td class="col-right val-mute">' + (item.lastCount != null ? item.lastCount : '—') + '</td>' +
               '<td class="col-right val-mute">' + movementText + '</td>' +
               '<td class="col-right val-mute">—</td>' +
-              '<td class="col-actions"><div class="row-actions-wrap"><button class="row-actions-toggle" type="button" data-row-actions-toggle>Actions</button><div class="row-actions-menu" data-row-actions-menu hidden><button type="button" data-delete-item-row>Delete</button></div></div></td>';
+              '<td class="col-actions"><div class="row-actions-wrap"><button class="row-actions-toggle" type="button" data-row-actions-toggle>Actions</button><div class="row-actions-menu" data-row-actions-menu hidden><button type="button" data-item-row-action="adjust">Add stock adjustment</button><button type="button" data-item-row-action="edit">Edit settings</button><button type="button" data-item-row-action="change-list">Change list</button><button class="row-action-delete" type="button" data-delete-item-row>Delete</button></div></div></td>';
             itemsBody.appendChild(tr);
           });
         }
@@ -2404,7 +2443,7 @@
 
     function positionRowActionsMenu(menu, toggle) {
       var rect = toggle.getBoundingClientRect();
-      var menuWidth = 150;
+      var menuWidth = 190;
       var menuHeight = menu.getBoundingClientRect().height || 44;
       var left = Math.max(8, Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 8));
       var top = rect.bottom + 4;
@@ -2441,6 +2480,20 @@
           var index = Array.prototype.indexOf.call(tbody.children, tr);
           closeRowActionsMenu();
           if (index > -1) onDelete(index);
+          return;
+        }
+        var itemActionBtn = event.target.closest('[data-item-row-action]');
+        if (itemActionBtn) {
+          event.stopPropagation();
+          var itemRow = itemActionBtn.closest('tr');
+          var itemIndex = Array.prototype.indexOf.call(tbody.children, itemRow);
+          var item = itemIndex > -1 ? store.items[itemIndex] : null;
+          var action = itemActionBtn.getAttribute('data-item-row-action');
+          closeRowActionsMenu();
+          if (!item) return;
+          if (action === 'adjust') showToast('Stock adjustment', 'Ready to adjust ' + item.name + '.');
+          if (action === 'edit') showToast('Edit settings', 'Settings opened for ' + item.name + '.');
+          if (action === 'change-list') showToast('Change list', 'Choose a new inventory list for ' + item.name + '.');
         }
       });
     }
