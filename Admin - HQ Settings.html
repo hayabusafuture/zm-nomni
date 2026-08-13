@@ -65,9 +65,9 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .back-link:hover { color: var(--seaweed); }
 
 /* Page head */
-.page-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; gap: 16px; }
+.page-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0; gap: 16px; }
 .page-title-wrap { display: flex; align-items: center; gap: 10px; }
-.page-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+.page-title { font-size: 24px; font-weight: 800; line-height: 1.2; margin: 0; letter-spacing: -0.03em; font-family: "Inter", system-ui, sans-serif; }
 .page-meta { font-size: 14px; color: var(--ink-mute); margin-bottom: 24px; }
 .head-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-top: 3px; }
 
@@ -564,6 +564,12 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   border-color: var(--seaweed);
 }
 .btn-primary:active:not(:disabled) { transform: scale(.96); }
+.btn-primary:disabled {
+  background: #E5E7EB;
+  border-color: #E5E7EB;
+  color: #9CA3AF;
+  cursor: not-allowed;
+}
 
 .btn-secondary,
 .btn-tertiary {
@@ -797,14 +803,13 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       <div>
         <div class="page-title-wrap">
           <h1 class="page-title">Garden Cuisine HQ</h1>
-          <span class="chip chip-active">Active</span>
         </div>
       </div>
       <div class="head-actions">
         <button class="btn-secondary" onclick="window.location.href='Admin - Edit HQ.html'">Edit details</button>
       </div>
     </div>
-    <div class="page-meta">Garden Cuisine Pte Ltd &nbsp;·&nbsp; Created 05 Sep 2019 &nbsp;·&nbsp; Last updated 10 Jun 2026</div>
+    <div class="page-meta">Garden Cuisine Pte Ltd &nbsp;·&nbsp; Last updated 10 Jun 2026</div>
 
     <div class="stats-strip" id="statsStrip"></div>
 
@@ -1384,7 +1389,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
 <script>
 
-function showNewHqEmptyState(panelId, title, copy) {
+function showNewHqEmptyState(panelId, title, copy, action) {
   var panel = document.getElementById(panelId);
   if (!panel) return;
   Array.from(panel.children).forEach(function(child) { child.style.display = 'none'; });
@@ -1395,8 +1400,16 @@ function showNewHqEmptyState(panelId, title, copy) {
     panel.appendChild(state);
   }
   state.style.display = 'flex';
-  state.innerHTML = '<div class="prereq-empty-inner">' +    '<h2 class="prereq-empty-title">' + title + '</h2>' +
+  var actionHtml = action ?
+    '<button class="btn-primary" style="margin-top:20px"' +
+      (action.disabled ? ' disabled aria-disabled="true"' : ' onclick="' + action.onclick + '"') + '>' +
+      action.label +
+    '</button>' +
+    (action.reason ? '<div style="margin-top:8px;font-size:14px;color:var(--ink-mute)">' + action.reason + '</div>' : '') : '';
+  state.innerHTML = '<div class="prereq-empty-inner">' +
+    '<h2 class="prereq-empty-title">' + title + '</h2>' +
     '<p class="prereq-empty-copy">' + copy + '</p>' +
+    actionHtml +
   '</div>';
 }
 
@@ -1410,17 +1423,36 @@ function clearNewHqEmptyState(panelId) {
 
 function refreshNewHqEmptyStates() {
   if (!window.isNewHQ) return;
-  if (SUPPLIERS.length === 0) {
-    showNewHqEmptyState('panel-market-list', 'Link a supplier before adding items', 'Items are supplied through an HQ supplier. Link at least one supplier to make item management available.');
+  if (ITEMS.length === 0) {
+    showNewHqEmptyState('panel-market-list', 'No items yet', 'Items are added from suppliers linked to this HQ.', {
+      label: 'Add item',
+      onclick: 'openAddCatalogueModal()',
+      disabled: SUPPLIERS.length === 0,
+      reason: SUPPLIERS.length === 0 ? 'Link a supplier first' : ''
+    });
   } else {
     clearNewHqEmptyState('panel-market-list');
   }
 
-  if (ITEMS.length === 0) {
-    showNewHqEmptyState('panel-inventory', 'Add an item before using inventory', 'Inventory records are created from items in the HQ item list.');
-    showNewHqEmptyState('panel-recipes', 'Add an item before creating recipes', 'Recipes require ingredients from the HQ item list.');
+  if (INV_ITEMS.length === 0) {
+    showNewHqEmptyState('panel-inventory', 'No inventory items yet', 'Add items from the HQ item list to start managing inventory.', {
+      label: 'Add to inventory',
+      onclick: 'openAddInvSkuModal()',
+      disabled: ITEMS.length === 0,
+      reason: ITEMS.length === 0 ? 'Add an item first' : ''
+    });
   } else {
     clearNewHqEmptyState('panel-inventory');
+  }
+
+  if (RECIPES.length === 0) {
+    showNewHqEmptyState('panel-recipes', 'No recipes yet', 'Recipes are created using items in the HQ item list.', {
+      label: 'Create recipe',
+      onclick: "window.location.href='Admin - HQ Recipe Create - New.html'",
+      disabled: ITEMS.length === 0,
+      reason: ITEMS.length === 0 ? 'Add an item first' : ''
+    });
+  } else {
     clearNewHqEmptyState('panel-recipes');
   }
 
@@ -4043,7 +4075,7 @@ function initialiseNewHQView() {
   document.querySelectorAll('.tab-status-dot').forEach(function(dot) { dot.remove(); });
   document.querySelectorAll('.tab-indicators:empty').forEach(function(group) { group.remove(); });
   document.querySelector('.page-title').textContent = saved.name;
-  document.querySelector('.page-meta').textContent = saved.company + ' · Created today';
+  document.querySelector('.page-meta').textContent = saved.company;
   document.title = saved.name + ' — Procure Admin';
 
   var stats = document.getElementById('statsStrip');

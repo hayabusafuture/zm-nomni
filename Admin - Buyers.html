@@ -65,7 +65,7 @@
 
   /* Page head */
   .page-head { display: flex; align-items: center; justify-content: space-between; margin: 0 0 0; }
-  .page-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -0.03em; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .page-title { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.03em; font-family: "Inter", system-ui, sans-serif; }
 
   /* Add new dropdown button */
   .add-btn-wrap { position: relative; display: inline-block; }
@@ -168,6 +168,13 @@
   .og-hq-rows table { border-top: none; }
   .og-hq-rows table thead th { background: #fff; }
   .og-hq-rows table tbody tr:last-child td { border-bottom: none; }
+
+  /* Freemium pagination */
+  .og-pager { display: flex; align-items: center; justify-content: space-between; padding: 16px 4px; color: var(--ink-mute); font-size: 14px; }
+  .og-pager-buttons { display: flex; align-items: center; gap: 4px; }
+  .og-pager-btn { min-width: 30px; height: 30px; padding: 0 8px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--ink); font-family: inherit; font-size: 14px; cursor: pointer; }
+  .og-pager-btn:hover { background: #F7F8FA; }
+  .og-pager-btn.active { background: var(--seaweed); color: #fff; border-color: var(--seaweed); }
 
   /* Outlet group chip */
   .og-chip { background: #f0f1f3; color: var(--ink-2); font-size: 12px; font-weight: 500; padding: 2px 9px; border-radius: 4px; display: inline-block; white-space: nowrap; }
@@ -1016,12 +1023,9 @@
       </div>
 
       <!-- Pager -->
-      <div class="pager" id="ogPager" style="margin-top:16px;display:none">
-        <span id="ogPagerInfo" style="font-size:12px;color:var(--ink-mute)"></span>
-        <div style="display:flex;align-items:center;gap:4px">
-          <button class="pager-btn" id="ogPrevBtn" onclick="ogGoPage(-1)">&#8592;</button>
-          <button class="pager-btn" id="ogNextBtn" onclick="ogGoPage(1)">&#8594;</button>
-        </div>
+      <div class="og-pager" id="ogPager" style="display:none">
+        <span id="ogPagerInfo"></span>
+        <div class="og-pager-buttons" id="ogPagerButtons"></div>
       </div>
 
     </div>
@@ -1167,14 +1171,18 @@
     pager.style.display = 'flex';
     var start = (ogCurrentPage - 1) * OG_PAGE_SIZE + 1;
     var end = Math.min(ogCurrentPage * OG_PAGE_SIZE, total);
-    document.getElementById('ogPagerInfo').textContent = start + '–' + end + ' of ' + total + ' HQs';
-    document.getElementById('ogPrevBtn').disabled = ogCurrentPage <= 1;
-    document.getElementById('ogNextBtn').disabled = ogCurrentPage >= totalPages;
+    document.getElementById('ogPagerInfo').textContent = 'Showing ' + start + '–' + end + ' of ' + total + ' HQs';
+    var buttons = '';
+    for (var page = 1; page <= totalPages; page++) {
+      buttons += '<button class="og-pager-btn' + (page === ogCurrentPage ? ' active' : '') + '" onclick="ogSetPage(' + page + ')"' +
+        (page === ogCurrentPage ? ' aria-current="page"' : '') + '>' + page + '</button>';
+    }
+    document.getElementById('ogPagerButtons').innerHTML = buttons;
   }
 
   function searchOG(val) { ogSearchQuery = val.trim().toLowerCase(); ogCurrentPage = 1; applyOGFilter(); }
   function renderOGPager() { applyOGFilter(); }
-  function ogGoPage(dir) { ogCurrentPage += dir; applyOGFilter(); }
+  function ogSetPage(page) { ogCurrentPage = page; applyOGFilter(); }
 
   renderOGPager();
 
