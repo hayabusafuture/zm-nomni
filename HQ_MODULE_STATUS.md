@@ -139,6 +139,7 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 
 | Date | Change |
 |---|---|
+| 14 August 2026 | Removed the established-HQ price-review banner from newly created HQs, which have no invoice price changes to review. |
 | 14 August 2026 | Fixed newly added and previously saved catalogue items being treated as inactive because their prototype access and active-state defaults were missing. |
 | 14 August 2026 | Expanded the prototype supplier catalogue to at least five items for every searchable Procure supplier. |
 | 14 August 2026 | Added a one-time success toast when a newly created HQ first opens. |
