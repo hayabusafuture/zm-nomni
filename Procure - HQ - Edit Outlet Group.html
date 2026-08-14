@@ -186,10 +186,12 @@
   .picker-filters { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-bottom: 1px solid var(--rule); background: #f9fafb; }
   .picker-filter-row { display: flex; gap: 8px; }
   .picker-search-wrap { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; width: 100%; }
+  .picker-search-wrap:focus-within { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
   .picker-search-wrap svg { flex-shrink: 0; color: var(--ink-mute); }
   .picker-search-wrap input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
   .picker-search-wrap input::placeholder { color: var(--ink-mute); }
-  .picker-filter-sel { flex: 1; height: 32px; padding: 0 24px 0 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 12px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center; }
+  .picker-filter-sel { flex: 1; height: 36px; padding: 0 28px 0 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; appearance: none; cursor: pointer; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center; }
+  .picker-filter-sel:focus { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
   .picker-list-meta { display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; border-bottom: 1px solid var(--rule); }
   .picker-meta-count { font-size: 12px; color: var(--ink-mute); }
   .select-all-btn { background: none; border: none; color: var(--spinach); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; }
@@ -1802,7 +1804,6 @@ function renderPickerList() {
 
 function renderPickerSelected() {
   const selList  = document.getElementById('modalSelectedList');
-  const empty    = document.getElementById('modalPickerEmpty');
   const count    = pendingAdd.size;
   document.getElementById('modalSelCount').textContent = count;
   document.getElementById('modalClearBtn').style.visibility = count ? 'visible' : 'hidden';
@@ -1810,8 +1811,7 @@ function renderPickerSelected() {
   addBtn.textContent = count ? `Add ${count} outlet${count > 1 ? 's' : ''}` : 'Add outlets';
   addBtn.disabled = count === 0;
 
-  if (!count) { selList.innerHTML = ''; selList.appendChild(empty); empty.style.display = 'flex'; return; }
-  empty.style.display = 'none';
+  if (!count) { selList.innerHTML = '<div class="picker-empty"><div class="picker-empty-title">No outlets selected</div><div class="picker-empty-hint">Select outlets from the results to add them here.</div></div>'; return; }
   selList.innerHTML = OUTLETS.filter(o => pendingAdd.has(o.id)).map(o => `
     <div class="picker-sel-item">
       <div class="picker-sel-info">

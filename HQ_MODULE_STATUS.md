@@ -139,6 +139,20 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 
 | Date | Change |
 |---|---|
+| 14 August 2026 | Standardised Create outlet group and both Add outlets flows on one search-first picker with Company/Cluster filters, filter-aware select all and a visible removable list of selected outlets. |
+| 14 August 2026 | Aligned the HQ Overview and group-details Add outlets dialogs on the same Procure outlet catalogue, compact centred layout, result-row styling, metadata, selected-outlet panel, counts and Add-button behaviour; corrected the selected-count/list mismatch. |
+| 14 August 2026 | Made outlet-picker search fields active on dialog open, applied the Styleguide green focus border and 18% focus ring to picker form controls, and strengthened the search-first empty-state hierarchy. |
+| 14 August 2026 | Extended the Styleguide picker focus treatment across Admin HQ and Procure HQ outlet-group pages, and automatically focused the primary search field in item, inventory and recipe picker dialogs. |
+| 14 August 2026 | Moved outlet selection on Create outlet group into the shared Add outlets dialog; confirmed selections now close the dialog and appear as a removable list on the page. |
+| 14 August 2026 | Fixed Add outlets result-state drift by locking the shared picker body to 420px and normalising selection IDs so highlighted results, the count badge and selected-outlet rows remain synchronised. |
+| 14 August 2026 | Corrected a shared selected-panel render failure after the first choice, prevented picker filters from clipping, and removed the active-looking focus treatment from disabled confirmation buttons. |
+| 14 August 2026 | Standardised the selected-panel empty state across all three Add outlets instances with muted “No outlets selected” text and lighter supporting copy. |
+| 14 August 2026 | Corrected the Create outlet group footer/sidebar alignment and revised the outlet empty state with a primary Add outlets CTA plus a lighter header text action. |
+| 14 August 2026 | Aligned the Create outlet group back link with other Admin HQ pages, using the chevron treatment and the parent HQ name from the page URL. |
+| 14 August 2026 | Standardised the group-details Items search and HQ Overview search at a fixed 320px × 38px, with matching icon treatment and the Styleguide green focus border plus 18% ring. |
+| 14 August 2026 | Moved Delete group from the group-details page header into the Settings dialog while retaining the destructive-action confirmation. |
+| 14 August 2026 | Aligned outlet-group detail tabs with the HQ tab system: full-width rule, 28px spacing, 46px tab height, darker inactive labels and the same active underline treatment. |
+| 14 August 2026 | Replaced the ambiguous supplier count “13 of 14” with the active supplier total only, matching the count treatment used by the other tabs. |
 | 14 August 2026 | Removed the established-HQ price-review banner from newly created HQs, which have no invoice price changes to review. |
 | 14 August 2026 | Fixed newly added and previously saved catalogue items being treated as inactive because their prototype access and active-state defaults were missing. |
 | 14 August 2026 | Expanded the prototype supplier catalogue to at least five items for every searchable Procure supplier. |
