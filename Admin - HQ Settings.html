@@ -1986,6 +1986,11 @@ function ensureItemAccessState(idx) {
   if (itemAccessState[idx]) return;
   const item = ITEMS[idx];
   const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  if (typeof item.active !== 'boolean') item.active = true;
+  if (!Array.isArray(item.groupList)) item.groupList = ML_GROUPS.slice();
+  if (!Array.isArray(item.outletList)) item.outletList = [];
+  if (!Array.isArray(item.uomEnabled)) item.uomEnabled = uoms.map(() => true);
+  if (!item.moq) item.moq = '1 ' + String(uoms[0] || 'unit').replace(/^per /i, '');
   itemAccessState[idx] = {};
   ML_GROUPS.forEach(g => {
     const enabled = item.groupList.includes(g);
@@ -3601,7 +3606,12 @@ function confirmAddItems() {
     aiSel.forEach(function(id) {
       var src = CAT_ITEMS.find(function(item) { return item.id === id; });
       if (!src || ITEMS.some(function(item) { return item.name === src.name; })) return;
-      ITEMS.push({ name: src.name, cat: src.cat, supplier: src.supplier, price: 0, uom: src.uoms.map(function(uom) { return 'per ' + uom; }) });
+      var uoms = src.uoms.map(function(uom) { return 'per ' + uom; });
+      ITEMS.push({
+        name:src.name, cat:src.cat, supplier:src.supplier, price:0, uom:uoms,
+        active:true, groupList:ML_GROUPS.slice(), outletList:[],
+        uomEnabled:uoms.map(function() { return true; }), moq:'1 ' + src.uoms[0]
+      });
     });
     renderMl();
     refreshNewHqEmptyStates();
