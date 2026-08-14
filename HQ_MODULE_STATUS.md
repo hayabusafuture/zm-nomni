@@ -69,7 +69,7 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 | HQ items | Browse master items | Built | Search, filters, sorting and pagination | — |
 | HQ items | Inspect UOM and access | Built | UOM and group-access controls are interactive | Retain changes |
 | HQ items | Create catalogue item | Partial | Details, supplier, tax, UOM, MOQ, inventory and access fields | Add validation and create a retained item record |
-| HQ items | Add existing catalogue items | Partial | Three-step selection and configuration wizard | Retain added items |
+| HQ items | Add existing catalogue items | Partial | Three-step selection and configuration wizard; the prototype directory provides at least five catalogue items for every searchable supplier and displays only items from suppliers linked to the HQ | Retain added items in the backend |
 | HQ items | Group price and MOQ exceptions | Partial | Add, edit, duplicate validation and removal work | Retain exceptions; consider effective dates |
 | HQ suppliers | Browse suppliers | Built | Supplier listing and View Supplier Items shortcut | — |
 | HQ suppliers | Link existing suppliers | Built | A shared search-first dialog finds suppliers in the large Procure directory by name, UEN or ABN; linked suppliers persist locally and feed the HQ catalogue | Replace the prototype directory with server-side search and pagination |
@@ -139,6 +139,7 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 
 | Date | Change |
 |---|---|
+| 14 August 2026 | Expanded the prototype supplier catalogue to at least five items for every searchable Procure supplier. |
 | 14 August 2026 | Added a one-time success toast when a newly created HQ first opens. |
 | 14 August 2026 | Unified supplier linking around Procure-directory search plus new-supplier capture, limited catalogue items to linked suppliers, improved the Add Item stepper and added locally retained Activity events with a reset control. |
 | 14 August 2026 | Retained the newly created group across refreshes, connected it to a populated group-details page, restored the new-HQ summary strip and unified the centred group Settings dialog. |
