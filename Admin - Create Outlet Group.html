@@ -163,10 +163,6 @@
   .user-menu-item:hover { background: #f3f4f6; }
   .user-menu-item.logout { color: #e53535; }
 
-  /* ── Toast ── */
-  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--seaweed); color: #fff; font-size: 14px; font-weight: 500; padding: 12px 20px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 9999; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
   @media (max-width: 1280px) {
     .app { grid-template-columns: 56px 1fr; }
     .sidebar { position: fixed; top: 56px; left: 0; width: 56px; height: calc(100vh - 56px); overflow: hidden; transition: width 0.2s ease; z-index: 4; }
@@ -488,12 +484,6 @@
   <button class="save-btn" id="saveBtn" disabled onclick="handleCreate()">Create outlet group</button>
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-  Outlet group created
-</div>
-
 <script>
 const OUTLETS = [
   { id:  1, name: "Amber Restaurant",               company: "The Grand Hospitality Group", cluster: "CBD Cluster" },
@@ -624,12 +614,22 @@ function checkReady() {
   document.getElementById('saveBtn').disabled = !ok;
 }
 function handleCreate() {
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => { history.back(); }, 300);
-  }, 1800);
+  var hqName = document.getElementById('hqSelect').value;
+  var group = {
+    name: document.getElementById('groupName').value.trim(),
+    description: document.getElementById('groupDesc').value.trim(),
+    hq: hqName,
+    outlets: OUTLETS.filter(function(outlet) { return selected.has(outlet.id); }).map(function(outlet) { return outlet.name; }),
+    outletDetails: OUTLETS.filter(function(outlet) { return selected.has(outlet.id); }).map(function(outlet) {
+      return { name: outlet.name, company: outlet.company, cluster: outlet.cluster };
+    })
+  };
+  localStorage.setItem('nomniNewOutletGroup', JSON.stringify(group));
+  localStorage.setItem('nomniNewOutletGroupToastPending', '1');
+  var params = new URLSearchParams(window.location.search);
+  var returnUrl = 'Admin - HQ Settings.html?groupCreated=1';
+  if (params.get('returnNew') === '1') returnUrl += '&new=1';
+  window.location.href = returnUrl;
 }
 
 document.getElementById('userMenuBtn').addEventListener('click', e => {

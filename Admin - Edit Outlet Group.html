@@ -545,10 +545,10 @@
 
     <div class="page-head">
       <div>
-        <h1 class="page-title">Chargrill Outlets</h1>
+        <h1 class="page-title" id="groupPageTitle">Chargrill Outlets</h1>
         <div class="page-hq">
           <span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--ink-mute);border-radius:4px;padding:1px 6px;color:var(--ink-mute);line-height:1.4">HQ</span>
-          <a href="Admin - HQ Settings.html">Garden Cuisine HQ</a>
+          <a href="Admin - HQ Settings.html" id="groupHqLink">Garden Cuisine HQ</a>
           <span style="color:var(--rule);margin:0 2px">·</span>
           <span>Last updated 10 Jun 2026</span>
         </div>
@@ -806,7 +806,7 @@
 <div class="modal-overlay" id="settingsModal">
   <div class="modal-card" style="width:480px">
     <div class="modal-header">
-      <h2 class="modal-title">Settings</h2>
+      <h2 class="modal-title" id="detailSettingsTitle">Chargrill Outlets</h2>
       <button class="modal-close" onclick="closeSettings()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
@@ -814,11 +814,11 @@
     <div class="modal-body" style="gap:16px;display:flex;flex-direction:column">
       <div>
         <label style="display:block;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px">Group name</label>
-        <input type="text" style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none" value="Chargrill Outlets" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'" />
+        <input id="detailSettingsName" type="text" style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none" value="Chargrill Outlets" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'" />
       </div>
       <div>
         <label style="display:block;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px">Description <span style="font-weight:400;color:var(--ink-mute);font-size: 14px">Optional</span></label>
-        <textarea style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none;min-height:80px;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'">Garden Cuisine Chargrill chain locations</textarea>
+        <textarea id="detailSettingsDescription" style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none;min-height:80px;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'">Garden Cuisine Chargrill chain locations</textarea>
         <span style="font-size:12px;color:var(--ink-mute);margin-top:4px;display:block">Used as internal notes only. Not visible to buyers.</span>
       </div>
     </div>
@@ -975,6 +975,31 @@ const OUTLETS = [
 const currentGroup = new Set([1, 2, 3, 4]);
 const pendingAdd   = new Set();
 let   pendingRemoveId = null;
+
+(function initialiseCreatedGroupDetails() {
+  if (new URLSearchParams(window.location.search).get('newGroup') !== '1') return;
+  var group;
+  try { group = JSON.parse(localStorage.getItem('nomniNewOutletGroup') || 'null'); } catch (e) { group = null; }
+  if (!group) return;
+  window.isCreatedGroupPrototype = true;
+  var details = Array.isArray(group.outletDetails) && group.outletDetails.length
+    ? group.outletDetails
+    : (group.outlets || []).map(function(name) { return { name:name, company:'Procure outlet' }; });
+  OUTLETS.splice(0, OUTLETS.length);
+  currentGroup.clear();
+  details.forEach(function(outlet, index) {
+    var id = index + 1;
+    OUTLETS.push({ id:id, name:outlet.name, company:outlet.company || 'Procure outlet', active:true, posConnected:false });
+    currentGroup.add(id);
+  });
+  document.getElementById('groupPageTitle').textContent = group.name;
+  document.getElementById('groupHqLink').textContent = group.hq;
+  document.getElementById('groupHqLink').href = 'Admin - HQ Settings.html?new=1&groupCreated=1';
+  document.getElementById('detailSettingsTitle').textContent = group.name;
+  document.getElementById('detailSettingsName').value = group.name;
+  document.getElementById('detailSettingsDescription').value = group.description || '';
+  document.title = group.name + ' — Procure Admin';
+})();
 
 function initials(name) {
   return name.replace(/[^a-zA-Z ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '??';
@@ -1312,12 +1337,12 @@ function renderStatsStrip() {
   const strip = document.getElementById('statsStrip');
   if (!strip) return;
   const outletCount   = currentGroup.size;
-  const itemCount     = ITEMS.length;
-  const supplierCount = HQ_SUPPLIERS.length - groupDisabledSuppliers.size;
+  const itemCount     = window.isCreatedGroupPrototype ? 0 : ITEMS.length;
+  const supplierCount = window.isCreatedGroupPrototype ? 0 : HQ_SUPPLIERS.length - groupDisabledSuppliers.size;
   const stats = [
     { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', value: outletCount,         label: 'Outlets',   iconColor: '#1A8040', accentColor: '#2AC864' },
     { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>', value: itemCount,           label: 'Items',     iconColor: '#185FA5', accentColor: '#3B82F6' },
-    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01z"/></svg>',                                                                                                                                                                value: OG_RECIPES.length,  label: 'Recipes',   iconColor: '#854F0B', accentColor: '#F59E0B' },
+    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01z"/></svg>',                                                                                                                                                                value: window.isCreatedGroupPrototype ? 0 : OG_RECIPES.length,  label: 'Recipes',   iconColor: '#854F0B', accentColor: '#F59E0B' },
     { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>', value: supplierCount,       label: 'Suppliers', iconColor: '#6D28D9', accentColor: '#8B5CF6' },
   ];
   strip.innerHTML = stats.map(s =>
@@ -1848,7 +1873,22 @@ document.getElementById('deleteGroupOverlay').addEventListener('click', e => { i
 // ── Settings dialog ────────────────────────────────────────
 function openSettings() { document.getElementById('settingsModal').classList.add('open'); }
 function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
-function saveSettings() { closeSettings(); }
+function saveSettings() {
+  if (window.isCreatedGroupPrototype) {
+    var group;
+    try { group = JSON.parse(localStorage.getItem('nomniNewOutletGroup') || 'null'); } catch (e) { group = null; }
+    var name = document.getElementById('detailSettingsName').value.trim();
+    if (group && name) {
+      group.name = name;
+      group.description = document.getElementById('detailSettingsDescription').value.trim();
+      localStorage.setItem('nomniNewOutletGroup', JSON.stringify(group));
+      document.getElementById('groupPageTitle').textContent = name;
+      document.getElementById('detailSettingsTitle').textContent = name;
+      document.title = name + ' — Procure Admin';
+    }
+  }
+  closeSettings();
+}
 
 // ── Tabs ───────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(tab => {
