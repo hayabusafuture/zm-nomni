@@ -2751,7 +2751,7 @@ function addPrototypeActivity(module, text, tab, scope) {
 
 function resetHqPrototypeData() {
   if (!window.confirm('Clear all locally saved data for this HQ prototype?')) return;
-  ['nomniNewHQ','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState'].forEach(function(key) { localStorage.removeItem(key); });
+  ['nomniNewHQ','nomniNewHQToastPending','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState'].forEach(function(key) { localStorage.removeItem(key); });
   window.location.href = 'Admin - Buyers.html#outlet-groups';
 }
 
@@ -4476,6 +4476,11 @@ panel.innerHTML =
   document.getElementById('newHqCreateGroupBtn').addEventListener('click', function() {
     window.location.href = 'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(saved.name) + '&returnNew=1';
   });
+
+  if (localStorage.getItem('nomniNewHQToastPending') === '1') {
+    localStorage.removeItem('nomniNewHQToastPending');
+    showHqToast('HQ created', saved.name + ' has been created.');
+  }
 }
 
 initialiseNewHQView();

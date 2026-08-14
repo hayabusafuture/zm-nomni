@@ -31,7 +31,7 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 | Required fields | Built | Company and HQ name are validated with inline errors and focus on the first invalid field | Confirm the production validation rules |
 | Create HQ submission | Built | The button validates the form, stores the new HQ for the prototype session and opens its Overview | Replace session storage with backend creation when implemented |
 | Duplicate checks | Not built | — | Represent duplicate HQ name/company handling |
-| Creation success | Built | Successful submission opens the newly created HQ Overview | A separate success message is intentionally omitted |
+| Creation success | Built | Successful submission opens the newly created HQ Overview and shows a one-time Freemium-style “HQ created” toast | — |
 | New HQ record | Partial | The new HQ record is available on its Overview for the current browser session | Add it to the Buyers listing and backend when persistence is implemented |
 | Post-creation destination | Built | The new HQ opens directly on its empty Overview | — |
 | Empty HQ state | Built | All tabs remain visible. Items, Inventory and Recipes use stable empty-state copy with prerequisite-aware CTAs; Suppliers is immediately actionable; Activity shows no activity yet | — |
@@ -139,6 +139,7 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 
 | Date | Change |
 |---|---|
+| 14 August 2026 | Added a one-time success toast when a newly created HQ first opens. |
 | 14 August 2026 | Unified supplier linking around Procure-directory search plus new-supplier capture, limited catalogue items to linked suppliers, improved the Add Item stepper and added locally retained Activity events with a reset control. |
 | 14 August 2026 | Retained the newly created group across refreshes, connected it to a populated group-details page, restored the new-HQ summary strip and unified the centred group Settings dialog. |
 | 14 August 2026 | Changed Add outlets to use a search-first, capped catalogue of Procure outlets not already attached to an HQ, with outlet search plus company and cluster filters. |
