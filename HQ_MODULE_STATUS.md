@@ -153,6 +153,8 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 | 14 August 2026 | Moved Delete group from the group-details page header into the Settings dialog while retaining the destructive-action confirmation. |
 | 14 August 2026 | Aligned outlet-group detail tabs with the HQ tab system: full-width rule, 28px spacing, 46px tab height, darker inactive labels and the same active underline treatment. |
 | 14 August 2026 | Replaced the ambiguous supplier count “13 of 14” with the active supplier total only, matching the count treatment used by the other tabs. |
+| 17 August 2026 | Create outlet group now redirects to the selected parent HQ using an explicit HQ route parameter, preserving the created-group state and success toast on arrival. |
+| 17 August 2026 | Fixed Edit details for newly created HQs so it opens a pre-filled editor for the saved HQ, persists name/company changes locally and returns to that same HQ page. |
 | 14 August 2026 | Removed the established-HQ price-review banner from newly created HQs, which have no invoice price changes to review. |
 | 14 August 2026 | Fixed newly added and previously saved catalogue items being treated as inactive because their prototype access and active-state defaults were missing. |
 | 14 August 2026 | Expanded the prototype supplier catalogue to at least five items for every searchable Procure supplier. |

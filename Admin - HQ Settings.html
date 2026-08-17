@@ -850,7 +850,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <div class="page-meta">Garden Cuisine Pte Ltd &nbsp;·&nbsp; Last updated 10 Jun 2026</div>
       </div>
       <div class="head-actions">
-        <button class="btn-secondary" onclick="window.location.href='Admin - Edit HQ.html'">Edit details</button>
+        <button class="btn-secondary" id="editHqDetailsBtn" onclick="window.location.href='Admin - Edit HQ.html'">Edit details</button>
       </div>
     </div>
     <div class="stats-strip" id="statsStrip"></div>
@@ -4570,6 +4570,12 @@ function initialiseNewHQView() {
   document.querySelector('.page-title').textContent = saved.name;
   document.querySelector('.page-meta').textContent = saved.company;
   document.title = saved.name + ' — Procure Admin';
+  var editDetailsButton = document.getElementById('editHqDetailsBtn');
+  if (editDetailsButton) {
+    editDetailsButton.onclick = function() {
+      window.location.href = 'Admin - Edit HQ.html?new=1';
+    };
+  }
 
   var stats = document.getElementById('statsStrip');
   if (stats) stats.style.display = '';
@@ -4649,6 +4655,16 @@ initialiseNewHQView();
 function getSavedOutletGroup() {
   try { return JSON.parse(localStorage.getItem('nomniNewOutletGroup') || 'null'); } catch (e) { return null; }
 }
+
+function initialiseRequestedHQContext() {
+  var hqName = new URLSearchParams(window.location.search).get('hq');
+  if (!hqName) return;
+  var title = document.querySelector('.page-title');
+  if (title) title.textContent = hqName;
+  document.title = 'Admin — ' + hqName;
+}
+
+initialiseRequestedHQContext();
 
 function renderNewHqSummary(group) {
   var strip = document.getElementById('statsStrip');
