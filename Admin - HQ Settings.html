@@ -85,6 +85,9 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .btn-secondary:hover { background: #C6F2CE; }
 .btn-tertiary { background: #F3F4F6; color: var(--ink-2); border: none; }
 .btn-tertiary:hover { background: #E6E8EC; }
+.picker-text-action { background: none; border: 0; color: var(--spinach); font: inherit; font-size: 14px; font-weight: 600; line-height: 1.4; padding: 4px 0; cursor: pointer; white-space: nowrap; }
+.picker-text-action:hover { color: var(--seaweed); }
+.picker-text-action:focus-visible { outline: 2px solid var(--spinach); outline-offset: 3px; border-radius: 2px; }
 .btn-outline { background: none; border: 1px solid #d0d2d8; color: var(--ink); border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .13s; }
 .btn-outline:hover { background: #f3f4f6; }
 .btn-ghost-danger { background: none; border: none; color: #c02020; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 12px; cursor: pointer; border-radius: 6px; transition: background .13s; }
@@ -244,6 +247,17 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .uom-text { font-size: 14px; color: var(--ink); }
 .uom-options-btn { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: inherit; transition: background .12s; margin-top: 2px; }
 .uom-options-btn:hover { background: #c6f2ce; }
+.ml-parent-row td { background: #fff !important; }
+.ml-parent-row:hover td { background: var(--row-hover) !important; }
+.ml-uom-row td { background: #f7f8fa !important; }
+.ml-uom-row:hover td { background: #f2f4f5 !important; }
+.ml-uom-row .ml-uom-indent { padding-left: 34px; color: var(--ink-mute); }
+.ml-options-link { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: var(--spinach); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.ml-options-link:hover { color: var(--nomni-green); }
+.ml-options-chevron { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .15s ease; }
+.ml-options-link.is-open .ml-options-chevron { transform: rotate(225deg) translate(-1px,-1px); }
+.ml-price-main { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.ml-price-meta { margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--ink-mute); white-space: nowrap; }
 
 /* Sort headers */
 .sort-th { cursor: pointer; user-select: none; transition: background .1s; }
@@ -416,13 +430,54 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .picker-step-item.active .picker-step-num { background: var(--seaweed); color: #fff; border-color: var(--seaweed); }
 .picker-step-item.done .picker-step-num { background: var(--spinach); color: #fff; border-color: var(--spinach); }
 .picker-step-sep { width: 20px; height: 1px; background: var(--rule); margin: 0 8px; }
-#addItemModal .picker-steps { width:100%; margin-top:18px; gap:0; }
-#addItemModal .picker-step-item { flex:1; position:relative; padding:0 10px 12px 0; font-size:14px; }
-#addItemModal .picker-step-item::after { content:''; position:absolute; left:0; right:0; bottom:0; height:3px; border-radius:3px; background:#E5E7EB; }
-#addItemModal .picker-step-item.active::after { background:var(--seaweed); }
-#addItemModal .picker-step-item.done::after { background:var(--nomni-green); }
-#addItemModal .picker-step-sep { display:none; }
-#addItemModal .picker-step-num { width:24px; height:24px; font-size:12px; }
+#addItemModal .picker-steps,
+#addInvSkuModal .picker-steps { width:100%; margin-top:18px; gap:0; }
+#addItemModal .picker-card { width:820px; }
+#addItemModal .picker-step-item,
+#addInvSkuModal .picker-step-item { flex:1; position:relative; padding:0 10px 12px 0; font-size:14px; }
+#addItemModal .picker-step-item::after,
+#addInvSkuModal .picker-step-item::after { content:''; position:absolute; left:0; right:0; bottom:0; height:3px; border-radius:3px; background:#E5E7EB; }
+#addItemModal .picker-step-item.active::after,
+#addInvSkuModal .picker-step-item.active::after { background:var(--nomni-green); }
+#addItemModal .picker-step-item.done::after,
+#addInvSkuModal .picker-step-item.done::after { background:#D9DDE3; }
+#addItemModal .picker-step-sep,
+#addInvSkuModal .picker-step-sep { display:none; }
+#addItemModal .picker-step-num,
+#addInvSkuModal .picker-step-num { width:24px; height:24px; font-size:12px; }
+#addItemModal .picker-step-item.done { color:#6F7580; }
+#addItemModal .picker-step-item.done .picker-step-num {
+  background:#F3F4F6;
+  border-color:#D1D5DB;
+  color:var(--spinach);
+}
+#addItemModal .picker-step-item.active {
+  color:var(--ink);
+  font-weight:700;
+}
+#addItemModal .picker-step-item.active .picker-step-num {
+  background:var(--seaweed);
+  border-color:var(--seaweed);
+  color:#fff;
+}
+#addItemModal .picker-steps {
+  border-bottom:1px solid #D9DDE3;
+}
+#addItemModal .picker-head {
+  border-bottom:0;
+}
+#addItemModal .picker-step-item::after {
+  bottom:-1px;
+  height:2px;
+  border-radius:0;
+  background:transparent;
+}
+#addItemModal .picker-step-item.done::after {
+  background:transparent;
+}
+#addItemModal .picker-step-item.active::after {
+  background:var(--nomni-green);
+}
 .picker-search-row { display: flex; gap: 8px; padding: 12px 24px 0; flex-shrink: 0; }
 .picker-search-wrap { display: flex; align-items: center; gap: 8px; flex: 1; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; }
 .picker-search-wrap:focus-within { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
@@ -447,6 +502,28 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .picker-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
 .picker-sel-label { font-size: 14px; color: var(--ink-mute); }
 .picker-sel-label strong { color: var(--ink); font-weight: 600; }
+.inventory-add-card { width:1040px; }
+#addInvSkuModal .picker-head { padding-bottom:8px; border-bottom:0; }
+#addInvSkuModal .picker-head-row { margin-bottom:0; }
+.inventory-add-toolbar { display:flex; align-items:center; gap:10px; padding:10px 24px 12px; border-bottom:0; flex-wrap:wrap; }
+.inventory-add-toolbar .picker-search-wrap { flex:1 1 260px; max-width:320px; }
+.inventory-filter-check { display:flex; align-items:center; gap:8px; min-height:36px; font-size:14px; color:var(--ink); cursor:pointer; white-space:nowrap; }
+.inventory-filter-check input { width:18px; height:18px; accent-color:var(--spinach); }
+.inventory-add-table { flex:1; min-height:0; overflow:auto; }
+.inventory-add-head,.inventory-add-row { display:grid; grid-template-columns:34px minmax(300px,1.4fr) minmax(140px,.6fr) minmax(240px,1fr) 90px; column-gap:14px; align-items:center; padding:0 24px; }
+.inventory-add-head { min-height:48px; position:sticky; top:0; z-index:2; background:#fff; border-bottom:1px solid var(--rule); color:var(--ink-mute); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+.inventory-add-row { min-height:82px; border-bottom:1px solid var(--rule); }
+.inventory-add-row.selected { background:rgba(42,200,100,.055); }
+.inventory-add-row input[type=checkbox] { width:18px; height:18px; accent-color:var(--spinach); }
+.inventory-inline-field { width:100%; height:38px; border:1px solid #dcdee3; border-radius:6px; padding:0 10px; background:#fff; color:var(--ink); font:inherit; font-size:14px; }
+.inventory-inline-field:focus { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
+.inventory-conversion { display:flex; align-items:center; gap:7px; min-width:0; font-size:14px; }
+.inventory-conversion .inventory-inline-field { width:70px; flex:0 0 70px; }
+.inventory-flip { border:0; background:none; color:var(--spinach); font:inherit; font-size:12px; font-weight:600; padding:4px 0; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:5px; }
+.inventory-flip .material-symbols-outlined { font-size:17px; line-height:1; }
+.inventory-not-required { color:var(--ink-mute); font-style:italic; }
+.inventory-add-row:not(.selected) .inventory-config { color:var(--ink-mute); }
+.inventory-add-row:not(.selected) .inventory-config select,.inventory-add-row:not(.selected) .inventory-config input,.inventory-add-row:not(.selected) .inventory-config button { visibility:hidden; }
 .outlet-picker-shell { display:flex; flex:1; min-height:420px; overflow:hidden; }
 .outlet-picker-results { flex:1; min-width:0; display:flex; flex-direction:column; border-right:1px solid var(--rule); }
 .outlet-picker-selected { width:280px; flex-shrink:0; display:flex; flex-direction:column; background:#F9FAFB; }
@@ -505,34 +582,29 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .config-grp-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--seaweed); cursor: pointer; flex-shrink: 0; }
 .config-grp-row label { font-size: 14px; cursor: pointer; }
 /* Step 2 compact price table */
-.ai-price-tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
+.ai-price-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.ai-step-helper { margin: 0; padding: 12px 24px; border-bottom: 1px solid var(--rule); background: #fff; color: var(--ink-mute); font-size: 14px; line-height: 1.5; }
 .ai-price-tbl thead th { position: sticky; top: 0; background: #fff; text-align: left; font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; padding: 12px 8px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; z-index: 1; }
 .ai-price-tbl thead th:first-child { padding-left: 24px; }
 .ai-price-tbl thead th:last-child { padding-right: 24px; }
 .ai-price-tbl tbody td { padding: 8px 8px; border-bottom: 1px solid var(--rule); vertical-align: middle; font-size: 14px; }
-.ai-price-tbl tbody td:first-child { padding-left: 24px; }
+.ai-price-tbl tbody td.col-name { padding-left: 24px; }
 .ai-price-tbl tbody td:last-child { padding-right: 24px; }
 .ai-price-tbl tbody tr:last-child td { border-bottom: none; }
-.ai-price-tbl .col-name { width: 200px; }
-.ai-price-tbl .col-name-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; font-weight: 500; color: var(--ink); }
-.ai-price-tbl .col-name-sub { font-size: 11px; color: var(--ink-mute); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
-.ai-price-tbl .col-uom { width: 64px; }
-.ai-price-tbl .col-price { width: 140px; }
-.ai-price-tbl .col-moq { }
-.ai-price-tbl .uom-badge { display: inline-block; background: #f0f1f3; border-radius: 4px; padding: 3px 8px; font-size: 12px; font-weight: 600; color: var(--ink-mute); }
+.ai-price-tbl .col-name { width: 46%; }
+.ai-price-tbl .col-name-text { white-space: normal; overflow: visible; max-width: none; font-weight: 500; color: var(--ink); line-height: 1.35; overflow-wrap: anywhere; }
+.ai-price-tbl .col-name-sub { font-size: 12px; color: var(--ink-mute); margin-top: 3px; white-space: normal; max-width: none; }
+.ai-price-tbl .col-uom { width: 16%; }
+.ai-price-tbl .col-price { width: 18%; }
+.ai-price-tbl .col-moq { width: 20%; }
+.ai-price-tbl .item-name-cell { vertical-align: top; padding-top: 14px; }
+.ai-price-tbl .uom-label { display: inline-block; font-size: 14px; font-weight: 400; color: var(--ink); white-space: nowrap; }
+.ai-price-tbl .uom-cell { display: flex; align-items: center; }
 .ai-price-tbl input { width: 100%; border: 1px solid #dcdee3; border-radius: 6px; padding: 6px 9px; font: inherit; font-size: 14px; color: var(--ink); background: #fff; }
-.ai-price-tbl input:focus { outline: none; border-color: var(--nomni-green); }
-.ai-price-tbl .price-wrap { position: relative; }
-.ai-price-tbl .price-wrap span { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--ink-mute); font-size: 14px; pointer-events: none; }
-.ai-price-tbl .price-wrap input { padding-left: 20px; }
-.ai-price-tbl tr.item-first td { border-top: 1px solid #d0d2d8; }
-.ai-price-tbl tr.item-first:first-child td { border-top: none; }
-.ai-price-tbl tr.uom-row-off td.col-price,
-.ai-price-tbl tr.uom-row-off td.col-moq { opacity: 0.35; }
-.ai-price-tbl tr.uom-row-off td.col-price input,
-.ai-price-tbl tr.uom-row-off td.col-moq input { pointer-events: none; }
-.ai-price-tbl .uom-check { width: 14px; height: 14px; accent-color: var(--seaweed); cursor: pointer; margin-right: 6px; vertical-align: middle; flex-shrink: 0; }
-.ai-price-tbl .uom-badge-off { text-decoration: line-through; opacity: 0.45; }
+.ai-price-tbl input:focus { outline: 2px solid rgba(42,200,100,.18); outline-offset: 0; border-color: var(--nomni-green); }
+.ai-price-tbl .price-wrap { width: 112px; }
+.ai-price-tbl .moq-wrap { display: flex; align-items: center; gap: 8px; }
+.ai-price-tbl .moq-wrap input { width: 104px; flex: 0 0 104px; }
 .access-uom-chip.hq-disabled { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; pointer-events: none; }
 /* Step 3 groups panel */
 .step3-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 0; }
@@ -778,6 +850,46 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   text-align: center;
 }
 
+  /* HQ inventory item settings page */
+  body.hq-inventory-settings-mode .main { padding:0; }
+  body.hq-inventory-settings-mode .main > :not(.hq-inventory-settings-page) { display:none !important; }
+  .hq-inventory-settings-page { min-height:calc(100vh - 64px); padding:18px 0 96px; background:#fff; }
+  .hq-inventory-settings-page[hidden] { display:none; }
+  .hq-inv-settings-back { display:inline-flex; align-items:center; gap:6px; min-height:40px; margin:0 40px 2px; padding:0; border:0; background:transparent; color:var(--spinach); font:600 14px Inter,sans-serif; cursor:pointer; }
+  .hq-inv-settings-back svg { width:16px; height:16px; }
+  .hq-inv-settings-head { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin:0 0 60px; padding:0 40px 16px; border-bottom:1px solid var(--rule); }
+  .hq-inv-settings-head h1 { max-width:920px; margin:0; font:700 24px/1.2 Inter,sans-serif; letter-spacing:-.03em; }
+  .hq-inv-settings-meta { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:2px 0 0; color:var(--ink-mute); font-size:14px; }
+  .hq-inv-settings-form { width:min(770px,calc(100% - 80px)); margin-left:40px; }
+  .hq-inv-field { display:grid; grid-template-columns:148px minmax(0,1fr); gap:28px; align-items:start; margin-bottom:18px; }
+  .hq-inv-field label { padding-top:10px; font-size:14px; font-weight:600; }
+  .hq-inv-control { width:100%; height:42px; padding:0 12px; border:1px solid #DCDEE3; border-radius:6px; background:#fff; color:var(--ink); font:14px Inter,sans-serif; outline:none; }
+  .hq-inv-control:focus { border-color:var(--nomni-green); box-shadow:0 0 0 3px rgba(42,200,100,.14); }
+  .hq-inv-par-wrap { display:flex; align-items:center; gap:10px; }
+  .hq-inv-par-wrap .hq-inv-control { width:150px; }
+  .hq-inv-par-unit { color:var(--ink-mute); font-size:14px; }
+  .hq-counting-uom-section { padding:16px 18px 12px; border-radius:8px; background:#F9FAFB; }
+  .hq-counting-uom-intro { margin:0 0 14px; color:var(--ink-mute); font-size:13px; line-height:1.5; }
+  .hq-counting-uom-intro strong { color:var(--ink); font-weight:600; }
+  .hq-counting-uoms { border:0; border-radius:0; overflow:visible; }
+  .hq-counting-uom-row { display:grid; grid-template-columns:92px minmax(160px,1fr) 120px 112px; gap:14px; align-items:center; min-height:54px; padding:8px 0; border-bottom:1px solid var(--rule); font-size:14px; }
+  .hq-counting-uom-row:last-child { border-bottom:0; }
+  .hq-counting-uom-name { font-weight:600; }
+  .hq-counting-uom-source { color:var(--ink-mute); font-size:13px; }
+  .hq-counting-uom-actions { display:flex; justify-content:flex-end; gap:10px; }
+  .hq-text-action { padding:6px 0; border:0; background:transparent; color:var(--spinach); font:600 13px Inter,sans-serif; cursor:pointer; }
+  .hq-text-action.danger { color:#D0291E; }
+  .hq-add-uom { margin-top:10px; min-height:40px; display:inline-flex; align-items:center; gap:6px; padding:0; }
+  .hq-custom-uom-editor { margin-top:12px; padding:14px; border:1px solid #B9F0C5; border-radius:8px; background:var(--mint); }
+  .hq-custom-uom-editor[hidden] { display:none; }
+  .hq-custom-uom-grid { display:grid; grid-template-columns:150px 1fr; gap:12px 16px; align-items:center; }
+  .hq-custom-uom-grid label { font-size:13px; font-weight:600; }
+  .hq-uom-equation { display:flex; align-items:center; gap:8px; }
+  .hq-uom-equation .hq-inv-control { width:100px; }
+  .hq-custom-uom-editor-actions { display:flex; justify-content:flex-end; gap:14px; margin-top:14px; }
+  .hq-inv-settings-footer { position:fixed; left:232px; right:0; bottom:0; z-index:60; display:flex; justify-content:flex-end; padding:14px 40px 18px; border-top:1px solid var(--rule); background:rgba(255,255,255,.97); }
+  @media(max-width:1100px){ .hq-inv-settings-footer{left:76px} }
+  @media(max-width:760px){ .hq-inventory-settings-page{padding:18px 0 96px}.hq-inv-settings-back{margin-left:20px}.hq-inv-settings-head{padding-left:20px;padding-right:20px}.hq-inv-settings-form{width:calc(100% - 40px);margin-left:20px}.hq-inv-field{grid-template-columns:1fr;gap:8px}.hq-inv-field label{padding-top:0}.hq-counting-uom-row{grid-template-columns:72px 1fr}.hq-counting-uom-source,.hq-counting-uom-actions{grid-column:2}.hq-counting-uom-actions{justify-content:flex-start}.hq-inv-settings-footer{left:0;padding-right:20px}.hq-custom-uom-grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -1414,7 +1526,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <div class="modal-field">
           <label>Custom name <span style="font-weight:400;text-transform:none;color:var(--ink-mute)">(optional)</span></label>
           <input id="hqItemCustomName" class="modal-field-input" type="text" placeholder="Leave blank to use the catalogue name" />
-          <div class="modal-field-hint">Overrides how this item appears on orders</div>
         </div>
         <div id="hqItemPriceSection"></div>
       </div>
@@ -1460,7 +1571,13 @@ function clearNewHqEmptyState(panelId) {
   var panel = document.getElementById(panelId);
   if (!panel) return;
   Array.from(panel.children).forEach(function(child) {
-    child.style.display = child.classList.contains('prereq-empty') ? 'none' : '';
+    if (child.classList.contains('prereq-empty')) {
+      child.style.display = 'none';
+    } else if (window.isNewHQ && child.id === 'priceReviewBanner') {
+      child.style.display = 'none';
+    } else {
+      child.style.display = '';
+    }
   });
 }
 
@@ -1962,6 +2079,14 @@ ITEMS.forEach((item, i) => {
 let mlPage = 1;
 const ML_PER_PAGE = 20;
 let mlSearch = '', mlCatFilter = '', mlSupplierFilter = '', mlStatusFilter = '', mlSortKey = 'default';
+const mlExpandedUoms = new Set();
+
+function toggleMlUoms(itemIdx, event) {
+  event.stopPropagation();
+  if (mlExpandedUoms.has(itemIdx)) mlExpandedUoms.delete(itemIdx);
+  else mlExpandedUoms.add(itemIdx);
+  renderMl();
+}
 
 function setMlSearch(v) { mlSearch = v; mlPage = 1; renderMl(); }
 function setMlCatFilter(v) { mlCatFilter = v; mlPage = 1; renderMl(); }
@@ -2062,7 +2187,7 @@ function openHqItemModal(idx, initialTab) {
     banner.className = 'modal-info-banner';
     banner.style.display = 'flex';
     banner.innerHTML =
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-label="Information" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="9.5"/><text x="12" y="16" text-anchor="middle" fill="currentColor" stroke="none" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="700">i</text></svg>' +
       '<span>Prices and MOQ for items from <strong>' + item.supplier + '</strong> are managed by the supplier and cannot be edited here.</span>';
   } else {
     banner.style.display = 'none';
@@ -2126,6 +2251,8 @@ function toggleHqUomEnabled(itemIdx, uomIdx) {
   }
   // Keep Access tab in sync if visible
   renderAccessPanel(itemIdx);
+  // Keep the Items table and its option count in sync with the HQ-level UOM selection.
+  renderMl();
 }
 
 let editingExcEntry = null;
@@ -2430,6 +2557,7 @@ function toggleGroupAccess(itemIdx, name, btn) {
   if (!state || !state[name]) return;
   state[name].enabled = !state[name].enabled;
   renderAccessPanel(itemIdx);
+  renderMl();
 }
 
 function toggleUomAccess(itemIdx, name, uomIdx, enabled) {
@@ -2437,6 +2565,7 @@ function toggleUomAccess(itemIdx, name, uomIdx, enabled) {
   if (!state || !state[name]) return;
   state[name].uoms[uomIdx] = enabled;
   renderAccessPanel(itemIdx);
+  renderMl();
 }
 
 function renderMl() {
@@ -2454,13 +2583,11 @@ function renderMl() {
     ensureItemAccessState(rawIdx);
     const state = itemAccessState[rawIdx];
 
-    return uoms.map((uom, ui) => {
-      const isFirst = ui === 0;
-      const borderTop = !isFirst ? 'border-top:1px dashed var(--rule);' : '';
+    const enabledUoms = uoms.map((uom, ui) => ({ uom, ui })).filter(entry => item.uomEnabled[entry.ui]);
+    const isMultiUom = enabledUoms.length > 1;
+    const isExpanded = mlExpandedUoms.has(rawIdx);
 
-      const uomCell = '$' + item.price.toFixed(2);
-
-      // Compute which groups/outlets have this UOM enabled
+    function getAccessInfo(ui) {
       const accessNames = [...ML_GROUPS, ...ALL_OUTLETS];
       const enabledForUom = accessNames.filter(name => {
         const s = state[name];
@@ -2472,28 +2599,54 @@ function renderMl() {
       const uomParts = [];
       if (groupsEnabled.length > 0) uomParts.push(groupsEnabled.length === 1 ? '1 group' : groupsEnabled.length + ' groups');
       if (outletsEnabled.length > 0) uomParts.push(outletsEnabled.length === 1 ? '1 outlet' : outletsEnabled.length + ' outlets');
-      const grpLabel = allAccess ? 'All groups' : uomParts.join(' · ');
+      const grpLabel = allAccess ? 'All groups' : (uomParts.join(' · ') || 'No access');
       const grpDataAttr = 'data-groups="' + groupsEnabled.join('|') + '" data-outlets="' + outletsEnabled.join('|') + '"';
       const grpHtml = '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" ' + grpDataAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
+      return { html:grpHtml, label:grpLabel, key:groupsEnabled.join('|') + '::' + outletsEnabled.join('|') };
+    }
 
-      const nameTd = '<td style="' + borderTop + '"><div class="ml-item-name">' + item.name + (isFirst && hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + item.supplier + '</div></td>';
-      const uomTd = '<td style="font-size: 14px;color:var(--ink-mute);' + borderTop + '">' + uom.replace(/^per /i, '') + '</td>';
-      const actionsTd = isFirst
-        ? '<td><div class="row-actions-wrap">' +
-            '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
-            '<div class="row-actions-menu">' +
-              '<div class="row-action-item" onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ')">Edit pricing</div>' +
-              '<div class="row-action-item danger">' + (item.active ? 'Deactivate' : 'Activate') + '</div>' +
-            '</div></div></td>'
-        : '<td style="' + borderTop + '"></td>';
+    const actionsTd = '<td><div class="row-actions-wrap">' +
+      '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
+      '<div class="row-actions-menu">' +
+        '<div class="row-action-item" onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ')">Edit pricing</div>' +
+        '<div class="row-action-item danger">' + (item.active ? 'Deactivate' : 'Activate') + '</div>' +
+      '</div></div></td>';
 
-      return '<tr' + (item.active ? '' : ' class="ml-inactive"') + ' style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-        nameTd + uomTd +
-        '<td style="' + borderTop + 'font-size: 14px;font-weight:600;color:var(--ink)">' + uomCell + '</td>' +
-        '<td style="text-align:left;' + borderTop + '">' + grpHtml + '</td>' +
-        actionsTd +
+    if (!isMultiUom) {
+      const onlyUom = enabledUoms[0] || { uom: uoms[0], ui: 0 };
+      const uom = onlyUom.uom.replace(/^per /i, '');
+      return '<tr class="ml-parent-row' + (item.active ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
+        '<td><div class="ml-item-name">' + item.name + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + item.supplier + '</div></td>' +
+        '<td class="uom-text">' + uom + '</td>' +
+        '<td><div class="ml-price-main">$' + item.price.toFixed(2) + '/' + uom + '</div><div class="ml-price-meta">MOQ: ' + item.moq + '</div></td>' +
+        '<td>' + getAccessInfo(onlyUom.ui).html + '</td>' + actionsTd +
       '</tr>';
-    }).join('');
+    }
+
+    const accessSummaries = enabledUoms.map(entry => getAccessInfo(entry.ui));
+    const sharedAccess = accessSummaries.every(summary => summary.key === accessSummaries[0].key);
+    const parentAccess = sharedAccess
+      ? accessSummaries[0].html
+      : '<button onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ',\'hqItemAccessPanel\')" style="background:none;border:none;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">Varies by UOM</button>';
+
+    const parent = '<tr class="ml-parent-row' + (item.active ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
+      '<td><div class="ml-item-name">' + item.name + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + item.supplier + '</div></td>' +
+      '<td></td>' +
+      '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
+      '<td>' + parentAccess + '</td>' + actionsTd +
+    '</tr>';
+
+    const children = isExpanded ? enabledUoms.map(({ uom, ui }) => {
+      const unit = uom.replace(/^per /i, '');
+      return '<tr class="ml-uom-row' + (item.active ? '' : ' ml-inactive') + '">' +
+        '<td class="ml-uom-indent">' + item.name + '</td>' +
+        '<td class="uom-text">' + unit + '</td>' +
+        '<td><div class="ml-price-main">$' + item.price.toFixed(2) + '/' + unit + '</div><div class="ml-price-meta">MOQ: ' + item.moq.replace(/\s+.*$/, ' ' + unit) + '</div></td>' +
+        '<td>' + getAccessInfo(ui).html + '</td><td></td>' +
+      '</tr>';
+    }).join('') : '';
+
+    return parent + children;
   }).join('');
 
   const totalPages = Math.max(1, Math.ceil(total / ML_PER_PAGE));
@@ -2767,6 +2920,9 @@ function savePrototypeState() {
   var state = getPrototypeState();
   state.suppliers = SUPPLIERS.map(function(supplier) { return Object.assign({}, supplier); });
   state.items = ITEMS.map(function(item) { return Object.assign({}, item); });
+  state.inventory = INV_ITEMS.map(function(item) { return Object.assign({}, item, {
+    groups: Array.isArray(item.groups) ? item.groups.slice() : []
+  }); });
   state.activity = ACTIVITY_LOG.slice();
   localStorage.setItem('nomniHqPrototypeState', JSON.stringify(state));
 }
@@ -3313,6 +3469,7 @@ function confirmNewSupplier() {
 }
 
 function renderInv() {
+  applyHqInventorySettingsOverrides();
   var items = INV_ITEMS.slice();
   if (invSearch) { var q = invSearch.toLowerCase(); items = items.filter(function(r){ return r.name.toLowerCase().includes(q) || (r.detail||'').toLowerCase().includes(q); }); }
   if (invTypeFilter) items = items.filter(function(r){ return r.type === invTypeFilter; });
@@ -3366,7 +3523,7 @@ function renderInv() {
       '<td style="' + td + 'text-align:center">' +
         '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
         '<div class="row-actions-menu">' +
-          '<div class="row-action-item">Edit</div>' +
+          '<div class="row-action-item" onclick="event.stopPropagation();openHqInventorySettings(' + globalIdx + ')">Edit</div>' +
           '<div class="row-action-item">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
           '<div class="row-action-item danger">Remove from inventory</div>' +
         '</div></div>' +
@@ -3400,6 +3557,137 @@ function renderInv() {
   pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + '</span><div class="pager-btns">' + btns + '</div>';
 }
 renderInv();
+
+function getHqInventorySettingsStore() {
+  try { return JSON.parse(localStorage.getItem('nomniHqInventoryItemSettings') || '{}'); } catch (e) { return {}; }
+}
+function applyHqInventorySettingsOverrides() {
+  var saved = getHqInventorySettingsStore();
+  INV_ITEMS.forEach(function(item) {
+    var override = saved[item.name];
+    if (!override) return;
+    item.catalogueUoms = Array.isArray(override.catalogueUoms) ? override.catalogueUoms.slice() : (item.catalogueUoms || [item.orderingUom || item.uom].filter(Boolean));
+    if (override.inventoryUom) item.uom = override.inventoryUom;
+    if (override.par !== undefined) item.par = Number(override.par || 0);
+    item.countingUoms = Array.isArray(override.customUoms) ? override.customUoms.slice() : [];
+  });
+}
+function openHqInventorySettings(index) {
+  var item = INV_ITEMS[index];
+  if (!item) return;
+  var params = new URLSearchParams(window.location.search);
+  params.set('inventoryItem', item.name);
+  params.delete('tab');
+  window.location.href = window.location.pathname + '?' + params.toString() + '#inventory';
+}
+function closeHqInventorySettingsPage() {
+  var params = new URLSearchParams(window.location.search);
+  params.delete('inventoryItem');
+  params.delete('tab');
+  var query = params.toString();
+  window.location.href = window.location.pathname + (query ? '?' + query : '') + '#inventory';
+}
+var hqInventorySettingsDraft = [];
+var hqInventorySettingsEditIndex = -1;
+function hqSettingsEscape(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]; });
+}
+function hqInventoryKnownUoms(item) {
+  var known = (item.catalogueUoms || []).concat([item.orderingUom, item.originalUom, item.uom]).filter(Boolean);
+  return known.filter(function(value,index,list){ return list.indexOf(value) === index; });
+}
+function renderHqInventoryCountingUoms(item) {
+  var list = document.getElementById('hqCountingUomList');
+  if (!list) return;
+  var primary = document.getElementById('hqInventoryUom').value;
+  var known = hqInventoryKnownUoms(item);
+  if (known.indexOf(primary) === -1) known.unshift(primary);
+  list.innerHTML = known.map(function(uom) {
+    var isCatalogue = (item.catalogueUoms || [item.orderingUom || item.uom]).indexOf(uom) > -1;
+    var source = uom === primary ? (isCatalogue ? 'Catalogue · Inventory UOM' : 'Inventory UOM') : 'Catalogue';
+    var conversion = uom === primary ? 'Used as the inventory base unit' : 'Catalogue UOM · read-only';
+    return '<div class="hq-counting-uom-row"><div class="hq-counting-uom-name">' + hqSettingsEscape(uom) + '</div><div>' + conversion + '</div><div class="hq-counting-uom-source">' + source + '</div><div></div></div>';
+  }).join('') + hqInventorySettingsDraft.map(function(entry,index) {
+    var conversion = entry.flipped ? '1 ' + entry.referenceUom + ' = ' + entry.quantity + ' ' + entry.uom : '1 ' + entry.uom + ' = ' + entry.quantity + ' ' + entry.referenceUom;
+    return '<div class="hq-counting-uom-row"><div class="hq-counting-uom-name">' + hqSettingsEscape(entry.uom) + '</div><div>' + hqSettingsEscape(conversion) + '</div><div class="hq-counting-uom-source">Custom</div><div class="hq-counting-uom-actions"><button class="hq-text-action" type="button" onclick="openHqCustomUomEditor(' + index + ')">Edit</button><button class="hq-text-action danger" type="button" onclick="removeHqCustomUom(' + index + ')">Remove</button></div></div>';
+  }).join('');
+}
+function hqAvailableCustomUoms(item,current) {
+  var all = ['bag','bottle','box','ctn','ea','g','kg','L','ml','pack','piece','pkt','roll','tin','tray','tub','unit'];
+  var used = hqInventoryKnownUoms(item).concat([document.getElementById('hqInventoryUom').value], hqInventorySettingsDraft.map(function(entry){return entry.uom;}));
+  return all.filter(function(uom){ return uom === current || used.indexOf(uom) === -1; });
+}
+function openHqCustomUomEditor(index) {
+  var item = window.hqActiveInventorySettingsItem;
+  var editor = document.getElementById('hqCustomUomEditor');
+  var entry = typeof index === 'number' && index > -1 ? hqInventorySettingsDraft[index] : null;
+  hqInventorySettingsEditIndex = entry ? index : -1;
+  var select = document.getElementById('hqCustomUomName');
+  select.innerHTML = hqAvailableCustomUoms(item,entry && entry.uom).map(function(uom){return '<option>' + hqSettingsEscape(uom) + '</option>';}).join('');
+  if (entry) select.value = entry.uom;
+  document.getElementById('hqCustomUomLabel').textContent = select.value || 'custom UOM';
+  document.getElementById('hqCustomUomQty').value = entry ? entry.quantity : 1;
+  var reference = document.getElementById('hqCustomUomReference');
+  reference.innerHTML = hqInventoryKnownUoms(item).concat([document.getElementById('hqInventoryUom').value]).filter(function(v,i,a){return v && a.indexOf(v)===i;}).map(function(uom){return '<option>' + hqSettingsEscape(uom) + '</option>';}).join('');
+  if (entry) reference.value = entry.referenceUom;
+  document.getElementById('hqCustomUomSave').textContent = entry ? 'Save' : 'Add';
+  editor.hidden = false;
+}
+function closeHqCustomUomEditor() { document.getElementById('hqCustomUomEditor').hidden = true; hqInventorySettingsEditIndex = -1; }
+function removeHqCustomUom(index) { hqInventorySettingsDraft.splice(index,1); closeHqCustomUomEditor(); renderHqInventoryCountingUoms(window.hqActiveInventorySettingsItem); }
+function saveHqCustomUom() {
+  var entry = {uom:document.getElementById('hqCustomUomName').value,quantity:Number(document.getElementById('hqCustomUomQty').value || 1),referenceUom:document.getElementById('hqCustomUomReference').value,flipped:false};
+  if (!entry.uom || !entry.referenceUom || entry.quantity <= 0) return;
+  if (hqInventorySettingsEditIndex > -1) hqInventorySettingsDraft[hqInventorySettingsEditIndex] = entry; else hqInventorySettingsDraft.push(entry);
+  closeHqCustomUomEditor();
+  renderHqInventoryCountingUoms(window.hqActiveInventorySettingsItem);
+}
+function saveHqInventorySettings(event) {
+  event.preventDefault();
+  var item = window.hqActiveInventorySettingsItem;
+  var saved = getHqInventorySettingsStore();
+  saved[item.name] = {inventoryUom:document.getElementById('hqInventoryUom').value,par:Number(document.getElementById('hqInventoryPar').value || 0),catalogueUoms:(item.catalogueUoms || [item.orderingUom || item.uom]).filter(Boolean),customUoms:hqInventorySettingsDraft.slice(),updatedAt:new Date().toISOString()};
+  localStorage.setItem('nomniHqInventoryItemSettings',JSON.stringify(saved));
+  if (window.isNewHQ) {
+    var prototype = getPrototypeState();
+    var prototypeItem = (prototype.inventory || []).find(function(entry){return entry.name === item.name;});
+    if (prototypeItem) { prototypeItem.uom = saved[item.name].inventoryUom; prototypeItem.par = saved[item.name].par; prototypeItem.countingUoms = saved[item.name].customUoms.slice(); localStorage.setItem('nomniHqPrototypeState',JSON.stringify(prototype)); }
+  }
+  closeHqInventorySettingsPage();
+}
+function initialiseHqInventorySettingsPage() {
+  var requestedName = new URLSearchParams(window.location.search).get('inventoryItem');
+  if (!requestedName) return;
+  applyHqInventorySettingsOverrides();
+  var item = INV_ITEMS.find(function(entry){return entry.name === requestedName;});
+  if (!item) { closeHqInventorySettingsPage(); return; }
+  window.hqActiveInventorySettingsItem = item;
+  var saved = getHqInventorySettingsStore()[item.name] || {};
+  item.catalogueUoms = Array.isArray(saved.catalogueUoms) ? saved.catalogueUoms.slice() : (item.catalogueUoms || [item.orderingUom || item.uom].filter(Boolean));
+  hqInventorySettingsDraft = Array.isArray(saved.customUoms) ? saved.customUoms.map(function(entry){return Object.assign({},entry);}) : (item.countingUoms || []).map(function(entry){return Object.assign({},entry);});
+  var hqName = (document.querySelector('.page-title') || {}).textContent || 'HQ';
+  var page = document.createElement('section');
+  page.className = 'hq-inventory-settings-page';
+  page.innerHTML = '<button class="hq-inv-settings-back" type="button" onclick="closeHqInventorySettingsPage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Inventory</button>' +
+    '<div class="hq-inv-settings-head"><div><h1>' + hqSettingsEscape(item.name) + '</h1><div class="hq-inv-settings-meta"><span>' + hqSettingsEscape(item.supplier || item.detail || 'Not assigned') + '</span><span aria-hidden="true">•</span><span>' + hqSettingsEscape(hqName.trim()) + '</span><span aria-hidden="true">•</span><span>HQ-wide</span></div></div></div>' +
+    '<form class="hq-inv-settings-form" onsubmit="saveHqInventorySettings(event)">' +
+    '<div class="hq-inv-field"><label for="hqInventoryUom">Inventory UOM:</label><select class="hq-inv-control" id="hqInventoryUom" onchange="renderHqInventoryCountingUoms(window.hqActiveInventorySettingsItem)"></select></div>' +
+    '<div class="hq-inv-field"><div aria-hidden="true"></div><div class="hq-counting-uom-section"><p class="hq-counting-uom-intro"><strong>Use these UOMs for stock counts and adjustments</strong><br>Quantities convert to the Inventory UOM when saved. Catalogue UOMs cannot be edited or removed.</p><div class="hq-counting-uoms" id="hqCountingUomList"></div><button class="hq-text-action hq-add-uom" type="button" onclick="openHqCustomUomEditor()"><span aria-hidden="true">+</span>Add UOM</button><div class="hq-custom-uom-editor" id="hqCustomUomEditor" hidden><div class="hq-custom-uom-grid"><label for="hqCustomUomName">UOM</label><select class="hq-inv-control" id="hqCustomUomName"></select><label>Conversion</label><div class="hq-uom-equation"><span>1</span><span id="hqCustomUomLabel">custom UOM</span><span>=</span><input class="hq-inv-control" id="hqCustomUomQty" type="number" min="0.01" step="0.01" value="1"><select class="hq-inv-control" id="hqCustomUomReference"></select></div></div><div class="hq-custom-uom-editor-actions"><button class="hq-text-action" type="button" onclick="closeHqCustomUomEditor()">Cancel</button><button class="btn-primary" id="hqCustomUomSave" type="button" onclick="saveHqCustomUom()">Add</button></div></div></div></div>' +
+    '<div class="hq-inv-field"><label for="hqInventoryPar">Par level:</label><div class="hq-inv-par-wrap"><input class="hq-inv-control" id="hqInventoryPar" type="number" min="0" step="0.01" value="' + hqSettingsEscape(saved.par !== undefined ? saved.par : (item.par || 0)) + '"><span class="hq-inv-par-unit" id="hqInventoryParUnit"></span></div></div>' +
+    '<div class="hq-inv-settings-footer"><button class="btn-primary" type="submit">Save changes</button></div></form>';
+  document.querySelector('.main').appendChild(page);
+  document.body.classList.add('hq-inventory-settings-mode');
+  var uomSelect = document.getElementById('hqInventoryUom');
+  var options = ['bag','bottle','box','ctn','ea','g','kg','L','ml','pack','piece','pkt','roll','tin','tray','tub','unit'];
+  hqInventoryKnownUoms(item).forEach(function(uom){if(options.indexOf(uom)===-1)options.push(uom);});
+  uomSelect.innerHTML = options.map(function(uom){return '<option value="' + hqSettingsEscape(uom) + '">' + hqSettingsEscape(uom) + '</option>';}).join('');
+  uomSelect.value = saved.inventoryUom || item.uom || 'unit';
+  document.getElementById('hqInventoryParUnit').textContent = uomSelect.value;
+  uomSelect.addEventListener('change',function(){document.getElementById('hqInventoryParUnit').textContent=this.value;});
+  document.getElementById('hqCustomUomName').addEventListener('change',function(){document.getElementById('hqCustomUomLabel').textContent=this.value || 'custom UOM';});
+  renderHqInventoryCountingUoms(item);
+  window.scrollTo(0,0);
+}
 
 // ── Toast ──
 function showHqToast(title, copy) {
@@ -3503,8 +3791,8 @@ const PLATFORM_CATALOGUE_ITEMS = {
     ['FRESH WHOLE MILK 2L X 6', ['ctn','bottle'], 'Dairy & Eggs'],
     ['UNSALTED BUTTER 250G X 20', ['ctn','pkt'], 'Dairy & Eggs'],
     ['CHEDDAR CHEESE BLOCK 2KG', ['kg','block'], 'Dairy & Eggs'],
-    ['GREEK YOGHURT NATURAL 1KG', ['tub','kg'], 'Dairy & Eggs'],
-    ['FREE-RANGE EGGS 30PC', ['tray','ctn'], 'Dairy & Eggs']
+    ['GREEK YOGHURT NATURAL 1KG', ['tub'], 'Dairy & Eggs'],
+    ['FREE-RANGE EGGS 30PC', ['tray'], 'Dairy & Eggs']
   ],
   'Wilmar International': [
     ['JASMINE RICE PREMIUM 25KG', ['bag','kg'], 'Dry Goods'],
@@ -3563,6 +3851,12 @@ function renderAiList() {
     (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
     (!sup || i.supplier === sup)
   );
+  const meta = document.getElementById('aiResultsMeta');
+  const selectAllButton = document.getElementById('aiSelectAll');
+  meta.textContent = filtered.length ? filtered.length + ' catalogue item' + (filtered.length === 1 ? '' : 's') : 'No catalogue items found';
+  selectAllButton.style.display = filtered.length ? 'inline-flex' : 'none';
+  const allFilteredSelected = filtered.length > 0 && filtered.every(i => aiSel.has(i.id));
+  selectAllButton.textContent = allFilteredSelected ? 'Deselect all' : 'Select all';
   document.getElementById('aiList').innerHTML = filtered.length ? filtered.map(i => {
     const s = aiSel.has(i.id);
     const uomBadges = i.uoms.map(u => '<span style="display:inline-block;background:#f0f1f3;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600;color:var(--ink-mute);margin-left:4px">' + u + '</span>').join('');
@@ -3576,44 +3870,34 @@ function renderAiList() {
   document.getElementById('aiNextBtn').disabled = n === 0;
 }
 function toggleAiItem(id) { aiSel.has(id) ? aiSel.delete(id) : aiSel.add(id); renderAiList(); }
+function toggleAllAiItems() {
+  const q = document.getElementById('aiSearch').value.toLowerCase();
+  const sup = document.getElementById('aiSupFilter').value;
+  const linkedNames = new Set(SUPPLIERS.map(function(supplier) { return supplier.name; }));
+  const filtered = CAT_ITEMS.filter(i => linkedNames.has(i.supplier) &&
+    (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
+    (!sup || i.supplier === sup)
+  );
+  const allSelected = filtered.length > 0 && filtered.every(i => aiSel.has(i.id));
+  filtered.forEach(i => allSelected ? aiSel.delete(i.id) : aiSel.add(i.id));
+  renderAiList();
+}
 function showAiStep2() {
   const items = CAT_ITEMS.filter(i => aiSel.has(i.id));
   document.getElementById('aiPriceRows').innerHTML = items.map((item) => {
-    const multi = item.uoms.length > 1;
     return item.uoms.map((u, ui) => {
       const isFirst = ui === 0;
-      const checkId = 'aiUomCheck_' + item.id + '_' + ui;
-      const uomCell = multi
-        ? '<td class="col-uom" style="display:flex;align-items:center;gap:4px;padding-top:14px;padding-bottom:14px">' +
-            '<input type="checkbox" class="uom-check" id="' + checkId + '" checked onchange="toggleAiUomRow(this,\'' + item.id + '\',' + ui + ')" />' +
-            '<span class="uom-badge" id="aiUomBadge_' + item.id + '_' + ui + '">' + u + '</span>' +
-          '</td>'
-        : '<td class="col-uom"><span class="uom-badge">' + u + '</span></td>';
+      const uomCell = '<td class="col-uom"><div class="uom-cell"><span class="uom-label">' + u + '</span></div></td>';
       return '<tr class="' + (isFirst ? 'item-first' : '') + '" id="aiUomRow_' + item.id + '_' + ui + '">' +
-        '<td class="col-name">' + (isFirst
-          ? '<div class="col-name-text" title="' + item.name + '">' + item.name + '</div><div class="col-name-sub">' + item.supplier + '</div>'
-          : '') + '</td>' +
+        (isFirst ? '<td class="col-name item-name-cell" rowspan="' + item.uoms.length + '"><div class="col-name-text">' + item.name + '</div><div class="col-name-sub">' + item.supplier + '</div></td>' : '') +
         uomCell +
-        '<td class="col-price"><div class="price-wrap"><span>$</span><input type="number" placeholder="0.00" step="0.01" min="0" /></div></td>' +
-        '<td class="col-moq"><input type="text" placeholder="e.g. 5 ' + u + '" /></td>' +
+        '<td class="col-price"><div class="price-wrap"><input type="number" value="0" step="0.01" min="0" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="price" aria-label="Unit price for ' + item.name + ' per ' + u + '" /></div></td>' +
+        '<td class="col-moq"><div class="moq-wrap"><input type="number" value="0" step="1" min="0" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="moq" aria-label="Minimum order quantity for ' + item.name + ' in ' + u + '" /></div></td>' +
       '</tr>';
     }).join('');
   }).join('');
   document.getElementById('aiAddBtn').textContent = 'Add ' + items.length + ' item' + (items.length>1?'s':'');
   setAiStep(2);
-}
-function toggleAiUomRow(cb, itemId, uomIdx) {
-  const item = CAT_ITEMS.find(i => i.id === itemId);
-  if (!item) return;
-  const enabledCount = item.uoms.filter((_, i) => {
-    const el = document.getElementById('aiUomCheck_' + itemId + '_' + i);
-    return !el || el.checked;
-  }).length;
-  if (!cb.checked && enabledCount === 0) { cb.checked = true; return; }
-  const row = document.getElementById('aiUomRow_' + itemId + '_' + uomIdx);
-  const badge = document.getElementById('aiUomBadge_' + itemId + '_' + uomIdx);
-  if (row) row.classList.toggle('uom-row-off', !cb.checked);
-  if (badge) badge.classList.toggle('uom-badge-off', !cb.checked);
 }
 function showAiStep3() { setAiStep(3); }
 function showAiStep2Back() { setAiStep(2); }
@@ -3653,84 +3937,87 @@ function confirmAddItems() {
 }
 
 // ── Flow 2a: Add SKU to Inventory ──
-const INV_AVAIL_SKUS = [
-  { id:'is1', name:'Whole Chicken Grade A', supplier:'Kee Song Group', uom:'kg', price:8.20 },
-  { id:'is2', name:'Chicken Wing Mid Joint', supplier:'Kee Song Group', uom:'kg', price:7.50 },
-  { id:'is3', name:'Beef Short Ribs', supplier:'Meat King', uom:'kg', price:28.00 },
-  { id:'is4', name:'US Prime Ribeye', supplier:'Meat King', uom:'kg', price:38.00 },
-  { id:'is5', name:'King Prawns L1', supplier:'Deli Hub', uom:'kg', price:32.00 },
-  { id:'is6', name:'Mozzarella Cheese Block', supplier:'Deli Hub', uom:'kg', price:16.50 },
-  { id:'is7', name:'Fresh Basil', supplier:'Provenir', uom:'bunch', price:2.80 },
-  { id:'is8', name:'Sweet Corn', supplier:'Provenir', uom:'piece', price:1.20 },
-  { id:'is9', name:'Extra Virgin Olive Oil', supplier:'Deli Hub', uom:'L', price:22.00 },
-  { id:'is10', name:'Sea Salt Flakes', supplier:'Deli Hub', uom:'kg', price:14.00 },
-];
 const UOM_OPTIONS = ['kg','g','L','mL','piece','portion','bottle','can','bag','box','carton','pack','bunch','roll','tray'];
 let isSel = new Set();
+let isConfig = {};
+function getInvAvailSkus() {
+  return ITEMS.map((item, idx) => {
+    ensureItemAccessState(idx);
+    const allUoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+    const enabledUoms = allUoms.filter((_, ui) => item.uomEnabled[ui]).map(u => u.replace(/^per /i, ''));
+    return { id:'is' + idx, itemIdx:idx, name:item.name, supplier:item.supplier, uom:enabledUoms[0], uoms:enabledUoms, price:item.price };
+  }).filter(item => item.uoms.length && !INV_ITEMS.some(inv => inv.sourceItemIdx === item.itemIdx));
+}
+function populateInvSupplierFilter(items) {
+  const select = document.getElementById('isSupFilter');
+  const current = select.value;
+  const suppliers = [...new Set(items.map(item => item.supplier))].sort();
+  select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+  if (suppliers.includes(current)) select.value = current;
+}
 function openAddInvSkuModal() {
   isSel.clear();
+  isConfig = {};
   document.getElementById('isSearch').value = '';
+  populateInvSupplierFilter(getInvAvailSkus());
   document.getElementById('isSupFilter').value = '';
-  setPickerSteps('isSt1','isSt2',1);
-  showPanel('isPanel1','isPanel2',1);
   renderIsList();
   document.getElementById('addInvSkuModal').classList.add('open');
   setTimeout(function() { document.getElementById('isSearch').focus(); }, 0);
 }
 function closeAddInvSkuModal() { document.getElementById('addInvSkuModal').classList.remove('open'); }
 function renderIsList() {
+  const available = getInvAvailSkus();
   const q = document.getElementById('isSearch').value.toLowerCase();
   const sup = document.getElementById('isSupFilter').value;
-  const filtered = INV_AVAIL_SKUS.filter(i =>
+  const filtered = available.filter(i =>
     (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
     (!sup || i.supplier === sup)
   ).sort((a, b) => a.name.localeCompare(b.name));
   document.getElementById('isList').innerHTML = filtered.length ? filtered.map(i => {
     const s = isSel.has(i.id);
-    return '<div class="picker-row' + (s?' sel':'') + '" onclick="toggleIsItem(\'' + i.id + '\')">' +
-      '<div class="picker-chk">' + (s ? chkSvg() : '') + '</div>' +
-      '<div class="picker-row-info"><div class="picker-row-name">' + i.name + '</div><div class="picker-row-sub">' + i.supplier + '</div></div>' +
-      '<div class="picker-row-meta"><div class="picker-row-price">$' + i.price.toFixed(2) + '</div><div class="picker-row-uom">/' + i.uom + '</div></div>' +
+    const cfg = isConfig[i.id] || { inventoryUom:i.uom, orderUom:i.uom, conversion:1, flipped:false, par:0 };
+    isConfig[i.id] = cfg;
+    const uomOpts = [...new Set([...i.uoms, ...UOM_OPTIONS])].map(u => '<option value="' + u + '"' + (u===cfg.inventoryUom?' selected':'') + '>' + u + '</option>').join('');
+    const conversion = cfg.inventoryUom === cfg.orderUom
+      ? '<span class="inventory-not-required">Not required</span>'
+      : '<div class="inventory-conversion"><span>1 ' + (cfg.flipped ? cfg.orderUom : cfg.inventoryUom) + '</span><span>=</span><input class="inventory-inline-field" type="number" min="0.001" step="any" value="' + cfg.conversion + '" onchange="updateIsConfig(\'' + i.id + '\',\'conversion\',this.value)"><span>' + (cfg.flipped ? cfg.inventoryUom : cfg.orderUom) + '</span><button class="inventory-flip" type="button" onclick="flipIsConversion(\'' + i.id + '\')"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>Flip units</button></div>';
+    return '<div class="inventory-add-row' + (s?' selected':'') + '">' +
+      '<input type="checkbox" ' + (s?'checked':'') + ' onclick="toggleIsItem(\'' + i.id + '\')">' +
+      '<div><div class="picker-row-name">' + i.name + '</div><div class="picker-row-sub">' + i.supplier + '</div></div>' +
+      '<div class="inventory-config"><select class="inventory-inline-field" onchange="updateIsConfig(\'' + i.id + '\',\'inventoryUom\',this.value)">' + uomOpts + '</select></div>' +
+      '<div class="inventory-config">' + conversion + '</div>' +
+      '<div class="inventory-config"><input class="inventory-inline-field" type="number" min="0" value="' + cfg.par + '" onchange="updateIsConfig(\'' + i.id + '\',\'par\',this.value)"></div>' +
     '</div>';
   }).join('') : '<div class="picker-empty">No items found</div>';
   const n = isSel.size;
   document.getElementById('isSelLabel').innerHTML = n ? '<strong>' + n + '</strong> item' + (n>1?'s':'') + ' selected' : 'No items selected';
-  document.getElementById('isNextBtn').disabled = n === 0;
+  document.getElementById('isDoneBtn').disabled = n === 0;
+  document.getElementById('isSaveMoreBtn').disabled = n === 0;
 }
 function toggleIsItem(id) { isSel.has(id) ? isSel.delete(id) : isSel.add(id); renderIsList(); }
-function showIsStep2() {
-  const items = INV_AVAIL_SKUS.filter(i => isSel.has(i.id));
-  document.getElementById('isConfigList').innerHTML = items.map(i => {
-    const uomOpts = [...new Set([i.uom, ...UOM_OPTIONS])].map(u =>
-      '<option value="' + u + '"' + (u===i.uom?' selected':'') + '>' + u + '</option>'
-    ).join('');
-    return '<div class="config-row">' +
-      '<div class="config-row-name">' + i.name + '</div>' +
-      '<div class="config-row-sub">' + i.supplier + '</div>' +
-      '<div class="config-fields cols2">' +
-        '<div class="config-field"><label>Ordering UOM</label><div class="config-readonly">' + i.uom + '</div></div>' +
-        '<div class="config-field"><label>Inventory UOM</label>' +
-          '<select onchange="onIsUomChange(this,\'' + i.uom + '\',\'' + i.id + '\')">' + uomOpts + '</select>' +
-        '</div>' +
-      '</div>' +
-      '<div id="isConv_' + i.id + '" style="display:none" class="conv-hint">' +
-        '1 ' + i.uom + ' = <input type="number" value="1" min="0.001" step="any" /> <span id="isConvUnit_' + i.id + '">' + i.uom + '</span>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-  setPickerSteps('isSt1','isSt2',2);
-  showPanel('isPanel1','isPanel2',2);
+function updateIsConfig(id, key, value) {
+  if (!isConfig[id]) return;
+  isConfig[id][key] = key === 'conversion' || key === 'par' ? Number(value) : value;
+  renderIsList();
 }
-function onIsUomChange(sel, orderingUom, id) {
-  const convRow = document.getElementById('isConv_' + id);
-  const convUnit = document.getElementById('isConvUnit_' + id);
-  convUnit.textContent = sel.value;
-  convRow.style.display = sel.value !== orderingUom ? 'flex' : 'none';
-}
-function showIsStep1() { setPickerSteps('isSt1','isSt2',1); showPanel('isPanel1','isPanel2',1); }
-function confirmAddInvSku() {
+function flipIsConversion(id) { if (isConfig[id]) { isConfig[id].flipped = !isConfig[id].flipped; renderIsList(); } }
+function confirmAddInvSku(addMore) {
   const n = isSel.size;
-  closeAddInvSkuModal();
+  const selected = getInvAvailSkus().filter(i => isSel.has(i.id));
+  selected.forEach(i => {
+    const cfg = isConfig[i.id];
+    INV_ITEMS.push({ type:'sku', sourceItemIdx:i.itemIdx, name:i.name, detail:i.supplier, uom:cfg.inventoryUom, orderingUom:cfg.orderUom, conversion:cfg.conversion, conversionFlipped:cfg.flipped, par:cfg.par, cost:i.price, active:true, groups:INV_GROUPS.slice() });
+  });
+  refreshNewHqEmptyStates();
+  renderInv();
+  renderNewHqSummary(getSavedOutletGroup());
+  if (n) {
+    addPrototypeActivity('inventory', '<strong>' + n + ' SKU' + (n > 1 ? 's' : '') + '</strong> added to inventory', 'inventory', 'Master');
+    savePrototypeState();
+  }
+  if (addMore) { isSel.clear(); populateInvSupplierFilter(getInvAvailSkus()); renderIsList(); }
+  else closeAddInvSkuModal();
   showHqToast(n + ' SKU' + (n>1?'s':'') + ' added to inventory');
 }
 
@@ -4181,7 +4468,7 @@ function confirmRemoveFromHQ() {
         </div>
         <div class="picker-info-bar" id="groupOutletInfoBar" style="display:none;align-items:center;justify-content:space-between;gap:12px;min-height:50px">
           <span id="groupOutletResultsMeta"></span>
-          <button class="btn btn-tertiary" id="groupOutletSelectAll" onclick="toggleAllGroupOutletResults()" style="display:none;min-height:40px;padding:0 12px;flex-shrink:0">Select all</button>
+          <button class="picker-text-action" id="groupOutletSelectAll" onclick="toggleAllGroupOutletResults()" style="display:none;flex-shrink:0">Select all</button>
         </div>
         <div class="picker-list" id="groupOutletPickerList"></div>
       </div>
@@ -4231,6 +4518,10 @@ function confirmRemoveFromHQ() {
           <option>Kee Song Group</option><option>Meat King</option><option>Provenir</option><option>Deli Hub</option>
         </select>
       </div>
+      <div class="picker-info-bar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px">
+        <span id="aiResultsMeta"></span>
+        <button class="picker-text-action" id="aiSelectAll" type="button" onclick="toggleAllAiItems()">Select all</button>
+      </div>
       <div class="picker-list" id="aiList"></div>
       <div class="picker-foot">
         <div class="picker-sel-label" id="aiSelLabel">No items selected</div>
@@ -4242,14 +4533,15 @@ function confirmRemoveFromHQ() {
     </div>
     <!-- Step 2: Set prices -->
     <div id="aiPanel2" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <p class="ai-step-helper">For items with multiple UOMs, enter values only for the UOMs you want to add. Leave both unit price and MOQ at 0 to skip a UOM.</p>
       <div style="flex:1;overflow-y:auto;min-height:0">
         <table class="ai-price-tbl">
           <thead>
             <tr>
               <th class="col-name">Item</th>
               <th class="col-uom">UOM</th>
-              <th class="col-price">Unit price (S$) <span style="color:#D0291E;text-transform:none;letter-spacing:0;font-weight:400">*</span></th>
-              <th class="col-moq">Min. order qty <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-mute)">(optional)</span></th>
+              <th class="col-price">Unit price (S$)</th>
+              <th class="col-moq">MOQ <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-mute)">(optional)</span></th>
             </tr>
           </thead>
           <tbody id="aiPriceRows"></tbody>
@@ -4314,21 +4606,15 @@ function confirmRemoveFromHQ() {
 
 <!-- ── Flow 2a: Add SKU to Inventory modal ── -->
 <div class="picker-overlay" id="addInvSkuModal" onclick="if(event.target===this)closeAddInvSkuModal()">
-  <div class="picker-card">
+  <div class="picker-card inventory-add-card">
     <div class="picker-head">
       <div class="picker-head-row">
-        <div class="picker-title">Add SKUs to inventory</div>
+        <div class="picker-title">Add to inventory</div>
         <button class="picker-close-btn" onclick="closeAddInvSkuModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
-      <div class="picker-steps">
-        <div class="picker-step-item" id="isSt1"><div class="picker-step-num">1</div>&nbsp;Select SKUs</div>
-        <div class="picker-step-sep"></div>
-        <div class="picker-step-item" id="isSt2"><div class="picker-step-num">2</div>&nbsp;Set inventory UOM</div>
-      </div>
     </div>
-    <!-- Step 1 -->
-    <div id="isPanel1" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
-      <div class="picker-search-row">
+    <div style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div class="inventory-add-toolbar">
         <div class="picker-search-wrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" placeholder="Search items…" id="isSearch" oninput="renderIsList()" />
@@ -4337,27 +4623,19 @@ function confirmRemoveFromHQ() {
           <option value="">All suppliers</option>
           <option>Kee Song Group</option><option>Meat King</option><option>Provenir</option><option>Deli Hub</option>
         </select>
+        <label class="inventory-filter-check"><input type="checkbox" disabled> Invoiced in past</label>
+        <select class="picker-select" disabled><option>90 days</option></select>
       </div>
-      <div class="picker-list" id="isList"></div>
+      <div class="inventory-add-table">
+        <div class="inventory-add-head"><span></span><span>Name</span><span>Inventory UOM</span><span>Conversion rate to order UOM</span><span>Par</span></div>
+        <div id="isList"></div>
+      </div>
       <div class="picker-foot">
         <div class="picker-sel-label" id="isSelLabel">No items selected</div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-tertiary" onclick="closeAddInvSkuModal()">Cancel</button>
-          <button class="btn btn-primary" id="isNextBtn" onclick="showIsStep2()" disabled>Next →</button>
+          <button class="picker-text-action" id="isSaveMoreBtn" onclick="confirmAddInvSku(true)" disabled>Save selected &amp; add more</button>
+          <button class="btn btn-primary" id="isDoneBtn" onclick="confirmAddInvSku(false)" disabled>Done</button>
         </div>
-      </div>
-    </div>
-    <!-- Step 2 -->
-    <div id="isPanel2" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
-      <div class="config-list" id="isConfigList"></div>
-      <div class="config-groups">
-        <div class="config-groups-lbl">Groups with access</div>
-        <div class="config-grp-row"><input type="checkbox" id="isGrp0" checked /><label for="isGrp0">Chargrill Outlets</label></div>
-        <div class="config-grp-row"><input type="checkbox" id="isGrp1" checked /><label for="isGrp1">Family Dining Express</label></div>
-      </div>
-      <div class="picker-foot">
-        <button class="btn btn-tertiary" onclick="showIsStep1()">← Back</button>
-        <button class="btn btn-primary" onclick="confirmAddInvSku()">Add to inventory</button>
       </div>
     </div>
   </div>
@@ -4617,6 +4895,9 @@ panel.innerHTML =
   if (Array.isArray(prototypeState.items)) {
     prototypeState.items.forEach(function(item) { ITEMS.push(item); });
   }
+  if (Array.isArray(prototypeState.inventory)) {
+    prototypeState.inventory.forEach(function(item) { INV_ITEMS.push(item); });
+  }
   ACTIVITY_LOG.splice(0, ACTIVITY_LOG.length);
   if (Array.isArray(prototypeState.activity) && prototypeState.activity.length) {
     prototypeState.activity.forEach(function(activity) { ACTIVITY_LOG.push(activity); });
@@ -4771,6 +5052,7 @@ function renderCreatedOutletGroup() {
 }
 
 renderCreatedOutletGroup();
+initialiseHqInventorySettingsPage();
 </script>
 
 </body>

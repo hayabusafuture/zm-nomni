@@ -78,7 +78,7 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 | Group suppliers | View supplier availability | Built | Active and inactive states are represented | — |
 | Group suppliers | Disable or reactivate by group | Partial | Item cascade choices are represented | Retain changes |
 | Inventory | Browse HQ inventory | Built | Search, filters, pagination and expandable rows | — |
-| Inventory | Add catalogue item | Partial | Two-step picker and inventory-UOM configuration | Retain the result |
+| Inventory | Add catalogue item | Built | One-screen picker with inline Inventory UOM, conversion to order UOM, Flip units, Par and save-and-add-more behaviour | — |
 | Inventory | Add recipe or sub-recipe | Partial | Two-step picker and confirmation | Retain the result |
 | Inventory | Add Group SKU | Not built | Menu option exists | Design and build the flow |
 | Inventory | Link suppliers | Partial | Multi-select modal and confirmation | Retain links |
@@ -139,6 +139,17 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 
 | Date | Change |
 |---|---|
+| 17 August 2026 | Connected Inventory row Edit actions to an HQ-specific item settings page based on PWF-1694, with Inventory UOM and par settings, read-only catalogue UOMs, editable custom counting UOM conversions and locally persisted updates. |
+| 17 August 2026 | Realigned the HQ Inventory item settings page to the existing Procure Inventory settings pattern: matching header and form rhythm, grey Counting UOM card, aligned Par level row and single fixed Save action, while retaining HQ-wide settings behaviour. |
+| 17 August 2026 | Reworked “Add to inventory” to match the existing Inventory flow: removed the stepper, moved Inventory UOM, conversion and Par configuration inline, added Flip units and “Save selected & add more”, and removed the redundant group-access step. |
+| 17 August 2026 | Aligned supplier-catalogue Step 2 with the existing add-item model: SKU selection happens in Step 1, UOM rows no longer have separate checkboxes, and zero price/MOQ values represent an unused UOM. |
+| 17 August 2026 | Aligned the HQ Items list with the live market-list pattern: multi-UOM SKUs now use expandable option rows, while single-UOM SKUs show price and MOQ directly. |
+| 17 August 2026 | Connected HQ-level UOM enablement to the Items list, so option counts and expanded UOM rows update immediately when a UOM is enabled or disabled. |
+| 17 August 2026 | Connected “Add SKUs to inventory” to the current HQ Items list, including enabled UOMs and newly added items, and aligned its stepper with the supplier-catalogue flow. |
+| 17 August 2026 | Improved multi-UOM access summaries in the Items list: shared access is shown directly, while genuinely different access links to the complete UOM-level Access view. |
+| 17 August 2026 | Removed the populated-HQ price-review warning from the new-HQ Items state and prevented empty-state refreshes from restoring it with a broken stacked layout. |
+| 17 August 2026 | Connected group, outlet and UOM changes in an item’s Access tab to the Groups with access details in the Items table. |
+| 17 August 2026 | Added filter-aware Select all/Deselect all to the supplier-catalogue item picker and standardised outlet-picker Select all controls as 14px text actions across Admin and Procure HQ flows. |
 | 14 August 2026 | Standardised Create outlet group and both Add outlets flows on one search-first picker with Company/Cluster filters, filter-aware select all and a visible removable list of selected outlets. |
 | 14 August 2026 | Aligned the HQ Overview and group-details Add outlets dialogs on the same Procure outlet catalogue, compact centred layout, result-row styling, metadata, selected-outlet panel, counts and Add-button behaviour; corrected the selected-count/list mismatch. |
 | 14 August 2026 | Made outlet-picker search fields active on dialog open, applied the Styleguide green focus border and 18% focus ring to picker form controls, and strengthened the search-first empty-state hierarchy. |
