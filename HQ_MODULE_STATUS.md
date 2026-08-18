@@ -1,6 +1,6 @@
 # HQ Module — Prototype Status and Gaps
 
-Last reviewed: 14 August 2026
+Last reviewed: 18 August 2026
 
 ## Purpose
 
@@ -71,9 +71,10 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 | HQ items | Create catalogue item | Partial | Details, supplier, tax, UOM, MOQ, inventory and access fields | Add validation and create a retained item record |
 | HQ items | Add existing catalogue items | Partial | Three-step selection and configuration wizard; the prototype directory provides at least five catalogue items for every searchable supplier and displays only items from suppliers linked to the HQ | Retain added items in the backend |
 | HQ items | Group price and MOQ exceptions | Partial | Add, edit, duplicate validation and removal work | Retain exceptions; consider effective dates |
-| HQ suppliers | Browse suppliers | Built | Supplier listing and View Supplier Items shortcut | — |
-| HQ suppliers | Link existing suppliers | Built | A shared search-first dialog finds suppliers in the large Procure directory by name, UEN or ABN; linked suppliers persist locally and feed the HQ catalogue | Replace the prototype directory with server-side search and pagination |
-| HQ suppliers | Add supplier to Procure | Built | A no-result path captures supplier name, UEN/ABN, category, address and optional contact details, then links the new record to the HQ | Add duplicate registration checks, validation and backend persistence |
+| HQ suppliers | Browse suppliers | Built | Supplier listing, contact-method-aware rows, View Supplier Items and Edit supplier settings actions | — |
+| HQ suppliers | Add existing suppliers | Built | A single Freemium-aligned flow searches Procure by company name first, then offers UEN/ABN lookup or manual creation when needed; every path opens a dedicated relationship-settings page before saving | Replace the prototype directory and expanded registration lookup with server-side search and pagination |
+| HQ suppliers | Create supplier in Procure | Built | A no-result path captures name, company registration number, address, postal code and optional alias, then uses the same settings page before creating and adding the supplier | Add duplicate registration checks, validation and backend persistence |
+| HQ suppliers | Edit supplier settings | Built | Existing linked suppliers reopen the settings page with retained relationship settings; edits update the list, activity and local browser storage without creating a duplicate | Replace local browser storage with backend persistence |
 | HQ suppliers | Disable or reactivate supplier | Partial | Warning and cascade choices are represented | Retain changes and define dependency reporting |
 | Group suppliers | View supplier availability | Built | Active and inactive states are represented | — |
 | Group suppliers | Disable or reactivate by group | Partial | Item cascade choices are represented | Retain changes |
@@ -139,6 +140,11 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 
 | Date | Change |
 |---|---|
+| 18 August 2026 | Reworked supplier relationship settings into a dedicated, scrollable HQ page with a fixed Save footer. Removed the supplier-flow stepper; added the Suppliers back link, 24px supplier-specific page title, Freemium-style cards and delivery cut-off interactions, including Apply to all. |
+| 18 August 2026 | Renamed the supplier entry action to “Add supplier”, simplified its dialog header, removed supplier categorisation from the flow UI, and updated supplier names to legal-style prototype names across HQ tabs while keeping internal matching keys stable. |
+| 18 August 2026 | Updated supplier contacts so email and WhatsApp are independently optional but at least one is required. Supplier list rows now show only available contact methods, and existing supplier settings can be edited and retained locally. |
+| 18 August 2026 | Unified supplier linking into one user-facing flow: search Procure by supplier name, then search by UEN/ABN or create manually if the supplier is not found. Removed the up-front existing-versus-new supplier choice and retained the shared relationship-settings step. |
+| 18 August 2026 | Added a mandatory supplier-settings step to both existing-supplier and new-supplier linking. Recipient details, minimum-order rules, delivery days and cut-off times are stored on the HQ–supplier relationship; manual supplier creation now follows the Freemium field structure. |
 | 17 August 2026 | Connected Inventory row Edit actions to an HQ-specific item settings page based on PWF-1694, with Inventory UOM and par settings, read-only catalogue UOMs, editable custom counting UOM conversions and locally persisted updates. |
 | 17 August 2026 | Realigned the HQ Inventory item settings page to the existing Procure Inventory settings pattern: matching header and form rhythm, grey Counting UOM card, aligned Par level row and single fixed Save action, while retaining HQ-wide settings behaviour. |
 | 17 August 2026 | Reworked “Add to inventory” to match the existing Inventory flow: removed the stepper, moved Inventory UOM, conversion and Par configuration inline, added Flip units and “Save selected & add more”, and removed the redundant group-access step. |
