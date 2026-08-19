@@ -217,7 +217,8 @@
   .access-type-label { font-size: 14px; font-weight: 600; color: var(--ink); }
   .access-type-desc { font-size: 13px; color: var(--ink-mute); margin-top: 3px; line-height: 1.5; }
   .access-action { flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
-  .access-status-label { font-size: 13px; font-weight: 600; color: var(--spinach); white-space: nowrap; }
+  .access-status-label { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--spinach); white-space: nowrap; }
+  .access-status-icon { display: inline-grid; place-items: center; width: 19px; height: 19px; flex-shrink: 0; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); font-size: 12px; font-weight: 700; line-height: 1; }
   .btn-secondary-sm { min-height: 40px; padding: 0 16px; border: 1px solid #E2FFE6; border-radius: 6px; background: #E2FFE6; color: var(--seaweed); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; transition: background-color .15s ease; }
   .btn-secondary-sm:hover { background: #C6F2CE; }
   .row-actions-wrap { position: relative; display: inline-block; }
@@ -843,7 +844,7 @@
   function renderAccessAction(kind, isOn) {
     const action = document.getElementById(kind + 'AccessAction');
     if (isOn) {
-      action.innerHTML = '<span class="access-status-label">&#10003; Enabled</span>' +
+      action.innerHTML = '<span class="access-status-label"><span class="access-status-icon">&#10003;</span>Enabled</span>' +
         '<div class="row-actions-wrap">' +
           '<button class="btn-row-actions" onclick="event.stopPropagation();toggleRowActions(this)">&bull;&bull;&bull;</button>' +
           '<div class="row-actions-menu">' +
@@ -941,12 +942,16 @@
       if (email) document.getElementById('emailInput').value = email;
       if (params.get('owner') === '1') document.getElementById('hqOwnerToggle').classList.add('on');
       document.querySelector('.page-title').textContent = 'Edit user';
+
+      // Editing an existing user — jump straight to HQ access instead of making them hunt for it.
+      document.getElementById('hqAccessSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       document.querySelector('.page-title').textContent = 'Add user to ' + hqName;
-    }
 
-    // Arrived from an HQ page — jump straight to HQ access instead of making the user hunt for it.
-    document.getElementById('hqAccessSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Creating a new user — leave them at the top to fill in name/email first,
+      // and default to HQ-only access since that's why they came from the HQ page.
+      setAccessType('outlet', false);
+    }
   })();
 </script>
 </body>
