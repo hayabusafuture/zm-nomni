@@ -14,6 +14,25 @@ Keep `Freemium/Freemium.md` updated when changing the freemium UX, CTA flow, pro
 
 ---
 
+## HQ Module
+
+The HQ module lets a multi-outlet restaurant/hospitality buyer group manage market lists, inventory, recipes, and POS mapping centrally, instead of configuring every outlet one by one. It's tracked in JIRA across two tickets that describe two different stages of the same feature:
+
+- **[PWF-1332](https://liventeam.atlassian.net/browse/PWF-1332)** (Done) — the **shipped v1** model. Any outlet can be flagged as an "HQ" outlet. Other outlets can then be set to be "managed by HQ", which makes them fully mirror the HQ's market list, inventory, recipes, and POS mapping — HQ-managed outlets get **read-only** views of this data (no edit, no add/remove, no bulk actions) across Admin, Buyer Hub, Supplier Hub, and mobile. There's no partial/selective following in this model: an outlet either manages its own data or fully defers to its HQ. Price changes picked up from HQ-managed outlets' invoices are tracked as price changes against the HQ, not the outlet, and go through a central HQ acceptance flow.
+- **[PWF-1557](https://liventeam.atlassian.net/browse/PWF-1557)** (In Progress — this is the **main design story for the current HQ work**, though per the user some of its detail is stale/no longer valid, so treat specifics as directional rather than final) — the **redesign** of that model to be more flexible. Key ideas it introduces:
+  - **Site Groups** (called **Outlet Groups** in this repo's prototypes) — clusters of outlets under an HQ (e.g. "Chargrill Outlets", "Tourist outlets") used to scope pricing levels and which items/menus get pushed to which outlets, instead of every HQ-managed outlet being forced to mirror everything identically.
+  - **Selective visibility/overrides instead of full mirroring** — HQ has a base market list with default pricing; individual items can be excluded per site group or per outlet, and multiple pricing levels can be set (e.g. a higher price tier for tourist-area outlets) rather than one single price for every outlet.
+  - **HQ users linked to one or more HQs**, automatically gaining access to the outlets each HQ manages — this is the basis for the "HQ users are regular Procure accounts with an HQ mode toggle" model implemented in this repo (see below), rather than a separate account type.
+  - Open questions the story itself still flags: how HQ interacts with outlets on **active suppliers** (who continue managing their own per-outlet market lists — HQ can view but not edit), how HQ inventory/Group SKUs work, and how price updates from invoice-processing should flow when pricing is no longer fully centralized.
+- **HQ users implementation in this repo**: per ticket PWF-1664, HQ users are not a separate account type — they're regular outlet user accounts with "HQ mode" enabled, giving them a mode switcher between their normal outlet view and cross-outlet HQ governance tools. There are two HQ user types (**Regular**, **Owner** — Owners can only be created/managed by Nomni Admin) and three HQ-specific permissions (manage user accounts, grant HQ access, revoke HQ access). See the "HQ access" section in `Admin - Buyer User.html` / `Procure - User Detail.html` for the implementation, and `Admin - HQ Users.html` for the per-HQ user list.
+- Ownership of each capability between **Admin** (platform-operator) and **Procure** (buyer-controlled) is still an open product decision for most of this module — see `HQ_MODULE_STATUS.md`.
+
+For what's actually built vs. partial vs. missing in this module, see **`HQ_MODULE_STATUS.md`** — it's the living tracker for HQ work and should be updated whenever HQ flows change.
+
+Build guidance: for HQ management views, start from `Procure - HQ - Outlet Groups.html` (Procure side) or `Admin - HQ Settings.html` (Admin side — a single-page shell with in-page tabs for Overview/Suppliers/Items/Inventory/Recipes/Activity, unlike Procure's split-into-separate-pages approach for the same areas).
+
+---
+
 ## Support Documentation
 
 Full product documentation is at **https://support.zeemart.co/**

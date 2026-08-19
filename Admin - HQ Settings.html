@@ -679,7 +679,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   .app { grid-template-columns: 232px 1fr; }
   .sidebar { background: #F5F5F5; color: #1A1F2B; }
   .nav { margin-top: 4px; padding: 6px 10px; flex: 1; }
-  .nav a { gap: 12px; padding: 10px 12px; color: #1A1F2B; border: 0; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
+  .nav a { gap: 12px; padding: 10px 12px; min-height: 40px; box-sizing: border-box; color: #1A1F2B; border: 0; border-radius: 6px; font-size: 14px; font-weight: 400; transition: background .15s, color .15s; }
   .nav a svg { width: 18px; height: 18px; color: #888; transition: color .15s; }
   .nav a:hover { color: #1A1F2B; background: rgba(0,0,0,.05); }
   .nav a:hover svg { color: #888; }
@@ -695,6 +695,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     .sidebar { width: 64px; }
     .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); }
     .nav a, .nav a.active { padding: 10px 12px; border: 0; }
+    .nav .badge { min-width: 8px; width: 8px; height: 8px; padding: 0; font-size: 0; margin-left: 4px; }
+    .sidebar:hover .nav .badge { min-width: 18px; width: auto; height: 18px; padding: 0 5px; font-size: 10px; margin-left: auto; }
   }
 
   /* Nomni Green Procure Admin top bar */
@@ -3107,7 +3109,10 @@ function navigateToTab(tab) {
 
 function goToHqUserEntry() {
   var hqName = (document.querySelector('.page-title') || {}).textContent || '';
-  window.location.href = 'Admin - HQ Users.html?hq=' + encodeURIComponent(hqName.trim());
+  var params = new URLSearchParams();
+  params.set('hq', hqName.trim());
+  params.set('back', 'Admin - HQ Settings.html' + window.location.search);
+  window.location.href = 'Admin - HQ Users.html?' + params.toString();
 }
 
 // Activate tab from URL hash (e.g. #recipes from recipe create back link)
