@@ -583,6 +583,7 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Admin — Create Buyer User (Access Cards Draft): Admin - Buyer User - Access Cards Draft.html
 - Admin — Create Buyer User (Access Reorg Draft): Admin - Buyer User - Access Reorg Draft.html
 - Admin — HQ Users: Admin - HQ Users.html
 - Your Nomni Procure setup is complete: SendGrid - Trial - Setup Complete.html
