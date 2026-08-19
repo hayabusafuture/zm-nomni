@@ -101,6 +101,24 @@
   .empty-state-title { font-size: 18px; font-weight: 650; color: var(--ink); margin-bottom: 5px; }
   .empty-state-copy { font-size: 14px; color: var(--ink-mute); }
 
+  /* ── Add user modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: center; justify-content: center; padding: 24px; }
+  .modal-overlay.open { display: flex; }
+  .modal-card { background: #fff; border-radius: 12px; width: 560px; max-width: 100%; max-height: calc(100vh - 80px); display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(0,0,0,.22); overflow: hidden; }
+  .modal-header { padding: 18px 24px; border-bottom: 1px solid var(--rule); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+  .modal-title { font-size: 21px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+  .modal-close { background: none; border: none; cursor: pointer; color: var(--ink-mute); padding: 4px; border-radius: 4px; display: flex; align-items: center; transition: color .13s; flex-shrink: 0; }
+  .modal-close:hover { color: var(--ink); }
+  .modal-body { padding: 18px 24px; overflow-y: auto; flex: 1; }
+  .modal-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+  .add-user-result-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  .add-user-result-row:last-child { border-bottom: none; }
+  .add-user-result-info { flex: 1; min-width: 0; }
+  .add-user-result-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .add-user-result-meta { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .btn-secondary-sm { min-height: 34px; padding: 0 12px; border: 1px solid #E2FFE6; border-radius: 6px; background: #E2FFE6; color: var(--seaweed); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background-color .15s ease; }
+  .btn-secondary-sm:hover { background: #C6F2CE; }
+
   .btn-primary {
     min-height: 40px; padding: 0 16px; border: 1px solid var(--nomni-green); border-radius: 6px;
     background: var(--nomni-green); color: var(--seaweed); font-size: 14px; font-weight: 600; line-height: 1;
@@ -290,6 +308,27 @@
   </main>
 </div>
 
+<!-- ── Add user modal ── -->
+<div class="modal-overlay" id="addUserOverlay" onclick="if(event.target===this)closeAddUserModal()">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title">Add user</h2>
+      <button class="modal-close" onclick="closeAddUserModal()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="ml-search-wrap" style="width:100%;margin-bottom:4px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="ml-search-input" id="addUserSearch" placeholder="Search by name or email" oninput="renderAddUserResults()" style="width:100%" />
+      </div>
+      <div id="addUserResults"></div>
+    </div>
+    <div class="modal-foot" style="justify-content:space-between">
+      <span style="font-size:13px;color:var(--ink-mute)">Not listed?</span>
+      <button class="btn-secondary-sm" onclick="createNewHqUser()">Create new user</button>
+    </div>
+  </div>
+</div>
+
 <div id="hqToast" role="status" aria-live="polite">
   <span class="hq-toast-check" aria-hidden="true">✓</span>
   <span><span class="hq-toast-title" id="hqToastTitle">Success</span><span class="hq-toast-copy" id="hqToastCopy"></span></span>
@@ -308,6 +347,16 @@
     { hq: 'Garden Cuisine HQ', name: 'Marcus Tan', jobTitle: 'Regional Chef', email: 'marcus.tan@gardencuisine.sg', hqOwner: false, active: true, lastActive: '08 Jun 2026' },
     { hq: 'Garden Cuisine HQ', name: 'Aisyah Rahman', jobTitle: 'Finance Lead', email: 'aisyah.rahman@gardencuisine.sg', hqOwner: false, active: true, lastActive: '05 Jun 2026' },
     { hq: 'Garden Cuisine HQ', name: 'Wei Chen', jobTitle: 'Supply Chain Analyst', email: 'wei.chen@gardencuisine.sg', hqOwner: false, active: false, lastActive: '02 May 2026' }
+  ];
+
+  // Existing Procure/outlet accounts not yet linked to any HQ — searched when adding a user, so we
+  // link the existing account instead of creating a duplicate.
+  var PLATFORM_USERS = [
+    { name: 'James Lim', jobTitle: 'Store Manager', email: 'james.lim@chargrilloutlets.sg', outlet: 'Chargrill Outlets' },
+    { name: 'Nadia Yusof', jobTitle: 'Assistant Manager', email: 'nadia.yusof@familydining.sg', outlet: 'Family Dining Express' },
+    { name: 'Kevin Ong', jobTitle: 'Head Chef', email: 'kevin.ong@chargrilloutlets.sg', outlet: 'Chargrill Outlets' },
+    { name: 'Farah Ismail', jobTitle: 'Inventory Coordinator', email: 'farah.ismail@gardencuisine.sg', outlet: 'Garden Express @ 290' },
+    { name: 'Ryan Teo', jobTitle: 'Duty Manager', email: 'ryan.teo@familydining.sg', outlet: 'Family Dining Express' }
   ];
 
   function currentHqName() {
@@ -404,9 +453,58 @@
     showHqToast('HQ access removed', u.name + ' can no longer access this HQ.');
   }
 
-  document.getElementById('addUserBtn').addEventListener('click', function() {
+  function openAddUserModal() {
+    document.getElementById('addUserSearch').value = '';
+    renderAddUserResults();
+    document.getElementById('addUserOverlay').classList.add('open');
+    setTimeout(function() { document.getElementById('addUserSearch').focus(); }, 80);
+  }
+  function closeAddUserModal() {
+    document.getElementById('addUserOverlay').classList.remove('open');
+  }
+  function linkedEmailsForCurrentHq() {
+    var hqName = currentHqName();
+    return new Set(HQ_USERS.filter(function(u) { return u.hq === hqName; }).map(function(u) { return u.email.toLowerCase(); }));
+  }
+  function renderAddUserResults() {
+    var q = (document.getElementById('addUserSearch').value || '').trim().toLowerCase();
+    var linked = linkedEmailsForCurrentHq();
+    var results = document.getElementById('addUserResults');
+    if (q.length < 2) {
+      results.innerHTML = '<div style="padding:32px 0;text-align:center;color:var(--ink-mute);font-size:14px">Search an existing Procure user by name or email.</div>';
+      return;
+    }
+    var matches = PLATFORM_USERS.filter(function(u) {
+      if (linked.has(u.email.toLowerCase())) return false;
+      return u.name.toLowerCase().indexOf(q) > -1 || u.email.toLowerCase().indexOf(q) > -1;
+    });
+    if (!matches.length) {
+      results.innerHTML = '<div style="padding:32px 0;text-align:center;color:var(--ink-mute);font-size:14px">No matching users found. Not listed below? Create a new user instead.</div>';
+      return;
+    }
+    results.innerHTML = matches.map(function(u) {
+      return '<div class="add-user-result-row">' +
+        '<div class="add-user-result-info"><div class="add-user-result-name">' + escapeHtml(u.name) + '</div><div class="add-user-result-meta">' + escapeHtml(u.jobTitle) + ' · ' + escapeHtml(u.outlet) + ' · ' + escapeHtml(u.email) + '</div></div>' +
+        '<button class="btn-secondary-sm" onclick="linkExistingUserToHq(\'' + u.email.replace(/'/g, "\\'") + '\')">Add to HQ</button>' +
+      '</div>';
+    }).join('');
+  }
+  function linkExistingUserToHq(email) {
+    var platformUser = PLATFORM_USERS.find(function(u) { return u.email === email; });
+    if (!platformUser) return;
+    HQ_USERS.push({
+      hq: currentHqName(), name: platformUser.name, jobTitle: platformUser.jobTitle, email: platformUser.email,
+      hqOwner: false, active: true, lastActive: 'Just now'
+    });
+    closeAddUserModal();
+    renderHqUsers();
+    showHqToast('User added', platformUser.name + ' now has access to ' + currentHqName() + '.');
+  }
+  function createNewHqUser() {
     window.location.href = 'Admin - Buyer User.html?hq=' + encodeURIComponent(currentHqName());
-  });
+  }
+
+  document.getElementById('addUserBtn').addEventListener('click', openAddUserModal);
 
   (function init() {
     var hqName = currentHqName();
