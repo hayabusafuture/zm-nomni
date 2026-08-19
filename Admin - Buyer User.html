@@ -735,6 +735,39 @@
     // Pass — proceed
     window.location.href = '#';
   });
+
+  // Arrived from an HQ page: pre-link that HQ and enable HQ mode.
+  (function prefillLinkedHqFromQuery() {
+    var hqName = new URLSearchParams(window.location.search).get('hq');
+    if (!hqName) return;
+    hqName = hqName.trim();
+    if (!hqName) return;
+
+    var option = Array.from(document.querySelectorAll('#hqDropdown .tag-option')).find(function(opt) { return opt.textContent.trim() === hqName; });
+    if (option) {
+      addTag('hqBox', 'hqDropdown', 'hqPlaceholder', option);
+    } else {
+      var box = document.getElementById('hqBox');
+      var placeholder = document.getElementById('hqPlaceholder');
+      if (placeholder) placeholder.style.display = 'none';
+      var tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.innerHTML = '<span>' + hqName + '</span><button class="tag-x" onclick="removeTag(this,\'hqPlaceholder\')">×</button>';
+      box.appendChild(tag);
+      updateHqPermGroup();
+    }
+
+    document.getElementById('hqToggle').classList.add('on');
+    document.getElementById('hqFeatures').classList.add('visible');
+    clearLinkingErrors();
+
+    var backLink = document.querySelector('.back-link');
+    if (backLink) {
+      backLink.href = 'Admin - HQ Settings.html';
+      backLink.lastChild.textContent = hqName;
+    }
+    document.querySelector('.page-title').textContent = 'Add user to ' + hqName;
+  })();
 </script>
 </body>
 </html>

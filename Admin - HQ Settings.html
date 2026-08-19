@@ -236,6 +236,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .ml-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
 .ml-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 10px 14px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fff; white-space: nowrap; position: sticky; top: 56px; z-index: 2; box-shadow: 0 1px 0 var(--rule); border-top: none; border-bottom: none; }
 .ml-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+#supplierTable th, #supplierTable td { padding-left: 0; padding-right: 0; }
 .ml-table tbody tr:last-child td { border-bottom: none; }
 .ml-table tbody tr:nth-child(even) td { background: #f9fafb; }
 .ml-table tbody tr:hover td { background: var(--row-hover) !important; }
@@ -298,6 +299,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .confirm-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
 .modal-cancel { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; transition: color .13s; }
 .modal-cancel:hover { color: var(--ink); }
+.group-sku-delete-btn { margin-top:10px; border:0; background:none; padding:0; color:#D0291E; font:inherit; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px; }
+.group-sku-delete-btn[hidden] { display:none; }
 .btn-danger { background: #D0291E; color: #fff; border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 18px; cursor: pointer; transition: background .15s; }
 .btn-danger:hover { background: #b8220f; }
 .modal-card { background: #fff; border-radius: 12px; width: 520px; max-width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,.22); overflow: hidden; }
@@ -318,18 +321,27 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .field-label .opt { font-weight:400; color:var(--ink-mute); }
 .field-input { width:100%; min-height:40px; padding:9px 12px; border:1px solid #dcdee3; border-radius:6px; background:#fff; color:var(--ink); font:inherit; font-size:14px; outline:none; box-sizing:border-box; }
 .field-input:focus { border-color:var(--nomni-green); box-shadow:0 0 0 3px rgba(42,200,100,.12); }
-/* Supplier settings is a dedicated HQ page, following the Freemium supplier-settings form. */
-#supplierSettingsOverlay { inset:56px 0 0 232px; z-index:8; padding:0; background:#fff; align-items:stretch; justify-content:stretch; }
-#supplierSettingsOverlay.open { display:block; }
-#supplierSettingsOverlay .modal-card { width:100% !important; height:100%; min-height:0; max-width:none; max-height:none; border-radius:0; box-shadow:none; overflow:hidden; }
-#supplierSettingsOverlay .modal-header { padding:28px 40px 18px; border-bottom:1px solid var(--rule); }
-#supplierSettingsOverlay #supplierSettingsPageTitle { font-size:24px !important; letter-spacing:-.03em; }
-#supplierSettingsOverlay .supplier-back { display:inline-flex; align-items:center; gap:5px; margin-bottom:5px; padding:0; border:0; background:none; color:var(--spinach); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
-#supplierSettingsOverlay .modal-body { flex:1; min-height:0; overflow-y:auto; gap:0; padding:0 40px 32px; }
+/* Supplier settings and Add supplier are dedicated HQ pages, following the Freemium supplier flow. */
+#supplierSettingsOverlay, #linkSupOverlay { inset:56px 0 0 232px; z-index:8; padding:0; background:#fff; align-items:stretch; justify-content:stretch; }
+#supplierSettingsOverlay.open, #linkSupOverlay.open { display:block; }
+#supplierSettingsOverlay .modal-card, #linkSupOverlay .modal-card { width:100% !important; height:100%; min-height:0; max-width:none; max-height:none; border-radius:0; box-shadow:none; overflow:hidden; }
+#supplierSettingsOverlay .modal-header, #linkSupOverlay .modal-header { padding:28px 40px 18px; border-bottom:1px solid var(--rule); }
+#supplierSettingsOverlay #supplierSettingsPageTitle, #linkSupOverlay #linkSupPageTitle { font-size:24px !important; letter-spacing:-.03em; }
+#supplierSettingsOverlay .supplier-back, #linkSupOverlay .supplier-back { display:inline-flex; align-items:center; gap:5px; margin-bottom:5px; padding:0; border:0; background:none; color:var(--spinach); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+#supplierSettingsOverlay .modal-body, #linkSupOverlay .modal-body { flex:1; min-height:0; overflow-y:auto; gap:0; padding:0 40px 32px; }
+#supplierSettingsOverlay .hq-steps, #linkSupOverlay .hq-steps { flex-shrink:0; display:flex; align-items:center; gap:34px; padding:10px 40px; background:var(--mint); border-bottom:1px solid #C9F6D3; }
+#supplierSettingsOverlay .hq-steps[hidden], #linkSupOverlay .hq-steps[hidden] { display:none; }
+#supplierSettingsOverlay .hq-step, #linkSupOverlay .hq-step { display:inline-flex; align-items:center; gap:10px; color:var(--ink-mute); font-size:14px; font-weight:700; }
+#supplierSettingsOverlay .hq-step-number, #linkSupOverlay .hq-step-number { width:27px; height:27px; display:grid; place-items:center; border-radius:50%; background:rgba(26,128,64,.45); color:#fff; font-size:13px; flex-shrink:0; }
+#supplierSettingsOverlay .hq-step.is-active, #linkSupOverlay .hq-step.is-active { color:var(--ink); }
+#supplierSettingsOverlay .hq-step.is-active .hq-step-number, #linkSupOverlay .hq-step.is-active .hq-step-number { background:var(--spinach); }
+#linkSupOverlay .link-sup-search-row { display:flex; align-items:center; gap:10px; max-width:520px; margin:24px 0 20px; }
+#linkSupOverlay .link-sup-search-row .ml-search-wrap { flex:1; width:auto; }
 #supplierSettingsOverlay .supplier-settings-shell { width:min(640px,100%); margin:0 auto; padding-bottom:18px; }
 #supplierSettingsOverlay .supplier-settings-section { display:flex; flex-direction:column; }
 #supplierSettingsOverlay .supplier-settings-heading { margin:34px 0 18px; font-size:21px; line-height:1.2; font-weight:700; letter-spacing:-.02em; color:var(--ink); }
 #supplierSettingsOverlay .supplier-settings-card { padding:28px; border:0; border-radius:8px; background:#F7F7F7; display:flex; flex-direction:column; gap:14px; }
+#supplierSettingsOverlay .supplier-settings-card + .supplier-settings-card { margin-top:20px; }
 #supplierSettingsOverlay .supplier-settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 #supplierSettingsOverlay .supplier-settings-help { margin:6px 0 0; font-size:12px; line-height:1.4; color:#7A808A; }
 #supplierSettingsOverlay .supplier-contact-error { margin:6px 0 0; color:#D0291E; font-size:12px; font-weight:600; }
@@ -337,6 +349,9 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-settings-check input { width:20px; height:20px; margin:0; accent-color:var(--spinach); cursor:pointer; }
 #supplierSettingsOverlay .supplier-settings-check strong { font-weight:700; }
 #supplierSettingsOverlay .supplier-soft-rule { height:1px; margin:10px 0 4px; background:var(--rule); }
+#supplierSettingsOverlay .supplier-more-link { align-self:flex-start; margin-top:-2px; padding:0; border:0; background:none; color:var(--spinach); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+#supplierSettingsOverlay .supplier-more-link:hover { color:var(--seaweed); }
+#supplierSettingsOverlay .supplier-more-link[hidden] { display:none; }
 #supplierSettingsOverlay .supplier-policy-note { margin:0 0 16px; padding:10px 12px; border-radius:6px; background:var(--settings-cream); color:var(--seaweed); font-size:12px; line-height:1.4; }
 #supplierSettingsOverlay .supplier-policy-table { border:0; border-radius:0; overflow:visible; }
 #supplierSettingsOverlay .supplier-policy-head,#supplierSettingsOverlay .supplier-policy-row { display:grid; grid-template-columns:190px 1fr 112px; gap:18px; align-items:center; padding:0; }
@@ -353,8 +368,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .modal-foot { padding:14px 40px 18px; background:#fff; box-shadow:0 -8px 20px rgba(10,20,15,.06); }
 #supplierSettingsOverlay .supplier-page-cancel { min-height:40px; padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
 #supplierSettingsOverlay .supplier-page-cancel:hover { color:var(--seaweed); }
-@media (max-width:1280px) { #supplierSettingsOverlay { left:64px; } }
-@media (max-width:700px) { #supplierSettingsOverlay { left:0; } #supplierSettingsOverlay .modal-header,#supplierSettingsOverlay .modal-body,#supplierSettingsOverlay .modal-foot { padding-left:20px; padding-right:20px; } #supplierSettingsOverlay .supplier-policy-head,#supplierSettingsOverlay .supplier-policy-row { grid-template-columns:110px 1fr; } #supplierSettingsOverlay .supplier-apply-all { grid-column:2; justify-self:start; } }
+@media (max-width:1280px) { #supplierSettingsOverlay, #linkSupOverlay { left:64px; } }
+@media (max-width:700px) { #supplierSettingsOverlay, #linkSupOverlay { left:0; } #supplierSettingsOverlay .modal-header,#supplierSettingsOverlay .modal-body,#supplierSettingsOverlay .modal-foot,#linkSupOverlay .modal-header,#linkSupOverlay .modal-body,#supplierSettingsOverlay .hq-steps,#linkSupOverlay .hq-steps { padding-left:20px; padding-right:20px; } #supplierSettingsOverlay .supplier-policy-head,#supplierSettingsOverlay .supplier-policy-row { grid-template-columns:110px 1fr; } #supplierSettingsOverlay .supplier-apply-all { grid-column:2; justify-self:start; } }
 .modal-field { display: flex; flex-direction: column; gap: 5px; }
 .modal-field label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; }
 .modal-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -999,6 +1014,10 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <div class="page-meta">Garden Cuisine Pte Ltd &nbsp;·&nbsp; Last updated 10 Jun 2026</div>
       </div>
       <div class="head-actions">
+        <button class="btn-secondary" id="hqUsersBtn" onclick="goToHqUserEntry()" style="display:inline-flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+          Users
+        </button>
         <button class="btn-secondary" id="editHqDetailsBtn" onclick="window.location.href='Admin - Edit HQ.html'">Edit details</button>
       </div>
     </div>
@@ -1351,21 +1370,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </div>
     </div>
 
-    <!-- ── Users (placeholder) ── -->
-    <div class="tab-panel" id="panel-users">
-      <div class="panel-label-row">
-        <span class="panel-label-text">Users <span class="panel-label-count">3</span></span>
-        <button class="btn-primary">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          Add user
-        </button>
-      </div>
-      <div class="placeholder-panel">
-        <div class="placeholder-title">User management coming soon</div>
-        <div class="placeholder-desc">HQ Admin accounts provisioned for Garden Cuisine HQ will appear here.</div>
-      </div>
-    </div>
-
     <!-- ── Suppliers ── -->
     <div class="tab-panel" id="panel-suppliers">
       <div class="panel-label-row">
@@ -1384,7 +1388,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         </div>
       </div>
       <div style="overflow:clip">
-        <table class="ml-table">
+        <table class="ml-table" id="supplierTable">
           <thead>
             <tr>
               <th>Supplier</th>
@@ -1421,7 +1425,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <div id="invAddMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:200px;overflow:hidden">
             <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none';openAddInvSkuModal()">Add SKU</div>
             <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none';openAddInvRecipeModal()">Add recipe / sub-recipe</div>
-            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none'">Add Group SKU</div>
+            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none';openGroupSkuModal()">Add Group SKU</div>
           </div>
         </div>
       </div>
@@ -3101,6 +3105,11 @@ function navigateToTab(tab) {
   window.scrollTo(0, 0);
 }
 
+function goToHqUserEntry() {
+  var hqName = (document.querySelector('.page-title') || {}).textContent || '';
+  window.location.href = 'Admin - Buyer User.html?hq=' + encodeURIComponent(hqName.trim());
+}
+
 // Activate tab from URL hash (e.g. #recipes from recipe create back link)
 (function() {
   var hash = window.location.hash.replace('#', '');
@@ -3308,6 +3317,7 @@ function saveGroupSettings() {
 
 // ── Inventory ──
 const INV_GROUPS = ['Chargrill Outlets', 'Family Dining Express'];
+const INV_LISTS = ['Main Store', 'Walk-in Chiller', 'Dry Store', 'Bar Stock'];
 
 const INV_ITEMS = [
   // SKUs
@@ -3387,29 +3397,40 @@ const PLATFORM_SUPPLIERS = [
   { name: 'Sun Huat Heng Produce',     reg: '198803221G', cat: 'Produce',          contact: 'b2b@sunhuatheng.com.sg',     phone: '+65 6744 3388' },
   { name: 'Bunge Asia Pte Ltd',        reg: '200001823N', cat: 'Oils & Fats',      contact: 'asia@bunge.com',             phone: '+65 6438 8200' },
   { name: 'Dairy Farm International',  reg: '199301594D', cat: 'Dairy & Eggs',     contact: 'foodservice@dfi.com.hk',     phone: '+65 6235 5500' },
-  { name: 'Wilmar International',      reg: '199904785Z', cat: 'Oils & Dry Goods', contact: 'sg.trade@wilmar-intl.com',   phone: '+65 6216 0244' },
+  { name: 'Wilmar International',      reg: '199904785Z', cat: 'Oils & Dry Goods', contact: 'sg.trade@wilmar-intl.com',   phone: '+65 6216 0244', contactNomni: true },
 ];
 
-const linkSupSelected = new Set();
+// Businesses not yet listed in Procure — returned by an ACRA/ABR registry lookup, not the internal directory.
+const EXTERNAL_REGISTRY_SUPPLIERS = [
+  { name: 'GOLDEN HARVEST TRADING PTE. LTD.', reg: '201813940C', address: 'NEIL ROAD, Singapore 088855' },
+  { name: 'BLUE OCEAN FOOD SUPPLIES PTE. LTD.', reg: '201955102M', address: 'TAMPINES INDUSTRIAL AVENUE, Singapore 528834' },
+  { name: 'HERITAGE SPICE COMPANY PTE. LTD.', reg: '202011223K', address: 'JOO CHIAT ROAD, Singapore 427357' },
+];
+
 var supplierSearchMode = 'name';
+var linkSupQuery = '';
 
 function openLinkSupModal() {
-  linkSupSelected.clear();
   supplierSearchMode = 'name';
+  linkSupQuery = '';
   document.getElementById('linkSupSearch').value = '';
   document.getElementById('linkSupSearch').placeholder = 'Enter supplier name';
   renderLinkSupList();
-  updateLinkSupFooter();
-  document.getElementById('linkSupOverlay').style.display = 'flex';
+  document.getElementById('linkSupOverlay').classList.add('open');
   setTimeout(function(){ document.getElementById('linkSupSearch').focus(); }, 80);
 }
 
 function closeLinkSupModal() {
-  document.getElementById('linkSupOverlay').style.display = 'none';
+  document.getElementById('linkSupOverlay').classList.remove('open');
+}
+
+function performLinkSupSearch() {
+  linkSupQuery = document.getElementById('linkSupSearch').value.trim();
+  renderLinkSupList();
 }
 
 function renderLinkSupList() {
-  var q = document.getElementById('linkSupSearch').value.trim();
+  var q = linkSupQuery;
   var listEl = document.getElementById('linkSupList');
 
   if (q.length < 2) {
@@ -3422,11 +3443,13 @@ function renderLinkSupList() {
     return;
   }
 
+  if (supplierSearchMode === 'registration') { renderAcraSupplierList(q); return; }
+
   var ql = q.toLowerCase();
   var linkedNames = new Set(SUPPLIERS.map(function(s){ return s.name.toLowerCase(); }));
   var results = PLATFORM_SUPPLIERS.filter(function(s) {
     if (linkedNames.has(s.name.toLowerCase())) return false;
-    return supplierSearchMode === 'registration' ? s.reg.toLowerCase().includes(ql) : s.name.toLowerCase().includes(ql);
+    return s.name.toLowerCase().includes(ql) || supplierLabel(s.name).toLowerCase().includes(ql);
   });
 
   if (!results.length) {
@@ -3436,60 +3459,96 @@ function renderLinkSupList() {
         '<div>Please check the spelling or try another keyword.</div>' +
         '<div style="width:72px;border-top:1px solid var(--rule);margin:22px auto"></div>' +
         '<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">' +
-          (supplierSearchMode === 'name' ? '<button class="btn btn-secondary" onclick="startExpandedSupplierSearch()">Search by UEN or ABN</button>' : '') +
+          '<button class="btn btn-secondary" onclick="startExpandedSupplierSearch()">Search by UEN or ABN</button>' +
           '<button class="btn btn-secondary" onclick="openNewSupplierModal(\'' + escapeOverviewText(q).replace(/&#39;/g, "\\'") + '\')">Create supplier manually</button>' +
         '</div>' +
-        (supplierSearchMode === 'name' ? '<div style="margin-top:10px">Registration-number search checks for businesses not yet listed in Procure.</div>' : '') +
+        '<div style="margin-top:10px">Registration-number search checks for businesses not yet listed in Procure.</div>' +
       '</div>';
     return;
   }
 
-  listEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 24px;border-bottom:1px solid var(--rule);font-size:14px;color:var(--ink-mute)"><span>' + results.length + ' matching supplier' + (results.length === 1 ? '' : 's') + '</span><span>Not listed? <button onclick="startExpandedSupplierSearch()" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;cursor:pointer;padding:0">Search by UEN or ABN</button> or <button onclick="openNewSupplierModal(\'' + escapeOverviewText(q).replace(/&#39;/g, "\\'") + '\')" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;cursor:pointer;padding:0">create manually</button></span></div>' + results.map(function(s) {
-    var checked = linkSupSelected.has(s.name);
-    return '<label style="display:flex;align-items:center;gap:14px;padding:13px 24px;border-bottom:1px solid var(--rule);cursor:pointer;transition:background .1s" onmouseover="this.style.background=\'var(--row-hover)\'" onmouseout="this.style.background=\'\'">' +
-      '<input type="radio" name="supplierToLink" ' + (checked ? 'checked' : '') + ' onchange="toggleLinkSupSel(\'' + s.name.replace(/'/g,"\\'") + '\',this.checked)" style="width:16px;height:16px;accent-color:var(--nomni-green);flex-shrink:0;cursor:pointer" />' +
+  listEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:14px;color:var(--ink-mute)"><span>' + results.length + ' matching supplier' + (results.length === 1 ? '' : 's') + '</span><span>Not listed? <button onclick="startExpandedSupplierSearch()" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;cursor:pointer;padding:0">Search by UEN or ABN</button> or <button onclick="openNewSupplierModal(\'' + escapeOverviewText(q).replace(/&#39;/g, "\\'") + '\')" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;cursor:pointer;padding:0">create manually</button></span></div>' + results.map(function(s) {
+    return '<div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--rule)">' +
       '<div style="flex:1;min-width:0">' +
         '<div style="font-weight:500;font-size:14px;color:var(--ink)">' + supplierLabel(s.name) + '</div>' +
         '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + s.reg + '</div>' +
       '</div>' +
-    '</label>';
+      '<div style="display:flex;align-items:center;flex-shrink:0">' + (s.contactNomni ? '<button type="button" onclick="openActiveSupplierInfo()" style="border:0;background:none;padding:0;color:var(--spinach);font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">Contact Nomni to add</button>' : '<button class="btn btn-primary" style="min-height:36px;padding:0 12px" onclick="addSupplierToHq(\'' + s.name.replace(/'/g,"\\'") + '\')">Add to My Supplier</button>') + '</div>' +
+    '</div>';
   }).join('');
+}
+
+// ACRA (Singapore) / ABR (Australia) registry lookup — external businesses not yet listed in Procure.
+function renderAcraSupplierList(q) {
+  var listEl = document.getElementById('linkSupList');
+  var ql = q.toLowerCase();
+  var linkedRegs = new Set(SUPPLIERS.map(function(s){ return (s.reg || '').toLowerCase(); }));
+  var results = EXTERNAL_REGISTRY_SUPPLIERS.filter(function(s) {
+    return s.reg.toLowerCase().includes(ql) && !linkedRegs.has(s.reg.toLowerCase());
+  });
+
+  var backLink = '<button type="button" onclick="backToZeemartSupplierSearch()" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:0;white-space:nowrap">Back to searching within Zeemart</button>';
+
+  if (!results.length) {
+    listEl.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0 0"><h3 style="margin:0;font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink)">Results from ACRA</h3>' + backLink + '</div>' +
+      '<div style="padding:40px 0;text-align:center;color:var(--ink-mute);font-size:14px;line-height:1.5">' +
+        '<div style="font-size:18px;font-weight:650;color:var(--ink);margin-bottom:5px">No results from ACRA</div>' +
+        '<div>Please check the UEN or ABN and try again.</div>' +
+        '<div style="width:72px;border-top:1px solid var(--rule);margin:22px auto"></div>' +
+        '<button class="btn btn-secondary" onclick="openNewSupplierModal(\'' + escapeOverviewText(q).replace(/&#39;/g, "\\'") + '\')">Create supplier manually</button>' +
+      '</div>';
+    return;
+  }
+
+  listEl.innerHTML =
+    '<div style="padding:16px 0 4px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px"><h3 style="margin:0;font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink)">Results from ACRA</h3>' + backLink + '</div>' +
+      '<div style="margin-top:6px;font-size:13px;font-weight:700;color:var(--ink-mute)">' + results.length + ' result' + (results.length === 1 ? '' : 's') + '</div>' +
+    '</div>' +
+    results.map(function(s) {
+      return '<div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--rule)">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:600;font-size:14px;color:var(--ink)">' + s.name + '</div>' +
+          '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + s.reg + ' · ' + s.address + '</div>' +
+        '</div>' +
+        '<div style="flex-shrink:0"><button class="btn btn-primary" style="min-height:36px;padding:0 12px" onclick="addExternalRegistrySupplier(\'' + s.reg.replace(/'/g,"\\'") + '\')">Add to My Supplier</button></div>' +
+      '</div>';
+    }).join('');
 }
 
 function startExpandedSupplierSearch() {
   supplierSearchMode = 'registration';
-  linkSupSelected.clear();
-  var input = document.getElementById('linkSupSearch');
-  input.value = '';
-  input.placeholder = 'Enter UEN or ABN';
-  renderLinkSupList();
-  updateLinkSupFooter();
-  setTimeout(function(){ input.focus(); }, 50);
+  document.getElementById('linkSupSearch').placeholder = 'Enter UEN or ABN';
+  performLinkSupSearch();
 }
 
-function toggleLinkSupSel(name, checked) {
-  linkSupSelected.clear();
-  if (checked) linkSupSelected.add(name);
-  renderLinkSupList();
-  updateLinkSupFooter();
+function backToZeemartSupplierSearch() {
+  supplierSearchMode = 'name';
+  document.getElementById('linkSupSearch').placeholder = 'Enter supplier name';
+  performLinkSupSearch();
 }
 
-function updateLinkSupFooter() {
-  var n = linkSupSelected.size;
-  document.getElementById('linkSupSelCount').textContent = n === 0 ? 'No supplier selected' : '1 supplier selected';
-  var btn = document.getElementById('linkSupConfirmBtn');
-  btn.disabled = n === 0;
-  btn.textContent = 'Continue';
+function addSupplierToHq(name) {
+  var supplier = PLATFORM_SUPPLIERS.find(function(item) { return item.name === name; });
+  if (supplier) openSupplierSettings(Object.assign({}, supplier), false);
 }
 
-function confirmLinkSuppliers() {
-  var name = Array.from(linkSupSelected)[0];
-  var src = PLATFORM_SUPPLIERS.find(function(s){ return s.name === name; });
-  if (src) openSupplierSettings(Object.assign({}, src), false);
+function addExternalRegistrySupplier(reg) {
+  var entry = EXTERNAL_REGISTRY_SUPPLIERS.find(function(item) { return item.reg === reg; });
+  if (!entry) return;
+  var supplier = {
+    name: entry.name, reg: entry.reg, contact: '—', phone: '—', address: entry.address,
+    address2: '', postalCode: '', alias: '',
+    active: true, type: 'active', itemCount: 0, groupList: [], outletList: []
+  };
+  openSupplierSettings(supplier, true);
+  pendingSupplierLink.viaAcra = true;
 }
+function openActiveSupplierInfo() { document.getElementById('activeSupplierInfoOverlay').classList.add('open'); }
+function closeActiveSupplierInfo() { document.getElementById('activeSupplierInfoOverlay').classList.remove('open'); }
 
 function openNewSupplierModal(searchValue) {
-  closeLinkSupModal();
   document.getElementById('newSupplierForm').reset();
   if (supplierSearchMode === 'registration') document.getElementById('newSupplierReg').value = searchValue || '';
   else document.getElementById('newSupplierName').value = searchValue || '';
@@ -3514,8 +3573,11 @@ var pendingSupplierLink = null;
 function openSupplierSettings(supplier, isNew, isEditing) {
   pendingSupplierLink = { supplier:supplier, isNew:!!isNew, isEditing:!!isEditing };
   closeLinkSupModal(); closeNewSupplierModal();
+  document.getElementById('supplierStepsBar').hidden = !!isEditing;
   document.getElementById('supplierSettingsPageTitle').textContent = "Supplier's settings: " + supplierLabel(supplier.name);
   document.getElementById('supplierSettingsForm').reset();
+  document.getElementById('supplierSmsField').hidden = true;
+  document.getElementById('supplierMoreContact').hidden = false;
   var settings = supplier.hqSettings || {};
   var recipientEmail = settings.recipientEmail || (supplier.contact && supplier.contact !== '—' ? supplier.contact : '');
   var whatsapp = settings.whatsapp || (supplier.phone && supplier.phone !== '—' ? supplier.phone : '');
@@ -3547,8 +3609,12 @@ function backFromSupplierSettings() {
   var pending = pendingSupplierLink;
   document.getElementById('supplierSettingsOverlay').classList.remove('open');
   if (!pending) return;
-  if (pending.isNew) document.getElementById('newSupplierOverlay').classList.add('open');
-  else if (!pending.isEditing) document.getElementById('linkSupOverlay').style.display = 'flex';
+  if (pending.isNew && !pending.viaAcra) {
+    document.getElementById('linkSupOverlay').classList.add('open');
+    document.getElementById('newSupplierOverlay').classList.add('open');
+  } else if (!pending.isEditing) {
+    document.getElementById('linkSupOverlay').classList.add('open');
+  }
 }
 function toggleSupplierNoEmail() {
   var noEmail = document.getElementById('supplierNoEmail').checked;
@@ -3556,6 +3622,10 @@ function toggleSupplierNoEmail() {
   input.disabled = noEmail; input.required = false;
   if (noEmail) input.value = '';
   clearSupplierContactError();
+}
+function revealSupplierSmsField() {
+  document.getElementById('supplierSmsField').hidden = false;
+  document.getElementById('supplierMoreContact').hidden = true;
 }
 function clearSupplierContactError() {
   var error = document.getElementById('supplierContactError');
@@ -3695,7 +3765,7 @@ function renderInv() {
       '<td style="' + td + 'text-align:center">' +
         '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
         '<div class="row-actions-menu">' +
-          '<div class="row-action-item" onclick="event.stopPropagation();openHqInventorySettings(' + globalIdx + ')">Edit</div>' +
+          '<div class="row-action-item" onclick="event.stopPropagation();' + (r.type === 'group' ? 'openGroupSkuModal(' + globalIdx + ')' : 'openHqInventorySettings(' + globalIdx + ')') + '">Edit</div>' +
           '<div class="row-action-item">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
           '<div class="row-action-item danger">Remove from inventory</div>' +
         '</div></div>' +
@@ -3729,6 +3799,194 @@ function renderInv() {
   pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + '</span><div class="pager-btns">' + btns + '</div>';
 }
 renderInv();
+
+// ── Group SKU (create/edit) ──
+var groupSkuDraft = null;
+var groupSkuPickerSelected = null;
+var groupSkuPickerSearch = '';
+var groupSkuPickerSupplier = '';
+
+function openGroupSkuModal(editIndex) {
+  var isEditing = typeof editIndex === 'number' && editIndex > -1;
+  var existing = isEditing ? INV_ITEMS[editIndex] : null;
+  groupSkuDraft = {
+    editIndex: isEditing ? editIndex : -1,
+    name: existing ? existing.name : '',
+    uom: existing ? existing.uom : '',
+    par: existing && existing.par != null ? existing.par : '',
+    list: existing ? (existing.list || '') : '',
+    items: existing && existing.constituents ? existing.constituents.map(function(c){ return Object.assign({ uom: existing.uom }, c); }) : []
+  };
+  document.getElementById('groupSkuModalTitle').textContent = isEditing ? 'Edit Group SKU' : 'Create Group SKU';
+  document.getElementById('groupSkuName').value = groupSkuDraft.name;
+  document.getElementById('groupSkuPar').value = groupSkuDraft.par;
+  renderGroupSkuList(INV_LISTS.concat(groupSkuDraft.list && INV_LISTS.indexOf(groupSkuDraft.list) === -1 ? [groupSkuDraft.list] : []));
+  document.getElementById('groupSkuListSelect').value = groupSkuDraft.list;
+  document.getElementById('groupSkuSaveBtn').textContent = isEditing ? 'Save' : 'Create';
+  renderGroupSkuContent();
+  updateGroupSkuSaveState();
+  document.getElementById('groupSkuOverlay').classList.add('open');
+}
+function renderGroupSkuList(lists) {
+  var select = document.getElementById('groupSkuListSelect');
+  select.innerHTML = '<option value="">Select list</option>' + lists.map(function(l){ return '<option value="' + hqSettingsEscape(l) + '">' + hqSettingsEscape(l) + '</option>'; }).join('');
+}
+function closeGroupSkuModal() {
+  document.getElementById('groupSkuOverlay').classList.remove('open');
+  groupSkuDraft = null;
+}
+function groupSkuContentChecked() {
+  return Array.from(document.querySelectorAll('#groupSkuContentBody [data-group-content-check]:checked')).map(function(el){ return el.dataset.groupContentCheck; });
+}
+function renderGroupSkuContent() {
+  var body = document.getElementById('groupSkuContentBody');
+  var deleteBtn = document.getElementById('groupSkuDeleteBtn');
+  if (!groupSkuDraft.items.length) {
+    body.innerHTML = '<tr><td colspan="2" style="padding:16px 0;color:var(--ink-mute);font-size:13px">No items added yet.</td></tr>';
+  } else {
+    body.innerHTML = groupSkuDraft.items.map(function(item) {
+      return '<tr>' +
+        '<td style="padding:12px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" data-group-content-check="' + hqSettingsEscape(item.name) + '" onchange="updateGroupSkuDeleteVisibility()" style="margin-top:3px" />' +
+          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</span></span></label></td>' +
+        '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+  deleteBtn.hidden = true;
+  updateGroupSkuSaveState();
+}
+function updateGroupSkuDeleteVisibility() {
+  document.getElementById('groupSkuDeleteBtn').hidden = groupSkuContentChecked().length === 0;
+}
+function deleteCheckedGroupSkuContent() {
+  var checked = groupSkuContentChecked();
+  groupSkuDraft.items = groupSkuDraft.items.filter(function(item){ return checked.indexOf(item.name) === -1; });
+  renderGroupSkuContent();
+}
+function updateGroupSkuSaveState() {
+  var name = document.getElementById('groupSkuName').value.trim();
+  var par = document.getElementById('groupSkuPar').value;
+  var list = document.getElementById('groupSkuListSelect').value;
+  var uomLabel = document.getElementById('groupSkuParUom');
+  uomLabel.textContent = groupSkuDraft.items.length ? groupSkuDraft.items[0].uom : '';
+  var ready = !!name && groupSkuDraft.items.length > 0 && par !== '' && Number(par) >= 0 && !!list;
+  document.getElementById('groupSkuSaveBtn').disabled = !ready;
+}
+function openGroupSkuPicker() {
+  groupSkuPickerSelected = new Set();
+  groupSkuPickerSearch = '';
+  groupSkuPickerSupplier = '';
+  document.getElementById('groupSkuPickerSearch').value = '';
+  document.getElementById('groupSkuPickerError').hidden = true;
+  renderGroupSkuPickerSupplierOptions();
+  renderGroupSkuPickerList();
+  document.getElementById('groupSkuPickerOverlay').classList.add('open');
+}
+function closeGroupSkuPicker() {
+  document.getElementById('groupSkuPickerOverlay').classList.remove('open');
+}
+function renderGroupSkuPickerSupplierOptions() {
+  var select = document.getElementById('groupSkuPickerSupplier');
+  var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'sku'; }).map(function(i){ return i.detail; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
+  select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(s){ return '<option value="' + hqSettingsEscape(s) + '">' + supplierLabel(s) + '</option>'; }).join('');
+}
+function setGroupSkuPickerSearch(v) { groupSkuPickerSearch = v; renderGroupSkuPickerList(); }
+function setGroupSkuPickerSupplier(v) { groupSkuPickerSupplier = v; renderGroupSkuPickerList(); }
+function groupSkuUsedNames() {
+  var used = new Set();
+  INV_ITEMS.forEach(function(item, idx) { if (item.type === 'group' && item.constituents && idx !== groupSkuDraft.editIndex) item.constituents.forEach(function(c){ used.add(c.name); }); });
+  (groupSkuDraft.items || []).forEach(function(item) { used.add(item.name); });
+  return used;
+}
+function renderGroupSkuPickerList() {
+  var used = groupSkuUsedNames();
+  var q = groupSkuPickerSearch.toLowerCase();
+  var candidates = INV_ITEMS.filter(function(item) {
+    if (item.type !== 'sku') return false;
+    if (used.has(item.name)) return false;
+    if (groupSkuPickerSupplier && item.detail !== groupSkuPickerSupplier) return false;
+    if (q && item.name.toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  });
+  var body = document.getElementById('groupSkuPickerBody');
+  if (!candidates.length) {
+    body.innerHTML = '<tr><td colspan="3" style="padding:24px 0;text-align:center;color:var(--ink-mute);font-size:13px">No matching items.</td></tr>';
+  } else {
+    body.innerHTML = candidates.map(function(item) {
+      var checked = groupSkuPickerSelected.has(item.name);
+      return '<tr>' +
+        '<td style="padding:10px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleGroupSkuPickerItem(\'' + item.name.replace(/'/g,"\\'") + '\',this.checked)" style="margin-top:3px" />' +
+          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.detail) + '</span></span></label></td>' +
+        '<td style="padding:10px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' +
+        '<td style="padding:10px 0;border-top:1px solid var(--rule);color:var(--ink);font-size:14px;font-weight:600">$' + item.cost.toFixed(2) + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+  document.getElementById('groupSkuPickerCount').textContent = groupSkuPickerSelected.size + ' item' + (groupSkuPickerSelected.size === 1 ? '' : 's') + ' selected';
+  document.getElementById('groupSkuPickerError').hidden = true;
+}
+function toggleGroupSkuPickerItem(name, checked) {
+  if (checked) {
+    if (groupSkuPickerSelected.size + groupSkuDraft.items.length >= 5) { checked = false; renderGroupSkuPickerList(); return; }
+    groupSkuPickerSelected.add(name);
+  } else {
+    groupSkuPickerSelected.delete(name);
+  }
+  document.getElementById('groupSkuPickerCount').textContent = groupSkuPickerSelected.size + ' item' + (groupSkuPickerSelected.size === 1 ? '' : 's') + ' selected';
+}
+function confirmGroupSkuPicker() {
+  var chosen = INV_ITEMS.filter(function(item) { return groupSkuPickerSelected.has(item.name); });
+  if (!chosen.length) return;
+  var uoms = groupSkuDraft.items.map(function(i){ return i.uom; }).concat(chosen.map(function(i){ return i.uom; }));
+  var distinctUoms = uoms.filter(function(v,i,a){ return a.indexOf(v) === i; });
+  if (distinctUoms.length > 1) {
+    document.getElementById('groupSkuPickerError').hidden = false;
+    return;
+  }
+  chosen.forEach(function(item) {
+    groupSkuDraft.items.push({ name: item.name, supplier: item.detail, cost: item.cost, uom: item.uom, groups: (item.groups || []).slice(), active: item.active !== false });
+  });
+  closeGroupSkuPicker();
+  renderGroupSkuContent();
+}
+function saveGroupSku() {
+  var name = document.getElementById('groupSkuName').value.trim();
+  var par = Number(document.getElementById('groupSkuPar').value || 0);
+  var list = document.getElementById('groupSkuListSelect').value;
+  if (!name || !groupSkuDraft.items.length || !list) return;
+  var duplicate = INV_ITEMS.some(function(item, idx) { return idx !== groupSkuDraft.editIndex && item.name.toLowerCase() === name.toLowerCase(); });
+  if (duplicate) { var nameField = document.getElementById('groupSkuName'); nameField.focus(); return; }
+  var uom = groupSkuDraft.items[0].uom;
+  var newNames = groupSkuDraft.items.map(function(c){ return c.name; });
+  var entry = {
+    type: 'group', name: name, detail: groupSkuDraft.items.length + ' SKU' + (groupSkuDraft.items.length === 1 ? '' : 's'),
+    uom: uom, cost: null, active: true, list: list,
+    groups: groupSkuDraft.editIndex > -1 ? INV_ITEMS[groupSkuDraft.editIndex].groups : INV_GROUPS.slice(),
+    par: par, constituents: groupSkuDraft.items.slice()
+  };
+  if (groupSkuDraft.editIndex > -1) {
+    // Restore any constituents that were removed from the group during this edit as standalone SKUs.
+    (INV_ITEMS[groupSkuDraft.editIndex].constituents || []).forEach(function(c) {
+      if (newNames.indexOf(c.name) === -1) {
+        INV_ITEMS.push({ type: 'sku', name: c.name, detail: c.supplier, uom: uom, cost: c.cost, active: c.active !== false, groups: (c.groups || []).slice() });
+      }
+    });
+    INV_ITEMS[groupSkuDraft.editIndex] = entry;
+    showHqToast('Group SKU updated', name + ' has been updated.');
+    addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(name) + '</strong> Group SKU updated', 'inventory', 'Master');
+  } else {
+    INV_ITEMS.push(entry);
+    showHqToast('Group SKU created', name + ' has been added to inventory.');
+    addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(name) + '</strong> Group SKU created from ' + entry.constituents.length + ' items', 'inventory', 'Master');
+  }
+  // Constituents now live only nested under the group; drop their standalone rows.
+  newNames.forEach(function(itemName) {
+    var idx = INV_ITEMS.findIndex(function(item){ return item.type === 'sku' && item.name === itemName; });
+    if (idx > -1) INV_ITEMS.splice(idx, 1);
+  });
+  closeGroupSkuModal();
+  renderInv();
+}
 
 function getHqInventorySettingsStore() {
   try { return JSON.parse(localStorage.getItem('nomniHqInventoryItemSettings') || '{}'); } catch (e) { return {}; }
@@ -4920,29 +5178,91 @@ function confirmRemoveFromHQ() {
   </div>
 </div>
 
-<!-- ── Link existing supplier modal ── -->
-<div class="modal-overlay" id="linkSupOverlay" onclick="if(event.target===this)closeLinkSupModal()">
-  <div class="modal-card" style="width:580px">
-    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--rule);flex-shrink:0">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <div class="modal-title">Add supplier</div>
-        <button onclick="closeLinkSupModal()" style="background:none;border:none;cursor:pointer;color:var(--ink-mute);padding:4px;border-radius:6px;display:flex;align-items:center" aria-label="Close">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
+<!-- ── Add supplier page ── -->
+<div class="modal-overlay" id="linkSupOverlay">
+  <div class="modal-card">
+    <div class="modal-header"><div><button class="supplier-back" type="button" onclick="closeLinkSupModal()">‹ Suppliers</button><h2 class="modal-title" id="linkSupPageTitle">Add supplier</h2></div></div>
+    <div class="hq-steps"><div class="hq-step is-active"><span class="hq-step-number">1</span><span>Search supplier</span></div><div class="hq-step"><span class="hq-step-number">2</span><span>Configure supplier settings</span></div></div>
+    <div class="modal-body">
+      <form class="link-sup-search-row" onsubmit="event.preventDefault();performLinkSupSearch();">
+        <div class="ml-search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="ml-search-input" id="linkSupSearch" placeholder="Enter supplier name" style="width:100%" />
+        </div>
+        <button type="submit" class="btn btn-secondary">Search</button>
+      </form>
+      <div id="linkSupList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Active supplier guidance ── -->
+<div class="modal-overlay" id="activeSupplierInfoOverlay" onclick="if(event.target===this)closeActiveSupplierInfo()">
+  <div class="modal-card" style="width:500px">
+    <div class="modal-header"><h2 class="modal-title">Contact Nomni to add</h2><button class="modal-close" onclick="closeActiveSupplierInfo()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+    <div class="modal-body" style="gap:14px"><p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink)">This is an <strong>Active supplier</strong>. Active suppliers manage their orders and market lists directly using Nomni Supply.</p><p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink)">To add Active suppliers, use the Live Chat (bottom left of screen) and make a request.</p></div>
+    <div class="modal-foot"><button class="btn btn-primary" onclick="closeActiveSupplierInfo()">Got it</button></div>
+  </div>
+</div>
+
+<!-- ── Create / edit Group SKU ── -->
+<div class="modal-overlay" id="groupSkuOverlay" onclick="if(event.target===this)closeGroupSkuModal()">
+  <div class="modal-card" style="width:620px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="groupSkuModalTitle" style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;font-weight:700;letter-spacing:.04em;background:#EDE9FE;color:#6D28D9;border-radius:4px;padding:2px 6px">G</span>Create Group SKU</h2>
+      <button class="modal-close" onclick="closeGroupSkuModal()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" style="gap:18px">
+      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--ink-mute)">Group several SKUs to track them as a single item in Inventory — useful if there are multiple buying options for an item.</p>
+      <div>
+        <label class="field-label">Group SKU name:</label>
+        <input class="field-input" id="groupSkuName" type="text" placeholder="E.g Fine White Sugar" oninput="updateGroupSkuSaveState()" />
       </div>
-      <div class="ml-search-wrap" style="width:100%">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" class="ml-search-input" id="linkSupSearch" placeholder="Enter supplier name" oninput="renderLinkSupList()" style="width:100%" />
+      <div>
+        <label class="field-label" style="margin-bottom:10px">Group content</label>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr><th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Item</th><th style="width:70px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">UoM</th></tr></thead>
+          <tbody id="groupSkuContentBody"></tbody>
+        </table>
+        <button type="button" id="groupSkuDeleteBtn" class="group-sku-delete-btn" hidden onclick="deleteCheckedGroupSkuContent()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>Delete</button>
+        <button type="button" onclick="openGroupSkuPicker()" style="margin-top:10px;border:0;background:none;padding:0;color:var(--spinach);font:inherit;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add new</button>
+      </div>
+      <div style="max-width:220px">
+        <label class="field-label">Par level:</label>
+        <div style="display:flex;align-items:center;gap:8px"><input class="field-input" id="groupSkuPar" type="number" min="0" step="1" oninput="updateGroupSkuSaveState()" /><span id="groupSkuParUom" style="font-size:13px;color:var(--ink-mute);white-space:nowrap"></span></div>
+      </div>
+      <div>
+        <label class="field-label">Receive goods in/deduct sold items from:</label>
+        <select class="field-input" id="groupSkuListSelect" onchange="updateGroupSkuSaveState()"><option value="">Select list</option></select>
       </div>
     </div>
-    <div style="flex:1;overflow-y:auto" id="linkSupList"></div>
-    <div style="padding:14px 24px;border-top:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <span id="linkSupSelCount" style="font-size: 14px;color:var(--ink-mute)">No suppliers selected</span>
+    <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkuModal()">Cancel</button><button class="btn btn-primary" id="groupSkuSaveBtn" disabled onclick="saveGroupSku()">Create</button></div>
+  </div>
+</div>
+
+<!-- ── Choose items for Group SKU ── -->
+<div class="modal-overlay" id="groupSkuPickerOverlay" onclick="if(event.target===this)closeGroupSkuPicker()">
+  <div class="modal-card" style="width:620px">
+    <div class="modal-header"><h2 class="modal-title">Choose items for Group SKU</h2><button class="modal-close" onclick="closeGroupSkuPicker()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+    <div class="modal-body" style="gap:14px">
+      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--ink)"><strong>Note:</strong> Select up to 5 items with the same UoM (Unit of Measurement) to create a group SKU.</p>
+      <div style="display:flex;gap:10px;padding:12px 14px;border-radius:6px;background:#EFF6FF;color:#1D4ED8;font-size:13px;line-height:1.5"><span aria-hidden="true">ⓘ</span><span>Any existing data (history, stock count, adjustments) of the items you selected will be lost when added to a Group SKU.</span></div>
       <div style="display:flex;gap:10px">
-        <button class="btn btn-tertiary" onclick="closeLinkSupModal()">Cancel</button>
-        <button class="btn btn-primary" id="linkSupConfirmBtn" disabled onclick="confirmLinkSuppliers()">Continue</button>
+        <div class="ml-search-wrap" style="flex:1">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="ml-search-input" id="groupSkuPickerSearch" placeholder="SKU name" oninput="setGroupSkuPickerSearch(this.value)" style="width:100%" />
+        </div>
+        <select class="ml-filter-select" id="groupSkuPickerSupplier" onchange="setGroupSkuPickerSupplier(this.value)" style="min-width:160px"><option value="">All suppliers</option></select>
+      </div>
+      <p class="supplier-contact-error" id="groupSkuPickerError" hidden style="margin:0">UOMs of selected items are not the same.</p>
+      <div style="max-height:280px;overflow-y:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr><th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">SKU</th><th style="width:80px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Inventory UOM</th><th style="width:80px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Cost</th></tr></thead>
+          <tbody id="groupSkuPickerBody"></tbody>
+        </table>
       </div>
     </div>
+    <div class="modal-foot" style="justify-content:space-between"><span id="groupSkuPickerCount" style="font-size:13px;color:var(--ink-mute)">0 items selected</span><div style="display:flex;gap:10px"><button class="modal-cancel" onclick="closeGroupSkuPicker()">Cancel</button><button class="btn btn-primary" onclick="confirmGroupSkuPicker()">Choose</button></div></div>
   </div>
 </div>
 
@@ -4960,7 +5280,7 @@ function confirmRemoveFromHQ() {
       <div style="max-width:250px"><label class="field-label">Postal code</label><input class="field-input" id="newSupplierPostal" /></div>
       <div><label class="field-label">Also known as <span class="opt">Optional</span></label><input class="field-input" id="newSupplierAlias" /></div>
     </form>
-    <div class="modal-foot"><button class="modal-cancel" onclick="closeNewSupplierModal()">Cancel</button><button class="modal-add-btn" style="background:var(--nomni-green);color:var(--seaweed)" onclick="confirmNewSupplier()">Continue to supplier settings →</button></div>
+    <div class="modal-foot"><button class="modal-cancel" onclick="closeNewSupplierModal()">Cancel</button><button class="btn btn-primary" onclick="confirmNewSupplier()">Continue to supplier settings →</button></div>
   </div>
 </div>
 
@@ -4968,11 +5288,14 @@ function confirmRemoveFromHQ() {
 <div class="modal-overlay" id="supplierSettingsOverlay">
   <div class="modal-card" style="width:760px">
     <div class="modal-header"><div><button class="supplier-back" type="button" onclick="backFromSupplierSettings()">‹ Suppliers</button><h2 class="modal-title" id="supplierSettingsPageTitle">Supplier's settings</h2></div></div>
+    <div class="hq-steps" id="supplierStepsBar"><div class="hq-step"><span class="hq-step-number">1</span><span>Search supplier</span></div><div class="hq-step is-active"><span class="hq-step-number">2</span><span>Configure supplier settings</span></div></div>
     <form id="supplierSettingsForm" class="modal-body" onsubmit="event.preventDefault();saveSupplierSettings()"><div class="supplier-settings-shell">
       <section class="supplier-settings-section"><h3 class="supplier-settings-heading">Send order notifications to…</h3><div class="supplier-settings-card">
         <div><label class="field-label">Supplier email(s)</label><input class="field-input" id="supplierRecipientEmail" type="text" placeholder="Email" oninput="clearSupplierContactError()" /><p class="supplier-settings-help" style="margin-top:6px">Separate multiple email addresses with commas.</p></div>
-        <label class="supplier-settings-check"><input id="supplierNoEmail" type="checkbox" onchange="toggleSupplierNoEmail()" /><span><strong>No email address?</strong> Add a WhatsApp number instead</span></label>
+        <label class="supplier-settings-check"><input id="supplierNoEmail" type="checkbox" onchange="toggleSupplierNoEmail()" /><span><strong>No email address?</strong> Tick to confirm</span></label>
         <div class="supplier-soft-rule"></div><div><label class="field-label">WhatsApp</label><input class="field-input" id="supplierWhatsapp" type="tel" placeholder="Enter mobile number" oninput="clearSupplierContactError()" /><p class="supplier-contact-error" id="supplierContactError" hidden>Enter an email address or WhatsApp number to continue.</p></div>
+        <div id="supplierSmsField" hidden><label class="field-label">SMS</label><input class="field-input" id="supplierSms" type="tel" placeholder="Enter mobile number" /></div>
+        <button type="button" class="supplier-more-link" id="supplierMoreContact" onclick="revealSupplierSmsField()">More⌄</button>
       </div></section>
       <section class="supplier-settings-section"><h3 class="supplier-settings-heading">Order &amp; delivery policy</h3><div class="supplier-settings-card"><div class="supplier-settings-grid"><div><label class="field-label">Min. order (S$)</label><input class="field-input" id="supplierMinOrder" inputmode="decimal" value="0" /></div></div><label class="supplier-settings-check"><input id="supplierBlockMin" type="checkbox" checked /><span>Block orders below minimum order</span></label></div>
         <div class="supplier-settings-card supplier-delivery-card"><p class="supplier-policy-note"><strong>Not sure of the cut-off?</strong> Use 2 days earlier at 12:00 PM for now. You can update it later.</p><div class="supplier-policy-table"><div class="supplier-policy-head"><span>Deliver on</span><span>Cut-off time</span><span></span></div>
