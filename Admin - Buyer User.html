@@ -149,7 +149,7 @@
   .perm-full .perm-cat { max-width: 100%; }
 
   /* Sticky footer */
-  .sticky-footer { position: fixed; bottom: 0; left: 220px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .sticky-footer { position: fixed; bottom: 0; left: 232px; right: 0; background: #fff; border-top: 1px solid var(--rule); padding: 12px 40px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
   .cancel-link { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; text-decoration: none; transition: color .13s; }
   .cancel-link:hover { color: var(--ink); }
   .save-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 24px; cursor: pointer; transition: background .15s; }
@@ -178,7 +178,7 @@
     .sidebar:hover .nav a.active { padding-left: 14px; border-left-width: 2px; }
     .sidebar .sidebar-foot { display: none; }
     .sidebar:hover .sidebar-foot { display: block; }
-    .sticky-footer { left: 56px; }
+    .sticky-footer { left: 64px; }
   }
 
   /* ── HQ access section ── */
@@ -325,9 +325,9 @@
 
     <!-- Breadcrumb + title run full width -->
     <div class="breadcrumb">
-      <a href="#" class="back-link">
+      <a href="#" class="back-link" id="backLink">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Users
+        <span id="backLinkLabel">Users</span>
       </a>
     </div>
     <h1 class="page-title">Create buyer user</h1>
@@ -341,22 +341,22 @@
       <div class="form-row">
         <div class="field-group">
           <label class="field-label">First name</label>
-          <input type="text" class="field-input" placeholder="e.g. William" />
+          <input type="text" class="field-input" id="firstNameInput" placeholder="e.g. William" />
         </div>
         <div class="field-group">
           <label class="field-label">Last name</label>
-          <input type="text" class="field-input" placeholder="e.g. Arya" />
+          <input type="text" class="field-input" id="lastNameInput" placeholder="e.g. Arya" />
         </div>
       </div>
 
       <div class="field-group">
         <label class="field-label">Job title</label>
-        <input type="text" class="field-input" placeholder="e.g. Store manager, Head chef" />
+        <input type="text" class="field-input" id="jobTitleInput" placeholder="e.g. Store manager, Head chef" />
       </div>
 
       <div class="field-group">
         <label class="field-label">Email</label>
-        <input type="email" class="field-input" placeholder="name@company.com" />
+        <input type="email" class="field-input" id="emailInput" placeholder="name@company.com" />
         <span class="field-hint">This will be used to log in — the user will receive a default password</span>
         <label class="checkbox-row">
           <input type="checkbox" />
@@ -736,9 +736,10 @@
     window.location.href = '#';
   });
 
-  // Arrived from an HQ page: pre-link that HQ and enable HQ mode.
-  (function prefillLinkedHqFromQuery() {
-    var hqName = new URLSearchParams(window.location.search).get('hq');
+  // Arrived from an HQ page: pre-link that HQ, enable HQ mode, and (if editing) prefill the person's details.
+  (function prefillFromQuery() {
+    var params = new URLSearchParams(window.location.search);
+    var hqName = params.get('hq');
     if (!hqName) return;
     hqName = hqName.trim();
     if (!hqName) return;
@@ -761,12 +762,27 @@
     document.getElementById('hqFeatures').classList.add('visible');
     clearLinkingErrors();
 
-    var backLink = document.querySelector('.back-link');
+    var backLink = document.getElementById('backLink');
     if (backLink) {
-      backLink.href = 'Admin - HQ Settings.html';
-      backLink.lastChild.textContent = hqName;
+      backLink.href = 'Admin - HQ Users.html?hq=' + encodeURIComponent(hqName);
+      document.getElementById('backLinkLabel').textContent = hqName + ' users';
     }
-    document.querySelector('.page-title').textContent = 'Add user to ' + hqName;
+
+    var name = params.get('name');
+    var isEditing = !!name;
+    if (isEditing) {
+      var parts = name.trim().split(/\s+/);
+      document.getElementById('firstNameInput').value = parts.shift() || '';
+      document.getElementById('lastNameInput').value = parts.join(' ');
+      var jobTitle = params.get('jobTitle');
+      if (jobTitle) document.getElementById('jobTitleInput').value = jobTitle;
+      var email = params.get('email');
+      if (email) document.getElementById('emailInput').value = email;
+      if (params.get('owner') === '1') document.getElementById('hqOwnerToggle').classList.add('on');
+      document.querySelector('.page-title').textContent = 'Edit user';
+    } else {
+      document.querySelector('.page-title').textContent = 'Add user to ' + hqName;
+    }
   })();
 </script>
 </body>
