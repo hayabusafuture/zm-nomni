@@ -1124,7 +1124,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
                 <div class="row-actions-menu">
                   <div class="row-action-item" onclick="openGroupOutletPicker('Chargrill Outlets',this)">Add outlets</div>
                   <div class="row-action-item" onclick="openGroupSettings('Chargrill Outlets','Garden Cuisine Chargrill chain locations')">Settings</div>
-                  <div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div>
                 </div>
               </div>
             </td>
@@ -1161,7 +1160,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
                 <div class="row-actions-menu">
                   <div class="row-action-item" onclick="openGroupOutletPicker('Family Dining Express',this)">Add outlets</div>
                   <div class="row-action-item" onclick="openGroupSettings('Family Dining Express','')">Settings</div>
-                  <div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div>
                 </div>
               </div>
             </td>
@@ -3359,6 +3357,15 @@ function openGroupSettings(name, description) {
 function closeGroupSettings() {
   document.getElementById('gsOverlay').classList.remove('open');
 }
+function openDeleteGroupFromSettings() {
+  var groupName = document.getElementById('gsOverlay').dataset.groupName || '';
+  var row = Array.from(document.querySelectorAll('#ogTable tbody > tr[data-group-name]')).find(function(candidate) {
+    return candidate.dataset.groupName === groupName.toLowerCase();
+  });
+  if (!row) return;
+  closeGroupSettings();
+  openDeleteGroupModal(row);
+}
 function saveGroupSettings() {
   var oldName = document.getElementById('gsOverlay').dataset.groupName || '';
   var newName = document.getElementById('gsGroupName').value.trim();
@@ -5080,9 +5087,12 @@ function confirmRemoveFromHQ() {
         <span style="font-size:12px;color:var(--ink-mute);margin-top:4px;display:block">Used as internal notes only. Not visible to buyers.</span>
       </div>
     </div>
-    <div class="modal-foot">
-      <button class="modal-cancel" onclick="closeGroupSettings()">Cancel</button>
-      <button class="modal-add-btn" style="background:var(--nomni-green);color:var(--seaweed)" onclick="saveGroupSettings()">Save changes</button>
+    <div class="modal-foot" style="justify-content:space-between">
+      <button class="modal-cancel" onclick="openDeleteGroupFromSettings()" style="color:#D0291E">Delete group</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="modal-cancel" onclick="closeGroupSettings()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveGroupSettings()">Save changes</button>
+      </div>
     </div>
   </div>
 </div>
@@ -5774,7 +5784,6 @@ function renderCreatedOutletGroup() {
     '<td style="color:var(--ink-mute)">Today</td><td><div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu">' +
       '<div class="row-action-item" data-group-name="' + safeName + '" onclick="openGroupOutletPicker(this.dataset.groupName,this)">Add outlets</div>' +
       '<div class="row-action-item" data-group-name="' + safeName + '" data-group-description="' + escapeOverviewText(group.description) + '" onclick="openGroupSettings(this.dataset.groupName,this.dataset.groupDescription)">Settings</div>' +
-      '<div class="row-action-item danger" onclick="openDeleteGroupModal(this)">Delete group</div>' +
     '</div></div></td>';
 
   var outletRow = document.createElement('tr');

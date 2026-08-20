@@ -1,6 +1,6 @@
 # HQ Module — Prototype Status and Gaps
 
-Last reviewed: 18 August 2026
+Last reviewed: 20 August 2026
 
 ## Purpose
 
@@ -27,8 +27,8 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 
 | Part | Status | What exists | Gap / next step |
 |---|---|---|---|
-| Create HQ form | Built | Company, HQ name and add-ons | Intentionally limited to details required for managing HQ data |
-| Required fields | Built | Company and HQ name are validated with inline errors and focus on the first invalid field | Confirm the production validation rules |
+| Create HQ form | Built | HQ name and add-ons | Intentionally limited to details required for managing HQ data |
+| Required fields | Built | HQ name is validated with an inline error and focus on the field | Confirm the production validation rules |
 | Create HQ submission | Built | The button validates the form, stores the new HQ for the prototype session and opens its Overview | Replace session storage with backend creation when implemented |
 | Duplicate checks | Not built | — | Represent duplicate HQ name/company handling |
 | Creation success | Built | Successful submission opens the newly created HQ Overview and shows a one-time Freemium-style “HQ created” toast | — |
@@ -59,6 +59,7 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 | Outlet groups | Delete group | Partial | Confirmation and in-page removal exist | Define dependencies, persistence and recovery |
 | Outlet assignment | Add ungrouped outlet to group | Partial | Selection modal moves the outlet in the current page | Retain the assignment |
 | Outlet assignment | Add outlets from group editor | Partial | Search, filters, multi-select and confirmation work | Retain the assignment |
+| Outlet assignment | Link outlets directly to HQ | Built | Overview provides a bulk **Link outlets** flow. Eligible outlets can be searched, filtered and multi-selected; confirmation moves them into the HQ as ungrouped outlets and explicitly updates their prototype type to **Managed by HQ** | Replace the prototype catalogue and browser-only state with backend search and persistence |
 | Outlet assignment | Remove outlet from group | Partial | Confirmation removes it from the current group | Define and display its ungrouped state consistently |
 | Outlet assignment | Remove outlet from HQ | Partial | Confirmation flows exist | Define consequences for items, suppliers, recipes, users and Procure access |
 | Group overview | View statistics and summaries | Built | Item, outlet, supplier and recipe summaries | Replace fixed data when persistence is introduced |
@@ -71,6 +72,7 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 | HQ items | Create catalogue item | Partial | Details, supplier, tax, UOM, MOQ, inventory and access fields | Add validation and create a retained item record |
 | HQ items | Add existing catalogue items | Partial | Three-step selection and configuration wizard; the prototype directory provides at least five catalogue items for every searchable supplier and displays only items from suppliers linked to the HQ | Retain added items in the backend |
 | HQ items | Group price and MOQ exceptions | Partial | Add, edit, duplicate validation and removal work | Retain exceptions; consider effective dates |
+| HQ price changes | Review invoice price changes | Built | Dedicated **Price changes** page, reached from the Items tab, Market List warning and Health check. It lists pending HQ-level invoice price changes with current/invoice price, source outlet and detection date; users can update the HQ market-list price or keep the current price. Updating confirms the HQ-wide effect and any skipped older change for that item; decisions move to a Reviewed tab for the current session. | Replace fixed sample changes and browser-only review state with price-change data, persistence, audit history and role checks. |
 | HQ suppliers | Browse suppliers | Built | Supplier listing, contact-method-aware rows, View Supplier Items and Edit supplier settings actions | — |
 | HQ suppliers | Add existing suppliers | Built | The entry point is now a dedicated **Add supplier** page (not a dialog) that opens beside the sidebar, matching the relationship-settings page pattern, with a `‹ Suppliers` back link and the Freemium two-step **Search supplier / Configure supplier settings** stepper (hidden when editing an existing linked supplier, since there is no search step in that path). Search is explicit — results only load when **Search** is clicked, not as the user types. A single Freemium-aligned flow searches Procure by company name first, then offers UEN/ABN lookup or manual creation when needed. Each search result is a direct-action row — most show an **Add to My Supplier** button that opens the relationship-settings page immediately; Active suppliers (matched to Nomni Supply) show a **Contact Nomni to add** link instead, which opens guidance to request the addition via Live Chat. "Search by UEN or ABN" reuses the keyword already typed and immediately queries a small external-registry dataset representing an ACRA/ABR lookup (**Results from ACRA**, 21px heading aligned flush with the search field, with a single **Back to searching within Zeemart** link to return to the internal directory search); adding a result flows into the same settings page as a new-to-Procure supplier. The external-registry dataset matches on UEN/ABN substrings `201813940C`, `201955102M` or `202011223K`. Manual creation still opens as a small modal layered on top of the Add supplier page, and backing out of it — or of an ACRA result — from the settings page restores the right combination of page/modal. There is no separate selection/Continue step | Replace the prototype directory, expanded registration lookup and ACRA/ABR dataset with a real server-side search, pagination and registry integration |
 | HQ suppliers | Create supplier in Procure | Built | A no-result path captures name, company registration number, address, postal code and optional alias, then uses the same settings page before creating and adding the supplier | Add duplicate registration checks, validation and backend persistence |
@@ -113,6 +115,26 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 | How is an HQ provisioned into Procure? | Not built | Define creation, activation and first-login hand-off |
 | How are Admin changes communicated to buyers? | Not built | Define notifications and activity history |
 
+### Proposed ownership model (lifecycle-stage split)
+
+Rather than splitting capabilities as "Admin-only" vs "Procure-only," the more accurate split is by **lifecycle stage**: Admin serves HQ provisioning/governance and CS-assisted onboarding setup; Procure serves the buyer's ongoing self-service operation once live. Most catalog-adjacent flows genuinely need to be complete in both surfaces, not just supported as an edge case in one.
+
+| Capability | Admin | Procure | Rationale |
+|---|---|---|---|
+| Create HQ | Owns it | — | Provisioning a new commercial entity — same category as creating a buyer account; keep platform-operator gated even if buyer self-serve creation is considered later |
+| Activate/deactivate HQ | Owns it | — | Lifecycle/billing-adjacent, same reasoning as Create HQ |
+| HQ Owner-type user management | Owns it | View only | Matches PWF-1664: "Owners can only be managed by ZM Admin" |
+| Edit HQ details (name/company) | Support/override | Owns it | Low-risk, buyer should self-serve day to day |
+| Outlet groups (create, edit, add/remove outlets) | Full onboarding build-out (CS-assisted, likely bulk) | Owns ongoing changes | CS sets up initial group structure for a new buyer; buyer maintains it after go-live |
+| HQ suppliers (add, create, edit settings, disable/reactivate) | Full onboarding build-out (CS-assisted) | Owns ongoing changes | Explains why most prototype effort went into Admin's supplier flow first — correctly prioritized, not a sequencing artifact |
+| HQ items (create, add existing, price/MOQ exceptions) | Full onboarding build-out (CS-assisted, likely bulk) | Owns ongoing changes | Catalog build-out at onboarding is fiddly and CS-driven; buyer maintains afterward |
+| HQ inventory (add catalogue item, Group SKU setup) | Full onboarding build-out (CS-assisted) | Owns ongoing changes | Inventory structure setup is exactly the kind of setup CS would do for a new buyer |
+| Recipes (create, variations, propagation) | Genuine fallback/support only | Owns it | Closer to the buyer's own culinary IP — less clearly CS-assisted; confirm with CS whether this holds |
+| HQ Overview / Activity log | Read-mostly, cross-buyer support/audit view | Primary dashboard, buyer-scoped | Same underlying data, different filters and action surface |
+| Regular (non-Owner) HQ user linking | Support path | Owns ongoing changes | Routine post-onboarding changes shouldn't need CS in the loop |
+
+Open question to confirm with CS: which of the "CS-assisted onboarding" flows above are actually bulk/CS-driven in practice today, versus ones this proposal is assuming.
+
 ## Cross-cutting implementation gaps
 
 | Gap | Status | Notes |
@@ -140,6 +162,12 @@ Recommended model: create an empty HQ first, then guide the administrator to add
 
 | Date | Change |
 |---|---|
+| 20 August 2026 | Added the dedicated HQ **Price changes** review page for invoice-driven price changes. It is linked from Health check, the Market List warning and the Items tab; the review table makes the HQ and source outlet explicit, supports Update price / Keep current actions, confirms skipped older changes, and retains reviewed decisions for the current session. |
+| 20 August 2026 | Removed the Company field and company-name metadata from HQ create, edit and list/detail surfaces, so the prototype consistently treats the HQ name as the displayed identity. |
+| 20 August 2026 | Added bulk **Link outlets** on HQ Overview, retaining the outlet settings page as the detailed per-outlet route. The in-page picker supports search, company/cluster filters and multi-select, confirms the **Managed by HQ** consequence, adds linked outlets as ungrouped and updates prototype activity and outlet counts. |
+| 20 August 2026 | Added Recipes **Type** and **Food cost** filters. The Health check food-cost entry now opens Recipes with **Higher than threshold** applied; Health check icons are filled Material Symbols Rounded and use concept-specific, severity-appropriate colours. |
+| 20 August 2026 | Standardised HQ Items, Recipes, Suppliers and Inventory access terminology to **Available to**, with explicit group/outlet summaries and a details dialog that separates outlet groups from individual outlets. |
+| 19 August 2026 | Added a proposed lifecycle-stage ownership model (Admin for provisioning/CS-assisted onboarding, Procure for ongoing buyer self-service) to the Admin/Procure ownership gaps section. |
 | 18 August 2026 | Reworked supplier relationship settings into a dedicated, scrollable HQ page with a fixed Save footer. Removed the supplier-flow stepper; added the Suppliers back link, 24px supplier-specific page title, Freemium-style cards and delivery cut-off interactions, including Apply to all. |
 | 18 August 2026 | Renamed the supplier entry action to “Add supplier”, simplified its dialog header, removed supplier categorisation from the flow UI, and updated supplier names to legal-style prototype names across HQ tabs while keeping internal matching keys stable. |
 | 18 August 2026 | Updated supplier contacts so email and WhatsApp are independently optional but at least one is required. Supplier list rows now show only available contact methods, and existing supplier settings can be edited and retained locally. |
