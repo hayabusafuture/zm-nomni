@@ -91,6 +91,9 @@
 
   /* Filter row */
   .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .empty-state { padding: 64px 24px; text-align: center; }
+  .empty-state-title { font-size: 21px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); margin-bottom: 6px; }
+  .empty-state-copy { font-size: 14px; line-height: 1.5; color: var(--ink-mute); }
   .search-wrap { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; min-width: 200px; }
   .search-wrap input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
   .search-wrap input::placeholder { color: var(--ink-mute); }
@@ -144,7 +147,7 @@
   .beta-tag { display: inline-block; font-size: 10px; font-weight: 700; background: #e0e2e8; color: #666; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
 
   /* Groups table */
-  .group-outlet-count { color: var(--ink-2); font-size: 13px; }
+  .group-outlet-count { color: var(--ink-2); font-size: 13px; font-variant-numeric: tabular-nums; }
 
   /* ── Outlet groups accordion ── */
   .og-hq-block { margin-bottom: 8px; }
@@ -160,9 +163,6 @@
   .og-hq-name-wrap .og-hq-name { flex: none; }
   .og-hq-company { font-size: 12px; color: var(--ink-mute); margin-top: 2px; display: block; }
   .og-hq-badge { font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #e8e9ec; padding: 2px 8px; border-radius: 10px; }
-  .og-badge-ungrouped { background: #FFF3CD; color: #7A5F00; }
-  .og-add-group-btn { font-size: 12px; font-weight: 600; color: var(--ink); background: #fff; border: 1px solid var(--rule); border-radius: 5px; padding: 3px 10px; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; transition: background .13s, border-color .13s; white-space: nowrap; }
-  .og-add-group-btn:hover { background: #f0f1f3; border-color: #c5c7cc; }
   .og-hq-rows { display: none; border: 1px solid var(--rule); border-radius: 0 0 8px 8px; overflow: visible; margin-bottom: 2px; }
   .og-hq-rows.is-open { display: block; }
   .og-hq-rows table { border-top: none; }
@@ -223,6 +223,13 @@
   .nav a:hover svg { color: #888; }
   .nav a.active { color: var(--seaweed); background: rgba(42,200,100,.14); border: 0; font-weight: 600; padding-left: 12px; }
   .nav a.active svg { color: var(--spinach); }
+  .nav a .icon-wrap { flex: 0 0 18px; width: 18px; height: 18px; position: relative; display: block; }
+  .nav a .icon { position: absolute; top: 0; left: 0; width: 18px; height: 18px; color: #888888; transition: color .15s ease; }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav a:hover .icon { color: #888; }
+  .nav a.active .icon { color: var(--spinach); }
   .nav .badge { background: var(--nomni-green); color: var(--seaweed); }
   .sidebar-foot { border-top-color: #E7E8EC; }
   .sidebar-avt { background: #7F6AD0; color: #fff; }
@@ -264,8 +271,12 @@
 .btn-add:active { transform: scale(.96); }
 
 /* Match the HQ listing to the Buyers page table language */
+#panel-outlet-groups { --outlets-column: 80%; }
+#panel-outlet-groups .table-wrap table,
+#panel-outlet-groups .og-hq-rows table { table-layout: fixed; }
 #panel-outlet-groups .og-hq-block { margin: 0; }
 #panel-outlet-groups .og-hq-header {
+  position: relative;
   min-height: 48px;
   padding: 13px 14px;
   border: 0;
@@ -273,24 +284,39 @@
   border-radius: 0;
   background: #fff;
 }
-#panel-outlet-groups .filter-row + .og-hq-block .og-hq-header {
-  border-top: 1px solid var(--rule);
+#panel-outlet-groups .table-wrap + .og-hq-block .og-hq-header {
+  border-top: 0;
 }
-#panel-outlet-groups .og-hq-header:hover,
 #panel-outlet-groups .og-hq-header.is-open {
+  background: #fff;
+  border-color: var(--rule);
+}
+#panel-outlet-groups .og-hq-header:hover {
   background: var(--row-hover);
   border-color: var(--rule);
 }
+#panel-outlet-groups thead th:first-child,
+#panel-outlet-groups .og-hq-rows tbody td:first-child { width: var(--outlets-column); }
+#panel-outlet-groups thead th:last-child,
+#panel-outlet-groups .og-hq-rows tbody td:last-child,
+#panel-outlet-groups .og-hq-badge { text-align: left; font-variant-numeric: tabular-nums; }
+#panel-outlet-groups .og-hq-rows tbody tr td { background: var(--row-hover); }
+#panel-outlet-groups .og-hq-rows tbody tr:hover td { background: #F0F1F3; }
 #panel-outlet-groups .og-hq-name { font-size: 14px; }
-#panel-outlet-groups .og-hq-name + .og-hq-badge { margin-left: auto; }
+#panel-outlet-groups .og-hq-name-wrap { flex: 1; width: auto; }
 #panel-outlet-groups .og-hq-badge {
-  margin-left: 6px;
+  /* Uses the same column start and cell inset as the table below. */
+  position: absolute;
+  left: calc(var(--outlets-column) + 14px);
+  top: 50%;
+  margin: 0;
+  transform: translateY(-50%);
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--ink-mute);
-  font-size: 12px;
-  font-weight: 500;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 400;
 }
 #panel-outlet-groups .og-hq-rows,
 #panel-outlet-groups .og-hq-rows.is-open {
@@ -347,15 +373,15 @@
   <aside class="sidebar">
     <nav class="nav" aria-label="Primary">
       <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+        <span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span>
         <span>Orders</span>
       </a>
       <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h4"/></svg>
+        <span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span>
         <span>Invoices</span>
       </a>
       <a href="#">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V6m5 14V10m5 10V4m5 16v-8"/></svg>
+        <span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span>
         <span>Reports</span>
       </a>
       <a href="#">
@@ -375,7 +401,7 @@
         <span>Notifications</span><span class="badge">4</span>
       </a>
       <a href="Admin - Buyer User.html">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+        <span class="icon-wrap"><img class="icon icon-grey" src="sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="sidenav icons/Users - green.png" alt="" aria-hidden="true"></span>
         <span>Users</span>
       </a>
     </nav>
@@ -405,6 +431,7 @@
     <!-- Tabs -->
     <div class="tabs">
       <div class="tab active" data-tab="outlets">Outlets</div>
+      <div class="tab" data-tab="trial">Trial</div>
       <div class="tab" data-tab="companies">Companies</div>
       <div class="tab" data-tab="groups">Clusters</div>
       <div class="tab" data-tab="outlet-groups">HQ &amp; Outlet groups</div>
@@ -594,6 +621,14 @@
       </div>
     </div>
 
+    <!-- ── Trial tab ── -->
+    <div class="tab-panel" id="panel-trial">
+      <div class="empty-state">
+        <div class="empty-state-title">No trial accounts yet</div>
+        <div class="empty-state-copy">Buyers currently on a trial will show up here.</div>
+      </div>
+    </div>
+
     <!-- ── Companies tab ── -->
     <div class="tab-panel" id="panel-companies">
       <div class="filter-row">
@@ -681,20 +716,24 @@
         </div>
       </div>
 
+      <div class="table-wrap">
+        <table><thead><tr><th>Name</th><th>Outlets</th></tr></thead></table>
+      </div>
+
       <!-- 1-Group HQ -->
       <!-- 1-Group HQ -->
       <div class="og-hq-block">
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">1-Group HQ</span>
-          <span class="og-hq-badge">2 groups · 8 outlets</span><span class="og-hq-badge og-badge-ungrouped">1 ungrouped</span>
+          <span class="og-hq-badge">9</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">1-Group Outlets</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">CBD Premium Bars</span></td><td><span class="group-outlet-count">3</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr class="og-outlet-row"><td><span style="font-weight:500">1-Atico - Main Kitchen</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">1-Group Outlets</span></td><td><span class="group-outlet-count">5</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">CBD Premium Bars</span></td><td><span class="group-outlet-count">3</span></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">1-Atico - Main Kitchen</span></td><td><span class="date-empty">—</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -704,12 +743,12 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Alchemy Dining Group HQ</span>
-          <span class="og-hq-badge">1 group · 5 outlets</span>
+          <span class="og-hq-badge">5</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">City Dining</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">City Dining</span></td><td><span class="group-outlet-count">5</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -719,17 +758,17 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Baoshi HQ</span>
-          <span class="og-hq-badge">3 groups · 27 outlets</span><span class="og-hq-badge og-badge-ungrouped">3 ungrouped</span>
+          <span class="og-hq-badge">30</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">CBD Core</span></td><td><span class="group-outlet-count">12</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Northern Heartlands</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Western Suburbs</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi Central Kitchen</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
-            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi Catering Office</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
-            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi R&amp;D Lab</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">CBD Core</span></td><td><span class="group-outlet-count">12</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Northern Heartlands</span></td><td><span class="group-outlet-count">9</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Western Suburbs</span></td><td><span class="group-outlet-count">6</span></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi Central Kitchen</span></td><td><span class="date-empty">—</span></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi Catering Office</span></td><td><span class="date-empty">—</span></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">Baoshi R&amp;D Lab</span></td><td><span class="date-empty">—</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -739,14 +778,14 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Braise Collective HQ</span>
-          <span class="og-hq-badge">3 groups · 21 outlets</span>
+          <span class="og-hq-badge">21</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Bistro Format</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Rooftop Bars</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Supper Clubs</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Bistro Format</span></td><td><span class="group-outlet-count">8</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Rooftop Bars</span></td><td><span class="group-outlet-count">6</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Supper Clubs</span></td><td><span class="group-outlet-count">7</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -756,13 +795,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Char Restaurant Group HQ</span>
-          <span class="og-hq-badge">2 groups · 11 outlets</span>
+          <span class="og-hq-badge">11</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Grill &amp; Charcoal</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Takeaway Counters</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Grill &amp; Charcoal</span></td><td><span class="group-outlet-count">7</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Takeaway Counters</span></td><td><span class="group-outlet-count">4</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -772,13 +811,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Da Paolo HQ</span>
-          <span class="og-hq-badge">2 groups · 13 outlets</span>
+          <span class="og-hq-badge">13</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">City Dining</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Italian Casual</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">City Dining</span></td><td><span class="group-outlet-count">8</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Italian Casual</span></td><td><span class="group-outlet-count">5</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -788,13 +827,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Dandy Group HQ</span>
-          <span class="og-hq-badge">2 groups · 10 outlets</span><span class="og-hq-badge og-badge-ungrouped">2 ungrouped</span>
+          <span class="og-hq-badge">12</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">East Coast Venues</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Premium Format</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">East Coast Venues</span></td><td><span class="group-outlet-count">7</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Premium Format</span></td><td><span class="group-outlet-count">5</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -804,13 +843,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">East Coast Eats HQ</span>
-          <span class="og-hq-badge">2 groups · 16 outlets</span>
+          <span class="og-hq-badge">16</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Seafood Shacks</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Katong Outlets</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Seafood Shacks</span></td><td><span class="group-outlet-count">9</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Katong Outlets</span></td><td><span class="group-outlet-count">7</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -820,12 +859,12 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Fable Hospitality HQ</span>
-          <span class="og-hq-badge">1 group · 8 outlets</span>
+          <span class="og-hq-badge">8</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Hotel F&amp;B</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Hotel F&amp;B</span></td><td><span class="group-outlet-count">8</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -835,15 +874,15 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Garden Cuisine HQ</span>
-          <span class="og-hq-badge">2 groups · 10 outlets</span><span class="og-hq-badge og-badge-ungrouped">2 ungrouped</span>
+          <span class="og-hq-badge">12</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Chargrill Outlets</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Family Dining Express</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr class="og-outlet-row"><td><span style="font-weight:500">(WF 139) Chargrill @ 139 Tampines</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
-            <tr class="og-outlet-row"><td><span style="font-weight:500">(WF 290) Garden Express @ 290 Sengkang</span></td><td><span class="date-empty">—</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit outlet</div><div class="actions-item">View details</div><div class="actions-divider"></div><div class="actions-item danger">Remove from HQ</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Chargrill Outlets</span></td><td><span class="group-outlet-count">4</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Family Dining Express</span></td><td><span class="group-outlet-count">6</span></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">(WF 139) Chargrill @ 139 Tampines</span></td><td><span class="date-empty">—</span></td></tr>
+            <tr class="og-outlet-row"><td><span style="font-weight:500">(WF 290) Garden Express @ 290 Sengkang</span></td><td><span class="date-empty">—</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -853,14 +892,14 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Grain Group HQ</span>
-          <span class="og-hq-badge">3 groups · 19 outlets</span>
+          <span class="og-hq-badge">19</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Artisan Bakeries</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Café Counters</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Grain Kitchen</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Artisan Bakeries</span></td><td><span class="group-outlet-count">7</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Café Counters</span></td><td><span class="group-outlet-count">8</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Grain Kitchen</span></td><td><span class="group-outlet-count">4</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -870,13 +909,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Hua Ting Group HQ</span>
-          <span class="og-hq-badge">2 groups · 10 outlets</span>
+          <span class="og-hq-badge">10</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Cantonese Banquet</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Dim Sum Express</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Cantonese Banquet</span></td><td><span class="group-outlet-count">6</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Dim Sum Express</span></td><td><span class="group-outlet-count">4</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -886,12 +925,12 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Imperial Palace HQ</span>
-          <span class="og-hq-badge">1 group · 6 outlets</span>
+          <span class="og-hq-badge">6</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Premium Outlets</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Premium Outlets</span></td><td><span class="group-outlet-count">6</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -901,13 +940,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Juniper Hospitality HQ</span>
-          <span class="og-hq-badge">2 groups · 10 outlets</span><span class="og-hq-badge og-badge-ungrouped">2 ungrouped</span>
+          <span class="og-hq-badge">12</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Garden Dining</span></td><td><span class="group-outlet-count">5</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Terrace Bars</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Garden Dining</span></td><td><span class="group-outlet-count">5</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Terrace Bars</span></td><td><span class="group-outlet-count">7</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -917,12 +956,12 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Kinship Dining HQ</span>
-          <span class="og-hq-badge">1 group · 7 outlets</span>
+          <span class="og-hq-badge">7</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Community Tables</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Community Tables</span></td><td><span class="group-outlet-count">7</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -932,13 +971,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Laut Seafood Group HQ</span>
-          <span class="og-hq-badge">2 groups · 14 outlets</span>
+          <span class="og-hq-badge">14</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Live Seafood Tanks</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Prawn Noodle Stalls</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Live Seafood Tanks</span></td><td><span class="group-outlet-count">8</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Prawn Noodle Stalls</span></td><td><span class="group-outlet-count">6</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -948,14 +987,14 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Mosaic Food Group HQ</span>
-          <span class="og-hq-badge">3 groups · 22 outlets</span>
+          <span class="og-hq-badge">22</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Fusion Kitchen</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Cloud Kitchen West</span></td><td><span class="group-outlet-count">7</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Food Courts</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Fusion Kitchen</span></td><td><span class="group-outlet-count">9</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Cloud Kitchen West</span></td><td><span class="group-outlet-count">7</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Food Courts</span></td><td><span class="group-outlet-count">6</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -965,13 +1004,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Noodle Republic HQ</span>
-          <span class="og-hq-badge">2 groups · 15 outlets</span>
+          <span class="og-hq-badge">15</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Ramen Bars</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Wanton Express</span></td><td><span class="group-outlet-count">6</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Ramen Bars</span></td><td><span class="group-outlet-count">9</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Wanton Express</span></td><td><span class="group-outlet-count">6</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -981,14 +1020,14 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Paradise Group HQ</span>
-          <span class="og-hq-badge">3 groups · 13 outlets</span>
+          <span class="og-hq-badge">13</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Casual Dining Bundle</span></td><td><span class="group-outlet-count">3</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">CBD High-Volume</span></td><td><span class="group-outlet-count">8</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Weekend Markets</span></td><td><span class="group-outlet-count">2</span></td><td><span class="date-empty">—</span></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Casual Dining Bundle</span></td><td><span class="group-outlet-count">3</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">CBD High-Volume</span></td><td><span class="group-outlet-count">8</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Weekend Markets</span></td><td><span class="group-outlet-count">2</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -998,12 +1037,12 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Pique Restaurant Group HQ</span>
-          <span class="og-hq-badge">1 group · 9 outlets</span>
+          <span class="og-hq-badge">9</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Orchard &amp; Marina</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Orchard &amp; Marina</span></td><td><span class="group-outlet-count">9</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -1013,13 +1052,13 @@
         <div class="og-hq-header" onclick="toggleHQ(this)">
           <svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           <span class="og-hq-name">Soup Restaurant Group HQ</span>
-          <span class="og-hq-badge">2 groups · 13 outlets</span>
+          <span class="og-hq-badge">13</span>
         </div>
         <div class="og-hq-rows">
-          <table><thead><tr><th style="width:30%">Name</th><th style="width:8%">Outlets</th><th style="width:14%">Last updated</th><th class="col-actions">Actions</th></tr></thead>
+          <table>
           <tbody>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Heritage Format</span></td><td><span class="group-outlet-count">9</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
-            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Kopitiam Kiosks</span></td><td><span class="group-outlet-count">4</span></td><td></td><td class="col-actions"><div class="actions-wrap" onclick="event.stopPropagation()"><button class="btn-actions" onclick="toggleActions(this)">Actions <span class="chev"></span></button><div class="actions-menu"><div class="actions-item">Edit group</div><div class="actions-divider"></div><div class="actions-item danger">Delete group</div></div></div></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Heritage Format</span></td><td><span class="group-outlet-count">9</span></td></tr>
+            <tr style="cursor:pointer" onclick="window.location.href='Admin - Edit Outlet Group.html?from=buyers'"><td><span style="font-weight:500">Kopitiam Kiosks</span></td><td><span class="group-outlet-count">4</span></td></tr>
           </tbody></table>
         </div>
       </div>
@@ -1256,39 +1295,6 @@
       wrap.appendChild(companyEl);
     }
 
-    // Add group button (appended last so it sits after badges)
-    var btn = document.createElement('button');
-    btn.className = 'og-add-group-btn';
-    btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Add group';
-    btn.onclick = function(e) {
-      e.stopPropagation();
-      window.location.href = 'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(hqName);
-    };
-    header.appendChild(btn);
-  });
-
-  // Last-updated dates for group rows
-  var GROUP_DATES = [
-    '10 Jun 2026','4 Jun 2026','28 May 2026','21 May 2026','14 May 2026',
-    '6 May 2026','29 Apr 2026','22 Apr 2026','15 Apr 2026','8 Apr 2026',
-    '1 Apr 2026','25 Mar 2026','18 Mar 2026','12 Mar 2026','5 Mar 2026',
-    '26 Feb 2026','19 Feb 2026','12 Feb 2026','5 Feb 2026','28 Jan 2026',
-    '21 Jan 2026','14 Jan 2026','7 Jan 2026','31 Dec 2025','24 Dec 2025',
-    '17 Dec 2025','10 Dec 2025','3 Dec 2025','26 Nov 2025','19 Nov 2025',
-    '12 Nov 2025','5 Nov 2025','29 Oct 2025','22 Oct 2025','15 Oct 2025',
-    '8 Oct 2025','1 Oct 2025','24 Sep 2025','17 Sep 2025','10 Sep 2025',
-    '3 Sep 2025','27 Aug 2025','20 Aug 2025','13 Aug 2025','6 Aug 2025',
-    '30 Jul 2025','23 Jul 2025','16 Jul 2025','9 Jul 2025','2 Jul 2025',
-    '25 Jun 2025','18 Jun 2025','11 Jun 2025','4 Jun 2025','28 May 2025',
-    '21 May 2025','14 May 2025','7 May 2025','30 Apr 2025','23 Apr 2025'
-  ];
-  var gdi = 0;
-  document.querySelectorAll('#panel-outlet-groups .og-hq-rows tbody tr:not(.og-outlet-row)').forEach(function(row) {
-    var td = row.cells[2];
-    if (td) {
-      td.innerHTML = '<span style="color:var(--ink-mute);font-size:13px">' + GROUP_DATES[gdi % GROUP_DATES.length] + '</span>';
-      gdi++;
-    }
   });
 
   // Actions dropdowns
