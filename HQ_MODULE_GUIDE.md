@@ -16,6 +16,8 @@ The HQ page is the operating view for a buyer's head office. It has a header wit
 
 ## Overview
 
+Health check panels are ordered by severity: warnings appear before informational items.
+
 Overview is the home for outlet structure and HQ health.
 
 ### Outlets and groups
@@ -91,6 +93,7 @@ POS mapping connects the HQ to Nomni POS and defines how POS sales affect the HQ
 - The HQ tab lists individual outlets, their connection state, mapping progress and last sync so an HQ user can check mapping accuracy at outlet level. Outlet API keys are for viewing that outlet's data and validation; they do not require the HQ to repeat the master mapping for every outlet.
 - The outlet table includes every outlet managed by the HQ. Each outlet can have fewer POS products than the HQ EMS catalogue, but never more; its mapping count is therefore measured against that outlet's own product total.
 - The overview can be filtered by outlet name, outlet group, POS connection state and mapping status. An outlet is treated as **Mapped** in this overview once it has at least one mapped POS product; otherwise it is **Unmapped**.
+- The Overview health-check alert for outlets not connected to POS opens this tab. Its count is derived from the same outlet records, so it remains consistent with the table.
 - The first visit to the HQ workspace presents a setup state. The user opens **POS settings** and saves the HQ Nomni POS API key; in the prototype, any key connects sample EMS products.
 - Once connected, the workspace is split into a POS-product list and a Procure mapping area.
 - A POS product or variant can map to any HQ inventory entry, including standard inventory items, Group SKUs and recipes that have been added to inventory.
