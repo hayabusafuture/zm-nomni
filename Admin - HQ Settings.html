@@ -15,6 +15,8 @@
   --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
   --ink: #1a1f2b; --ink-2: #4a4f5a; --ink-mute: #8a8f98; --ink-soft: #c7c9cf;
   --rule: #e7e8ec; --row-hover: #f7f8fa; --primary: #2AC864; --settings-cream: #FFF9DE;
+  --notice-warning-bg: #FFF3CD; --notice-warning-border: #F5D87A; --notice-warning-ink: #7A5F00;
+  --notice-info-border: #B9F0C5;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -94,6 +96,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .btn-outline:hover { background: #f3f4f6; }
 .btn-ghost-danger { background: none; border: none; color: #c02020; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 12px; cursor: pointer; border-radius: 6px; transition: background .13s; }
 .btn-ghost-danger:hover { background: #fff0f0; }
+.prototype-reset-btn { position: fixed; left: 16px; bottom: 16px; z-index: 20; padding: 6px 9px; border: 1px solid rgba(255,255,255,.24); border-radius: 5px; background: rgba(14,55,39,.88); color: rgba(255,255,255,.62); font: 600 10px/1 "Inter",system-ui,sans-serif; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; opacity: .62; transition: opacity .15s,background .15s; }
+.prototype-reset-btn:hover { opacity: 1; background: var(--seaweed); color: #fff; }
 
 /* Stats strip */
 .hq-summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
@@ -201,10 +205,14 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-search-wrap input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
 .og-search-wrap input::placeholder { color: var(--ink-mute); }
 /* Add-to-group modal */
-.modal-warning { background: #FEF3C7; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 14px; font-size: 14px; color: #92400E; line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
+.modal-warning { background: var(--notice-warning-bg); border: 1px solid var(--notice-warning-border); border-radius: 8px; padding: 12px 14px; font-size: 14px; color: var(--notice-warning-ink); line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
 .modal-warning svg, .modal-warning .material-symbols-rounded { flex-shrink: 0; margin-top: 1px; color: #D97706; }
 .modal-warning .material-symbols-rounded { font-size:20px; line-height:20px; }
+.modal-info { background:var(--mint); border-color:var(--notice-info-border); color:var(--seaweed); }
+.modal-info .material-symbols-rounded { color:var(--nomni-green); }
 .notice-symbol { flex-shrink:0; color:#D97706; font-size:20px; line-height:20px; }
+.health-check-panel { transition:filter .16s ease; }
+.health-check-panel:hover { filter:brightness(.97); }
 .group-radio-list { display: flex; flex-direction: column; gap: 8px; }
 .group-radio-item { position:relative; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; transition: border-color .15s, background-color .15s; }
 .group-radio-item:has(input:checked) { border-color: var(--nomni-green); background: #F6FFF9; }
@@ -264,6 +272,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .ml-uom-row td { background: #f7f8fa !important; }
 .ml-uom-row:hover td { background: #f2f4f5 !important; }
 .ml-uom-row .ml-uom-indent { padding-left: 34px; color: var(--ink-mute); }
+.inv-uom-row td { background:#F7F8FA !important; }
+.inv-uom-row:hover td { background:#F2F4F5 !important; }
 .ml-options-link { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: var(--spinach); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .ml-options-link:hover { color: var(--nomni-green); }
 .ml-options-chevron { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .15s ease; }
@@ -297,6 +307,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .row-action-item:hover { background: var(--mint); }
 .row-action-item.danger { color: #D0291E; }
 .row-action-item.danger:hover { background: #FDD6DC; }
+.inventory-actions-menu { min-width: 180px; text-align: left; }
+.inventory-actions-menu .row-action-item { text-align: left; }
 
 /* UOM modal */
 .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: center; justify-content: center; padding: 24px; }
@@ -1031,7 +1043,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <div class="page-title-wrap">
           <h1 class="page-title">Garden Cuisine HQ</h1>
         </div>
-        <div class="page-meta">Garden Cuisine Pte Ltd &nbsp;·&nbsp; Last updated 10 Jun 2026</div>
+        <div class="page-meta">Last updated 10 Jun 2026</div>
       </div>
       <div class="head-actions">
         <button class="btn-secondary" id="hqUsersBtn" onclick="goToHqUserEntry()" style="display:inline-flex;align-items:center;gap:6px">
@@ -1227,9 +1239,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <div class="panel-label-row" style="margin-bottom:12px">
               <span class="panel-label-text">Health check</span>
             </div>
-            <div style="border:1px solid var(--rule);border-radius:10px;overflow:hidden">
-              <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px" id="healthCheck"></div>
-            </div>
+            <div style="display:flex;flex-direction:column;gap:8px" id="healthCheck"></div>
           </div>
 
           <!-- Recent activity -->
@@ -1284,27 +1294,30 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
     <!-- ── Market List ── -->
     <div class="tab-panel" id="panel-market-list">
-      <div id="priceReviewBanner" style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
+      <div id="priceReviewBanner" style="background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
         <div style="display:flex;align-items:flex-start;gap:10px">
           <span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span>
           <div>
-            <div style="font-size:14px;font-weight:600;color:#92400E">3 price changes pending review</div>
-            <div style="font-size: 14px;color:#92400E;margin-top:2px">Invoice prices from outlets differ from current market list prices. Review and approve to update.</div>
+            <div style="font-size:14px;font-weight:600;color:var(--notice-warning-ink)">3 price changes pending review</div>
+            <div style="font-size: 14px;color:var(--notice-warning-ink);margin-top:2px">Invoice prices from outlets differ from current market list prices. Review and approve to update.</div>
           </div>
         </div>
-        <button class="btn btn-tertiary" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size: 14px;padding:7px 14px;white-space:nowrap">Review changes</button>
+        <button class="btn btn-tertiary" onclick="window.location.href='Admin - HQ - Price Changes.html'" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size: 14px;padding:7px 14px;white-space:nowrap">Review changes</button>
       </div>
       <div class="panel-label-row">
         <span class="panel-label-text">Items <span class="panel-label-count" id="mlCount"></span></span>
-        <div style="position:relative">
-          <button class="btn-primary" id="addItemBtn" onclick="toggleAddItemMenu(event)" style="gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <a class="btn-secondary" href="Admin - HQ - Price Changes.html" style="text-decoration:none">Price changes</a>
+          <div style="position:relative">
+            <button class="btn-primary" id="addItemBtn" onclick="toggleAddItemMenu(event)" style="gap:8px">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             Add item
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div id="addItemMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:230px;overflow:hidden">
-            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openAddCatalogueModal()">Add from supplier catalogue</div>
-            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';window.location.href='Admin - HQ Create Item.html'">Create new item</div>
+            </button>
+            <div id="addItemMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:230px;overflow:hidden">
+              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openAddCatalogueModal()">Add from supplier catalogue</div>
+              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';window.location.href='Admin - HQ Create Item.html'">Create new item</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1500,7 +1513,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="tab-panel" id="panel-activity">
       <div class="panel-label-row">
         <span class="panel-label-text">Activity log</span>
-        <button class="btn btn-tertiary" onclick="resetHqPrototypeData()">Reset prototype data</button>
       </div>
       <div class="act-filter-row">
         <div class="ml-search-wrap" style="min-width:200px">
@@ -1546,6 +1558,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
   </main>
 </div>
+
+<button class="prototype-reset-btn" onclick="resetHqPrototypeData()" title="Reset prototype data">Reset prototype</button>
 
 <!-- Recipes settings modal -->
 <div class="modal-overlay" id="recSettingsModal" onclick="if(event.target===this)closeRecSettings()">
@@ -1883,11 +1897,11 @@ function renderHealthCheck() {
   const issues = [];
   const infos = [];
 
-  if (PRICE_CHANGES.length) issues.push({ type: 'priceChanges', symbol: 'price_change', text: PRICE_CHANGES.length + ' price change' + (PRICE_CHANGES.length > 1 ? 's' : '') + ' pending review', color: '#B45309', bg: '#FEF3C7', items: PRICE_CHANGES });
-  if (UNGROUPED.length) issues.push({ type: 'ungrouped', symbol: 'storefront', text: UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + ' not assigned to any group', color: '#2563EB', bg: '#EFF6FF', items: UNGROUPED });
+  if (PRICE_CHANGES.length) issues.push({ type: 'priceChanges', symbol: 'warning', text: '<strong>' + PRICE_CHANGES.length + ' price change' + (PRICE_CHANGES.length > 1 ? 's' : '') + '</strong> pending review', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: PRICE_CHANGES });
+  if (UNGROUPED.length) issues.push({ type: 'ungrouped', symbol: 'info', text: '<strong>' + UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + '</strong> not assigned to any group', color: 'var(--spinach)', iconColor: 'var(--nomni-green)', bg: 'var(--mint)', border: 'var(--notice-info-border)', items: UNGROUPED });
 
   const highFcRecipes = RECIPES.filter(r => r.foodCostPct > recFcThreshold);
-  if (highFcRecipes.length) issues.push({ type: 'highfc', symbol: 'restaurant_menu', text: highFcRecipes.length + ' recipe' + (highFcRecipes.length > 1 ? 's' : '') + ' above ' + recFcThreshold + '% food cost target', color: '#B45309', bg: '#FEF3C7', items: highFcRecipes });
+  if (highFcRecipes.length) issues.push({ type: 'highfc', symbol: 'warning', text: '<strong>' + highFcRecipes.length + ' recipe' + (highFcRecipes.length > 1 ? 's' : '') + '</strong> above ' + recFcThreshold + '% food cost target', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: highFcRecipes });
 
   // POS not connected — outlets missing API key mapping
   const POS_UNCONNECTED = [
@@ -1899,21 +1913,25 @@ function renderHealthCheck() {
     '(WF 290) Garden Express @ 290 Sengkang',
     '(WF 203) Garden Café @ 203 Bedok',
   ];
-  infos.push({ type: 'pos', symbol: 'point_of_sale', text: POS_UNCONNECTED.length + ' outlet' + (POS_UNCONNECTED.length > 1 ? 's' : '') + ' not connected to POS', color: '#64748B', bg: '#F1F5F9', items: POS_UNCONNECTED });
+  infos.push({ type: 'pos', symbol: 'info', text: '<strong>' + POS_UNCONNECTED.length + ' outlet' + (POS_UNCONNECTED.length > 1 ? 's' : '') + '</strong> not connected to POS', color: 'var(--spinach)', iconColor: 'var(--nomni-green)', bg: 'var(--mint)', border: 'var(--notice-info-border)', items: POS_UNCONNECTED });
 
   const el = document.getElementById('healthCheck');
   if (!el) return;
 
   function healthIcon(name, color) {
-    return '<span class="material-symbols-rounded" aria-hidden="true" style="font-size:24px;line-height:24px;color:' + color + ';flex-shrink:0">' + name + '</span>';
+    return '<span class="material-symbols-rounded" aria-hidden="true" style="font-size:20px;line-height:20px;color:' + color + ';flex-shrink:0">' + name + '</span>';
+  }
+
+  function healthPanelStyle(i) {
+    return 'background:' + i.bg + ';border:0;border-radius:6px;padding:10px 12px';
   }
 
   function makeExpandable(i, listItems, listBg, listBorder, dotColor, uid, maxHeight) {
     var scrollStyle = maxHeight ? 'max-height:' + maxHeight + ';overflow-y:auto;' : '';
-    return '<div>' +
+    return '<div class="health-check-panel" style="' + healthPanelStyle(i) + '">' +
       '<div onclick="(function(row){var list=row.parentNode.querySelector(\'[data-hclist=\\\'' + uid + '\\\']\');var open=list.style.display!==\'none\';list.style.display=open?\'none\':\'\';row.querySelector(\'.hc-chevron\').style.transform=open?\'\':\' rotate(180deg)\';})(this)" style="display:flex;align-items:center;gap:8px;font-size: 14px;cursor:pointer;user-select:none">' +
-      healthIcon(i.symbol || 'info', i.color) +
-      '<span style="color:' + i.color + ';font-weight:500;flex:1">' + i.text + '</span>' +
+      healthIcon(i.symbol || 'info', i.iconColor || i.color) +
+      '<span style="color:var(--ink);font-weight:400;flex:1">' + i.text + '</span>' +
       '<svg class="hc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0;transition:transform .15s"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<div data-hclist="' + uid + '" style="display:none;margin-top:6px;padding:6px 8px;background:' + listBg + ';border-radius:6px;border:1px solid ' + listBorder + '">' +
@@ -1929,19 +1947,19 @@ function renderHealthCheck() {
 
   const issueHtmlParts = issues.map(function(i, idx) {
     if (i.type === 'priceChanges') {
-      return '<div onclick="goToItemsTab()" style="display:flex;align-items:center;gap:8px;font-size: 14px;cursor:pointer">' +
-        healthIcon(i.symbol, i.color) +
-        '<span style="color:#92400E;font-weight:500;flex:1">' + i.text + '</span>' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
+      return '<div class="health-check-panel" onclick="window.location.href=\'Admin - HQ - Price Changes.html\'" style="' + healthPanelStyle(i) + ';display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">' +
+        healthIcon(i.symbol, i.iconColor || i.color) +
+        '<span style="color:var(--ink);font-weight:400;flex:1">' + i.text + '</span>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
       '</div>';
     }
     if (i.type === 'ungrouped') {
-      return makeExpandable(i, UNGROUPED.map(function(n){ return dotItem(n, i.color); }).join(''), '#F8FBFF', '#BFDBFE', i.color, 'ug');
+      return makeExpandable(i, UNGROUPED.map(function(n){ return dotItem(n, i.color); }).join(''), 'var(--mint)', 'var(--notice-info-border)', i.color, 'ug');
     }
     if (i.type === 'highfc') {
-      return '<div onclick="goToHighFoodCostRecipes()" style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">' +
-        healthIcon(i.symbol, i.color) +
-        '<span style="color:' + i.color + ';font-weight:500;flex:1">' + i.text + '</span>' +
+      return '<div class="health-check-panel" onclick="goToHighFoodCostRecipes()" style="' + healthPanelStyle(i) + ';display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">' +
+        healthIcon(i.symbol, i.iconColor || i.color) +
+        '<span style="color:var(--ink);font-weight:400;flex:1">' + i.text + '</span>' +
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
       '</div>';
     }
@@ -1952,17 +1970,17 @@ function renderHealthCheck() {
     if (i.type === 'pos') {
       const rows = i.items.map(function(n){ return dotItem(n, '#6B7280'); }).join('');
       const note = '<div style="margin-top:8px;padding-top:7px;border-top:1px solid #E2E8F0;font-size:11px;color:#94A3B8">Each outlet requires a POS API key to be configured individually.</div>';
-      const posItem = { bg: i.bg, color: i.color, symbol: i.symbol, text: i.text };
-      return makeExpandable(posItem, rows + note, '#F8FAFC', '#E2E8F0', '#64748B', 'pos' + idx, '160px');
+      const posItem = { bg: i.bg, border: i.border, color: i.color, iconColor: i.iconColor, symbol: i.symbol, text: i.text };
+      return makeExpandable(posItem, rows + note, 'var(--mint)', 'var(--notice-info-border)', 'var(--spinach)', 'pos' + idx, '160px');
     }
-    return '<div style="display:flex;align-items:center;gap:8px;font-size: 14px">' +
-      healthIcon(i.symbol || 'info', i.color) +
-      '<span style="color:' + i.color + ';font-weight:500">' + i.text + '</span>' +
+    return '<div class="health-check-panel" style="' + healthPanelStyle(i) + ';display:flex;align-items:center;gap:8px;font-size:14px">' +
+      healthIcon(i.symbol || 'info', i.iconColor || i.color) +
+      '<span style="color:var(--ink);font-weight:400">' + i.text + '</span>' +
       '</div>';
   });
 
   const allParts = issueHtmlParts.concat(infoHtmlParts);
-  el.innerHTML = allParts.join('<div style="height:1px;background:var(--rule);margin:2px 0"></div>');
+  el.innerHTML = allParts.join('');
 }
 // Stats strip
 (function() {
@@ -2719,8 +2737,8 @@ function renderMl() {
 
     const parent = '<tr class="ml-parent-row' + rowEvenClass + (item.active ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
       '<td><div class="ml-item-name">' + item.name + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
-      '<td></td>' +
       '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
+      '<td></td>' +
       '<td></td>' + actionsTd +
     '</tr>';
 
@@ -3374,13 +3392,20 @@ const INV_LISTS = ['Main Store', 'Walk-in Chiller', 'Dry Store', 'Bar Stock'];
 
 const INV_ITEMS = [
   // SKUs
-  { type:'sku', name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg Vac Pk', detail:'Kee Song Group', uom:'kg', cost:6.80, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg Vac Pk', detail:'Kee Song Group', uom:'kg', cost:6.80, active:true, groups:INV_GROUPS.slice(), inventoryUoms:[
+    { groups:['Chargrill Outlets'], outlets:['(WF 139) Chargrill @ 139 Tampines'], uom:'kg' },
+    { groups:['Family Dining Express'], outlets:[], uom:'tray' }
+  ] },
   { type:'sku', name:'Kee Song Chilled Chicken Breast Fillet IQF 2kg Vac Pk', detail:'Kee Song Group', uom:'kg', cost:7.20, active:true, groups:INV_GROUPS.slice() },
   { type:'sku', name:'Chilled Pork Belly Skin-On 1.5kg Vac Pk', detail:'Meat Masters SG', uom:'kg', cost:12.40, active:true, groups:['Chargrill Outlets'] },
   { type:'sku', name:'Chilled Wagyu Striploin MS3 Grain-Fed BLK 4/5kg', detail:'Premium Meats Pte Ltd', uom:'kg', cost:48.50, active:true, groups:['Chargrill Outlets'] },
   { type:'sku', name:'Chilled Lamb Rack Frenched 8-Rib Cap-Off 1.2kg', detail:'Premium Meats Pte Ltd', uom:'kg', cost:32.80, active:true, groups:INV_GROUPS.slice() },
   { type:'sku', name:'Thai Hom Mali Jasmine Rice AA Grade 25kg PP Bag', detail:'Rice & Grain Co', uom:'kg', cost:1.20, active:true, groups:INV_GROUPS.slice() },
-  { type:'sku', name:'Sime Darby Canola Oil RBD 20L Jerry Can', detail:'Sunny Gold F&B Supplies', uom:'L', cost:3.20, active:true, groups:INV_GROUPS.slice() },
+  { type:'sku', name:'Sime Darby Canola Oil RBD 20L Jerry Can', detail:'Sunny Gold F&B Supplies', uom:'L', cost:3.20, active:true, groups:INV_GROUPS.slice(), inventoryUoms:[
+    { groups:['Chargrill Outlets'], outlets:[], uom:'L' },
+    { groups:[], outlets:['(WF 290) Garden Express @ 290 Sengkang'], uom:'btl' },
+    { groups:['Family Dining Express'], outlets:[], uom:'L' }
+  ] },
   { type:'sku', name:'Fresh Garlic Peeled 10kg Vac Bag', detail:'Veggie Fresh Pte Ltd', uom:'kg', cost:4.80, active:true, groups:INV_GROUPS.slice() },
   { type:'sku', name:'Fresh Lemongrass Trimmed 1kg Bunch', detail:'Veggie Fresh Pte Ltd', uom:'kg', cost:8.20, active:true, groups:['Chargrill Outlets'] },
   { type:'sku', name:'Kikkoman Naturally Brewed Soy Sauce 1.8L x 6', detail:'Kikkoman', uom:'btl', cost:12.40, active:false, groups:INV_GROUPS.slice() },
@@ -3420,12 +3445,14 @@ const INV_ITEMS = [
 let invPage = 1, invSearch = '', invTypeFilter = '', invStatusFilter = '';
 const INV_PER_PAGE = 20;
 const invExpanded = new Set();
+const invUomExpanded = new Set();
 
 function setInvSearch(v) { invSearch = v; invPage = 1; renderInv(); }
 function setInvTypeFilter(v) { invTypeFilter = v; invPage = 1; renderInv(); }
 function setInvStatusFilter(v) { invStatusFilter = v; invPage = 1; renderInv(); }
 function setInvPage(p) { invPage = p; renderInv(); window.scrollTo(0,0); }
 function toggleInvExpand(idx) { invExpanded.has(idx) ? invExpanded.delete(idx) : invExpanded.add(idx); renderInv(); }
+function toggleInvUoms(idx, event) { event.stopPropagation(); invUomExpanded.has(idx) ? invUomExpanded.delete(idx) : invUomExpanded.add(idx); renderInv(); }
 function toggleInvAddMenu(e) {
   e.stopPropagation();
   var m = document.getElementById('invAddMenu');
@@ -3795,6 +3822,12 @@ function renderInv() {
     var grpHtml = grpLabel === 'Not available'
       ? '<span style="font-size:12px;color:var(--ink-mute)">Not available</span>'
       : '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + (r.groups||[]).join('|') + '" data-outlets="" style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
+    var hasUomVariations = Array.isArray(r.inventoryUoms) && r.inventoryUoms.length > 1;
+    var uomCell = hasUomVariations
+      ? '<button class="ml-options-link' + (invUomExpanded.has(globalIdx) ? ' is-open' : '') + '" onclick="toggleInvUoms(' + globalIdx + ',event)">' + r.inventoryUoms.length + ' options<span class="ml-options-chevron"></span></button>'
+      : r.uom;
+    var parentCostCell = hasUomVariations ? '<td style="' + td + '"></td>' : costCell;
+    var parentGrpHtml = hasUomVariations ? '' : grpHtml;
 
     rows.push('<tr' + inactiveClass + '>' +
       '<td style="' + td + '">' +
@@ -3809,12 +3842,12 @@ function renderInv() {
             : '<div style="font-size:12px;color:var(--ink-mute)">' + detail + '</div>') : '') +
         '</div></div>' +
       '</td>' +
-      '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + r.uom + '</td>' +
-      costCell +
-      '<td style="' + td + 'text-align:left">' + grpHtml + '</td>' +
+      '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + uomCell + '</td>' +
+      parentCostCell +
+      '<td style="' + td + 'text-align:left">' + parentGrpHtml + '</td>' +
       '<td style="' + td + 'text-align:center">' +
         '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
-        '<div class="row-actions-menu">' +
+        '<div class="row-actions-menu inventory-actions-menu">' +
           '<div class="row-action-item" onclick="event.stopPropagation();' + (r.type === 'group' ? 'openGroupSkuModal(' + globalIdx + ')' : 'openHqInventorySettings(' + globalIdx + ')') + '">Edit</div>' +
           '<div class="row-action-item">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
           '<div class="row-action-item danger">Remove from inventory</div>' +
@@ -3832,6 +3865,24 @@ function renderInv() {
           '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + r.uom + '</td>' +
           '<td style="' + td + 'font-size: 14px;font-weight:600;color:var(--ink)">$' + c.cost.toFixed(2) + '</td>' +
           '<td style="' + td + '"></td><td style="' + td + '"></td>' +
+        '</tr>');
+      });
+    }
+
+    if (hasUomVariations && invUomExpanded.has(globalIdx)) {
+      r.inventoryUoms.forEach(function(entry) {
+        var entryCost = entry.cost !== undefined ? entry.cost : r.cost;
+        var entryCostHtml = entryCost !== null ? '$' + entryCost.toFixed(2) : 'varies';
+        var entryCostStyle = entryCost !== null ? 'font-size:14px;font-weight:600;color:var(--ink)' : 'font-size:14px;color:var(--ink-mute)';
+        var entryGroups = entry.groups || [];
+        var entryOutlets = entry.outlets || [];
+        var entryLabel = availabilityLabel(entryGroups, entryOutlets, INV_GROUPS.length, 0);
+        var entryAccess = '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + entryGroups.join('|') + '" data-outlets="' + entryOutlets.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + entryLabel + '</button>';
+        rows.push('<tr class="inv-uom-row">' +
+          '<td style="' + td + 'padding-left:48px"><span style="font-size:14px;color:var(--ink)">' + r.name + '</span></td>' +
+          '<td style="' + td + 'font-size:14px;color:var(--ink)">' + entry.uom + '</td>' +
+          '<td style="' + td + entryCostStyle + '">' + entryCostHtml + '</td>' +
+          '<td style="' + td + '">' + entryAccess + '</td><td style="' + td + '"></td>' +
         '</tr>');
       });
     }
@@ -4709,7 +4760,7 @@ function renderGroupOutletPicker() {
   document.getElementById('groupOutletPickerConfirm').disabled = count === 0;
   document.getElementById('groupOutletPickerConfirm').textContent = count ? action + ' ' + count + ' outlet' + (count === 1 ? '' : 's') : action + ' outlets';
 
-  if (groupOutletMode !== 'hq' && !query && !company && !cluster) {
+  if (!query && !company && !cluster) {
     groupOutletFilteredResults = [];
     list.classList.add('is-empty');
     meta.textContent = '';
@@ -4740,7 +4791,7 @@ function renderGroupOutletPicker() {
       '<div class="picker-chk">' + (selected ? chkSvg() : '') + '</div>' +
       '<div class="picker-row-info"><div class="picker-row-name">' + escapeOverviewText(outlet.name) + '</div><div class="picker-row-sub">' + escapeOverviewText(outlet.company) + ' · ' + escapeOverviewText(outlet.cluster) + '</div></div>' +
     '</div>';
-  }).join('') : '<div class="picker-empty">No available Procure outlets match your search</div>';
+  }).join('') : '<div class="picker-empty">No outlets match your search</div>';
 
 }
 
@@ -5064,8 +5115,8 @@ function confirmRemoveFromHQ() {
         <h2 class="picker-title" id="groupOutletPickerTitle">Add outlets</h2>
         <button class="picker-close-btn" onclick="closeGroupOutletPicker()" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
-      <div class="modal-warning" id="groupOutletLinkNotice" style="display:none;margin-top:16px">
-        <span class="material-symbols-rounded" aria-hidden="true" style="color:#2563EB">info</span>
+      <div class="modal-warning modal-info" id="groupOutletLinkNotice" style="display:none;margin-top:16px">
+        <span class="material-symbols-rounded" aria-hidden="true">info</span>
         <span>Linked outlets will be managed by this HQ. Their outlet type will be updated to <strong>Managed by HQ</strong>.</span>
       </div>
     </div>
@@ -5556,7 +5607,7 @@ function initialiseNewHQView() {
   document.querySelectorAll('.tab-status-dot').forEach(function(dot) { dot.remove(); });
   document.querySelectorAll('.tab-indicators:empty').forEach(function(group) { group.remove(); });
   document.querySelector('.page-title').textContent = saved.name;
-  document.querySelector('.page-meta').textContent = saved.company;
+  document.querySelector('.page-meta').textContent = 'Last updated today';
   document.title = saved.name + ' — Procure Admin';
   var editDetailsButton = document.getElementById('editHqDetailsBtn');
   if (editDetailsButton) {

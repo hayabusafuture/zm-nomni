@@ -377,18 +377,6 @@
       <h2 class="section-heading" style="margin-top:0">Basic information</h2>
 
       <div class="field-group">
-        <label class="field-label">Company</label>
-        <select class="field-select" id="hqCompany" required>
-          <option value="">Select company</option>
-          <option>Garden Cuisine Pte Ltd</option>
-          <option>Wok &amp; Roll Pte Ltd</option>
-          <option>Spice Garden Group Pte Ltd</option>
-          <option>Harbour Eats Holdings Pte Ltd</option>
-          <option>Noodle Republic Pte Ltd</option>
-        </select>
-      </div>
-
-      <div class="field-group">
         <label class="field-label">HQ name</label>
         <input type="text" class="field-input" id="hqName" placeholder="e.g. Garden Cuisine HQ" required />
         <span class="field-hint">Typically the brand or group name followed by "HQ"</span>
@@ -478,14 +466,9 @@ function clearCreateErrors() {
 
 function createHQ() {
   clearCreateErrors();
-  var company = document.getElementById('hqCompany');
   var name = document.getElementById('hqName');
   var firstInvalid = null;
 
-  if (!company.value) {
-    setCreateFieldError(company, 'Select a company.');
-    firstInvalid = firstInvalid || company;
-  }
   if (!name.value.trim()) {
     setCreateFieldError(name, 'Enter an HQ name.');
     firstInvalid = firstInvalid || name;
@@ -499,7 +482,7 @@ function createHQ() {
 
   var newHQ = {
     name: name.value.trim(),
-    company: company.options[company.selectedIndex].text,
+    company: 'Garden Cuisine Pte Ltd',
     createdAt: new Date().toISOString()
   };
   localStorage.setItem('nomniNewHQ', JSON.stringify(newHQ));
@@ -510,7 +493,7 @@ function createHQ() {
   window.location.href = 'Admin - HQ Settings.html?new=1';
 }
 
-['hqCompany', 'hqName'].forEach(function(id) {
+['hqName'].forEach(function(id) {
   document.getElementById(id).addEventListener('input', function() {
     this.classList.remove('is-invalid');
     var error = this.closest('.field-group').querySelector('.field-error');

@@ -370,18 +370,6 @@
       <h2 class="section-heading" style="margin-top:0">Basic information</h2>
 
       <div class="field-group">
-        <label class="field-label">Company</label>
-        <select class="field-select" id="editHqCompany">
-          <option value="">Select company</option>
-          <option selected>Garden Cuisine Pte Ltd</option>
-          <option>Wok &amp; Roll Pte Ltd</option>
-          <option>Spice Garden Group Pte Ltd</option>
-          <option>Harbour Eats Holdings Pte Ltd</option>
-          <option>Noodle Republic Pte Ltd</option>
-        </select>
-      </div>
-
-      <div class="field-group">
         <label class="field-label">HQ name</label>
         <input type="text" class="field-input" id="editHqName" value="Garden Cuisine HQ" />
         <span class="field-hint">Typically the brand or group name followed by "HQ"</span>
@@ -454,13 +442,6 @@
     try { editingHq = JSON.parse(localStorage.getItem('nomniNewHQ') || 'null'); } catch (e) { editingHq = null; }
   }
   if (editingHq) {
-    var companySelect = document.getElementById('editHqCompany');
-    var matchingOption = Array.from(companySelect.options).find(function(option) { return option.text === editingHq.company; });
-    if (!matchingOption) {
-      matchingOption = new Option(editingHq.company, editingHq.company);
-      companySelect.add(matchingOption);
-    }
-    companySelect.value = matchingOption.value;
     document.getElementById('editHqName').value = editingHq.name;
     document.getElementById('editHqBackLabel').textContent = editingHq.name;
     document.title = 'Edit ' + editingHq.name + ' — Procure Admin';
@@ -474,7 +455,6 @@
       window.location.href = 'Admin - HQ Settings.html';
       return;
     }
-    editingHq.company = document.getElementById('editHqCompany').options[document.getElementById('editHqCompany').selectedIndex].text;
     editingHq.name = document.getElementById('editHqName').value.trim() || editingHq.name;
     localStorage.setItem('nomniNewHQ', JSON.stringify(editingHq));
     window.location.href = 'Admin - HQ Settings.html?new=1&hq=' + encodeURIComponent(editingHq.name);
