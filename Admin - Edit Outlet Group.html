@@ -1855,7 +1855,10 @@ function getPickerVisible() {
 
 function getPickerAvailableOutlets() {
   const groupNames = new Set(OUTLETS.filter(o => currentGroup.has(o.id)).map(o => o.name.toLowerCase()));
-  return PROCURE_OUTLETS_AVAILABLE.filter(o => !groupNames.has(o.name.toLowerCase()));
+  const hqUngrouped = OUTLETS.filter(o => [5, 6].includes(o.id) && !currentGroup.has(o.id)).map(o => ({
+    id:o.id, name:o.name, company:'Already linked to Garden Cuisine HQ', cluster:'Ungrouped', hqLinked:true
+  }));
+  return hqUngrouped.concat(PROCURE_OUTLETS_AVAILABLE.filter(o => !groupNames.has(o.name.toLowerCase())));
 }
 
 function pickerCheckSvg() {
@@ -1902,7 +1905,7 @@ function renderPickerList() {
 
 function renderPickerSelected() {
   const selList  = document.getElementById('modalSelectedList');
-  const selectedOutlets = Array.from(pendingAdd).map(id => PROCURE_OUTLETS_AVAILABLE.find(o => String(o.id) === String(id))).filter(Boolean);
+  const selectedOutlets = Array.from(pendingAdd).map(id => getPickerAvailableOutlets().find(o => String(o.id) === String(id))).filter(Boolean);
   const count    = selectedOutlets.length;
   document.getElementById('modalSelCount').textContent = count;
   document.getElementById('modalFooterSelection').innerHTML = count ? '<strong>' + count + '</strong> outlet' + (count === 1 ? '' : 's') + ' selected' : 'No outlets selected';
@@ -1947,7 +1950,7 @@ function openPickerModal() {
 }
 function closePickerModal() { document.getElementById('pickerModal').classList.remove('open'); }
 function confirmAddOutlets() {
-  const added = PROCURE_OUTLETS_AVAILABLE.filter(o => pendingAdd.has(String(o.id)));
+  const added = getPickerAvailableOutlets().filter(o => pendingAdd.has(String(o.id)));
   added.forEach(function(outlet) {
     if (!OUTLETS.some(o => o.id === outlet.id)) {
       OUTLETS.push({ id:outlet.id, name:outlet.name, company:outlet.company, active:true, posConnected:false });

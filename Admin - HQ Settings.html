@@ -98,6 +98,11 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .btn-ghost-danger:hover { background: #fff0f0; }
 .prototype-reset-btn { position: fixed; left: 16px; bottom: 16px; z-index: 20; padding: 6px 9px; border: 1px solid rgba(255,255,255,.24); border-radius: 5px; background: rgba(14,55,39,.88); color: rgba(255,255,255,.62); font: 600 10px/1 "Inter",system-ui,sans-serif; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; opacity: .62; transition: opacity .15s,background .15s; }
 .prototype-reset-btn:hover { opacity: 1; background: var(--seaweed); color: #fff; }
+.prototype-hints { display:none; position:fixed; left:16px; bottom:52px; z-index:20; width:232px; padding:10px 11px; border:1px solid rgba(255,255,255,.18); border-radius:7px; background:rgba(14,55,39,.90); color:rgba(255,255,255,.78); font-size:11px; line-height:1.45; opacity:.68; transition:opacity .15s; }
+.prototype-hints:hover { opacity:1; }
+.prototype-hints-title { font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#fff; margin-bottom:5px; }
+.prototype-hints-row + .prototype-hints-row { margin-top:3px; }
+.prototype-hints strong { color:#fff; font-weight:600; }
 
 /* Stats strip */
 .hq-summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
@@ -1073,7 +1078,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <div class="panel-label-row">
             <span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">4</span></span>
             <div style="display:flex;align-items:center;gap:8px">
-              <button class="btn-secondary" onclick="openLinkOutletPicker()">Link outlets</button>
+              <button class="btn-secondary" onclick="openLinkOutletPicker()">Add outlets</button>
               <button class="btn-primary" onclick="window.location.href='Admin - Create Outlet Group.html?hq=Garden+Cuisine+HQ'">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
                 New group
@@ -1557,6 +1562,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   </main>
 </div>
 
+<aside class="prototype-hints" id="prototypeHints" aria-label="Prototype search hints"></aside>
 <button class="prototype-reset-btn" onclick="resetHqPrototypeData()" title="Reset prototype data">Reset prototype</button>
 
 <!-- Recipes settings modal -->
@@ -1622,6 +1628,23 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 </div>
 
 <script>
+
+function showPrototypeHints(type) {
+  var hints = document.getElementById('prototypeHints');
+  if (!hints) return;
+  var content = {
+    outlet: '<div class="prototype-hints-title">Outlet search hints</div><div class="prototype-hints-row"><strong>Urban Bites</strong> → matching outlets.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
+    supplier: '<div class="prototype-hints-title">Supplier search hints</div><div class="prototype-hints-row"><strong>Wilmar</strong> → Active supplier guidance.</div><div class="prototype-hints-row"><strong>Golden Harvest</strong> → use UEN <strong>201813940C</strong>.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
+    item: '<div class="prototype-hints-title">Item search hints</div><div class="prototype-hints-row"><strong>Chicken</strong> → matching items.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
+    user: '<div class="prototype-hints-title">User search hints</div><div class="prototype-hints-row"><strong>James</strong> → matching Procure account.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results and Create new user.</div>'
+  };
+  hints.innerHTML = content[type] || '';
+  hints.style.display = content[type] ? 'block' : 'none';
+}
+function hidePrototypeHints() {
+  var hints = document.getElementById('prototypeHints');
+  if (hints) hints.style.display = 'none';
+}
 
 function showNewHqEmptyState(panelId, title, copy, action) {
   var panel = document.getElementById(panelId);
@@ -3498,6 +3521,7 @@ var supplierSearchMode = 'name';
 var linkSupQuery = '';
 
 function openLinkSupModal() {
+  showPrototypeHints('supplier');
   supplierSearchMode = 'name';
   linkSupQuery = '';
   document.getElementById('linkSupSearch').value = '';
@@ -3509,6 +3533,7 @@ function openLinkSupModal() {
 
 function closeLinkSupModal() {
   document.getElementById('linkSupOverlay').classList.remove('open');
+  hidePrototypeHints();
 }
 
 function performLinkSupSearch() {
@@ -4353,6 +4378,7 @@ function toggleAddItemMenu(e) {
   m.style.display = m.style.display === 'none' ? 'block' : 'none';
 }
 function openAddCatalogueModal() {
+  showPrototypeHints('item');
   aiSel.clear();
   document.getElementById('aiSearch').value = '';
   document.getElementById('aiSupFilter').value = '';
@@ -4364,7 +4390,7 @@ function openAddCatalogueModal() {
   document.getElementById('addItemModal').classList.add('open');
   setTimeout(function() { document.getElementById('aiSearch').focus(); }, 0);
 }
-function closeAddItemModal() { document.getElementById('addItemModal').classList.remove('open'); }
+function closeAddItemModal() { document.getElementById('addItemModal').classList.remove('open'); hidePrototypeHints(); }
 function setAiStep(n) {
   ['aiPanel1','aiPanel2','aiPanel3'].forEach((id,i) => {
     const el = document.getElementById(id);
@@ -4718,6 +4744,7 @@ var PROCURE_OUTLETS_AVAILABLE = [
 ];
 
 function openGroupOutletPicker(groupName, trigger) {
+  showPrototypeHints('outlet');
   groupOutletMode = 'group';
   groupOutletTargetName = groupName;
   groupOutletTargetRow = trigger.closest('tr');
@@ -4733,11 +4760,12 @@ function openGroupOutletPicker(groupName, trigger) {
 }
 
 function openLinkOutletPicker() {
+  showPrototypeHints('outlet');
   groupOutletMode = 'hq';
   groupOutletTargetName = document.querySelector('.page-title').textContent.trim();
   groupOutletTargetRow = null;
   groupOutletSelection.clear();
-  document.getElementById('groupOutletPickerTitle').textContent = 'Link outlets to ' + groupOutletTargetName;
+  document.getElementById('groupOutletPickerTitle').textContent = 'Add outlets to ' + groupOutletTargetName;
   document.getElementById('groupOutletSearch').value = '';
   document.getElementById('groupOutletCompany').value = '';
   document.getElementById('groupOutletCluster').value = '';
@@ -4750,6 +4778,7 @@ function openLinkOutletPicker() {
 function closeGroupOutletPicker() {
   document.getElementById('groupOutletPicker').classList.remove('open');
   document.getElementById('groupOutletLinkNotice').style.display = 'none';
+  hidePrototypeHints();
 }
 
 function renderGroupOutletPicker() {
@@ -4762,7 +4791,7 @@ function renderGroupOutletPicker() {
   var infoBar = document.getElementById('groupOutletInfoBar');
   var count = groupOutletSelection.size;
   renderGroupOutletSelected();
-  var action = groupOutletMode === 'hq' ? 'Link' : 'Add';
+  var action = 'Add';
   document.getElementById('groupOutletPickerCount').innerHTML = count ? '<strong>' + count + '</strong> outlet' + (count === 1 ? '' : 's') + ' selected' : 'No outlets selected';
   document.getElementById('groupOutletPickerConfirm').disabled = count === 0;
   document.getElementById('groupOutletPickerConfirm').textContent = count ? action + ' ' + count + ' outlet' + (count === 1 ? '' : 's') : action + ' outlets';
@@ -4777,11 +4806,19 @@ function renderGroupOutletPicker() {
     return;
   }
 
-  var outlets = PROCURE_OUTLETS_AVAILABLE.filter(function(outlet) {
+  var alreadyLinked = groupOutletMode === 'group' ? Array.from(document.querySelectorAll('#ogTable tr[data-ungrouped-name]')).map(function(row) {
+    var name = row.querySelector('.og-name').textContent.trim();
+    return { id:'hq:' + name.toLowerCase(), name:name, company:'Already linked to this HQ', cluster:'Ungrouped', linkedToHq:true, row:row };
+  }) : [];
+  var outlets = alreadyLinked.concat(PROCURE_OUTLETS_AVAILABLE.filter(function(outlet) {
     if (procureOutletAssignedToHq.has(outlet.id)) return false;
     if (company && outlet.company !== company) return false;
     if (cluster && outlet.cluster !== cluster) return false;
     return !query || outlet.name.toLowerCase().includes(query) || outlet.company.toLowerCase().includes(query) || outlet.cluster.toLowerCase().includes(query);
+  }));
+  outlets = outlets.filter(function(outlet) {
+    if (outlet.linkedToHq) return !company && !cluster && (!query || outlet.name.toLowerCase().includes(query));
+    return true;
   });
   groupOutletFilteredResults = outlets;
   list.classList.toggle('is-empty', outlets.length === 0);
@@ -4807,13 +4844,21 @@ function renderGroupOutletSelected() {
   var clearButton = document.getElementById('groupOutletClearSelected');
   var countNode = document.getElementById('groupOutletSelectedCount');
   if (!selectedList || !clearButton || !countNode) return;
-  var selectedOutlets = PROCURE_OUTLETS_AVAILABLE.filter(function(outlet) { return groupOutletSelection.has(String(outlet.id)); });
+  var selectedOutlets = getGroupOutletCandidates().filter(function(outlet) { return groupOutletSelection.has(String(outlet.id)); });
   countNode.textContent = selectedOutlets.length;
   clearButton.style.visibility = selectedOutlets.length ? 'visible' : 'hidden';
   selectedList.innerHTML = selectedOutlets.length ? selectedOutlets.map(function(outlet) {
     return '<div class="outlet-picker-selected-row"><div class="outlet-picker-selected-info"><div class="outlet-picker-selected-name">' + escapeOverviewText(outlet.name) + '</div><div class="outlet-picker-selected-meta">' + escapeOverviewText(outlet.company) + '</div></div>' +
       '<button class="outlet-picker-remove" data-outlet-key="' + escapeOverviewText(String(outlet.id)) + '" onclick="removeGroupOutletSelection(this.dataset.outletKey)" aria-label="Remove ' + escapeOverviewText(outlet.name) + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>';
-  }).join('') : '<div class="outlet-picker-selected-empty"><strong>No outlets selected</strong><span>Select outlets from the results to ' + (groupOutletMode === 'hq' ? 'link them to this HQ.' : 'add them here.') + '</span></div>';
+  }).join('') : '<div class="outlet-picker-selected-empty"><strong>No outlets selected</strong><span>Select outlets from the results to ' + (groupOutletMode === 'hq' ? 'add them to this HQ.' : 'add them here.') + '</span></div>';
+}
+
+function getGroupOutletCandidates() {
+  var linked = groupOutletMode === 'group' ? Array.from(document.querySelectorAll('#ogTable tr[data-ungrouped-name]')).map(function(row) {
+    var name = row.querySelector('.og-name').textContent.trim();
+    return { id:'hq:' + name.toLowerCase(), name:name, company:'Already linked to this HQ', cluster:'Ungrouped', linkedToHq:true, row:row };
+  }) : [];
+  return linked.concat(PROCURE_OUTLETS_AVAILABLE.filter(function(outlet) { return !procureOutletAssignedToHq.has(outlet.id); }));
 }
 
 function removeGroupOutletSelection(key) {
@@ -4853,11 +4898,11 @@ function confirmGroupOutletSelection() {
   var list = subRow.querySelector('.outlet-list');
   var addedNames = [];
 
-  PROCURE_OUTLETS_AVAILABLE.forEach(function(outlet) {
+  getGroupOutletCandidates().forEach(function(outlet) {
     var key = String(outlet.id);
-    if (!groupOutletSelection.has(key) || procureOutletAssignedToHq.has(outlet.id)) return;
+    if (!groupOutletSelection.has(key)) return;
     addedNames.push(outlet.name);
-    procureOutletAssignedToHq.add(outlet.id);
+    if (!outlet.linkedToHq) procureOutletAssignedToHq.add(outlet.id);
     list.insertAdjacentHTML('beforeend',
       '<div class="outlet-list-item" data-outlet-name="' + escapeOverviewText(outlet.name.toLowerCase()) + '">' +
         '<span class="outlet-item-name">' + escapeOverviewText(outlet.name) + '</span><span class="pos-chip off">POS ✕</span>' +
@@ -4866,6 +4911,11 @@ function confirmGroupOutletSelection() {
           '<div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest(\'.outlet-list-item\').dataset.outletName)">Remove from HQ</div>' +
         '</div></div>' +
       '</div>');
+    if (outlet.linkedToHq) {
+      var index = UNGROUPED.indexOf(outlet.name);
+      if (index !== -1) UNGROUPED.splice(index, 1);
+      outlet.row.remove();
+    }
   });
 
   var currentOutlets = groupOutletTargetRow.dataset.groupOutlets ? groupOutletTargetRow.dataset.groupOutlets.split('|') : [];
@@ -4921,9 +4971,22 @@ function confirmLinkOutletSelection() {
   var labelCount = document.querySelector('#panel-outlet-groups .panel-label-count');
   if (labelCount) labelCount.textContent = document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length;
   refreshHqOutletSummary();
-  addPrototypeActivity('outlet-groups', '<strong>' + linked.length + ' outlet' + (linked.length === 1 ? '' : 's') + ' linked</strong> to this HQ', 'outlet-groups', groupOutletTargetName);
+  addPrototypeActivity('outlet-groups', '<strong>' + linked.length + ' outlet' + (linked.length === 1 ? '' : 's') + ' added</strong> to this HQ', 'outlet-groups', groupOutletTargetName);
   closeGroupOutletPicker();
-  showHqToast('Outlets linked', linked.length + ' outlet' + (linked.length === 1 ? ' is' : 's are') + ' now managed by ' + groupOutletTargetName + '.');
+  openLinkOutletGroupStep(linked);
+}
+
+function openLinkOutletGroupStep(linkedNames) {
+  _addToGroupOutlets = Array.from(document.querySelectorAll('#ogTable tr[data-ungrouped-name]')).filter(function(row) {
+    return linkedNames.indexOf(row.querySelector('.og-name').textContent.trim()) !== -1;
+  }).map(function(row) { return { row:row, name:row.querySelector('.og-name').textContent.trim() }; });
+  document.getElementById('addToGroupTitle').textContent = 'Add outlets to group';
+  document.getElementById('addToGroupOutletName').textContent = linkedNames.length === 1 ? linkedNames[0] : linkedNames.length + ' selected outlets';
+  document.getElementById('addToGroupPrompt').textContent = 'Select a group for';
+  document.getElementById('addToGroupWarning').innerHTML = 'Adding them to a group will <strong>replace their existing data</strong> — market list, recipes, and supplier settings — with the group\'s data.';
+  document.getElementById('addToGroupCancel').textContent = 'Leave ungrouped';
+  document.querySelectorAll('input[name="targetGroup"]').forEach(function(r){ r.checked = false; });
+  document.getElementById('addToGroupOverlay').classList.add('open');
 }
 
 // ── Add ungrouped outlets to a group ──
@@ -4965,6 +5028,7 @@ function openAddToGroupModal(outletName) {
 }
 function closeAddToGroupModal() {
   document.getElementById('addToGroupOverlay').classList.remove('open');
+  document.getElementById('addToGroupCancel').textContent = 'Cancel';
 }
 function confirmAddToGroup() {
   var selected = document.querySelector('input[name="targetGroup"]:checked');
@@ -5424,7 +5488,7 @@ function confirmRemoveFromHQ() {
       </div>
     </div>
     <div class="modal-foot">
-      <button class="modal-cancel" onclick="closeAddToGroupModal()">Cancel</button>
+      <button class="modal-cancel" id="addToGroupCancel" onclick="closeAddToGroupModal()">Cancel</button>
       <button class="btn-primary" onclick="confirmAddToGroup()">Add to group</button>
     </div>
   </div>

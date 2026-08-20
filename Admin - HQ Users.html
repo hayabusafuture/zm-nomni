@@ -127,6 +127,10 @@
   .create-user-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; font-size: 14px; color: var(--ink-mute); }
   .cancel-link { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; transition: color .13s; }
   .cancel-link:hover { color: var(--ink); }
+  .prototype-hints { display:none; position:fixed; left:16px; bottom:16px; z-index:901; width:232px; padding:10px 11px; border:1px solid rgba(255,255,255,.18); border-radius:7px; background:rgba(14,55,39,.90); color:rgba(255,255,255,.78); font-size:11px; line-height:1.45; opacity:.82; }
+  .prototype-hints-title { font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#fff; margin-bottom:5px; }
+  .prototype-hints-row + .prototype-hints-row { margin-top:3px; }
+  .prototype-hints strong { color:#fff; font-weight:600; }
 
   .btn-primary {
     min-height: 40px; padding: 0 16px; border: 1px solid var(--nomni-green); border-radius: 6px;
@@ -325,6 +329,12 @@
   </main>
 </div>
 
+<aside class="prototype-hints" id="prototypeUserHints" aria-label="Prototype user search hints">
+  <div class="prototype-hints-title">User search hints</div>
+  <div class="prototype-hints-row"><strong>James</strong> → matching Procure account.</div>
+  <div class="prototype-hints-row"><strong>zzz</strong> → no results and Create user.</div>
+</aside>
+
 <!-- ── Add user modal ── -->
 <div class="modal-overlay" id="addUserOverlay" onclick="if(event.target===this)closeAddUserModal()">
   <div class="modal-card">
@@ -468,6 +478,7 @@
   }
 
   function openAddUserModal() {
+    document.getElementById('prototypeUserHints').style.display = 'block';
     document.getElementById('addUserSearch').value = '';
     renderAddUserResults();
     document.getElementById('addUserOverlay').classList.add('open');
@@ -475,6 +486,7 @@
   }
   function closeAddUserModal() {
     document.getElementById('addUserOverlay').classList.remove('open');
+    document.getElementById('prototypeUserHints').style.display = 'none';
   }
   function linkedEmailsForCurrentHq() {
     var hqName = currentHqName();
