@@ -83,6 +83,21 @@ Inventory defines the HQ's inventory items and counting setup.
 - Availability in child rows can identify outlet groups and individual outlets.
 - Row actions support editing and deactivating/removing inventory records in the prototype.
 
+## POS mapping
+
+POS mapping connects the HQ to Nomni POS and defines how POS sales affect the HQ's stock and recipe data. The HQ tab is a connection and progress overview; detailed master mapping happens on a dedicated full-width workspace.
+
+- **Open POS mapping** opens the HQ's master-mapping workspace. It uses the HQ's Nomni POS EMS API key and its mappings form the baseline for all outlets managed by that HQ.
+- The HQ tab lists individual outlets, their connection state, mapping progress and last sync so an HQ user can check mapping accuracy at outlet level. Outlet API keys are for viewing that outlet's data and validation; they do not require the HQ to repeat the master mapping for every outlet.
+- The outlet table includes every outlet managed by the HQ. Each outlet can have fewer POS products than the HQ EMS catalogue, but never more; its mapping count is therefore measured against that outlet's own product total.
+- The overview can be filtered by outlet name, outlet group, POS connection state and mapping status. An outlet is treated as **Mapped** in this overview once it has at least one mapped POS product; otherwise it is **Unmapped**.
+- The first visit to the HQ workspace presents a setup state. The user opens **POS settings** and saves the HQ Nomni POS API key; in the prototype, any key connects sample EMS products.
+- Once connected, the workspace is split into a POS-product list and a Procure mapping area.
+- A POS product or variant can map to any HQ inventory entry, including standard inventory items, Group SKUs and recipes that have been added to inventory.
+- It can alternatively map directly to a recipe that is not an inventory item.
+- **Ignore mapping** is available for POS products or variants that should not affect inventory. An ignored mapping is shown explicitly.
+- The current regular-outlet Procure flow also supports a more advanced variant model—add/modify ingredients, replace an ingredient, or apply a multiplier to the base recipe. The HQ prototype should adopt these variant behaviours when the detailed mapping editor is designed, rather than duplicating a recipe for each variant.
+
 ## Recipes
 
 Recipes is the HQ recipe library.
@@ -169,6 +184,19 @@ Reviews invoice-detected price changes for managed outlets at HQ level.
 - Search and supplier filter help find a change.
 - Each pending row shows the item, supplier, current price, invoice price and change amount, source outlet, and detection date.
 - **Update price** changes the HQ market-list price after confirmation; **Keep current** records the alternative decision.
+
+### HQ POS mapping — `Admin - HQ Settings.html`, POS mapping tab and `Admin - HQ - POS Mapping.html`
+
+The POS mapping tab is the HQ-level version of the existing Nomni Procure POS mapping experience.
+
+- The HQ tab provides outlet-level connection and mapping status, while **Open POS mapping** opens the dedicated wide HQ master-mapping screen.
+- Users can search the managed outlets and filter the overview by group, connection state or mapping status before opening a specific outlet for validation or setup.
+- The HQ mapping screen starts in a Nomni POS connection state and opens a small settings dialog for the HQ EMS API key. Outlet-level views are for validating the derived mapping against each outlet's separate POS connection.
+- Its left pane lists POS products with product codes, category and Mapped/Unmapped filters. Products expose their variants in an accordion.
+- Its right pane is the Procure search-and-map workspace. The user selects Inventory or Recipes and then maps the selected POS entry.
+- Inventory choices deliberately include regular inventory items, Group SKUs and inventory recipes; Recipe choices are recipes not held in inventory.
+- For variants, the workspace presents the existing Procure behaviours: Add/modify, Replace and Multiplier. Detailed ingredient selection for those behaviours remains to be built.
+- The API-key-only connection is a current prototype assumption. The production connection requirements, POS location selection and visibility/category settings still need confirmation.
 
 ### Create outlet group — `Admin - Create Outlet Group.html`
 

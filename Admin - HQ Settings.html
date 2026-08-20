@@ -1066,6 +1066,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       <div class="tab" data-tab="market-list"><span class="tab-label">Items</span><span class="tab-indicators"><span class="tab-status-dot" aria-label="New activity" title="New activity"></span></span></div>
       <div class="tab" data-tab="inventory">Inventory</div>
       <div class="tab" data-tab="recipes">Recipes</div>
+      <div class="tab" data-tab="pos-mapping">POS mapping</div>
       <div class="tab" data-tab="activity">Activity</div>
     </div>
 
@@ -1512,6 +1513,49 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </div>
     </div>
 
+    <!-- ── POS mapping ── -->
+    <div class="tab-panel" id="panel-pos-mapping">
+      <div class="panel-label-row">
+        <span class="panel-label-text">POS mapping</span>
+        <a class="btn btn-primary" href="Admin - HQ - POS Mapping.html" style="text-decoration:none">Open POS mapping</a>
+      </div>
+      <p style="margin:0 0 18px;color:var(--ink-mute);font-size:14px">Review each outlet group’s POS connection and mapping progress, then open the detailed mapping workspace when you are ready to work through its menu.</p>
+      <div class="ml-filter-row" aria-label="Filter outlets for POS mapping">
+        <div class="ml-search-wrap" style="min-width:260px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="ml-search-input" id="posOutletSearch" type="search" placeholder="Search outlet name…" oninput="filterPosOutlets()" />
+        </div>
+        <select class="ml-filter-select" id="posGroupFilter" onchange="filterPosOutlets()" aria-label="Filter by outlet group">
+          <option value="">All outlet groups</option>
+          <option value="Chargrill Outlets">Chargrill Outlets</option>
+          <option value="Family Dining Express">Family Dining Express</option>
+          <option value="Ungrouped">Ungrouped</option>
+        </select>
+        <select class="ml-filter-select" id="posConnectionFilter" onchange="filterPosOutlets()" aria-label="Filter by POS connection">
+          <option value="">All connections</option><option value="connected">Connected</option><option value="not connected">Not connected</option>
+        </select>
+        <select class="ml-filter-select" id="posStatusFilter" onchange="filterPosOutlets()" aria-label="Filter by mapping status">
+          <option value="">All mapping statuses</option><option value="mapped">Mapped</option><option value="unmapped">Unmapped</option>
+        </select>
+        <span id="posOutletResultCount" style="font-size:12px;color:var(--ink-mute);margin-left:auto">12 outlets</span>
+      </div>
+      <table class="ml-table"><thead><tr><th>Outlet</th><th style="width:160px">POS connection</th><th style="width:220px">Mapping status</th><th style="width:150px">Last synced</th><th style="width:110px"></th></tr></thead><tbody id="posOutletTableBody">
+        <tr><td><div style="font-weight:600">(WF 301) Chargrill @ 301 Punggol</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:82%;height:100%;background:var(--nomni-green)"></div></div><strong>18 / 22</strong></div></td><td style="color:var(--ink-mute)">10 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20301%20Punggol" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 107) Chargrill @ 107 Serangoon</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:60%;height:100%;background:var(--nomni-green)"></div></div><strong>12 / 20</strong></div></td><td style="color:var(--ink-mute)">09 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20107%20Serangoon" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 139) Chargrill @ 139 Tampines</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Ungrouped</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20139%20Tampines" style="color:var(--spinach);font-weight:600;text-decoration:none">Set up</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 259) Chargrill @ 259 Bukit Panjang</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20259%20Bukit%20Panjang" style="color:var(--spinach);font-weight:600;text-decoration:none">Set up</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 280) Chargrill @ 280 Bishan</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20280%20Bishan" style="color:var(--spinach);font-weight:600;text-decoration:none">Set up</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 055) Garden Express @ 055 Jurong East</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:67%;height:100%;background:var(--nomni-green)"></div></div><strong>16 / 24</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20055%20Jurong%20East" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 088) Garden Express @ 088 Clementi</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:54%;height:100%;background:var(--nomni-green)"></div></div><strong>13 / 24</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20088%20Clementi" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 112) Garden Bistro @ 112 Novena</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:42%;height:100%;background:var(--nomni-green)"></div></div><strong>10 / 24</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20112%20Novena" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 167) Garden Bistro @ 167 Ang Mo Kio</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:75%;height:100%;background:var(--nomni-green)"></div></div><strong>18 / 24</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20167%20Ang%20Mo%20Kio" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 203) Garden Café @ 203 Bedok</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Caf%C3%A9%20%40%20203%20Bedok" style="color:var(--spinach);font-weight:600;text-decoration:none">Set up</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 244) Garden Café @ 244 Woodlands</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:63%;height:100%;background:var(--nomni-green)"></div></div><strong>15 / 24</strong></div></td><td style="color:var(--ink-mute)">06 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Caf%C3%A9%20%40%20244%20Woodlands" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr><td><div style="font-weight:600">(WF 290) Garden Express @ 290 Sengkang</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Ungrouped</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20290%20Sengkang" style="color:var(--spinach);font-weight:600;text-decoration:none">Set up</a></td></tr>
+        <tr id="posOutletEmpty" hidden><td colspan="5" style="padding:32px;text-align:center;color:var(--ink-mute)">No outlets match these filters.</td></tr>
+      </tbody></table>
+    </div>
+
     <!-- ── Activity ── -->
     <div class="tab-panel" id="panel-activity">
       <div class="panel-label-row">
@@ -1769,6 +1813,12 @@ document.querySelectorAll('.tab').forEach(tab => {
     if (p) p.classList.add('active');
   });
 });
+
+// Preserve a direct return from full-page HQ tools such as POS mapping.
+if (window.location.hash === '#pos-mapping') {
+  const posMappingTab = document.querySelector('.tab[data-tab="pos-mapping"]');
+  if (posMappingTab) posMappingTab.click();
+}
 
 function goToItemsTab() {
   document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
@@ -3068,7 +3118,7 @@ function addPrototypeActivity(module, text, tab, scope) {
 
 function resetHqPrototypeData() {
   if (!window.confirm('Clear all locally saved data for this HQ prototype?')) return;
-  ['nomniNewHQ','nomniNewHQToastPending','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState'].forEach(function(key) { localStorage.removeItem(key); });
+  ['nomniNewHQ','nomniNewHQToastPending','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState','nomniHqManagedOutlets'].forEach(function(key) { localStorage.removeItem(key); });
   window.location.href = 'Admin - Buyers.html#outlet-groups';
 }
 
@@ -4949,6 +4999,15 @@ function refreshHqOutletSummary() {
   if (statValue) statValue.textContent = groupedOutlets + UNGROUPED.length;
 }
 
+function saveManagedOutletList() {
+  var names = Array.from(document.querySelectorAll('.outlet-list-item .outlet-item-name, #ogTable tr[data-ungrouped-name] .og-name'))
+    .map(function(node) { return node.textContent.trim(); })
+    .filter(Boolean);
+  localStorage.setItem('nomniHqManagedOutlets', JSON.stringify(Array.from(new Set(names))));
+}
+
+saveManagedOutletList();
+
 function confirmLinkOutletSelection() {
   var tbody = document.querySelector('#ogTable tbody');
   if (!tbody) return;
@@ -4971,6 +5030,7 @@ function confirmLinkOutletSelection() {
   var labelCount = document.querySelector('#panel-outlet-groups .panel-label-count');
   if (labelCount) labelCount.textContent = document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length;
   refreshHqOutletSummary();
+  saveManagedOutletList();
   addPrototypeActivity('outlet-groups', '<strong>' + linked.length + ' outlet' + (linked.length === 1 ? '' : 's') + ' added</strong> to this HQ', 'outlet-groups', groupOutletTargetName);
   closeGroupOutletPicker();
   openLinkOutletGroupStep(linked);
@@ -5113,6 +5173,123 @@ function confirmRemoveFromHQ() {
   closeRemoveFromHQModal();
   showHqToast(_removeFromHQOutlet + ' removed from HQ');
 }
+
+// ── Nomni POS mapping ──
+var POS_PRODUCTS = [
+  { id:'chargrill-burger', name:'Chargrill Signature Burger', variants:[{ id:'single', name:'Single patty' }, { id:'double', name:'Double patty' }] },
+  { id:'chicken-rice', name:'Hainanese Chicken Rice', variants:[{ id:'regular', name:'Regular' }, { id:'large', name:'Large' }] },
+  { id:'truffle-fries', name:'Truffle Fries', variants:[] },
+  { id:'iced-tea', name:'Iced Lemon Tea', variants:[{ id:'less-sugar', name:'Less sugar' }, { id:'regular-sugar', name:'Regular sugar' }] }
+];
+var POS_MAPPING_TARGETS = {
+  inventory: [
+    { id:'inv-chicken', name:'Chilled Chicken Breast Fillet Skinless Boneless 2kg', meta:'Inventory item · kg' },
+    { id:'inv-fries', name:'Frozen Shoestring Fries 2kg', meta:'Inventory item · bag' },
+    { id:'inv-tea', name:'Iced Tea Concentrate', meta:'Inventory item · L' },
+    { id:'inv-burger', name:'Chargrill Burger Bundle', meta:'Group SKU · 1 set' },
+    { id:'inv-char-siu', name:'Char Siu Marinade', meta:'Inventory recipe · L' }
+  ],
+  recipes: [
+    { id:'rec-burger', name:'Chargrill Signature Burger', meta:'Recipe · not in inventory' },
+    { id:'rec-chicken-rice', name:'Hainanese Chicken Rice', meta:'Recipe · not in inventory' },
+    { id:'rec-lemon-tea', name:'Iced Lemon Tea', meta:'Recipe · not in inventory' }
+  ]
+};
+var posMappings = {};
+var posIgnoredMappings = new Set();
+var posMappingSelection = null;
+var posMappingTargetType = 'inventory';
+
+function posKey(productId, variantId) { return productId + ':' + (variantId || 'product'); }
+function isPosConfigured() { return !!localStorage.getItem('nomniPosApiKey'); }
+function renderPosMappingState() {
+  var setup = document.getElementById('posMappingSetup');
+  var content = document.getElementById('posMappingContent');
+  if (!setup || !content) return;
+  setup.style.display = isPosConfigured() ? 'none' : 'block';
+  content.style.display = isPosConfigured() ? 'block' : 'none';
+  if (isPosConfigured()) renderPosMappings();
+}
+function renderPosMappings() {
+  var body = document.getElementById('posMappingBody');
+  if (!body || !isPosConfigured()) return;
+  var query = (document.getElementById('posMappingSearch').value || '').trim().toLowerCase();
+  var rows = [];
+  POS_PRODUCTS.forEach(function(product) {
+    var entries = product.variants.length ? product.variants : [{ id:'', name:'No variant' }];
+    entries.forEach(function(variant, index) {
+      var mapping = posMappings[posKey(product.id, variant.id)];
+      var ignored = posIgnoredMappings.has(posKey(product.id, variant.id));
+      if (query && !(product.name + ' ' + variant.name + ' ' + (mapping ? mapping.name : '')).toLowerCase().includes(query)) return;
+      rows.push('<tr><td>' + (index === 0 ? '<div style="font-weight:600;color:var(--ink)">' + escapeOverviewText(product.name) + '</div>' : '') + '</td>' +
+        '<td><span style="color:' + (variant.id ? 'var(--ink)' : 'var(--ink-mute)') + '">' + escapeOverviewText(variant.name) + '</span></td>' +
+        '<td>' + (mapping ? '<div style="font-weight:600;color:var(--ink)">' + escapeOverviewText(mapping.name) + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(mapping.meta) + '</div>' : ignored ? '<span style="color:var(--ink-mute)">Ignored</span>' : '<span style="color:var(--ink-mute)">Not mapped</span>') + '</td>' +
+        '<td>' + (mapping ? '<span class="pos-chip" style="background:var(--mint);color:var(--spinach)">' + (mapping.type === 'inventory' ? 'Inventory' : 'Recipe') + '</span>' : ignored ? '<span class="pos-chip off">Ignored</span>' : '—') + '</td>' +
+        '<td><button class="btn-row-actions" aria-label="Map ' + escapeOverviewText(product.name) + '" onclick="openPosMappingDialog(\'' + product.id + '\',\'' + variant.id + '\')">' + (mapping || ignored ? '•••' : 'Map') + '</button></td></tr>');
+    });
+  });
+  body.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5" style="padding:32px;text-align:center;color:var(--ink-mute)">No POS products match your search.</td></tr>';
+  var mapped = Object.keys(posMappings).length;
+  document.getElementById('posMappedCount').textContent = mapped ? mapped + ' mapped' : '';
+}
+function openPosSettings() {
+  document.getElementById('posApiKey').value = localStorage.getItem('nomniPosApiKey') || '';
+  document.getElementById('posSettingsOverlay').classList.add('open');
+  setTimeout(function(){ document.getElementById('posApiKey').focus(); }, 0);
+}
+function closePosSettings() { document.getElementById('posSettingsOverlay').classList.remove('open'); }
+function savePosSettings() {
+  var key = document.getElementById('posApiKey').value.trim();
+  var error = document.getElementById('posApiKeyError');
+  if (!key) { error.style.display = 'block'; return; }
+  error.style.display = 'none';
+  localStorage.setItem('nomniPosApiKey', key);
+  closePosSettings(); renderPosMappingState();
+  showHqToast('Nomni POS connected', 'POS products are ready to map.');
+}
+function openPosMappingDialog(productId, variantId) {
+  posMappingSelection = { productId:productId, variantId:variantId };
+  var product = POS_PRODUCTS.find(function(item){ return item.id === productId; });
+  var variant = product.variants.find(function(item){ return item.id === variantId; });
+  document.getElementById('posMappingDialogTitle').textContent = 'Map ' + product.name;
+  document.getElementById('posMappingDialogContext').textContent = variantId ? 'POS variant: ' + variant.name : 'No POS variant';
+  posMappingTargetType = 'inventory';
+  document.querySelectorAll('[data-pos-map-type]').forEach(function(tab){ tab.classList.toggle('active', tab.dataset.posMapType === 'inventory'); });
+  document.getElementById('posMappingTargetSearch').value = '';
+  renderPosMappingTargets();
+  document.getElementById('posMappingOverlay').classList.add('open');
+}
+function closePosMappingDialog() { document.getElementById('posMappingOverlay').classList.remove('open'); }
+function setPosMappingTargetType(type, tab) {
+  posMappingTargetType = type;
+  document.querySelectorAll('[data-pos-map-type]').forEach(function(item){ item.classList.toggle('active', item === tab); });
+  renderPosMappingTargets();
+}
+function renderPosMappingTargets() {
+  var query = (document.getElementById('posMappingTargetSearch').value || '').toLowerCase();
+  var list = POS_MAPPING_TARGETS[posMappingTargetType].filter(function(item){ return !query || item.name.toLowerCase().includes(query); });
+  var key = posKey(posMappingSelection.productId, posMappingSelection.variantId);
+  var current = posMappings[key];
+  document.getElementById('posMappingTargets').innerHTML = list.map(function(item) {
+    var selected = current && current.id === item.id;
+    return '<button type="button" class="group-radio-item" style="width:100%;text-align:left" onclick="savePosMapping(\'' + item.id + '\')"><div><div class="group-radio-name">' + escapeOverviewText(item.name) + '</div><div class="group-radio-meta">' + escapeOverviewText(item.meta) + '</div></div><span class="group-select-tick" style="opacity:' + (selected ? '1' : '0') + '">✓</span></button>';
+  }).join('') || '<div style="padding:24px;text-align:center;color:var(--ink-mute)">No matching ' + (posMappingTargetType === 'inventory' ? 'inventory items' : 'recipes') + '.</div>';
+}
+function savePosMapping(targetId) {
+  var target = POS_MAPPING_TARGETS[posMappingTargetType].find(function(item){ return item.id === targetId; });
+  posMappings[posKey(posMappingSelection.productId, posMappingSelection.variantId)] = { id:target.id, name:target.name, meta:target.meta, type:posMappingTargetType };
+  posIgnoredMappings.delete(posKey(posMappingSelection.productId, posMappingSelection.variantId));
+  closePosMappingDialog(); renderPosMappings();
+  showHqToast('POS mapping saved', 'The POS product is now mapped to ' + target.name + '.');
+}
+function ignorePosMapping() {
+  var key = posKey(posMappingSelection.productId, posMappingSelection.variantId);
+  delete posMappings[key];
+  posIgnoredMappings.add(key);
+  closePosMappingDialog(); renderPosMappings();
+  showHqToast('Mapping ignored', 'This POS product or variant will not affect stock depletion.');
+}
+document.addEventListener('DOMContentLoaded', renderPosMappingState);
 </script>
 
 <!-- Recipe Groups Dialog -->
@@ -5491,6 +5668,29 @@ function confirmRemoveFromHQ() {
       <button class="modal-cancel" id="addToGroupCancel" onclick="closeAddToGroupModal()">Cancel</button>
       <button class="btn-primary" onclick="confirmAddToGroup()">Add to group</button>
     </div>
+  </div>
+</div>
+
+<!-- ── Nomni POS connection settings ── -->
+<div class="modal-overlay" id="posSettingsOverlay" onclick="if(event.target===this)closePosSettings()">
+  <div class="modal-card" style="width:500px">
+    <div class="modal-header"><h2 class="modal-title">Nomni POS settings</h2><button class="modal-close" onclick="closePosSettings()" aria-label="Close">×</button></div>
+    <div class="modal-body" style="gap:14px">
+      <div class="modal-warning modal-info" style="margin:0"><span class="material-symbols-rounded">info</span><span>Connect a Nomni POS location to load its products and variants for mapping.</span></div>
+      <div><label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">API key</label><input id="posApiKey" type="password" placeholder="Enter Nomni POS API key" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit" oninput="document.getElementById('posApiKeyError').style.display='none'" /><div id="posApiKeyError" style="display:none;color:#D0291E;font-size:12px;margin-top:6px">Enter an API key to continue.</div></div>
+      <p style="margin:0;color:var(--ink-mute);font-size:12px;line-height:1.5">For this prototype, saving any API key connects the sample Nomni POS location. Connection credentials and location settings will be finalised with the integration design.</p>
+    </div>
+    <div class="modal-foot"><button class="modal-cancel" onclick="closePosSettings()">Cancel</button><button class="btn btn-primary" onclick="savePosSettings()">Save &amp; connect</button></div>
+  </div>
+</div>
+
+<!-- ── POS mapping chooser ── -->
+<div class="modal-overlay" id="posMappingOverlay" onclick="if(event.target===this)closePosMappingDialog()">
+  <div class="modal-card" style="width:620px">
+    <div class="modal-header"><div><h2 class="modal-title" id="posMappingDialogTitle">Map POS product</h2><div id="posMappingDialogContext" style="margin-top:4px;font-size:13px;color:var(--ink-mute)"></div></div><button class="modal-close" onclick="closePosMappingDialog()" aria-label="Close">×</button></div>
+    <div class="modal-tab-bar"><button class="modal-tab active" data-pos-map-type="inventory" onclick="setPosMappingTargetType('inventory',this)">Inventory</button><button class="modal-tab" data-pos-map-type="recipes" onclick="setPosMappingTargetType('recipes',this)">Recipes</button></div>
+    <div class="modal-body" style="gap:12px"><div class="ml-search-wrap" style="width:100%"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="posMappingTargetSearch" class="ml-search-input" placeholder="Search inventory items or recipes…" oninput="renderPosMappingTargets()" style="width:100%" /></div><div id="posMappingTargets" class="group-radio-list"></div></div>
+    <div class="modal-foot"><button class="modal-cancel" onclick="closePosMappingDialog()">Cancel</button><button class="modal-cancel" style="color:var(--spinach)" onclick="ignorePosMapping()">Ignore mapping</button></div>
   </div>
 </div>
 
@@ -5887,6 +6087,34 @@ function renderCreatedOutletGroup() {
 
 renderCreatedOutletGroup();
 initialiseHqInventorySettingsPage();
+
+function filterPosOutlets() {
+  const query = (document.getElementById('posOutletSearch')?.value || '').trim().toLowerCase();
+  const group = document.getElementById('posGroupFilter')?.value || '';
+  const connection = document.getElementById('posConnectionFilter')?.value || '';
+  const mapping = document.getElementById('posStatusFilter')?.value || '';
+  const rows = Array.from(document.querySelectorAll('#posOutletTableBody > tr:not(#posOutletEmpty)'));
+  let visible = 0;
+
+  rows.forEach(row => {
+    const cells = row.cells;
+    const outlet = (cells[0]?.querySelector('div')?.textContent || '').toLowerCase();
+    const outletGroup = (cells[0]?.querySelectorAll('div')[1]?.textContent || '').trim();
+    const posConnection = (cells[1]?.textContent || '').trim().toLowerCase();
+    const mappingStatus = cells[2]?.querySelector('strong') ? 'mapped' : 'unmapped';
+    const matches = (!query || outlet.includes(query))
+      && (!group || outletGroup === group)
+      && (!connection || posConnection === connection)
+      && (!mapping || mappingStatus === mapping);
+    row.hidden = !matches;
+    if (matches) visible += 1;
+  });
+
+  const empty = document.getElementById('posOutletEmpty');
+  if (empty) empty.hidden = visible !== 0;
+  const count = document.getElementById('posOutletResultCount');
+  if (count) count.textContent = `${visible} outlet${visible === 1 ? '' : 's'}`;
+}
 </script>
 
 </body>
