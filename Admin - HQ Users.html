@@ -79,7 +79,8 @@
   .ml-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
   .ml-table tbody tr:last-child td { border-bottom: none; }
   .ml-table tbody tr:hover td { background: var(--row-hover); }
-  .ml-inactive { opacity: 0.45; }
+  .ml-inactive td { opacity: 0.45; }
+  .ml-inactive td:last-child { opacity: 1; }
   .ml-item-name { font-size: 14px; font-weight: 500; color: var(--ink); }
   .ml-item-sub { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
 
@@ -97,6 +98,7 @@
   .row-action-item:hover { background: var(--mint); }
   .row-action-item.danger { color: #D0291E; }
   .row-action-item.danger:hover { background: #FDD6DC; }
+  .row-action-note { padding: 10px 16px; font-size: 12px; font-weight: 600; color: var(--ink-mute); background: #F7F8FA; border-bottom: 1px solid var(--rule); cursor: default; white-space: nowrap; }
 
   .empty-state { padding: 64px 24px; text-align: center; }
   .empty-state-title { font-size: 21px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); margin-bottom: 6px; }
@@ -305,7 +307,6 @@
             <th>Name</th>
             <th>Email</th>
             <th style="width:100px">HQ Owner</th>
-            <th style="width:90px">Status</th>
             <th style="width:120px">Last active</th>
             <th style="width:48px"></th>
           </tr>
@@ -417,7 +418,7 @@
     var body = document.getElementById('userBody');
     document.getElementById('userTableHead').hidden = !rows.length;
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state-title">No users linked to this HQ</div><div class="empty-state-copy">Click Add user to link someone to ' + escapeHtml(hqName) + '.</div></div></td></tr>';
+      body.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-state-title">No users linked to this HQ</div><div class="empty-state-copy">Click Add user to link someone to ' + escapeHtml(hqName) + '.</div></div></td></tr>';
       return;
     }
 
@@ -427,12 +428,11 @@
         '<td><div class="ml-item-name">' + escapeHtml(u.name) + '</div><div class="ml-item-sub">' + escapeHtml(u.jobTitle) + '</div></td>' +
         '<td>' + escapeHtml(u.email) + '</td>' +
         '<td>' + (u.hqOwner ? '<span class="chip chip-owner">Owner</span>' : '<span style="color:var(--ink-mute)">—</span>') + '</td>' +
-        '<td>' + (u.active ? '<span class="chip chip-active">Active</span>' : '<span class="chip chip-inactive">Inactive</span>') + '</td>' +
         '<td style="color:var(--ink-mute)">' + escapeHtml(u.lastActive) + '</td>' +
         '<td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
           '<div class="row-actions-menu">' +
+            (u.active ? '' : '<div class="row-action-note">Account is disabled</div>') +
             '<div class="row-action-item" onclick="editHqUser(' + idx + ')">Edit</div>' +
-            '<div class="row-action-item" onclick="toggleHqUserActive(' + idx + ')">' + (u.active ? 'Deactivate' : 'Activate') + '</div>' +
             '<div class="row-action-item danger" onclick="removeHqUser(' + idx + ')">Remove HQ access</div>' +
           '</div></div></td>' +
       '</tr>';
@@ -449,13 +449,6 @@
     params.set('owner', u.hqOwner ? '1' : '0');
     params.set('back', 'Admin - HQ Users.html' + window.location.search);
     window.location.href = 'Admin - Buyer User.html?' + params.toString();
-  }
-
-  function toggleHqUserActive(idx) {
-    var u = HQ_USERS[idx];
-    u.active = !u.active;
-    renderHqUsers();
-    showHqToast(u.active ? 'User activated' : 'User deactivated', u.name + (u.active ? ' can now access this HQ.' : ' can no longer access this HQ.'));
   }
 
   function removeHqUser(idx) {
