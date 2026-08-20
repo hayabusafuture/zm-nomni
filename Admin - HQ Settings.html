@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
 <style>
 :root {
   --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
@@ -31,6 +32,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .user { display: flex; align-items: center; gap: 10px; color: #fff; cursor: pointer; user-select: none; }
 .chev { width: 10px; height: 10px; display: inline-block; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-1px,-1px); }
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.material-symbols-rounded { font-family:'Material Symbols Rounded'; font-weight:normal; font-style:normal; line-height:1; letter-spacing:normal; text-transform:none; display:inline-block; white-space:nowrap; word-wrap:normal; direction:ltr; -webkit-font-feature-settings:'liga'; -webkit-font-smoothing:antialiased; font-variation-settings:'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 .help-btn { background: transparent; border: none; color: rgba(255,255,255,.7); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; transition: background .15s, color .15s; text-decoration: none; font-size: 14px; }
 .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
 .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
@@ -169,11 +171,15 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-table tbody tr:hover td { background: var(--row-hover) !important; }
 .og-name { font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none; }
 .og-name:hover { color: var(--spinach); text-decoration: underline; }
-.og-expand-btn { background: none; border: none; cursor: pointer; padding: 0; display: inline-flex; align-items: center; color: var(--ink-mute); transition: color .13s; flex-shrink: 0; margin-right: 6px; }
+.og-expand-btn { background: none; border: none; cursor: pointer; padding: 0; display: inline-flex; align-items: center; color: var(--ink-mute); transition: color .13s; flex-shrink: 0; margin:0 14px 0 8px; }
 .og-expand-btn:hover { color: var(--ink); }
 .og-expand-btn svg { transition: transform .18s; }
 .og-expand-btn.open svg { transform: rotate(90deg); }
 .og-name-cell { display: flex; align-items: center; }
+.ungrouped-select { appearance:none; box-sizing:border-box; width:16px; height:16px; margin:0 11px 0 6px; border:1.5px solid #8A8F98; border-radius:4px; background:#fff; cursor:pointer; flex:0 0 16px; }
+.ungrouped-select:checked { border-color:var(--seaweed); background:var(--seaweed) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.1 4.8 8.6 9.8 3.5' fill='none' stroke='white' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px 12px no-repeat; }
+.ungrouped-select:focus-visible { outline:2px solid rgba(42,200,100,.35); outline-offset:2px; }
+#ogTable tbody tr:has(.ungrouped-select:checked) td { background:rgba(42,200,100,.07) !important; }
 .og-name-cell-inner { display: flex; flex-direction: column; }
 .og-outlet-count { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
 .og-row-inactive .og-name { color: var(--ink-mute); }
@@ -195,12 +201,17 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-search-wrap input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
 .og-search-wrap input::placeholder { color: var(--ink-mute); }
 /* Add-to-group modal */
-.modal-warning { background: #FFF8EC; border: 1px solid #F5D87A; border-radius: 8px; padding: 12px 14px; font-size: 14px; color: #7A5C00; line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
-.modal-warning svg { flex-shrink: 0; margin-top: 1px; color: #C47B00; }
+.modal-warning { background: #FEF3C7; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px 14px; font-size: 14px; color: #92400E; line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
+.modal-warning svg, .modal-warning .material-symbols-rounded { flex-shrink: 0; margin-top: 1px; color: #D97706; }
+.modal-warning .material-symbols-rounded { font-size:20px; line-height:20px; }
+.notice-symbol { flex-shrink:0; color:#D97706; font-size:20px; line-height:20px; }
 .group-radio-list { display: flex; flex-direction: column; gap: 8px; }
-.group-radio-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; transition: border-color .15s; }
+.group-radio-item { position:relative; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; transition: border-color .15s, background-color .15s; }
 .group-radio-item:has(input:checked) { border-color: var(--nomni-green); background: #F6FFF9; }
-.group-radio-item input[type="radio"] { accent-color: var(--nomni-green); width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; }
+.group-radio-item input[type="radio"] { position:absolute; opacity:0; pointer-events:none; }
+.group-radio-item > div { flex:1; min-width:0; }
+.group-select-tick { width:22px; height:22px; border:1.5px solid #CCD0D8; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:transparent; flex-shrink:0; }
+.group-radio-item:has(input:checked) .group-select-tick { background:var(--seaweed); border-color:var(--seaweed); color:#fff; }
 .group-radio-name { font-size: 14px; font-weight: 600; color: var(--ink); }
 .group-radio-meta { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
 /* Remove-from-group confirm */
@@ -1049,14 +1060,22 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <div>
           <div class="panel-label-row">
             <span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">4</span></span>
-        <button class="btn-primary" onclick="window.location.href='Admin - Create Outlet Group.html?hq=Garden+Cuisine+HQ'">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          New group
-        </button>
-      </div>
-      <div class="og-search-wrap">
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="btn-secondary" onclick="openLinkOutletPicker()">Link outlets</button>
+              <button class="btn-primary" onclick="window.location.href='Admin - Create Outlet Group.html?hq=Garden+Cuisine+HQ'">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                New group
+              </button>
+            </div>
+          </div>
+      <div class="og-search-wrap" id="ogSearchWrap">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" id="ogSearch" placeholder="Search outlets or groups…" oninput="filterOgTable(this.value)" />
+      </div>
+      <div id="ogBulkActions" style="display:none;align-items:center;gap:10px;height:38px;margin-bottom:12px">
+        <span id="ogBulkCount" style="font-size:14px;font-weight:600;color:var(--ink)"></span>
+        <button class="btn-secondary" style="padding:8px 12px" onclick="openBulkAddToGroupModal()">Add to group</button>
+        <button class="modal-cancel" style="padding:8px 4px" onclick="clearUngroupedSelection()">Cancel</button>
       </div>
       <div style="overflow:clip">
       <table class="og-table" id="ogTable">
@@ -1150,7 +1169,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <tr data-ungrouped-name="(wf 139) chargrill @ 139 tampines">
             <td>
               <div class="og-name-cell">
-                <div style="width:18px;flex-shrink:0"></div>
+                <input class="ungrouped-select" type="checkbox" aria-label="Select (WF 139) Chargrill @ 139 Tampines" onchange="updateUngroupedSelection()" />
                 <div class="og-name-cell-inner">
                   <span class="og-name">(WF 139) Chargrill @ 139 Tampines</span>
                   <span class="og-outlet-count" style="display:flex;align-items:center;gap:5px"><span class="pos-chip off">POS ✕</span></span>
@@ -1174,7 +1193,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <tr data-ungrouped-name="(wf 290) garden express @ 290 sengkang">
             <td>
               <div class="og-name-cell">
-                <div style="width:18px;flex-shrink:0"></div>
+                <input class="ungrouped-select" type="checkbox" aria-label="Select (WF 290) Garden Express @ 290 Sengkang" onchange="updateUngroupedSelection()" />
                 <div class="og-name-cell-inner">
                   <span class="og-name">(WF 290) Garden Express @ 290 Sengkang</span>
                   <span class="og-outlet-count" style="display:flex;align-items:center;gap:5px"><span class="pos-chip off">POS ✕</span></span>
@@ -1267,7 +1286,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="tab-panel" id="panel-market-list">
       <div id="priceReviewBanner" style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
         <div style="display:flex;align-items:flex-start;gap:10px">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+          <span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span>
           <div>
             <div style="font-size:14px;font-weight:600;color:#92400E">3 price changes pending review</div>
             <div style="font-size: 14px;color:#92400E;margin-top:2px">Invoice prices from outlets differ from current market list prices. Review and approve to update.</div>
@@ -1316,7 +1335,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">Item name <span class="sort-ind"></span></th>
               <th style="width:100px">UOM</th>
               <th class="sort-th" id="mlSortTh-price" onclick="setMlSort('price')" style="width:120px">Price <span class="sort-ind"></span></th>
-              <th style="width:120px">Groups with access</th>
+              <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
             </tr>
           </thead>
@@ -1346,6 +1365,15 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" class="ml-search-input" id="recSearch" placeholder="Search recipes…" oninput="setRecSearch(this.value)" />
         </div>
+        <select class="ml-filter-select" id="recTypeFilter" onchange="setRecTypeFilter(this.value)">
+          <option value="">All types</option>
+          <option value="recipe">Recipe</option>
+          <option value="sub-recipe">Sub-recipe</option>
+        </select>
+        <select class="ml-filter-select" id="recFoodCostFilter" onchange="setRecFoodCostFilter(this.value)">
+          <option value="">All food costs</option>
+          <option value="above-threshold">Higher than threshold</option>
+        </select>
         <select class="ml-filter-select" id="recCatFilter" onchange="setRecCatFilter(this.value)">
           <option value="">All tags</option>
           <option>Mains</option>
@@ -1355,11 +1383,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <option>Desserts</option>
           <option>Beverages</option>
         </select>
-        <select class="ml-filter-select" id="recStatusFilter" onchange="setRecStatusFilter(this.value)">
-          <option value="">All statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
       </div>
       <div style="overflow:clip">
         <table class="ml-table">
@@ -1368,7 +1391,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <th class="sort-th" id="recSortTh-name" onclick="setRecSort('name')">Recipe <span class="sort-ind"></span></th>
               <th class="sort-th" id="recSortTh-cost" onclick="setRecSort('cost')" style="width:100px">Cost <span class="sort-ind"></span></th>
               <th style="width:110px">Food cost %</th>
-              <th style="width:160px">Groups with access</th>
+              <th style="width:160px">Available to</th>
               <th style="width:120px">Last updated</th>
               <th style="width:48px"></th>
             </tr>
@@ -1404,7 +1427,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <th style="width:80px;text-align:center">Items</th>
               <th style="width:200px">Contact</th>
               <th style="width:110px">Type</th>
-              <th style="width:120px">Groups with access</th>
+              <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
             </tr>
           </thead>
@@ -1463,7 +1486,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <th>Item</th>
               <th style="width:70px">UOM</th>
               <th style="width:110px">Unit cost</th>
-              <th style="width:160px">Groups with access</th>
+              <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
             </tr>
           </thead>
@@ -1860,11 +1883,11 @@ function renderHealthCheck() {
   const issues = [];
   const infos = [];
 
-  if (PRICE_CHANGES.length) issues.push({ type: 'priceChanges', icon: '⚠', text: PRICE_CHANGES.length + ' price change' + (PRICE_CHANGES.length > 1 ? 's' : '') + ' pending review', color: '#92400E', bg: '#FEF3C7', items: PRICE_CHANGES });
-  if (UNGROUPED.length) issues.push({ type: 'ungrouped', icon: '⚠', text: UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + ' not assigned to any group', color: '#92400E', bg: '#FEF3C7' });
+  if (PRICE_CHANGES.length) issues.push({ type: 'priceChanges', symbol: 'price_change', text: PRICE_CHANGES.length + ' price change' + (PRICE_CHANGES.length > 1 ? 's' : '') + ' pending review', color: '#B45309', bg: '#FEF3C7', items: PRICE_CHANGES });
+  if (UNGROUPED.length) issues.push({ type: 'ungrouped', symbol: 'storefront', text: UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + ' not assigned to any group', color: '#2563EB', bg: '#EFF6FF', items: UNGROUPED });
 
   const highFcRecipes = RECIPES.filter(r => r.foodCostPct > recFcThreshold);
-  if (highFcRecipes.length) issues.push({ type: 'highfc', icon: '⚠', text: highFcRecipes.length + ' recipe' + (highFcRecipes.length > 1 ? 's' : '') + ' above ' + recFcThreshold + '% food cost target', color: '#92400E', bg: '#FEF3C7', items: highFcRecipes });
+  if (highFcRecipes.length) issues.push({ type: 'highfc', symbol: 'restaurant_menu', text: highFcRecipes.length + ' recipe' + (highFcRecipes.length > 1 ? 's' : '') + ' above ' + recFcThreshold + '% food cost target', color: '#B45309', bg: '#FEF3C7', items: highFcRecipes });
 
   // POS not connected — outlets missing API key mapping
   const POS_UNCONNECTED = [
@@ -1876,16 +1899,20 @@ function renderHealthCheck() {
     '(WF 290) Garden Express @ 290 Sengkang',
     '(WF 203) Garden Café @ 203 Bedok',
   ];
-  infos.push({ type: 'pos', icon: '○', text: POS_UNCONNECTED.length + ' outlet' + (POS_UNCONNECTED.length > 1 ? 's' : '') + ' not connected to POS', color: '#6B7280', bg: '#F3F4F6', items: POS_UNCONNECTED });
+  infos.push({ type: 'pos', symbol: 'point_of_sale', text: POS_UNCONNECTED.length + ' outlet' + (POS_UNCONNECTED.length > 1 ? 's' : '') + ' not connected to POS', color: '#64748B', bg: '#F1F5F9', items: POS_UNCONNECTED });
 
   const el = document.getElementById('healthCheck');
   if (!el) return;
+
+  function healthIcon(name, color) {
+    return '<span class="material-symbols-rounded" aria-hidden="true" style="font-size:24px;line-height:24px;color:' + color + ';flex-shrink:0">' + name + '</span>';
+  }
 
   function makeExpandable(i, listItems, listBg, listBorder, dotColor, uid, maxHeight) {
     var scrollStyle = maxHeight ? 'max-height:' + maxHeight + ';overflow-y:auto;' : '';
     return '<div>' +
       '<div onclick="(function(row){var list=row.parentNode.querySelector(\'[data-hclist=\\\'' + uid + '\\\']\');var open=list.style.display!==\'none\';list.style.display=open?\'none\':\'\';row.querySelector(\'.hc-chevron\').style.transform=open?\'\':\' rotate(180deg)\';})(this)" style="display:flex;align-items:center;gap:8px;font-size: 14px;cursor:pointer;user-select:none">' +
-      '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:' + i.bg + ';color:' + i.color + ';font-size:10px;font-weight:700;flex-shrink:0">' + i.icon + '</span>' +
+      healthIcon(i.symbol || 'info', i.color) +
       '<span style="color:' + i.color + ';font-weight:500;flex:1">' + i.text + '</span>' +
       '<svg class="hc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0;transition:transform .15s"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
@@ -1903,17 +1930,20 @@ function renderHealthCheck() {
   const issueHtmlParts = issues.map(function(i, idx) {
     if (i.type === 'priceChanges') {
       return '<div onclick="goToItemsTab()" style="display:flex;align-items:center;gap:8px;font-size: 14px;cursor:pointer">' +
-        '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;flex-shrink:0">⚠</span>' +
+        healthIcon(i.symbol, i.color) +
         '<span style="color:#92400E;font-weight:500;flex:1">' + i.text + '</span>' +
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
       '</div>';
     }
     if (i.type === 'ungrouped') {
-      return makeExpandable(i, UNGROUPED.map(function(n){ return dotItem(n, '#92400E'); }).join(''), '#FEF9ED', '#FDE68A', '#92400E', 'ug');
+      return makeExpandable(i, UNGROUPED.map(function(n){ return dotItem(n, i.color); }).join(''), '#F8FBFF', '#BFDBFE', i.color, 'ug');
     }
     if (i.type === 'highfc') {
-      const rows = i.items.map(function(r){ return dotItem(r.name + ' — ' + r.foodCostPct.toFixed(1) + '%', '#92400E'); }).join('');
-      return makeExpandable(i, rows, '#FEF9ED', '#FDE68A', '#92400E', 'hfc' + idx, '160px');
+      return '<div onclick="goToHighFoodCostRecipes()" style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">' +
+        healthIcon(i.symbol, i.color) +
+        '<span style="color:' + i.color + ';font-weight:500;flex:1">' + i.text + '</span>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
+      '</div>';
     }
     return '';
   });
@@ -1921,12 +1951,12 @@ function renderHealthCheck() {
   const infoHtmlParts = infos.map(function(i, idx) {
     if (i.type === 'pos') {
       const rows = i.items.map(function(n){ return dotItem(n, '#6B7280'); }).join('');
-      const note = '<div style="margin-top:8px;padding-top:7px;border-top:1px solid #E5E7EB;font-size:11px;color:#9CA3AF">Each outlet requires a POS API key to be configured individually.</div>';
-      const posItem = { bg: i.bg, color: i.color, icon: i.icon, text: i.text };
-      return makeExpandable(posItem, rows + note, '#F9FAFB', '#E5E7EB', '#6B7280', 'pos' + idx, '160px');
+      const note = '<div style="margin-top:8px;padding-top:7px;border-top:1px solid #E2E8F0;font-size:11px;color:#94A3B8">Each outlet requires a POS API key to be configured individually.</div>';
+      const posItem = { bg: i.bg, color: i.color, symbol: i.symbol, text: i.text };
+      return makeExpandable(posItem, rows + note, '#F8FAFC', '#E2E8F0', '#64748B', 'pos' + idx, '160px');
     }
     return '<div style="display:flex;align-items:center;gap:8px;font-size: 14px">' +
-      '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:' + i.bg + ';color:' + i.color + ';font-size:10px;font-weight:700;flex-shrink:0">' + i.icon + '</span>' +
+      healthIcon(i.symbol || 'info', i.color) +
       '<span style="color:' + i.color + ';font-weight:500">' + i.text + '</span>' +
       '</div>';
   });
@@ -2106,6 +2136,18 @@ const UOM_MULT = {
 const ML_GROUPS = ['Chargrill Outlets', 'Family Dining Express'];
 const ALL_OUTLETS = ['(WF 139) Chargrill @ 139 Tampines', '(WF 140) Chargrill @ Bedok', '(WF 141) Chargrill @ Jurong', '(WF 142) Chargrill @ Orchard'];
 const ML_OUTLETS = [ALL_OUTLETS[0], ALL_OUTLETS[1]];
+
+function availabilityLabel(groups, outlets, totalGroups, totalOutlets) {
+  const groupCount = groups.length;
+  const outletCount = outlets.length;
+  if (!groupCount && !outletCount) return 'Not available';
+  if (totalOutlets && groupCount === totalGroups && outletCount === totalOutlets) return 'All outlets';
+  if (groupCount === totalGroups && !outletCount) return 'All groups';
+  const parts = [];
+  if (groupCount) parts.push(groupCount === 1 ? '1 group' : groupCount + ' groups');
+  if (outletCount) parts.push(outletCount === 1 ? '1 outlet' : outletCount + ' outlets');
+  return parts.join(' · ');
+}
 
 // Access state for items: itemIdx -> {name: {enabled, uoms: [bool...], type: 'group'|'outlet'}}
 const itemAccessState = {};
@@ -2651,11 +2693,7 @@ function renderMl() {
       });
       const groupsEnabled = enabledForUom.filter(n => ML_GROUPS.includes(n));
       const outletsEnabled = enabledForUom.filter(n => ALL_OUTLETS.includes(n));
-      const allAccess = groupsEnabled.length === ML_GROUPS.length && outletsEnabled.length === 0;
-      const uomParts = [];
-      if (groupsEnabled.length > 0) uomParts.push(groupsEnabled.length === 1 ? '1 group' : groupsEnabled.length + ' groups');
-      if (outletsEnabled.length > 0) uomParts.push(outletsEnabled.length === 1 ? '1 outlet' : outletsEnabled.length + ' outlets');
-      const grpLabel = allAccess ? 'All groups' : (uomParts.join(' · ') || 'No access');
+      const grpLabel = availabilityLabel(groupsEnabled, outletsEnabled, ML_GROUPS.length, ALL_OUTLETS.length);
       const grpDataAttr = 'data-groups="' + groupsEnabled.join('|') + '" data-outlets="' + outletsEnabled.join('|') + '"';
       const grpHtml = '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" ' + grpDataAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
       return { html:grpHtml, label:grpLabel, key:groupsEnabled.join('|') + '::' + outletsEnabled.join('|') };
@@ -2679,17 +2717,11 @@ function renderMl() {
       '</tr>';
     }
 
-    const accessSummaries = enabledUoms.map(entry => getAccessInfo(entry.ui));
-    const sharedAccess = accessSummaries.every(summary => summary.key === accessSummaries[0].key);
-    const parentAccess = sharedAccess
-      ? accessSummaries[0].html
-      : '<button onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ',\'hqItemAccessPanel\')" style="background:none;border:none;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">Varies by UOM</button>';
-
     const parent = '<tr class="ml-parent-row' + rowEvenClass + (item.active ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
       '<td><div class="ml-item-name">' + item.name + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
       '<td></td>' +
       '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
-      '<td>' + parentAccess + '</td>' + actionsTd +
+      '<td></td>' + actionsTd +
     '</tr>';
 
     const children = isExpanded ? enabledUoms.map(({ uom, ui }) => {
@@ -2802,6 +2834,7 @@ RECIPES.forEach((r, i) => {
   r.lastUpdated = REC_DATES[i % REC_DATES.length];
   if (i === 2) r.lastUpdated = '23 Jun 2026';
   r.active = (i % 9 !== 0);
+  r.type = i % 5 === 0 ? 'sub-recipe' : 'recipe';
   const fc = REC_FC_TARGETS[r.cat] || 0.30;
   r.price = Math.round(r.cost / fc * 2) / 2;
   r.foodCostPct = r.cost / r.price * 100;
@@ -2809,7 +2842,7 @@ RECIPES.forEach((r, i) => {
 
 let recPage = 1;
 const REC_PER_PAGE = 20;
-let recSearch = '', recCatFilter = '', recStatusFilter = '', recSortKey = 'default';
+let recSearch = '', recTypeFilter = '', recFoodCostFilter = '', recCatFilter = '', recStatusFilter = '', recSortKey = 'default';
 let recFcThreshold = 25;
 
 function openRecSettings() {
@@ -2829,6 +2862,8 @@ function saveRecSettings() {
 }
 
 function setRecSearch(v) { recSearch = v; recPage = 1; renderRec(); }
+function setRecTypeFilter(v) { recTypeFilter = v; recPage = 1; renderRec(); }
+function setRecFoodCostFilter(v) { recFoodCostFilter = v; recPage = 1; renderRec(); }
 function setRecCatFilter(v) { recCatFilter = v; recPage = 1; renderRec(); }
 function setRecStatusFilter(v) { recStatusFilter = v; recPage = 1; renderRec(); }
 
@@ -2845,6 +2880,8 @@ function setRecSort(key) {
 
 function getRecItems() {
   let items = RECIPES.slice();
+  if (recTypeFilter) items = items.filter(r => r.type === recTypeFilter);
+  if (recFoodCostFilter === 'above-threshold') items = items.filter(r => r.foodCostPct > recFcThreshold);
   if (recCatFilter) items = items.filter(r => r.cat === recCatFilter);
   if (recStatusFilter === 'active') items = items.filter(r => r.active);
   else if (recStatusFilter === 'inactive') items = items.filter(r => !r.active);
@@ -2872,18 +2909,14 @@ function renderRec() {
   document.getElementById('recCount').textContent = total;
 
   document.getElementById('recBody').innerHTML = page.map(r => {
-    const allGroups = r.groupList.length === REC_GROUPS.length && r.outletList.length === 0;
-    const parts = [];
-    if (r.groupList.length > 0) parts.push(r.groupList.length === 1 ? '1 group' : r.groupList.length + ' groups');
-    if (r.outletList.length > 0) parts.push(r.outletList.length === 1 ? '1 outlet' : r.outletList.length + ' outlets');
-    const accessLabel = parts.join(' · ');
+    const accessLabel = availabilityLabel(r.groupList, r.outletList, REC_GROUPS.length, ALL_OUTLETS.length);
     const grpAttr = 'data-groups="' + r.groupList.join('|') + '" data-outlets="' + r.outletList.join('|') + '"';
-    const grpHtml = '<button onclick="openRecGroupsDialog(this)" ' + grpAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + (allGroups ? 'All groups' : accessLabel) + '</button>';
+    const grpHtml = '<button onclick="openRecGroupsDialog(this)" ' + grpAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + accessLabel + '</button>';
     const versionsHtml = r.versions > 1
       ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' variations</span>'
       : '';
     return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
-      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + versionsHtml + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
+      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + versionsHtml + '</div><span class="ml-cat-tag">' + (r.type === 'sub-recipe' ? 'Sub-recipe · ' : 'Recipe · ') + r.cat + '</span></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">sell $' + r.price.toFixed(2) + '</div></td>' +
       '<td><span style="font-size: 14px;font-weight:700;color:' + (r.foodCostPct > recFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
       '<td style="text-align:left">' + grpHtml + '</td>' +
@@ -3119,6 +3152,15 @@ function navigateToTab(tab) {
   window.scrollTo(0, 0);
 }
 
+function goToHighFoodCostRecipes() {
+  recFoodCostFilter = 'above-threshold';
+  recPage = 1;
+  var filter = document.getElementById('recFoodCostFilter');
+  if (filter) filter.value = recFoodCostFilter;
+  navigateToTab('recipes');
+  renderRec();
+}
+
 function goToHqUserEntry() {
   var hqName = (document.querySelector('.page-title') || {}).textContent || '';
   var params = new URLSearchParams();
@@ -3236,15 +3278,12 @@ function renderSuppliers() {
     return;
   }
   document.getElementById('supBody').innerHTML = rows.map(s => {
-    const allGroups = s.groupList.length === 2 && s.outletList.length === 0;
-    const supParts = [];
-    if (s.groupList.length > 0) supParts.push(s.groupList.length === 1 ? '1 group' : s.groupList.length + ' groups');
-    if (s.outletList.length > 0) supParts.push(s.outletList.length === 1 ? '1 outlet' : s.outletList.length + ' outlets');
+    const accessLabel = availabilityLabel(s.groupList, s.outletList, ML_GROUPS.length, ALL_OUTLETS.length);
     const contactLines = [];
     if (s.contact && s.contact !== '—') contactLines.push('<div style="color:var(--ink)">' + s.contact + '</div>');
     if (s.phone && s.phone !== '—') contactLines.push('<div style="color:var(--ink-mute);margin-top:' + (contactLines.length ? '2px' : '0') + '">' + s.phone + '</div>');
     const contactHtml = contactLines.join('') || '<span style="color:var(--ink-mute)">No contact details</span>';
-    const grpHtml = '<button onclick="openRecGroupsDialog(this)" data-groups="' + s.groupList.join('|') + '" data-outlets="' + s.outletList.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + (allGroups ? 'All groups' : supParts.join(' · ')) + '</button>';
+    const grpHtml = '<button onclick="openRecGroupsDialog(this)" data-groups="' + s.groupList.join('|') + '" data-outlets="' + s.outletList.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + accessLabel + '</button>';
     return '<tr' + (s.active ? '' : ' class="ml-inactive"') + '>' +
     '<td><div class="ml-item-name">' + supplierLabel(s.name) + '</div></td>' +
     '<td style="text-align:center;font-size: 14px;color:var(--ink)">' + (s.itemCount || '—') + '</td>' +
@@ -3275,20 +3314,17 @@ function openRecGroupsDialog(btn) {
   const outletIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
   const row = (icon, label, last) =>
     '<div style="padding:10px 0;' + (last ? '' : 'border-bottom:1px solid var(--rule);') + 'font-size:14px;color:var(--ink);display:flex;align-items:center;gap:8px">' + icon + label + '</div>';
-  let html = '';
-  if (groups.length) {
-    if (outlets.length) html += '<div style="font-size:11px;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.06em;padding:12px 0 2px">Outlet groups</div>';
-    html += groups.map((g, i) => row(groupIcon, g, !outlets.length && i === groups.length - 1)).join('');
-  }
-  if (outlets.length) {
-    if (groups.length) html += '<div style="font-size:11px;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.06em;padding:12px 0 2px">Individual outlets</div>';
-    html += outlets.map((o, i) => row(outletIcon, o, i === outlets.length - 1)).join('');
-  }
+  const sectionLabel = label => '<div style="font-size:11px;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.06em;padding:12px 0 2px">' + label + '</div>';
+  const emptyState = label => '<div style="padding:10px 0;font-size:14px;color:var(--ink-mute)">' + label + '</div>';
+  let html = sectionLabel('Outlet groups');
+  html += groups.length ? groups.map((g, i) => row(groupIcon, g, i === groups.length - 1)).join('') : emptyState('No outlet groups');
+  html += sectionLabel('Individual outlets');
+  html += outlets.length ? outlets.map((o, i) => row(outletIcon, o, i === outlets.length - 1)).join('') : emptyState('No individual outlets');
   const parts = [];
   if (groups.length) parts.push(groups.length === 1 ? '1 group' : groups.length + ' groups');
   if (outlets.length) parts.push(outlets.length === 1 ? '1 outlet' : outlets.length + ' outlets');
   document.getElementById('recGroupsList').innerHTML = html;
-  document.getElementById('recGroupsCount').textContent = parts.join(' · ');
+  document.getElementById('recGroupsCount').textContent = parts.join(' · ') + (outlets.length ? '' : (parts.length ? ' · No individual outlets' : 'Not available'));
   document.getElementById('recGroupsOverlay').style.display = 'flex';
 }
 function closeRecGroupsDialog() {
@@ -3755,12 +3791,9 @@ function renderInv() {
       ? '<td style="' + td + 'font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</td>'
       : '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">varies</td>';
 
-    var allGroups = r.groups && r.groups.length === INV_GROUPS.length;
-    var grpLabel = !r.groups || r.groups.length === 0
-      ? null
-      : allGroups ? 'All groups' : (r.groups.length === 1 ? '1 group' : r.groups.length + ' groups');
-    var grpHtml = !grpLabel
-      ? '<span style="font-size:12px;color:var(--ink-mute)">—</span>'
+    var grpLabel = availabilityLabel(r.groups || [], [], INV_GROUPS.length, 0);
+    var grpHtml = grpLabel === 'Not available'
+      ? '<span style="font-size:12px;color:var(--ink-mute)">Not available</span>'
       : '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + (r.groups||[]).join('|') + '" data-outlets="" style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
 
     rows.push('<tr' + inactiveClass + '>' +
@@ -4596,6 +4629,7 @@ var groupOutletSelection = new Set();
 var groupOutletTargetRow = null;
 var groupOutletTargetName = '';
 var groupOutletFilteredResults = [];
+var groupOutletMode = 'group';
 var procureOutletAssignedToHq = new Set();
 var PROCURE_OUTLETS_AVAILABLE = [
   { id:1, name:'Amber Restaurant', company:'The Grand Hospitality Group', cluster:'CBD Cluster' },
@@ -4626,6 +4660,7 @@ var PROCURE_OUTLETS_AVAILABLE = [
 ];
 
 function openGroupOutletPicker(groupName, trigger) {
+  groupOutletMode = 'group';
   groupOutletTargetName = groupName;
   groupOutletTargetRow = trigger.closest('tr');
   groupOutletSelection.clear();
@@ -4633,6 +4668,22 @@ function openGroupOutletPicker(groupName, trigger) {
   document.getElementById('groupOutletSearch').value = '';
   document.getElementById('groupOutletCompany').value = '';
   document.getElementById('groupOutletCluster').value = '';
+  document.getElementById('groupOutletLinkNotice').style.display = 'none';
+  renderGroupOutletPicker();
+  document.getElementById('groupOutletPicker').classList.add('open');
+  setTimeout(function() { document.getElementById('groupOutletSearch').focus(); }, 0);
+}
+
+function openLinkOutletPicker() {
+  groupOutletMode = 'hq';
+  groupOutletTargetName = document.querySelector('.page-title').textContent.trim();
+  groupOutletTargetRow = null;
+  groupOutletSelection.clear();
+  document.getElementById('groupOutletPickerTitle').textContent = 'Link outlets to ' + groupOutletTargetName;
+  document.getElementById('groupOutletSearch').value = '';
+  document.getElementById('groupOutletCompany').value = '';
+  document.getElementById('groupOutletCluster').value = '';
+  document.getElementById('groupOutletLinkNotice').style.display = 'flex';
   renderGroupOutletPicker();
   document.getElementById('groupOutletPicker').classList.add('open');
   setTimeout(function() { document.getElementById('groupOutletSearch').focus(); }, 0);
@@ -4640,6 +4691,7 @@ function openGroupOutletPicker(groupName, trigger) {
 
 function closeGroupOutletPicker() {
   document.getElementById('groupOutletPicker').classList.remove('open');
+  document.getElementById('groupOutletLinkNotice').style.display = 'none';
 }
 
 function renderGroupOutletPicker() {
@@ -4652,11 +4704,12 @@ function renderGroupOutletPicker() {
   var infoBar = document.getElementById('groupOutletInfoBar');
   var count = groupOutletSelection.size;
   renderGroupOutletSelected();
+  var action = groupOutletMode === 'hq' ? 'Link' : 'Add';
   document.getElementById('groupOutletPickerCount').innerHTML = count ? '<strong>' + count + '</strong> outlet' + (count === 1 ? '' : 's') + ' selected' : 'No outlets selected';
   document.getElementById('groupOutletPickerConfirm').disabled = count === 0;
-  document.getElementById('groupOutletPickerConfirm').textContent = count ? 'Add ' + count + ' outlet' + (count === 1 ? '' : 's') : 'Add outlets';
+  document.getElementById('groupOutletPickerConfirm').textContent = count ? action + ' ' + count + ' outlet' + (count === 1 ? '' : 's') : action + ' outlets';
 
-  if (!query && !company && !cluster) {
+  if (groupOutletMode !== 'hq' && !query && !company && !cluster) {
     groupOutletFilteredResults = [];
     list.classList.add('is-empty');
     meta.textContent = '';
@@ -4702,7 +4755,7 @@ function renderGroupOutletSelected() {
   selectedList.innerHTML = selectedOutlets.length ? selectedOutlets.map(function(outlet) {
     return '<div class="outlet-picker-selected-row"><div class="outlet-picker-selected-info"><div class="outlet-picker-selected-name">' + escapeOverviewText(outlet.name) + '</div><div class="outlet-picker-selected-meta">' + escapeOverviewText(outlet.company) + '</div></div>' +
       '<button class="outlet-picker-remove" data-outlet-key="' + escapeOverviewText(String(outlet.id)) + '" onclick="removeGroupOutletSelection(this.dataset.outletKey)" aria-label="Remove ' + escapeOverviewText(outlet.name) + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>';
-  }).join('') : '<div class="outlet-picker-selected-empty"><strong>No outlets selected</strong><span>Select outlets from the results to add them here.</span></div>';
+  }).join('') : '<div class="outlet-picker-selected-empty"><strong>No outlets selected</strong><span>Select outlets from the results to ' + (groupOutletMode === 'hq' ? 'link them to this HQ.' : 'add them here.') + '</span></div>';
 }
 
 function removeGroupOutletSelection(key) {
@@ -4731,7 +4784,12 @@ function toggleAllGroupOutletResults() {
 }
 
 function confirmGroupOutletSelection() {
-  if (!groupOutletTargetRow || !groupOutletSelection.size) return;
+  if (!groupOutletSelection.size) return;
+  if (groupOutletMode === 'hq') {
+    confirmLinkOutletSelection();
+    return;
+  }
+  if (!groupOutletTargetRow) return;
   var subRow = groupOutletTargetRow.nextElementSibling;
   if (!subRow || !subRow.classList.contains('og-outlet-sub-row')) return;
   var list = subRow.querySelector('.outlet-list');
@@ -4775,11 +4833,75 @@ function confirmGroupOutletSelection() {
   showHqToast('Outlets added', addedNames.length + ' outlet' + (addedNames.length === 1 ? '' : 's') + ' added to ' + groupOutletTargetName + '.');
 }
 
-// ── Add to group modal ──
-var _addToGroupOutlet = '';
+function refreshHqOutletSummary() {
+  var groupedOutlets = Array.from(document.querySelectorAll('.og-outlet-count')).reduce(function(sum, el) {
+    return sum + (parseInt(el.textContent, 10) || 0);
+  }, 0);
+  var statValue = document.querySelector('#statsStrip .hq-summary-cell:first-child .hq-summary-value');
+  if (statValue) statValue.textContent = groupedOutlets + UNGROUPED.length;
+}
+
+function confirmLinkOutletSelection() {
+  var tbody = document.querySelector('#ogTable tbody');
+  if (!tbody) return;
+  var linked = [];
+  PROCURE_OUTLETS_AVAILABLE.forEach(function(outlet) {
+    var key = String(outlet.id);
+    if (!groupOutletSelection.has(key) || procureOutletAssignedToHq.has(outlet.id)) return;
+    procureOutletAssignedToHq.add(outlet.id);
+    linked.push(outlet.name);
+    UNGROUPED.push(outlet.name);
+    var row = document.createElement('tr');
+    row.dataset.ungroupedName = outlet.name.toLowerCase();
+    row.innerHTML =
+      '<td><div class="og-name-cell"><input class="ungrouped-select" type="checkbox" aria-label="Select ' + escapeOverviewText(outlet.name) + '" onchange="updateUngroupedSelection()" /><div class="og-name-cell-inner"><span class="og-name">' + escapeOverviewText(outlet.name) + '</span><span class="og-outlet-count" style="display:flex;align-items:center;gap:5px"><span class="pos-chip off">POS ✕</span></span></div></div></td>' +
+      '<td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td><td style="color:var(--ink-mute)">Today</td>' +
+      '<td><div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="openAddToGroupModal(this.closest(\'tr\').dataset.ungroupedName)">Add to group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest(\'tr\').dataset.ungroupedName)">Remove from HQ</div></div></div></td>';
+    tbody.appendChild(row);
+  });
+  if (!linked.length) return;
+  var labelCount = document.querySelector('#panel-outlet-groups .panel-label-count');
+  if (labelCount) labelCount.textContent = document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length;
+  refreshHqOutletSummary();
+  addPrototypeActivity('outlet-groups', '<strong>' + linked.length + ' outlet' + (linked.length === 1 ? '' : 's') + ' linked</strong> to this HQ', 'outlet-groups', groupOutletTargetName);
+  closeGroupOutletPicker();
+  showHqToast('Outlets linked', linked.length + ' outlet' + (linked.length === 1 ? ' is' : 's are') + ' now managed by ' + groupOutletTargetName + '.');
+}
+
+// ── Add ungrouped outlets to a group ──
+var _addToGroupOutlets = [];
+function updateUngroupedSelection() {
+  var selected = Array.from(document.querySelectorAll('#ogTable tr[data-ungrouped-name] .ungrouped-select:checked'));
+  var search = document.getElementById('ogSearchWrap');
+  var actions = document.getElementById('ogBulkActions');
+  if (!search || !actions) return;
+  search.style.display = selected.length ? 'none' : 'flex';
+  actions.style.display = selected.length ? 'flex' : 'none';
+  document.getElementById('ogBulkCount').textContent = selected.length + ' outlet' + (selected.length === 1 ? '' : 's') + ' selected';
+}
+function clearUngroupedSelection() {
+  document.querySelectorAll('#ogTable tr[data-ungrouped-name] .ungrouped-select').forEach(function(input) { input.checked = false; });
+  updateUngroupedSelection();
+}
+function openBulkAddToGroupModal() {
+  var rows = Array.from(document.querySelectorAll('#ogTable tr[data-ungrouped-name]'));
+  _addToGroupOutlets = rows.filter(function(row) { return row.querySelector('.ungrouped-select:checked'); }).map(function(row) {
+    return { row: row, name: row.querySelector('.og-name').textContent.trim() };
+  });
+  if (!_addToGroupOutlets.length) return;
+  document.getElementById('addToGroupTitle').textContent = 'Add outlets to group';
+  document.getElementById('addToGroupOutletName').textContent = _addToGroupOutlets.length === 1 ? _addToGroupOutlets[0].name : _addToGroupOutlets.length + ' selected outlets';
+  document.getElementById('addToGroupPrompt').textContent = 'Select a group for';
+  document.getElementById('addToGroupWarning').innerHTML = 'Adding these outlets to a group will <strong>replace all their existing data</strong> — market list, recipes, and supplier settings — with the group\'s data. This cannot be undone.';
+  document.querySelectorAll('input[name="targetGroup"]').forEach(function(r){ r.checked = false; });
+  document.getElementById('addToGroupOverlay').classList.add('open');
+}
 function openAddToGroupModal(outletName) {
-  _addToGroupOutlet = outletName;
+  _addToGroupOutlets = [{ row: null, name: outletName }];
+  document.getElementById('addToGroupTitle').textContent = 'Add outlet to group';
   document.getElementById('addToGroupOutletName').textContent = outletName;
+  document.getElementById('addToGroupPrompt').textContent = 'Select a group for';
+  document.getElementById('addToGroupWarning').innerHTML = 'Adding this outlet to a group will <strong>replace all its existing data</strong> — market list, recipes, and supplier settings — with the group\'s data. This cannot be undone.';
   document.querySelectorAll('input[name="targetGroup"]').forEach(function(r){ r.checked = false; });
   document.getElementById('addToGroupOverlay').classList.add('open');
 }
@@ -4789,8 +4911,24 @@ function closeAddToGroupModal() {
 function confirmAddToGroup() {
   var selected = document.querySelector('input[name="targetGroup"]:checked');
   if (!selected) return;
+  var targetRow = Array.from(document.querySelectorAll('#ogTable tr[data-group-name]')).find(function(row) { return row.dataset.groupName === selected.value.toLowerCase(); });
+  var targetList = targetRow && targetRow.nextElementSibling ? targetRow.nextElementSibling.querySelector('.outlet-list') : null;
+  _addToGroupOutlets.forEach(function(outlet) {
+    if (!outlet.row || !targetList) return;
+    targetList.insertAdjacentHTML('beforeend', '<div class="outlet-list-item" data-outlet-name="' + escapeOverviewText(outlet.name.toLowerCase()) + '"><span class="outlet-item-name">' + escapeOverviewText(outlet.name) + '</span><span class="pos-chip off">POS ✕</span></div>');
+    var outletIndex = UNGROUPED.indexOf(outlet.name);
+    if (outletIndex !== -1) UNGROUPED.splice(outletIndex, 1);
+    outlet.row.remove();
+  });
+  if (targetRow && targetList) {
+    var targetCount = targetList.querySelectorAll('.outlet-list-item').length;
+    targetRow.querySelector('.og-outlet-count').textContent = targetCount + ' outlets';
+  }
   closeAddToGroupModal();
-  showHqToast(_addToGroupOutlet + ' added to ' + selected.value);
+  refreshHqOutletSummary();
+  clearUngroupedSelection();
+  var count = _addToGroupOutlets.length;
+  showHqToast('Outlets added to group', count + ' outlet' + (count === 1 ? '' : 's') + ' added to ' + selected.value + '.');
 }
 
 // ── Remove from group modal ──
@@ -4805,8 +4943,38 @@ function closeRemoveModal() {
   document.getElementById('removeFromGroupOverlay').classList.remove('open');
 }
 function confirmRemoveFromGroup() {
+  var groupRow = Array.from(document.querySelectorAll('#ogTable tr[data-group-name]')).find(function(row) {
+    return row.dataset.groupName === String(_removeGroup).toLowerCase();
+  });
+  var outletList = groupRow && groupRow.nextElementSibling ? groupRow.nextElementSibling.querySelector('.outlet-list') : null;
+  var sourceItem = outletList ? Array.from(outletList.querySelectorAll('.outlet-list-item')).find(function(item) {
+    return item.dataset.outletName === String(_removeOutlet).toLowerCase();
+  }) : null;
+  var outletName = sourceItem ? sourceItem.querySelector('.outlet-item-name').textContent.trim() : _removeOutlet;
+  var posHtml = sourceItem && sourceItem.querySelector('.pos-chip') ? sourceItem.querySelector('.pos-chip').outerHTML : '<span class="pos-chip off">POS ✕</span>';
+  if (sourceItem) sourceItem.remove();
+  if (groupRow && outletList) {
+    var remaining = outletList.querySelectorAll('.outlet-list-item').length;
+    groupRow.querySelector('.og-outlet-count').textContent = remaining + ' outlet' + (remaining === 1 ? '' : 's');
+    var groupOutlets = (groupRow.dataset.groupOutlets || '').split('|').filter(Boolean);
+    groupRow.dataset.groupOutlets = groupOutlets.filter(function(name) { return name !== outletName.toLowerCase(); }).join('|');
+  }
+  if (outletName && UNGROUPED.indexOf(outletName) === -1) UNGROUPED.push(outletName);
+  var tbody = document.querySelector('#ogTable tbody');
+  if (tbody && outletName) {
+    var row = document.createElement('tr');
+    row.dataset.ungroupedName = outletName.toLowerCase();
+    row.innerHTML =
+      '<td><div class="og-name-cell"><input class="ungrouped-select" type="checkbox" aria-label="Select ' + escapeOverviewText(outletName) + '" onchange="updateUngroupedSelection()" /><div class="og-name-cell-inner"><span class="og-name">' + escapeOverviewText(outletName) + '</span><span class="og-outlet-count" style="display:flex;align-items:center;gap:5px">' + posHtml + '</span></div></div></td>' +
+      '<td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td><td style="color:var(--ink-mute)">Today</td>' +
+      '<td><div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="openAddToGroupModal(this.closest(\'tr\').dataset.ungroupedName)">Add to group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest(\'tr\').dataset.ungroupedName)">Remove from HQ</div></div></div></td>';
+    tbody.appendChild(row);
+  }
+  var labelCount = document.querySelector('#panel-outlet-groups .panel-label-count');
+  if (labelCount) labelCount.textContent = document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length;
   closeRemoveModal();
-  showHqToast(_removeOutlet + ' moved to ungrouped');
+  addPrototypeActivity('outlet-groups', '<strong>' + escapeOverviewText(outletName) + '</strong> removed from ' + escapeOverviewText(_removeGroup), 'outlet-groups', _removeGroup);
+  showHqToast('Outlet moved to ungrouped', outletName + ' remains linked to this HQ.');
 }
 
 // ── Remove from HQ modal ──
@@ -4830,7 +4998,7 @@ function confirmRemoveFromHQ() {
   <div style="background:#fff;border-radius:12px;width:400px;max-width:calc(100vw - 32px);box-shadow:0 24px 64px rgba(0,0,0,.22);overflow:hidden">
     <div style="padding:20px 24px 16px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink)">Groups with access</div>
+        <div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink)">Available to</div>
         <div style="font-size: 14px;color:var(--ink-mute);margin-top:2px" id="recGroupsCount"></div>
       </div>
       <button onclick="closeRecGroupsDialog()" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--rule);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-mute)">
@@ -4896,6 +5064,10 @@ function confirmRemoveFromHQ() {
         <h2 class="picker-title" id="groupOutletPickerTitle">Add outlets</h2>
         <button class="picker-close-btn" onclick="closeGroupOutletPicker()" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
+      <div class="modal-warning" id="groupOutletLinkNotice" style="display:none;margin-top:16px">
+        <span class="material-symbols-rounded" aria-hidden="true" style="color:#2563EB">info</span>
+        <span>Linked outlets will be managed by this HQ. Their outlet type will be updated to <strong>Managed by HQ</strong>.</span>
+      </div>
     </div>
     <div class="outlet-picker-shell">
       <div class="outlet-picker-results">
@@ -4950,7 +5122,7 @@ function confirmRemoveFromHQ() {
         <div class="picker-step-sep"></div>
         <div class="picker-step-item" id="aiSt2"><div class="picker-step-num">2</div>&nbsp;Set prices</div>
         <div class="picker-step-sep"></div>
-        <div class="picker-step-item" id="aiSt3"><div class="picker-step-num">3</div>&nbsp;Groups with access</div>
+        <div class="picker-step-item" id="aiSt3"><div class="picker-step-num">3</div>&nbsp;Available to</div>
       </div>
     </div>
     <!-- Step 1: Select items -->
@@ -4999,7 +5171,7 @@ function confirmRemoveFromHQ() {
         <button class="btn btn-primary" onclick="showAiStep3()">Next →</button>
       </div>
     </div>
-    <!-- Step 3: Groups with access -->
+    <!-- Step 3: Available to -->
     <div id="aiPanel3" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
       <div class="step3-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -5129,7 +5301,7 @@ function confirmRemoveFromHQ() {
     <div id="irPanel2" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
       <div class="config-list" id="irConfirmList"></div>
       <div class="config-groups">
-        <div class="config-groups-lbl">Groups with access</div>
+        <div class="config-groups-lbl">Available to</div>
         <div class="config-grp-row"><input type="checkbox" id="irGrp0" checked /><label for="irGrp0">Chargrill Outlets</label></div>
         <div class="config-grp-row"><input type="checkbox" id="irGrp1" checked /><label for="irGrp1">Family Dining Express</label></div>
       </div>
@@ -5146,7 +5318,7 @@ function confirmRemoveFromHQ() {
   <div class="confirm-card">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
       <div style="width:36px;height:36px;border-radius:8px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="material-symbols-rounded notice-symbol" aria-hidden="true" style="font-size:22px;line-height:22px">warning</span>
       </div>
       <div class="confirm-title" style="margin:0">Disable supplier?</div>
     </div>
@@ -5166,7 +5338,7 @@ function confirmRemoveFromHQ() {
       <button class="modal-close" onclick="closeAddToGroupModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="modal-body">
-      <p style="margin:0;font-size:14px;color:var(--ink-mute)">Select a group for <strong id="addToGroupOutletName" style="color:var(--ink)"></strong>:</p>
+      <p style="margin:0;font-size:14px;color:var(--ink-mute)"><span id="addToGroupPrompt">Select a group for</span> <strong id="addToGroupOutletName" style="color:var(--ink)"></strong>:</p>
       <div class="group-radio-list">
         <label class="group-radio-item">
           <input type="radio" name="targetGroup" value="Chargrill Outlets" />
@@ -5174,6 +5346,7 @@ function confirmRemoveFromHQ() {
             <div class="group-radio-name">Chargrill Outlets</div>
             <div class="group-radio-meta">4 outlets · 100 items · 48 recipes</div>
           </div>
+          <span class="group-select-tick" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.2 4.2L19 6.5"/></svg></span>
         </label>
         <label class="group-radio-item">
           <input type="radio" name="targetGroup" value="Family Dining Express" />
@@ -5181,11 +5354,12 @@ function confirmRemoveFromHQ() {
             <div class="group-radio-name">Family Dining Express</div>
             <div class="group-radio-meta">6 outlets · 92 items · 18 recipes</div>
           </div>
+          <span class="group-select-tick" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.2 4.2L19 6.5"/></svg></span>
         </label>
       </div>
       <div class="modal-warning">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span>Adding this outlet to a group will <strong>replace all its existing data</strong> — market list, recipes, and supplier settings — with the group's data. This cannot be undone.</span>
+        <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+        <span id="addToGroupWarning">Adding this outlet to a group will <strong>replace all its existing data</strong> — market list, recipes, and supplier settings — with the group's data. This cannot be undone.</span>
       </div>
     </div>
     <div class="modal-foot">
