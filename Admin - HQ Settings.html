@@ -1342,7 +1342,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <select class="ml-filter-select" id="mlStatusFilter" onchange="setMlStatusFilter(this.value)">
           <option value="">All statuses</option>
           <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+          <option value="disabled">Disabled</option>
+          <option value="removed">Removed</option>
         </select>
       </div>
       <div style="overflow:clip">
@@ -1647,7 +1648,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="modal-tab-bar">
       <div class="modal-tab active" data-panel="hqItemDetailsPanel" onclick="switchHqItemTab(this)">Details</div>
       <div class="modal-tab" data-panel="hqItemExcPanel" onclick="switchHqItemTab(this)">Exceptions <span class="modal-tab-badge" id="hqItemExcBadge" style="display:none">0</span></div>
-      <div class="modal-tab" data-panel="hqItemAccessPanel" onclick="switchHqItemTab(this)">Access <span class="modal-tab-badge" id="hqItemAccessBadge">0</span></div>
+      <div class="modal-tab" data-panel="hqItemAccessPanel" onclick="switchHqItemTab(this)">Availability <span class="modal-tab-badge" id="hqItemAccessBadge">0</span></div>
     </div>
     <div class="modal-body">
       <div class="hq-modal-panel" id="hqItemDetailsPanel">
@@ -1660,6 +1661,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </div>
       <div class="hq-modal-panel" id="hqItemExcPanel" style="display:none"></div>
       <div class="hq-modal-panel" id="hqItemAccessPanel" style="display:none">
+        <div style="font-size:12px;line-height:1.5;color:var(--ink-mute);margin-bottom:12px">Turn off a group or outlet to exclude this item there. Exclusion takes priority over the item’s active or disabled state.</div>
         <div id="hqItemGroupsList"></div>
       </div>
     </div>
@@ -2237,6 +2239,15 @@ function availabilityLabel(groups, outlets, totalGroups, totalOutlets) {
 
 // Access state for items: itemIdx -> {name: {enabled, uoms: [bool...], type: 'group'|'outlet'}}
 const itemAccessState = {};
+const HQ_ITEM_EXCLUSION_KEY = 'nomni-hq-item-exclusions-v1';
+function saveItemAccessState(itemIdx) {
+  const item = ITEMS[itemIdx];
+  if (!item) return;
+  let exclusions = {};
+  try { exclusions = JSON.parse(localStorage.getItem(HQ_ITEM_EXCLUSION_KEY) || '{}'); } catch (e) {}
+  exclusions[item.name] = Object.keys(itemAccessState[itemIdx]).filter(name => !itemAccessState[itemIdx][name].enabled);
+  localStorage.setItem(HQ_ITEM_EXCLUSION_KEY, JSON.stringify(exclusions));
+}
 ITEMS.forEach((item, i) => {
   item.groupList = (i % 5 === 0) ? [ML_GROUPS[0]] : (i % 5 === 3) ? [ML_GROUPS[1]] : ML_GROUPS.slice();
   item.outletList = (i % 7 === 2) ? ML_OUTLETS.slice() : (i % 7 === 5) ? [ML_OUTLETS[0]] : [];
@@ -2263,6 +2274,52 @@ let mlPage = 1;
 const ML_PER_PAGE = 20;
 let mlSearch = '', mlCatFilter = '', mlSupplierFilter = '', mlStatusFilter = '', mlSortKey = 'default';
 const mlExpandedUoms = new Set();
+
+// Master lifecycle is shared with group and ungrouped-outlet prototype views.
+// Removed items are deliberately retained here so they can be restored.
+const HQ_ITEM_STATE_KEY = 'nomni-hq-item-lifecycle-v1';
+function getHqItemState() {
+  try { return JSON.parse(localStorage.getItem(HQ_ITEM_STATE_KEY) || '{}'); } catch (e) { return {}; }
+}
+function itemLifecycle(item) {
+  const saved = getHqItemState()[item.name];
+  return saved || (item.active === false ? 'disabled' : 'active');
+}
+function saveItemLifecycle(item, lifecycle) {
+  const states = getHqItemState();
+  states[item.name] = lifecycle;
+  localStorage.setItem(HQ_ITEM_STATE_KEY, JSON.stringify(states));
+  item.active = lifecycle === 'active';
+}
+function setMasterItemLifecycle(rawIdx, lifecycle) {
+  const item = ITEMS[rawIdx];
+  if (!item) return;
+  if (lifecycle === 'removed') { openRemoveMasterItemModal(rawIdx); return; }
+  saveItemLifecycle(item, lifecycle);
+  mlPage = 1;
+  renderMl();
+  const messages = { disabled: 'Item disabled across included groups and outlets', active: 'Item restored to the master market list', removed: 'Item removed from the master market list' };
+  if (typeof showToast === 'function') showToast(messages[lifecycle]);
+}
+let pendingMasterItemRemoval = null;
+function openRemoveMasterItemModal(rawIdx) {
+  pendingMasterItemRemoval = rawIdx;
+  document.getElementById('removeMasterItemName').textContent = ITEMS[rawIdx].name;
+  document.getElementById('removeMasterItemOverlay').classList.add('open');
+}
+function closeRemoveMasterItemModal() {
+  pendingMasterItemRemoval = null;
+  document.getElementById('removeMasterItemOverlay').classList.remove('open');
+}
+function confirmRemoveMasterItem() {
+  if (pendingMasterItemRemoval === null) return;
+  const item = ITEMS[pendingMasterItemRemoval];
+  saveItemLifecycle(item, 'removed');
+  closeRemoveMasterItemModal();
+  mlPage = 1;
+  renderMl();
+  if (typeof showToast === 'function') showToast('Item removed from the master market list');
+}
 
 function toggleMlUoms(itemIdx, event) {
   event.stopPropagation();
@@ -2291,8 +2348,10 @@ function getMlItems() {
   let items = ITEMS.slice();
   if (mlCatFilter) items = items.filter(i => i.cat === mlCatFilter);
   if (mlSupplierFilter) items = items.filter(i => i.supplier === mlSupplierFilter);
-  if (mlStatusFilter === 'active') items = items.filter(i => i.active);
-  else if (mlStatusFilter === 'inactive') items = items.filter(i => !i.active);
+  if (mlStatusFilter === 'active') items = items.filter(i => itemLifecycle(i) === 'active');
+  else if (mlStatusFilter === 'disabled') items = items.filter(i => itemLifecycle(i) === 'disabled');
+  else if (mlStatusFilter === 'removed') items = items.filter(i => itemLifecycle(i) === 'removed');
+  else items = items.filter(i => itemLifecycle(i) !== 'removed');
   if (mlSearch) {
     const q = mlSearch.toLowerCase();
     items = items.filter(i => i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q));
@@ -2739,6 +2798,7 @@ function toggleGroupAccess(itemIdx, name, btn) {
   const state = itemAccessState[itemIdx];
   if (!state || !state[name]) return;
   state[name].enabled = !state[name].enabled;
+  saveItemAccessState(itemIdx);
   renderAccessPanel(itemIdx);
   renderMl();
 }
@@ -2747,6 +2807,7 @@ function toggleUomAccess(itemIdx, name, uomIdx, enabled) {
   const state = itemAccessState[itemIdx];
   if (!state || !state[name]) return;
   state[name].uoms[uomIdx] = enabled;
+  saveItemAccessState(itemIdx);
   renderAccessPanel(itemIdx);
   renderMl();
 }
@@ -2785,26 +2846,31 @@ function renderMl() {
       return { html:grpHtml, label:grpLabel, key:groupsEnabled.join('|') + '::' + outletsEnabled.join('|') };
     }
 
+    const lifecycle = itemLifecycle(item);
+    const stateBadge = lifecycle === 'active' ? '' : '<span class="item-exc-badge" style="margin-left:7px;color:' + (lifecycle === 'removed' ? 'var(--chip-rejected-ink)' : 'var(--ink-mute)') + '">' + (lifecycle === 'removed' ? 'Removed' : 'Disabled') + '</span>';
     const actionsTd = '<td><div class="row-actions-wrap">' +
       '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
       '<div class="row-actions-menu">' +
         '<div class="row-action-item" onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ')">Edit pricing</div>' +
-        '<div class="row-action-item danger">' + (item.active ? 'Deactivate' : 'Activate') + '</div>' +
+        (lifecycle === 'removed'
+          ? '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'active\')">Restore to master list</div>'
+          : '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'' + (lifecycle === 'disabled' ? 'active' : 'disabled') + '\')">' + (lifecycle === 'disabled' ? 'Enable item' : 'Disable item') + '</div>' +
+            '<div class="row-action-item danger" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'removed\')">Remove from HQ</div>') +
       '</div></div></td>';
 
     if (!isMultiUom) {
       const onlyUom = enabledUoms[0] || { uom: uoms[0], ui: 0 };
       const uom = onlyUom.uom.replace(/^per /i, '');
-      return '<tr class="ml-parent-row' + rowEvenClass + (item.active ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-        '<td><div class="ml-item-name">' + item.name + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
+      return '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
+        '<td><div class="ml-item-name">' + item.name + stateBadge + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
         '<td class="uom-text">' + uom + '</td>' +
         '<td><div class="ml-price-main">$' + item.price.toFixed(2) + '/' + uom + '</div><div class="ml-price-meta">MOQ: ' + item.moq + '</div></td>' +
         '<td>' + getAccessInfo(onlyUom.ui).html + '</td>' + actionsTd +
       '</tr>';
     }
 
-    const parent = '<tr class="ml-parent-row' + rowEvenClass + (item.active ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-      '<td><div class="ml-item-name">' + item.name + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
+    const parent = '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
+      '<td><div class="ml-item-name">' + item.name + stateBadge + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
       '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
       '<td></td>' +
       '<td></td>' + actionsTd +
@@ -2812,7 +2878,7 @@ function renderMl() {
 
     const children = isExpanded ? enabledUoms.map(({ uom, ui }) => {
       const unit = uom.replace(/^per /i, '');
-      return '<tr class="ml-uom-row' + (item.active ? '' : ' ml-inactive') + '">' +
+      return '<tr class="ml-uom-row' + (lifecycle === 'active' ? '' : ' ml-inactive') + '">' +
         '<td class="ml-uom-indent">' + item.name + '</td>' +
         '<td class="uom-text">' + unit + '</td>' +
         '<td><div class="ml-price-main">$' + item.price.toFixed(2) + '/' + unit + '</div><div class="ml-price-meta">MOQ: ' + item.moq.replace(/\s+.*$/, ' ' + unit) + '</div></td>' +
@@ -3115,7 +3181,7 @@ function addPrototypeActivity(module, text, tab, scope) {
 
 function resetHqPrototypeData() {
   if (!window.confirm('Clear all locally saved data for this HQ prototype?')) return;
-  ['nomniNewHQ','nomniNewHQToastPending','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState','nomniHqManagedOutlets'].forEach(function(key) { localStorage.removeItem(key); });
+  ['nomniNewHQ','nomniNewHQToastPending','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState','nomniHqManagedOutlets','nomni-hq-item-lifecycle-v1','nomni-hq-item-exclusions-v1'].forEach(function(key) { localStorage.removeItem(key); });
   window.location.href = 'Admin - Buyers.html#outlet-groups';
 }
 
@@ -5858,6 +5924,18 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
     <div class="danger-confirm-actions">
       <button class="btn-cancel-plain" onclick="closeRemoveFromHQModal()">Cancel</button>
       <button class="btn-danger-confirm" onclick="confirmRemoveFromHQ()">Remove from HQ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Remove master item confirm ── -->
+<div class="confirm-overlay" id="removeMasterItemOverlay" onclick="if(event.target===this)closeRemoveMasterItemModal()">
+  <div class="danger-confirm-card">
+    <div class="danger-confirm-title">Remove from HQ?</div>
+    <div class="danger-confirm-body"><strong id="removeMasterItemName"></strong> will no longer be available to any outlet group or ungrouped outlet in this HQ. Existing Inventory and Recipe records will be kept, but the item cannot be newly added or ordered. You can restore it later from the <strong>Removed</strong> filter.</div>
+    <div class="danger-confirm-actions">
+      <button class="btn-cancel-plain" onclick="closeRemoveMasterItemModal()">Cancel</button>
+      <button class="btn-danger-confirm" onclick="confirmRemoveMasterItem()">Remove from HQ</button>
     </div>
   </div>
 </div>

@@ -8,6 +8,13 @@ This guide describes the current user-facing HQ prototype: what each area contai
 
 The HQ page is the operating view for a buyer's head office. It has a header with the HQ name, last-updated date, **Users** and **Edit details** actions, a summary strip, and six tabs: Overview, Suppliers, Items, Inventory, Recipes and Activity.
 
+### Last updated timestamps
+
+- **HQ:** the timestamp reflects the most recent material change to HQ-owned configuration, including HQ details, the master market list, HQ suppliers, inventory or recipes, HQ availability rules, managed-outlet membership, POS integration settings or user/access settings.
+- **Outlet group:** the timestamp reflects the most recent material change whose scope is that group, including group settings, items, inventory/UOMs, recipes, suppliers, POS mapping or outlet membership. A group-scoped change initiated from an HQ screen still updates the group timestamp.
+- **Outlet:** the timestamp reflects the most recent material change to that outlet’s own settings, items, inventory/UOMs, recipes, suppliers or POS integration/mapping.
+- Searches, tab views, filters, opening dialogs and other read-only actions do not update timestamps. When one action changes multiple scopes, update each affected resource and record the initiator in Activity.
+
 ### Header and summary
 
 - **Users** opens the HQ user list, where existing Procure users can be added, user access can be removed, and non-owner users can be activated or deactivated.
@@ -63,6 +70,9 @@ Items is the HQ master market-list view.
 - Multi-UOM items use an expandable parent row. The parent shows the number of UOM options; child rows show the UOM, price and availability.
 - **Available to** explains where an item can be used. It can identify all outlet groups, individual groups and individual outlets; the detail dialog separates group and outlet access.
 - Item settings include Details, Exceptions and Access.
+- **Master lifecycle:** an HQ item can be **Active**, **Disabled** or **Removed**. Disabled items remain visible but cannot be ordered by included outlet groups or ungrouped outlets. Removed items disappear from available market lists throughout the HQ, while existing Inventory and Recipe references remain as historical records and can no longer be newly selected.
+- Removed items remain available in the HQ’s **Removed** status view, where they can be restored to the master market list.
+- **Scope exclusion:** HQ can exclude an otherwise active or disabled item from a specific outlet group or ungrouped outlet. Exclusion means it is not available there at all. The effective-state priority is **Removed → Excluded → Disabled → Active**.
 
 ## Price changes
 
@@ -215,12 +225,21 @@ Creates an outlet group below an HQ.
 This is the detailed management page for one outlet group.
 
 - Header identifies the parent HQ, has a **Settings** action and **Add outlets** action, and links back to the HQ.
-- Tabs cover the group’s Overview, Outlets, Recipes and Suppliers.
+- Tabs cover the group’s Overview, Outlets, Inventory, Recipes, Suppliers and Activity.
 - **Overview** shows group-level summary information and key sections such as items and assigned outlets.
 - **Outlets** lists members, supports adding multiple outlets, and supports removing an outlet from the group.
 - The add-outlets picker searches the wider directory, but also includes ungrouped outlets already managed by Garden Cuisine HQ. These are clearly labelled as already linked to the HQ.
 - **Settings** edits group name and internal description and exposes the destructive **Delete group** action.
-- The group’s Items area includes item search, item management and group-level item controls; Recipe and Supplier areas surface the data available to this group.
+- The group’s Items area includes item search, item management and group-level item controls. Multi-UOM items use the same expandable pattern as the HQ: the parent shows the number of options, while child rows show the UOM, price and MOQ.
+- **Inventory** shows the stock-tracked items and UOM/cost setup that applies to the group.
+- Recipe and Supplier areas surface the data available to this group. Each outlet group—and each ungrouped outlet—uses one assigned recipe variation, so the group recipe view does not expose recipe version or variation choices.
+
+### Group Activity boundary
+
+- The group Activity tab records changes whose scope is this group: outlets added/removed, group item or inventory changes, supplier enable/disable actions, recipe changes, POS mapping changes and group settings updates.
+- HQ Activity remains the audit trail for HQ-wide changes, such as changing the HQ market list, HQ suppliers, HQ-level availability, linking outlets to the HQ or changing HQ settings. The same event should not be duplicated in both views unless the HQ action also created a group-level result.
+- Activity placement follows the **scope of the resulting change**, not the screen or button used to start it. For example, an HQ user disabling a supplier specifically for one group creates a group Activity entry, even if initiated from an HQ control; the entry should retain the origin (for example, “Initiated from HQ”). A change applied across the whole HQ belongs in HQ Activity.
+- If one HQ action has both scopes, record the group-level result in each affected group’s Activity and retain the broader administrative action in HQ Activity. Copying setup follows the same rule: record the copied changes in the destination group, including the source group and initiator.
 
 ### Outlet group settings — `Admin - Outlet Group Settings.html`
 
@@ -260,18 +279,19 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 
 - **Implemented prototype:** clicking an ungrouped outlet in the HQ Overview opens an individual outlet-management view. It is clearly marked as independently managed and exposes Overview, Items, Inventory, Recipes, Suppliers, POS mapping and Activity sections.
 - An ungrouped outlet needs its own Items, Inventory, Recipes, Suppliers and POS connection/mapping configuration until it is added to a group.
+- The view makes scope explicit: item rows can show whether a value comes from the HQ setup or an outlet override; inventory and supplier settings are outlet-specific; POS mapping uses the outlet's own API key; and Activity records outlet-level changes.
 - Grouped outlets should continue to inherit their group configuration rather than exposing competing individual customisation. Selecting one from the HQ Overview should take the user to its group context.
 
 ### Outlet-group activity
 
-- Add an **Activity** tab to the outlet-group page.
+- **Implemented prototype:** the outlet-group page includes an **Activity** tab.
 - Record configuration changes relevant to the group, including items, recipes, suppliers, inventory records and features being enabled, disabled, added or removed.
 - Each entry should identify what changed, who made the change and when it occurred.
 
 ### Split an outlet into a new group without losing its setup
 
 - **Implemented prototype:** each outlet’s action menu on the outlet-group **Outlets** tab and inside the HQ Overview group accordions includes **Split into new group**. It creates a new group for that outlet and defaults to copying the current group’s setup.
-- The default safe path should create a new outlet group using a copy of the current group’s configuration, then move the outlet into it. This preserves its market list, inventory setup and UOMs, recipes and variations, supplier settings, availability rules and relevant POS mapping baseline.
+- The default safe path should create a new outlet group using a copy of the current group’s configuration, then move the outlet into it. This preserves its items, inventory setup and UOMs, recipes, supplier settings and relevant POS mapping.
 - The confirmation step should make the alternative explicit: **Use the current group’s setup** (recommended) or **Start with HQ settings**. The latter should warn that it may substantially change what the outlet can order, count or use.
 - After the move, the new group becomes independent: future changes to either group do not affect the other. This prevents a removed outlet silently reverting to the generic HQ configuration.
 - **Implemented prototype:** group settings include **Copy setup**, which remains available after a group is created or split. The user selects a source group and the sections to overwrite; historical data, users and API keys are excluded.

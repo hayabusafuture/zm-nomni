@@ -99,6 +99,10 @@
   .tab:first-child { padding-left:2px; }
   .tab.active { color:var(--ink); }
   .tab.active::after { left:0; right:0; bottom:-1px; height:2px; border-radius:2px; background:var(--nomni-green); }
+  .activity-row { display:flex; align-items:flex-start; gap:12px; padding:15px 18px; border-bottom:1px solid var(--rule); }
+  .activity-row:last-child { border-bottom:0; }
+  .activity-dot { width:8px; height:8px; margin-top:6px; border-radius:50%; background:var(--nomni-green); flex:0 0 auto; }
+  .activity-meta { margin-top:4px; color:var(--ink-mute); font-size:12px; }
 
   /* ── Two-column layout ── */
   .detail-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
@@ -345,6 +349,15 @@
   /* Zebra rows */
   .items-table tbody tr:nth-child(even) td { background: #f9fafb; }
   .items-table tbody tr:hover td { background: var(--row-hover) !important; }
+  .items-table .item-parent-row td { background:#fff !important; }
+  .items-table .item-parent-row.item-row-even td { background:#f9fafb !important; }
+  .items-table .item-uom-row td { background:#f7f8fa !important; }
+  .items-table .item-uom-row:hover td { background:#f2f4f5 !important; }
+  .item-uom-name { padding-left:36px !important; color:var(--ink-mute) !important; }
+  .item-options-link { display:inline-flex; align-items:center; gap:7px; padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .item-options-link:hover { color:var(--nomni-green); }
+  .item-options-chevron { width:8px; height:8px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg) translateY(-2px); transition:transform .15s ease; }
+  .item-options-chevron.open { transform:rotate(225deg) translate(-1px,-1px); }
 
   /* Item name with supplier sub-line */
   .item-name-cell { max-width: 0; width: 100%; }
@@ -626,8 +639,10 @@
     <div class="tabs">
       <div class="tab active" data-tab="overview">Overview</div>
       <div class="tab" data-tab="outlets">Outlets</div>
+      <div class="tab" data-tab="inventory">Inventory</div>
       <div class="tab" data-tab="recipes">Recipes</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
+      <div class="tab" data-tab="activity">Activity</div>
     </div>
 
     <!-- Overview tab -->
@@ -666,6 +681,7 @@
             <thead>
               <tr>
                 <th id="sortTh-name" class="sort-th" onclick="setItemSort('name')">Item name <span class="sort-ind"></span></th>
+                <th style="width:120px">UOM</th>
                 <th id="sortTh-price" class="sort-th" style="width:140px" onclick="setItemSort('price')">Unit price <span class="sort-ind"></span></th>
                 <th style="width:88px">MOQ</th>
                 <th style="width:48px"></th>
@@ -743,6 +759,28 @@
       </table>
     </div>
 
+    <!-- Inventory tab -->
+    <div class="tab-panel" id="panel-inventory">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span>
+        <button class="section-action" onclick="showToast('Inventory settings are managed for this group')">Manage inventory</button>
+      </div>
+      <div class="ml-filter-row">
+        <div class="ml-search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="ml-search-input" placeholder="Search inventory…" oninput="showToast('Inventory search is available in the full inventory workspace')" />
+        </div>
+      </div>
+      <table class="ml-table">
+        <thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Anchor Unsalted Butter 25kg Bulk Block</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Fonterra Brands</div></td><td>kg</td><td>S$11.80</td></tr>
+          <tr><td><strong>Chaokoh UHT Coconut Milk 400ml x 24 Ctn</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Chaokoh F&amp;B</div></td><td>tin</td><td>S$1.80</td></tr>
+          <tr><td><strong>Char Siu Marinade</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Sub-recipe · Batch 1 L</div></td><td>L</td><td>S$3.60</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Suppliers tab -->
     <div class="tab-panel" id="panel-suppliers">
       <div class="panel-label-row">
@@ -785,6 +823,19 @@
           <tbody id="ogRecBody"></tbody>
         </table>
         <div id="ogRecPager" class="ml-pager-wrap"></div>
+      </div>
+    </div>
+
+    <!-- Activity tab -->
+    <div class="tab-panel" id="panel-activity">
+      <div class="panel-label-row">
+        <span class="panel-label-text">Activity</span>
+      </div>
+      <div class="section-card" style="padding:0;overflow:hidden">
+        <div class="activity-row"><div class="activity-dot"></div><div><strong>Group settings updated</strong><div class="activity-meta">Items and supplier settings changed · 10 Jun 2026 · William Arya</div></div></div>
+        <div class="activity-row"><div class="activity-dot"></div><div><strong>Outlet added to group</strong><div class="activity-meta">(WF 301) Chargrill @ 301 Punggol · 08 Jun 2026 · William Arya</div></div></div>
+        <div class="activity-row"><div class="activity-dot"></div><div><strong>Inventory item enabled</strong><div class="activity-meta">Char Siu Marinade · 05 Jun 2026 · James Tan</div></div></div>
+        <div class="activity-row"><div class="activity-dot"></div><div><strong>Supplier disabled for group</strong><div class="activity-meta">Kikkoman · 02 Jun 2026 · William Arya</div></div></div>
       </div>
     </div>
 
@@ -902,17 +953,17 @@
     </div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:18px">
       <div>
-        <label style="display:block;font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">Copy setup into <span id="copySetupTargetName"></span></label>
+        <label style="display:block;font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">Copy from</label>
         <select id="copySetupSource" style="width:100%;height:38px;padding:0 12px;border:1px solid #dcdee3;border-radius:6px;background:#fff;font:inherit;font-size:14px;color:var(--ink)"></select>
       </div>
       <div>
         <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px">Copy these sections</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px" id="copySetupSections">
-          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Items" checked /> Items &amp; availability</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Inventory" checked /> Inventory &amp; UOMs</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Recipes" checked /> Recipes &amp; variations</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Suppliers" checked /> Suppliers &amp; settings</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="POS mapping" checked /> POS mapping baseline</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Items" checked /> Items</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Inventory" checked /> Inventory</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Recipes" checked /> Recipes</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Suppliers" checked /> Suppliers</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="POS mapping" checked /> POS mapping</label>
         </div>
       </div>
       <div style="display:flex;gap:9px;padding:12px;border-radius:6px;background:#FFF3CD;border:1px solid #F3D36B;color:#7A5F00;font-size:12px;line-height:1.45">
@@ -1023,7 +1074,7 @@
         <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px">Starting setup</div>
         <label style="display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--nomni-green);border-radius:6px;background:#F4FFF6;cursor:pointer">
           <input type="radio" name="splitSetup" value="copy" checked style="margin-top:2px;accent-color:var(--spinach)" />
-          <span><strong style="font-size:14px">Copy the current group’s setup</strong><span style="display:block;margin-top:3px;font-size:12px;line-height:1.4;color:var(--ink-mute)">Recommended. Copies configuration, availability and POS mapping baseline; the new group can then change independently.</span></span>
+          <span><strong style="font-size:14px">Copy the current group’s setup</strong><span style="display:block;margin-top:3px;font-size:12px;line-height:1.4;color:var(--ink-mute)">Recommended. Copies items, inventory, recipes, suppliers and POS mapping; the new group can then change independently.</span></span>
         </label>
         <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;padding:12px;border:1px solid var(--rule);border-radius:6px;cursor:pointer">
           <input type="radio" name="splitSetup" value="hq" style="margin-top:2px;accent-color:var(--spinach)" />
@@ -1168,8 +1219,8 @@ let   pendingRemoveId = null;
   document.getElementById('groupPageTitle').textContent = outletName;
   document.getElementById('backLink').href = 'Admin - HQ Settings.html';
   document.getElementById('backLinkLabel').textContent = 'Garden Cuisine HQ';
-  document.querySelector('.page-hq').innerHTML = '<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--ink-mute);border-radius:4px;padding:1px 6px;color:var(--ink-mute);line-height:1.4">HQ</span><a href="Admin - HQ Settings.html">Garden Cuisine HQ</a><span style="color:var(--rule);margin:0 2px">·</span><span>Individually managed</span>';
-  document.querySelector('.head-actions .btn-secondary').innerHTML = 'Outlet settings';
+  document.querySelector('.page-hq').innerHTML = '<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--ink-mute);border-radius:4px;padding:1px 6px;color:var(--ink-mute);line-height:1.4">HQ</span><a href="Admin - HQ Settings.html">Garden Cuisine HQ</a>';
+  document.querySelector('.head-actions .btn-secondary').innerHTML = 'Settings';
   document.querySelector('.head-actions .btn-primary').style.display = 'none';
   document.getElementById('detailSettingsTitle').textContent = 'Outlet settings';
   document.getElementById('detailSettingsName').value = outletName;
@@ -1181,27 +1232,30 @@ let   pendingRemoveId = null;
   });
 
   var tabs = document.querySelector('.tabs');
-  tabs.querySelector('[data-tab="outlets"]').textContent = 'Items';
-  tabs.querySelector('[data-tab="recipes"]').insertAdjacentHTML('beforebegin', '<div class="tab" data-tab="inventory">Inventory</div>');
-  tabs.querySelector('[data-tab="suppliers"]').insertAdjacentHTML('afterend', '<div class="tab" data-tab="pos">POS mapping</div><div class="tab" data-tab="activity">Activity</div>');
+  tabs.querySelector('[data-tab="outlets"]').remove();
+  tabs.querySelector('[data-tab="suppliers"]').insertAdjacentHTML('afterend', '<div class="tab" data-tab="pos">POS mapping</div>');
 
   document.getElementById('panel-overview').innerHTML =
-    '<div style="padding:16px 18px;border:1px solid #B9F0C5;border-radius:8px;background:var(--mint);color:var(--seaweed);display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">✓</span><div><strong>Individually managed outlet</strong><div style="margin-top:3px;font-size:13px;line-height:1.45">This outlet uses its own configuration. It inherits the HQ setup by default; changes made here apply only to this outlet.</div></div></div>' +
-    '<div class="overview-grid" style="margin-top:24px"><div><div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="section-action" onclick="switchToTab(\'outlets\')">Manage</button></div><div class="section-card"><div style="font-weight:600">74 items available</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Based on Garden Cuisine HQ, with outlet-level changes available.</div></div><div class="panel-label-row" style="margin-top:22px"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="section-action" onclick="switchToTab(\'inventory\')">Manage</button></div><div class="section-card"><div style="font-weight:600">28 inventory records</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">UOMs and stock-tracking settings are managed for this outlet.</div></div></div><div class="overview-right"><div><div class="panel-label-row"><span class="panel-label-text">Recipes <span class="panel-label-count">5</span></span><button class="section-action" onclick="switchToTab(\'recipes\')">View all</button></div><div class="section-card"><div style="font-weight:600">5 recipes available</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Recipe availability is specific to this outlet.</div></div></div><div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span><button class="section-action" onclick="switchToTab(\'pos\')">View</button></div><div class="section-card"><div style="font-weight:600">Not connected</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Connect this outlet’s Nomni POS API key to review its mapping.</div></div></div></div></div>';
+    '<div style="padding:16px 18px;border:1px solid #B9F0C5;border-radius:8px;background:var(--mint);color:var(--seaweed);display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">✓</span><div><strong>Ungrouped outlet</strong><div style="margin-top:3px;font-size:13px;line-height:1.45">This outlet is managed independently from outlet groups. It follows the HQ setup by default; changes made here apply only to this outlet.</div></div></div>' +
+    '<div class="overview-grid" style="margin-top:24px;grid-template-columns:1fr 1fr;gap:32px"><div><div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="section-action" onclick="switchToTab(\'outlets\')">Manage</button></div><div class="section-card" style="padding:16px 18px;min-height:66px"><div style="font-weight:600">74 items available</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Based on Garden Cuisine HQ, with outlet-level changes available.</div></div><div class="panel-label-row" style="margin-top:22px"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="section-action" onclick="switchToTab(\'inventory\')">Manage</button></div><div class="section-card" style="padding:16px 18px;min-height:66px"><div style="font-weight:600">28 inventory records</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">UOMs and stock-tracking settings are managed for this outlet.</div></div></div><div class="overview-right" style="gap:22px"><div><div class="panel-label-row"><span class="panel-label-text">Recipes <span class="panel-label-count">5</span></span><button class="section-action" onclick="switchToTab(\'recipes\')">View all</button></div><div class="section-card" style="padding:16px 18px;min-height:66px"><div style="font-weight:600">5 recipes available</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Recipe availability is specific to this outlet.</div></div></div><div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span><button class="section-action" onclick="switchToTab(\'pos\')">View</button></div><div class="section-card" style="padding:16px 18px;min-height:66px"><div style="font-weight:600">Not connected</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Connect this outlet’s Nomni POS API key to review its mapping.</div></div></div></div></div>';
 
-  document.getElementById('panel-outlets').innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="btn-primary" onclick="showToast(\'Item management is ready for this outlet\')">Manage items</button></div><div class="ml-filter-row"><div class="search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg><input placeholder="Search items…" /></div></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Available to</th></tr></thead><tbody><tr><td><strong>Chilled Boneless Duck Breast</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td><span style="color:var(--spinach);font-weight:600">This outlet</span></td></tr><tr><td><strong>Char Siu Marinade</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Sub-recipe · Batch 11 L</div></td><td>L</td><td><span style="color:var(--spinach);font-weight:600">This outlet</span></td></tr></tbody></table>';
-  var inventory = document.createElement('div');
-  inventory.className = 'tab-panel'; inventory.id = 'panel-inventory';
-  inventory.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="btn-primary" onclick="showToast(\'Inventory settings are ready for this outlet\')">Manage inventory</button></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th></tr></thead><tbody><tr><td><strong>Anchor Unsalted Butter 25kg Bulk Block</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Fonterra Brands</div></td><td>kg</td><td>S$11.80</td></tr><tr><td><strong>Chaokoh UHT Coconut Milk 400ml x 24 Ctn</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Chaokoh F&amp;B</div></td><td>tin</td><td>S$1.80</td></tr></tbody></table>';
-  document.getElementById('panel-outlets').after(inventory);
+  document.getElementById('panel-overview').innerHTML = '<div class="overview-grid"><div><div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="section-action" onclick="openManageModal()">Manage</button></div><div class="items-filter-row"><div class="item-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="item-search-input" placeholder="Search items or suppliers…" /></div><select class="items-cat-select"><option>All categories</option></select></div><table class="items-table"><thead><tr><th>Item name</th><th style="width:120px">UOM</th><th style="width:140px">Unit price</th><th style="width:88px">MOQ</th><th style="width:48px"></th></tr></thead><tbody id="individualOverviewItemsBody"></tbody></table></div><div class="overview-right"><div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span><button class="section-action" onclick="switchToTab(\'pos\')">View</button></div><div class="section-card" style="padding:16px 18px"><div style="font-weight:600">Not connected</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px;line-height:1.45">Connect this outlet’s Nomni POS API key to review its mapping.</div></div></div></div></div>';
+  setTimeout(function() { var overviewItems = document.getElementById('individualOverviewItemsBody'); if (overviewItems) overviewItems.innerHTML = ITEMS.slice(0, 8).map(function(item) { var uom = Array.isArray(item.uom) ? item.uom[0] : item.uom; return '<tr><td><div class="ml-item-name">' + item.name + '</div><span class="item-supplier-text">' + item.supplier + '</span></td><td>' + String(uom || '').replace(/^per\s+/, '') + '</td><td>S$' + Number(item.price || 0).toFixed(2) + '</td><td>' + (item.moq || '—') + '</td><td>•••</td></tr>'; }).join(''); }, 0);
+  document.getElementById('panel-outlets').innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="btn-primary" onclick="showToast(\'Item management is ready for this outlet\')">Manage items</button></div><div style="margin:-4px 0 16px;color:var(--ink-mute);font-size:13px">Items available to this outlet, including any outlet-level overrides.</div><div class="ml-filter-row"><div class="search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg><input placeholder="Search items or suppliers…" /></div></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit price</th><th>Source</th></tr></thead><tbody><tr><td><strong>Chilled Boneless Duck Breast</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td>S$18.00</td><td><span style="color:var(--spinach);font-weight:600">HQ setup</span></td></tr><tr><td><strong>Chilled Chicken Breast Fillet</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td>S$8.20</td><td><span style="color:var(--spinach);font-weight:600">Outlet override</span></td></tr><tr><td><strong>Char Siu Marinade</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Sub-recipe · Batch 11 L</div></td><td>L</td><td>—</td><td><span style="color:var(--spinach);font-weight:600">HQ setup</span></td></tr></tbody></table>';
+  var inventory = document.getElementById('panel-inventory');
+  inventory.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="btn-primary" onclick="showToast(\'Inventory settings are ready for this outlet\')">Manage inventory</button></div><div style="margin:-4px 0 16px;color:var(--ink-mute);font-size:13px">Stock tracking and UOMs for this outlet are maintained independently.</div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th></tr></thead><tbody><tr><td><strong>Anchor Unsalted Butter 25kg Bulk Block</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Fonterra Brands</div></td><td>kg</td><td>S$11.80</td></tr><tr><td><strong>Chaokoh UHT Coconut Milk 400ml x 24 Ctn</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Chaokoh F&amp;B</div></td><td>tin</td><td>S$1.80</td></tr><tr><td><strong>Char Siu Marinade</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Sub-recipe · Batch 1 L</div></td><td>L</td><td>S$3.60</td></tr></tbody></table>';
   var pos = document.createElement('div');
   pos.className = 'tab-panel'; pos.id = 'panel-pos';
-  pos.innerHTML = '<div style="max-width:620px;margin:56px auto;text-align:center"><div style="width:44px;height:44px;margin:0 auto 16px;border-radius:10px;background:var(--mint);display:grid;place-items:center;color:var(--spinach);font-size:21px">▦</div><h2 style="margin:0;font-size:21px;letter-spacing:-.02em">Connect Nomni POS for this outlet</h2><p style="margin:10px 0 20px;color:var(--ink-mute);line-height:1.5">Enter this outlet’s API key to review how its POS products map to its individual inventory and recipes.</p><button class="btn btn-primary" onclick="showToast(\'POS settings opened\')">Set up Nomni POS</button></div>';
+  pos.innerHTML = '<div style="max-width:620px;margin:56px auto;text-align:center"><div style="width:44px;height:44px;margin:0 auto 16px;border-radius:10px;background:var(--mint);display:grid;place-items:center;color:var(--spinach);font-size:21px">▦</div><h2 style="margin:0;font-size:21px;letter-spacing:-.02em">Connect Nomni POS for this outlet</h2><p style="margin:10px 0 20px;color:var(--ink-mute);line-height:1.5">Add this outlet’s API key to review its POS products and variants, then map them to this outlet’s inventory or recipes.</p><button class="btn btn-primary" onclick="showToast(\'POS settings opened\')">Set up Nomni POS</button></div>';
   inventory.after(pos);
-  var activity = document.createElement('div');
-  activity.className = 'tab-panel'; activity.id = 'panel-activity';
-  activity.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Activity</span></div><div class="section-card"><div style="font-weight:600">Outlet is individually managed</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Today · Nomni Admin</div></div>';
-  pos.after(activity);
+  var activity = document.getElementById('panel-activity');
+  activity.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Activity</span></div><div class="section-card" style="padding:0;overflow:hidden"><div class="activity-row"><div class="activity-dot"></div><div><strong>Outlet settings updated</strong><div class="activity-meta">Outlet-level configuration saved · Today · William Arya</div></div></div><div class="activity-row"><div class="activity-dot"></div><div><strong>Item override added</strong><div class="activity-meta">Chilled Chicken Breast Fillet · Yesterday · William Arya</div></div></div><div class="activity-row"><div class="activity-dot"></div><div><strong>Outlet removed from outlet group</strong><div class="activity-meta">Now managed independently · 20 Aug 2026 · William Arya</div></div></div></div>';
+  document.getElementById('panel-suppliers').innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Suppliers <span class="panel-label-count">13</span></span><button class="btn-primary" onclick="showToast(\'Supplier settings are ready for this outlet\')">Manage suppliers</button></div><div style="margin:-4px 0 16px;color:var(--ink-mute);font-size:13px">Supplier contacts and ordering settings apply only to this ungrouped outlet.</div><table class="ml-table"><thead><tr><th>Supplier</th><th>Items</th><th>Status</th></tr></thead><tbody><tr><td><strong>Kee Song Group</strong></td><td>7 items</td><td><span style="color:var(--spinach);font-weight:600">Active</span></td></tr><tr><td><strong>Sustenir Agriculture</strong></td><td>8 items</td><td><span style="color:var(--spinach);font-weight:600">Active</span></td></tr><tr><td><strong>Fonterra Brands</strong></td><td>4 items</td><td><span style="color:var(--spinach);font-weight:600">Active</span></td></tr></tbody></table>';
+  document.getElementById('panel-recipes').insertAdjacentHTML('afterbegin', '<div style="margin-bottom:18px;padding:14px 16px;border:1px solid var(--rule);border-radius:8px;background:#F9FAFB;color:var(--ink-mute);font-size:13px;line-height:1.45">Recipes for this ungrouped outlet are managed independently. Each recipe uses one assigned variation.</div>');
+  var outletHelper = 'div[style*="margin:-4px 0 16px"]';
+  var inventoryHelper = inventory.querySelector(outletHelper); if (inventoryHelper) inventoryHelper.remove();
+  var supplierHelper = document.getElementById('panel-suppliers').querySelector(outletHelper); if (supplierHelper) supplierHelper.remove();
+  var recipeHelper = document.getElementById('panel-recipes').querySelector('div[style*="margin-bottom:18px"]'); if (recipeHelper) recipeHelper.remove();
 })();
 
 function initials(name) {
@@ -1387,6 +1441,23 @@ const ITEMS = [
   { name: "Taylor Precision Digital Instant-Read Probe Meat Thermometer NSF Certified",cat: "Supplies",   supplier: "Grill Master SG",  price: 35.00, uom: "per pc",                          moq: "1 pc"        },
 ];
 
+// Inherit the HQ master lifecycle. A removed master item is absent here; a
+// disabled master item remains visible but cannot be enabled at this scope.
+const HQ_ITEM_STATE_KEY = 'nomni-hq-item-lifecycle-v1';
+const HQ_ITEM_EXCLUSION_KEY = 'nomni-hq-item-exclusions-v1';
+function inheritedHqItemLifecycle(item) {
+  try { return (JSON.parse(localStorage.getItem(HQ_ITEM_STATE_KEY) || '{}')[item.name]) || 'active'; }
+  catch (e) { return 'active'; }
+}
+function isExcludedByHq(item) {
+  let exclusions = {};
+  try { exclusions = JSON.parse(localStorage.getItem(HQ_ITEM_EXCLUSION_KEY) || '{}'); } catch (e) {}
+  const target = window.isIndividualOutletPrototype
+    ? new URLSearchParams(window.location.search).get('outlet')
+    : (document.getElementById('groupPageTitle') || {}).textContent;
+  return (exclusions[item.name] || []).includes(target);
+}
+
 const CAT_ORDER = ["Poultry","Beef","Pork","Lamb","Seafood","Produce","Dry Goods","Sauces","Dairy & Eggs","Frozen","Beverages","Supplies"];
 const sortedItems = ITEMS.slice().sort((a, b) => {
   const ci = CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat);
@@ -1398,6 +1469,7 @@ const ITEMS_PER_PAGE = 20;
 let itemSearch = '';
 let itemCatFilter = '';
 let itemSortKey = 'default';
+const groupExpandedUoms = new Set();
 let currentItemIdx = null;
 let overrideEnabled = false;
 const itemOverrides = {};
@@ -1540,13 +1612,15 @@ function renderSuppliers() {
 function renderStatsStrip() {
   const strip = document.getElementById('statsStrip');
   if (!strip) return;
-  const outletCount   = currentGroup.size;
-  const itemCount     = window.isCreatedGroupPrototype ? 0 : ITEMS.length;
-  const supplierCount = window.isCreatedGroupPrototype ? 0 : HQ_SUPPLIERS.length - groupDisabledSuppliers.size;
+  const isOutlet = window.isIndividualOutletPrototype;
+  const outletCount   = isOutlet ? 1 : currentGroup.size;
+  const itemCount     = isOutlet ? 74 : (window.isCreatedGroupPrototype ? 0 : ITEMS.length);
+  const supplierCount = isOutlet ? 13 : (window.isCreatedGroupPrototype ? 0 : HQ_SUPPLIERS.length - groupDisabledSuppliers.size);
+  const recipeCount   = isOutlet ? 5 : (window.isCreatedGroupPrototype ? 0 : OG_RECIPES.length);
   const stats = [
-    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', value: outletCount,         label: 'Outlets',   iconColor: '#1A8040', accentColor: '#2AC864' },
+    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', value: outletCount,         label: isOutlet ? 'Outlet' : 'Outlets',   iconColor: '#1A8040', accentColor: '#2AC864' },
     { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>', value: itemCount,           label: 'Items',     iconColor: '#185FA5', accentColor: '#3B82F6' },
-    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01z"/></svg>',                                                                                                                                                                value: window.isCreatedGroupPrototype ? 0 : OG_RECIPES.length,  label: 'Recipes',   iconColor: '#854F0B', accentColor: '#F59E0B' },
+    { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01z"/></svg>',                                                                                                                                                                value: recipeCount,  label: 'Recipes',   iconColor: '#854F0B', accentColor: '#F59E0B' },
     { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>', value: supplierCount,       label: 'Suppliers', iconColor: '#6D28D9', accentColor: '#8B5CF6' },
   ];
   strip.innerHTML = stats.map(s =>
@@ -1559,7 +1633,8 @@ function renderStatsStrip() {
 }
 
 function getDisplayItems() {
-  let items = ITEMS.slice();
+  // Removed at HQ means unavailable to this group. Disabled stays visible.
+  let items = ITEMS.filter(i => inheritedHqItemLifecycle(i) !== 'removed' && !isExcludedByHq(i));
   if (itemCatFilter) items = items.filter(i => i.cat === itemCatFilter);
   if (itemSearch) {
     const q = itemSearch.toLowerCase();
@@ -1602,6 +1677,13 @@ function setItemSort(key) {
   renderItems();
 }
 
+function toggleGroupUoms(itemIdx, event) {
+  event.stopPropagation();
+  if (groupExpandedUoms.has(itemIdx)) groupExpandedUoms.delete(itemIdx);
+  else groupExpandedUoms.add(itemIdx);
+  renderItems();
+}
+
 function renderItems() {
   const body = document.getElementById('itemsBody');
   if (!body) return;
@@ -1623,48 +1705,61 @@ function renderItems() {
   const page = display.slice(start, start + ITEMS_PER_PAGE);
 
   if (!page.length) {
-    body.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--ink-mute)">No items match your search</td></tr>';
+    body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink-mute)">No items match your search</td></tr>';
     renderItemsPager(0, total);
     return;
   }
 
-  body.innerHTML = page.map(item => {
+  body.innerHTML = page.map(function(item, pageIdx) {
     const rawIdx = ITEMS.indexOf(item);
     const ov = itemOverrides[rawIdx] || {};
     const displayName = ov.customName || item.name;
-    const displayMOQ = ov.moq || item.moq;
-    let priceHtml;
-    if (Array.isArray(item.uom)) {
-      priceHtml = '<button class="uom-options-btn" onclick="event.stopPropagation();openItemModal(' + rawIdx + ')">' + item.uom.length + ' options</button>';
-    } else {
-      const displayPrice = (ov.price != null) ? ov.price : item.price;
-      priceHtml = 'S$' + parseFloat(displayPrice).toFixed(2) + ' <span class="uom-text">/ ' + item.uom + '</span>';
-    }
     const customTag = ov.customName ? ' <span class="item-custom-tag">custom</span>' : '';
     const hasOverride = SUPPLIER_TYPES[item.supplier] !== 'active' && (ov.price != null || (Array.isArray(ov.prices) && ov.prices.length) || ov.moq != null);
     const overrideTag = hasOverride ? ' <span class="item-override-tag">overridden</span>' : '';
+    const inheritedDisabled = inheritedHqItemLifecycle(item) === 'disabled';
     const isSupplierDisabled = groupDisabledItems.has(rawIdx);
     const isIndivDisabled = individuallyDisabledItems.has(rawIdx);
-    const isDisabled = isSupplierDisabled || isIndivDisabled;
-    const actionLabel = isDisabled ? 'Enable item' : 'Disable item';
+    const isDisabled = inheritedDisabled || isSupplierDisabled || isIndivDisabled;
+    const actionLabel = inheritedDisabled ? 'Disabled at HQ' : (isDisabled ? 'Enable item' : 'Disable item');
     const actionClass = isDisabled ? '' : ' danger';
     const openFn = 'openItemModal(' + rawIdx + ')';
-    return '<tr class="item-row' + (isDisabled ? ' ml-inactive' : '') + '">' +
-      '<td class="item-name-cell" onclick="' + openFn + '" style="cursor:pointer">' +
-        '<div class="item-name-text">' + displayName + customTag + overrideTag + '</div>' +
-        '<div class="item-supplier-text">' + item.supplier + '</div>' +
-      '</td>' +
-      '<td class="price-cell" onclick="' + openFn + '" style="cursor:pointer">' + priceHtml + '</td>' +
-      '<td class="moq-cell" onclick="' + openFn + '" style="cursor:pointer">' + displayMOQ + '</td>' +
-      '<td style="padding:10px 8px;border-bottom:1px solid var(--rule);text-align:right">' +
-        '<div class="row-actions-wrap">' +
-          '<button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button>' +
-          '<div class="row-actions-menu">' +
-            '<div class="row-action-item' + actionClass + '" onclick="itemActionClick(' + rawIdx + ')">' + actionLabel + '</div>' +
-          '</div>' +
-        '</div>' +
-      '</td>' +
-      '</tr>';
+    const rowClass = (isDisabled ? ' ml-inactive' : '') + (pageIdx % 2 ? ' item-row-even' : '');
+    const nameCell = '<td class="item-name-cell" onclick="' + openFn + '" style="cursor:pointer">' +
+      '<div class="item-name-text">' + displayName + customTag + overrideTag + '</div>' +
+      '<div class="item-supplier-text">' + item.supplier + '</div>' +
+    '</td>';
+    const actionCell = '<td style="padding:10px 8px;border-bottom:1px solid var(--rule);text-align:right">' +
+      '<div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button>' +
+      '<div class="row-actions-menu"><div class="row-action-item' + actionClass + (inheritedDisabled ? ' disabled' : '') + '"' + (inheritedDisabled ? ' title="Enable this item from the HQ master market list"' : ' onclick="itemActionClick(' + rawIdx + ')"') + '>' + actionLabel + '</div></div></div></td>';
+    const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+
+    if (uoms.length === 1) {
+      const displayPrice = (ov.price != null) ? ov.price : item.price;
+      const displayMOQ = ov.moq || item.moq;
+      return '<tr class="item-row item-parent-row' + rowClass + '">' + nameCell +
+        '<td class="uom-text" onclick="' + openFn + '" style="cursor:pointer">' + uoms[0].replace(/^per\s+/i, '') + '</td>' +
+        '<td class="price-cell" onclick="' + openFn + '" style="cursor:pointer">S$' + parseFloat(displayPrice).toFixed(2) + ' <span class="uom-text">/ ' + uoms[0].replace(/^per\s+/i, '') + '</span></td>' +
+        '<td class="moq-cell" onclick="' + openFn + '" style="cursor:pointer">' + displayMOQ + '</td>' + actionCell + '</tr>';
+    }
+
+    const expanded = groupExpandedUoms.has(rawIdx);
+    const parent = '<tr class="item-row item-parent-row' + rowClass + '">' + nameCell +
+      '<td><button class="item-options-link" onclick="toggleGroupUoms(' + rawIdx + ', event)">' + uoms.length + ' options <span class="item-options-chevron' + (expanded ? ' open' : '') + '"></span></button></td>' +
+      '<td></td><td></td>' + actionCell + '</tr>';
+    if (!expanded) return parent;
+    const breakdown = getUOMBreakdown(item) || [];
+    const children = breakdown.map(function(entry, uomIdx) {
+      const childPrice = ov.prices && ov.prices[uomIdx] != null ? ov.prices[uomIdx] : entry.price;
+      const childMOQ = ov.moqs && ov.moqs[uomIdx] != null ? ov.moqs[uomIdx] : (ov.moq || item.moq);
+      const unit = entry.uom.replace(/^per\s+/i, '');
+      return '<tr class="item-uom-row' + (isDisabled ? ' ml-inactive' : '') + '">' +
+        '<td class="item-uom-name">' + displayName + '</td>' +
+        '<td class="uom-text">' + unit + '</td>' +
+        '<td class="price-cell">S$' + parseFloat(childPrice).toFixed(2) + ' <span class="uom-text">/ ' + unit + '</span></td>' +
+        '<td class="moq-cell">' + childMOQ + '</td><td></td></tr>';
+    }).join('');
+    return parent + children;
   }).join('');
 
   renderItemsPager(totalPages, total);
@@ -2150,7 +2245,7 @@ function confirmSplitGroup() {
     localStorage.setItem('nomniGroupSetupCopy', JSON.stringify({
       target: name,
       source,
-      sections: ['Items & availability', 'Inventory & UOMs', 'Recipes & variations', 'Suppliers & settings', 'POS mapping baseline'],
+      sections: ['Items', 'Inventory', 'Recipes', 'Suppliers', 'POS mapping'],
       copiedAt: new Date().toISOString()
     }));
   }
@@ -2225,7 +2320,6 @@ function openCopySetupModal() {
   const target = document.getElementById('groupPageTitle').textContent.trim();
   const sources = ['Chargrill Outlets', 'Family Dining Express'].filter(name => name !== target);
   const select = document.getElementById('copySetupSource');
-  document.getElementById('copySetupTargetName').textContent = target;
   select.innerHTML = sources.map(name => '<option value="' + name + '">' + name + '</option>').join('');
   document.getElementById('settingsModal').classList.remove('open');
   document.getElementById('copySetupModal').classList.add('open');
@@ -2312,7 +2406,6 @@ const OG_REC_DATES = ['10 Jun 2026','05 Jun 2026','28 May 2026','20 May 2026','1
 const OG_REC_CAT_ORDER = ['Mains','Starters','Sides','Sauces & Marinades','Desserts','Beverages'];
 const OG_REC_FC_TARGETS = { 'Mains': 0.35, 'Starters': 0.32, 'Sides': 0.26, 'Sauces & Marinades': 0.25, 'Desserts': 0.28, 'Beverages': 0.14 };
 OG_RECIPES.forEach((r, i) => {
-  r.versions = (i === 2 || i === 7 || i === 15) ? 2 : 1;
   r.lastUpdated = OG_REC_DATES[i % OG_REC_DATES.length];
   r.active = (i % 9 !== 0);
   const fc = OG_REC_FC_TARGETS[r.cat] || 0.30;
@@ -2353,11 +2446,8 @@ function renderOgRec() {
   const page = items.slice(start, start + OG_REC_PER_PAGE);
   document.getElementById('ogRecCount').textContent = total;
   document.getElementById('ogRecBody').innerHTML = page.map(r => {
-    const versionsHtml = r.versions > 1
-      ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' versions</span>'
-      : '';
     return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
-      '<td><div class="ml-item-name">' + r.name + versionsHtml + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
+      '<td><div class="ml-item-name">' + r.name + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">sell $' + r.price.toFixed(2) + '</div></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
       '<td style="font-size: 14px;color:var(--ink-mute)">' + r.lastUpdated + '</td>' +
@@ -2385,8 +2475,9 @@ document.getElementById('modalClearBtn').style.visibility = 'hidden';
 if (!window.isIndividualOutletPrototype) renderOutlets();
 if (!window.isIndividualOutletPrototype) renderItems();
 renderMiniSuppliers();
-renderSuppliers();
+if (!window.isIndividualOutletPrototype) renderSuppliers();
 renderStatsStrip();
+if (window.isIndividualOutletPrototype) { const strip = document.getElementById('statsStrip'); if (strip) { const firstStat = strip.querySelector('.stat-cell'); if (firstStat) firstStat.remove(); strip.style.gridTemplateColumns = 'repeat(3, 1fr)'; } }
 document.getElementById('itemModal').addEventListener('click', e => { if (e.target === document.getElementById('itemModal')) closeItemModal(); });
 document.getElementById('manageModal').addEventListener('click', e => { if (e.target === document.getElementById('manageModal')) closeManageModal(); });
 
