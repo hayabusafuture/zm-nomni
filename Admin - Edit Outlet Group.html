@@ -876,9 +876,9 @@
         <textarea id="detailSettingsDescription" style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none;min-height:80px;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'">Garden Cuisine Chargrill chain locations</textarea>
         <span style="font-size:12px;color:var(--ink-mute);margin-top:4px;display:block">Used as internal notes only. Not visible to buyers.</span>
       </div>
-      <div style="padding-top:16px;border-top:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;gap:16px">
-        <div><div style="font-size:14px;font-weight:600;color:var(--ink)">Group setup</div><div style="margin-top:3px;font-size:12px;color:var(--ink-mute)">Copy selected configuration from another group.</div></div>
-        <button class="btn btn-secondary" type="button" onclick="openCopySetupModal()">Copy setup</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;border:1px solid var(--rule);border-radius:8px;background:#F9FAFB">
+        <div style="min-width:0"><div style="font-size:14px;font-weight:600;color:var(--ink)">Copy setup from another group</div><div style="margin-top:3px;font-size:12px;color:var(--ink-mute);line-height:1.45">Replace this group’s items, recipes, suppliers and inventory setup.</div></div>
+        <button class="btn btn-secondary" type="button" onclick="openCopySetupModal()">Copy from…</button>
       </div>
     </div>
     <div class="modal-foot" style="justify-content:space-between">
@@ -1007,6 +1007,34 @@
 </div>
 
 <!-- Remove confirmation -->
+<div class="modal-overlay" id="splitGroupModal" onclick="if(event.target===this)closeSplitGroupModal()">
+  <div class="modal-card" style="width:560px">
+    <div class="modal-header">
+      <h2 class="modal-title">Split into new group</h2>
+      <button class="modal-close" onclick="closeSplitGroupModal()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:18px">
+      <p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink-mute)"><strong id="splitOutletName" style="color:var(--ink)"></strong> will move from <strong id="splitSourceGroup" style="color:var(--ink)"></strong> into a new independent outlet group.</p>
+      <div>
+        <label style="display:block;font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">New group name</label>
+        <input id="splitGroupName" type="text" style="width:100%;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);box-sizing:border-box" />
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px">Starting setup</div>
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--nomni-green);border-radius:6px;background:#F4FFF6;cursor:pointer">
+          <input type="radio" name="splitSetup" value="copy" checked style="margin-top:2px;accent-color:var(--spinach)" />
+          <span><strong style="font-size:14px">Copy the current group’s setup</strong><span style="display:block;margin-top:3px;font-size:12px;line-height:1.4;color:var(--ink-mute)">Recommended. Copies configuration, availability and POS mapping baseline; the new group can then change independently.</span></span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;padding:12px;border:1px solid var(--rule);border-radius:6px;cursor:pointer">
+          <input type="radio" name="splitSetup" value="hq" style="margin-top:2px;accent-color:var(--spinach)" />
+          <span><strong style="font-size:14px">Start with HQ setup</strong><span style="display:block;margin-top:3px;font-size:12px;line-height:1.4;color:var(--ink-mute)">The outlet may receive a substantially different market list, inventory and recipe configuration.</span></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-foot" style="display:flex;justify-content:flex-end;gap:10px"><button class="modal-cancel" onclick="closeSplitGroupModal()">Cancel</button><button class="btn btn-primary" onclick="confirmSplitGroup()">Create group</button></div>
+  </div>
+</div>
+
 <!-- Remove from group confirm -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-card">
@@ -1124,11 +1152,56 @@ let   pendingRemoveId = null;
   });
   document.getElementById('groupPageTitle').textContent = group.name;
   document.getElementById('groupHqLink').textContent = group.hq;
-  document.getElementById('groupHqLink').href = 'Admin - HQ Settings.html?new=1&groupCreated=1';
+  document.getElementById('groupHqLink').href = 'Admin - HQ Settings.html?groupCreated=1';
   document.getElementById('detailSettingsTitle').textContent = group.name;
   document.getElementById('detailSettingsName').value = group.name;
   document.getElementById('detailSettingsDescription').value = group.description || '';
   document.title = group.name + ' — Procure Admin';
+})();
+
+// ── Individual ungrouped outlet view ───────────────────────
+(function initialiseIndividualOutletView() {
+  var outletName = new URLSearchParams(window.location.search).get('outlet');
+  if (!outletName) return;
+  window.isIndividualOutletPrototype = true;
+  document.title = outletName + ' — Procure Admin';
+  document.getElementById('groupPageTitle').textContent = outletName;
+  document.getElementById('backLink').href = 'Admin - HQ Settings.html';
+  document.getElementById('backLinkLabel').textContent = 'Garden Cuisine HQ';
+  document.querySelector('.page-hq').innerHTML = '<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--ink-mute);border-radius:4px;padding:1px 6px;color:var(--ink-mute);line-height:1.4">HQ</span><a href="Admin - HQ Settings.html">Garden Cuisine HQ</a><span style="color:var(--rule);margin:0 2px">·</span><span>Individually managed</span>';
+  document.querySelector('.head-actions .btn-secondary').innerHTML = 'Outlet settings';
+  document.querySelector('.head-actions .btn-primary').style.display = 'none';
+  document.getElementById('detailSettingsTitle').textContent = 'Outlet settings';
+  document.getElementById('detailSettingsName').value = outletName;
+  document.querySelector('#settingsModal label').textContent = 'Outlet name';
+  document.querySelector('#settingsModal .settings-delete-link').style.display = 'none';
+  Array.from(document.querySelectorAll('#settingsModal div')).forEach(function(el) {
+    if (el.textContent.trim() === 'Copy setup from another group') el.textContent = 'Copy setup from an outlet group';
+    if (el.textContent.trim() === 'Replace this group’s items, recipes, suppliers and inventory setup.') el.textContent = 'Replace this outlet’s items, recipes, suppliers and inventory setup.';
+  });
+
+  var tabs = document.querySelector('.tabs');
+  tabs.querySelector('[data-tab="outlets"]').textContent = 'Items';
+  tabs.querySelector('[data-tab="recipes"]').insertAdjacentHTML('beforebegin', '<div class="tab" data-tab="inventory">Inventory</div>');
+  tabs.querySelector('[data-tab="suppliers"]').insertAdjacentHTML('afterend', '<div class="tab" data-tab="pos">POS mapping</div><div class="tab" data-tab="activity">Activity</div>');
+
+  document.getElementById('panel-overview').innerHTML =
+    '<div style="padding:16px 18px;border:1px solid #B9F0C5;border-radius:8px;background:var(--mint);color:var(--seaweed);display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">✓</span><div><strong>Individually managed outlet</strong><div style="margin-top:3px;font-size:13px;line-height:1.45">This outlet uses its own configuration. It inherits the HQ setup by default; changes made here apply only to this outlet.</div></div></div>' +
+    '<div class="overview-grid" style="margin-top:24px"><div><div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="section-action" onclick="switchToTab(\'outlets\')">Manage</button></div><div class="section-card"><div style="font-weight:600">74 items available</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Based on Garden Cuisine HQ, with outlet-level changes available.</div></div><div class="panel-label-row" style="margin-top:22px"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="section-action" onclick="switchToTab(\'inventory\')">Manage</button></div><div class="section-card"><div style="font-weight:600">28 inventory records</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">UOMs and stock-tracking settings are managed for this outlet.</div></div></div><div class="overview-right"><div><div class="panel-label-row"><span class="panel-label-text">Recipes <span class="panel-label-count">5</span></span><button class="section-action" onclick="switchToTab(\'recipes\')">View all</button></div><div class="section-card"><div style="font-weight:600">5 recipes available</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Recipe availability is specific to this outlet.</div></div></div><div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span><button class="section-action" onclick="switchToTab(\'pos\')">View</button></div><div class="section-card"><div style="font-weight:600">Not connected</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Connect this outlet’s Nomni POS API key to review its mapping.</div></div></div></div></div>';
+
+  document.getElementById('panel-outlets').innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="btn-primary" onclick="showToast(\'Item management is ready for this outlet\')">Manage items</button></div><div class="ml-filter-row"><div class="search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg><input placeholder="Search items…" /></div></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Available to</th></tr></thead><tbody><tr><td><strong>Chilled Boneless Duck Breast</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td><span style="color:var(--spinach);font-weight:600">This outlet</span></td></tr><tr><td><strong>Char Siu Marinade</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Sub-recipe · Batch 11 L</div></td><td>L</td><td><span style="color:var(--spinach);font-weight:600">This outlet</span></td></tr></tbody></table>';
+  var inventory = document.createElement('div');
+  inventory.className = 'tab-panel'; inventory.id = 'panel-inventory';
+  inventory.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="btn-primary" onclick="showToast(\'Inventory settings are ready for this outlet\')">Manage inventory</button></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th></tr></thead><tbody><tr><td><strong>Anchor Unsalted Butter 25kg Bulk Block</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Fonterra Brands</div></td><td>kg</td><td>S$11.80</td></tr><tr><td><strong>Chaokoh UHT Coconut Milk 400ml x 24 Ctn</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Chaokoh F&amp;B</div></td><td>tin</td><td>S$1.80</td></tr></tbody></table>';
+  document.getElementById('panel-outlets').after(inventory);
+  var pos = document.createElement('div');
+  pos.className = 'tab-panel'; pos.id = 'panel-pos';
+  pos.innerHTML = '<div style="max-width:620px;margin:56px auto;text-align:center"><div style="width:44px;height:44px;margin:0 auto 16px;border-radius:10px;background:var(--mint);display:grid;place-items:center;color:var(--spinach);font-size:21px">▦</div><h2 style="margin:0;font-size:21px;letter-spacing:-.02em">Connect Nomni POS for this outlet</h2><p style="margin:10px 0 20px;color:var(--ink-mute);line-height:1.5">Enter this outlet’s API key to review how its POS products map to its individual inventory and recipes.</p><button class="btn btn-primary" onclick="showToast(\'POS settings opened\')">Set up Nomni POS</button></div>';
+  inventory.after(pos);
+  var activity = document.createElement('div');
+  activity.className = 'tab-panel'; activity.id = 'panel-activity';
+  activity.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Activity</span></div><div class="section-card"><div style="font-weight:600">Outlet is individually managed</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Today · Nomni Admin</div></div>';
+  pos.after(activity);
 })();
 
 function initials(name) {
@@ -1157,6 +1230,7 @@ function renderOutlets() {
         <div class="row-actions-wrap">
           <button class="btn-row-actions" onclick="toggleRowMenu(this)" title="Actions">•••</button>
           <div class="row-actions-menu">
+            <div class="row-action-item" onclick="openSplitGroup(${o.id})">Split into new group</div>
             <div class="row-action-item danger" onclick="openConfirm(${o.id}, '${o.name.replace(/'/g,"\\'")}')">Remove from group</div>
             <div class="row-action-item danger" onclick="openConfirmHQ(${o.id}, '${o.name.replace(/'/g,"\\'")}')">Remove from HQ</div>
           </div>
@@ -2025,6 +2099,77 @@ function openConfirm(id, name) {
 function closeConfirm() { pendingRemoveId = null; document.getElementById('confirmOverlay').classList.remove('open'); }
 function confirmRemove() { if (pendingRemoveId !== null) { currentGroup.delete(pendingRemoveId); renderOutlets(); } closeConfirm(); }
 
+// ── Split into new group ───────────────────────────────────
+var pendingSplitId = null;
+var pendingSplitOutlet = null;
+var pendingSplitSource = '';
+var pendingSplitHq = '';
+function openSplitGroup(id) {
+  document.querySelectorAll('.row-actions-menu.open').forEach(m => m.classList.remove('open'));
+  const outlet = OUTLETS.find(item => item.id === id);
+  if (!outlet) return;
+  pendingSplitId = id;
+  openSplitGroupForOutlet(outlet, document.getElementById('groupPageTitle').textContent.trim());
+}
+function openSplitGroupForOutlet(outlet, sourceGroup, hq) {
+  const name = outlet.name;
+  pendingSplitOutlet = outlet;
+  pendingSplitSource = sourceGroup;
+  pendingSplitHq = hq || document.getElementById('groupHqLink').textContent.trim();
+  const suggestedName = name.replace(/^\(WF\s+\d+\)\s*/, '').trim();
+  document.getElementById('splitOutletName').textContent = name;
+  document.getElementById('splitSourceGroup').textContent = sourceGroup;
+  document.getElementById('splitGroupName').value = suggestedName;
+  document.querySelector('input[name="splitSetup"][value="copy"]').checked = true;
+  document.getElementById('splitGroupModal').classList.add('open');
+}
+function closeSplitGroupModal() {
+  pendingSplitId = null;
+  pendingSplitOutlet = null;
+  pendingSplitSource = '';
+  pendingSplitHq = '';
+  document.getElementById('splitGroupModal').classList.remove('open');
+}
+function confirmSplitGroup() {
+  const name = document.getElementById('splitGroupName').value.trim();
+  const outlet = pendingSplitOutlet || OUTLETS.find(item => item.id === pendingSplitId);
+  if (!name) { showToast('Enter a name for the new group'); return; }
+  if (!outlet) { closeSplitGroupModal(); return; }
+  const source = pendingSplitSource || document.getElementById('groupPageTitle').textContent.trim();
+  const setup = document.querySelector('input[name="splitSetup"]:checked').value;
+  const group = {
+    name,
+    description: '',
+    hq: pendingSplitHq || document.getElementById('groupHqLink').textContent.trim(),
+    outlets: [outlet.name],
+    outletDetails: [{ name: outlet.name, company: outlet.company }],
+    splitFrom: source,
+    setupSource: setup === 'copy' ? 'group' : 'hq'
+  };
+  if (setup === 'copy') {
+    localStorage.setItem('nomniGroupSetupCopy', JSON.stringify({
+      target: name,
+      source,
+      sections: ['Items & availability', 'Inventory & UOMs', 'Recipes & variations', 'Suppliers & settings', 'POS mapping baseline'],
+      copiedAt: new Date().toISOString()
+    }));
+  }
+  localStorage.setItem('nomniNewOutletGroup', JSON.stringify(group));
+  localStorage.setItem('nomniNewOutletGroupToastPending', '1');
+  localStorage.setItem('nomniSplitCompleted', JSON.stringify({ outlet: outlet.name, source: source }));
+  currentGroup.delete(outlet.id);
+  window.location.href = 'Admin - HQ Settings.html?groupCreated=1&splitCompleted=1';
+}
+
+function initialiseSplitFromHqOverview() {
+  if (new URLSearchParams(window.location.search).get('split') !== '1') return;
+  var request;
+  try { request = JSON.parse(localStorage.getItem('nomniSplitRequest') || 'null'); } catch (e) { request = null; }
+  if (!request || !request.outlet || !request.group) return;
+  localStorage.removeItem('nomniSplitRequest');
+  openSplitGroupForOutlet({ name: request.outlet, company: 'Managed outlet' }, request.group, request.hq);
+}
+
 // ── Remove from HQ ──────────────────────────────────────────
 var pendingRemoveHQId = null;
 function openConfirmHQ(id, name) {
@@ -2049,9 +2194,11 @@ document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPr
 document.getElementById('pickerModal').addEventListener('click', e => { if (e.target === document.getElementById('pickerModal')) closePickerModal(); });
 document.getElementById('settingsModal').addEventListener('click', e => { if (e.target === document.getElementById('settingsModal')) closeSettings(); });
 document.getElementById('copySetupModal').addEventListener('click', e => { if (e.target === document.getElementById('copySetupModal')) closeCopySetupModal(); });
+document.getElementById('splitGroupModal').addEventListener('click', e => { if (e.target === document.getElementById('splitGroupModal')) closeSplitGroupModal(); });
 document.getElementById('confirmOverlay').addEventListener('click', e => { if (e.target === document.getElementById('confirmOverlay')) closeConfirm(); });
 document.getElementById('confirmRemoveHQOverlay').addEventListener('click', e => { if (e.target === document.getElementById('confirmRemoveHQOverlay')) closeConfirmHQ(); });
 document.getElementById('deleteGroupOverlay').addEventListener('click', e => { if (e.target === document.getElementById('deleteGroupOverlay')) closeDeleteGroup(); });
+initialiseSplitFromHqOverview();
 
 // ── Settings dialog ────────────────────────────────────────
 function openSettings() { document.getElementById('settingsModal').classList.add('open'); }
@@ -2235,8 +2382,8 @@ function setOgRecPage(p) { ogRecPage = p; renderOgRec(); window.scrollTo(0,0); }
 renderOgRec();
 
 document.getElementById('modalClearBtn').style.visibility = 'hidden';
-renderOutlets();
-renderItems();
+if (!window.isIndividualOutletPrototype) renderOutlets();
+if (!window.isIndividualOutletPrototype) renderItems();
 renderMiniSuppliers();
 renderSuppliers();
 renderStatsStrip();

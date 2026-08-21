@@ -176,8 +176,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 10px 14px; background: #fff; white-space: nowrap; position: sticky; top: 56px; z-index: 2; box-shadow: 0 1px 0 var(--rule), 0 -1px 0 var(--rule); }
 .og-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
 .og-table tbody tr:last-child td { border-bottom: none; }
-.og-table tbody tr:nth-child(even) td { background: #f9fafb; }
 .og-table tbody tr:hover td { background: var(--row-hover) !important; }
+.og-row-split-created td { background: #F4FFF6; }
 .og-name { font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none; }
 .og-name:hover { color: var(--spinach); text-decoration: underline; }
 .og-expand-btn { background: none; border: none; cursor: pointer; padding: 0; display: inline-flex; align-items: center; color: var(--ink-mute); transition: color .13s; flex-shrink: 0; margin:0 14px 0 8px; }
@@ -6001,6 +6001,60 @@ function escapeOverviewText(value) {
   });
 }
 
+function addSplitActionsToOverview() {
+  document.querySelectorAll('.og-outlet-sub-row .outlet-list-item').forEach(function(item) {
+    var menu = item.querySelector('.row-actions-menu');
+    if (!menu || menu.querySelector('[data-split-action]')) return;
+    menu.insertAdjacentHTML('afterbegin', '<div class="row-action-item" data-split-action onclick="openSplitFromOverview(this)">Split into new group</div>');
+  });
+}
+
+function openSplitFromOverview(action) {
+  var item = action.closest('.outlet-list-item');
+  var outletRow = item && item.closest('.og-outlet-sub-row');
+  var groupRow = outletRow && outletRow.previousElementSibling;
+  var outlet = item && item.querySelector('.outlet-item-name');
+  var group = groupRow && groupRow.querySelector('.og-name');
+  if (!outlet || !group) return;
+  localStorage.setItem('nomniSplitRequest', JSON.stringify({
+    outlet: outlet.textContent.trim(),
+    group: group.textContent.trim(),
+    hq: document.querySelector('.page-title').textContent.trim()
+  }));
+  window.location.href = 'Admin - Edit Outlet Group.html?from=hq&split=1';
+}
+
+document.addEventListener('click', function(event) {
+  var outletName = event.target.closest('#ogTable tr[data-ungrouped-name] .og-name');
+  if (!outletName) return;
+  window.location.href = 'Admin - Edit Outlet Group.html?from=hq&outlet=' + encodeURIComponent(outletName.textContent.trim());
+});
+
+function applyCompletedOutletSplit() {
+  var split;
+  try { split = JSON.parse(localStorage.getItem('nomniSplitCompleted') || 'null'); } catch (e) { split = null; }
+  if (!split || !split.outlet || !split.source) return;
+  var sourceRow = Array.from(document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)')).find(function(row) {
+    var name = row.querySelector('.og-name');
+    return name && name.textContent.trim() === split.source;
+  });
+  var outletRow = sourceRow && sourceRow.nextElementSibling;
+  var list = outletRow && outletRow.querySelector('.outlet-list');
+  if (list) {
+    Array.from(list.querySelectorAll('.outlet-list-item')).forEach(function(item) {
+      var name = item.querySelector('.outlet-item-name');
+      if (name && name.textContent.trim() === split.outlet) item.remove();
+    });
+    var countNode = sourceRow.querySelector('.og-outlet-count');
+    var count = list.querySelectorAll('.outlet-list-item').length;
+    if (countNode) countNode.textContent = count + ' outlet' + (count === 1 ? '' : 's');
+    sourceRow.dataset.groupOutlets = Array.from(list.querySelectorAll('.outlet-list-item')).map(function(item) {
+      return item.dataset.outletName;
+    }).join('|');
+  }
+  localStorage.removeItem('nomniSplitCompleted');
+}
+
 function renderCreatedOutletGroup() {
   var params = new URLSearchParams(window.location.search);
   if (params.get('groupCreated') !== '1' && params.get('new') !== '1') return;
@@ -6036,6 +6090,7 @@ function renderCreatedOutletGroup() {
   });
   var safeName = escapeOverviewText(group.name);
   var groupRow = document.createElement('tr');
+  if (group.splitFrom) groupRow.className = 'og-row-split-created';
   groupRow.dataset.groupName = String(group.name || '').toLowerCase();
   groupRow.dataset.groupOutlets = outletNames.join('|').toLowerCase();
   groupRow.innerHTML =
@@ -6051,7 +6106,7 @@ function renderCreatedOutletGroup() {
   outletRow.className = 'og-outlet-sub-row';
   outletRow.id = rowId;
   outletRow.innerHTML = '<td colspan="6"><div class="outlet-list">' + outletNames.map(function(name) {
-    return '<div class="outlet-list-item" data-outlet-name="' + escapeOverviewText(name.toLowerCase()) + '"><span class="outlet-item-name">' + escapeOverviewText(name) + '</span><span class="pos-chip off">POS ✕</span></div>';
+    return '<div class="outlet-list-item" data-outlet-name="' + escapeOverviewText(name.toLowerCase()) + '"><span class="outlet-item-name">' + escapeOverviewText(name) + '</span><span class="pos-chip off">POS ✕</span><div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item" data-split-action onclick="openSplitFromOverview(this)">Split into new group</div></div></div></div>';
   }).join('') + '</div></td>';
 
   tbody.insertBefore(outletRow, tbody.firstChild);
@@ -6077,12 +6132,16 @@ function renderCreatedOutletGroup() {
   renderNewHqSummary(group);
   if (localStorage.getItem('nomniNewOutletGroupToastPending') === '1') {
     localStorage.removeItem('nomniNewOutletGroupToastPending');
-    addPrototypeActivity('outlet-groups', '<strong>' + safeName + '</strong> outlet group created', 'outlet-groups', group.name);
-    showHqToast('Outlet group created', group.name + ' has been added.');
+    var splitMessage = group.splitFrom ? '<strong>' + safeName + '</strong> created by splitting an outlet from ' + escapeOverviewText(group.splitFrom) : '<strong>' + safeName + '</strong> outlet group created';
+    addPrototypeActivity('outlet-groups', splitMessage, 'outlet-groups', group.name);
+    showHqToast(group.splitFrom ? 'Outlet split into new group' : 'Outlet group created', group.splitFrom ? safeName + ' is now shown in Outlets & groups.' : group.name + ' has been added.');
   }
 }
 
+addSplitActionsToOverview();
 renderCreatedOutletGroup();
+applyCompletedOutletSplit();
+addSplitActionsToOverview();
 initialiseHqInventorySettingsPage();
 
 function filterPosOutlets() {
