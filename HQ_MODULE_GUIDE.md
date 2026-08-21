@@ -253,3 +253,25 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 - Captures basic user details and access.
 - Supports linking the person to an HQ and defining HQ-related permissions.
 - It complements the HQ Users list, which is the preferred starting point when managing access for a known HQ.
+
+## Planned follow-up work
+
+### Ungrouped outlet management
+
+- Define and build a lightweight individual outlet-management page for outlets that belong to an HQ but are not in an outlet group.
+- An ungrouped outlet needs its own Items, Inventory, Recipes, Suppliers and POS connection/mapping configuration until it is added to a group.
+- Grouped outlets should continue to inherit their group configuration rather than exposing competing individual customisation. Selecting one from the HQ Overview should take the user to its group context.
+
+### Outlet-group activity
+
+- Add an **Activity** tab to the outlet-group page.
+- Record configuration changes relevant to the group, including items, recipes, suppliers, inventory records and features being enabled, disabled, added or removed.
+- Each entry should identify what changed, who made the change and when it occurred.
+
+### Split an outlet into a new group without losing its setup
+
+- Add a **Move to new group** / **Create group from this group** action for a selected outlet in an existing group.
+- The default safe path should create a new outlet group using a copy of the current group’s configuration, then move the outlet into it. This preserves its market list, inventory setup and UOMs, recipes and variations, supplier settings, availability rules and relevant POS mapping baseline.
+- The confirmation step should make the alternative explicit: **Use the current group’s setup** (recommended) or **Start with HQ settings**. The latter should warn that it may substantially change what the outlet can order, count or use.
+- After the move, the new group becomes independent: future changes to either group do not affect the other. This prevents a removed outlet silently reverting to the generic HQ configuration.
+- **Implemented prototype:** group settings include **Copy setup**, which remains available after a group is created or split. The user selects a source group and the sections to overwrite; historical data, users and API keys are excluded.

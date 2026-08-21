@@ -876,6 +876,10 @@
         <textarea id="detailSettingsDescription" style="width:100%;padding:8px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);outline:none;min-height:80px;resize:vertical;line-height:1.5" onfocus="this.style.borderColor='var(--nomni-green)'" onblur="this.style.borderColor='#dcdee3'">Garden Cuisine Chargrill chain locations</textarea>
         <span style="font-size:12px;color:var(--ink-mute);margin-top:4px;display:block">Used as internal notes only. Not visible to buyers.</span>
       </div>
+      <div style="padding-top:16px;border-top:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;gap:16px">
+        <div><div style="font-size:14px;font-weight:600;color:var(--ink)">Group setup</div><div style="margin-top:3px;font-size:12px;color:var(--ink-mute)">Copy selected configuration from another group.</div></div>
+        <button class="btn btn-secondary" type="button" onclick="openCopySetupModal()">Copy setup</button>
+      </div>
     </div>
     <div class="modal-foot" style="justify-content:space-between">
       <button class="settings-delete-link" onclick="closeSettings();openDeleteGroup()">Delete group</button>
@@ -883,6 +887,41 @@
         <button class="modal-cancel" onclick="closeSettings()">Cancel</button>
         <button class="modal-add-btn" style="background:var(--nomni-green);color:var(--seaweed)" onclick="saveSettings()">Save changes</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Copy setup from another group -->
+<div class="modal-overlay" id="copySetupModal" onclick="if(event.target===this)closeCopySetupModal()">
+  <div class="modal-card" style="width:560px">
+    <div class="modal-header">
+      <h2 class="modal-title">Copy setup from another group</h2>
+      <button class="modal-close" onclick="closeCopySetupModal()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:18px">
+      <div>
+        <label style="display:block;font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">Copy setup into <span id="copySetupTargetName"></span></label>
+        <select id="copySetupSource" style="width:100%;height:38px;padding:0 12px;border:1px solid #dcdee3;border-radius:6px;background:#fff;font:inherit;font-size:14px;color:var(--ink)"></select>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px">Copy these sections</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px" id="copySetupSections">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Items" checked /> Items &amp; availability</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Inventory" checked /> Inventory &amp; UOMs</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Recipes" checked /> Recipes &amp; variations</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="Suppliers" checked /> Suppliers &amp; settings</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" value="POS mapping" checked /> POS mapping baseline</label>
+        </div>
+      </div>
+      <div style="display:flex;gap:9px;padding:12px;border-radius:6px;background:#FFF3CD;border:1px solid #F3D36B;color:#7A5F00;font-size:12px;line-height:1.45">
+        <span aria-hidden="true" style="font-size:16px;line-height:1">⚠</span><span>Selected sections will replace this group’s current setup. Activity, orders, stock counts, users and API keys are not copied.</span>
+      </div>
+    </div>
+    <div class="modal-foot" style="display:flex;justify-content:flex-end;gap:10px">
+      <button class="modal-cancel" onclick="closeCopySetupModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmCopySetup()">Copy setup</button>
     </div>
   </div>
 </div>
@@ -2009,6 +2048,7 @@ document.addEventListener('click', e => {
 document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userMenu').classList.toggle('open'); });
 document.getElementById('pickerModal').addEventListener('click', e => { if (e.target === document.getElementById('pickerModal')) closePickerModal(); });
 document.getElementById('settingsModal').addEventListener('click', e => { if (e.target === document.getElementById('settingsModal')) closeSettings(); });
+document.getElementById('copySetupModal').addEventListener('click', e => { if (e.target === document.getElementById('copySetupModal')) closeCopySetupModal(); });
 document.getElementById('confirmOverlay').addEventListener('click', e => { if (e.target === document.getElementById('confirmOverlay')) closeConfirm(); });
 document.getElementById('confirmRemoveHQOverlay').addEventListener('click', e => { if (e.target === document.getElementById('confirmRemoveHQOverlay')) closeConfirmHQ(); });
 document.getElementById('deleteGroupOverlay').addEventListener('click', e => { if (e.target === document.getElementById('deleteGroupOverlay')) closeDeleteGroup(); });
@@ -2031,6 +2071,27 @@ function saveSettings() {
     }
   }
   closeSettings();
+}
+
+// ── Copy setup from another group ──────────────────────────
+function openCopySetupModal() {
+  const target = document.getElementById('groupPageTitle').textContent.trim();
+  const sources = ['Chargrill Outlets', 'Family Dining Express'].filter(name => name !== target);
+  const select = document.getElementById('copySetupSource');
+  document.getElementById('copySetupTargetName').textContent = target;
+  select.innerHTML = sources.map(name => '<option value="' + name + '">' + name + '</option>').join('');
+  document.getElementById('settingsModal').classList.remove('open');
+  document.getElementById('copySetupModal').classList.add('open');
+}
+function closeCopySetupModal() { document.getElementById('copySetupModal').classList.remove('open'); }
+function confirmCopySetup() {
+  const target = document.getElementById('groupPageTitle').textContent.trim();
+  const source = document.getElementById('copySetupSource').value;
+  const sections = Array.from(document.querySelectorAll('#copySetupSections input:checked')).map(input => input.value);
+  if (!sections.length) { showToast('Select at least one setup section'); return; }
+  localStorage.setItem('nomniGroupSetupCopy', JSON.stringify({ target, source, sections, copiedAt: new Date().toISOString() }));
+  closeCopySetupModal();
+  showToast('Setup copied from ' + source);
 }
 
 // ── Tabs ───────────────────────────────────────────────────
