@@ -178,7 +178,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-table tbody tr:last-child td { border-bottom: none; }
 .og-table tbody tr:hover td { background: var(--row-hover) !important; }
 .og-row-split-created td { background: #F4FFF6; }
-.og-name { font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none; }
+.og-name { font-size: 14px; font-weight: 600; color: var(--ink); text-decoration: none; cursor: pointer; }
 .og-name:hover { color: var(--spinach); text-decoration: underline; }
 .og-expand-btn { background: none; border: none; cursor: pointer; padding: 0; display: inline-flex; align-items: center; color: var(--ink-mute); transition: color .13s; flex-shrink: 0; margin:0 14px 0 8px; }
 .og-expand-btn:hover { color: var(--ink); }
@@ -1401,6 +1401,12 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <option>Desserts</option>
           <option>Beverages</option>
         </select>
+        <select class="ml-filter-select" id="recStatusFilter" onchange="setRecStatusFilter(this.value)">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="disabled">Disabled</option>
+          <option value="removed">Removed</option>
+        </select>
       </div>
       <div style="overflow:clip">
         <table class="ml-table">
@@ -1494,7 +1500,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <select class="ml-filter-select" id="invStatusFilter" onchange="setInvStatusFilter(this.value)">
           <option value="">All statuses</option>
           <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+          <option value="disabled">Disabled</option>
+          <option value="removed">Removed</option>
         </select>
       </div>
       <div style="overflow:clip">
@@ -2295,6 +2302,17 @@ function setMasterItemLifecycle(rawIdx, lifecycle) {
   const item = ITEMS[rawIdx];
   if (!item) return;
   if (lifecycle === 'removed') { openRemoveMasterItemModal(rawIdx); return; }
+  if (lifecycle === 'disabled') {
+    requestDisableConfirmation('item', item.name, 'will remain visible in the HQ market list, but buyers in included outlet groups and ungrouped outlets will not be able to order it. You can enable it again at any time.', function() {
+      applyMasterItemLifecycle(rawIdx, 'disabled');
+    });
+    return;
+  }
+  applyMasterItemLifecycle(rawIdx, lifecycle);
+}
+function applyMasterItemLifecycle(rawIdx, lifecycle) {
+  const item = ITEMS[rawIdx];
+  if (!item) return;
   saveItemLifecycle(item, lifecycle);
   mlPage = 1;
   renderMl();
@@ -2851,11 +2869,11 @@ function renderMl() {
     const actionsTd = '<td><div class="row-actions-wrap">' +
       '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
       '<div class="row-actions-menu">' +
-        '<div class="row-action-item" onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ')">Edit pricing</div>' +
+        '<div class="row-action-item" onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ')">Edit</div>' +
         (lifecycle === 'removed'
-          ? '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'active\')">Restore to master list</div>'
-          : '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'' + (lifecycle === 'disabled' ? 'active' : 'disabled') + '\')">' + (lifecycle === 'disabled' ? 'Enable item' : 'Disable item') + '</div>' +
-            '<div class="row-action-item danger" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'removed\')">Remove from HQ</div>') +
+          ? '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'active\')">Restore</div>'
+          : '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'' + (lifecycle === 'disabled' ? 'active' : 'disabled') + '\')">' + (lifecycle === 'disabled' ? 'Enable' : 'Disable') + '</div>' +
+            '<div class="row-action-item danger" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'removed\')">Remove</div>') +
       '</div></div></td>';
 
     if (!isMultiUom) {
@@ -2985,7 +3003,7 @@ RECIPES.forEach((r, i) => {
   r.versions = (i === 2) ? 7 : (i === 7 || i === 15 || i === 22 || i === 35) ? 2 : 1;
   r.lastUpdated = REC_DATES[i % REC_DATES.length];
   if (i === 2) r.lastUpdated = '23 Jun 2026';
-  r.active = (i % 9 !== 0);
+  r.lifecycle = (i % 9 !== 0) ? 'active' : 'disabled';
   r.type = i % 5 === 0 ? 'sub-recipe' : 'recipe';
   const fc = REC_FC_TARGETS[r.cat] || 0.30;
   r.price = Math.round(r.cost / fc * 2) / 2;
@@ -3035,8 +3053,8 @@ function getRecItems() {
   if (recTypeFilter) items = items.filter(r => r.type === recTypeFilter);
   if (recFoodCostFilter === 'above-threshold') items = items.filter(r => r.foodCostPct > recFcThreshold);
   if (recCatFilter) items = items.filter(r => r.cat === recCatFilter);
-  if (recStatusFilter === 'active') items = items.filter(r => r.active);
-  else if (recStatusFilter === 'inactive') items = items.filter(r => !r.active);
+  if (recStatusFilter) items = items.filter(r => recipeLifecycle(r) === recStatusFilter);
+  else items = items.filter(r => recipeLifecycle(r) !== 'removed');
   if (recSearch) {
     const q = recSearch.toLowerCase();
     items = items.filter(r => r.name.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q));
@@ -3067,8 +3085,11 @@ function renderRec() {
     const versionsHtml = r.versions > 1
       ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' variations</span>'
       : '';
-    return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
-      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + versionsHtml + '</div><span class="ml-cat-tag">' + (r.type === 'sub-recipe' ? 'Sub-recipe · ' : 'Recipe · ') + r.cat + '</span></td>' +
+    const lifecycle = recipeLifecycle(r);
+    const stateBadge = lifecycle === 'active' ? '' : '<span class="item-exc-badge" style="margin-left:7px;color:' + (lifecycle === 'removed' ? 'var(--chip-rejected-ink)' : 'var(--ink-mute)') + '">' + (lifecycle === 'removed' ? 'Removed' : 'Disabled') + '</span>';
+    const rawIdx = RECIPES.indexOf(r);
+    return '<tr' + (lifecycle === 'active' ? '' : ' class="ml-inactive"') + '>' +
+      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + stateBadge + versionsHtml + '</div><span class="ml-cat-tag">' + (r.type === 'sub-recipe' ? 'Sub-recipe · ' : 'Recipe · ') + r.cat + '</span></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">sell $' + r.price.toFixed(2) + '</div></td>' +
       '<td><span style="font-size: 14px;font-weight:700;color:' + (r.foodCostPct > recFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
       '<td style="text-align:left">' + grpHtml + '</td>' +
@@ -3076,9 +3097,12 @@ function renderRec() {
       '<td><div class="row-actions-wrap">' +
         '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
         '<div class="row-actions-menu">' +
-          '<div class="row-action-item">Edit recipe</div>' +
-          '<div class="row-action-item">Manage groups</div>' +
-          '<div class="row-action-item danger">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
+          '<div class="row-action-item">Edit</div>' +
+          '<div class="row-action-item" onclick="event.stopPropagation();openRecAvailabilityManager(' + rawIdx + ')">Manage availability</div>' +
+          (lifecycle === 'removed'
+            ? '<div class="row-action-item" onclick="event.stopPropagation();setRecipeLifecycle(' + rawIdx + ',\'active\')">Restore</div>'
+            : '<div class="row-action-item" onclick="event.stopPropagation();setRecipeLifecycle(' + rawIdx + ',\'' + (lifecycle === 'disabled' ? 'active' : 'disabled') + '\')">' + (lifecycle === 'disabled' ? 'Enable' : 'Disable') + '</div>' +
+              '<div class="row-action-item danger" onclick="event.stopPropagation();openRemoveRecipeModal(' + rawIdx + ')">Remove</div>') +
         '</div></div></td>' +
     '</tr>';
   }).join('');
@@ -3096,6 +3120,80 @@ function renderRec() {
 }
 
 function setRecPage(p) { recPage = p; renderRec(); window.scrollTo(0,0); }
+
+function recipeLifecycle(recipe) { return recipe.lifecycle || (recipe.active === false ? 'disabled' : 'active'); }
+function setRecipeLifecycle(index, lifecycle) {
+  const recipe = RECIPES[index];
+  if (!recipe) return;
+  if (lifecycle === 'disabled') {
+    requestDisableConfirmation('recipe', recipe.name, 'will remain visible in the HQ recipe library, but it cannot be used by any outlet group or ungrouped outlet. You can enable it again at any time.', function() {
+      applyRecipeLifecycle(index, 'disabled');
+    });
+    return;
+  }
+  applyRecipeLifecycle(index, lifecycle);
+}
+function applyRecipeLifecycle(index, lifecycle) {
+  const recipe = RECIPES[index];
+  if (!recipe) return;
+  recipe.lifecycle = lifecycle;
+  renderRec();
+  showHqToast(lifecycle === 'removed' ? 'Recipe removed' : (lifecycle === 'disabled' ? 'Recipe disabled' : 'Recipe restored'), recipe.name);
+}
+let pendingRecipeRemoval = null;
+function openRemoveRecipeModal(index) {
+  const recipe = RECIPES[index];
+  if (!recipe) return;
+  pendingRecipeRemoval = index;
+  document.getElementById('removeRecipeName').textContent = recipe.name;
+  document.getElementById('removeRecipeOverlay').classList.add('open');
+}
+function closeRemoveRecipeModal() { pendingRecipeRemoval = null; document.getElementById('removeRecipeOverlay').classList.remove('open'); }
+function confirmRemoveRecipe() {
+  if (pendingRecipeRemoval !== null) setRecipeLifecycle(pendingRecipeRemoval, 'removed');
+  closeRemoveRecipeModal();
+}
+
+let pendingDisableAction = null;
+function requestDisableConfirmation(entity, name, description, action) {
+  pendingDisableAction = action;
+  document.getElementById('disableConfirmTitle').textContent = 'Disable ' + entity + '?';
+  document.getElementById('disableConfirmName').textContent = name;
+  document.getElementById('disableConfirmDescription').textContent = description;
+  document.getElementById('disableConfirmOverlay').classList.add('open');
+}
+function closeDisableConfirmation() {
+  pendingDisableAction = null;
+  document.getElementById('disableConfirmOverlay').classList.remove('open');
+}
+function confirmDisableConfirmation() {
+  const action = pendingDisableAction;
+  closeDisableConfirmation();
+  if (action) action();
+}
+function toggleInventoryLifecycle(index) {
+  const record = INV_ITEMS[index];
+  if (!record) return;
+  if (inventoryLifecycle(record) === 'removed') {
+    record.removed = false;
+    record.lifecycle = 'active';
+    record.active = true;
+    renderInv();
+    showHqToast('Inventory record restored', record.name);
+    return;
+  }
+  if (record.active) {
+    requestDisableConfirmation('inventory record', record.name, 'will remain visible in HQ Inventory, but it cannot be used for stock counting or ordering. You can enable it again at any time.', function() {
+      record.active = false;
+      renderInv();
+      showHqToast('Inventory record disabled', record.name);
+    });
+  } else {
+    record.active = true;
+    renderInv();
+    showHqToast('Inventory record enabled', record.name);
+  }
+}
 
 renderRec();
 renderHealthCheck();
@@ -3118,8 +3216,8 @@ const ACTIVITY_LOG = [
   { date: '08 Jun 2026', time: '11:05', user: 'James Tan',    module: 'market-list', text: '<strong>2 items removed</strong> from master market list — Chilled Pork Belly Slab Skin-On Bone-Out AU 2kg, J-Basket Frozen Edamame Beans Shelled IQF 500g', scope: 'Master', tab: 'market-list' },
   // Market List — pricing updated
   { date: '15 May 2026', time: '09:30', user: 'William Arya', module: 'market-list', text: 'Pricing updated for <strong>12 items</strong> in master list', scope: 'Master', tab: 'market-list' },
-  // Market List — item deactivated
-  { date: '28 Feb 2026', time: '09:00', user: 'James Tan',    module: 'market-list', text: '<strong>Natural Bamboo BBQ Grill Skewer Flat Blade 30cm 100pcs Bag</strong> deactivated in master list', scope: 'Master', tab: 'market-list' },
+  // Market List — item disabled
+  { date: '28 Feb 2026', time: '09:00', user: 'James Tan',    module: 'market-list', text: '<strong>Natural Bamboo BBQ Grill Skewer Flat Blade 30cm 100pcs Bag</strong> disabled in master list', scope: 'Master', tab: 'market-list' },
   // Market List — supplier linked
   { date: '02 May 2026', time: '11:20', user: 'William Arya', module: 'market-list', text: '<strong>Ocean Fresh</strong> linked as supplier', scope: 'Master', tab: 'suppliers' },
   // Market List — group list customised
@@ -3321,7 +3419,7 @@ function goToHqUserEntry() {
   window.location.href = 'Admin - HQ Users.html?' + params.toString();
 }
 
-// Activate tab from URL hash (e.g. #recipes from recipe create back link)
+// Open tab from URL hash (e.g. #recipes from recipe create back link)
 (function() {
   var hash = window.location.hash.replace('#', '');
   if (hash) {
@@ -3447,7 +3545,7 @@ function renderSuppliers() {
       '<div class="row-actions-menu">' +
         '<div class="row-action-item" onclick="editLinkedSupplierSettings(\'' + s.name.replace(/'/g,"\\'") + '\')">Edit supplier settings</div>' +
         '<div class="row-action-item" onclick="viewSupplierItems(\'' + s.name.replace(/'/g,"\\'") + '\')">View items</div>' +
-        '<div class="row-action-item' + (s.active ? ' danger' : '') + '" onclick="toggleSupActive(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (s.active ? 'Disable supplier' : 'Enable supplier') + '</div>' +
+        '<div class="row-action-item' + (s.active ? ' danger' : '') + '" onclick="toggleSupActive(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (s.active ? 'Disable' : 'Enable') + '</div>' +
       '</div></div></td>' +
     '</tr>';
   }).join('') || '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--ink-mute)">No suppliers found</td></tr>';
@@ -3477,10 +3575,38 @@ function openRecGroupsDialog(btn) {
   if (outlets.length) parts.push(outlets.length === 1 ? '1 outlet' : outlets.length + ' outlets');
   document.getElementById('recGroupsList').innerHTML = html;
   document.getElementById('recGroupsCount').textContent = parts.join(' · ') + (outlets.length ? '' : (parts.length ? ' · No individual outlets' : 'Not available'));
+  document.getElementById('recGroupsTitle').textContent = 'Available to';
+  document.getElementById('recGroupsFoot').style.display = 'none';
   document.getElementById('recGroupsOverlay').style.display = 'flex';
 }
 function closeRecGroupsDialog() {
   document.getElementById('recGroupsOverlay').style.display = 'none';
+}
+let managedRecipeIndex = null;
+function openRecAvailabilityManager(index) {
+  const recipe = RECIPES[index];
+  if (!recipe) return;
+  managedRecipeIndex = index;
+  const allScopes = REC_GROUPS.concat(REC_OUTLETS);
+  const selected = new Set((recipe.groupList || []).concat(recipe.outletList || []));
+  document.getElementById('recGroupsTitle').textContent = 'Manage availability';
+  document.getElementById('recGroupsCount').textContent = recipe.name;
+  document.getElementById('recGroupsList').innerHTML = allScopes.map(function(scope) {
+    const type = REC_GROUPS.includes(scope) ? 'Outlet group' : 'Individual outlet';
+    return '<label style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);cursor:pointer"><span><span style="display:block;font-size:14px;font-weight:600;color:var(--ink)">' + escapeOverviewText(scope) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + type + '</span></span><input type="checkbox" data-rec-scope value="' + escapeOverviewText(scope) + '"' + (selected.has(scope) ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:var(--spinach);cursor:pointer" /></label>';
+  }).join('');
+  document.getElementById('recGroupsFoot').style.display = 'flex';
+  document.getElementById('recGroupsOverlay').style.display = 'flex';
+}
+function saveRecAvailability() {
+  const recipe = RECIPES[managedRecipeIndex];
+  if (!recipe) return;
+  const selected = Array.from(document.querySelectorAll('[data-rec-scope]:checked')).map(function(input) { return input.value; });
+  recipe.groupList = selected.filter(function(scope) { return REC_GROUPS.includes(scope); });
+  recipe.outletList = selected.filter(function(scope) { return REC_OUTLETS.includes(scope); });
+  closeRecGroupsDialog();
+  renderRec();
+  showHqToast('Recipe availability updated', recipe.name);
 }
 
 function openGroupSettings(name, description) {
@@ -3935,13 +4061,19 @@ function saveSupplierSettings() {
   showHqToast(isEditing ? 'Supplier settings updated' : 'Supplier linked', isEditing ? supplier.name + ' has been updated.' : supplier.name + ' has been linked to this HQ.');
 }
 
+function inventoryLifecycle(item) {
+  if (item.lifecycle === 'removed' || item.removed === true) return 'removed';
+  return item.active === false ? 'disabled' : 'active';
+}
+
 function renderInv() {
   applyHqInventorySettingsOverrides();
   var items = INV_ITEMS.slice();
   if (invSearch) { var q = invSearch.toLowerCase(); items = items.filter(function(r){ return r.name.toLowerCase().includes(q) || (r.detail||'').toLowerCase().includes(q); }); }
   if (invTypeFilter) items = items.filter(function(r){ return r.type === invTypeFilter; });
-  if (invStatusFilter === 'active') items = items.filter(function(r){ return r.active; });
-  else if (invStatusFilter === 'inactive') items = items.filter(function(r){ return !r.active; });
+  if (invStatusFilter === 'active') items = items.filter(function(r){ return inventoryLifecycle(r) === 'active'; });
+  else if (invStatusFilter === 'disabled') items = items.filter(function(r){ return inventoryLifecycle(r) === 'disabled'; });
+  else if (invStatusFilter === 'removed') items = items.filter(function(r){ return inventoryLifecycle(r) === 'removed'; });
   items.sort(function(a, b){ return a.name.localeCompare(b.name); });
 
   var total = items.length;
@@ -3954,7 +4086,11 @@ function renderInv() {
 
   page.forEach(function(r) {
     var globalIdx = INV_ITEMS.indexOf(r);
-    var inactiveClass = r.active ? '' : ' class="ml-inactive"';
+    var lifecycle = inventoryLifecycle(r);
+    var inactiveClass = lifecycle === 'active' ? '' : ' class="ml-inactive"';
+    var lifecycleBadge = lifecycle === 'removed'
+      ? '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#FDD6DC;color:#B42318;margin-left:6px">Removed</span>'
+      : (lifecycle === 'disabled' ? '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#F0F0F2;color:#555;margin-left:6px">Disabled</span>' : '');
 
 
     var detail = r.detail || '';
@@ -3979,7 +4115,7 @@ function renderInv() {
         '<div style="display:flex;align-items:center;gap:8px">' +
         '<div>' +
           '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">' +
-            '<span style="font-size:14px;font-weight:500;color:var(--ink)">' + r.name + '</span>' +
+            '<span style="font-size:14px;font-weight:500;color:var(--ink)">' + r.name + lifecycleBadge + '</span>' +
             (r.type === 'group' ? '<span style="font-size:10px;font-weight:700;letter-spacing:.04em;background:#EDE9FE;color:#6D28D9;border-radius:4px;padding:2px 6px;flex-shrink:0">G</span>' : '') +
           '</div>' +
           (detail ? (r.type === 'group'
@@ -3994,8 +4130,8 @@ function renderInv() {
         '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
         '<div class="row-actions-menu inventory-actions-menu">' +
           '<div class="row-action-item" onclick="event.stopPropagation();' + (r.type === 'group' ? 'openGroupSkuModal(' + globalIdx + ')' : 'openHqInventorySettings(' + globalIdx + ')') + '">Edit</div>' +
-          '<div class="row-action-item">' + (r.active ? 'Deactivate' : 'Activate') + '</div>' +
-          '<div class="row-action-item danger">Remove from inventory</div>' +
+          '<div class="row-action-item" onclick="event.stopPropagation();toggleInventoryLifecycle(' + globalIdx + ')">' + (lifecycle === 'removed' ? 'Restore' : (lifecycle === 'active' ? 'Disable' : 'Enable')) + '</div>' +
+          '<div class="row-action-item danger">Remove</div>' +
         '</div></div>' +
       '</td>' +
     '</tr>');
@@ -4060,22 +4196,15 @@ function openGroupSkuModal(editIndex) {
     name: existing ? existing.name : '',
     uom: existing ? existing.uom : '',
     par: existing && existing.par != null ? existing.par : '',
-    list: existing ? (existing.list || '') : '',
     items: existing && existing.constituents ? existing.constituents.map(function(c){ return Object.assign({ uom: existing.uom }, c); }) : []
   };
   document.getElementById('groupSkuModalTitle').textContent = isEditing ? 'Edit Group SKU' : 'Create Group SKU';
   document.getElementById('groupSkuName').value = groupSkuDraft.name;
   document.getElementById('groupSkuPar').value = groupSkuDraft.par;
-  renderGroupSkuList(INV_LISTS.concat(groupSkuDraft.list && INV_LISTS.indexOf(groupSkuDraft.list) === -1 ? [groupSkuDraft.list] : []));
-  document.getElementById('groupSkuListSelect').value = groupSkuDraft.list;
   document.getElementById('groupSkuSaveBtn').textContent = isEditing ? 'Save' : 'Create';
   renderGroupSkuContent();
   updateGroupSkuSaveState();
   document.getElementById('groupSkuOverlay').classList.add('open');
-}
-function renderGroupSkuList(lists) {
-  var select = document.getElementById('groupSkuListSelect');
-  select.innerHTML = '<option value="">Select list</option>' + lists.map(function(l){ return '<option value="' + hqSettingsEscape(l) + '">' + hqSettingsEscape(l) + '</option>'; }).join('');
 }
 function closeGroupSkuModal() {
   document.getElementById('groupSkuOverlay').classList.remove('open');
@@ -4112,10 +4241,9 @@ function deleteCheckedGroupSkuContent() {
 function updateGroupSkuSaveState() {
   var name = document.getElementById('groupSkuName').value.trim();
   var par = document.getElementById('groupSkuPar').value;
-  var list = document.getElementById('groupSkuListSelect').value;
   var uomLabel = document.getElementById('groupSkuParUom');
   uomLabel.textContent = groupSkuDraft.items.length ? groupSkuDraft.items[0].uom : '';
-  var ready = !!name && groupSkuDraft.items.length > 0 && par !== '' && Number(par) >= 0 && !!list;
+  var ready = !!name && groupSkuDraft.items.length > 0 && par !== '' && Number(par) >= 0;
   document.getElementById('groupSkuSaveBtn').disabled = !ready;
 }
 function openGroupSkuPicker() {
@@ -4173,7 +4301,6 @@ function renderGroupSkuPickerList() {
 }
 function toggleGroupSkuPickerItem(name, checked) {
   if (checked) {
-    if (groupSkuPickerSelected.size + groupSkuDraft.items.length >= 5) { checked = false; renderGroupSkuPickerList(); return; }
     groupSkuPickerSelected.add(name);
   } else {
     groupSkuPickerSelected.delete(name);
@@ -4198,15 +4325,14 @@ function confirmGroupSkuPicker() {
 function saveGroupSku() {
   var name = document.getElementById('groupSkuName').value.trim();
   var par = Number(document.getElementById('groupSkuPar').value || 0);
-  var list = document.getElementById('groupSkuListSelect').value;
-  if (!name || !groupSkuDraft.items.length || !list) return;
+  if (!name || !groupSkuDraft.items.length) return;
   var duplicate = INV_ITEMS.some(function(item, idx) { return idx !== groupSkuDraft.editIndex && item.name.toLowerCase() === name.toLowerCase(); });
   if (duplicate) { var nameField = document.getElementById('groupSkuName'); nameField.focus(); return; }
   var uom = groupSkuDraft.items[0].uom;
   var newNames = groupSkuDraft.items.map(function(c){ return c.name; });
   var entry = {
     type: 'group', name: name, detail: groupSkuDraft.items.length + ' SKU' + (groupSkuDraft.items.length === 1 ? '' : 's'),
-    uom: uom, cost: null, active: true, list: list,
+    uom: uom, cost: null, active: true,
     groups: groupSkuDraft.editIndex > -1 ? INV_ITEMS[groupSkuDraft.editIndex].groups : INV_GROUPS.slice(),
     par: par, constituents: groupSkuDraft.items.slice()
   };
@@ -5360,7 +5486,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
   <div style="background:#fff;border-radius:12px;width:400px;max-width:calc(100vw - 32px);box-shadow:0 24px 64px rgba(0,0,0,.22);overflow:hidden">
     <div style="padding:20px 24px 16px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink)">Available to</div>
+        <div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink)" id="recGroupsTitle">Available to</div>
         <div style="font-size: 14px;color:var(--ink-mute);margin-top:2px" id="recGroupsCount"></div>
       </div>
       <button onclick="closeRecGroupsDialog()" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--rule);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-mute)">
@@ -5368,6 +5494,10 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
       </button>
     </div>
     <div style="padding:4px 24px 20px" id="recGroupsList"></div>
+    <div id="recGroupsFoot" style="display:none;padding:16px 24px 20px;border-top:1px solid var(--rule);justify-content:flex-end;gap:8px">
+      <button class="btn btn-tertiary" onclick="closeRecGroupsDialog()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRecAvailability()">Save</button>
+    </div>
   </div>
 </div>
 
@@ -5400,16 +5530,16 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
     </div>
   </div>
 </div>
-<!-- Supplier re-activate with items option (HQ level) -->
+<!-- Supplier enable with items option (HQ level) -->
 <div class="confirm-overlay" id="supReactivateOverlay" onclick="if(event.target===this)closeSupReactivateOverlay()">
   <div class="confirm-card">
-    <div class="confirm-title">Re-enable supplier?</div>
-    <div class="confirm-body"><strong id="supReactivateName"></strong> will be re-enabled. There are <strong id="supReactivateCount"></strong> items from this supplier that were disabled when the supplier was deactivated. Would you like to re-activate them as well?</div>
+    <div class="confirm-title">Enable supplier?</div>
+    <div class="confirm-body"><strong id="supReactivateName"></strong> will be enabled. There are <strong id="supReactivateCount"></strong> items from this supplier that were disabled when the supplier was disabled. Would you like to enable them as well?</div>
     <div class="confirm-foot" style="justify-content:space-between">
       <button class="modal-cancel" onclick="closeSupReactivateOverlay()">Cancel</button>
       <div style="display:flex;gap:8px">
         <button class="btn btn-tertiary" onclick="confirmSupReactivate(false)">Keep items disabled</button>
-        <button class="btn btn-primary" onclick="confirmSupReactivate(true)">Re-activate items</button>
+        <button class="btn btn-primary" onclick="confirmSupReactivate(true)">Enable items</button>
       </div>
     </div>
   </div>
@@ -5690,7 +5820,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
     <div class="confirm-body">Disabling <strong id="supDisableName"></strong> at the HQ level will remove it from <em>all</em> outlet groups immediately. Buyers will no longer be able to order from this supplier. This can be reversed at any time.</div>
     <div class="confirm-foot">
       <button class="modal-cancel" onclick="closeSupDisableWarning()">Cancel</button>
-      <button class="btn-danger" onclick="confirmSupDisable()">Disable supplier</button>
+      <button class="btn-danger" onclick="confirmSupDisable()">Disable</button>
     </div>
   </div>
 </div>
@@ -5811,8 +5941,6 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
         <div style="display:flex;align-items:center;gap:8px"><input class="field-input" id="groupSkuPar" type="number" min="0" step="1" oninput="updateGroupSkuSaveState()" /><span id="groupSkuParUom" style="font-size:13px;color:var(--ink-mute);white-space:nowrap"></span></div>
       </div>
       <div>
-        <label class="field-label">Receive goods in/deduct sold items from:</label>
-        <select class="field-input" id="groupSkuListSelect" onchange="updateGroupSkuSaveState()"><option value="">Select list</option></select>
       </div>
     </div>
     <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkuModal()">Cancel</button><button class="btn btn-primary" id="groupSkuSaveBtn" disabled onclick="saveGroupSku()">Create</button></div>
@@ -5824,7 +5952,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
   <div class="modal-card" style="width:620px">
     <div class="modal-header"><h2 class="modal-title">Choose items for Group SKU</h2><button class="modal-close" onclick="closeGroupSkuPicker()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
     <div class="modal-body" style="gap:14px">
-      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--ink)"><strong>Note:</strong> Select up to 5 items with the same UoM (Unit of Measurement) to create a group SKU.</p>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--ink)"><strong>Note:</strong> Select any number of items with the same UoM (Unit of Measurement) to create a group SKU.</p>
       <div style="display:flex;gap:10px;padding:12px 14px;border-radius:6px;background:#EFF6FF;color:#1D4ED8;font-size:13px;line-height:1.5"><span aria-hidden="true">ⓘ</span><span>Any existing data (history, stock count, adjustments) of the items you selected will be lost when added to a Group SKU.</span></div>
       <div style="display:flex;gap:10px">
         <div class="ml-search-wrap" style="flex:1">
@@ -5936,6 +6064,30 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
     <div class="danger-confirm-actions">
       <button class="btn-cancel-plain" onclick="closeRemoveMasterItemModal()">Cancel</button>
       <button class="btn-danger-confirm" onclick="confirmRemoveMasterItem()">Remove from HQ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Remove recipe confirm ── -->
+<div class="confirm-overlay" id="removeRecipeOverlay" onclick="if(event.target===this)closeRemoveRecipeModal()">
+  <div class="danger-confirm-card">
+    <div class="danger-confirm-title">Remove recipe?</div>
+    <div class="danger-confirm-body"><strong id="removeRecipeName"></strong> will no longer be available to any outlet group or ungrouped outlet in this HQ. Existing POS mappings, inventory records and historical data will be kept, but the recipe cannot be newly selected or mapped. You can restore it later from the <strong>Removed</strong> filter.</div>
+    <div class="danger-confirm-actions">
+      <button class="btn-cancel-plain" onclick="closeRemoveRecipeModal()">Cancel</button>
+      <button class="btn-danger-confirm" onclick="confirmRemoveRecipe()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Shared HQ disable confirmation ── -->
+<div class="confirm-overlay" id="disableConfirmOverlay" onclick="if(event.target===this)closeDisableConfirmation()">
+  <div class="confirm-card">
+    <div class="confirm-title" id="disableConfirmTitle">Disable?</div>
+    <div class="confirm-body"><strong id="disableConfirmName"></strong><span id="disableConfirmDescription" style="margin-left:4px"></span></div>
+    <div class="confirm-foot">
+      <button class="modal-cancel" onclick="closeDisableConfirmation()">Cancel</button>
+      <button class="btn-danger" onclick="confirmDisableConfirmation()">Disable</button>
     </div>
   </div>
 </div>

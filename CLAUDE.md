@@ -25,9 +25,9 @@ The HQ module lets a multi-outlet restaurant/hospitality buyer group manage mark
   - **HQ users linked to one or more HQs**, automatically gaining access to the outlets each HQ manages — this is the basis for the "HQ users are regular Procure accounts with an HQ mode toggle" model implemented in this repo (see below), rather than a separate account type.
   - Open questions the story itself still flags: how HQ interacts with outlets on **active suppliers** (who continue managing their own per-outlet market lists — HQ can view but not edit), how HQ inventory/Group SKUs work, and how price updates from invoice-processing should flow when pricing is no longer fully centralized.
 - **HQ users implementation in this repo**: per ticket PWF-1664, HQ users are not a separate account type — they're regular outlet user accounts with "HQ mode" enabled, giving them a mode switcher between their normal outlet view and cross-outlet HQ governance tools. There are two HQ user types (**Regular**, **Owner** — Owners can only be created/managed by Nomni Admin) and three HQ-specific permissions (manage user accounts, grant HQ access, revoke HQ access). See the "HQ access" section in `Admin - Buyer User.html` / `Procure - User Detail.html` for the implementation, and `Admin - HQ Users.html` for the per-HQ user list.
-- Ownership of each capability between **Admin** (platform-operator) and **Procure** (buyer-controlled) is still an open product decision for most of this module — see `HQ_MODULE_STATUS.md`.
+- Ownership of each capability between **Admin** (platform-operator) and **Procure** (buyer-controlled) is still an open product decision for most of this module — see `HQ_MODULE_GUIDE.md`.
 
-For what's actually built vs. partial vs. missing in this module, see **`HQ_MODULE_STATUS.md`** — it's the living tracker for HQ work and should be updated whenever HQ flows change.
+For the current guide, delivery status and gaps in this module, see **`HQ_MODULE_GUIDE.md`** — it is the living HQ reference and should be updated whenever HQ flows change.
 
 Build guidance: for HQ management views, start from `Procure - HQ - Outlet Groups.html` (Procure side) or `Admin - HQ Settings.html` (Admin side — a single-page shell with in-page tabs for Overview/Suppliers/Items/Inventory/Recipes/Activity, unlike Procure's split-into-separate-pages approach for the same areas).
 

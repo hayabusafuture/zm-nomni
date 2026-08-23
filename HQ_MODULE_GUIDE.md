@@ -1,12 +1,23 @@
 # HQ Module — Prototype Guide
 
-Last updated: 20 August 2026
+Last updated: 24 August 2026
 
-This guide describes the current user-facing HQ prototype: what each area contains, what an administrator can do, and the important behaviour represented in the prototype. For delivery status, limitations and backlog gaps, see `HQ_MODULE_STATUS.md`.
+This guide is the single source of truth for the current user-facing HQ prototype, its delivery status, limitations and follow-up work.
 
 ## HQ page
 
-The HQ page is the operating view for a buyer's head office. It has a header with the HQ name, last-updated date, **Users** and **Edit details** actions, a summary strip, and six tabs: Overview, Suppliers, Items, Inventory, Recipes and Activity.
+### Lifecycle terminology
+
+| Meaning | Use |
+| --- | --- |
+| HQ-wide record remains visible but cannot be used | **Disable / Enable** |
+| Unavailable only in a group or ungrouped outlet | **Exclude / Include** |
+| Removed from the HQ master list while historical references remain | **Remove / Restore** |
+| Detaching membership or access | **Remove access / Remove from group** |
+
+The effective priority is **Removed → Excluded → Disabled → Active**. Excluded records are hidden from the normal list for that scope and restored through an Excluded status filter or availability manager. HQ-disabled records remain visible, dimmed and labelled **Disabled at HQ**, and cannot be enabled locally. Legacy lifecycle wording is not used in HQ product UI or activity copy.
+
+The HQ page is the operating view for a buyer's head office. It has a header with the HQ name, last-updated date, **Users** and **Edit details** actions, a summary strip, and seven tabs: Overview, Suppliers, Items, Inventory, Recipes, POS mapping and Activity.
 
 ### Last updated timestamps
 
@@ -17,7 +28,7 @@ The HQ page is the operating view for a buyer's head office. It has a header wit
 
 ### Header and summary
 
-- **Users** opens the HQ user list, where existing Procure users can be added, user access can be removed, and non-owner users can be activated or deactivated.
+- **Users** opens the HQ user list, where existing Procure users can be added, users can be disabled or enabled, and access can be removed.
 - **Edit details** opens the HQ editing screen. An HQ is identified by its HQ name; company is not collected or shown.
 - The summary strip shows the total outlets, items, recipes and suppliers associated with the HQ.
 
@@ -58,7 +69,7 @@ Suppliers are managed at HQ level and then made available to the relevant outlet
 - Supplier search supports normal Procure suppliers, Active suppliers that require a Live Chat request, UEN/ABN lookup, and manual creation when no match exists.
 - Each linked supplier has configurable notification contacts, minimum order rules, delivery days and cut-off times, including **Apply to all** for delivery settings.
 - Email and WhatsApp are individually optional, but at least one contact method is required.
-- Existing suppliers can be edited, disabled or reactivated; prototype changes are retained locally where supported.
+- Existing suppliers can be edited, disabled or enabled at HQ level; group/outlet-specific availability uses Exclude/Include.
 
 ## Items
 
@@ -73,6 +84,7 @@ Items is the HQ master market-list view.
 - **Master lifecycle:** an HQ item can be **Active**, **Disabled** or **Removed**. Disabled items remain visible but cannot be ordered by included outlet groups or ungrouped outlets. Removed items disappear from available market lists throughout the HQ, while existing Inventory and Recipe references remain as historical records and can no longer be newly selected.
 - Removed items remain available in the HQ’s **Removed** status view, where they can be restored to the master market list.
 - **Scope exclusion:** HQ can exclude an otherwise active or disabled item from a specific outlet group or ungrouped outlet. Exclusion means it is not available there at all. The effective-state priority is **Removed → Excluded → Disabled → Active**.
+- In a group or outlet, **Exclude from this group/outlet** hides the item from the normal Items list; the **Excluded** status filter exposes it for **Include**. An HQ-disabled item remains visible, dimmed and labelled **Disabled at HQ**.
 
 ## Price changes
 
@@ -92,8 +104,9 @@ Inventory defines the HQ's inventory items and counting setup.
 - **Add to inventory** adds catalogue items or recipes to inventory and configures inventory UOM, conversion and par level.
 - Single-UOM rows show the UOM, unit cost and availability directly.
 - Multi-UOM rows are expandable: the parent shows the number of UOM options, while each child row repeats the item name and shows its UOM, cost and availability.
+- HQ inventory uses **Disable / Enable** for master records and **Remove from inventory** for removal. Group/outlet-specific availability uses **Exclude / Include** and excluded records are hidden from the normal local list.
 - Availability in child rows can identify outlet groups and individual outlets.
-- Row actions support editing and deactivating/removing inventory records in the prototype.
+- Row actions support editing, disabling/enabling and removing inventory records in the prototype.
 
 ## POS mapping
 
@@ -115,11 +128,12 @@ POS mapping connects the HQ to Nomni POS and defines how POS sales affect the HQ
 
 Recipes is the HQ recipe library.
 
-- Search and filters support browsing by recipe type and food-cost status.
+- Search and filters support browsing by recipe type, food-cost status and lifecycle status, including **Removed**.
 - Recipes can be created and edited, with ingredients, portions, instructions and food-cost information.
 - Recipes can have variations. The default variation is available broadly; non-default variations can be explicitly assigned to selected groups or outlets.
-- The **Available to** dialog makes the distinction between group-level availability and outlet-specific recipe variations visible.
+- **Manage availability** controls the groups and individual outlets in which a recipe is available; the **Available to** dialog remains a read-only summary.
 - The prototype includes recipe version history, copying data between variations and ingredient-update propagation flows.
+- **Master lifecycle:** HQ recipes can be **Active**, **Disabled** or **Removed**. Disabled recipes remain visible but unusable. Removed recipes disappear from HQ and local recipe lists but retain their POS mappings, inventory records and historical data; they can be restored from the **Removed** filter. Group/outlet recipe availability uses **Exclude / Include**; excluded recipes are hidden from the normal local list and restored from the **Excluded** filter. A recipe disabled at HQ remains visible locally as **Disabled at HQ**.
 
 ## Activity
 
@@ -186,7 +200,7 @@ Manages people with access to the currently viewed HQ.
 - Displays name, email, HQ Owner state and last active date; search filters the list.
 - **Add user** searches existing Procure accounts by name or email. A matching account can be added directly without creating a duplicate.
 - No match offers **Create new user**, carrying the current HQ into the new-user route.
-- Row actions support editing user details, activating/deactivating and removing HQ access. HQ Owners are protected from ordinary access removal.
+- Row actions support editing user details, disabling/enabling users and removing HQ access. HQ Owners are protected from ordinary access removal.
 
 ### HQ Price changes — `Admin - HQ - Price Changes.html`
 
@@ -236,7 +250,7 @@ This is the detailed management page for one outlet group.
 
 ### Group Activity boundary
 
-- The group Activity tab records changes whose scope is this group: outlets added/removed, group item or inventory changes, supplier enable/disable actions, recipe changes, POS mapping changes and group settings updates.
+- The group Activity tab records changes whose scope is this group: outlets added/removed, group item or inventory changes, supplier excluded/included actions, recipe changes, POS mapping changes and group settings updates.
 - HQ Activity remains the audit trail for HQ-wide changes, such as changing the HQ market list, HQ suppliers, HQ-level availability, linking outlets to the HQ or changing HQ settings. The same event should not be duplicated in both views unless the HQ action also created a group-level result.
 - Activity placement follows the **scope of the resulting change**, not the screen or button used to start it. For example, an HQ user disabling a supplier specifically for one group creates a group Activity entry, even if initiated from an HQ control; the entry should retain the origin (for example, “Initiated from HQ”). A change applied across the whole HQ belongs in HQ Activity.
 - If one HQ action has both scopes, record the group-level result in each affected group’s Activity and retain the broader administrative action in HQ Activity. Copying setup follows the same rule: record the copied changes in the destination group, including the source group and initiator.
@@ -275,6 +289,15 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 
 ## Planned follow-up work
 
+### Complete and confirm core flows
+
+- **Create item:** the page captures the required details but **Save item** does not yet create a locally retained HQ catalogue record. Complete the save, return and list-refresh flow.
+- **Recipes:** recipe creation and editing screens need to be fully fleshed out, including validation, save behaviour, variations, ingredients and retained state.
+- **POS mapping:** the HQ overview and mapping workspace are represented, but the end-to-end mapping flow and its dependency rules are not fully fleshed out.
+- **Price changes:** confirm that the dedicated HQ Price changes page, its scope and its review actions are the intended product experience before treating it as final.
+- **Unit costs and pricing:** confirm how unit costs are calculated and displayed across every HQ, outlet-group and outlet tab when supplier costs, item overrides, UOMs or price tiers differ by scope.
+- **Recipe availability:** define and build the management experience for recipe availability. The current dialog is a placeholder and needs clear group/outlet controls, exclusion behaviour and a restoration path.
+
 ### Ungrouped outlet management
 
 - **Implemented prototype:** clicking an ungrouped outlet in the HQ Overview opens an individual outlet-management view. It is clearly marked as independently managed and exposes Overview, Items, Inventory, Recipes, Suppliers, POS mapping and Activity sections.
@@ -285,8 +308,9 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 ### Outlet-group activity
 
 - **Implemented prototype:** the outlet-group page includes an **Activity** tab.
-- Record configuration changes relevant to the group, including items, recipes, suppliers, inventory records and features being enabled, disabled, added or removed.
-- Each entry should identify what changed, who made the change and when it occurred.
+- Record configuration changes relevant to the group, including items, recipes, suppliers, inventory records and features being enabled, disabled, excluded, included, added or removed. Use **disabled/enabled** for HQ-wide state and **excluded/included** for scope-specific availability.
+- Each entry uses the shared HQ audit-log format: a module-coloured dot, 14px activity text, 11px metadata for date/time, module and user, and a trailing navigation chevron. The scope field is omitted on detail pages because the current outlet group or outlet already supplies that context.
+- Outlet-group Outlets, Inventory and Suppliers tables use the shared table typography used by Recipes; item names use the common medium-weight treatment rather than browser-default bold text.
 
 ### Split an outlet into a new group without losing its setup
 
@@ -295,3 +319,58 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 - The confirmation step should make the alternative explicit: **Use the current group’s setup** (recommended) or **Start with HQ settings**. The latter should warn that it may substantially change what the outlet can order, count or use.
 - After the move, the new group becomes independent: future changes to either group do not affect the other. This prevents a removed outlet silently reverting to the generic HQ configuration.
 - **Implemented prototype:** group settings include **Copy setup**, which remains available after a group is created or split. The user selects a source group and the sections to overwrite; historical data, users and API keys are excluded.
+
+## Delivery status and gaps
+
+### Status definitions
+
+- **Built:** the intended interaction works in the prototype.
+- **Partial:** the screen or interaction exists, but a material part of the flow is incomplete.
+- **Not built:** absent or represented only by a non-functional control.
+- **Product decision:** behaviour or ownership remains undefined.
+
+Prototype status does not imply backend integration. Browser-local state is used for selected demonstration flows and may reset after navigation or refresh.
+
+### Current delivery snapshot
+
+| Area | Status | Remaining work |
+|---|---|---|
+| HQ creation and first outlet group | Built | Replace browser-local state with durable records and define production validation/error handling. |
+| HQ overview, groups and outlet assignment | Partial | Define removal consequences and retain assignments. |
+| HQ suppliers | Partial | Persist relationship settings, lifecycle changes and dependency reporting. |
+| HQ items | Partial | Complete locally retained Create item, then persist catalogue, access and exception state. |
+| HQ price changes | Partial | Confirm the page’s product scope and review workflow before finalising it; then persist review state. |
+| HQ inventory | Partial | Persist setup; define Group SKU dependency safeguards and views. |
+| HQ recipes | Partial | Fully flesh out creation and editing, then persist recipes, availability, history and variation changes. |
+| HQ POS mapping | Partial | Fully flesh out the end-to-end mapping flow and its dependency rules. |
+| Cost and pricing model | Product decision | Define the effective unit-cost calculation and display rules across HQ, group and outlet scopes. |
+| HQ users | Built | Replace the hard-coded prototype directory with real data and permissions. |
+| Activity | Partial | Write all actions to one durable audit trail. |
+| HQ lifecycle | Not built | Define and implement an HQ-wide enable/disable lifecycle. |
+
+### Admin and Procure ownership
+
+The intended split is by lifecycle stage rather than by surface alone: Admin supports provisioning, governance and CS-assisted onboarding; Procure supports ongoing buyer self-service.
+
+| Capability | Admin | Procure |
+|---|---|---|
+| Create or disable an HQ | Owns | — |
+| HQ Owner management | Owns | View only |
+| HQ details | Support/override | Owns day-to-day changes |
+| Outlet groups, suppliers, items and inventory | Onboarding/support | Owns ongoing changes |
+| Recipes | Fallback/support | Owns |
+| Overview and Activity | Read-mostly support/audit view | Primary buyer dashboard |
+| Routine HQ-user linking | Support path | Owns ongoing changes |
+
+### Cross-cutting implementation gaps
+
+- Backend/API integration, durable prototype state, roles and permissions, shared validation, loading/error states and accessibility review are not complete.
+- Confirmation, undo, notifications and audit conventions are only partially consistent.
+- Complex tables and modals still need a systematic responsive review.
+
+### Suggested next work
+
+1. Confirm Admin/Procure ownership and permission boundaries.
+2. Extend durable prototype state across HQ configuration, not only creation flows.
+3. Connect Health check and Activity to the same change events used by interactions.
+4. Complete disconnected actions and align confirmation, error and notification patterns.

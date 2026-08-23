@@ -450,10 +450,19 @@
           '<div class="row-actions-menu">' +
             (u.active ? '' : '<div class="row-action-note">Account is disabled</div>') +
             '<div class="row-action-item" onclick="editHqUser(' + idx + ')">Edit</div>' +
+            (u.hqOwner ? '' : '<div class="row-action-item' + (u.active ? ' danger' : '') + '" onclick="toggleHqUser(' + idx + ')">' + (u.active ? 'Disable user' : 'Enable user') + '</div>') +
             '<div class="row-action-item danger" onclick="removeHqUser(' + idx + ')">Remove HQ access</div>' +
           '</div></div></td>' +
       '</tr>';
     }).join('');
+  }
+
+  function toggleHqUser(idx) {
+    var u = HQ_USERS[idx];
+    if (!u || u.hqOwner) return;
+    u.active = !u.active;
+    showHqToast(u.active ? 'User enabled' : 'User disabled', u.name + ' has been ' + (u.active ? 'enabled' : 'disabled') + ' for this HQ.');
+    renderHqUsers();
   }
 
   function editHqUser(idx) {
