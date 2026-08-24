@@ -1096,7 +1096,7 @@
         <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px">Starting setup</div>
         <label style="display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--nomni-green);border-radius:6px;background:#F4FFF6;cursor:pointer">
           <input type="radio" name="splitSetup" value="copy" checked style="margin-top:2px;accent-color:var(--spinach)" />
-          <span><strong style="font-size:14px">Copy the current group’s setup</strong><span style="display:block;margin-top:3px;font-size:12px;line-height:1.4;color:var(--ink-mute)">Recommended. Copies items, inventory, recipes, suppliers and POS mapping; the new group can then change independently.</span></span>
+          <span><span style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><strong style="font-size:14px">Copy the current group’s setup</strong><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:4px;background:#D9F5E4;color:#1A8040;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;line-height:1.2">Recommended</span></span><span style="display:block;margin-top:4px;font-size:12px;line-height:1.4;color:var(--ink-mute)">Copies items, inventory, recipes, suppliers and POS mapping; the new group can then change independently.</span></span>
         </label>
         <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;padding:12px;border:1px solid var(--rule);border-radius:6px;cursor:pointer">
           <input type="radio" name="splitSetup" value="hq" style="margin-top:2px;accent-color:var(--spinach)" />
@@ -1566,6 +1566,18 @@ function getGroupedSuppliers() {
     groupDisabled: !s.hqDisabled && groupDisabledSuppliers.has(s.name),
   })).sort((a, b) => (a.hqDisabled ? 1 : 0) - (b.hqDisabled ? 1 : 0) || a.groupDisabled - b.groupDisabled || b.itemCount - a.itemCount || a.name.localeCompare(b.name));
 }
+const UNGROUPED_SUPPLIER_COUNTS = {
+  '(wf 139) chargrill @ 139 tampines': 9,
+  '(wf 290) garden express @ 290 sengkang': 10,
+};
+function initialiseUngroupedSupplierAvailability() {
+  if (!window.isIndividualOutletPrototype) return;
+  const outletKey = (new URLSearchParams(window.location.search).get('outlet') || '').toLowerCase();
+  const targetCount = UNGROUPED_SUPPLIER_COUNTS[outletKey];
+  if (typeof targetCount !== 'number') return;
+  const available = getGroupedSuppliers().filter(s => !s.hqDisabled);
+  available.slice(targetCount).forEach(s => scopeExcludedSuppliers.add(s.name));
+}
 function setSupplierStatusFilter(value) {
   groupSupplierStatusFilter = value || 'available';
   renderSuppliers();
@@ -1581,7 +1593,7 @@ function renderMiniSuppliers() {
   const mini = document.getElementById('miniSupplierList');
   if (!mini) return;
   const suppliers = getGroupedSuppliers();
-  const activeSuppliers = suppliers.filter(s => !s.groupDisabled && !s.hqDisabled);
+  const activeSuppliers = suppliers.filter(s => !s.groupDisabled && !s.hqDisabled && (!window.isIndividualOutletPrototype || !scopeExcludedSuppliers.has(s.name)));
   const badge = document.getElementById('supplierCountOverview');
   if (badge) badge.textContent = activeSuppliers.length;
   const show = activeSuppliers.slice(0, MINI_SUPPLIERS_MAX);
@@ -1656,7 +1668,7 @@ function renderIndividualSuppliers() {
     return individualSupplierStatusFilter === 'all' || (individualSupplierStatusFilter === 'excluded' ? excluded : !excluded);
   });
   panel.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Suppliers <span class="panel-label-count">' + getGroupedSuppliers().filter(s => !scopeExcludedSuppliers.has(s.name) && !s.hqDisabled).length + '</span></span></div>' +
-    '<div class="ml-filter-row"><select class="ml-filter-select" onchange="setIndividualSupplierStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
+    '<div class="ml-filter-row"><select class="ml-filter-select" id="individualSupplierStatusFilter" onchange="setIndividualSupplierStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
     '<table class="ml-table"><thead><tr><th>Supplier</th><th>Type</th><th>Items</th><th style="width:48px"></th></tr></thead><tbody>' +
     suppliers.map(s => {
       const excluded = scopeExcludedSuppliers.has(s.name);
@@ -1666,6 +1678,8 @@ function renderIndividualSuppliers() {
       return '<tr' + dim + '><td><div class="ml-item-name">' + s.name + '</div></td><td>' + status + '</td><td>' + s.itemCount + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu">' + action + '</div></div></td></tr>';
     }).join('') +
     '</tbody></table>';
+  const statusSelect = document.getElementById('individualSupplierStatusFilter');
+  if (statusSelect) statusSelect.value = individualSupplierStatusFilter;
 }
 
 function toggleIndividualSupplier(name) {
@@ -1717,7 +1731,7 @@ function renderStatsStrip() {
   const isOutlet = window.isIndividualOutletPrototype;
   const outletCount   = isOutlet ? 1 : currentGroup.size;
   const itemCount     = isOutlet ? 74 : (window.isCreatedGroupPrototype ? 0 : ITEMS.length);
-  const supplierCount = isOutlet ? 13 : (window.isCreatedGroupPrototype ? 0 : HQ_SUPPLIERS.length - groupDisabledSuppliers.size);
+  const supplierCount = isOutlet ? getGroupedSuppliers().filter(s => !s.hqDisabled && !scopeExcludedSuppliers.has(s.name)).length : (window.isCreatedGroupPrototype ? 0 : HQ_SUPPLIERS.filter(s => !s.hqDisabled && !groupDisabledSuppliers.has(s.name)).length);
   const recipeCount   = isOutlet ? 5 : (window.isCreatedGroupPrototype ? 0 : OG_RECIPES.length);
   const stats = [
     { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', value: outletCount,         label: isOutlet ? 'Outlet' : 'Outlets',   iconColor: '#1A8040', accentColor: '#2AC864' },
@@ -2590,7 +2604,7 @@ function renderOgRec() {
         '<button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button>' +
         '<div class="row-actions-menu">' +
           '<div class="row-action-item">Edit recipe</div>' +
-          (r.active ? '<div class="row-action-item' + (ogRecipeExclusions.has(r.name) ? '' : ' danger') + '" onclick="toggleOgRecipeExclusion(\'' + r.name.replace(/'/g, "\\'") + '\')">' + (ogRecipeExclusions.has(r.name) ? (window.isIndividualOutletPrototype ? 'Include in this outlet' : 'Include in this group') : (window.isIndividualOutletPrototype ? 'Exclude from this outlet' : 'Exclude from this group')) + '</div>' : '<div class="row-action-note">Disabled at HQ</div>') +
+          (r.active ? '<div class="row-action-item' + (ogRecipeExclusions.has(r.name) ? '' : ' danger') + '" onclick="event.stopPropagation();toggleOgRecipeExclusion(\'' + r.name.replace(/'/g, "\\'") + '\')">' + (ogRecipeExclusions.has(r.name) ? (window.isIndividualOutletPrototype ? 'Include in this outlet' : 'Include in this group') : (window.isIndividualOutletPrototype ? 'Exclude from this outlet' : 'Exclude from this group')) + '</div>' : '<div class="row-action-note">Disabled at HQ</div>') +
         '</div></div></td>' +
     '</tr>';
   }).join('');
@@ -2614,9 +2628,12 @@ renderOgRec();
 document.getElementById('modalClearBtn').style.visibility = 'hidden';
 if (!window.isIndividualOutletPrototype) renderOutlets();
 if (!window.isIndividualOutletPrototype) renderItems();
+if (window.isIndividualOutletPrototype) initialiseUngroupedSupplierAvailability();
 renderMiniSuppliers();
 if (!window.isIndividualOutletPrototype) renderSuppliers();
-if (window.isIndividualOutletPrototype) renderIndividualOverviewItems();
+if (window.isIndividualOutletPrototype) {
+  renderIndividualOverviewItems();
+}
 renderScopeInventory();
 renderStatsStrip();
 if (window.isIndividualOutletPrototype) { const strip = document.getElementById('statsStrip'); if (strip) { const firstStat = strip.querySelector('.stat-cell'); if (firstStat) firstStat.remove(); strip.style.gridTemplateColumns = 'repeat(3, 1fr)'; } }

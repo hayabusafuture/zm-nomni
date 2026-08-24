@@ -235,6 +235,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .danger-confirm-actions { display: flex; justify-content: flex-end; gap: 10px; }
 .btn-danger-confirm { background: #D0291E; color: #fff; border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 18px; cursor: pointer; transition: background .15s; }
 .btn-danger-confirm:hover { background: #b02016; }
+.btn-danger-confirm:disabled { background: #E7A7A2; cursor: not-allowed; opacity: .8; }
 .btn-cancel-plain { background: none; border: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink-mute); padding: 9px 14px; cursor: pointer; border-radius: 6px; transition: color .13s; }
 .btn-cancel-plain:hover { color: var(--ink); }
 .outlet-chips { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
@@ -353,9 +354,10 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay, #linkSupOverlay { inset:56px 0 0 232px; z-index:8; padding:0; background:#fff; align-items:stretch; justify-content:stretch; }
 #supplierSettingsOverlay.open, #linkSupOverlay.open { display:block; }
 #supplierSettingsOverlay .modal-card, #linkSupOverlay .modal-card { width:100% !important; height:100%; min-height:0; max-width:none; max-height:none; border-radius:0; box-shadow:none; overflow:hidden; }
-#supplierSettingsOverlay .modal-header, #linkSupOverlay .modal-header { padding:28px 40px 18px; border-bottom:1px solid var(--rule); }
+#supplierSettingsOverlay .modal-header, #linkSupOverlay .modal-header { padding:28px 40px 16px; border-bottom:1px solid var(--rule); }
 #supplierSettingsOverlay #supplierSettingsPageTitle, #linkSupOverlay #linkSupPageTitle { font-size:24px !important; letter-spacing:-.03em; }
-#supplierSettingsOverlay .supplier-back, #linkSupOverlay .supplier-back { display:inline-flex; align-items:center; gap:5px; margin-bottom:5px; padding:0; border:0; background:none; color:var(--spinach); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
+#supplierSettingsOverlay .supplier-back, #linkSupOverlay .supplier-back { display:inline-flex; align-items:center; gap:5px; min-height:18px; margin-bottom:10px; padding:0; border:0; background:none; color:var(--spinach); font:inherit; font-size:13px; font-weight:600; line-height:18px; cursor:pointer; }
+#supplierSettingsOverlay .supplier-back:hover, #linkSupOverlay .supplier-back:hover { color:var(--seaweed); text-decoration:underline; text-underline-offset:3px; }
 #supplierSettingsOverlay .modal-body, #linkSupOverlay .modal-body { flex:1; min-height:0; overflow-y:auto; gap:0; padding:0 40px 32px; }
 #supplierSettingsOverlay .hq-steps, #linkSupOverlay .hq-steps { flex-shrink:0; display:flex; align-items:center; gap:34px; padding:10px 40px; background:var(--mint); border-bottom:1px solid #C9F6D3; }
 #supplierSettingsOverlay .hq-steps[hidden], #linkSupOverlay .hq-steps[hidden] { display:none; }
@@ -365,7 +367,58 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .hq-step.is-active .hq-step-number, #linkSupOverlay .hq-step.is-active .hq-step-number { background:var(--spinach); }
 #linkSupOverlay .link-sup-search-row { display:flex; align-items:center; gap:10px; max-width:520px; margin:24px 0 20px; }
 #linkSupOverlay .link-sup-search-row .ml-search-wrap { flex:1; width:auto; }
-#supplierSettingsOverlay .supplier-settings-shell { width:min(640px,100%); margin:0 auto; padding-bottom:18px; }
+#supplierSettingsOverlay .supplier-settings-shell { width:100%; margin:0; padding-bottom:18px; }
+#supplierSettingsOverlay .supplier-settings-layout { display:grid; grid-template-columns:220px minmax(0,1fr); gap:42px; align-items:stretch; min-height:100%; }
+#supplierSettingsOverlay .supplier-scope-nav { position:sticky; top:0; align-self:start; height:calc(100vh - 220px); min-height:0; max-height:calc(100vh - 220px); box-sizing:border-box; padding:22px 20px 0 0; border-right:1px solid var(--rule); display:flex; flex-direction:column; }
+#supplierSettingsOverlay .supplier-scope-nav-item { width:100%; min-height:52px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:11px 12px; border:1px solid var(--rule); border-radius:8px; background:#fff; color:var(--ink-2); font:inherit; font-size:14px; font-weight:700; text-align:left; cursor:pointer; }
+#supplierSettingsOverlay .supplier-scope-nav-item:hover { border-color:#A9DDB6; background:#F7FFF9; color:var(--spinach); }
+#supplierSettingsOverlay .supplier-scope-nav-item.is-active { background:#E2FFE6; border-color:#91CEA0; color:var(--seaweed); }
+#supplierSettingsOverlay .supplier-scope-nav-item small { display:block; margin-top:3px; color:var(--ink-mute); font-size:11px; font-weight:500; }
+#supplierSettingsOverlay .supplier-scope-nav-add { width:100%; justify-content:center; margin-top:10px; }
+#supplierSettingsOverlay .supplier-scope-nav-overrides { display:flex; flex:0 1 auto; min-height:0; max-height:calc(100vh - 330px); flex-direction:column; gap:8px; margin-top:10px; overflow-y:auto; }
+#supplierSettingsOverlay .supplier-scope-nav-overrides:empty { flex:0 0 auto; }
+#supplierSettingsOverlay .supplier-settings-content { width:min(640px,100%); min-width:0; justify-self:center; }
+#supplierSettingsOverlay .supplier-scope-card { margin-top:28px; padding:18px 20px; border:1px solid #C9F6D3; border-radius:10px; background:#F7FFF9; }
+#supplierSettingsOverlay .supplier-scope-title { margin:0; color:var(--ink); font-size:16px; font-weight:700; letter-spacing:-.01em; }
+#supplierSettingsOverlay .supplier-scope-intro { margin:5px 0 14px; color:var(--ink-mute); font-size:13px; line-height:1.45; }
+#supplierSettingsOverlay .supplier-scope-summary { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
+#supplierSettingsOverlay .supplier-scope-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 7px; border-radius:5px; background:#fff; color:#356343; font-size:11px; font-weight:700; border:1px solid #D8EEDD; }
+#supplierSettingsOverlay .supplier-scope-chip b { color:var(--spinach); }
+#supplierSettingsOverlay .supplier-scope-list { border-top:1px solid #D8EEDD; }
+#supplierSettingsOverlay .supplier-scope-row { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:14px; min-height:58px; border-bottom:1px solid #D8EEDD; }
+#supplierSettingsOverlay .supplier-scope-name { display:block; color:var(--ink); font-size:14px; font-weight:700; }
+#supplierSettingsOverlay .supplier-scope-meta { display:block; margin-top:3px; color:var(--ink-mute); font-size:12px; }
+#supplierSettingsOverlay .supplier-scope-status { display:inline-flex; align-items:center; border-radius:4px; padding:3px 6px; background:#E8F7EC; color:#1A8040; font-size:10px; font-weight:700; letter-spacing:.035em; text-transform:uppercase; }
+#supplierSettingsOverlay .supplier-scope-status.inherited { background:#F0F2F4; color:#6A7079; }
+#supplierSettingsOverlay .supplier-scope-edit { min-height:34px; padding:0 10px; border:1px solid #B8DFC1; border-radius:6px; background:#fff; color:var(--spinach); font:inherit; font-size:12px; font-weight:700; cursor:pointer; transition:background .13s,color .13s,transform .13s; }
+#supplierSettingsOverlay .supplier-scope-edit:hover { background:#E8F7EC; }
+#supplierSettingsOverlay .supplier-scope-edit:active { transform:scale(.96); }
+#supplierSettingsOverlay .supplier-scope-row.is-current .supplier-scope-edit { background:var(--spinach); color:#fff; border-color:var(--spinach); }
+#supplierSettingsOverlay .supplier-editing-note { min-height:52px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:22px 0 -10px; padding:13px 15px; border-radius:8px; background:var(--mint); color:#356343; font-size:14px; line-height:1.35; }
+#supplierSettingsOverlay .supplier-editing-note strong { color:var(--ink); }
+#supplierSettingsOverlay .supplier-override-delete { border:0; background:transparent; padding:5px 0; color:#B42318; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+#supplierSettingsOverlay .supplier-override-delete:hover { color:#8D1B12; }
+#supplier-override-picker-card { width:600px !important; }
+#supplierOverridePicker .modal-header { align-items:center; padding:10px 24px; }
+#supplierOverridePicker .modal-close { width:40px; height:40px; padding:0; justify-content:center; border-radius:6px; color:var(--ink-mute); }
+#supplierOverridePicker .modal-close:hover { background:#F3F4F6; color:var(--ink); }
+#supplierOverridePicker .modal-body { padding:24px; gap:20px; }
+#supplierOverridePicker .supplier-override-intro { margin:0; color:var(--ink-mute); font-size:14px; line-height:1.5; }
+#supplierOverridePicker .supplier-override-label { margin:0 0 12px; color:var(--ink); font-size:13px; font-weight:700; }
+#supplierOverridePicker .supplier-override-type-choices { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+#supplierOverridePicker .supplier-override-type { display:flex; align-items:flex-start; gap:10px; min-height:76px; padding:13px; border:1px solid var(--rule); border-radius:8px; background:#fff; cursor:pointer; box-sizing:border-box; }
+#supplierOverridePicker .supplier-override-type:hover { border-color:#A9DDB6; background:#F7FFF9; }
+#supplierOverridePicker .supplier-override-type.is-selected { border-color:var(--spinach); background:#F2FFF5; box-shadow:0 0 0 1px var(--spinach); }
+#supplierOverridePicker .supplier-override-type input { width:16px; height:16px; margin:2px 0 0; accent-color:var(--spinach); flex-shrink:0; }
+#supplierOverridePicker .supplier-override-type strong { display:block; color:var(--ink); font-size:14px; }
+#supplierOverridePicker .supplier-override-type span span { display:block; margin-top:4px; color:var(--ink-mute); font-size:12px; line-height:1.35; }
+#supplierOverridePicker .supplier-override-targets { display:flex; flex-direction:column; border:1px solid var(--rule); border-radius:8px; overflow:hidden; background:#fff; }
+#supplierOverridePicker .supplier-override-target { display:flex; align-items:center; gap:12px; min-height:58px; padding:11px 14px; border-bottom:1px solid var(--rule); cursor:pointer; }
+#supplierOverridePicker .supplier-override-target:last-child { border-bottom:0; }
+#supplierOverridePicker .supplier-override-target:hover { background:#F7FFF9; }
+#supplierOverridePicker .supplier-override-target input { width:16px; height:16px; margin:0; accent-color:var(--spinach); }
+#supplierOverridePicker .supplier-override-target strong { display:block; color:var(--ink); font-size:14px; }
+#supplierOverridePicker .supplier-override-target span span { display:block; margin-top:3px; color:var(--ink-mute); font-size:12px; }
 #supplierSettingsOverlay .supplier-settings-section { display:flex; flex-direction:column; }
 #supplierSettingsOverlay .supplier-settings-heading { margin:34px 0 18px; font-size:21px; line-height:1.2; font-weight:700; letter-spacing:-.02em; color:var(--ink); }
 #supplierSettingsOverlay .supplier-settings-card { padding:28px; border:0; border-radius:8px; background:#F7F7F7; display:flex; flex-direction:column; gap:14px; }
@@ -397,7 +450,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-page-cancel { min-height:40px; padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:700; cursor:pointer; }
 #supplierSettingsOverlay .supplier-page-cancel:hover { color:var(--seaweed); }
 @media (max-width:1280px) { #supplierSettingsOverlay, #linkSupOverlay { left:64px; } }
-@media (max-width:700px) { #supplierSettingsOverlay, #linkSupOverlay { left:0; } #supplierSettingsOverlay .modal-header,#supplierSettingsOverlay .modal-body,#supplierSettingsOverlay .modal-foot,#linkSupOverlay .modal-header,#linkSupOverlay .modal-body,#supplierSettingsOverlay .hq-steps,#linkSupOverlay .hq-steps { padding-left:20px; padding-right:20px; } #supplierSettingsOverlay .supplier-policy-head,#supplierSettingsOverlay .supplier-policy-row { grid-template-columns:110px 1fr; } #supplierSettingsOverlay .supplier-apply-all { grid-column:2; justify-self:start; } }
+@media (max-width:700px) { #supplierSettingsOverlay, #linkSupOverlay { left:0; } #supplierSettingsOverlay .modal-header,#supplierSettingsOverlay .modal-body,#supplierSettingsOverlay .modal-foot,#linkSupOverlay .modal-header,#linkSupOverlay .modal-body,#supplierSettingsOverlay .hq-steps,#linkSupOverlay .hq-steps { padding-left:20px; padding-right:20px; } #supplierSettingsOverlay .supplier-policy-head,#supplierSettingsOverlay .supplier-policy-row { grid-template-columns:110px 1fr; } #supplierSettingsOverlay .supplier-apply-all { grid-column:2; justify-self:start; } #supplierSettingsOverlay .supplier-settings-layout { grid-template-columns:1fr; gap:18px; } #supplierSettingsOverlay .supplier-scope-nav { position:static; height:auto; max-height:none; border-right:0; padding:0; } }
 .modal-field { display: flex; flex-direction: column; gap: 5px; }
 .modal-field label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; }
 .modal-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -1122,7 +1175,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             </td>
             <td style="text-align:center"><span class="og-count">100</span></td>
             <td style="text-align:center"><span class="og-count">48</span></td>
-            <td style="text-align:center"><span class="og-count">14</span></td>
+            <td style="text-align:center"><span class="og-count">13</span></td>
             <td style="color:var(--ink-mute)">10 Jun 2026</td>
             <td>
               <div class="row-actions-wrap">
@@ -1686,7 +1739,7 @@ function showPrototypeHints(type) {
   if (!hints) return;
   var content = {
     outlet: '<div class="prototype-hints-title">Outlet search hints</div><div class="prototype-hints-row"><strong>Urban Bites</strong> → matching outlets.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
-    supplier: '<div class="prototype-hints-title">Supplier search hints</div><div class="prototype-hints-row"><strong>Wilmar</strong> → Active supplier guidance.</div><div class="prototype-hints-row"><strong>Golden Harvest</strong> → use UEN <strong>201813940C</strong>.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
+    supplier: '<div class="prototype-hints-title">Supplier search hints</div><div class="prototype-hints-row"><strong>Wilmar</strong> → active supplier, ready for an Admin user to add.</div><div class="prototype-hints-row"><strong>Golden Harvest</strong> → use UEN <strong>201813940C</strong>.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
     item: '<div class="prototype-hints-title">Item search hints</div><div class="prototype-hints-row"><strong>Chicken</strong> → matching items.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
     user: '<div class="prototype-hints-title">User search hints</div><div class="prototype-hints-row"><strong>James</strong> → matching Procure account.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results and Create new user.</div>'
   };
@@ -3824,7 +3877,7 @@ function renderLinkSupList() {
         '<div style="font-weight:500;font-size:14px;color:var(--ink)">' + supplierLabel(s.name) + '</div>' +
         '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + s.reg + '</div>' +
       '</div>' +
-      '<div style="display:flex;align-items:center;flex-shrink:0">' + (s.contactNomni ? '<button type="button" onclick="openActiveSupplierInfo()" style="border:0;background:none;padding:0;color:var(--spinach);font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">Contact Nomni to add</button>' : '<button class="btn btn-primary" style="min-height:36px;padding:0 12px" onclick="addSupplierToHq(\'' + s.name.replace(/'/g,"\\'") + '\')">Add to My Supplier</button>') + '</div>' +
+      '<div style="display:flex;align-items:center;flex-shrink:0"><button class="btn btn-primary" style="min-height:36px;padding:0 12px" onclick="addSupplierToHq(\'' + s.name.replace(/'/g,"\\'") + '\')">Add supplier</button></div>' +
     '</div>';
   }).join('');
 }
@@ -3921,15 +3974,31 @@ function confirmNewSupplier() {
 }
 
 var pendingSupplierLink = null;
-function openSupplierSettings(supplier, isNew, isEditing) {
-  pendingSupplierLink = { supplier:supplier, isNew:!!isNew, isEditing:!!isEditing };
-  closeLinkSupModal(); closeNewSupplierModal();
-  document.getElementById('supplierStepsBar').hidden = !!isEditing;
-  document.getElementById('supplierSettingsPageTitle').textContent = "Supplier's settings: " + supplierLabel(supplier.name);
-  document.getElementById('supplierSettingsForm').reset();
-  document.getElementById('supplierSmsField').hidden = true;
-  document.getElementById('supplierMoreContact').hidden = false;
-  var settings = supplier.hqSettings || {};
+var supplierSettingsScope = 'hq';
+var supplierScopeDrafts = {};
+var supplierScopeLabels = {};
+var supplierOverrideTargetType = 'group';
+function supplierScopeLabel(scope) {
+  return supplierScopeLabels[scope] || (pendingSupplierLink && pendingSupplierLink.supplier.scopeLabels && pendingSupplierLink.supplier.scopeLabels[scope]) || (scope === 'hq' ? 'HQ default' : scope);
+}
+function supplierScopeMeta(scope) {
+  if (scope.indexOf('group-') !== 0) return '';
+  var groupKey = scope.slice(6);
+  var row = Array.from(document.querySelectorAll('#ogTable tr[data-group-name]')).find(function(entry) { return entry.dataset.groupName === groupKey; });
+  return row && row.querySelector('.og-outlet-count') ? row.querySelector('.og-outlet-count').textContent.trim() : '';
+}
+function readSupplierSettingsForm() {
+  return {
+    recipientEmail:document.getElementById('supplierRecipientEmail').value.trim(),
+    noEmail:document.getElementById('supplierNoEmail').checked,
+    whatsapp:document.getElementById('supplierWhatsapp').value.trim(),
+    minOrder:document.getElementById('supplierMinOrder').value.trim() || '0',
+    blockBelowMinimum:document.getElementById('supplierBlockMin').checked,
+    deliveryDays:Array.from(document.querySelectorAll('#supplierSettingsOverlay .supplier-policy-row')).filter(function(row){ return row.querySelector('[data-supplier-day]').checked; }).map(function(row){ return { day:row.dataset.day, daysEarlier:row.querySelector('[data-supplier-days]').value, cutoff:row.querySelector('[data-supplier-time]').value }; })
+  };
+}
+function setSupplierSettingsForm(settings, supplier) {
+  settings = settings || {};
   var recipientEmail = settings.recipientEmail || (supplier.contact && supplier.contact !== '—' ? supplier.contact : '');
   var whatsapp = settings.whatsapp || (supplier.phone && supplier.phone !== '—' ? supplier.phone : '');
   document.getElementById('supplierRecipientEmail').value = recipientEmail;
@@ -3949,6 +4018,125 @@ function openSupplierSettings(supplier, isNew, isEditing) {
     setSupplierPolicyRow(row, !!delivery);
   });
   if (document.getElementById('supplierNoEmail').checked) toggleSupplierNoEmail();
+}
+function supplierScopeSettings(supplier, scope) {
+  if (supplierScopeDrafts[scope]) return supplierScopeDrafts[scope];
+  if (scope === 'hq') return supplier.hqSettings || {};
+  return (supplier.scopeSettings && supplier.scopeSettings[scope]) || supplier.hqSettings || {};
+}
+function updateSupplierScopePresentation() {
+  var savedOverrides = pendingSupplierLink && pendingSupplierLink.supplier.scopeSettings ? Object.keys(pendingSupplierLink.supplier.scopeSettings) : [];
+  var draftOverrides = Object.keys(supplierScopeDrafts).filter(function(scope) { return scope !== 'hq'; });
+  var overrides = Array.from(new Set(savedOverrides.concat(draftOverrides)));
+  var nav = document.getElementById('supplierScopeNavOverrides');
+  nav.innerHTML = overrides.length ? overrides.map(function(scope) {
+    var meta = supplierScopeMeta(scope);
+    return '<button type="button" class="supplier-scope-nav-item" data-supplier-scope="' + escapeOverviewText(scope) + '" onclick="openSavedSupplierOverride(\'' + scope.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(supplierScopeLabel(scope)) + (meta ? '<small>' + escapeOverviewText(meta) + '</small>' : '') + '</button>';
+  }).join('') : '';
+  document.querySelectorAll('#supplierSettingsOverlay [data-supplier-scope]').forEach(function(item) { item.classList.toggle('is-active', item.dataset.supplierScope === supplierSettingsScope); });
+  document.getElementById('supplierEditingScope').textContent = supplierSettingsScope === 'hq' ? 'all groups and outlets' : supplierScopeLabel(supplierSettingsScope);
+  document.getElementById('supplierOverrideDelete').hidden = supplierSettingsScope === 'hq';
+}
+function selectSupplierSettingsScope(scope) {
+  if (!pendingSupplierLink || scope === supplierSettingsScope) return;
+  supplierScopeDrafts[supplierSettingsScope] = readSupplierSettingsForm();
+  supplierSettingsScope = scope;
+  var nextSettings = supplierScopeSettings(pendingSupplierLink.supplier, scope);
+  if (scope !== 'hq' && !supplierScopeDrafts[scope]) supplierScopeDrafts[scope] = nextSettings;
+  setSupplierSettingsForm(nextSettings, pendingSupplierLink.supplier);
+  updateSupplierScopePresentation();
+}
+function openSupplierOverridePicker() {
+  supplierOverrideTargetType = 'group';
+  document.querySelector('input[name="supplierOverrideType"][value="group"]').checked = true;
+  renderSupplierOverrideTargets();
+  document.getElementById('supplierOverridePicker').classList.add('open');
+}
+function renderSupplierOverrideTargets() {
+  var targets = [];
+  if (supplierOverrideTargetType === 'group') Array.from(document.querySelectorAll('#ogTable tr[data-group-name]')).forEach(function(row) {
+    var name = row.querySelector('.og-name').textContent.trim();
+    targets.push({ key:'group-' + row.dataset.groupName, label:name, meta:row.querySelector('.og-outlet-count').textContent.trim() });
+  });
+  if (supplierOverrideTargetType === 'outlet') {
+    Array.from(document.querySelectorAll('#ogTable .outlet-list-item')).forEach(function(item) {
+      var name = item.querySelector('.outlet-item-name').textContent.trim();
+      var group = item.closest('.og-outlet-sub-row').previousElementSibling.querySelector('.og-name').textContent.trim();
+      targets.push({ key:'outlet-' + item.dataset.outletName, label:name, meta:'In ' + group });
+    });
+    Array.from(document.querySelectorAll('#ogTable tr[data-ungrouped-name]')).forEach(function(row) {
+      var name = row.querySelector('.og-name').textContent.trim();
+      targets.push({ key:'outlet-' + row.dataset.ungroupedName, label:name, meta:'' });
+    });
+  }
+  document.getElementById('supplierOverrideTargets').innerHTML = targets.map(function(target, index) {
+    return '<label class="supplier-override-target"><input type="radio" name="supplierOverrideTarget" value="' + escapeOverviewText(target.key) + '" data-label="' + escapeOverviewText(target.label) + '"' + (index === 0 ? ' checked' : '') + ' /><span><strong>' + escapeOverviewText(target.label) + '</strong>' + (target.meta ? '<span>' + escapeOverviewText(target.meta) + '</span>' : '') + '</span></label>';
+  }).join('');
+}
+function setSupplierOverrideTargetType(type) {
+  supplierOverrideTargetType = type;
+  document.getElementById('supplierOverrideTargetKind').textContent = type === 'group' ? 'a group' : 'an outlet';
+  document.querySelectorAll('#supplierOverrideTypeChoices .supplier-override-type').forEach(function(choice) {
+    choice.classList.toggle('is-selected', choice.querySelector('input').value === type);
+  });
+  renderSupplierOverrideTargets();
+}
+function closeSupplierOverridePicker() { document.getElementById('supplierOverridePicker').classList.remove('open'); }
+function startSupplierOverride() {
+  var selected = document.querySelector('input[name="supplierOverrideTarget"]:checked');
+  if (!selected) return;
+  closeSupplierOverridePicker();
+  supplierScopeLabels[selected.value] = selected.dataset.label || selected.value;
+  pendingSupplierLink.supplier.scopeLabels = pendingSupplierLink.supplier.scopeLabels || {};
+  pendingSupplierLink.supplier.scopeLabels[selected.value] = supplierScopeLabels[selected.value];
+  selectSupplierSettingsScope(selected.value);
+}
+function openSupplierOverrideList() {
+  var supplier = pendingSupplierLink && pendingSupplierLink.supplier;
+  var overrides = supplier && supplier.scopeSettings ? Object.keys(supplier.scopeSettings) : [];
+  document.getElementById('supplierOverrideListItems').innerHTML = overrides.map(function(key) {
+    return '<button type="button" class="supplier-scope-edit" style="width:100%;text-align:left;margin-bottom:8px" onclick="openSavedSupplierOverride(\'' + key + '\')">' + escapeOverviewText(supplierScopeLabel(key)) + ' <span style="float:right">Edit →</span></button>';
+  }).join('');
+  document.getElementById('supplierOverrideList').classList.add('open');
+}
+function closeSupplierOverrideList() { document.getElementById('supplierOverrideList').classList.remove('open'); }
+function openSavedSupplierOverride(scope) { closeSupplierOverrideList(); selectSupplierSettingsScope(scope); }
+function openDeleteSupplierOverrideConfirm() {
+  if (supplierSettingsScope === 'hq' || !pendingSupplierLink) return;
+  var label = supplierScopeLabel(supplierSettingsScope);
+  document.getElementById('deleteSupplierOverrideScope').textContent = label;
+  document.getElementById('deleteSupplierOverrideOverlay').classList.add('open');
+}
+function closeDeleteSupplierOverrideConfirm() {
+  document.getElementById('deleteSupplierOverrideOverlay').classList.remove('open');
+}
+function deleteSupplierOverride() {
+  if (supplierSettingsScope === 'hq' || !pendingSupplierLink) return;
+  var scope = supplierSettingsScope;
+  delete supplierScopeDrafts[scope];
+  if (pendingSupplierLink.supplier.scopeSettings) delete pendingSupplierLink.supplier.scopeSettings[scope];
+  if (pendingSupplierLink.supplier.scopeLabels) delete pendingSupplierLink.supplier.scopeLabels[scope];
+  delete supplierScopeLabels[scope];
+  supplierSettingsScope = 'hq';
+  setSupplierSettingsForm(supplierScopeSettings(pendingSupplierLink.supplier, 'hq'), pendingSupplierLink.supplier);
+  updateSupplierScopePresentation();
+  savePrototypeState();
+  closeDeleteSupplierOverrideConfirm();
+  showHqToast('Supplier override deleted', 'This location now uses the default supplier settings.');
+}
+function openSupplierSettings(supplier, isNew, isEditing) {
+  pendingSupplierLink = { supplier:supplier, isNew:!!isNew, isEditing:!!isEditing };
+  closeLinkSupModal(); closeNewSupplierModal();
+  document.getElementById('supplierStepsBar').hidden = !!isEditing;
+  document.getElementById('supplierSettingsPageTitle').textContent = "Supplier's settings: " + supplierLabel(supplier.name);
+  document.getElementById('supplierSettingsForm').reset();
+  document.getElementById('supplierSmsField').hidden = true;
+  document.getElementById('supplierMoreContact').hidden = false;
+  supplierSettingsScope = 'hq';
+  supplierScopeDrafts = {};
+  supplierScopeLabels = supplier.scopeLabels || {};
+  setSupplierSettingsForm(supplierScopeSettings(supplier, supplierSettingsScope), supplier);
+  updateSupplierScopePresentation();
   document.getElementById('supplierPolicyApplied').hidden = true;
   ensureSupplierApplyAllButtons();
   updateSupplierApplyAll();
@@ -4041,14 +4229,16 @@ function saveSupplierSettings() {
   var supplier = pendingSupplierLink.supplier;
   var isNew = pendingSupplierLink.isNew;
   var isEditing = pendingSupplierLink.isEditing;
-  supplier.contact = email.value.trim() || '—';
-  supplier.phone = whatsapp.value.trim() || '—';
-  supplier.hqSettings = {
-    recipientEmail:email.value.trim(), noEmail:document.getElementById('supplierNoEmail').checked,
-    whatsapp:document.getElementById('supplierWhatsapp').value.trim(), minOrder:document.getElementById('supplierMinOrder').value.trim() || '0',
-    blockBelowMinimum:document.getElementById('supplierBlockMin').checked,
-    deliveryDays:Array.from(document.querySelectorAll('#supplierSettingsOverlay .supplier-policy-row')).filter(function(row){ return row.querySelector('[data-supplier-day]').checked; }).map(function(row){ return { day:row.dataset.day, daysEarlier:row.querySelector('[data-supplier-days]').value, cutoff:row.querySelector('[data-supplier-time]').value }; })
-  };
+  if (supplierSettingsScope === 'hq') {
+    supplier.contact = email.value.trim() || '—';
+    supplier.phone = whatsapp.value.trim() || '—';
+  }
+  supplierScopeDrafts[supplierSettingsScope] = readSupplierSettingsForm();
+  supplier.hqSettings = supplierScopeDrafts.hq || supplier.hqSettings || {};
+  supplier.scopeSettings = supplier.scopeSettings || {};
+  Object.keys(supplierScopeDrafts).filter(function(scope) { return scope !== 'hq'; }).forEach(function(scope) {
+    supplier.scopeSettings[scope] = supplierScopeDrafts[scope];
+  });
   if (isNew) PLATFORM_SUPPLIERS.push(supplier);
   if (!isEditing) SUPPLIERS.push(supplier);
   document.getElementById('supCount').textContent = SUPPLIERS.length;
@@ -4056,8 +4246,12 @@ function saveSupplierSettings() {
   if (window.isNewHQ) { refreshNewHqSupplierEmptyState(); refreshNewHqEmptyStates(); renderNewHqSummary(getSavedOutletGroup()); }
   addPrototypeActivity('market-list', '<strong>' + escapeOverviewText(supplier.name) + '</strong> ' + (isEditing ? 'supplier settings updated' : (isNew ? 'added to Procure and ' : '') + 'linked to this HQ'), 'suppliers', 'Master');
   savePrototypeState();
-  document.getElementById('supplierSettingsOverlay').classList.remove('open');
-  pendingSupplierLink = null;
+  if (supplierSettingsScope !== 'hq') {
+    openSupplierSettings(supplier, false, true);
+  } else {
+    document.getElementById('supplierSettingsOverlay').classList.remove('open');
+    pendingSupplierLink = null;
+  }
   showHqToast(isEditing ? 'Supplier settings updated' : 'Supplier linked', isEditing ? supplier.name + ' has been updated.' : supplier.name + ' has been linked to this HQ.');
 }
 
@@ -5070,9 +5264,12 @@ function renderGroupOutletPicker() {
   list.innerHTML = visibleOutlets.length ? visibleOutlets.map(function(outlet) {
     var key = String(outlet.id);
     var selected = groupOutletSelection.has(key);
+    var outletMeta = outlet.linkedToHq
+      ? '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:4px;background:#D9F5E4;color:#1A8040;font-size:10px;font-weight:700;letter-spacing:.03em;line-height:1.2">Already linked to this HQ</span><span style="margin-left:5px;color:var(--ink-mute)">· Ungrouped</span>'
+      : escapeOverviewText(outlet.company) + ' · ' + escapeOverviewText(outlet.cluster);
     return '<div class="picker-row' + (selected ? ' sel' : '') + '" data-outlet-key="' + escapeOverviewText(key) + '" onclick="toggleGroupOutletSelection(this.dataset.outletKey)">' +
       '<div class="picker-chk">' + (selected ? chkSvg() : '') + '</div>' +
-      '<div class="picker-row-info"><div class="picker-row-name">' + escapeOverviewText(outlet.name) + '</div><div class="picker-row-sub">' + escapeOverviewText(outlet.company) + ' · ' + escapeOverviewText(outlet.cluster) + '</div></div>' +
+      '<div class="picker-row-info"><div class="picker-row-name">' + escapeOverviewText(outlet.name) + '</div><div class="picker-row-sub">' + outletMeta + '</div></div>' +
     '</div>';
   }).join('') : '<div class="picker-empty">No outlets match your search</div>';
 
@@ -5176,6 +5373,8 @@ function confirmGroupOutletSelection() {
     renderNewHqSummary(stored);
   }
   addPrototypeActivity('outlet-groups', '<strong>' + addedNames.length + ' outlet' + (addedNames.length === 1 ? '' : 's') + ' added</strong> to ' + escapeOverviewText(groupOutletTargetName), 'outlet-groups', groupOutletTargetName);
+  saveManagedOutletList();
+  refreshHqOutletSummary();
   closeGroupOutletPicker();
   showHqToast('Outlets added', addedNames.length + ' outlet' + (addedNames.length === 1 ? '' : 's') + ' added to ' + groupOutletTargetName + '.');
 }
@@ -5189,12 +5388,37 @@ function refreshHqOutletSummary() {
 }
 
 function saveManagedOutletList() {
-  var names = Array.from(document.querySelectorAll('.outlet-list-item .outlet-item-name, #ogTable tr[data-ungrouped-name] .og-name'))
-    .map(function(node) { return node.textContent.trim(); })
-    .filter(Boolean);
-  localStorage.setItem('nomniHqManagedOutlets', JSON.stringify(Array.from(new Set(names))));
+  var tbody = document.querySelector('#ogTable tbody');
+  if (!tbody) return;
+  localStorage.setItem('nomniHqManagedOutlets', JSON.stringify({
+    tableHtml: tbody.innerHTML,
+    ungrouped: UNGROUPED.slice()
+  }));
 }
 
+function restoreManagedOutletList() {
+  var stored;
+  try { stored = JSON.parse(localStorage.getItem('nomniHqManagedOutlets') || 'null'); } catch (e) { stored = null; }
+  if (!stored || !stored.tableHtml) return;
+  var tbody = document.querySelector('#ogTable tbody');
+  if (!tbody) return;
+  tbody.innerHTML = stored.tableHtml;
+  if (Array.isArray(stored.ungrouped)) {
+    UNGROUPED.splice(0, UNGROUPED.length);
+    stored.ungrouped.forEach(function(name) { UNGROUPED.push(name); });
+  }
+  var managedNames = Array.from(document.querySelectorAll('.outlet-list-item .outlet-item-name, #ogTable tr[data-ungrouped-name] .og-name')).map(function(node) {
+    return node.textContent.trim();
+  });
+  PROCURE_OUTLETS_AVAILABLE.forEach(function(outlet) {
+    if (managedNames.indexOf(outlet.name) !== -1) procureOutletAssignedToHq.add(outlet.id);
+  });
+  var labelCount = document.querySelector('#panel-outlet-groups .panel-label-count');
+  if (labelCount) labelCount.textContent = document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length;
+  refreshHqOutletSummary();
+}
+
+restoreManagedOutletList();
 saveManagedOutletList();
 
 function confirmLinkOutletSelection() {
@@ -5285,18 +5509,27 @@ function confirmAddToGroup() {
   var targetRow = Array.from(document.querySelectorAll('#ogTable tr[data-group-name]')).find(function(row) { return row.dataset.groupName === selected.value.toLowerCase(); });
   var targetList = targetRow && targetRow.nextElementSibling ? targetRow.nextElementSibling.querySelector('.outlet-list') : null;
   _addToGroupOutlets.forEach(function(outlet) {
-    if (!outlet.row || !targetList) return;
-    targetList.insertAdjacentHTML('beforeend', '<div class="outlet-list-item" data-outlet-name="' + escapeOverviewText(outlet.name.toLowerCase()) + '"><span class="outlet-item-name">' + escapeOverviewText(outlet.name) + '</span><span class="pos-chip off">POS ✕</span></div>');
-    var outletIndex = UNGROUPED.indexOf(outlet.name);
+    var sourceRow = outlet.row || Array.from(document.querySelectorAll('#ogTable tr[data-ungrouped-name]')).find(function(row) {
+      return row.dataset.ungroupedName === outlet.name.toLowerCase();
+    });
+    if (!sourceRow || !targetList) return;
+    var posChip = sourceRow.querySelector('.pos-chip');
+    targetList.insertAdjacentHTML('beforeend', '<div class="outlet-list-item" data-outlet-name="' + escapeOverviewText(outlet.name.toLowerCase()) + '"><span class="outlet-item-name">' + escapeOverviewText(outlet.name) + '</span>' + (posChip ? posChip.outerHTML : '<span class="pos-chip off">POS ✕</span>') + '<div class="outlet-item-actions row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item danger" onclick="openRemoveModal(\'' + escapeOverviewText(outlet.name) + '\',\'' + escapeOverviewText(selected.value) + '\')">Remove from group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal(\'' + escapeOverviewText(outlet.name) + '\')">Remove from HQ</div></div></div></div>');
+    var outletIndex = UNGROUPED.findIndex(function(name) { return String(name).toLowerCase() === outlet.name.toLowerCase(); });
     if (outletIndex !== -1) UNGROUPED.splice(outletIndex, 1);
-    outlet.row.remove();
+    sourceRow.remove();
   });
   if (targetRow && targetList) {
     var targetCount = targetList.querySelectorAll('.outlet-list-item').length;
     targetRow.querySelector('.og-outlet-count').textContent = targetCount + ' outlets';
+    targetRow.dataset.groupOutlets = Array.from(targetList.querySelectorAll('.outlet-list-item')).map(function(item) {
+      return item.dataset.outletName;
+    }).join('|');
   }
   closeAddToGroupModal();
   refreshHqOutletSummary();
+  saveManagedOutletList();
+  renderHealthCheck();
   clearUngroupedSelection();
   var count = _addToGroupOutlets.length;
   showHqToast('Outlets added to group', count + ' outlet' + (count === 1 ? '' : 's') + ' added to ' + selected.value + '.');
@@ -5345,6 +5578,8 @@ function confirmRemoveFromGroup() {
   if (labelCount) labelCount.textContent = document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length;
   closeRemoveModal();
   addPrototypeActivity('outlet-groups', '<strong>' + escapeOverviewText(outletName) + '</strong> removed from ' + escapeOverviewText(_removeGroup), 'outlet-groups', _removeGroup);
+  refreshHqOutletSummary();
+  saveManagedOutletList();
   showHqToast('Outlet moved to ungrouped', outletName + ' remains linked to this HQ.');
 }
 
@@ -5353,14 +5588,60 @@ var _removeFromHQOutlet = '';
 function openRemoveFromHQModal(outletName) {
   _removeFromHQOutlet = outletName;
   document.getElementById('removeFromHQOutletName').textContent = outletName;
+  var confirmation = document.getElementById('removeFromHQConfirmation');
+  var button = document.getElementById('confirmRemoveFromHQButton');
+  if (confirmation) confirmation.value = '';
+  if (button) button.disabled = true;
   document.getElementById('removeFromHQOverlay').classList.add('open');
 }
 function closeRemoveFromHQModal() {
   document.getElementById('removeFromHQOverlay').classList.remove('open');
 }
+function updateRemoveFromHQConfirmation() {
+  var confirmation = document.getElementById('removeFromHQConfirmation');
+  var button = document.getElementById('confirmRemoveFromHQButton');
+  if (confirmation && button) button.disabled = confirmation.value.trim().toLowerCase() !== 'remove';
+}
 function confirmRemoveFromHQ() {
+  var confirmation = document.getElementById('removeFromHQConfirmation');
+  if (!confirmation || confirmation.value.trim().toLowerCase() !== 'remove') return;
+  var outletName = _removeFromHQOutlet;
+  var key = String(outletName || '').toLowerCase();
+  var removed = false;
+  var ungroupedRow = Array.from(document.querySelectorAll('#ogTable tr[data-ungrouped-name]')).find(function(row) {
+    return row.dataset.ungroupedName === key;
+  });
+  if (ungroupedRow) {
+    ungroupedRow.remove();
+    removed = true;
+  }
+  var ungroupedIndex = UNGROUPED.findIndex(function(name) { return String(name).toLowerCase() === key; });
+  if (ungroupedIndex !== -1) {
+    UNGROUPED.splice(ungroupedIndex, 1);
+    removed = true;
+  }
+  Array.from(document.querySelectorAll('#ogTable .outlet-list-item')).forEach(function(item) {
+    if (item.dataset.outletName !== key) return;
+    var groupRow = item.closest('.og-outlet-sub-row') && item.closest('.og-outlet-sub-row').previousElementSibling;
+    item.remove();
+    removed = true;
+    if (groupRow) {
+      var list = groupRow.nextElementSibling && groupRow.nextElementSibling.querySelector('.outlet-list');
+      var count = list ? list.querySelectorAll('.outlet-list-item').length : 0;
+      var countNode = groupRow.querySelector('.og-outlet-count');
+      if (countNode) countNode.textContent = count + ' outlet' + (count === 1 ? '' : 's');
+      groupRow.dataset.groupOutlets = list ? Array.from(list.querySelectorAll('.outlet-list-item')).map(function(entry) { return entry.dataset.outletName; }).join('|') : '';
+    }
+  });
   closeRemoveFromHQModal();
-  showHqToast(_removeFromHQOutlet + ' removed from HQ');
+  if (removed) {
+    var labelCount = document.querySelector('#panel-outlet-groups .panel-label-count');
+    if (labelCount) labelCount.textContent = document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length;
+    refreshHqOutletSummary();
+    saveManagedOutletList();
+    renderHealthCheck();
+  }
+  showHqToast(outletName + ' removed from HQ');
 }
 
 // ── Nomni POS mapping ──
@@ -5890,7 +6171,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
 <!-- ── Add supplier page ── -->
 <div class="modal-overlay" id="linkSupOverlay">
   <div class="modal-card">
-    <div class="modal-header"><div><button class="supplier-back" type="button" onclick="closeLinkSupModal()">‹ Suppliers</button><h2 class="modal-title" id="linkSupPageTitle">Add supplier</h2></div></div>
+    <div class="modal-header"><div><button class="supplier-back" type="button" onclick="closeLinkSupModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Suppliers</button><h2 class="modal-title" id="linkSupPageTitle">Add supplier</h2></div></div>
     <div class="hq-steps"><div class="hq-step is-active"><span class="hq-step-number">1</span><span>Search supplier</span></div><div class="hq-step"><span class="hq-step-number">2</span><span>Configure supplier settings</span></div></div>
     <div class="modal-body">
       <form class="link-sup-search-row" onsubmit="event.preventDefault();performLinkSupSearch();">
@@ -5994,9 +6275,11 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
 <!-- ── Supplier relationship settings page ── -->
 <div class="modal-overlay" id="supplierSettingsOverlay">
   <div class="modal-card" style="width:760px">
-    <div class="modal-header"><div><button class="supplier-back" type="button" onclick="backFromSupplierSettings()">‹ Suppliers</button><h2 class="modal-title" id="supplierSettingsPageTitle">Supplier's settings</h2></div></div>
+    <div class="modal-header"><div><button class="supplier-back" type="button" onclick="backFromSupplierSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Suppliers</button><h2 class="modal-title" id="supplierSettingsPageTitle">Supplier's settings</h2></div></div>
     <div class="hq-steps" id="supplierStepsBar"><div class="hq-step"><span class="hq-step-number">1</span><span>Search supplier</span></div><div class="hq-step is-active"><span class="hq-step-number">2</span><span>Configure supplier settings</span></div></div>
-    <form id="supplierSettingsForm" class="modal-body" onsubmit="event.preventDefault();saveSupplierSettings()"><div class="supplier-settings-shell">
+    <form id="supplierSettingsForm" class="modal-body" onsubmit="event.preventDefault();saveSupplierSettings()"><div class="supplier-settings-shell"><div class="supplier-settings-layout">
+      <aside class="supplier-scope-nav"><button type="button" class="supplier-scope-nav-item is-active" data-supplier-scope="hq" onclick="selectSupplierSettingsScope('hq')">Default</button><div class="supplier-scope-nav-overrides" id="supplierScopeNavOverrides"></div><button type="button" class="btn btn-primary supplier-scope-nav-add" onclick="openSupplierOverridePicker()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add override</button></aside>
+      <div class="supplier-settings-content"><div class="supplier-editing-note"><span>Applies to <strong id="supplierEditingScope">all groups and outlets</strong></span><button type="button" class="supplier-override-delete" id="supplierOverrideDelete" hidden onclick="openDeleteSupplierOverrideConfirm()">Delete</button></div>
       <section class="supplier-settings-section"><h3 class="supplier-settings-heading">Send order notifications to…</h3><div class="supplier-settings-card">
         <div><label class="field-label">Supplier email(s)</label><input class="field-input" id="supplierRecipientEmail" type="text" placeholder="Email" oninput="clearSupplierContactError()" /><p class="supplier-settings-help" style="margin-top:6px">Separate multiple email addresses with commas.</p></div>
         <label class="supplier-settings-check"><input id="supplierNoEmail" type="checkbox" onchange="toggleSupplierNoEmail()" /><span><strong>No email address?</strong> Tick to confirm</span></label>
@@ -6014,9 +6297,24 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
           <div class="supplier-policy-row" data-day="Saturday"><label class="supplier-settings-check"><input data-supplier-day type="checkbox" onchange="toggleSupplierDay(this)" />Saturday</label><div class="supplier-cutoff is-disabled"><input class="field-input" data-supplier-days inputmode="numeric" value="2" disabled /><span>day(s) earlier</span><input class="field-input" data-supplier-time type="time" value="12:00" disabled /></div></div>
           <div class="supplier-policy-row" data-day="Sunday"><label class="supplier-settings-check"><input data-supplier-day type="checkbox" onchange="toggleSupplierDay(this)" />Sunday</label><div class="supplier-cutoff is-disabled"><input class="field-input" data-supplier-days inputmode="numeric" value="2" disabled /><span>day(s) earlier</span><input class="field-input" data-supplier-time type="time" value="12:00" disabled /></div></div>
         </div><p class="supplier-policy-applied" id="supplierPolicyApplied" hidden>Delivery cut-off copied to all days.</p></div>
-      </section></div>
+      </section></div></div></div>
     </form>
     <div class="modal-foot" style="justify-content:space-between"><button class="supplier-page-cancel" onclick="backFromSupplierSettings()">Cancel</button><button class="btn btn-primary" onclick="saveSupplierSettings()">Save</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="supplierOverridePicker" onclick="if(event.target===this)closeSupplierOverridePicker()"><div class="modal-card supplier-override-picker-card"><div class="modal-header"><h2 class="modal-title">Add supplier override</h2><button class="modal-close" onclick="closeSupplierOverridePicker()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="modal-body"><p class="supplier-override-intro">Create an exception to the default supplier settings for one outlet group or individual outlet. Individual outlets can be selected whether they are grouped or ungrouped.</p><div><p class="supplier-override-label">Apply this override to</p><div class="supplier-override-type-choices" id="supplierOverrideTypeChoices"><label class="supplier-override-type is-selected"><input type="radio" name="supplierOverrideType" value="group" checked onchange="setSupplierOverrideTargetType(this.value)" /><span><strong>Outlet group</strong><span>Use one shared setting for every outlet in the group.</span></span></label><label class="supplier-override-type"><input type="radio" name="supplierOverrideType" value="outlet" onchange="setSupplierOverrideTargetType(this.value)" /><span><strong>Individual outlet</strong><span>Set an exception for one managed outlet.</span></span></label></div></div><div><p class="supplier-override-label">Select <span id="supplierOverrideTargetKind">a group</span></p><div class="supplier-override-targets" id="supplierOverrideTargets"></div></div></div><div class="modal-foot"><button class="modal-cancel" onclick="closeSupplierOverridePicker()">Cancel</button><button class="btn btn-primary" onclick="startSupplierOverride()">Configure override</button></div></div></div>
+
+<div class="modal-overlay" id="supplierOverrideList" onclick="if(event.target===this)closeSupplierOverrideList()"><div class="modal-card" style="width:500px"><div class="modal-header"><h2 class="modal-title">Supplier overrides</h2><button class="modal-close" onclick="closeSupplierOverrideList()">×</button></div><div class="modal-body"><p style="margin:0;color:var(--ink-mute);font-size:14px">Choose an override to review or edit its settings.</p><div id="supplierOverrideListItems" style="margin-top:4px"></div></div><div class="modal-foot"><button class="modal-cancel" onclick="closeSupplierOverrideList()">Close</button></div></div></div>
+
+<div class="confirm-overlay" id="deleteSupplierOverrideOverlay" onclick="if(event.target===this)closeDeleteSupplierOverrideConfirm()">
+  <div class="danger-confirm-card">
+    <div class="danger-confirm-title">Delete supplier override?</div>
+    <div class="danger-confirm-body">The <strong id="deleteSupplierOverrideScope"></strong> override will be deleted. This location will use the default supplier settings again.</div>
+    <div class="danger-confirm-actions">
+      <button class="btn-cancel-plain" onclick="closeDeleteSupplierOverrideConfirm()">Cancel</button>
+      <button class="btn-danger-confirm" onclick="deleteSupplierOverride()">Delete override</button>
+    </div>
   </div>
 </div>
 
@@ -6049,9 +6347,11 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
   <div class="danger-confirm-card">
     <div class="danger-confirm-title">Remove from HQ?</div>
     <div class="danger-confirm-body">Remove <strong id="removeFromHQOutletName"></strong> from this HQ entirely? The outlet will be fully detached — all HQ-linked data will be unlinked and it will operate independently.</div>
+    <label for="removeFromHQConfirmation" style="display:block;font-size:13px;font-weight:600;color:var(--ink);margin:-4px 0 7px">Type <strong style="display:inline-block;color:#B42318;background:#FDE8E7;border-radius:4px;padding:2px 6px;letter-spacing:.02em">remove</strong> to confirm</label>
+    <input id="removeFromHQConfirmation" type="text" autocomplete="off" spellcheck="false" oninput="updateRemoveFromHQConfirmation()" style="width:100%;box-sizing:border-box;padding:9px 11px;border:1px solid var(--rule);border-radius:6px;font:inherit;font-size:14px;margin-bottom:20px" />
     <div class="danger-confirm-actions">
       <button class="btn-cancel-plain" onclick="closeRemoveFromHQModal()">Cancel</button>
-      <button class="btn-danger-confirm" onclick="confirmRemoveFromHQ()">Remove from HQ</button>
+      <button class="btn-danger-confirm" id="confirmRemoveFromHQButton" disabled onclick="confirmRemoveFromHQ()">Remove from HQ</button>
     </div>
   </div>
 </div>
@@ -6089,6 +6389,35 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
       <button class="modal-cancel" onclick="closeDisableConfirmation()">Cancel</button>
       <button class="btn-danger" onclick="confirmDisableConfirmation()">Disable</button>
     </div>
+  </div>
+</div>
+
+<!-- ── Split outlet into a new group from HQ Overview ── -->
+<div class="modal-overlay" id="overviewSplitGroupModal" onclick="if(event.target===this)closeOverviewSplitGroupModal()">
+  <div class="modal-card" style="width:560px">
+    <div class="modal-header">
+      <h2 class="modal-title">Split into new group</h2>
+      <button class="modal-close" onclick="closeOverviewSplitGroupModal()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:18px">
+      <p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink-mute)"><strong id="overviewSplitOutletName" style="color:var(--ink)"></strong> will move from <strong id="overviewSplitSourceGroup" style="color:var(--ink)"></strong> into a new independent outlet group.</p>
+      <div>
+        <label for="overviewSplitGroupName" style="display:block;font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">New group name</label>
+        <input id="overviewSplitGroupName" type="text" style="width:100%;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit;font-size:14px;color:var(--ink);box-sizing:border-box" />
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px">Starting setup</div>
+        <label style="display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--nomni-green);border-radius:6px;background:#F4FFF6;cursor:pointer">
+          <input type="radio" name="overviewSplitSetup" value="copy" checked style="margin-top:2px;accent-color:var(--spinach)" />
+          <span><span style="display:flex;align-items:center;gap:7px;flex-wrap:wrap"><strong style="font-size:14px">Copy the current group’s setup</strong><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:4px;background:#D9F5E4;color:#1A8040;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;line-height:1.2">Recommended</span></span><span style="display:block;margin-top:4px;font-size:12px;line-height:1.4;color:var(--ink-mute)">Copies items, inventory, recipes, suppliers and POS mapping; the new group can then change independently.</span></span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;padding:12px;border:1px solid var(--rule);border-radius:6px;cursor:pointer">
+          <input type="radio" name="overviewSplitSetup" value="hq" style="margin-top:2px;accent-color:var(--spinach)" />
+          <span><strong style="font-size:14px">Start with HQ setup</strong><span style="display:block;margin-top:3px;font-size:12px;line-height:1.4;color:var(--ink-mute)">The outlet may receive a substantially different market list, inventory and recipe configuration.</span></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-foot" style="display:flex;justify-content:flex-end;gap:10px"><button class="modal-cancel" onclick="closeOverviewSplitGroupModal()">Cancel</button><button class="btn btn-primary" onclick="confirmOverviewSplitGroup()">Create group</button></div>
   </div>
 </div>
 
@@ -6246,12 +6575,55 @@ function openSplitFromOverview(action) {
   var outlet = item && item.querySelector('.outlet-item-name');
   var group = groupRow && groupRow.querySelector('.og-name');
   if (!outlet || !group) return;
-  localStorage.setItem('nomniSplitRequest', JSON.stringify({
+  window.overviewSplitRequest = {
     outlet: outlet.textContent.trim(),
     group: group.textContent.trim(),
     hq: document.querySelector('.page-title').textContent.trim()
-  }));
-  window.location.href = 'Admin - Edit Outlet Group.html?from=hq&split=1';
+  };
+  document.getElementById('overviewSplitOutletName').textContent = window.overviewSplitRequest.outlet;
+  document.getElementById('overviewSplitSourceGroup').textContent = window.overviewSplitRequest.group;
+  document.getElementById('overviewSplitGroupName').value = window.overviewSplitRequest.outlet.replace(/^\(WF\s+\d+\)\s*/, '').trim();
+  document.querySelector('input[name="overviewSplitSetup"][value="copy"]').checked = true;
+  document.getElementById('overviewSplitGroupModal').classList.add('open');
+}
+
+function closeOverviewSplitGroupModal() {
+  window.overviewSplitRequest = null;
+  document.getElementById('overviewSplitGroupModal').classList.remove('open');
+}
+
+function confirmOverviewSplitGroup() {
+  var request = window.overviewSplitRequest;
+  var name = document.getElementById('overviewSplitGroupName').value.trim();
+  if (!request || !name) {
+    if (!name) showHqToast('Enter a name for the new group');
+    return;
+  }
+  var setup = document.querySelector('input[name="overviewSplitSetup"]:checked').value;
+  var group = {
+    name: name,
+    description: '',
+    hq: request.hq,
+    outlets: [request.outlet],
+    outletDetails: [{ name: request.outlet, company: 'Managed outlet' }],
+    splitFrom: request.group,
+    setupSource: setup === 'copy' ? 'group' : 'hq'
+  };
+  if (setup === 'copy') {
+    localStorage.setItem('nomniGroupSetupCopy', JSON.stringify({
+      target: name,
+      source: request.group,
+      sections: ['Items', 'Inventory', 'Recipes', 'Suppliers', 'POS mapping'],
+      copiedAt: new Date().toISOString()
+    }));
+  }
+  localStorage.setItem('nomniNewOutletGroup', JSON.stringify(group));
+  localStorage.setItem('nomniNewOutletGroupToastPending', '1');
+  localStorage.setItem('nomniSplitCompleted', JSON.stringify({ outlet: request.outlet, source: request.group }));
+  var url = new URL(window.location.href);
+  url.searchParams.set('groupCreated', '1');
+  url.searchParams.set('splitCompleted', '1');
+  window.location.href = url.pathname + '?' + url.searchParams.toString();
 }
 
 document.addEventListener('click', function(event) {
@@ -6283,6 +6655,8 @@ function applyCompletedOutletSplit() {
     }).join('|');
   }
   localStorage.removeItem('nomniSplitCompleted');
+  refreshHqOutletSummary();
+  saveManagedOutletList();
 }
 
 function renderCreatedOutletGroup() {
@@ -6296,6 +6670,12 @@ function renderCreatedOutletGroup() {
   var panel = document.getElementById('panel-outlet-groups');
   var title = document.querySelector('.page-title').textContent.trim();
   if (group.hq && group.hq !== title) return;
+
+  var groupKey = String(group.name || '').toLowerCase();
+  var alreadyRendered = Array.from(document.querySelectorAll('#ogTable tr[data-group-name]')).some(function(row) {
+    return row.dataset.groupName === groupKey;
+  });
+  if (alreadyRendered) return;
 
   if (!document.getElementById('ogTable')) {
     var overviewMain = document.getElementById('newHqOverviewMain') || panel;
@@ -6360,6 +6740,7 @@ function renderCreatedOutletGroup() {
       '</div>';
   }
   renderNewHqSummary(group);
+  saveManagedOutletList();
   if (localStorage.getItem('nomniNewOutletGroupToastPending') === '1') {
     localStorage.removeItem('nomniNewOutletGroupToastPending');
     var splitMessage = group.splitFrom ? '<strong>' + safeName + '</strong> created by splitting an outlet from ' + escapeOverviewText(group.splitFrom) : '<strong>' + safeName + '</strong> outlet group created';

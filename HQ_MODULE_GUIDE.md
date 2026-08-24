@@ -150,7 +150,7 @@ On search-driven actions, a small helper panel appears above the reset control w
 ## Prototype boundaries
 
 - This is a static HTML prototype. It does not connect to backend data or enforce real permissions.
-- Some browser-local state is retained while the prototype is open; reset clears that state.
+- Outlet groups and their linked outlets are retained in browser-local state across refreshes until **Reset prototype** is used. Other prototype state may still be session-only.
 - Names, counts, activity and catalogues are illustrative unless explicitly derived from a prior prototype flow.
 
 ---
@@ -303,6 +303,7 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 - **Implemented prototype:** clicking an ungrouped outlet in the HQ Overview opens an individual outlet-management view. It is clearly marked as independently managed and exposes Overview, Items, Inventory, Recipes, Suppliers, POS mapping and Activity sections.
 - An ungrouped outlet needs its own Items, Inventory, Recipes, Suppliers and POS connection/mapping configuration until it is added to a group.
 - The view makes scope explicit: item rows can show whether a value comes from the HQ setup or an outlet override; inventory and supplier settings are outlet-specific; POS mapping uses the outlet's own API key; and Activity records outlet-level changes.
+- Supplier counts and lists honour outlet-specific exclusions. Excluded suppliers are omitted from the normal ungrouped-outlet list and can be restored from the Excluded filter, so the detail-page count matches the HQ Overview for each outlet.
 - Grouped outlets should continue to inherit their group configuration rather than exposing competing individual customisation. Selecting one from the HQ Overview should take the user to its group context.
 
 ### Outlet-group activity
@@ -319,6 +320,7 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 - The confirmation step should make the alternative explicit: **Use the current group’s setup** (recommended) or **Start with HQ settings**. The latter should warn that it may substantially change what the outlet can order, count or use.
 - After the move, the new group becomes independent: future changes to either group do not affect the other. This prevents a removed outlet silently reverting to the generic HQ configuration.
 - **Implemented prototype:** group settings include **Copy setup**, which remains available after a group is created or split. The user selects a source group and the sections to overwrite; historical data, users and API keys are excluded.
+- **Implemented prototype:** supplier relationship settings use a left-hand scope navigator: **Default** applies to all HQ-managed groups and outlets, while saved overrides appear beneath it. **Add override** separates outlet-group selection from individual-outlet selection (including grouped and ungrouped outlets); each scoped page exposes its effective scope and a Delete action.
 
 ## Delivery status and gaps
 
@@ -329,14 +331,14 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 - **Not built:** absent or represented only by a non-functional control.
 - **Product decision:** behaviour or ownership remains undefined.
 
-Prototype status does not imply backend integration. Browser-local state is used for selected demonstration flows and may reset after navigation or refresh.
+Prototype status does not imply backend integration. Browser-local state is used for selected demonstration flows; outlet-group assignments persist through refreshes until the prototype is reset.
 
 ### Current delivery snapshot
 
 | Area | Status | Remaining work |
 |---|---|---|
 | HQ creation and first outlet group | Built | Replace browser-local state with durable records and define production validation/error handling. |
-| HQ overview, groups and outlet assignment | Partial | Define removal consequences and retain assignments. |
+| HQ overview, groups and outlet assignment | Partial | Define removal consequences; linked outlets and group structure now persist locally until reset. |
 | HQ suppliers | Partial | Persist relationship settings, lifecycle changes and dependency reporting. |
 | HQ items | Partial | Complete locally retained Create item, then persist catalogue, access and exception state. |
 | HQ price changes | Partial | Confirm the page’s product scope and review workflow before finalising it; then persist review state. |
@@ -351,6 +353,8 @@ Prototype status does not imply backend integration. Browser-local state is used
 ### Admin and Procure ownership
 
 The intended split is by lifecycle stage rather than by surface alone: Admin supports provisioning, governance and CS-assisted onboarding; Procure supports ongoing buyer self-service.
+
+In the Admin HQ supplier search, an Admin user can add an Active supplier directly. The Procure-facing equivalent can retain **Contact Nomni to add** where supplier activation needs Nomni involvement.
 
 | Capability | Admin | Procure |
 |---|---|---|
