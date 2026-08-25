@@ -106,6 +106,8 @@ Inventory defines the HQ's inventory items and counting setup.
 
 - Search, type and status filters narrow the list.
 - **Add to inventory** adds catalogue items or recipes to inventory and configures inventory UOM, conversion and par level.
+- **Availability dependency:** an inventory SKU inherits its base availability from the corresponding HQ Item. Inventory availability can be narrowed, but cannot include a group or ungrouped outlet that is unavailable at Item level. For example, an Item available to four of seven groups can only be configured for those four groups in Inventory.
+- The **Add to inventory** SKU picker includes a multi-select availability filter for outlet groups and ungrouped outlets, so users can find items available to one or more selected scopes before adding them.
 - Single-UOM rows show the UOM, unit cost and availability directly.
 - Multi-UOM rows are expandable: the parent shows the number of UOM options, while each child row repeats the item name and shows its UOM, cost and availability.
 - HQ inventory uses **Disable / Enable** for master records and **Remove from inventory** for removal. Group/outlet-specific availability uses **Exclude / Include** and excluded records are hidden from the normal local list.
@@ -296,9 +298,9 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 ## Completed in the current prototype
 
 - **Create item:** saves the new HQ catalogue record locally, shows an “Item created” confirmation, returns to the Items tab and refreshes the list.
-- **Create item validation:** validates item name, supplier, UOM, positive pricing, duplicate UOM rows and inventory UOM/par values; the HQ form no longer asks for an Inventory list.
+- **Create item validation:** validates item name, supplier, UOM, positive pricing, duplicate UOM rows, inventory UOM/par values and at least one group/outlet availability selection; new records start Active with no conflicting Removed, Disabled or Excluded state. The HQ form no longer asks for an Inventory list.
 - **Persistence pass:** supplier settings and lifecycle, item lifecycle/access, inventory setup and Group SKU entries, recipe lifecycle/availability, price-review decisions, activity entries, outlet-group detail state, and recipe-editor drafts/variations/assignments/versions now persist across refreshes.
-- **Group SKU safeguards:** removing selected components confirms that they leave Inventory; deleting an unused Group SKU confirms and removes it; Group SKUs used by recipes or POS mapping are blocked with an affected-dependencies view action.
+- **Group SKU availability:** removing selected components confirms that they leave Inventory; Group SKU visibility is derived from its constituent SKUs, and each group/outlet sees only the constituent SKUs available to that scope. The HQ Inventory table summarises scope counts (for example, `2 groups · 2 outlets`), expanded rows show each constituent’s availability, and the availability dialog manages each constituent separately.
 - **Supplier scope flow:** default and override saves are scoped correctly; unsaved scope switching offers Save changes, Discard changes or Cancel; deleting an override confirms immediately and returns to Default.
 - **Outlet-group consistency:** outlet-group and ungrouped-outlet tables, exclusions, activity formatting and supplier counts follow the shared HQ interaction model.
 
@@ -360,13 +362,12 @@ The implemented demonstration flows use browser-local state and persist through 
 | HQ suppliers | Partial | Relationship settings and lifecycle changes persist in the prototype; finish dependency reporting. |
 | HQ items | Partial | Create item save/return/list refresh, catalogue validation and local access/lifecycle persistence are implemented; continue confirming edge-case copy and availability behaviour. |
 | HQ price changes | Partial | Review state persists locally; confirm the page’s product scope and workflow. |
-| HQ inventory | Partial | Inventory setup, Group SKU entries and dependency safeguards persist locally; continue refining related dependency views. |
+| HQ inventory | Partial | Inventory setup, Group SKU entries and scope-aware constituent availability persist locally; Group SKU availability is now summarised in the table and constituent rows. |
 | HQ recipes | Partial | Recipe lifecycle, availability, history and editor variation changes persist locally; complete validation. |
 | HQ POS mapping | Partial | Fully flesh out the end-to-end mapping flow and its dependency rules. |
 | Cost and pricing model | Product decision | Define the effective unit-cost calculation and display rules across HQ, group and outlet scopes. |
 | HQ users | Built | — |
 | Activity | Partial | A shared browser-local audit trail now persists across HQ activity views; confirm remaining activity coverage. |
-| HQ lifecycle | Not built | Define and implement an HQ-wide enable/disable lifecycle. |
 
 ### Admin and Procure ownership
 

@@ -639,8 +639,11 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .inventory-add-card { width:1040px; }
 #addInvSkuModal .picker-head { padding-bottom:8px; border-bottom:0; }
 #addInvSkuModal .picker-head-row { margin-bottom:0; }
-.inventory-add-toolbar { display:flex; align-items:center; gap:10px; padding:10px 24px 12px; border-bottom:0; flex-wrap:wrap; }
-.inventory-add-toolbar .picker-search-wrap { flex:1 1 260px; max-width:320px; }
+.inventory-add-toolbar { display:flex; align-items:center; gap:10px; padding:10px 24px 12px; border-bottom:0; flex-wrap:nowrap; }
+.inventory-add-toolbar .picker-search-wrap { flex:1 1 auto; min-width:220px; max-width:none; }
+#addInvSkuModal #isSupFilter { width:220px; flex:0 0 220px; }
+#addInvSkuModal #isAvailFilter { width:170px; min-width:170px; flex:0 0 170px; }
+#addInvSkuModal #isInvDaysFilter { width:96px; flex:0 0 96px; }
 .inventory-filter-check { display:flex; align-items:center; gap:8px; min-height:36px; font-size:14px; color:var(--ink); cursor:pointer; white-space:nowrap; }
 .inventory-filter-check input { width:18px; height:18px; accent-color:var(--spinach); }
 .inventory-add-table { flex:1; min-height:0; overflow:auto; }
@@ -659,6 +662,10 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .inventory-not-required { color:var(--ink-mute); font-style:italic; }
 .inventory-add-row:not(.selected) .inventory-config { color:var(--ink-mute); }
 .inventory-add-row:not(.selected) .inventory-config select,.inventory-add-row:not(.selected) .inventory-config input,.inventory-add-row:not(.selected) .inventory-config button { visibility:hidden; }
+@media (max-width:900px) {
+  .inventory-add-toolbar { flex-wrap:wrap; }
+  .inventory-add-toolbar .picker-search-wrap { flex:1 1 100%; }
+}
 .outlet-picker-shell { display:flex; flex:1; min-height:420px; overflow:hidden; }
 .outlet-picker-results { flex:1; min-width:0; display:flex; flex-direction:column; border-right:1px solid var(--rule); }
 .outlet-picker-selected { width:280px; flex-shrink:0; display:flex; flex-direction:column; background:#F9FAFB; }
@@ -1711,7 +1718,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </button>
     </div>
     <div class="modal-tab-bar">
-      <div class="modal-tab active" data-panel="hqItemDetailsPanel" onclick="switchHqItemTab(this)">Details</div>
       <div class="modal-tab" data-panel="hqItemExcPanel" onclick="switchHqItemTab(this)">Exceptions <span class="modal-tab-badge" id="hqItemExcBadge" style="display:none">0</span></div>
     </div>
     <div class="modal-body">
@@ -2465,6 +2471,15 @@ function switchHqItemTab(tab) {
   const foot = document.getElementById('hqItemModalFoot');
   if (foot) foot.style.display = panelId === 'hqItemExcPanel' ? 'none' : '';
 }
+function showHqItemDetails() {
+  const detailsTab = document.querySelector('#hqItemModal .modal-tab[data-panel="hqItemDetailsPanel"]');
+  if (detailsTab) switchHqItemTab(detailsTab);
+  else {
+    document.querySelectorAll('#hqItemModal .hq-modal-panel').forEach(p => p.style.display = p.id === 'hqItemDetailsPanel' ? 'flex' : 'none');
+    const foot = document.getElementById('hqItemModalFoot');
+    if (foot) foot.style.display = '';
+  }
+}
 
 function ensureItemAccessState(idx) {
   if (itemAccessState[idx]) return;
@@ -2493,7 +2508,7 @@ function openHqItemModal(idx, initialTab) {
   document.getElementById('hqItemModalSupplier').textContent = supplierLabel(item.supplier);
   document.getElementById('hqItemCustomName').value = '';
   // Reset to Details tab
-  document.querySelectorAll('#hqItemModal .modal-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  document.querySelectorAll('#hqItemModal .modal-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('#hqItemModal .hq-modal-panel').forEach((p, i) => { p.style.display = i === 0 ? 'flex' : 'none'; });
   const foot = document.getElementById('hqItemModalFoot');
   if (foot) foot.style.display = '';
@@ -2512,6 +2527,8 @@ function openHqItemModal(idx, initialTab) {
   // Show/hide Exceptions tab depending on supplier type
   const excTabBtn = document.querySelector('#hqItemModal .modal-tab[data-panel="hqItemExcPanel"]');
   if (excTabBtn) excTabBtn.style.display = isActiveSup ? 'none' : '';
+  const itemTabBar = document.querySelector('#hqItemModal .modal-tab-bar');
+  if (itemTabBar) itemTabBar.style.display = isActiveSup ? 'none' : '';
 
   const banner = document.getElementById('hqItemBanner');
   if (isActiveSup) {
@@ -2635,6 +2652,7 @@ function renderGroupExceptions(itemIdx, container) {
 
   let html = '<div class="exc-section-head">' +
     '<span class="exc-section-label">Group & outlet exceptions</span>' +
+    '<button class="btn-outline" style="font-size:12px;padding:5px 10px;margin-left:auto" onclick="showHqItemDetails()">Back to item details</button>' +
     '<button class="btn-outline" style="font-size:12px;padding:5px 10px" onclick="showAddExcForm(' + itemIdx + ')">+ Add exception</button>' +
   '</div>';
 
@@ -3710,6 +3728,7 @@ function openRecGroupsDialog(btn) {
   document.getElementById('recGroupsDialogHeader').style.borderBottom = '1px solid var(--rule)';
   document.getElementById('recGroupsFoot').style.display = overlay.dataset.avKind ? 'flex' : 'none';
   document.getElementById('recGroupsCancel').style.display = 'none';
+  document.getElementById('recGroupsCancel').textContent = 'Cancel';
   document.getElementById('recGroupsManage').style.display = overlay.dataset.avKind ? '' : 'none';
   document.getElementById('recGroupsSave').style.display = 'none';
   overlay.style.display = 'flex';
@@ -3725,6 +3744,54 @@ function manageAvailabilityFromSummary() {
   if (kind === 'supplier') openSupplierAvailability(ref);
   if (kind === 'inventory') openInventoryAvailability(Number(ref));
   if (kind === 'item') openItemAvailability(Number(ref));
+}
+
+function openGroupSkuAvailability(index) {
+  var record = INV_ITEMS[index];
+  if (!record || record.type !== 'group') return;
+  var overlay = document.getElementById('recGroupsOverlay');
+  var groupIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--spinach)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>';
+  var outletIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+  var rows = (record.constituents || []).map(function(c, constituentIndex) {
+    var groups = c.groups || record.groups || [];
+    var outlets = c.outlets || record.outlets || [];
+    var label = availabilityLabel(groups, outlets, INV_GROUPS.length, REC_OUTLETS.length);
+    return '<div style="padding:14px 0;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;gap:14px">' +
+      '<div style="min-width:0"><div style="font-size:14px;font-weight:600;color:var(--ink)">' + hqSettingsEscape(c.name) + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:3px">' + hqSettingsEscape(supplierLabel(c.supplier)) + ' · ' + groupIcon + ' ' + label + '</div></div>' +
+      '<button class="btn btn-tertiary" style="flex-shrink:0;font-size:12px;padding:7px 10px" onclick="openGroupSkuConstituentManager(' + index + ',' + constituentIndex + ')">Manage</button>' +
+    '</div>';
+  }).join('');
+  document.getElementById('recGroupsTitle').textContent = 'Group SKU availability';
+  document.getElementById('recGroupsCount').textContent = record.name;
+  document.getElementById('recGroupsCount').style.fontSize = '14px';
+  document.getElementById('recGroupsList').innerHTML = rows || '<div style="padding:14px 0;color:var(--ink-mute);font-size:14px">No constituent items.</div>';
+  document.getElementById('recGroupsDialogHeader').style.borderBottom = '1px solid var(--rule)';
+  document.getElementById('recGroupsFoot').style.display = 'flex';
+  document.getElementById('recGroupsCancel').style.display = '';
+  document.getElementById('recGroupsCancel').textContent = 'Cancel';
+  document.getElementById('recGroupsCancel').textContent = 'Close';
+  document.getElementById('recGroupsManage').style.display = 'none';
+  document.getElementById('recGroupsSave').style.display = 'none';
+  overlay.style.display = 'flex';
+}
+
+function openGroupSkuConstituentAvailability(groupIndex, constituentIndex) {
+  var record = INV_ITEMS[groupIndex];
+  var constituent = record && record.constituents ? record.constituents[constituentIndex] : null;
+  if (!record || !constituent) return;
+  closeRecGroupsDialog();
+  openAvailabilityManager({
+    record: constituent,
+    groups: INV_GROUPS,
+    outlets: REC_OUTLETS,
+    save: function() {
+      record.groups = Array.from(new Set((record.constituents || []).reduce(function(all, item) { return all.concat(item.groups || []); }, [])));
+      record.outlets = Array.from(new Set((record.constituents || []).reduce(function(all, item) { return all.concat(item.outlets || []); }, [])));
+      saveHqInventoryState();
+    },
+    render: renderInv,
+    toast: 'Group SKU availability updated'
+  });
 }
 let managedAvailability = null;
 function availabilityGroupCount(name) {
@@ -3886,12 +3953,12 @@ const INV_ITEMS = [
   { type:'sku', name:'Anchor Unsalted Butter 25kg Bulk Block', detail:'Fonterra Brands', uom:'kg', cost:11.80, active:true, groups:INV_GROUPS.slice() },
   // Group SKUs
   { type:'group', name:'Chicken Thigh Boneless', detail:'2 SKUs', uom:'kg', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
-    { name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier:'Kee Song Group', cost:6.80 },
-    { name:'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier:'Poultry Masters SG', cost:6.40 },
+    { name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier:'Kee Song Group', cost:6.80, groups:['Chargrill Outlets','Family Dining Express'], outlets:['(WF 139) Chargrill @ 139 Tampines'] },
+    { name:'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier:'Poultry Masters SG', cost:6.40, groups:['Chargrill Outlets'], outlets:['(WF 290) Garden Express @ 290 Sengkang'] },
   ]},
   { type:'group', name:'Dark Soy Sauce', detail:'2 SKUs', uom:'L', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
-    { name:'Kikkoman Dark Soy Sauce 2L', supplier:'Kikkoman', cost:8.80 },
-    { name:'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier:'Asian Dry Goods', cost:6.90 },
+    { name:'Kikkoman Dark Soy Sauce 2L', supplier:'Kikkoman', cost:8.80, groups:['Family Dining Express'] },
+    { name:'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier:'Asian Dry Goods', cost:6.90, groups:['Chargrill Outlets'], outlets:['(WF 107) Chargrill @ 107 Serangoon'] },
   ]},
   { type:'group', name:'Cooking Oil', detail:'3 SKUs', uom:'L', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
     { name:'Sime Darby Canola Oil RBD 20L', supplier:'Sunny Gold F&B Supplies', cost:3.20 },
@@ -3919,6 +3986,16 @@ function loadHqInventoryState() {
   saved.forEach(function(entry) {
     if (!entry || !entry.name) return;
     const idx = INV_ITEMS.findIndex(function(item) { return item.name === entry.name; });
+    var base = idx > -1 ? INV_ITEMS[idx] : null;
+    if (entry.type === 'group' && Array.isArray(entry.constituents)) {
+      entry = Object.assign({}, entry, { constituents: entry.constituents.map(function(c) {
+        var baseConstituent = base && Array.isArray(base.constituents) ? base.constituents.find(function(candidate) { return candidate.name === c.name; }) : null;
+        var upgraded = Object.assign({}, c);
+        if (!Array.isArray(upgraded.groups) && baseConstituent && Array.isArray(baseConstituent.groups)) upgraded.groups = baseConstituent.groups.slice();
+        if (!Array.isArray(upgraded.outlets) && baseConstituent && Array.isArray(baseConstituent.outlets)) upgraded.outlets = baseConstituent.outlets.slice();
+        return upgraded;
+      }) });
+    }
     if (idx > -1) Object.assign(INV_ITEMS[idx], entry);
     else INV_ITEMS.push(entry);
   });
@@ -3944,11 +4021,13 @@ function toggleInvAddMenu(e) {
   var m = document.getElementById('invAddMenu');
   m.style.display = m.style.display === 'none' ? '' : 'none';
 }
-document.addEventListener('click', function() {
+document.addEventListener('click', function(event) {
   var m = document.getElementById('invAddMenu');
   if (m) m.style.display = 'none';
   var m2 = document.getElementById('addItemMenu');
   if (m2) m2.style.display = 'none';
+  var availabilityMenu = document.getElementById('isAvailFilterMenu');
+  if (availabilityMenu && !(event.target.closest && event.target.closest('.availability-filter-wrap'))) availabilityMenu.style.display = 'none';
 });
 
 // ── Link supplier dropdown + modal ──────────────────────────────
@@ -4524,7 +4603,42 @@ function openInventoryAvailability(index) {
   const record = INV_ITEMS[index];
   if (!record) return;
   if (!Array.isArray(record.outlets)) record.outlets = [];
-  openAvailabilityManager({ record: record, groups: INV_GROUPS, outlets: REC_OUTLETS, save: saveHqInventoryState, render: renderInv, toast: 'Inventory availability updated' });
+  var source = Number.isInteger(record.sourceItemIdx) ? ITEMS[record.sourceItemIdx] : ITEMS.find(function(item) { return item.name === record.name; });
+  if (source) ensureItemAccessState(ITEMS.indexOf(source));
+  openAvailabilityManager({ record: record, groups: source ? source.groupList.slice() : INV_GROUPS, outlets: source ? (source.outletList || []).slice() : REC_OUTLETS, save: saveHqInventoryState, render: renderInv, toast: 'Inventory availability updated' });
+}
+
+function groupSkuScope(record) {
+  var constituents = Array.isArray(record.constituents) ? record.constituents : [];
+  var groups = [];
+  var outlets = [];
+  constituents.forEach(function(c) {
+    (c.groups || record.groups || []).forEach(function(value) { if (groups.indexOf(value) === -1) groups.push(value); });
+    (c.outlets || record.outlets || []).forEach(function(value) { if (outlets.indexOf(value) === -1) outlets.push(value); });
+  });
+  if (!constituents.length) {
+    groups = (record.groups || []).slice();
+    outlets = (record.outlets || []).slice();
+  }
+  var fullyAvailableToAllGroups = constituents.length > 0 && INV_GROUPS.every(function(group) {
+    return constituents.every(function(c) { return (c.groups || record.groups || []).indexOf(group) > -1; });
+  });
+  var fullyAvailableToAllOutlets = constituents.length > 0 && REC_OUTLETS.length > 0 && REC_OUTLETS.every(function(outlet) {
+    return constituents.every(function(c) { return (c.outlets || record.outlets || []).indexOf(outlet) > -1; });
+  });
+  return { groups: groups, outlets: outlets, partial: !(fullyAvailableToAllGroups || fullyAvailableToAllOutlets) };
+}
+
+function groupSkuScopeLabel(record) {
+  var scope = groupSkuScope(record);
+  var groupCount = scope.groups.length;
+  var outletCount = scope.outlets.length;
+  if (!scope.partial && groupCount === INV_GROUPS.length && outletCount === 0) return 'All groups';
+  if (!groupCount && !outletCount) return 'Not available';
+  var parts = [];
+  if (groupCount) parts.push(groupCount + ' group' + (groupCount === 1 ? '' : 's'));
+  if (outletCount) parts.push(outletCount + ' outlet' + (outletCount === 1 ? '' : 's'));
+  return parts.join(' · ');
 }
 
 function renderInv() {
@@ -4560,10 +4674,14 @@ function renderInv() {
       ? '<td style="' + td + 'font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</td>'
       : '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">varies</td>';
 
-    var grpLabel = availabilityLabel(r.groups || [], r.outlets || [], INV_GROUPS.length, REC_OUTLETS.length);
+    var groupScope = r.type === 'group' ? groupSkuScope(r) : null;
+    var availableGroups = groupScope ? groupScope.groups : (r.groups || []);
+    var availableOutlets = groupScope ? groupScope.outlets : (r.outlets || []);
+    var grpLabel = groupScope ? groupSkuScopeLabel(r) : availabilityLabel(availableGroups, availableOutlets, INV_GROUPS.length, REC_OUTLETS.length);
+    var availabilityKind = r.type === 'group' ? '' : 'inventory';
     var grpHtml = grpLabel === 'Not available'
-      ? '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="" data-outlets="" data-av-kind="inventory" data-av-ref="' + globalIdx + '" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--ink-mute);cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">Not available</button>'
-      : '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + (r.groups||[]).join('|') + '" data-outlets="' + (r.outlets||[]).join('|') + '" data-av-kind="inventory" data-av-ref="' + globalIdx + '" style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
+      ? '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="" data-outlets="" data-av-kind="' + availabilityKind + '" data-av-ref="' + globalIdx + '" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--ink-mute);cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">Not available</button>'
+      : '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + availableGroups.join('|') + '" data-outlets="' + availableOutlets.join('|') + '" data-av-kind="' + availabilityKind + '" data-av-ref="' + globalIdx + '" style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
     var hasUomVariations = Array.isArray(r.inventoryUoms) && r.inventoryUoms.length > 1;
     var uomCell = hasUomVariations
       ? '<button class="ml-options-link' + (invUomExpanded.has(globalIdx) ? ' is-open' : '') + '" onclick="toggleInvUoms(' + globalIdx + ',event)">' + r.inventoryUoms.length + ' options<span class="ml-options-chevron"></span></button>'
@@ -4598,7 +4716,10 @@ function renderInv() {
     '</tr>');
 
     if (r.type === 'group' && invExpanded.has(globalIdx) && r.constituents) {
-      r.constituents.forEach(function(c) {
+      r.constituents.forEach(function(c, constituentIndex) {
+        var cGroups = c.groups || r.groups || [];
+        var cOutlets = c.outlets || r.outlets || [];
+        var cLabel = availabilityLabel(cGroups, cOutlets, INV_GROUPS.length, REC_OUTLETS.length);
         rows.push('<tr style="background:#F9FAFB">' +
           '<td style="' + td + 'padding-left:52px">' +
             '<div style="font-size: 14px;font-weight:500;color:var(--ink);margin-bottom:2px">' + c.name + '</div>' +
@@ -4606,7 +4727,7 @@ function renderInv() {
           '</td>' +
           '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + r.uom + '</td>' +
           '<td style="' + td + 'font-size: 14px;font-weight:600;color:var(--ink)">$' + c.cost.toFixed(2) + '</td>' +
-          '<td style="' + td + '"></td><td style="' + td + '"></td>' +
+          '<td style="' + td + '"><button onclick="event.stopPropagation();openGroupSkuConstituentAvailability(' + globalIdx + ',' + constituentIndex + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + cLabel + '</button></td><td style="' + td + '"></td>' +
         '</tr>');
       });
     }
@@ -4658,7 +4779,14 @@ function openGroupSkuModal(editIndex) {
     name: existing ? existing.name : '',
     uom: existing ? existing.uom : '',
     par: existing && existing.par != null ? existing.par : '',
-    items: existing && existing.constituents ? existing.constituents.map(function(c){ return Object.assign({ uom: existing.uom }, c); }) : []
+    items: existing && existing.constituents ? existing.constituents.map(function(c){
+      var source = INV_ITEMS.find(function(item) { return item.type === 'sku' && item.name === c.name; });
+      return Object.assign({
+        uom: existing.uom,
+        groups: source ? (source.groups || []).slice() : (c.groups || (existing.groups || [])).slice(),
+        outlets: source ? (source.outlets || []).slice() : (c.outlets || (existing.outlets || [])).slice()
+      }, c);
+    }) : []
   };
   document.getElementById('groupSkuModalTitle').textContent = isEditing ? 'Edit Group SKU' : 'Create Group SKU';
   document.getElementById('groupSkuName').value = groupSkuDraft.name;
@@ -4794,7 +4922,7 @@ function confirmGroupSkuPicker() {
     return;
   }
   chosen.forEach(function(item) {
-    groupSkuDraft.items.push({ name: item.name, supplier: item.detail, cost: item.cost, uom: item.uom, groups: (item.groups || []).slice(), active: item.active !== false });
+    groupSkuDraft.items.push({ name: item.name, supplier: item.detail, cost: item.cost, uom: item.uom, groups: (item.groups || []).slice(), outlets: (item.outlets || []).slice(), active: item.active !== false });
   });
   closeGroupSkuPicker();
   renderGroupSkuContent();
@@ -4806,11 +4934,14 @@ function saveGroupSku() {
   var duplicate = INV_ITEMS.some(function(item, idx) { return idx !== groupSkuDraft.editIndex && item.name.toLowerCase() === name.toLowerCase(); });
   if (duplicate) { var nameField = document.getElementById('groupSkuName'); nameField.focus(); return; }
   var uom = groupSkuDraft.items[0].uom;
+  var groupAvailability = Array.from(new Set(groupSkuDraft.items.reduce(function(all, item) { return all.concat(item.groups || []); }, [])));
+  var outletAvailability = Array.from(new Set(groupSkuDraft.items.reduce(function(all, item) { return all.concat(item.outlets || []); }, [])));
   var newNames = groupSkuDraft.items.map(function(c){ return c.name; });
   var entry = {
     type: 'group', name: name, detail: groupSkuDraft.items.length + ' SKU' + (groupSkuDraft.items.length === 1 ? '' : 's'),
     uom: uom, cost: null, active: true,
-    groups: groupSkuDraft.editIndex > -1 ? INV_ITEMS[groupSkuDraft.editIndex].groups : INV_GROUPS.slice(),
+    groups: groupAvailability,
+    outlets: outletAvailability,
     par: par, constituents: groupSkuDraft.items.slice()
   };
   if (groupSkuDraft.editIndex > -1) {
@@ -5258,17 +5389,50 @@ function confirmAddItems() {
 const UOM_OPTIONS = ['kg','g','L','mL','piece','portion','bottle','can','bag','box','carton','pack','bunch','roll','tray'];
 let isSel = new Set();
 let isConfig = {};
+let isAvailScopes = new Set();
 function getInvAvailSkus() {
   const itemSkus = ITEMS.map((item, idx) => {
     ensureItemAccessState(idx);
     const allUoms = Array.isArray(item.uom) ? item.uom : [item.uom];
     const enabledUoms = allUoms.filter((_, ui) => item.uomEnabled[ui]).map(u => u.replace(/^per /i, ''));
-    return { id:'is' + idx, itemIdx:idx, name:item.name, supplier:item.supplier, uom:enabledUoms[0], uoms:enabledUoms, price:item.price };
+    return { id:'is' + idx, itemIdx:idx, name:item.name, supplier:item.supplier, uom:enabledUoms[0], uoms:enabledUoms, price:item.price, groups:item.groupList.slice(), outlets:(item.outletList || []).slice() };
   }).filter(item => item.uoms.length && !INV_ITEMS.some(inv => inv.sourceItemIdx === item.itemIdx));
   const recipeSkus = typeof INV_AVAIL_RECIPES === 'undefined' ? [] : INV_AVAIL_RECIPES.map(function(recipe) {
     return { id:'recipe-' + recipe.id, recipeId:recipe.id, itemIdx:null, name:recipe.name, supplier:recipe.type === 'sub-recipe' ? 'Sub-recipe' : 'Recipe', recipeType:recipe.type, uom:recipe.uom, uoms:[recipe.uom], price:recipe.cost, isRecipe:true };
   }).filter(function(item) { return !INV_ITEMS.some(function(inv) { return inv.sourceRecipeId === item.recipeId; }); });
   return itemSkus.concat(recipeSkus);
+}
+function renderIsAvailabilityFilter() {
+  var select = document.getElementById('isAvailFilter');
+  if (!select) return;
+  var selected = isAvailScopes.size ? Array.from(isAvailScopes)[0] : '';
+  var scopes = INV_GROUPS.concat(REC_OUTLETS);
+  select.innerHTML = '<option value="">All availability</option>' + scopes.map(function(scope) {
+    return '<option value="' + escapeOverviewText(scope) + '">' + escapeOverviewText(scope) + '</option>';
+  }).join('');
+  select.value = selected;
+}
+function setInvAvailabilityFilter(value) {
+  isAvailScopes.clear();
+  if (value) isAvailScopes.add(value);
+  renderIsList();
+}
+function toggleIsAvailFilter(event) {
+  event.stopPropagation();
+  var menu = document.getElementById('isAvailFilterMenu');
+  if (!menu) return;
+  renderIsAvailabilityFilter();
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+function toggleIsAvailScope(scope, checked) {
+  checked ? isAvailScopes.add(scope) : isAvailScopes.delete(scope);
+  renderIsAvailabilityFilter();
+  renderIsList();
+}
+function clearIsAvailFilter() {
+  isAvailScopes.clear();
+  renderIsAvailabilityFilter();
+  renderIsList();
 }
 function populateInvSupplierFilter(items) {
   const select = document.getElementById('isSupFilter');
@@ -5280,9 +5444,11 @@ function populateInvSupplierFilter(items) {
 function openAddInvSkuModal() {
   isSel.clear();
   isConfig = {};
+  isAvailScopes.clear();
   document.getElementById('isSearch').value = '';
   populateInvSupplierFilter(getInvAvailSkus());
   document.getElementById('isSupFilter').value = '';
+  renderIsAvailabilityFilter();
   renderIsList();
   document.getElementById('addInvSkuModal').classList.add('open');
   setTimeout(function() { document.getElementById('isSearch').focus(); }, 0);
@@ -5294,7 +5460,8 @@ function renderIsList() {
   const sup = document.getElementById('isSupFilter').value;
   const filtered = available.filter(i =>
     (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q) || supplierLabel(i.supplier).toLowerCase().includes(q)) &&
-    (!sup || i.supplier === sup)
+    (!sup || i.supplier === sup) &&
+    (!isAvailScopes.size || Array.from(isAvailScopes).some(function(scope) { return (i.groups || []).includes(scope) || (i.outlets || []).includes(scope); }))
   ).sort((a, b) => a.name.localeCompare(b.name));
   document.getElementById('isList').innerHTML = filtered.length ? filtered.map(i => {
     const s = isSel.has(i.id);
@@ -5329,9 +5496,11 @@ function confirmAddInvSku(addMore) {
   const selected = getInvAvailSkus().filter(i => isSel.has(i.id));
   selected.forEach(i => {
     const cfg = isConfig[i.id];
+    const sourceGroups = (i.groups || []).slice();
+    const sourceOutlets = (i.outlets || []).slice();
     INV_ITEMS.push(i.isRecipe
       ? { type:i.recipeType, sourceRecipeId:i.recipeId, name:i.name, detail:i.supplier, uom:cfg.inventoryUom, orderingUom:cfg.orderUom, conversion:cfg.conversion, conversionFlipped:cfg.flipped, par:cfg.par, cost:i.price, active:true, groups:INV_GROUPS.slice() }
-      : { type:'sku', sourceItemIdx:i.itemIdx, name:i.name, detail:i.supplier, uom:cfg.inventoryUom, orderingUom:cfg.orderUom, conversion:cfg.conversion, conversionFlipped:cfg.flipped, par:cfg.par, cost:i.price, active:true, groups:INV_GROUPS.slice() });
+      : { type:'sku', sourceItemIdx:i.itemIdx, name:i.name, detail:i.supplier, uom:cfg.inventoryUom, orderingUom:cfg.orderUom, conversion:cfg.conversion, conversionFlipped:cfg.flipped, par:cfg.par, cost:i.price, active:true, groups:sourceGroups, outlets:sourceOutlets });
   });
   refreshNewHqEmptyStates();
   renderInv();
@@ -6346,8 +6515,11 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
           <option value="">All suppliers</option>
           <option>Kee Song Group</option><option>Meat King</option><option>Provenir</option><option>Deli Hub</option>
         </select>
+        <select class="picker-select" id="isAvailFilter" onchange="setInvAvailabilityFilter(this.value)">
+          <option value="">All availability</option>
+        </select>
         <label class="inventory-filter-check"><input type="checkbox" disabled> Invoiced in past</label>
-        <select class="picker-select" disabled><option>90 days</option></select>
+        <select class="picker-select" id="isInvDaysFilter" disabled><option>90 days</option></select>
       </div>
       <div class="inventory-add-table">
         <div class="inventory-add-head"><span></span><span>Name</span><span>Inventory UOM</span><span>Conversion rate to order UOM</span><span>Par</span></div>

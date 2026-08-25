@@ -741,6 +741,11 @@ function saveNewHqItem() {
       if (document.getElementById(entry[0]).checked) outletList.push(entry[1]);
     });
   }
+  if (!groupList.length && !outletList.length) {
+    alert('Select at least one outlet group or outlet where this item will be available.');
+    document.getElementById('chkChargrill').focus();
+    return;
+  }
   const uoms = pricing.map(function(row) { return 'per ' + row.uom; });
   const item = {
     name: name,
@@ -755,6 +760,8 @@ function saveNewHqItem() {
     groupList: groupList,
     outletList: outletList,
     active: true,
+    lifecycle: 'active',
+    excludedScopes: [],
     createdAt: new Date().toISOString()
   };
   created.push(item);
@@ -772,8 +779,9 @@ function saveNewHqItem() {
   } catch (e) {}
 
   localStorage.setItem('nomniHqCreatedItemToastPending', name);
-  const returnUrl = localStorage.getItem('nomniNewHQ') ? 'Admin - HQ Settings.html?new=1#market-list' : 'Admin - HQ Settings.html#market-list';
-  window.location.href = returnUrl;
+  // Return to the normal HQ Items list after saving. A stale new-HQ flag
+  // should not redirect an item created from the existing HQ workspace.
+  window.location.href = 'Admin - HQ Settings.html#market-list';
 }
 
 // UOM chip toggle
