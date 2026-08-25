@@ -55,6 +55,16 @@ Overview is the home for outlet structure and HQ health.
 - Ungrouped outlets can be selected in the table and added to a group in bulk.
 - Removing an outlet from a group returns it to the ungrouped HQ list. Removing it from the HQ is represented as a confirmation flow.
 
+### Membership and removal consequences
+
+These actions change membership and inheritance; they do not remove the HQ master catalogue or historical references.
+
+- **Remove from group:** the outlet remains managed by the HQ but becomes ungrouped. It keeps a copy of the group’s current effective setup—items, inventory, recipes, suppliers, POS mapping and relevant overrides—and no longer receives future updates from that group. It can later be added to another group.
+- **Remove from HQ:** the outlet is fully detached from the HQ and disappears from the HQ’s outlet and ungrouped lists. HQ links and future HQ updates no longer apply; the outlet continues independently with its retained outlet configuration. HQ master records and historical activity remain in the HQ.
+- **Split into new group:** the outlet moves out of its current group into a new independent group. The recommended option copies the current group’s items, inventory, recipes, suppliers, POS mapping and relevant overrides. **Start with HQ setup** instead creates the new group from HQ configuration and may substantially change the outlet’s available setup. In either case, future changes to the old group do not affect the new group.
+- **Delete group:** the group itself is removed, while all member outlets remain in the HQ as ungrouped outlets. Their effective group setup is retained as independent copies; the outlets no longer receive updates from the deleted group and can subsequently be assigned to a new group.
+- **Copy boundary:** copied setup includes items, inventory, recipes, suppliers, POS mapping and relevant overrides. Historical activity, orders, stock counts, users and API keys are not copied or deleted by these membership changes.
+
 ### Health check
 
 - Shows operational prompts, including pending price changes, ungrouped outlets, recipes above food-cost target and outlets not connected to POS.
@@ -107,7 +117,7 @@ Inventory defines the HQ's inventory items and counting setup.
 - Search, type and status filters narrow the list.
 - **Add to inventory** adds catalogue items or recipes to inventory and configures inventory UOM, conversion and par level.
 - **Availability dependency:** an inventory SKU inherits its base availability from the corresponding HQ Item. Inventory availability can be narrowed, but cannot include a group or ungrouped outlet that is unavailable at Item level. For example, an Item available to four of seven groups can only be configured for those four groups in Inventory.
-- The **Add to inventory** SKU picker includes a multi-select availability filter for outlet groups and ungrouped outlets, so users can find items available to one or more selected scopes before adding them.
+- The **Add to inventory** SKU picker includes a single-select availability filter for outlet groups and ungrouped outlets, so users can find items available to a selected scope before adding them.
 - Single-UOM rows show the UOM, unit cost and availability directly.
 - Multi-UOM rows are expandable: the parent shows the number of UOM options, while each child row repeats the item name and shows its UOM, cost and availability.
 - HQ inventory uses **Disable / Enable** for master records and **Remove from inventory** for removal. Group/outlet-specific availability uses **Exclude / Include** and excluded records are hidden from the normal local list.
@@ -182,6 +192,8 @@ Creates an HQ record.
 
 - **Basic information:** HQ name is required and is the only displayed HQ identity. The form suggests the convention “brand or group name + HQ”.
 - **Subscription information:** enables the relevant product add-ons: invoice processing, 3-way match, Retail POS, inventory tracking for recipes and AI features.
+- Validation keeps the user on the form and preserves selected add-ons when the HQ name is missing, too short or contains unsupported characters.
+- HQ names are checked case-insensitively against existing HQs; duplicates are rejected with an inline error before creation.
 - The sticky footer provides **Cancel** and **Create HQ**.
 - On successful creation, the prototype opens the new HQ Overview and stores enough browser-local state to demonstrate the empty-HQ journey.
 
@@ -357,10 +369,10 @@ The implemented demonstration flows use browser-local state and persist through 
 
 | Area | Status | Remaining work |
 |---|---|---|
-| HQ creation and first outlet group | Built | Confirm validation and error-state presentation in the prototype. |
-| HQ overview, groups and outlet assignment | Partial | Define removal consequences; linked outlets and group structure now persist locally until reset. |
+| HQ creation and first outlet group | Built | — |
+| HQ overview, groups and outlet assignment | Partial | Removal consequences and copy boundaries are defined. |
 | HQ suppliers | Partial | Relationship settings and lifecycle changes persist in the prototype; finish dependency reporting. |
-| HQ items | Partial | Create item save/return/list refresh, catalogue validation and local access/lifecycle persistence are implemented; continue confirming edge-case copy and availability behaviour. |
+| HQ items | Built | Create item save/return/list refresh, catalogue validation and access/lifecycle behaviour are implemented. |
 | HQ price changes | Partial | Review state persists locally; confirm the page’s product scope and workflow. |
 | HQ inventory | Partial | Inventory setup, Group SKU entries and scope-aware constituent availability persist locally; Group SKU availability is now summarised in the table and constituent rows. |
 | HQ recipes | Partial | Recipe lifecycle, availability, history and editor variation changes persist locally; complete validation. |

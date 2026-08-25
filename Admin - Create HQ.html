@@ -464,13 +464,36 @@ function clearCreateErrors() {
   document.querySelectorAll('.is-invalid').forEach(function(field) { field.classList.remove('is-invalid'); });
 }
 
+function getExistingHQNames() {
+  var names = [
+    '1-Group HQ', 'Alchemy Dining Group HQ', 'Baoshi HQ', 'Braise Collective HQ',
+    'Char Restaurant Group HQ', 'Da Paolo HQ', 'Dandy Group HQ', 'East Coast Eats HQ',
+    'Fable Hospitality HQ', 'Garden Cuisine HQ', 'Grain Group HQ', 'Hua Ting Group HQ',
+    'Imperial Palace HQ', 'Juniper Hospitality HQ', 'Kinship Dining HQ', 'Laut Seafood Group HQ',
+    'Mosaic Food Group HQ', 'Noodle Republic HQ', 'Paradise Group HQ', 'Pique Restaurant Group HQ',
+    'Soup Restaurant Group HQ'
+  ];
+  try {
+    var saved = JSON.parse(localStorage.getItem('nomniNewHQ') || 'null');
+    if (saved && saved.name) names.push(saved.name);
+  } catch (e) {}
+  return names;
+}
+
 function createHQ() {
   clearCreateErrors();
   var name = document.getElementById('hqName');
+  var trimmedName = name.value.trim();
   var firstInvalid = null;
 
-  if (!name.value.trim()) {
+  if (!trimmedName) {
     setCreateFieldError(name, 'Enter an HQ name.');
+    firstInvalid = firstInvalid || name;
+  } else if (trimmedName.length < 2 || !/^[\p{L}\p{N}][\p{L}\p{N} &'().,\-]*$/u.test(trimmedName)) {
+    setCreateFieldError(name, 'Use at least 2 letters or numbers. &, apostrophes and hyphens are allowed.');
+    firstInvalid = firstInvalid || name;
+  } else if (getExistingHQNames().some(function(existing) { return existing.toLowerCase() === trimmedName.toLowerCase(); })) {
+    setCreateFieldError(name, 'An HQ with this name already exists.');
     firstInvalid = firstInvalid || name;
   }
 
@@ -481,7 +504,7 @@ function createHQ() {
   }
 
   var newHQ = {
-    name: name.value.trim(),
+    name: trimmedName,
     company: 'Garden Cuisine Pte Ltd',
     createdAt: new Date().toISOString()
   };
