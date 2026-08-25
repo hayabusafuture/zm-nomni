@@ -2719,7 +2719,9 @@ function itemActionClick(rawIdx) {
   if (disableTitle) disableTitle.textContent = 'Exclude item from ' + scopeTitle + '?';
   if (enableTitle) enableTitle.textContent = 'Include item in ' + scopeTitle + '?';
   const isSupplierDisabled = groupDisabledItems.has(rawIdx);
-  const isIndivDisabled = individuallyDisabledItems.has(rawIdx);
+  // Scope exclusions are represented separately from legacy individual-disable
+  // state, but both should use the Include confirmation/action in this scope.
+  const isIndivDisabled = individuallyDisabledItems.has(rawIdx) || scopeExcludedItems.has(rawIdx);
   if (isSupplierDisabled) {
     const supplierName = ITEMS[rawIdx].supplier;
     const supplierItemCount = ITEMS.filter(item => item.supplier === supplierName).length;
