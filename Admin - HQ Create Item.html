@@ -449,16 +449,6 @@
       </label>
       <div class="inv-fields" id="invFields">
         <div class="field-group">
-          <label class="field-label">Inventory list <span class="opt">(optional)</span></label>
-          <select class="field-select">
-            <option value="">Uncategorised</option>
-            <option>Cold Storage</option>
-            <option>Dry Store</option>
-            <option>Freezer</option>
-          </select>
-          <span class="field-hint">If no list is selected, the item will be added to the 'Uncategorised' list.</span>
-        </div>
-        <div class="field-group">
           <label class="field-label" style="margin-bottom:8px">Inventory UOM <span class="req">*</span></label>
           <div class="inv-uom-row">
             <select class="inv-uom-select" id="invUomSelect" onchange="onInvUomChange()">
@@ -501,7 +491,7 @@
         </div>
         <div class="field-group">
           <label class="field-label">Inventory par <span class="opt">(optional)</span></label>
-          <input type="number" class="field-input" placeholder="e.g. 10" min="0" step="any" style="max-width:160px" />
+          <input type="number" class="field-input" id="inventoryPar" placeholder="e.g. 10" min="0" step="any" style="max-width:160px" />
           <span class="field-hint">Minimum stock level. Used for reorder alerts.</span>
         </div>
       </div>
@@ -610,7 +600,7 @@
 <div class="sticky-footer">
   <button class="cancel-link" onclick="history.back()">Cancel</button>
   <div class="footer-right">
-    <button class="save-btn" onclick="history.back()">Save item</button>
+    <button class="save-btn" onclick="saveNewHqItem()">Save item</button>
   </div>
 </div>
 
@@ -697,6 +687,93 @@ function flipInvConv() {
   rhsSel.value = lhsVal;
   val.value = numVal !== 0 ? (1 / numVal).toFixed(4).replace(/\.?0+$/, '') : 1;
   label.textContent = rhsVal;
+}
+
+function saveNewHqItem() {
+  const name = document.getElementById('skuName').value.trim();
+  const supplier = document.getElementById('supplierSelect').value;
+  const addToInventory = document.getElementById('addToInvChk').checked;
+  const inventoryUom = document.getElementById('invUomSelect').value;
+  const inventoryPar = document.getElementById('inventoryPar').value.trim();
+  const rows = Array.from(document.querySelectorAll('#pricingRows tr'));
+  const pricing = rows.map(function(row) {
+    const uom = row.querySelector('select').value;
+    const inputs = row.querySelectorAll('input');
+    return { uom: uom, price: inputs[0].value.trim(), moq: inputs[1].value.trim() };
+  });
+
+  if (!name || name.length > 100) { alert('Enter an item name between 1 and 100 characters.'); document.getElementById('skuName').focus(); return; }
+  if (!supplier) { alert('Select a supplier before saving.'); document.getElementById('supplierSelect').focus(); return; }
+  if (!pricing.length || pricing.some(function(row) { return !row.uom; })) {
+    alert('Select a UOM for each pricing row before saving.'); return;
+  }
+  const duplicateUom = pricing.some(function(row, index) { return pricing.findIndex(function(other) { return other.uom === row.uom; }) !== index; });
+  if (duplicateUom) {
+    alert('Each UOM can only appear once. Remove or change the duplicate UOM.'); return;
+  }
+  if (pricing.some(function(row) { return row.price === '' || !Number.isFinite(Number(row.price)) || Number(row.price) <= 0; })) {
+    alert('Enter a unit price greater than $0 for each UOM before saving.'); return;
+  }
+  if (addToInventory && !inventoryUom) {
+    alert('Select an Inventory UOM when adding this item to Inventory.');
+    document.getElementById('invUomSelect').focus();
+    return;
+  }
+  if (addToInventory && inventoryPar !== '' && (!Number.isFinite(Number(inventoryPar)) || Number(inventoryPar) < 0)) {
+    alert('Enter a valid non-negative inventory par level.');
+    document.getElementById('inventoryPar').focus();
+    return;
+  }
+
+  let created = [];
+  try { created = JSON.parse(localStorage.getItem('nomni-hq-created-items-v1') || '[]'); } catch (e) {}
+  if (!Array.isArray(created)) created = [];
+  if (created.some(function(item) { return item && item.name.toLowerCase() === name.toLowerCase(); })) {
+    alert('An item with this name has already been created.'); return;
+  }
+
+  const groupList = [];
+  if (document.getElementById('chkChargrill').checked) groupList.push('Chargrill Outlets');
+  if (document.getElementById('chkFamily').checked) groupList.push('Family Dining Express');
+  const outletList = [];
+  if (document.getElementById('chkUngroup').checked) {
+    [['chkO139','(WF 139) Chargrill @ 139 Tampines'],['chkO140','(WF 140) Chargrill @ Bedok'],['chkO141','(WF 141) Chargrill @ Jurong'],['chkO142','(WF 142) Chargrill @ Orchard']].forEach(function(entry) {
+      if (document.getElementById(entry[0]).checked) outletList.push(entry[1]);
+    });
+  }
+  const uoms = pricing.map(function(row) { return 'per ' + row.uom; });
+  const item = {
+    name: name,
+    cat: 'Other',
+    supplier: supplier,
+    price: Number(pricing[0].price),
+    uom: uoms.length === 1 ? uoms[0] : uoms,
+    moq: pricing[0].moq || '',
+    addToInventory: addToInventory,
+    inventoryUom: addToInventory ? inventoryUom : '',
+    inventoryPar: addToInventory ? inventoryPar : '',
+    groupList: groupList,
+    outletList: outletList,
+    active: true,
+    createdAt: new Date().toISOString()
+  };
+  created.push(item);
+  localStorage.setItem('nomni-hq-created-items-v1', JSON.stringify(created));
+
+  // New-HQ prototypes keep their own copied state, so update it as well.
+  try {
+    const newHq = JSON.parse(localStorage.getItem('nomniNewHQ') || 'null');
+    if (newHq) {
+      const state = JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}');
+      state.items = Array.isArray(state.items) ? state.items : [];
+      state.items.push(item);
+      localStorage.setItem('nomniHqPrototypeState', JSON.stringify(state));
+    }
+  } catch (e) {}
+
+  localStorage.setItem('nomniHqCreatedItemToastPending', name);
+  const returnUrl = localStorage.getItem('nomniNewHQ') ? 'Admin - HQ Settings.html?new=1#market-list' : 'Admin - HQ Settings.html#market-list';
+  window.location.href = returnUrl;
 }
 
 // UOM chip toggle

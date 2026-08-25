@@ -17,6 +17,10 @@ This guide is the single source of truth for the current user-facing HQ prototyp
 
 The effective priority is **Removed → Excluded → Disabled → Active**. Excluded records are hidden from the normal list for that scope and restored through an Excluded status filter or availability manager. HQ-disabled records remain visible, dimmed and labelled **Disabled at HQ**, and cannot be enabled locally. Legacy lifecycle wording is not used in HQ product UI or activity copy.
 
+**Availability target rule:** availability can be configured for an outlet group or an ungrouped outlet. A grouped outlet always inherits its outlet group’s availability and cannot receive its own availability exception.
+
+**Availability interaction:** **Available to** is the read-only summary and the entry point for changes. Its **Manage availability** action opens an editable list with **Outlet groups** and **Ungrouped outlets** tabs, each showing its selected count. Removing an existing selection shows a warning that it will be excluded when saved.
+
 The HQ page is the operating view for a buyer's head office. It has a header with the HQ name, last-updated date, **Users** and **Edit details** actions, a summary strip, and seven tabs: Overview, Suppliers, Items, Inventory, Recipes, POS mapping and Activity.
 
 ### Last updated timestamps
@@ -69,7 +73,7 @@ Suppliers are managed at HQ level and then made available to the relevant outlet
 - Supplier search supports normal Procure suppliers, Active suppliers that require a Live Chat request, UEN/ABN lookup, and manual creation when no match exists.
 - Each linked supplier has configurable notification contacts, minimum order rules, delivery days and cut-off times, including **Apply to all** for delivery settings.
 - Email and WhatsApp are individually optional, but at least one contact method is required.
-- Existing suppliers can be edited, disabled or enabled at HQ level; group/outlet-specific availability uses Exclude/Include.
+- Existing suppliers can be edited, disabled or enabled at HQ level; **Manage availability** sets supplier availability for outlet groups or ungrouped outlets. Grouped outlets inherit their group’s availability. Supplier delivery-policy overrides remain separate and may still target one individual managed outlet.
 
 ## Items
 
@@ -79,8 +83,8 @@ Items is the HQ master market-list view.
 - **Price changes** opens the HQ-level invoice price-review page.
 - Items can be added from supplier catalogues and configured for access, UOMs, pricing and MOQ.
 - Multi-UOM items use an expandable parent row. The parent shows the number of UOM options; child rows show the UOM, price and availability.
-- **Available to** explains where an item can be used. It can identify all outlet groups, individual groups and individual outlets; the detail dialog separates group and outlet access.
-- Item settings include Details, Exceptions and Access.
+- **Available to** explains where an item can be used. It can identify all outlet groups, individual groups and ungrouped outlets; the detail dialog separates group and ungrouped-outlet access. An outlet in a group inherits its group’s availability and cannot be configured separately.
+- Item settings include Details and Exceptions. Item availability is managed from the item’s **Available to** summary rather than from a separate tab in Edit item details.
 - **Master lifecycle:** an HQ item can be **Active**, **Disabled** or **Removed**. Disabled items remain visible but cannot be ordered by included outlet groups or ungrouped outlets. Removed items disappear from available market lists throughout the HQ, while existing Inventory and Recipe references remain as historical records and can no longer be newly selected.
 - Removed items remain available in the HQ’s **Removed** status view, where they can be restored to the master market list.
 - **Scope exclusion:** HQ can exclude an otherwise active or disabled item from a specific outlet group or ungrouped outlet. Exclusion means it is not available there at all. The effective-state priority is **Removed → Excluded → Disabled → Active**.
@@ -105,8 +109,8 @@ Inventory defines the HQ's inventory items and counting setup.
 - Single-UOM rows show the UOM, unit cost and availability directly.
 - Multi-UOM rows are expandable: the parent shows the number of UOM options, while each child row repeats the item name and shows its UOM, cost and availability.
 - HQ inventory uses **Disable / Enable** for master records and **Remove from inventory** for removal. Group/outlet-specific availability uses **Exclude / Include** and excluded records are hidden from the normal local list.
-- Availability in child rows can identify outlet groups and individual outlets.
-- Row actions support editing, disabling/enabling and removing inventory records in the prototype.
+- Availability in child rows can identify outlet groups and ungrouped outlets. Grouped outlets inherit their outlet group’s availability.
+- Row actions support editing, managing availability, disabling/enabling and removing inventory records in the prototype. Inventory availability can target outlet groups or ungrouped outlets only.
 
 ## POS mapping
 
@@ -130,8 +134,8 @@ Recipes is the HQ recipe library.
 
 - Search and filters support browsing by recipe type, food-cost status and lifecycle status, including **Removed**.
 - Recipes can be created and edited, with ingredients, portions, instructions and food-cost information.
-- Recipes can have variations. The default variation is available broadly; non-default variations can be explicitly assigned to selected groups or outlets.
-- **Manage availability** controls the groups and individual outlets in which a recipe is available; the **Available to** dialog remains a read-only summary.
+- Recipes can have variations. The default variation is available broadly; non-default variations can be explicitly assigned to selected groups or ungrouped outlets. A grouped outlet inherits its group’s assigned variation.
+- **Manage availability** controls the outlet groups and ungrouped outlets in which a recipe is available; the **Available to** dialog remains a read-only summary. Grouped outlets inherit their outlet group’s availability.
 - The prototype includes recipe version history, copying data between variations and ingredient-update propagation flows.
 - **Master lifecycle:** HQ recipes can be **Active**, **Disabled** or **Removed**. Disabled recipes remain visible but unusable. Removed recipes disappear from HQ and local recipe lists but retain their POS mappings, inventory records and historical data; they can be restored from the **Removed** filter. Group/outlet recipe availability uses **Exclude / Include**; excluded recipes are hidden from the normal local list and restored from the **Excluded** filter. A recipe disabled at HQ remains visible locally as **Disabled at HQ**.
 
@@ -150,7 +154,7 @@ On search-driven actions, a small helper panel appears above the reset control w
 ## Prototype boundaries
 
 - This is a static HTML prototype. It does not connect to backend data or enforce real permissions.
-- Outlet groups and their linked outlets are retained in browser-local state across refreshes until **Reset prototype** is used. Other prototype state may still be session-only.
+- Outlet groups and their linked outlets, catalogue/lifecycle changes, supplier settings, inventory setup, recipe changes, price-review decisions and activity entries are retained in browser-local state across refreshes until **Reset prototype** is used.
 - Names, counts, activity and catalogues are illustrative unless explicitly derived from a prior prototype flow.
 
 ---
@@ -223,7 +227,7 @@ The POS mapping tab is the HQ-level version of the existing Nomni Procure POS ma
 - Its right pane is the Procure search-and-map workspace. The user selects Inventory or Recipes and then maps the selected POS entry.
 - Inventory choices deliberately include regular inventory items, Group SKUs and inventory recipes; Recipe choices are recipes not held in inventory.
 - For variants, the workspace presents the existing Procure behaviours: Add/modify, Replace and Multiplier. Detailed ingredient selection for those behaviours remains to be built.
-- The API-key-only connection is a current prototype assumption. The production connection requirements, POS location selection and visibility/category settings still need confirmation.
+- The API-key-only connection is a current prototype assumption. Connection requirements, POS location selection and visibility/category settings still need confirmation.
 
 ### Create outlet group — `Admin - Create Outlet Group.html`
 
@@ -271,12 +275,14 @@ An Admin supplier route. The active HQ-specific supplier experience is launched 
 
 Creates a new HQ market-list item. It is the dedicated route behind the HQ item-creation flow, collecting catalogue and ordering configuration before defining where the item is available.
 
-### HQ recipe creation — `Admin - HQ Recipe Create.html` and `Admin - HQ Recipe Create - New.html`
+### HQ recipe creation — `Admin - HQ Recipe Create.html`, `Admin - HQ Recipe Create - New.html` and `Admin - HQ Recipe Create - V3.html`
 
 The Admin recipe-creation screens support building the HQ recipe library.
 
+- **V3 is an exploratory alternative:** it preserves V2 as a separate reference while presenting recipe variations as clearer scope cards. The base recipe is explicitly the default; variation cards show assignment context, and the active variation’s applicability is shown in a mint panel with a delete action.
+
 - They capture recipe identity, ingredients, UOMs, portions and instructions.
-- The flows support assigning recipes and variations to groups or individual outlets where applicable.
+- The flows support assigning recipes and variations to outlet groups or ungrouped outlets where applicable. A grouped outlet inherits its group’s availability and variation assignment.
 - These routes sit behind the Recipes tab rather than replacing it as the primary library view.
 
 ### Buyer user — `Admin - Buyer User.html`
@@ -287,16 +293,24 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 - Supports linking the person to an HQ and defining HQ-related permissions.
 - It complements the HQ Users list, which is the preferred starting point when managing access for a known HQ.
 
+## Completed in the current prototype
+
+- **Create item:** saves the new HQ catalogue record locally, shows an “Item created” confirmation, returns to the Items tab and refreshes the list.
+- **Create item validation:** validates item name, supplier, UOM, positive pricing, duplicate UOM rows and inventory UOM/par values; the HQ form no longer asks for an Inventory list.
+- **Persistence pass:** supplier settings and lifecycle, item lifecycle/access, inventory setup and Group SKU entries, recipe lifecycle/availability, price-review decisions, activity entries, outlet-group detail state, and recipe-editor drafts/variations/assignments/versions now persist across refreshes.
+- **Group SKU safeguards:** removing selected components confirms that they leave Inventory; deleting an unused Group SKU confirms and removes it; Group SKUs used by recipes or POS mapping are blocked with an affected-dependencies view action.
+- **Supplier scope flow:** default and override saves are scoped correctly; unsaved scope switching offers Save changes, Discard changes or Cancel; deleting an override confirms immediately and returns to Default.
+- **Outlet-group consistency:** outlet-group and ungrouped-outlet tables, exclusions, activity formatting and supplier counts follow the shared HQ interaction model.
+
 ## Planned follow-up work
 
 ### Complete and confirm core flows
 
-- **Create item:** the page captures the required details but **Save item** does not yet create a locally retained HQ catalogue record. Complete the save, return and list-refresh flow.
-- **Recipes:** recipe creation and editing screens need to be fully fleshed out, including validation, save behaviour, variations, ingredients and retained state.
+- **Recipes:** complete validation and confirm the intended save behaviour for variations, ingredients and retained state.
 - **POS mapping:** the HQ overview and mapping workspace are represented, but the end-to-end mapping flow and its dependency rules are not fully fleshed out.
-- **Price changes:** confirm that the dedicated HQ Price changes page, its scope and its review actions are the intended product experience before treating it as final.
+- **Price changes:** confirm the final product scope and review workflow.
 - **Unit costs and pricing:** confirm how unit costs are calculated and displayed across every HQ, outlet-group and outlet tab when supplier costs, item overrides, UOMs or price tiers differ by scope.
-- **Recipe availability:** define and build the management experience for recipe availability. The current dialog is a placeholder and needs clear group/outlet controls, exclusion behaviour and a restoration path.
+- **Recipe availability:** confirm ownership, exclusion rules and restoration behaviour.
 
 ### Ungrouped outlet management
 
@@ -321,6 +335,10 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 - After the move, the new group becomes independent: future changes to either group do not affect the other. This prevents a removed outlet silently reverting to the generic HQ configuration.
 - **Implemented prototype:** group settings include **Copy setup**, which remains available after a group is created or split. The user selects a source group and the sections to overwrite; historical data, users and API keys are excluded.
 - **Implemented prototype:** supplier relationship settings use a left-hand scope navigator: **Default** applies to all HQ-managed groups and outlets, while saved overrides appear beneath it. **Add override** separates outlet-group selection from individual-outlet selection (including grouped and ungrouped outlets); each scoped page exposes its effective scope and a Delete action.
+- Supplier settings use explicit scope actions: **Save default settings** saves only the HQ default and returns to the Suppliers list; **Save override** saves only the selected group or outlet exception, keeps the override visible, and returns to **Default** in the same supplier settings page.
+- When changing scope with unsaved edits, the user is warned and can **Save changes**, **Discard changes** or **Cancel** the switch. **Cancel** from the supplier settings page discards unsaved changes and returns to the previous page.
+- Override inheritance follows **outlet → outlet group → HQ default**. An outlet-specific override takes precedence over its group override; if it is deleted, the outlet follows its group’s settings when available, otherwise the HQ default. Deleting an override is confirmed, takes effect immediately and returns to **Default**.
+- Supplier settings show contextual confirmation messages in plain language, such as **This outlet now follows its group’s supplier settings** or **This outlet now follows the HQ supplier settings** after an outlet override is deleted.
 
 ## Delivery status and gaps
 
@@ -331,23 +349,23 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 - **Not built:** absent or represented only by a non-functional control.
 - **Product decision:** behaviour or ownership remains undefined.
 
-Prototype status does not imply backend integration. Browser-local state is used for selected demonstration flows; outlet-group assignments persist through refreshes until the prototype is reset.
+The implemented demonstration flows use browser-local state and persist through refreshes until the prototype is reset.
 
 ### Current delivery snapshot
 
 | Area | Status | Remaining work |
 |---|---|---|
-| HQ creation and first outlet group | Built | Replace browser-local state with durable records and define production validation/error handling. |
+| HQ creation and first outlet group | Built | Confirm validation and error-state presentation in the prototype. |
 | HQ overview, groups and outlet assignment | Partial | Define removal consequences; linked outlets and group structure now persist locally until reset. |
-| HQ suppliers | Partial | Persist relationship settings, lifecycle changes and dependency reporting. |
-| HQ items | Partial | Complete locally retained Create item, then persist catalogue, access and exception state. |
-| HQ price changes | Partial | Confirm the page’s product scope and review workflow before finalising it; then persist review state. |
-| HQ inventory | Partial | Persist setup; define Group SKU dependency safeguards and views. |
-| HQ recipes | Partial | Fully flesh out creation and editing, then persist recipes, availability, history and variation changes. |
+| HQ suppliers | Partial | Relationship settings and lifecycle changes persist in the prototype; finish dependency reporting. |
+| HQ items | Partial | Create item save/return/list refresh, catalogue validation and local access/lifecycle persistence are implemented; continue confirming edge-case copy and availability behaviour. |
+| HQ price changes | Partial | Review state persists locally; confirm the page’s product scope and workflow. |
+| HQ inventory | Partial | Inventory setup, Group SKU entries and dependency safeguards persist locally; continue refining related dependency views. |
+| HQ recipes | Partial | Recipe lifecycle, availability, history and editor variation changes persist locally; complete validation. |
 | HQ POS mapping | Partial | Fully flesh out the end-to-end mapping flow and its dependency rules. |
 | Cost and pricing model | Product decision | Define the effective unit-cost calculation and display rules across HQ, group and outlet scopes. |
-| HQ users | Built | Replace the hard-coded prototype directory with real data and permissions. |
-| Activity | Partial | Write all actions to one durable audit trail. |
+| HQ users | Built | — |
+| Activity | Partial | A shared browser-local audit trail now persists across HQ activity views; confirm remaining activity coverage. |
 | HQ lifecycle | Not built | Define and implement an HQ-wide enable/disable lifecycle. |
 
 ### Admin and Procure ownership
@@ -368,13 +386,12 @@ In the Admin HQ supplier search, an Admin user can add an Active supplier direct
 
 ### Cross-cutting implementation gaps
 
-- Backend/API integration, durable prototype state, roles and permissions, shared validation, loading/error states and accessibility review are not complete.
+- Shared validation, loading/error states and accessibility review are not complete.
 - Confirmation, undo, notifications and audit conventions are only partially consistent.
 - Complex tables and modals still need a systematic responsive review.
 
 ### Suggested next work
 
 1. Confirm Admin/Procure ownership and permission boundaries.
-2. Extend durable prototype state across HQ configuration, not only creation flows.
-3. Connect Health check and Activity to the same change events used by interactions.
-4. Complete disconnected actions and align confirmation, error and notification patterns.
+2. Connect Health check and Activity to the same change events used by interactions.
+3. Complete disconnected actions and align confirmation, error and notification patterns.

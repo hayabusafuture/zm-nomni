@@ -1011,6 +1011,35 @@ const currentGroup = new Set([1, 2, 3, 4]);
 const pendingAdd   = new Set();
 let   pendingRemoveId = null;
 
+const GROUP_DETAIL_STATE_KEY = 'nomni-hq-outlet-group-detail-v1';
+function groupDetailStateName() {
+  const title = document.querySelector('.page-title');
+  return title ? title.textContent.trim() : 'NSW Metro';
+}
+function loadGroupDetailState() {
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem(GROUP_DETAIL_STATE_KEY) || '{}'); } catch (e) {}
+  const saved = all[groupDetailStateName()];
+  if (!saved) return;
+  currentGroup.clear(); (saved.outletIds || []).forEach(id => currentGroup.add(Number(id)));
+  groupDisabledSuppliers.clear(); (saved.disabledSuppliers || []).forEach(name => groupDisabledSuppliers.add(name));
+  groupDisabledItems.clear(); (saved.disabledItems || []).forEach(idx => groupDisabledItems.add(Number(idx)));
+  individuallyDisabledItems.clear(); (saved.individualDisabledItems || []).forEach(idx => individuallyDisabledItems.add(Number(idx)));
+  Object.keys(saved.itemOverrides || {}).forEach(idx => { itemOverrides[idx] = saved.itemOverrides[idx]; });
+}
+function saveGroupDetailState() {
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem(GROUP_DETAIL_STATE_KEY) || '{}'); } catch (e) {}
+  all[groupDetailStateName()] = {
+    outletIds: Array.from(currentGroup),
+    disabledSuppliers: Array.from(groupDisabledSuppliers),
+    disabledItems: Array.from(groupDisabledItems),
+    individualDisabledItems: Array.from(individuallyDisabledItems),
+    itemOverrides: itemOverrides
+  };
+  localStorage.setItem(GROUP_DETAIL_STATE_KEY, JSON.stringify(all));
+}
+
 function initials(name) {
   return name.replace(/[^a-zA-Z ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '??';
 }
@@ -1046,6 +1075,7 @@ function renderOutlets() {
   `).join('');
   renderMiniOutlets();
   renderStatsStrip();
+  saveGroupDetailState();
 }
 
 const MINI_OUTLETS_MAX = 5;
@@ -1244,6 +1274,7 @@ HQ_SUPPLIERS.forEach(s => { s.itemCount = ITEMS.filter(item => item.supplier ===
 const groupDisabledSuppliers = new Set(); // supplier names disabled at group level
 const groupDisabledItems = new Set();     // item indices auto-disabled due to supplier disable
 const individuallyDisabledItems = new Set(); // item indices disabled individually
+loadGroupDetailState();
 
 function getUOMBreakdown(item) {
   if (!Array.isArray(item.uom)) return null;
@@ -1341,6 +1372,7 @@ function renderSuppliers() {
       '</tr>';
     }).join('') +
     '</tbody></table>';
+  saveGroupDetailState();
 }
 
 function renderStatsStrip() {
@@ -1474,6 +1506,7 @@ function renderItems() {
   }).join('');
 
   renderItemsPager(totalPages, total);
+  saveGroupDetailState();
 }
 
 function renderItemsPager(totalPages, total) {

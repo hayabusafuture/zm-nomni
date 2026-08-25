@@ -583,6 +583,7 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Admin — Recipe V3 · BBQ Baby Back Pork Ribs with House Sauce: Admin - HQ Recipe Create - V3.html
 - Admin — POS mapping: Admin - HQ - POS Mapping.html
 - Admin — HQ Price Changes: Admin - HQ - Price Changes.html
 - Admin — Create Buyer User (Access Cards Draft): Admin - Buyer User - Access Cards Draft.html
