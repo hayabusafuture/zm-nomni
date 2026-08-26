@@ -284,8 +284,36 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .ml-options-link:hover { color: var(--nomni-green); }
 .ml-options-chevron { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-2px); transition: transform .15s ease; }
 .ml-options-link.is-open .ml-options-chevron { transform: rotate(225deg) translate(-1px,-1px); }
-.ml-price-main { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.ml-price-main { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ml-price-meta { margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--ink-mute); white-space: nowrap; }
+.pilot-pricing { display:flex; flex-direction:column; gap:16px; }
+.pilot-default-card { border:1px solid var(--rule); border-radius:8px; padding:14px; background:#F9FAFB; }
+.pilot-price-label { font-size:12px; font-weight:700; color:var(--ink); }
+.pilot-price-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+.pilot-price-fields label { display:block; }
+.pilot-price-fields .pilot-scope-source { display:block; margin:0 0 4px; }
+.pilot-price-fields .modal-field-input { font-size:14px; line-height:20px; font-weight:400; font-variant-numeric:tabular-nums; }
+.pilot-scope-name { min-width:0; font-size:14px; font-weight:500; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pilot-pricing-table { margin-top:2px; box-sizing:border-box; table-layout:fixed; }
+.pilot-pricing-table th { padding:9px 10px; }
+.pilot-pricing-table td { padding:10px; font-variant-numeric:tabular-nums; }
+.pilot-pricing-table th:nth-child(2), .pilot-pricing-table td:nth-child(2) { width:110px; }
+.pilot-pricing-table th:nth-child(3), .pilot-pricing-table td:nth-child(3) { width:76px; }
+.pilot-pricing-table th:last-child, .pilot-pricing-table td:last-child { width:40px; text-align:right; }
+.pilot-pricing-table td[colspan]:last-child { width:auto; text-align:left; }
+.pilot-scope-inherited { color:var(--ink-mute); }
+.pilot-scope-unset { color:var(--ink-mute); font-size:14px; }
+.pilot-scope-row-off td { color:var(--ink-mute); }
+.pilot-scope-cell { display:flex; align-items:center; gap:10px; min-width:0; }
+.pilot-scope-edit { width:32px; height:32px; padding:0; border:0; border-radius:6px; background:transparent; color:var(--spinach); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+.pilot-scope-edit:hover { background:var(--mint); color:var(--seaweed); }
+.pilot-scope-edit .material-symbols-outlined { font-size:18px; }
+.pilot-scope-editor { display:grid; grid-template-columns:1fr 1fr auto auto; gap:8px; align-items:end; padding:4px 0; }
+.pilot-scope-editor-hint { grid-column:1 / -1; font-size:12px; color:var(--ink-mute); line-height:1.35; }
+.pilot-scope-editor .modal-field-input { min-width:0; height:36px; box-sizing:border-box; padding:7px 9px; }
+.pilot-scope-editor .btn { min-height:36px; height:36px; box-sizing:border-box; padding:0 12px; }
+.pilot-uom-section { display:flex; flex-direction:column; gap:12px; }
+.pilot-scope-source { margin-top:2px; font-size:11px; color:var(--ink-mute); }
 
 /* Sort headers */
 .sort-th { cursor: pointer; user-select: none; transition: background .1s; }
@@ -598,8 +626,13 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   border-bottom:1px solid #D9DDE3;
 }
 #addItemModal .picker-head {
+  padding-bottom:0;
   border-bottom:0;
 }
+#addItemModal[data-ai-step="0"] .picker-head { padding-bottom:10px; }
+#addItemModal .picker-search-row { padding-top:0; padding-bottom:20px; }
+#addItemModal #aiPanel1 .picker-search-wrap,
+#addItemModal #aiPanel1 .picker-select { height:40px; }
 #addItemModal .picker-step-item::after {
   bottom:-1px;
   height:2px;
@@ -612,6 +645,11 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #addItemModal .picker-step-item.active::after {
   background:var(--nomni-green);
 }
+.ai-catalogue-picker-list { flex:1; min-height:0; padding:0 24px 16px; overflow-y:auto; scrollbar-width:none; }
+.ai-catalogue-picker-list::-webkit-scrollbar { display:none; }
+.ai-catalogue-name { display:block; font-size:14px; font-weight:500; color:var(--ink); }
+.ai-catalogue-sub { display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-top:2px; font-size:12px; color:var(--ink-mute); }
+.ai-catalogue-uom { display:inline-block; background:#f0f1f3; border-radius:4px; padding:1px 7px; font-size:11px; font-weight:600; color:var(--ink-mute); }
 .picker-search-row { display: flex; gap: 8px; padding: 12px 24px 0; flex-shrink: 0; }
 .picker-search-wrap { display: flex; align-items: center; gap: 8px; flex: 1; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; }
 .picker-search-wrap:focus-within { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
@@ -691,6 +729,75 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #groupOutletPicker .picker-list.is-empty { display:flex; align-items:center; justify-content:center; }
 #groupOutletPicker .picker-list.is-empty .picker-empty { width:100%; padding:32px 24px; text-align:center; }
 #groupOutletPicker .picker-list.is-empty .picker-empty { color:var(--ink); font-size:16px; font-weight:600; line-height:1.45; }
+/* ── Add from invoice (HQ) ── */
+#hqInvoiceModal .picker-card { width:680px; }
+#hqInvoiceModal .picker-head { padding-bottom:20px; border-bottom:0; }
+#hqInvoiceModal, #addItemModal { align-items:center; box-sizing:border-box; padding:24px; }
+.hq-invoice-step { display:flex; flex:1; min-height:0; flex-direction:column; }
+.hq-invoice-copy { margin:0; padding:18px 24px 10px; color:var(--ink-mute); font-size:14px; line-height:1.5; }
+.hq-invoice-scopes { display:flex; flex-direction:column; padding:0 24px 16px; overflow:auto; }
+.hq-invoice-list-actions { display:flex; align-items:center; min-height:44px; flex-shrink:0; position:sticky; top:0; z-index:2; background:#f5f6f7; border:1px solid var(--rule); border-bottom:0; border-radius:8px 8px 0 0; padding:0 14px; }
+.hq-invoice-list-actions label { display:inline-flex; align-items:center; gap:12px; color:var(--ink); font:inherit; font-size:14px; font-weight:600; cursor:pointer; row-gap:12px; column-gap:12px; }
+.hq-invoice-list-actions input { width:18px; height:18px; margin:0; accent-color:var(--spinach); cursor:pointer; }
+.hq-invoice-scope-section { display:flex; flex-direction:column; }
+.hq-invoice-scope-label { margin:0 0 8px; color:var(--ink); font-size:13px; font-weight:700; }
+.hq-invoice-scope-list { display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--rule); border-radius:0 0 8px 8px; background:#fff; }
+.hq-invoice-scope { display:flex; align-items:center; gap:12px; min-height:62px; padding:11px 14px; border-bottom:1px solid var(--rule); cursor:pointer; transition:background-color .13s ease; }
+.hq-invoice-scope:last-child { border-bottom:0; }
+.hq-invoice-scope:hover { background:#F7FFF9; }
+.hq-invoice-scope.is-selected { background:#F2FFF5; }
+.hq-invoice-scope input { width:18px; height:18px; margin:0; accent-color:var(--spinach); flex-shrink:0; }
+.hq-invoice-scope-name { display:block; font-size:14px; font-weight:500; color:var(--ink); }
+.hq-invoice-scope-meta { display:block; margin-top:2px; font-size:12px; color:var(--ink-mute); }
+.hq-upload-body { padding:0 24px 20px; }
+.hq-drop-zone { width:100%; min-height:142px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; border:1px dashed #BFC6D0; border-radius:10px; background:#fff; color:var(--ink); cursor:pointer; font:inherit; }
+.hq-drop-zone:hover { background:#FBFFFC; border-color:var(--nomni-green); }
+.hq-drop-zone .material-symbols-outlined { color:var(--spinach); font-size:28px; }
+.hq-drop-zone strong { font-size:14px; }
+.hq-drop-zone span:last-child { color:var(--ink-mute); font-size:12px; }
+.hq-upload-files { margin-top:12px; border-top:1px solid var(--rule); }
+.hq-upload-file { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 2px; border-bottom:1px solid var(--rule); font-size:14px; }
+.hq-upload-file-meta { color:var(--ink-mute); font-size:12px; }
+.hq-upload-ready { color:var(--spinach); font-size:12px; font-weight:600; }
+.hq-review-overlay { position:fixed; inset:0; z-index:940; display:none; background:#fff; }
+.hq-review-overlay.open { display:grid; grid-template-columns:minmax(330px, 38%) minmax(0, 1fr); grid-template-rows:56px 1fr; }
+.hq-review-topbar { grid-column:1 / -1; grid-row:1; position:static; height:56px; min-height:56px; box-sizing:border-box; }
+.hq-review-close { width:40px; height:40px; border:0; border-radius:6px; background:none; color:var(--ink-mute); display:grid; place-items:center; cursor:pointer; }
+.hq-review-close:hover { background:#F3F4F6; color:var(--ink); }
+.hq-review-preview { grid-row:2; display:flex; flex-direction:column; align-items:center; min-width:0; padding:22px; background:#2A353A; overflow:auto; }
+.hq-review-preview-label { color:#fff; font-size:13px; font-weight:600; margin-bottom:14px; }
+.hq-invoice-paper { width:min(360px, 100%); min-height:475px; box-sizing:border-box; padding:26px 24px; background:#fff; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,.2); color:#34373D; font-size:12px; line-height:1.55; }
+.hq-invoice-paper-head { display:flex; justify-content:space-between; gap:12px; margin-bottom:22px; }
+.hq-invoice-paper h3 { margin:0; color:#1A1F2B; font-size:17px; }
+.hq-invoice-paper hr { border:0; border-top:1px solid #D9DDE3; margin:16px 0; }
+.hq-paper-line { display:flex; justify-content:space-between; gap:8px; padding:7px 0; border-bottom:1px solid #EEF0F3; }
+.hq-review-main { grid-row:2; display:flex; min-width:0; flex-direction:column; overflow:hidden; }
+.hq-review-title { padding:22px 30px 22px; border-bottom:1px solid var(--rule); }
+.hq-review-back { display:inline-flex; align-items:center; gap:5px; margin-bottom:6px; border:0; background:none; padding:0; color:var(--spinach); font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.hq-review-title .hq-review-back { margin-bottom:14px; font-size:14px; font-weight:500; }
+.hq-review-title h1 { margin:0; font-size:24px; font-weight:700; letter-spacing:-.03em; }
+.hq-review-scope-note { margin-top:10px; padding:14px; border-radius:8px; background:#E2FFE6; color:var(--seaweed); font-size:14px; font-weight:500; }
+.hq-review-scroll { flex:1; min-height:0; overflow:auto; }
+.hq-review-invoice-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 30px; background:#FFF8D9; border-bottom:1px solid #F3D779; }
+.hq-review-invoice-meta { display:flex; align-items:center; gap:10px; min-width:0; }
+.hq-review-invoice-num { width:32px; height:32px; display:grid; place-items:center; flex-shrink:0; border-radius:50%; background:#fff; color:var(--ink); font-size:14px; font-weight:700; }
+.hq-review-invoice-name { font-size:14px; font-weight:700; }
+.hq-review-invoice-sub { margin-top:2px; color:var(--ink-mute); font-size:12px; }
+.hq-review-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.hq-review-content { padding:20px 30px 36px; }
+.hq-review-summary { display:flex; align-items:center; gap:8px; margin-bottom:14px; font-size:21px; font-weight:700; }
+.hq-review-summary em { padding:3px 7px; border-radius:4px; background:#FFF3CD; color:#9A6700; font-size:12px; font-style:normal; }
+.hq-review-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.hq-review-table th { padding:10px 8px; border-bottom:1px solid var(--rule); color:var(--ink-mute); font-size:11px; font-weight:700; letter-spacing:.05em; text-align:left; text-transform:uppercase; }
+.hq-review-table td { padding:12px 8px; border-bottom:1px solid var(--rule); vertical-align:top; }
+.hq-review-line-number { width:30px; color:#9A6700; font-weight:700; vertical-align:middle !important; }
+.hq-review-content > .hq-review-back { font-size:14px; }
+.hq-review-name { font-size:14px; font-weight:600; line-height:1.35; }
+.hq-review-status { margin-top:4px; color:var(--ink-mute); font-size:12px; }
+.hq-review-status.changed { color:#B45309; }
+.hq-review-field { width:100%; min-width:0; height:40px; box-sizing:border-box; border:1px solid #DCDEE3; border-radius:6px; padding:0 8px; color:var(--ink); font:inherit; font-size:14px; background:#fff; }
+.hq-review-field:focus { outline:2px solid rgba(42,200,100,.18); border-color:var(--nomni-green); }
+@media (max-width: 900px) { .hq-review-overlay.open { grid-template-columns:1fr; } .hq-review-preview { display:none; } .hq-review-main { grid-row:2; } .hq-review-content,.hq-review-title,.hq-review-invoice-bar { padding-left:18px; padding-right:18px; } }
 /* Config step */
 .config-list { flex: 1; overflow-y: auto; min-height: 0; }
 .config-row { padding: 16px 24px; border-bottom: 1px solid var(--rule); }
@@ -725,7 +832,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .config-grp-row label { font-size: 14px; cursor: pointer; }
 /* Step 2 compact price table */
 .ai-price-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.ai-step-helper { margin: 0; padding: 12px 24px; border-bottom: 1px solid var(--rule); background: #fff; color: var(--ink-mute); font-size: 14px; line-height: 1.5; }
+.ai-step-helper { margin: 0; padding: 0 24px 12px; border-bottom: 1px solid var(--rule); background: #fff; color: var(--ink-mute); font-size: 14px; line-height: 1.5; }
 .ai-price-tbl thead th { position: sticky; top: 0; background: #fff; text-align: left; font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; padding: 12px 8px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; z-index: 1; }
 .ai-price-tbl thead th:first-child { padding-left: 24px; }
 .ai-price-tbl thead th:last-child { padding-right: 24px; }
@@ -740,8 +847,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .ai-price-tbl .col-price { width: 18%; }
 .ai-price-tbl .col-moq { width: 20%; }
 .ai-price-tbl .item-name-cell { vertical-align: top; padding-top: 14px; }
-.ai-price-tbl .uom-label { display: inline-block; font-size: 14px; font-weight: 400; color: var(--ink); white-space: nowrap; }
-.ai-price-tbl .uom-cell { display: flex; align-items: center; }
+.ai-price-tbl .uom-label { display: inline-block; font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.ai-price-tbl .uom-cell { display: flex; align-items: center; gap:8px; }
 .ai-price-tbl input { width: 100%; border: 1px solid #dcdee3; border-radius: 6px; padding: 6px 9px; font: inherit; font-size: 14px; color: var(--ink); background: #fff; }
 .ai-price-tbl input:focus { outline: 2px solid rgba(42,200,100,.18); outline-offset: 0; border-color: var(--nomni-green); }
 .ai-price-tbl .price-wrap { width: 112px; }
@@ -751,10 +858,13 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 /* Step 3 groups panel */
 .step3-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 0; }
 .step3-intro { font-size: 14px; color: var(--ink-mute); margin-bottom: 16px; }
-.step3-group { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
-.step3-grp-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: background .1s; }
-.step3-grp-row:hover { background: #f7f8fa; }
-.step3-grp-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--seaweed); cursor: pointer; flex-shrink: 0; }
+.step3-list { display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+.step3-group { margin:0; }
+.step3-grp-row { display: flex; align-items: center; gap: 12px; min-height:62px; box-sizing:border-box; padding:11px 14px; border-bottom:1px solid var(--rule); cursor: pointer; transition:background-color .13s ease; }
+.step3-group:last-child .step3-grp-row { border-bottom:0; }
+.step3-grp-row:hover { background:#F7FFF9; }
+.step3-grp-row:has(input:checked) { background:#F2FFF5; }
+.step3-grp-row input[type=checkbox] { width:18px; height:18px; margin:0; accent-color:var(--spinach); cursor:pointer; flex-shrink:0; }
 .step3-grp-info { flex: 1; }
 .step3-grp-name { font-size: 14px; font-weight: 500; color: var(--ink); }
 .step3-grp-sub { font-size: 12px; color: var(--ink-mute); margin-top: 1px; }
@@ -1318,7 +1428,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <span class="panel-label-text">Recent activity</span>
               <button onclick="navigateToTab('activity')" style="font-size: 14px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View all →</button>
             </div>
-            <div class="activity-feed">
+            <div class="activity-feed" id="overviewRecentActivity">
               <div class="activity-item">
                 <div class="activity-dot" style="background:#2AC864"></div>
                 <div class="activity-body">
@@ -1385,6 +1495,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div id="addItemMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:230px;overflow:hidden">
+              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openHqInvoiceModal()">Add from invoice</div>
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openAddCatalogueModal()">Add from supplier catalogue</div>
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';window.location.href='Admin - HQ Create Item.html'">Create new item</div>
             </div>
@@ -1406,9 +1517,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <option value="">All suppliers</option>
         </select>
         <select class="ml-filter-select" id="mlStatusFilter" onchange="setMlStatusFilter(this.value)">
-          <option value="">All statuses</option>
-          <option value="active">Active</option>
-          <option value="disabled">Disabled</option>
+          <option value="">All items</option>
           <option value="removed">Removed</option>
         </select>
       </div>
@@ -1418,7 +1527,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <tr>
               <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">Item name <span class="sort-ind"></span></th>
               <th style="width:100px">UOM</th>
-              <th class="sort-th" id="mlSortTh-price" onclick="setMlSort('price')" style="width:120px">Price <span class="sort-ind"></span></th>
+              <th class="sort-th" id="mlSortTh-price" onclick="setMlSort('price')" style="width:140px">Price range <span class="sort-ind"></span></th>
               <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
             </tr>
@@ -1516,7 +1625,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
               <th>Supplier</th>
               <th style="width:80px;text-align:center">Items</th>
               <th style="width:200px">Contact</th>
-              <th style="width:110px">Type</th>
+              <th style="width:130px">Supplier type</th>
               <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
             </tr>
@@ -1718,7 +1827,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       </button>
     </div>
     <div class="modal-tab-bar">
-      <div class="modal-tab" data-panel="hqItemExcPanel" onclick="switchHqItemTab(this)">Exceptions <span class="modal-tab-badge" id="hqItemExcBadge" style="display:none">0</span></div>
     </div>
     <div class="modal-body">
       <div class="hq-modal-panel" id="hqItemDetailsPanel">
@@ -1733,7 +1841,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     </div>
     <div class="modal-foot" id="hqItemModalFoot">
       <button class="btn btn-tertiary" onclick="closeHqItemModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="closeHqItemModal()">Save changes</button>
+      <button class="btn btn-primary" onclick="saveHqItemModal()">Save changes</button>
     </div>
   </div>
 </div>
@@ -2157,7 +2265,7 @@ function supplierLabel(name) { return SUPPLIER_LEGAL_NAMES[name] || name; }
 const ITEMS = [
   { name: "Chilled Chicken Thigh Fillet Skinless Boneless IVP 500g", cat: "Poultry", supplier: "Kee Song Group", price: 7.50, uom: "per kg" },
   { name: "Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray", cat: "Poultry", supplier: "Kee Song Group", price: 8.20, uom: ["per kg", "per tray"] },
-  { name: "Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack", cat: "Poultry", supplier: "Kee Song Group", price: 4.80, uom: "per kg" },
+  { name: "Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack", cat: "Poultry", supplier: "Kee Song Group", price: 4.80, uom: ["per kg", "per pack"], defaultPricing: [{ price: 4.80, moq: "10 kg" }, { price: null, moq: null }] },
   { name: "Chilled Chicken Drumstick Grade A Fresh 1kg Pack", cat: "Poultry", supplier: "Kee Song Group", price: 4.50, uom: "per kg" },
   { name: "Chilled Chicken Liver Fresh Singapore Standard Grade 500g", cat: "Poultry", supplier: "Kee Song Group", price: 3.20, uom: "per kg" },
   { name: "Chilled Boneless Duck Breast with Skin French Origin 200g Each", cat: "Poultry", supplier: "Kee Song Group", price: 18.00, uom: "per pc" },
@@ -2270,11 +2378,29 @@ function loadCreatedHqItems() {
     }
   });
 }
+function saveCreatedHqItems() {
+  var saved = [];
+  try { saved = JSON.parse(localStorage.getItem(HQ_CREATED_ITEMS_KEY) || '[]'); } catch (e) {}
+  if (!Array.isArray(saved)) saved = [];
+  ITEMS.filter(function(item) { return item && item.createdAt; }).forEach(function(item) {
+    if (!saved.some(function(existing) { return existing && existing.name === item.name; })) saved.push(item);
+  });
+  localStorage.setItem(HQ_CREATED_ITEMS_KEY, JSON.stringify(saved));
+}
 loadCreatedHqItems();
 
-// Per-item HQ-set group overrides: itemIdx -> [{group, uomIdx, price, moq}]
-// Flat per-entry format: group, uomIdx (0 for single-UOM items), price (null if not set), moq string (null if not set)
+// Per-item pricing-scope overrides: itemIdx -> [{group, uomIdx, price, moq}]
+// Flat per-entry format: scope name, uomIdx (0 for single-UOM items), price (null if not set), moq string (null if not set)
 const GROUP_EXCEPTIONS = {};
+// Seed a few early, passive-supplier examples so the Items table demonstrates
+// how an HQ-level price range surfaces intentional scope differences.
+GROUP_EXCEPTIONS[2] = [
+  { group: 'Chargrill Outlets', uomIdx: 0, price: 5.20, moq: null },
+  { group: 'Family Dining Express', uomIdx: 1, price: 10.20, moq: '6 packs' }
+];
+GROUP_EXCEPTIONS[4] = [
+  { group: 'Family Dining Express', uomIdx: 0, price: 3.55, moq: null }
+];
 // idx 12 = Chilled Australian Beef Tenderloin (Provenir, passive, single UOM)
 GROUP_EXCEPTIONS[12] = [
   { group: 'Chargrill Outlets', uomIdx: 0, price: null, moq: '3 kg' }
@@ -2428,6 +2554,10 @@ function setMlCatFilter(v) { mlCatFilter = v; mlPage = 1; renderMl(); }
 function setMlSupplierFilter(v) { mlSupplierFilter = v; mlPage = 1; renderMl(); }
 function setMlStatusFilter(v) { mlStatusFilter = v; mlPage = 1; renderMl(); }
 
+function itemDisplayName(item) {
+  return item.customName || item.name;
+}
+
 function setMlSort(key) {
   mlSortKey = mlSortKey === key + '-asc' ? key + '-desc' : key + '-asc';
   ['name','price'].forEach(k => {
@@ -2443,18 +2573,16 @@ function getMlItems() {
   let items = ITEMS.slice();
   if (mlCatFilter) items = items.filter(i => i.cat === mlCatFilter);
   if (mlSupplierFilter) items = items.filter(i => i.supplier === mlSupplierFilter);
-  if (mlStatusFilter === 'active') items = items.filter(i => itemLifecycle(i) === 'active');
-  else if (mlStatusFilter === 'disabled') items = items.filter(i => itemLifecycle(i) === 'disabled');
-  else if (mlStatusFilter === 'removed') items = items.filter(i => itemLifecycle(i) === 'removed');
+  if (mlStatusFilter === 'removed') items = items.filter(i => itemLifecycle(i) === 'removed');
   else items = items.filter(i => itemLifecycle(i) !== 'removed');
   if (mlSearch) {
     const q = mlSearch.toLowerCase();
-    items = items.filter(i => i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q));
+    items = items.filter(i => itemDisplayName(i).toLowerCase().includes(q) || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q));
   }
-  if (mlSortKey === 'name-asc') items.sort((a,b) => a.name.localeCompare(b.name));
-  else if (mlSortKey === 'name-desc') items.sort((a,b) => b.name.localeCompare(a.name));
-  else if (mlSortKey === 'price-asc') items.sort((a,b) => a.price - b.price);
-  else if (mlSortKey === 'price-desc') items.sort((a,b) => b.price - a.price);
+  if (mlSortKey === 'name-asc') items.sort((a,b) => itemDisplayName(a).localeCompare(itemDisplayName(b)));
+  else if (mlSortKey === 'name-desc') items.sort((a,b) => itemDisplayName(b).localeCompare(itemDisplayName(a)));
+  else if (mlSortKey === 'price-asc') items.sort((a,b) => getItemPriceRange(ITEMS.indexOf(a), 0).min - getItemPriceRange(ITEMS.indexOf(b), 0).min);
+  else if (mlSortKey === 'price-desc') items.sort((a,b) => getItemPriceRange(ITEMS.indexOf(b), 0).min - getItemPriceRange(ITEMS.indexOf(a), 0).min);
   else items.sort((a,b) => {
     const ci = CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat);
     return ci !== 0 ? ci : a.name.localeCompare(b.name);
@@ -2469,7 +2597,7 @@ function switchHqItemTab(tab) {
   document.querySelectorAll('#hqItemModal .hq-modal-panel').forEach(p => p.style.display = 'none');
   document.getElementById(panelId).style.display = 'flex';
   const foot = document.getElementById('hqItemModalFoot');
-  if (foot) foot.style.display = panelId === 'hqItemExcPanel' ? 'none' : '';
+  if (foot) foot.style.display = '';
 }
 function showHqItemDetails() {
   const detailsTab = document.querySelector('#hqItemModal .modal-tab[data-panel="hqItemDetailsPanel"]');
@@ -2479,6 +2607,14 @@ function showHqItemDetails() {
     const foot = document.getElementById('hqItemModalFoot');
     if (foot) foot.style.display = '';
   }
+}
+
+function getScopeUomState(item, uoms, scope) {
+  const scopeUoms = item.scopeUoms || {};
+  return uoms.map(function(uom, uomIdx) {
+    const unit = String(uom || '').replace(/^per /i, '');
+    return item.uomEnabled[uomIdx] !== false && (!Array.isArray(scopeUoms[scope]) || scopeUoms[scope].includes(unit));
+  });
 }
 
 function ensureItemAccessState(idx) {
@@ -2493,42 +2629,109 @@ function ensureItemAccessState(idx) {
   itemAccessState[idx] = {};
   ML_GROUPS.forEach(g => {
     const enabled = item.groupList.includes(g);
-    itemAccessState[idx][g] = { enabled, uoms: uoms.map(() => true), type: 'group' };
+    itemAccessState[idx][g] = { enabled, uoms: getScopeUomState(item, uoms, g), type: 'group' };
   });
   ML_UNGROUPED_OUTLETS.forEach(o => {
     const enabled = item.outletList && item.outletList.includes(o);
-    itemAccessState[idx][o] = { enabled, uoms: uoms.map(() => true), type: 'outlet' };
+    itemAccessState[idx][o] = { enabled, uoms: getScopeUomState(item, uoms, o), type: 'outlet' };
   });
+  // Example data: pack is intentionally unavailable to one outlet group.
+  if (idx === 2 && itemAccessState[idx]['Chargrill Outlets'] && uoms.length > 1) {
+    itemAccessState[idx]['Chargrill Outlets'].uoms[1] = false;
+  }
+}
+
+function getItemPriceRange(itemIdx, uomIdx) {
+  const item = ITEMS[itemIdx];
+  if (!item) return { min: 0, max: 0, scopeCount: 0, varies: false };
+  ensureItemAccessState(itemIdx);
+
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  const defaultPrice = getDefaultScopePrice(item, uomIdx);
+  const state = itemAccessState[itemIdx];
+  const scopes = [...ML_GROUPS, ...ML_UNGROUPED_OUTLETS].filter(function(scope) {
+    const access = state[scope];
+    return access && access.enabled && access.uoms[uomIdx];
+  });
+  const prices = scopes.map(function(scope) {
+    const override = (GROUP_EXCEPTIONS[itemIdx] || []).find(function(entry) {
+      return entry.group === scope && entry.uomIdx === uomIdx && entry.price != null;
+    });
+    return override ? Number(override.price) : defaultPrice;
+  });
+  const values = prices.length ? prices : [defaultPrice];
+  const min = Math.min.apply(null, values);
+  const max = Math.max.apply(null, values);
+  return { min: min, max: max, scopeCount: scopes.length, varies: min !== max };
+}
+
+function hasSetPrice(value) {
+  return Number.isFinite(Number(value)) && Number(value) > 0;
+}
+
+function hasSetMoq(value) {
+  const normalised = String(value == null ? '' : value).trim();
+  return !!normalised && !/^0(?:\.0+)?(?:\s|$)/.test(normalised);
+}
+
+function formatMoqValue(value) {
+  const match = String(value == null ? '' : value).trim().match(/^\d+(?:\.\d+)?/);
+  return match ? match[0] : String(value || '');
+}
+
+function getDefaultScopePrice(item, uomIdx) {
+  const configured = item.defaultPricing && item.defaultPricing[uomIdx];
+  if (configured && hasSetPrice(configured.price)) return Number(configured.price);
+  if (configured) return null;
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  return item.price * (UOM_MULT[uoms[uomIdx]] || 1);
+}
+
+function getDefaultScopeMoq(item, uomIdx) {
+  const configured = item.defaultPricing && item.defaultPricing[uomIdx];
+  if (configured) return hasSetMoq(configured.moq) ? configured.moq : null;
+  return item.moq;
+}
+
+function formatItemPriceRange(itemIdx, uomIdx) {
+  const range = getItemPriceRange(itemIdx, uomIdx);
+  const price = range.varies
+    ? 'S$' + range.min.toFixed(2) + '–' + range.max.toFixed(2)
+    : 'S$' + range.min.toFixed(2);
+  return '<div class="ml-price-main">' + price + '</div>';
 }
 
 function openHqItemModal(idx, initialTab) {
   const item = ITEMS[idx];
-  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
-  document.getElementById('hqItemModalTitle').textContent = item.name;
+  const modal = document.getElementById('hqItemModal');
+  modal.dataset.itemIdx = idx;
+  document.getElementById('hqItemModalTitle').textContent = itemDisplayName(item);
   document.getElementById('hqItemModalSupplier').textContent = supplierLabel(item.supplier);
-  document.getElementById('hqItemCustomName').value = '';
-  // Reset to Details tab
-  document.querySelectorAll('#hqItemModal .modal-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('#hqItemModal .hq-modal-panel').forEach((p, i) => { p.style.display = i === 0 ? 'flex' : 'none'; });
+  document.getElementById('hqItemCustomName').value = item.customName || '';
+  const itemTabBar = document.querySelector('#hqItemModal .modal-tab-bar');
   const foot = document.getElementById('hqItemModalFoot');
   if (foot) foot.style.display = '';
 
   ensureItemAccessState(idx);
-
-  // Update Exceptions badge
-  const excCount = (GROUP_EXCEPTIONS[idx] || []).length;
-  const excBadge = document.getElementById('hqItemExcBadge');
-  excBadge.textContent = excCount;
-  excBadge.style.display = excCount > 0 ? 'inline-block' : 'none';
+  pilotModalSnapshot = {
+    itemIdx: idx,
+    uomEnabled: item.uomEnabled.slice(),
+    accessState: JSON.parse(JSON.stringify(itemAccessState[idx])),
+    exceptions: JSON.parse(JSON.stringify(GROUP_EXCEPTIONS[idx] || [])),
+    defaultPricing: JSON.parse(JSON.stringify(item.defaultPricing || [])),
+    customName: item.customName || '',
+    price: item.price,
+    moq: item.moq
+  };
+  modal.dataset.pilotCommitted = 'false';
+  renderPilotModalTabs(idx);
+  document.querySelectorAll('#hqItemModal .hq-modal-panel').forEach(function(panel) {
+    panel.style.display = panel.id === 'hqItemDetailsPanel' ? 'flex' : 'none';
+  });
 
   const supplierRecord = SUPPLIERS.find(s => s.name === item.supplier);
   const isActiveSup = supplierRecord && supplierRecord.type === 'active';
-
-  // Show/hide Exceptions tab depending on supplier type
-  const excTabBtn = document.querySelector('#hqItemModal .modal-tab[data-panel="hqItemExcPanel"]');
-  if (excTabBtn) excTabBtn.style.display = isActiveSup ? 'none' : '';
-  const itemTabBar = document.querySelector('#hqItemModal .modal-tab-bar');
-  if (itemTabBar) itemTabBar.style.display = isActiveSup ? 'none' : '';
+  if (itemTabBar) itemTabBar.style.display = '';
 
   const banner = document.getElementById('hqItemBanner');
   if (isActiveSup) {
@@ -2542,37 +2745,10 @@ function openHqItemModal(idx, initialTab) {
   }
 
   const section = document.getElementById('hqItemPriceSection');
-  if (uoms.length > 1) {
-    section.innerHTML =
-      '<div class="modal-field"><label>UOM pricing</label>' +
-      '<table class="uom-breakdown-table"><thead><tr><th style="width:28px"></th><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th><th style="width:120px">MOQ</th></tr></thead><tbody>' +
-      uoms.map((u, ui) => {
-        const on = item.uomEnabled[ui];
-        return '<tr id="hqUomRow_' + idx + '_' + ui + '"' + (on ? '' : ' style="opacity:0.38"') + '>' +
-          '<td style="padding-right:4px"><button class="access-toggle' + (on ? ' on' : '') + '" onclick="toggleHqUomEnabled(' + idx + ',' + ui + ')" title="' + (on ? 'Disable this UOM' : 'Enable this UOM') + '"></button></td>' +
-          '<td>' + u + '</td>' +
-          '<td><input class="modal-field-input" type="text" value="' + item.price.toFixed(2) + '"' + (on ? '' : ' disabled') + ' style="padding:6px 10px" /></td>' +
-          '<td><input class="modal-field-input" type="text" value="' + item.moq + '"' + (on ? '' : ' disabled') + ' style="padding:6px 10px" /></td>' +
-        '</tr>';
-      }).join('') +
-      '</tbody></table>' +
-      '<p style="font-size:12px;color:var(--ink-mute);margin:8px 0 0">At least one UOM must remain enabled.</p>' +
-      '</div>';
-  } else {
-    section.innerHTML =
-      '<div class="modal-field"><label>UOM pricing</label>' +
-      '<table class="uom-breakdown-table"><thead><tr><th>Unit of measure</th><th style="width:140px">Unit price (S$)</th><th style="width:120px">MOQ</th></tr></thead><tbody>' +
-      '<tr><td>' + item.uom + '</td><td><input class="modal-field-input uom-price-input" type="text" value="' + item.price.toFixed(2) + '" style="padding:6px 10px" /></td><td><input class="modal-field-input uom-moq-input" type="text" value="' + item.moq + '" style="padding:6px 10px" /></td></tr>' +
-      '</tbody></table></div>';
-  }
+  renderPilotDetailsUoms(idx, section);
 
-  if (isActiveSup) {
-    section.querySelectorAll('input').forEach(inp => { inp.disabled = true; });
-  }
-
-  // Render Exceptions tab content
   const excPanel = document.getElementById('hqItemExcPanel');
-  if (excPanel) renderGroupExceptions(idx, excPanel);
+  if (excPanel) renderPilotPricing(idx, excPanel);
 
   if (initialTab && initialTab !== 'hqItemDetailsPanel') {
     const targetTab = document.querySelector('#hqItemModal .modal-tab[data-panel="' + initialTab + '"]');
@@ -2580,6 +2756,172 @@ function openHqItemModal(idx, initialTab) {
   }
 
   document.getElementById('hqItemModal').classList.add('open');
+}
+
+let pilotPricingEditor = null;
+let pilotPricingUomIdx = 0;
+let pilotModalSnapshot = null;
+
+function renderPilotDetailsUoms(itemIdx, container) {
+  const item = ITEMS[itemIdx];
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  container.innerHTML = '<div class="modal-field"><label>UOMs</label><div style="display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:6px;overflow:hidden">' +
+    uoms.map(function(uom, uomIdx) {
+      const enabled = item.uomEnabled[uomIdx];
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px' + (uomIdx ? ';border-top:1px solid var(--rule)' : '') + '"><span style="font-size:14px;color:var(--ink);opacity:' + (enabled ? '1' : '.45') + '">' + uom + '</span><button class="access-toggle' + (enabled ? ' on' : '') + '" type="button" onclick="togglePilotUomEnabled(' + itemIdx + ',' + uomIdx + ')" title="' + (enabled ? 'Disable this UOM' : 'Enable this UOM') + '"></button></div>';
+    }).join('') +
+  '</div><p style="margin:8px 0 0;font-size:12px;color:var(--ink-mute)">Turn off a UOM to disable it for every group and outlet. At least one UOM must remain enabled.</p></div>';
+}
+
+function togglePilotUomEnabled(itemIdx, uomIdx) {
+  const item = ITEMS[itemIdx];
+  const enabledCount = item.uomEnabled.filter(Boolean).length;
+  if (item.uomEnabled[uomIdx] && enabledCount <= 1) return;
+  item.uomEnabled[uomIdx] = !item.uomEnabled[uomIdx];
+  renderPilotModalTabs(itemIdx);
+  renderPilotDetailsUoms(itemIdx, document.getElementById('hqItemPriceSection'));
+  renderPilotPricing(itemIdx, document.getElementById('hqItemExcPanel'));
+  renderMl();
+}
+
+function renderPilotPricing(itemIdx, container) {
+  const item = ITEMS[itemIdx];
+  const state = itemAccessState[itemIdx];
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  const supplierRecord = SUPPLIERS.find(function(supplier) { return supplier.name === item.supplier; });
+  const pricingEditable = !supplierRecord || supplierRecord.type !== 'active';
+  const groupOutletCounts = { 'Chargrill Outlets': 4, 'Family Dining Express': 6 };
+  if (!item.uomEnabled[pilotPricingUomIdx]) pilotPricingUomIdx = item.uomEnabled.findIndex(Boolean);
+  const scopeRows = function(uomIdx) {
+    return [...ML_GROUPS, ...ML_UNGROUPED_OUTLETS].filter(function(name) {
+      return state[name] && state[name].enabled;
+    }).map(function(name) {
+      const override = (GROUP_EXCEPTIONS[itemIdx] || []).find(function(entry) { return entry.group === name && entry.uomIdx === uomIdx; });
+      const uomAvailable = !!state[name].uoms[uomIdx];
+      const isEditing = pilotPricingEditor && pilotPricingEditor.itemIdx === itemIdx && pilotPricingEditor.scope === name && pilotPricingEditor.uomIdx === uomIdx;
+      const usesDefaultPrice = !override || !hasSetPrice(override.price);
+      const usesDefaultMoq = !override || !hasSetMoq(override.moq);
+      const price = usesDefaultPrice ? getDefaultScopePrice(item, uomIdx) : Number(override.price);
+      const moq = usesDefaultMoq ? getDefaultScopeMoq(item, uomIdx) : override.moq;
+      const editor = isEditing
+        ? '<tr><td colspan="4"><div class="pilot-scope-editor"><div class="pilot-scope-editor-hint">Leave a field empty to use its default.</div><input class="modal-field-input" id="pilotScopePrice" inputmode="decimal" placeholder="Price (S$)" value="' + (override && override.price != null ? override.price : '') + '" /><input class="modal-field-input" id="pilotScopeMoq" inputmode="decimal" placeholder="MOQ" value="' + (override && override.moq ? formatMoqValue(override.moq) : '') + '" /><button class="btn btn-tertiary" type="button" onclick="cancelPilotScopePrice(' + itemIdx + ')">Cancel</button><button class="btn btn-primary" type="button" onclick="savePilotScopePrice(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + uomIdx + ')">Update</button></div></td></tr>'
+        : '';
+      const scopeMeta = groupOutletCounts[name] ? '<div class="pilot-scope-source">' + groupOutletCounts[name] + ' outlets</div>' : '';
+      const priceDisplay = !uomAvailable ? '—' : (price != null ? 'S$' + price.toFixed(2) : '<span class="pilot-scope-unset">S$0.00</span>');
+      const moqDisplay = !uomAvailable ? '—' : (moq ? formatMoqValue(moq) : '<span class="pilot-scope-unset">0</span>');
+      const editButton = pricingEditable && uomAvailable ? '<button class="pilot-scope-edit" type="button" onclick="editPilotScopePrice(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + uomIdx + ')" aria-label="' + (override ? 'Edit' : 'Set') + ' pricing for ' + name + '" title="' + (override ? 'Edit pricing' : 'Set pricing') + '"><span class="material-symbols-outlined">edit</span></button>' : '';
+      return '<tr class="' + (uomAvailable ? '' : 'pilot-scope-row-off') + '"><td><div class="pilot-scope-cell"><button class="access-toggle' + (uomAvailable ? ' on' : '') + '" type="button" onclick="togglePilotScopeUom(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + uomIdx + ')" title="' + (uomAvailable ? 'Make this UOM unavailable to ' : 'Make this UOM available to ') + name + '"></button><div class="pilot-scope-name">' + name + scopeMeta + '</div></div></td><td' + (usesDefaultPrice ? ' class="pilot-scope-inherited"' : '') + '>' + priceDisplay + '</td><td' + (usesDefaultMoq ? ' class="pilot-scope-inherited"' : '') + '>' + moqDisplay + '</td><td>' + editButton + '</td></tr>' + editor;
+    }).join('');
+  };
+  const uom = uoms[pilotPricingUomIdx];
+  const defaultPrice = getDefaultScopePrice(item, pilotPricingUomIdx);
+  const defaultMoq = getDefaultScopeMoq(item, pilotPricingUomIdx);
+  container.innerHTML = '<div class="pilot-pricing">' +
+    '<section class="pilot-uom-section"><div class="pilot-default-card"><div class="pilot-price-label">Default <span style="font-weight:400;color:var(--ink-mute)">(optional)</span></div><div class="pilot-price-fields"><label><span class="pilot-scope-source">Price (S$)</span><input class="modal-field-input" id="pilotDefaultPrice_' + pilotPricingUomIdx + '" inputmode="decimal" value="' + (defaultPrice != null ? defaultPrice.toFixed(2) : '0.00') + '" aria-label="Default price for ' + uom + '"' + (pricingEditable ? '' : ' disabled') + ' /></label><label><span class="pilot-scope-source">MOQ</span><input class="modal-field-input" id="pilotDefaultMoq_' + pilotPricingUomIdx + '" inputmode="decimal" value="' + (defaultMoq ? formatMoqValue(defaultMoq) : '0') + '" aria-label="Default MOQ for ' + uom + '"' + (pricingEditable ? '' : ' disabled') + ' /></label></div></div>' +
+    '<table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>Available to…</th><th>Price</th><th>MOQ</th><th></th></tr></thead><tbody>' + scopeRows(pilotPricingUomIdx) + '</tbody></table></section>' +
+  '</div>';
+}
+
+function renderPilotModalTabs(itemIdx) {
+  const item = ITEMS[itemIdx];
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  const itemTabBar = document.querySelector('#hqItemModal .modal-tab-bar');
+  if (!itemTabBar) return;
+  itemTabBar.innerHTML = '<div class="modal-tab active" data-panel="hqItemDetailsPanel" onclick="showPilotDetails(this,' + itemIdx + ')">Details</div>' +
+    uoms.map(function(label, uomIdx) {
+      return item.uomEnabled[uomIdx]
+        ? '<div class="modal-tab" data-panel="hqItemExcPanel" onclick="showPilotPricingUom(this,' + itemIdx + ',' + uomIdx + ')">Pricing ' + label + '</div>'
+        : '';
+    }).join('');
+}
+
+function showPilotPricingUom(tab, itemIdx, uomIdx) {
+  stagePilotDefaultPricing(itemIdx, pilotPricingUomIdx);
+  pilotPricingUomIdx = uomIdx;
+  pilotPricingEditor = null;
+  switchHqItemTab(tab);
+  renderPilotPricing(itemIdx, document.getElementById('hqItemExcPanel'));
+}
+
+function showPilotDetails(tab, itemIdx) {
+  stagePilotDefaultPricing(itemIdx, pilotPricingUomIdx);
+  switchHqItemTab(tab);
+}
+
+function stagePilotDefaultPricing(itemIdx, uomIdx) {
+  const priceInput = document.getElementById('pilotDefaultPrice_' + uomIdx);
+  const moqInput = document.getElementById('pilotDefaultMoq_' + uomIdx);
+  if (!priceInput && !moqInput) return;
+  const item = ITEMS[itemIdx];
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  item.defaultPricing = Array.isArray(item.defaultPricing) ? item.defaultPricing : uoms.map(function() { return {}; });
+  item.defaultPricing[uomIdx] = {
+    price: hasSetPrice(priceInput ? priceInput.value.trim() : '') ? Number(priceInput.value.trim()) : null,
+    moq: hasSetMoq(moqInput ? moqInput.value.trim() : '') ? moqInput.value.trim() : null
+  };
+}
+
+function togglePilotScopeUom(itemIdx, scope, uomIdx) {
+  const state = itemAccessState[itemIdx];
+  if (!state || !state[scope]) return;
+  state[scope].uoms[uomIdx] = !state[scope].uoms[uomIdx];
+  pilotPricingEditor = null;
+  renderPilotPricing(itemIdx, document.getElementById('hqItemExcPanel'));
+  renderMl();
+}
+
+function editPilotScopePrice(itemIdx, scope, uomIdx) {
+  pilotPricingEditor = { itemIdx: itemIdx, scope: scope, uomIdx: uomIdx };
+  renderPilotPricing(itemIdx, document.getElementById('hqItemExcPanel'));
+}
+
+function cancelPilotScopePrice(itemIdx) {
+  pilotPricingEditor = null;
+  renderPilotPricing(itemIdx, document.getElementById('hqItemExcPanel'));
+}
+
+function savePilotScopePrice(itemIdx, scope, uomIdx) {
+  const price = document.getElementById('pilotScopePrice').value.trim();
+  const moq = document.getElementById('pilotScopeMoq').value.trim();
+  const entries = GROUP_EXCEPTIONS[itemIdx] || (GROUP_EXCEPTIONS[itemIdx] = []);
+  const existing = entries.find(function(entry) { return entry.group === scope && entry.uomIdx === uomIdx; });
+  if (!price && !moq) {
+    if (existing) entries.splice(entries.indexOf(existing), 1);
+    pilotPricingEditor = null;
+    renderPilotPricing(itemIdx, document.getElementById('hqItemExcPanel'));
+    renderMl();
+    return;
+  }
+  const next = { group: scope, uomIdx: uomIdx, price: price ? Number(price) : null, moq: moq || null };
+  if (existing) Object.assign(existing, next); else entries.push(next);
+  pilotPricingEditor = null;
+  renderPilotPricing(itemIdx, document.getElementById('hqItemExcPanel'));
+  renderMl();
+}
+
+function saveHqItemModal() {
+  const modal = document.getElementById('hqItemModal');
+  const item = ITEMS[Number(modal.dataset.itemIdx)];
+  let toastCopy = '';
+  if (item) {
+    const customName = document.getElementById('hqItemCustomName').value.trim();
+    if (customName) item.customName = customName; else delete item.customName;
+  }
+  if (item) {
+    const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+    stagePilotDefaultPricing(Number(modal.dataset.itemIdx), pilotPricingUomIdx);
+    item.defaultPricing = uoms.map(function(uom, uomIdx) {
+      const configured = item.defaultPricing[uomIdx] || {};
+      return { price: hasSetPrice(configured.price) ? Number(configured.price) : null, moq: hasSetMoq(configured.moq) ? configured.moq : null };
+    });
+    item.price = item.defaultPricing[0].price;
+    item.moq = item.defaultPricing[0].moq;
+    modal.dataset.pilotCommitted = 'true';
+    renderMl();
+    toastCopy = itemDisplayName(item);
+  }
+  closeHqItemModal();
+  if (toastCopy) showHqToast('Item settings saved', toastCopy);
 }
 
 function toggleHqUomEnabled(itemIdx, uomIdx) {
@@ -2806,7 +3148,24 @@ function removeGroupException(itemIdx, excIdx) {
 }
 
 function closeHqItemModal() {
-  document.getElementById('hqItemModal').classList.remove('open');
+  const modal = document.getElementById('hqItemModal');
+  if (modal.dataset.pilotCommitted !== 'true' && pilotModalSnapshot) {
+    const snapshot = pilotModalSnapshot;
+    const item = ITEMS[snapshot.itemIdx];
+    if (item) {
+      item.uomEnabled = snapshot.uomEnabled.slice();
+      item.defaultPricing = JSON.parse(JSON.stringify(snapshot.defaultPricing));
+      if (snapshot.customName) item.customName = snapshot.customName; else delete item.customName;
+      item.price = snapshot.price;
+      item.moq = snapshot.moq;
+      itemAccessState[snapshot.itemIdx] = JSON.parse(JSON.stringify(snapshot.accessState));
+      GROUP_EXCEPTIONS[snapshot.itemIdx] = JSON.parse(JSON.stringify(snapshot.exceptions));
+      renderMl();
+    }
+  }
+  pilotModalSnapshot = null;
+  pilotPricingEditor = null;
+  modal.classList.remove('open');
 }
 
 function renderAccessPanel(itemIdx) {
@@ -2929,7 +3288,6 @@ function renderMl() {
     const rawIdx = ITEMS.indexOf(item);
     const rowEvenClass = pageIdx % 2 === 1 ? ' ml-row-even' : '';
     const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
-    const hasExc = (GROUP_EXCEPTIONS[rawIdx] || []).length > 0;
     ensureItemAccessState(rawIdx);
     const state = itemAccessState[rawIdx];
 
@@ -2952,7 +3310,7 @@ function renderMl() {
     }
 
     const lifecycle = itemLifecycle(item);
-    const stateBadge = lifecycle === 'active' ? '' : '<span class="item-exc-badge" style="margin-left:7px;color:' + (lifecycle === 'removed' ? 'var(--chip-rejected-ink)' : 'var(--ink-mute)') + '">' + (lifecycle === 'removed' ? 'Removed' : 'Disabled') + '</span>';
+    const stateBadge = lifecycle === 'removed' ? '<span class="item-exc-badge" style="margin-left:7px;color:var(--chip-rejected-ink)">Removed</span>' : '';
     const actionsTd = '<td><div class="row-actions-wrap">' +
       '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
       '<div class="row-actions-menu">' +
@@ -2967,15 +3325,15 @@ function renderMl() {
       const onlyUom = enabledUoms[0] || { uom: uoms[0], ui: 0 };
       const uom = onlyUom.uom.replace(/^per /i, '');
       return '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-        '<td><div class="ml-item-name">' + item.name + stateBadge + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
+        '<td><div class="ml-item-name">' + itemDisplayName(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
         '<td class="uom-text">' + uom + '</td>' +
-        '<td><div class="ml-price-main">$' + item.price.toFixed(2) + '/' + uom + '</div><div class="ml-price-meta">MOQ: ' + item.moq + '</div></td>' +
+        '<td>' + formatItemPriceRange(rawIdx, onlyUom.ui) + '</td>' +
         '<td>' + getAccessInfo(onlyUom.ui).html + '</td>' + actionsTd +
       '</tr>';
     }
 
     const parent = '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-      '<td><div class="ml-item-name">' + item.name + stateBadge + (hasExc ? '<span class="item-exc-badge">Exceptions</span>' : '') + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
+      '<td><div class="ml-item-name">' + itemDisplayName(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
       '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
       '<td></td>' +
       '<td></td>' + actionsTd +
@@ -2984,9 +3342,9 @@ function renderMl() {
     const children = isExpanded ? enabledUoms.map(({ uom, ui }) => {
       const unit = uom.replace(/^per /i, '');
       return '<tr class="ml-uom-row' + (lifecycle === 'active' ? '' : ' ml-inactive') + '">' +
-        '<td class="ml-uom-indent">' + item.name + '</td>' +
+        '<td class="ml-uom-indent">' + itemDisplayName(item) + '</td>' +
         '<td class="uom-text">' + unit + '</td>' +
-        '<td><div class="ml-price-main">$' + item.price.toFixed(2) + '/' + unit + '</div><div class="ml-price-meta">MOQ: ' + item.moq.replace(/\s+.*$/, ' ' + unit) + '</div></td>' +
+        '<td>' + formatItemPriceRange(rawIdx, ui) + '</td>' +
         '<td>' + getAccessInfo(ui).html + '</td><td></td>' +
       '</tr>';
     }).join('') : '';
@@ -3286,6 +3644,7 @@ function toggleInventoryLifecycle(index) {
     record.active = true;
     renderInv();
     showHqToast('Inventory record restored', record.name);
+    addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(record.name) + '</strong> restored in inventory', 'inventory', 'Master');
     return;
   }
   if (record.active) {
@@ -3293,11 +3652,13 @@ function toggleInventoryLifecycle(index) {
       record.active = false;
       renderInv();
       showHqToast('Inventory record disabled', record.name);
+      addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(record.name) + '</strong> disabled in inventory', 'inventory', 'Master');
     });
   } else {
     record.active = true;
     renderInv();
     showHqToast('Inventory record enabled', record.name);
+    addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(record.name) + '</strong> enabled in inventory', 'inventory', 'Master');
   }
 }
 
@@ -3393,7 +3754,31 @@ function addPrototypeActivity(module, text, tab, scope) {
   });
   savePrototypeState();
   renderActivity();
+  emitHqChange({ module: module, text: text, tab: tab, scope: scope || 'Master' });
 }
+
+// All prototype changes use one notification path so the overview Health check
+// and the Activity feed stay in sync after an interaction.
+const HQ_CHANGE_EVENT = 'nomni:hq-change';
+function emitHqChange(detail) {
+  window.dispatchEvent(new CustomEvent(HQ_CHANGE_EVENT, { detail: detail || {} }));
+}
+function renderRecentActivity() {
+  const feed = document.getElementById('overviewRecentActivity');
+  if (!feed || typeof ACTIVITY_LOG === 'undefined') return;
+  const recent = ACTIVITY_LOG.slice(0, 4);
+  feed.innerHTML = recent.map(function(a) {
+    const module = ACT_MODULE[a.module] || ACT_MODULE.hq;
+    return '<div class="activity-item">' +
+      '<div class="activity-dot" style="background:' + module.color + '"></div>' +
+      '<div class="activity-body"><div class="activity-text">' + a.text + '</div>' +
+      '<div class="activity-time">' + a.date + ' · ' + a.user + '</div></div></div>';
+  }).join('');
+}
+window.addEventListener(HQ_CHANGE_EVENT, function() {
+  renderHealthCheck();
+  renderRecentActivity();
+});
 
 function resetHqPrototypeData() {
   if (!window.confirm('Clear all locally saved data for this HQ prototype?')) return;
@@ -3547,22 +3932,25 @@ function goToHqUserEntry() {
 })();
 
 renderActivity();
+renderRecentActivity();
 
 // ── Suppliers ──
 const SUPPLIERS = [
-  { name: 'Kee Song Group',        cat: 'Poultry',               contact: 'sales@keesong.com.sg',       phone: '+65 6268 2828', active: true,  type: 'active'  },
-  { name: 'NH Foods',              cat: 'Beef & Lamb',           contact: 'sg@nhfoods.com',             phone: '+65 6511 0200', active: true,  type: 'active'  },
+  // Active suppliers are intentionally rare in the HQ seed data. Passive is
+  // the normal model so HQ users can maintain prices and MOQ themselves.
+  { name: 'Kee Song Group',        cat: 'Poultry',               contact: 'sales@keesong.com.sg',       phone: '+65 6268 2828', active: true,  type: 'passive' },
+  { name: 'NH Foods',              cat: 'Beef & Lamb',           contact: 'sg@nhfoods.com',             phone: '+65 6511 0200', active: true,  type: 'passive' },
   { name: 'Provenir',              cat: 'Beef & Lamb',           contact: 'orders@provenir.com.au',     phone: '+61 3 9001 0200', active: true, type: 'passive' },
-  { name: 'Meat King',             cat: 'Beef & Lamb',           contact: 'orders@meatking.com.sg',     phone: '+65 2251 0988', active: true,  type: 'active'  },
-  { name: 'Ocean Fresh',           cat: 'Seafood',               contact: 'ops@oceanfresh.com.sg',      phone: '+65 6570 8833', active: true,  type: 'active'  },
+  { name: 'Meat King',             cat: 'Beef & Lamb',           contact: 'orders@meatking.com.sg',     phone: '+65 2251 0988', active: true,  type: 'passive' },
+  { name: 'Ocean Fresh',           cat: 'Seafood',               contact: 'ops@oceanfresh.com.sg',      phone: '+65 6570 8833', active: true,  type: 'passive' },
   { name: 'Song Fish Dealer',      cat: 'Seafood',               contact: 'song@songfish.com.sg',       phone: '+65 6536 1100', active: true,  type: 'passive' },
   { name: 'Deli Hub',              cat: 'Seafood',               contact: 'orders@delihub.com.sg',      phone: '+65 6742 2828', active: true,  type: 'passive' },
-  { name: 'Sustenir Agriculture',  cat: 'Produce',               contact: 'b2b@sustenir.com',           phone: '+65 6904 5130', active: true,  type: 'active'  },
-  { name: 'Lee Kum Kee',           cat: 'Sauces & Condiments',   contact: 'sg@leekumkee.com',           phone: '+65 6274 7788', active: true,  type: 'active'  },
+  { name: 'Sustenir Agriculture',  cat: 'Produce',               contact: 'b2b@sustenir.com',           phone: '+65 6904 5130', active: true,  type: 'passive' },
+  { name: 'Lee Kum Kee',           cat: 'Sauces & Condiments',   contact: 'sg@leekumkee.com',           phone: '+65 6274 7788', active: true,  type: 'passive' },
   { name: 'AmoyFoods',             cat: 'Sauces & Condiments',   contact: 'trade@amoyfoods.com.sg',     phone: '+65 6365 5411', active: true,  type: 'passive' },
   { name: 'Kikkoman',              cat: 'Sauces & Condiments',   contact: 'sg@kikkoman.com',            phone: '+65 6270 9000', active: false, type: 'passive' },
   { name: 'Fonterra',              cat: 'Dairy & Eggs',          contact: 'orders.sg@fonterra.com',     phone: '+65 6225 9988', active: true,  type: 'active'  },
-  { name: 'Seng Choon Farm',       cat: 'Dairy & Eggs',          contact: 'wholesale@sengchoon.com.sg', phone: '+65 6769 7111', active: true,  type: 'active'  },
+  { name: 'Seng Choon Farm',       cat: 'Dairy & Eggs',          contact: 'wholesale@sengchoon.com.sg', phone: '+65 6769 7111', active: true,  type: 'passive' },
   { name: 'Grill Master SG',       cat: 'Supplies',              contact: 'orders@grillmaster.com.sg',  phone: '+65 6747 1133', active: true,  type: 'passive' },
 ];
 
@@ -3578,6 +3966,13 @@ const SUPPLIERS = [
 })();
 
 const HQ_SUPPLIER_STATE_KEY = 'nomni-hq-supplier-state-v1';
+const HQ_SUPPLIER_TYPE_MIGRATION_KEY = 'nomni-hq-supplier-type-migration-v1';
+const HQ_SEED_SUPPLIER_NAMES = new Set([
+  'Kee Song Group', 'NH Foods', 'Provenir', 'Meat King', 'Ocean Fresh',
+  'Song Fish Dealer', 'Deli Hub', 'Sustenir Agriculture', 'Lee Kum Kee',
+  'AmoyFoods', 'Kikkoman', 'Fonterra', 'Seng Choon Farm', 'Grill Master SG'
+]);
+const HQ_ACTIVE_SEED_SUPPLIER_NAMES = new Set(['Fonterra']);
 function loadHqSupplierState() {
   let saved = [];
   try { saved = JSON.parse(localStorage.getItem(HQ_SUPPLIER_STATE_KEY) || '[]'); } catch (e) {}
@@ -3592,7 +3987,19 @@ function loadHqSupplierState() {
 function saveHqSupplierState() {
   localStorage.setItem(HQ_SUPPLIER_STATE_KEY, JSON.stringify(SUPPLIERS));
 }
+function migrateSupplierTypesToPassiveMajority() {
+  if (localStorage.getItem(HQ_SUPPLIER_TYPE_MIGRATION_KEY)) return;
+  let changed = false;
+  SUPPLIERS.forEach(function(supplier) {
+    if (!HQ_SEED_SUPPLIER_NAMES.has(supplier.name)) return;
+    const type = HQ_ACTIVE_SEED_SUPPLIER_NAMES.has(supplier.name) ? 'active' : 'passive';
+    if (supplier.type !== type) { supplier.type = type; changed = true; }
+  });
+  if (changed) saveHqSupplierState();
+  localStorage.setItem(HQ_SUPPLIER_TYPE_MIGRATION_KEY, '1');
+}
 loadHqSupplierState();
+migrateSupplierTypesToPassiveMajority();
 document.getElementById('supCount').textContent = SUPPLIERS.length;
 
 let pendingSupDisableName = null;
@@ -5160,6 +5567,121 @@ function showPanel(p1Id, p2Id, step) {
   document.getElementById(p2Id).style.display = step === 2 ? 'flex' : 'none';
 }
 
+// ── Add from invoice (HQ) ──
+let hqInvoiceScopes = new Set();
+let hqInvoiceFilesReady = false;
+let hqInvoiceRows = [];
+const HQ_INVOICE_SEED_ROWS = [
+  { name:'Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack', code:'KS-WING-1K', uom:'kg', price:5.20, status:'Price change', match:'Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack', cat:'Poultry' },
+  { name:'Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray', code:'KS-BRF-2K', uom:'kg', price:8.20, status:'Matched', match:'Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray', cat:'Poultry' },
+  { name:'Chilled Chicken Liver Fresh Singapore Standard Grade 500g', code:'KS-LIVER-P', uom:'pack', price:6.50, status:'New UOM', match:'Chilled Chicken Liver Fresh Singapore Standard Grade 500g', cat:'Poultry' },
+  { name:'Chilled Chicken Skin Fresh', code:'KS-SKIN-1K', uom:'kg', price:3.40, status:'New item', match:null, cat:'Poultry' }
+];
+function invoiceScopeEntries() {
+  return ML_GROUPS.map(function(name, index) { return { name:name, type:'group', meta:index === 0 ? '4 outlets' : '6 outlets' }; }).concat(ML_UNGROUPED_OUTLETS.map(function(name) { return { name:name, type:'outlet', meta:'' }; }));
+}
+function openHqInvoiceModal() {
+  hqInvoiceScopes = new Set(); hqInvoiceFilesReady = false;
+  renderHqInvoiceScopes(); showHqInvoiceScopes();
+  document.getElementById('hqInvoiceModal').classList.add('open');
+}
+function closeHqInvoiceModal() { document.getElementById('hqInvoiceModal').classList.remove('open'); }
+function showHqInvoiceScopes() {
+  document.getElementById('hqInvoiceModalTitle').textContent = 'Add items to...';
+  document.getElementById('hqInvoiceScopeStep').style.display = 'flex';
+  document.getElementById('hqInvoiceUploadStep').style.display = 'none';
+  renderHqInvoiceScopes();
+}
+function renderHqInvoiceScopes() {
+  const list = document.getElementById('hqInvoiceScopeList');
+  const scopes = invoiceScopeEntries();
+  const groupRows = scopes.filter(function(s) { return s.type === 'group'; });
+  const outletRows = scopes.filter(function(s) { return s.type === 'outlet'; });
+  function rows(entries) { return entries.map(function(scope) { const selected = hqInvoiceScopes.has(scope.name); return '<label class="hq-invoice-scope' + (selected ? ' is-selected' : '') + '"><input type="checkbox" ' + (selected ? 'checked' : '') + ' onchange="toggleHqInvoiceScope(this.value, this.checked)" value="' + escapeOverviewText(scope.name) + '"><span><span class="hq-invoice-scope-name">' + escapeOverviewText(scope.name) + '</span>' + (scope.meta ? '<span class="hq-invoice-scope-meta">' + scope.meta + '</span>' : '') + '</span></label>'; }).join(''); }
+  const allSelected = scopes.length > 0 && scopes.every(function(scope) { return hqInvoiceScopes.has(scope.name); });
+  list.innerHTML = '<div class="hq-invoice-list-actions"><label><input type="checkbox" ' + (allSelected ? 'checked' : '') + ' onchange="toggleAllHqInvoiceScopes()"><span>Select all</span></label></div><div class="hq-invoice-scope-list">' + rows(groupRows.concat(outletRows)) + '</div>';
+  const count = hqInvoiceScopes.size;
+  document.getElementById('hqInvoiceScopeCount').innerHTML = count ? '<strong>' + count + '</strong> selected' : 'No groups or outlets selected';
+  document.getElementById('hqInvoiceScopeNext').disabled = !count;
+}
+function toggleHqInvoiceScope(name, checked) { if (checked) hqInvoiceScopes.add(name); else hqInvoiceScopes.delete(name); renderHqInvoiceScopes(); }
+function toggleAllHqInvoiceScopes() {
+  const scopes = invoiceScopeEntries();
+  const allSelected = scopes.length > 0 && scopes.every(function(scope) { return hqInvoiceScopes.has(scope.name); });
+  hqInvoiceScopes = allSelected ? new Set() : new Set(scopes.map(function(scope) { return scope.name; }));
+  renderHqInvoiceScopes();
+}
+function showHqInvoiceUpload() {
+  document.getElementById('hqInvoiceModalTitle').textContent = 'Upload invoices';
+  document.getElementById('hqInvoiceScopeStep').style.display = 'none';
+  document.getElementById('hqInvoiceUploadStep').style.display = 'flex';
+  document.getElementById('hqInvoiceUploadFiles').style.display = 'none';
+  document.getElementById('hqInvoiceUploadBtn').disabled = true;
+}
+function addHqInvoiceDemoFiles() {
+  hqInvoiceFilesReady = true;
+  document.getElementById('hqInvoiceUploadFiles').style.display = 'block';
+  document.getElementById('hqInvoiceUploadFiles').innerHTML = '<div class="hq-upload-file"><span>Invoice_INV-2026-0142.pdf <span class="hq-upload-file-meta">· 624 KB</span></span><span class="hq-upload-ready">Ready</span></div><div class="hq-upload-file"><span>Invoice_INV-2026-0143.pdf <span class="hq-upload-file-meta">· 488 KB</span></span><span class="hq-upload-ready">Ready</span></div>';
+  document.getElementById('hqInvoiceUploadBtn').disabled = false;
+}
+function openHqInvoiceReview() {
+  if (!hqInvoiceFilesReady) return;
+  closeHqInvoiceModal();
+  hqInvoiceRows = HQ_INVOICE_SEED_ROWS.map(function(row) { return Object.assign({}, row); });
+  renderHqInvoiceReview();
+  const review = document.getElementById('hqInvoiceReview'); review.classList.add('open'); review.setAttribute('aria-hidden', 'false');
+}
+function closeHqInvoiceReview() { const review = document.getElementById('hqInvoiceReview'); review.classList.remove('open'); review.setAttribute('aria-hidden', 'true'); }
+function getHqInvoiceRowChanges() { return hqInvoiceRows.filter(function(row) { return row.status !== 'Matched'; }).length; }
+function getHqInvoiceTargetSummary() {
+  const groups = Array.from(hqInvoiceScopes).filter(function(name) { return ML_GROUPS.includes(name); }).length;
+  const outlets = hqInvoiceScopes.size - groups;
+  const parts = [];
+  if (groups) parts.push(groups + ' group' + (groups === 1 ? '' : 's'));
+  if (outlets) parts.push(outlets + ' outlet' + (outlets === 1 ? '' : 's'));
+  const target = parts.join(' · ') || 'no targets';
+  return 'Items will be added/updated for <strong>' + target + '</strong>.';
+}
+function renderHqInvoiceReview() {
+  document.getElementById('hqReviewScopeNote').innerHTML = getHqInvoiceTargetSummary();
+  document.getElementById('hqInvoiceLineCount').textContent = hqInvoiceRows.length + ' item' + (hqInvoiceRows.length === 1 ? '' : 's');
+  document.getElementById('hqInvoiceReviewRows').innerHTML = hqInvoiceRows.map(function(row, index) {
+    return '<tr><td class="hq-review-line-number">' + (index + 1) + '</td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="name" value="' + escapeOverviewText(row.name) + '"></td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="code" value="' + escapeOverviewText(row.code || '') + '"></td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="uom" value="' + escapeOverviewText(row.uom) + '"></td><td><input class="hq-review-field" type="number" min="0" step="0.01" data-invoice-row="' + index + '" data-invoice-field="price" value="' + Number(row.price || 0).toFixed(2) + '"></td><td><button class="hq-review-close" style="width:34px;height:34px" title="Remove item" onclick="removeHqInvoiceReviewRow(' + index + ')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>';
+  }).join('');
+}
+function captureHqInvoiceRows() { document.querySelectorAll('#hqInvoiceReviewRows [data-invoice-field]').forEach(function(input) { const row = hqInvoiceRows[Number(input.dataset.invoiceRow)]; if (!row) return; row[input.dataset.invoiceField] = input.dataset.invoiceField === 'price' ? Number(input.value || 0) : input.value; }); }
+function addHqInvoiceReviewRow() { captureHqInvoiceRows(); hqInvoiceRows.push({name:'', code:'', uom:'kg', price:0, status:'New item', match:null, cat:'Other'}); renderHqInvoiceReview(); const fields = document.querySelectorAll('#hqInvoiceReviewRows [data-invoice-field="name"]'); if (fields.length) fields[fields.length - 1].focus(); }
+function removeHqInvoiceReviewRow(index) { hqInvoiceRows.splice(index, 1); renderHqInvoiceReview(); showHqToast('Item removed from invoice review'); }
+function invoiceUomLabel(uom) { const value = String(uom || 'unit').trim(); return /^per\s/i.test(value) ? value : 'per ' + value; }
+function applyHqInvoiceRow(row) {
+  const name = String(row.name || '').trim(); if (!name) return false;
+  let itemIdx = row.match ? ITEMS.findIndex(function(item) { return item.name === row.match; }) : -1;
+  const scopeGroups = Array.from(hqInvoiceScopes).filter(function(scope) { return ML_GROUPS.includes(scope); });
+  const scopeOutlets = Array.from(hqInvoiceScopes).filter(function(scope) { return ML_UNGROUPED_OUTLETS.includes(scope); });
+  if (itemIdx < 0) {
+    ITEMS.push({ name:name, cat:row.cat || 'Other', supplier:'Kee Song Group', price:0, uom:invoiceUomLabel(row.uom), defaultPricing:[{price:null,moq:null}], moq:'', active:true, lifecycle:'active', groupList:scopeGroups.slice(), outletList:scopeOutlets.slice(), uomEnabled:[true], excludedScopes:[], createdAt:new Date().toISOString() });
+    itemIdx = ITEMS.length - 1;
+  }
+  const item = ITEMS[itemIdx];
+  let uoms = Array.isArray(item.uom) ? item.uom.slice() : [item.uom];
+  const targetUom = invoiceUomLabel(row.uom);
+  let uomIdx = uoms.findIndex(function(uom) { return String(uom).toLowerCase() === targetUom.toLowerCase(); });
+  if (uomIdx < 0) { uoms.push(targetUom); item.uom = uoms; uomIdx = uoms.length - 1; if (!Array.isArray(item.defaultPricing)) item.defaultPricing = []; item.defaultPricing[uomIdx] = {price:null,moq:null}; if (!Array.isArray(item.uomEnabled)) item.uomEnabled = uoms.map(function() { return true; }); else item.uomEnabled[uomIdx] = true; }
+  ensureItemAccessState(itemIdx);
+  scopeGroups.forEach(function(scope) { if (!item.groupList.includes(scope)) item.groupList.push(scope); itemAccessState[itemIdx][scope].enabled = true; itemAccessState[itemIdx][scope].uoms[uomIdx] = true; });
+  scopeOutlets.forEach(function(scope) { if (!item.outletList.includes(scope)) item.outletList.push(scope); itemAccessState[itemIdx][scope].enabled = true; itemAccessState[itemIdx][scope].uoms[uomIdx] = true; });
+  const moq = /^(kg|g)$/i.test(String(row.uom).trim()) ? '0' : '1';
+  const entries = GROUP_EXCEPTIONS[itemIdx] || (GROUP_EXCEPTIONS[itemIdx] = []);
+  Array.from(hqInvoiceScopes).forEach(function(scope) { const existing = entries.find(function(entry) { return entry.group === scope && entry.uomIdx === uomIdx; }); const update = {group:scope, uomIdx:uomIdx, price:Number(row.price || 0) || null, moq:moq}; if (existing) Object.assign(existing, update); else entries.push(update); });
+  return true;
+}
+function saveHqInvoiceReview() {
+  captureHqInvoiceRows();
+  const validRows = hqInvoiceRows.filter(function(row) { return String(row.name || '').trim() && Number(row.price) > 0; });
+  if (!validRows.length) { showHqToast('Add at least one item with a price'); return; }
+  validRows.forEach(applyHqInvoiceRow); renderMl(); if (typeof saveCreatedHqItems === 'function') saveCreatedHqItems(); closeHqInvoiceReview(); showHqToast('Invoice saved', validRows.length + ' items added or updated.'); }
+function skipHqInvoiceReview() { closeHqInvoiceReview(); showHqToast('Invoice saved for later', 'No pricing changes were applied.'); }
+
 // ── Flow 1: Add from supplier catalogue ──
 const CAT_ITEMS = [
   { id:'c1', name:'CHILLED WHOLE CHICKEN GD A 1.2-1.6KG IND PKT', supplier:'Kee Song Group', uoms:['kg','ctn'], cat:'Poultry' },
@@ -5257,6 +5779,8 @@ Object.keys(PLATFORM_CATALOGUE_ITEMS).forEach(function(supplier, supplierIndex) 
   });
 });
 let aiSel = new Set();
+let aiUomEnabled = {};
+let aiTargets = new Set();
 function toggleAddItemMenu(e) {
   e.stopPropagation();
   const m = document.getElementById('addItemMenu');
@@ -5265,32 +5789,51 @@ function toggleAddItemMenu(e) {
 function openAddCatalogueModal() {
   showPrototypeHints('item');
   aiSel.clear();
+  aiUomEnabled = {};
+  aiTargets.clear();
   document.getElementById('aiSearch').value = '';
   document.getElementById('aiSupFilter').value = '';
   var linkedNames = new Set(SUPPLIERS.map(function(supplier) { return supplier.name; }));
   var availableNames = Array.from(new Set(CAT_ITEMS.filter(function(item) { return linkedNames.has(item.supplier); }).map(function(item) { return item.supplier; }))).sort();
   document.getElementById('aiSupFilter').innerHTML = '<option value="">All linked suppliers</option>' + availableNames.map(function(name) { return '<option value="' + escapeOverviewText(name) + '">' + escapeOverviewText(supplierLabel(name)) + '</option>'; }).join('');
-  setAiStep(1);
+  setAiStep(0);
+  renderAiTargets();
   renderAiList();
   document.getElementById('addItemModal').classList.add('open');
-  setTimeout(function() { document.getElementById('aiSearch').focus(); }, 0);
 }
 function closeAddItemModal() { document.getElementById('addItemModal').classList.remove('open'); hidePrototypeHints(); }
 function setAiStep(n) {
-  ['aiPanel1','aiPanel2','aiPanel3'].forEach((id,i) => {
+  ['aiPanel0','aiPanel1','aiPanel2'].forEach((id,i) => {
     const el = document.getElementById(id);
-    el.style.display = (i+1===n) ? 'flex' : 'none';
+    el.style.display = (i===n) ? 'flex' : 'none';
   });
-  const nums = ['aiSt1','aiSt2','aiSt3'];
-  nums.forEach((id,i) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.toggle('active', i+1===n);
-    el.classList.toggle('done', i+1<n);
-    el.setAttribute('aria-current', i+1===n ? 'step' : 'false');
-    var number = el.querySelector('.picker-step-num');
-    if (number) number.textContent = i+1<n ? '✓' : String(i+1);
-  });
+  const titles = ['Add items to…', 'Select items', 'Set default price (optional)'];
+  const modal = document.getElementById('addItemModal');
+  modal.dataset.aiStep = String(n);
+  modal.querySelector('.picker-card').style.width = n === 0 ? '680px' : '720px';
+  document.getElementById('addItemModalTitle').textContent = titles[n];
+}
+function renderAiTargets() {
+  const list = document.getElementById('aiTargetList');
+  const targets = invoiceScopeEntries();
+  const allSelected = targets.length > 0 && targets.every(function(target) { return aiTargets.has(target.name); });
+  list.innerHTML = '<div class="hq-invoice-list-actions"><label><input type="checkbox" ' + (allSelected ? 'checked' : '') + ' onchange="toggleAllAiTargets()"><span>Select all</span></label></div><div class="hq-invoice-scope-list">' + targets.map(function(target) {
+    const selected = aiTargets.has(target.name);
+    return '<label class="hq-invoice-scope' + (selected ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(target.name) + '" ' + (selected ? 'checked' : '') + ' onchange="toggleAiTarget(this.value,this.checked)"><span><span class="hq-invoice-scope-name">' + escapeOverviewText(target.name) + '</span>' + (target.meta ? '<span class="hq-invoice-scope-meta">' + target.meta + '</span>' : '') + '</span></label>';
+  }).join('') + '</div>';
+  const count = aiTargets.size;
+  document.getElementById('aiTargetCount').innerHTML = count ? '<strong>' + count + '</strong> selected' : 'No groups or outlets selected';
+  document.getElementById('aiTargetNext').disabled = count === 0;
+}
+function toggleAiTarget(name, checked) { if (checked) aiTargets.add(name); else aiTargets.delete(name); renderAiTargets(); }
+function toggleAllAiTargets() {
+  const targets = ML_GROUPS.concat(ML_UNGROUPED_OUTLETS);
+  const allSelected = targets.length > 0 && targets.every(function(name) { return aiTargets.has(name); });
+  aiTargets = allSelected ? new Set() : new Set(targets);
+  renderAiTargets();
+}
+function formatCatalogueItemName(name) {
+  return String(name || '').toLowerCase().replace(/(^|[\s/\-])([a-z])/g, function(match, prefix, letter) { return prefix + letter.toUpperCase(); });
 }
 function renderAiList() {
   const q = document.getElementById('aiSearch').value.toLowerCase();
@@ -5299,21 +5842,13 @@ function renderAiList() {
   const filtered = CAT_ITEMS.filter(i => linkedNames.has(i.supplier) &&
     (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q) || (i.isRecipe ? i.supplier : supplierLabel(i.supplier)).toLowerCase().includes(q)) &&
     (!sup || i.supplier === sup)
-  );
-  const meta = document.getElementById('aiResultsMeta');
-  const selectAllButton = document.getElementById('aiSelectAll');
-  meta.textContent = filtered.length ? filtered.length + ' catalogue item' + (filtered.length === 1 ? '' : 's') : 'No catalogue items found';
-  selectAllButton.style.display = filtered.length ? 'inline-flex' : 'none';
+  ).sort(function(a, b) { return formatCatalogueItemName(a.name).localeCompare(formatCatalogueItemName(b.name)); });
   const allFilteredSelected = filtered.length > 0 && filtered.every(i => aiSel.has(i.id));
-  selectAllButton.textContent = allFilteredSelected ? 'Deselect all' : 'Select all';
-  document.getElementById('aiList').innerHTML = filtered.length ? filtered.map(i => {
+  document.getElementById('aiList').innerHTML = filtered.length ? '<div class="hq-invoice-list-actions"><label><input type="checkbox" ' + (allFilteredSelected ? 'checked' : '') + ' onchange="toggleAllAiItems()"><span>Select all</span></label></div><div class="hq-invoice-scope-list">' + filtered.map(i => {
     const s = aiSel.has(i.id);
-    const uomBadges = i.uoms.map(u => '<span style="display:inline-block;background:#f0f1f3;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600;color:var(--ink-mute);margin-left:4px">' + u + '</span>').join('');
-    return '<div class="picker-row' + (s?' sel':'') + '" onclick="toggleAiItem(\'' + i.id + '\')">' +
-      '<div class="picker-chk">' + (s ? chkSvg() : '') + '</div>' +
-      '<div class="picker-row-info"><div class="picker-row-name">' + i.name + '</div><div class="picker-row-sub" style="display:flex;align-items:center;flex-wrap:wrap;gap:2px">' + supplierLabel(i.supplier) + ' · ' + i.cat + uomBadges + '</div></div>' +
-    '</div>';
-  }).join('') : '<div class="picker-empty">No catalogue items found from the linked suppliers</div>';
+    const uomBadges = i.uoms.map(function(uom) { return '<span class="ai-catalogue-uom">' + uom + '</span>'; }).join('');
+    return '<label class="hq-invoice-scope' + (s ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(i.id) + '" ' + (s ? 'checked' : '') + ' onchange="toggleAiItem(this.value)"><span><span class="ai-catalogue-name">' + formatCatalogueItemName(i.name) + '</span><span class="ai-catalogue-sub">' + supplierLabel(i.supplier) + uomBadges + '</span></span></label>';
+  }).join('') + '</div>' : '<div class="picker-empty">No catalogue items found from the linked suppliers</div>';
   const n = aiSel.size;
   document.getElementById('aiSelLabel').innerHTML = n ? '<strong>' + n + '</strong> item' + (n>1?'s':'') + ' selected' : 'No items selected';
   document.getElementById('aiNextBtn').disabled = n === 0;
@@ -5326,19 +5861,21 @@ function toggleAllAiItems() {
   const filtered = CAT_ITEMS.filter(i => linkedNames.has(i.supplier) &&
     (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
     (!sup || i.supplier === sup)
-  );
+  ).sort(function(a, b) { return formatCatalogueItemName(a.name).localeCompare(formatCatalogueItemName(b.name)); });
   const allSelected = filtered.length > 0 && filtered.every(i => aiSel.has(i.id));
   filtered.forEach(i => allSelected ? aiSel.delete(i.id) : aiSel.add(i.id));
   renderAiList();
 }
 function showAiStep2() {
   const items = CAT_ITEMS.filter(i => aiSel.has(i.id));
+  items.forEach(function(item) { if (!Array.isArray(aiUomEnabled[item.id])) aiUomEnabled[item.id] = item.uoms.map(function() { return true; }); });
   document.getElementById('aiPriceRows').innerHTML = items.map((item) => {
     return item.uoms.map((u, ui) => {
       const isFirst = ui === 0;
-      const uomCell = '<td class="col-uom"><div class="uom-cell"><span class="uom-label">' + u + '</span></div></td>';
+      const uomEnabled = aiUomEnabled[item.id][ui] !== false;
+      const uomCell = '<td class="col-uom"><div class="uom-cell"><button type="button" class="access-toggle' + (uomEnabled ? ' on' : '') + '" onclick="toggleAiUom(\'' + item.id + '\',' + ui + ')" title="' + (uomEnabled ? 'Disable this UOM' : 'Enable this UOM') + '"></button><span class="uom-label">' + u + '</span></div></td>';
       return '<tr class="' + (isFirst ? 'item-first' : '') + '" id="aiUomRow_' + item.id + '_' + ui + '">' +
-        (isFirst ? '<td class="col-name item-name-cell" rowspan="' + item.uoms.length + '"><div class="col-name-text">' + item.name + '</div><div class="col-name-sub">' + supplierLabel(item.supplier) + '</div></td>' : '') +
+        (isFirst ? '<td class="col-name item-name-cell" rowspan="' + item.uoms.length + '"><div class="col-name-text">' + formatCatalogueItemName(item.name) + '</div><div class="col-name-sub">' + supplierLabel(item.supplier) + '</div></td>' : '') +
         uomCell +
         '<td class="col-price"><div class="price-wrap"><input type="number" value="0" step="0.01" min="0" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="price" aria-label="Unit price for ' + item.name + ' per ' + u + '" /></div></td>' +
         '<td class="col-moq"><div class="moq-wrap"><input type="number" value="0" step="1" min="0" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="moq" aria-label="Minimum order quantity for ' + item.name + ' in ' + u + '" /></div></td>' +
@@ -5348,39 +5885,44 @@ function showAiStep2() {
   document.getElementById('aiAddBtn').textContent = 'Add ' + items.length + ' item' + (items.length>1?'s':'');
   setAiStep(2);
 }
-function showAiStep3() { setAiStep(3); }
-function showAiStep2Back() { setAiStep(2); }
-function updateStep3ToggleLabel() {
-  const boxes = document.querySelectorAll('#aiGrp0,#aiGrp1,#aiOut0,#aiOut1');
-  const allChecked = Array.from(boxes).every(b => b.checked);
-  document.getElementById('aiStep3ToggleAll').textContent = allChecked ? 'Deselect all' : 'Select all';
+function toggleAiUom(itemId, uomIdx) {
+  var enabled = aiUomEnabled[itemId] || [];
+  if (enabled[uomIdx] && enabled.filter(Boolean).length <= 1) return;
+  enabled[uomIdx] = !enabled[uomIdx];
+  aiUomEnabled[itemId] = enabled;
+  showAiStep2();
 }
-function toggleAllStep3() {
-  const boxes = document.querySelectorAll('#aiGrp0,#aiGrp1,#aiOut0,#aiOut1');
-  const allChecked = Array.from(boxes).every(b => b.checked);
-  boxes.forEach(b => b.checked = !allChecked);
-  updateStep3ToggleLabel();
-}
-function showAiStep1() { setAiStep(1); }
+function showAiStep1() { setAiStep(1); setTimeout(function() { document.getElementById('aiSearch').focus(); }, 0); }
+function showAiTargets() { setAiStep(0); renderAiTargets(); }
 function confirmAddItems() {
   const n = aiSel.size;
-  if (window.isNewHQ) {
-    aiSel.forEach(function(id) {
-      var src = CAT_ITEMS.find(function(item) { return item.id === id; });
-      if (!src || ITEMS.some(function(item) { return item.name === src.name; })) return;
-      var uoms = src.uoms.map(function(uom) { return 'per ' + uom; });
-      ITEMS.push({
-        name:src.name, cat:src.cat, supplier:src.supplier, price:0, uom:uoms,
-        active:true, groupList:ML_GROUPS.slice(), outletList:[],
-        uomEnabled:uoms.map(function() { return true; }), moq:'1 ' + src.uoms[0]
-      });
+  var groupList = ML_GROUPS.filter(function(name) { return aiTargets.has(name); });
+  var outletList = ML_UNGROUPED_OUTLETS.filter(function(name) { return aiTargets.has(name); });
+  aiSel.forEach(function(id) {
+    var src = CAT_ITEMS.find(function(item) { return item.id === id; });
+    if (!src || ITEMS.some(function(item) { return item.name === src.name; })) return;
+    var uoms = src.uoms.map(function(uom) { return 'per ' + uom; });
+    var enabled = aiUomEnabled[src.id] || src.uoms.map(function() { return true; });
+    var pricing = src.uoms.map(function(uom, ui) {
+      var priceInput = document.querySelector('#aiPriceRows input[data-item-id="' + id + '"][data-uom-index="' + ui + '"][data-field="price"]');
+      var moqInput = document.querySelector('#aiPriceRows input[data-item-id="' + id + '"][data-uom-index="' + ui + '"][data-field="moq"]');
+      return { uom:uom, price:priceInput ? Number(priceInput.value || 0) : 0, moq:moqInput ? Number(moqInput.value || 0) : 0 };
     });
-    renderMl();
+    var first = pricing[0] || {price:0,moq:0};
+    ITEMS.push({
+      name:src.name, cat:src.cat, supplier:src.supplier, price:first.price, uom:uoms,
+      defaultPricing:pricing.map(function(row) { return {price:row.price > 0 ? row.price : null, moq:row.moq > 0 ? row.moq : null}; }),
+      moq:first.moq > 0 ? String(first.moq) : '', active:true, lifecycle:'active', groupList:groupList.slice(), outletList:outletList.slice(),
+      uomEnabled:enabled.slice(), excludedScopes:[], createdAt:new Date().toISOString()
+    });
+  });
+  renderMl();
+  if (window.isNewHQ) {
     refreshNewHqEmptyStates();
     renderNewHqSummary(getSavedOutletGroup());
     addPrototypeActivity('market-list', '<strong>' + n + ' item' + (n === 1 ? '' : 's') + ' added</strong> to master market list', 'market-list', 'Master');
     savePrototypeState();
-  }
+  } else if (typeof saveCreatedHqItems === 'function') saveCreatedHqItems();
   closeAddItemModal();
   showHqToast(n + ' item' + (n>1?'s':'') + ' added to market list');
 }
@@ -6211,6 +6753,7 @@ function savePosSettings() {
   error.style.display = 'none';
   localStorage.setItem('nomniPosApiKey', key);
   closePosSettings(); renderPosMappingState();
+  addPrototypeActivity('hq', 'Nomni POS connection settings updated', 'pos-mapping', 'HQ');
   showHqToast('Nomni POS connected', 'POS products are ready to map.');
 }
 function openPosMappingDialog(productId, variantId) {
@@ -6246,6 +6789,7 @@ function savePosMapping(targetId) {
   posMappings[posKey(posMappingSelection.productId, posMappingSelection.variantId)] = { id:target.id, name:target.name, meta:target.meta, type:posMappingTargetType };
   posIgnoredMappings.delete(posKey(posMappingSelection.productId, posMappingSelection.variantId));
   closePosMappingDialog(); renderPosMappings();
+  addPrototypeActivity('hq', '<strong>' + escapeOverviewText(target.name) + '</strong> linked to a POS product', 'pos-mapping', 'HQ');
   showHqToast('POS mapping saved', 'The POS product is now mapped to ' + target.name + '.');
 }
 function ignorePosMapping() {
@@ -6253,6 +6797,7 @@ function ignorePosMapping() {
   delete posMappings[key];
   posIgnoredMappings.add(key);
   closePosMappingDialog(); renderPosMappings();
+  addPrototypeActivity('hq', 'POS product mapping ignored', 'pos-mapping', 'HQ');
   showHqToast('Mapping ignored', 'This POS product or variant will not affect stock depletion.');
 }
 document.addEventListener('DOMContentLoaded', renderPosMappingState);
@@ -6382,23 +6927,53 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
   </div>
 </div>
 
+<!-- ── Add from invoice (HQ) ── -->
+<div class="picker-overlay" id="hqInvoiceModal" onclick="if(event.target===this)closeHqInvoiceModal()">
+  <div class="picker-card">
+    <div class="picker-head">
+      <div class="picker-head-row" style="margin-bottom:0">
+        <div class="picker-title" id="hqInvoiceModalTitle">Add items to...</div>
+        <button class="picker-close-btn" onclick="closeHqInvoiceModal()" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+    </div>
+    <section class="hq-invoice-step" id="hqInvoiceScopeStep">
+      <div class="hq-invoice-scopes" id="hqInvoiceScopeList"></div>
+      <div class="picker-foot"><span class="picker-sel-label" id="hqInvoiceScopeCount">No groups or outlets selected</span><div style="display:flex;gap:8px"><button class="btn btn-tertiary" onclick="closeHqInvoiceModal()">Cancel</button><button class="btn btn-primary" id="hqInvoiceScopeNext" onclick="showHqInvoiceUpload()" disabled>Continue</button></div></div>
+    </section>
+    <section class="hq-invoice-step" id="hqInvoiceUploadStep" style="display:none">
+      <div class="hq-upload-body">
+        <button class="hq-drop-zone" type="button" onclick="addHqInvoiceDemoFiles()"><span class="material-symbols-outlined" aria-hidden="true">upload_file</span><strong>Drag &amp; drop invoice files here</strong><span>or click to browse · PDF, JPEG or PNG · up to 5 files</span></button>
+        <div class="hq-upload-files" id="hqInvoiceUploadFiles" style="display:none"></div>
+      </div>
+      <div class="picker-foot"><button class="btn btn-tertiary" onclick="showHqInvoiceScopes()">Back</button><button class="btn btn-primary" id="hqInvoiceUploadBtn" onclick="openHqInvoiceReview()" disabled>Upload and review</button></div>
+    </section>
+  </div>
+</div>
+
+<div class="hq-review-overlay" id="hqInvoiceReview" aria-hidden="true">
+  <header class="topbar hq-review-topbar">
+    <div class="topbar-left"><div class="brand"><img class="brand-logo-img" src="assets/nomni_full_greenbar.svg" alt="nomni" /><div class="brand-sub">Procure Admin</div></div></div>
+    <div class="topbar-right"><a href="https://support.zeemart.co/en/" target="_blank" class="help-btn"><span class="material-symbols-outlined">help</span> Help</a><div class="user"><div class="topbar-avt">WA</div><span>William Arya</span><span class="chev"></span></div></div>
+  </header>
+  <aside class="hq-review-preview"><div class="hq-review-preview-label">1 of 2 · INV-2026-0142</div><div class="hq-invoice-paper"><div class="hq-invoice-paper-head"><div><h3>Kee Song Food</h3><div>Singapore</div></div><div style="text-align:right">Invoice<br><strong>INV-2026-0142</strong></div></div><div>Bill to: Garden Cuisine HQ</div><hr><div class="hq-paper-line"><span>Chicken wings, fresh</span><strong>S$5.20</strong></div><div class="hq-paper-line"><span>Chicken breast fillet</span><strong>S$8.20</strong></div><div class="hq-paper-line"><span>Chicken liver, pack</span><strong>S$6.50</strong></div><div class="hq-paper-line"><span>Chicken skin, fresh</span><strong>S$3.40</strong></div><hr><div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Total</span><span>S$23.30</span></div></div></aside>
+  <main class="hq-review-main"><div class="hq-review-title"><button class="hq-review-back" onclick="closeHqInvoiceReview()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>Items</button><h1>Review items</h1><div class="hq-review-scope-note" id="hqReviewScopeNote"></div></div><div class="hq-review-scroll"><div class="hq-review-invoice-bar"><div class="hq-review-invoice-meta"><div class="hq-review-invoice-num">1</div><div><div class="hq-review-invoice-name">INV-2026-0142</div><div class="hq-review-invoice-sub">8 Oct 2025 · Kee Song Food Corporation (S) Pte Ltd</div></div></div><div class="hq-review-actions"><button class="btn btn-tertiary" onclick="skipHqInvoiceReview()">Skip for later</button><button class="btn btn-primary" onclick="saveHqInvoiceReview()">Save invoice</button></div></div><div class="hq-review-content"><div class="hq-review-summary"><span id="hqInvoiceLineCount">4 items</span></div><table class="hq-review-table"><thead><tr><th style="width:30px">#</th><th>Name in invoice</th><th style="width:92px">Product code</th><th style="width:74px">UOM</th><th style="width:82px">Price</th><th style="width:34px"></th></tr></thead><tbody id="hqInvoiceReviewRows"></tbody></table><button class="hq-review-back" style="margin-top:18px" onclick="addHqInvoiceReviewRow()"><span class="material-symbols-outlined" style="font-size:17px">add</span>Add item</button></div></div></main>
+</div>
+
 <!-- ── Flow 1: Add Item modal ── -->
 <div class="picker-overlay" id="addItemModal" onclick="if(event.target===this)closeAddItemModal()">
   <div class="picker-card">
     <div class="picker-head">
       <div class="picker-head-row">
-        <div class="picker-title">Add from supplier catalogue</div>
+        <div class="picker-title" id="addItemModalTitle">Add items to…</div>
         <button class="picker-close-btn" onclick="closeAddItemModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
-      <div class="picker-steps">
-        <div class="picker-step-item" id="aiSt1"><div class="picker-step-num">1</div>&nbsp;Select items</div>
-        <div class="picker-step-sep"></div>
-        <div class="picker-step-item" id="aiSt2"><div class="picker-step-num">2</div>&nbsp;Set prices</div>
-        <div class="picker-step-sep"></div>
-        <div class="picker-step-item" id="aiSt3"><div class="picker-step-num">3</div>&nbsp;Available to</div>
-      </div>
     </div>
-    <!-- Step 1: Select items -->
+    <!-- Step 1: Choose targets -->
+    <div id="aiPanel0" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
+      <div class="hq-invoice-scopes" id="aiTargetList"></div>
+      <div class="picker-foot"><span class="picker-sel-label" id="aiTargetCount">No groups or outlets selected</span><div style="display:flex;gap:8px"><button class="btn btn-tertiary" onclick="closeAddItemModal()">Cancel</button><button class="btn btn-primary" id="aiTargetNext" onclick="showAiStep1()" disabled>Continue</button></div></div>
+    </div>
+    <!-- Step 2: Select items -->
     <div id="aiPanel1" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
       <div class="picker-search-row">
         <div class="picker-search-wrap">
@@ -6410,22 +6985,18 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
           <option>Kee Song Group</option><option>Meat King</option><option>Provenir</option><option>Deli Hub</option>
         </select>
       </div>
-      <div class="picker-info-bar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px">
-        <span id="aiResultsMeta"></span>
-        <button class="picker-text-action" id="aiSelectAll" type="button" onclick="toggleAllAiItems()">Select all</button>
-      </div>
-      <div class="picker-list" id="aiList"></div>
+      <div class="ai-catalogue-picker-list" id="aiList"></div>
       <div class="picker-foot">
-        <div class="picker-sel-label" id="aiSelLabel">No items selected</div>
+        <button class="btn btn-tertiary" onclick="showAiTargets()">Back</button>
+        <div style="display:flex;align-items:center;gap:14px"><div class="picker-sel-label" id="aiSelLabel">No items selected</div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-tertiary" onclick="closeAddItemModal()">Cancel</button>
-          <button class="btn btn-primary" id="aiNextBtn" onclick="showAiStep2()" disabled>Next →</button>
-        </div>
+          <button class="btn btn-primary" id="aiNextBtn" onclick="showAiStep2()" disabled>Set defaults</button>
+        </div></div>
       </div>
     </div>
-    <!-- Step 2: Set prices -->
+    <!-- Step 3: Set default price -->
     <div id="aiPanel2" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
-      <p class="ai-step-helper">For items with multiple UOMs, enter values only for the UOMs you want to add. Leave both unit price and MOQ at 0 to skip a UOM.</p>
+      <p class="ai-step-helper">Leave as $0.00 and 0 to set this later.</p>
       <div style="flex:1;overflow-y:auto;min-height:0">
         <table class="ai-price-tbl">
           <thead>
@@ -6433,63 +7004,14 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
               <th class="col-name">Item</th>
               <th class="col-uom">UOM</th>
               <th class="col-price">Unit price (S$)</th>
-              <th class="col-moq">MOQ <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-mute)">(optional)</span></th>
+              <th class="col-moq">MOQ</th>
             </tr>
           </thead>
           <tbody id="aiPriceRows"></tbody>
         </table>
       </div>
       <div class="picker-foot">
-        <button class="btn btn-tertiary" onclick="showAiStep1()">← Back</button>
-        <button class="btn btn-primary" onclick="showAiStep3()">Next →</button>
-      </div>
-    </div>
-    <!-- Step 3: Available to -->
-    <div id="aiPanel3" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
-      <div class="step3-body">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <p class="step3-intro" style="margin:0">Select which outlet groups and ungrouped outlets can see and order these items. Outlets in a group inherit their group’s availability. You can change this later from each item's settings.</p>
-          <button id="aiStep3ToggleAll" onclick="toggleAllStep3()" style="flex-shrink:0;margin-left:16px;background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:2px">Deselect all</button>
-        </div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);padding:0 2px 8px">Outlet groups</div>
-        <div class="step3-group">
-          <label class="step3-grp-row">
-            <input type="checkbox" id="aiGrp0" checked onchange="updateStep3ToggleLabel()" />
-            <div class="step3-grp-info">
-              <div class="step3-grp-name">Chargrill Outlets</div>
-              <div class="step3-grp-sub">4 outlets</div>
-            </div>
-          </label>
-        </div>
-        <div class="step3-group">
-          <label class="step3-grp-row">
-            <input type="checkbox" id="aiGrp1" checked onchange="updateStep3ToggleLabel()" />
-            <div class="step3-grp-info">
-              <div class="step3-grp-name">Family Dining Express</div>
-              <div class="step3-grp-sub">3 outlets</div>
-            </div>
-          </label>
-        </div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);padding:16px 2px 8px">Ungrouped outlets</div>
-        <div class="step3-group">
-          <label class="step3-grp-row">
-            <input type="checkbox" id="aiOut0" checked onchange="updateStep3ToggleLabel()" />
-            <div class="step3-grp-info">
-              <div class="step3-grp-name">(WF 139) Chargrill @ 139 Tampines</div>
-            </div>
-          </label>
-        </div>
-        <div class="step3-group">
-          <label class="step3-grp-row">
-            <input type="checkbox" id="aiOut1" checked onchange="updateStep3ToggleLabel()" />
-            <div class="step3-grp-info">
-              <div class="step3-grp-name">(WF 290) Garden Express @ 290 Sengkang</div>
-            </div>
-          </label>
-        </div>
-      </div>
-      <div class="picker-foot">
-        <button class="btn btn-tertiary" onclick="showAiStep2Back()">← Back</button>
+        <button class="btn btn-tertiary" onclick="showAiStep1()">Back</button>
         <button class="btn btn-primary" id="aiAddBtn" onclick="confirmAddItems()">Add items</button>
       </div>
     </div>

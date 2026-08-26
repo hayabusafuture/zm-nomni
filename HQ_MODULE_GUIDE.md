@@ -78,11 +78,12 @@ These actions change membership and inheritance; they do not remove the HQ maste
 
 Suppliers are managed at HQ level and then made available to the relevant outlet groups or outlets.
 
-- The list shows suppliers, available contact methods and status.
+- The list shows suppliers, available contact methods, supplier type and availability. **Active** always refers to the supplier type; a temporarily unavailable record is described as **Disabled**.
 - **Add supplier** opens a two-step search and supplier-settings flow.
 - Supplier search supports normal Procure suppliers, Active suppliers that require a Live Chat request, UEN/ABN lookup, and manual creation when no match exists.
 - Each linked supplier has configurable notification contacts, minimum order rules, delivery days and cut-off times, including **Apply to all** for delivery settings.
 - Email and WhatsApp are individually optional, but at least one contact method is required.
+- The prototype seed data treats Active suppliers as exceptional (one of fourteen); Passive suppliers are the usual path and permit HQ-managed item pricing and MOQ.
 - Existing suppliers can be edited, disabled or enabled at HQ level; **Manage availability** sets supplier availability for outlet groups or ungrouped outlets. Grouped outlets inherit their group’s availability. Supplier delivery-policy overrides remain separate and may still target one individual managed outlet.
 
 ## Items
@@ -91,10 +92,12 @@ Items is the HQ master market-list view.
 
 - Search and filters narrow the item list.
 - **Price changes** opens the HQ-level invoice price-review page.
-- Items can be added from supplier catalogues and configured for access, UOMs, pricing and MOQ.
-- Multi-UOM items use an expandable parent row. The parent shows the number of UOM options; child rows show the UOM, price and availability.
+- Items can be added manually or from supplier catalogues and configured for access, UOMs, pricing and MOQ.
+- **Add from invoice (HQ):** starts with selecting one or more outlet groups and/or ungrouped outlets. The upload supports up to five PDF, JPEG or PNG invoices, then uses the existing invoice-review pattern: a fixed invoice preview beside editable OCR line items. Saving creates new catalogue items/UOMs where needed, enables them for the selected scopes and writes the detected prices as **scope custom pricing**. It never updates an HQ default price automatically. Invoice MOQ seeds to `0` for kg/g and `1` for other UOMs; the default remains optional and may be set later deliberately.
+- Item availability targets outlet groups and ungrouped outlets only; grouped outlets inherit their group. UOM availability can vary by those scopes, while the global UOM toggle disables a UOM for every scope.
+- Multi-UOM items use an expandable parent row. The parent shows the number of UOM options; child rows show the UOM, scope-aware price range and availability. The HQ Items table does not show MOQ because it may differ by pricing scope.
 - **Available to** explains where an item can be used. It can identify all outlet groups, individual groups and ungrouped outlets; the detail dialog separates group and ungrouped-outlet access. An outlet in a group inherits its group’s availability and cannot be configured separately.
-- Item settings include Details and Exceptions. Item availability is managed from the item’s **Available to** summary rather than from a separate tab in Edit item details.
+- Every item uses the same **Details + UOM-pricing** dialog. Each globally enabled UOM is a primary tab alongside Details; it opens compact labelled default Price/MOQ fields and one flat table with Available to, Price and MOQ columns. The Details toggle disables a UOM globally. Within each pricing tab, a toggle controls whether that UOM is available to the relevant outlet group or ungrouped outlet; grouped outlets inherit their group’s UOM availability. Disabled availability retains any pricing but makes it inactive. Group rows show their outlet count and pencil actions edit active pricing. **Update** applies an individual row to the open dialogue’s draft; **Save changes** commits all defaults, UOM availability and overrides, while Cancel/close discards the draft. The selected UOM supplies the MOQ context, so MOQ fields and table values are numeric only. Defaults start as `S$0.00` and `0`; both values mean **not set**, never a free price or a zero MOQ. Active-supplier pricing remains read-only.
 - **Master lifecycle:** an HQ item can be **Active**, **Disabled** or **Removed**. Disabled items remain visible but cannot be ordered by included outlet groups or ungrouped outlets. Removed items disappear from available market lists throughout the HQ, while existing Inventory and Recipe references remain as historical records and can no longer be newly selected.
 - Removed items remain available in the HQ’s **Removed** status view, where they can be restored to the master market list.
 - **Scope exclusion:** HQ can exclude an otherwise active or disabled item from a specific outlet group or ungrouped outlet. Exclusion means it is not available there at all. The effective-state priority is **Removed → Excluded → Disabled → Active**.
@@ -157,6 +160,7 @@ Activity is the audit-style record for the HQ.
 
 - Supports activity browsing, filters, date range and pagination in the prototype.
 - It records selected prototype actions, while much of the displayed history remains illustrative.
+- Health check and Activity now listen to the same browser-local HQ change notification. Actions that write Activity (including inventory lifecycle and POS mapping changes) refresh the Health check and the Overview recent-activity feed together, so the two views do not drift after an interaction.
 - The reset control is deliberately kept outside the product UI at the lower-left of the prototype; it clears browser-stored demonstration state.
 
 ## Prototype search hints
@@ -309,8 +313,9 @@ The broader buyer-user create/edit route used when a new HQ user needs to be cre
 
 ## Completed in the current prototype
 
-- **Create item:** saves the new HQ catalogue record locally, shows an “Item created” confirmation, returns to the Items tab and refreshes the list.
-- **Create item validation:** validates item name, supplier, UOM, positive pricing, duplicate UOM rows, inventory UOM/par values and at least one group/outlet availability selection; new records start Active with no conflicting Removed, Disabled or Excluded state. The HQ form no longer asks for an Inventory list.
+- **Create item:** saves the new HQ catalogue record locally, shows an “Item created” confirmation, returns to the Items tab and refreshes the list. Defaults are optional (`S$0.00` / MOQ `0`), availability targets groups or ungrouped outlets, and global UOM toggles plus scope-level UOM choices are retained.
+- **Add from supplier catalogue:** starts with choosing the outlet groups and ungrouped outlets the items are for, then selecting catalogue items, then setting optional default price/MOQ values. There is no separate availability step: the initial target selection is applied to every added item.
+- **Create item validation:** validates item name, supplier, UOM, non-negative numeric default price/MOQ values, duplicate UOM rows, inventory UOM/par values and at least one group/outlet availability selection; `S$0.00` and MOQ `0` mean unset defaults. New records start Active with no conflicting Removed, Disabled or Excluded state. The HQ form no longer asks for an Inventory list.
 - **Persistence pass:** supplier settings and lifecycle, item lifecycle/access, inventory setup and Group SKU entries, recipe lifecycle/availability, price-review decisions, activity entries, outlet-group detail state, and recipe-editor drafts/variations/assignments/versions now persist across refreshes.
 - **Group SKU availability:** removing selected components confirms that they leave Inventory; Group SKU visibility is derived from its constituent SKUs, and each group/outlet sees only the constituent SKUs available to that scope. The HQ Inventory table summarises scope counts (for example, `2 groups · 2 outlets`), expanded rows show each constituent’s availability, and the availability dialog manages each constituent separately.
 - **Supplier scope flow:** default and override saves are scoped correctly; unsaved scope switching offers Save changes, Discard changes or Cancel; deleting an override confirms immediately and returns to Default.
@@ -379,7 +384,7 @@ The implemented demonstration flows use browser-local state and persist through 
 | HQ POS mapping | Partial | Fully flesh out the end-to-end mapping flow and its dependency rules. |
 | Cost and pricing model | Product decision | Define the effective unit-cost calculation and display rules across HQ, group and outlet scopes. |
 | HQ users | Built | — |
-| Activity | Partial | A shared browser-local audit trail now persists across HQ activity views; confirm remaining activity coverage. |
+| Activity | Partial | Shared browser-local audit trail and Health check refresh are connected through the same prototype change notifications; confirm remaining activity coverage. |
 
 ### Admin and Procure ownership
 
@@ -406,5 +411,4 @@ In the Admin HQ supplier search, an Admin user can add an Active supplier direct
 ### Suggested next work
 
 1. Confirm Admin/Procure ownership and permission boundaries.
-2. Connect Health check and Activity to the same change events used by interactions.
-3. Complete disconnected actions and align confirmation, error and notification patterns.
+2. Complete disconnected actions and align confirmation, error and notification patterns.
