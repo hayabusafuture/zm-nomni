@@ -102,6 +102,12 @@
   .pricing-table .col-price { width: 220px; white-space: nowrap; }
   .pricing-table .col-price { text-transform: none; letter-spacing: 0; }
   .pricing-table .col-moq { width: 110px; white-space: nowrap; }
+  .uom-conversion-row { display:flex; align-items:center; gap:6px; padding:0 0 4px 0; color:var(--ink-mute); font-size:12px; white-space:nowrap; }
+  .pricing-conversion-detail td { padding-top:0; padding-left:100px; }
+  .uom-conversion-row input, .uom-conversion-row select { height:30px; border:1px solid var(--rule); border-radius:5px; padding:0 7px; font:inherit; color:var(--ink); background:#fff; }
+  .uom-conversion-row input { width:58px; }
+  .uom-conversion-row select { width:82px; }
+  .uom-conversion-row button { display:inline-flex; align-items:center; border:0; background:none; color:var(--spinach); cursor:pointer; padding:2px; }
   .pricing-input { width: 100%; padding: 8px 10px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; background: #fff; }
   .pricing-input:focus { border-color: var(--nomni-green); }
   .pricing-input::placeholder { color: var(--ink-mute); }
@@ -139,20 +145,22 @@
   .flip-btn { display: inline-flex; align-items: center; gap: 5px; background: none; border: 1px solid #dcdee3; border-radius: 6px; padding: 7px 11px; font: inherit; font-size: 14px; font-weight: 500; color: var(--ink-mute); cursor: pointer; white-space: nowrap; transition: border-color .13s, color .13s; }
   .flip-btn:hover { border-color: var(--spinach); color: var(--spinach); }
 
-  /* Groups section */
-  .groups-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
-  .group-item { border-bottom: 1px solid var(--rule); }
-  .group-item:last-child { border-bottom: none; }
-  .group-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: background .1s; }
-  .group-row:hover { background: var(--row-hover); }
-  .group-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--seaweed); cursor: pointer; flex-shrink: 0; }
-  .group-row-info { flex: 1; }
-  .group-row-name { font-size: 14px; font-weight: 500; color: var(--ink); }
-  .group-row-sub { font-size: 12px; color: var(--ink-mute); margin-top: 1px; }
-  /* UOM chips per group */
-  .group-uom-row { display: none; padding: 0 16px 12px 44px; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .group-uom-row.visible { display: flex; }
-  .group-uom-label { font-size: 12px; color: var(--ink-mute); margin-right: 2px; }
+  /* Availability targets */
+  .groups-grid { display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  .availability-select-all { display:flex; align-items:center; min-height:44px; padding:0 14px; background:#f5f6f7; border-bottom:1px solid var(--rule); }
+  .availability-select-all label { display:inline-flex; align-items:center; gap:12px; font-size:14px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .availability-select-all input, .availability-target-row input[type=checkbox] { width:18px; height:18px; margin:0; accent-color:var(--spinach); cursor:pointer; flex-shrink:0; }
+  .availability-target { border-bottom:1px solid var(--rule); transition:background-color .13s ease; }
+  .availability-target:last-child { border-bottom:0; }
+  .availability-target:hover { background:#F7FFF9; }
+  .availability-target.is-selected { background:#F2FFF5; }
+  .availability-target-row { display:flex; align-items:center; gap:12px; min-height:62px; padding:11px 14px; cursor:pointer; }
+  .availability-target-info { min-width:0; flex:1; }
+  .availability-target-name { display:block; font-size:14px; font-weight:500; color:var(--ink); }
+  .availability-target-meta { display:block; margin-top:2px; font-size:12px; color:var(--ink-mute); }
+  .group-uom-row { display:none; align-items:center; gap:8px; flex-wrap:wrap; padding:0 14px 12px 44px; }
+  .group-uom-row.visible { display:flex; }
+  .group-uom-label { font-size:12px; color:var(--ink-mute); margin-right:2px; }
   .uom-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; border: 1px solid #dcdee3; font-size: 12px; font-weight: 500; color: var(--ink-mute); cursor: pointer; transition: background .1s, border-color .1s, color .1s; user-select: none; }
   .uom-chip.on { background: #E2FFE6; border-color: var(--spinach); color: var(--spinach); }
   .uom-chip input { display: none; }
@@ -490,95 +498,54 @@
       <div class="section-divider"></div>
 
       <!-- ── Groups with access ── -->
-      <h2 class="section-heading" style="margin-bottom:0">Groups with access</h2>
-      <span class="field-hint" style="display:block;font-size:14px;margin:4px 0 14px">Select which outlet groups can see and order this item. You can change this later from the Items tab.</span>
+      <h2 class="section-heading" style="margin-bottom:0">Available to...</h2>
+      <span class="field-hint" style="display:block;font-size:14px;margin:4px 0 14px">Select where this item can be ordered, then choose the UOMs available to each group or outlet.</span>
 
       <div class="groups-grid" id="groupsGrid">
-        <!-- Chargrill Outlets -->
-        <div class="group-item">
-          <label class="group-row">
-            <input type="checkbox" id="chkChargrill" checked onchange="document.getElementById('uomChargrill').classList.toggle('visible',this.checked)" />
-            <div class="group-row-info">
-              <div class="group-row-name">Chargrill Outlets</div>
-              <div class="group-row-sub">4 outlets</div>
-            </div>
+        <div class="availability-select-all">
+          <label><input type="checkbox" id="chkAllAvailability" onchange="toggleAllAvailabilityTargets(this.checked)" />Select all</label>
+        </div>
+        <!-- Outlet groups, followed by ungrouped outlets -->
+        <div class="availability-target is-selected">
+          <label class="availability-target-row">
+            <input type="checkbox" id="chkChargrill" checked onchange="onAvailabilityTargetChange(this, 'uomChargrill')" />
+            <span class="availability-target-info"><span class="availability-target-name">Chargrill Outlets</span><span class="availability-target-meta">4 outlets</span></span>
           </label>
           <div class="group-uom-row visible" id="uomChargrill">
-            <span class="group-uom-label">UOM:</span>
+            <span class="group-uom-label">Available UOMs</span>
             <label class="uom-chip on"><input type="checkbox" checked />kg</label>
             <label class="uom-chip on"><input type="checkbox" checked />carton</label>
           </div>
         </div>
-        <!-- Family Dining Express -->
-        <div class="group-item">
-          <label class="group-row">
-            <input type="checkbox" id="chkFamily" checked onchange="document.getElementById('uomFamily').classList.toggle('visible',this.checked)" />
-            <div class="group-row-info">
-              <div class="group-row-name">Family Dining Express</div>
-              <div class="group-row-sub">3 outlets</div>
-            </div>
+        <div class="availability-target is-selected">
+          <label class="availability-target-row">
+            <input type="checkbox" id="chkFamily" checked onchange="onAvailabilityTargetChange(this, 'uomFamily')" />
+            <span class="availability-target-info"><span class="availability-target-name">Family Dining Express</span><span class="availability-target-meta">6 outlets</span></span>
           </label>
           <div class="group-uom-row visible" id="uomFamily">
-            <span class="group-uom-label">UOM:</span>
+            <span class="group-uom-label">Available UOMs</span>
             <label class="uom-chip on"><input type="checkbox" checked />kg</label>
             <label class="uom-chip on"><input type="checkbox" checked />carton</label>
           </div>
         </div>
-        <!-- Individual outlets -->
-        <div class="group-item">
-          <label class="group-row">
-            <input type="checkbox" id="chkUngroup" onchange="document.getElementById('outletSubRows').style.display=this.checked?'block':'none'" />
-            <div class="group-row-info">
-              <div class="group-row-name">Individual outlets</div>
-              <div class="group-row-sub">Apply to specific outlets not in a group</div>
-            </div>
+        <div class="availability-target">
+          <label class="availability-target-row">
+            <input type="checkbox" id="chkO139" onchange="onAvailabilityTargetChange(this, 'uomO139')" />
+            <span class="availability-target-info"><span class="availability-target-name">(WF 139) Chargrill @ 139 Tampines</span></span>
           </label>
-          <div id="outletSubRows" style="display:none">
-            <div class="group-item" style="border-bottom:none">
-              <label class="group-row" style="padding-left:40px">
-                <input type="checkbox" id="chkO139" onchange="document.getElementById('uomO139').classList.toggle('visible',this.checked)" />
-                <div class="group-row-info"><div class="group-row-name" style="font-weight:400">(WF 139) Chargrill @ 139 Tampines</div></div>
-              </label>
-              <div class="group-uom-row" id="uomO139" style="padding-left:72px">
-                <span class="group-uom-label">UOM:</span>
-                <label class="uom-chip on"><input type="checkbox" checked />kg</label>
-                <label class="uom-chip on"><input type="checkbox" checked />carton</label>
-              </div>
-            </div>
-            <div class="group-item" style="border-bottom:none">
-              <label class="group-row" style="padding-left:40px">
-                <input type="checkbox" id="chkO140" onchange="document.getElementById('uomO140').classList.toggle('visible',this.checked)" />
-                <div class="group-row-info"><div class="group-row-name" style="font-weight:400">(WF 140) Chargrill @ Bedok</div></div>
-              </label>
-              <div class="group-uom-row" id="uomO140" style="padding-left:72px">
-                <span class="group-uom-label">UOM:</span>
-                <label class="uom-chip on"><input type="checkbox" checked />kg</label>
-                <label class="uom-chip on"><input type="checkbox" checked />carton</label>
-              </div>
-            </div>
-            <div class="group-item" style="border-bottom:none">
-              <label class="group-row" style="padding-left:40px">
-                <input type="checkbox" id="chkO141" onchange="document.getElementById('uomO141').classList.toggle('visible',this.checked)" />
-                <div class="group-row-info"><div class="group-row-name" style="font-weight:400">(WF 141) Chargrill @ Jurong</div></div>
-              </label>
-              <div class="group-uom-row" id="uomO141" style="padding-left:72px">
-                <span class="group-uom-label">UOM:</span>
-                <label class="uom-chip on"><input type="checkbox" checked />kg</label>
-                <label class="uom-chip on"><input type="checkbox" checked />carton</label>
-              </div>
-            </div>
-            <div class="group-item" style="border-bottom:none">
-              <label class="group-row" style="padding-left:40px">
-                <input type="checkbox" id="chkO142" onchange="document.getElementById('uomO142').classList.toggle('visible',this.checked)" />
-                <div class="group-row-info"><div class="group-row-name" style="font-weight:400">(WF 142) Chargrill @ Orchard</div></div>
-              </label>
-              <div class="group-uom-row" id="uomO142" style="padding-left:72px">
-                <span class="group-uom-label">UOM:</span>
-                <label class="uom-chip on"><input type="checkbox" checked />kg</label>
-                <label class="uom-chip on"><input type="checkbox" checked />carton</label>
-              </div>
-            </div>
-          </div>
+          <div class="group-uom-row" id="uomO139"><span class="group-uom-label">Available UOMs</span><label class="uom-chip on"><input type="checkbox" checked />kg</label><label class="uom-chip on"><input type="checkbox" checked />carton</label></div>
+        </div>
+        <div class="availability-target">
+          <label class="availability-target-row"><input type="checkbox" id="chkO140" onchange="onAvailabilityTargetChange(this, 'uomO140')" /><span class="availability-target-info"><span class="availability-target-name">(WF 140) Chargrill @ Bedok</span></span></label>
+          <div class="group-uom-row" id="uomO140"><span class="group-uom-label">Available UOMs</span><label class="uom-chip on"><input type="checkbox" checked />kg</label><label class="uom-chip on"><input type="checkbox" checked />carton</label></div>
+        </div>
+        <div class="availability-target">
+          <label class="availability-target-row"><input type="checkbox" id="chkO141" onchange="onAvailabilityTargetChange(this, 'uomO141')" /><span class="availability-target-info"><span class="availability-target-name">(WF 141) Chargrill @ Jurong</span></span></label>
+          <div class="group-uom-row" id="uomO141"><span class="group-uom-label">Available UOMs</span><label class="uom-chip on"><input type="checkbox" checked />kg</label><label class="uom-chip on"><input type="checkbox" checked />carton</label></div>
+        </div>
+        <div class="availability-target">
+          <label class="availability-target-row"><input type="checkbox" id="chkO142" onchange="onAvailabilityTargetChange(this, 'uomO142')" /><span class="availability-target-info"><span class="availability-target-name">(WF 142) Chargrill @ Orchard</span></span></label>
+          <div class="group-uom-row" id="uomO142"><span class="group-uom-label">Available UOMs</span><label class="uom-chip on"><input type="checkbox" checked />kg</label><label class="uom-chip on"><input type="checkbox" checked />carton</label></div>
         </div>
       </div>
 
@@ -614,30 +581,65 @@ function addPricingRow(uom, price, moq) {
   const tr = document.createElement('tr');
   tr.id = id;
   tr.innerHTML =
-    '<td class="col-uom">' + uomSelectHtml(uom || 'kg') + '</td>' +
+    '<td class="col-uom">' + uomSelectHtml(uom || (isFirst ? 'kg' : 'block')) + '</td>' +
     '<td class="col-price"><div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-mute);font-size: 14px;pointer-events:none">$</span><input class="pricing-input" type="number" step="0.01" min="0" value="' + (price !== undefined ? price : '0.00') + '" style="padding-left:22px" /></div></td>' +
     '<td class="col-moq"><input class="pricing-input" type="number" min="0" step="1" value="' + (moq !== undefined ? moq : '0') + '" /></td>' +
     '<td><button class="remove-row-btn" onclick="removeRow(\'' + id + '\')" title="Remove">' +
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
     '</button></td>';
   document.getElementById('pricingRows').appendChild(tr);
+  if (!isFirst) {
+    const detail = document.createElement('tr');
+    detail.className = 'pricing-conversion-detail';
+    detail.dataset.forRow = id;
+    detail.innerHTML = '<td colspan="4"><div class="uom-conversion-row"><input type="number" min="0" step="any" value="1" aria-label="Conversion quantity" /><span class="conversion-uom-label">' + (uom || 'block') + ' =</span><input type="number" min="0" step="any" value="1" aria-label="Base conversion quantity" /><select aria-label="Base UOM">' + uomSelectHtml('kg').replace('<select class="uom-select">','').replace('</select>','') + '</select><button type="button" title="Flip units" onclick="flipPricingConversion(\'' + id + '\')">↔</button></div></td>';
+    document.getElementById('pricingRows').appendChild(detail);
+  }
   tr.querySelector('select').addEventListener('change', renderScopeUomOptions);
   updateRemoveButtons();
   renderScopeUomOptions();
 }
+function flipPricingConversion(id) {
+  const row = document.getElementById(id);
+  if (!row) return;
+  const controls = row.querySelectorAll('.uom-conversion-row input, .uom-conversion-row select');
+  if (controls.length < 3) return;
+  const qty = controls[0].value; controls[0].value = controls[2].value; controls[2].value = qty;
+  const unit = controls[1].textContent.replace(/\s*=\s*$/, ''); controls[1].textContent = controls[2].value + ' =';
+}
 function removeRow(id) {
   document.getElementById(id).remove();
+  const detail = document.querySelector('.pricing-conversion-detail[data-for-row="' + id + '"]');
+  if (detail) detail.remove();
   updateRemoveButtons();
   renderScopeUomOptions();
 }
 function renderScopeUomOptions() {
-  const uoms = Array.from(document.querySelectorAll('#pricingRows select')).map(select => select.value).filter((uom, index, list) => uom && list.indexOf(uom) === index);
+  const uoms = Array.from(document.querySelectorAll('#pricingRows tr:not(.pricing-conversion-detail) > td.col-uom > select')).map(select => select.value).filter((uom, index, list) => uom && list.indexOf(uom) === index);
   document.querySelectorAll('.group-uom-row').forEach(function(wrap) {
-    const selected = new Set(Array.from(wrap.querySelectorAll('input:checked')).map(function(input) { return input.value; }));
-    wrap.innerHTML = '<span class="group-uom-label">UOM:</span>' + uoms.map(function(uom) {
+    const selected = new Set(Array.from(wrap.querySelectorAll('input:checked')).map(function(input) { return input.value === 'on' ? input.parentElement.textContent.trim() : input.value; }));
+    wrap.innerHTML = '<span class="group-uom-label">Available UOMs</span>' + uoms.map(function(uom) {
       const checked = selected.size ? selected.has(uom) : true;
       return '<label class="uom-chip ' + (checked ? 'on' : '') + '"><input type="checkbox" value="' + uom + '" ' + (checked ? 'checked' : '') + ' />' + uom + '</label>';
     }).join('');
+  });
+}
+function syncAvailabilitySelectAll() {
+  const targets = Array.from(document.querySelectorAll('.availability-target-row input[type=checkbox]'));
+  const all = document.getElementById('chkAllAvailability');
+  if (!all) return;
+  all.checked = targets.length > 0 && targets.every(function(input) { return input.checked; });
+  all.indeterminate = !all.checked && targets.some(function(input) { return input.checked; });
+}
+function onAvailabilityTargetChange(input, uomId) {
+  document.getElementById(uomId).classList.toggle('visible', input.checked);
+  input.closest('.availability-target').classList.toggle('is-selected', input.checked);
+  syncAvailabilitySelectAll();
+}
+function toggleAllAvailabilityTargets(checked) {
+  document.querySelectorAll('.availability-target-row input[type=checkbox]').forEach(function(input) {
+    input.checked = checked;
+    onAvailabilityTargetChange(input, input.id.replace('chk', 'uom'));
   });
 }
 function updateRemoveButtons() {
@@ -699,7 +701,7 @@ function saveNewHqItem() {
   const addToInventory = document.getElementById('addToInvChk').checked;
   const inventoryUom = document.getElementById('invUomSelect').value;
   const inventoryPar = document.getElementById('inventoryPar').value.trim();
-  const rows = Array.from(document.querySelectorAll('#pricingRows tr'));
+  const rows = Array.from(document.querySelectorAll('#pricingRows tr:not(.pricing-conversion-detail)'));
   const pricing = rows.map(function(row) {
     const uom = row.querySelector('select').value;
     const inputs = row.querySelectorAll('input');
@@ -740,11 +742,9 @@ function saveNewHqItem() {
   if (document.getElementById('chkChargrill').checked) groupList.push('Chargrill Outlets');
   if (document.getElementById('chkFamily').checked) groupList.push('Family Dining Express');
   const outletList = [];
-  if (document.getElementById('chkUngroup').checked) {
-    [['chkO139','(WF 139) Chargrill @ 139 Tampines'],['chkO140','(WF 140) Chargrill @ Bedok'],['chkO141','(WF 141) Chargrill @ Jurong'],['chkO142','(WF 142) Chargrill @ Orchard']].forEach(function(entry) {
-      if (document.getElementById(entry[0]).checked) outletList.push(entry[1]);
-    });
-  }
+  [['chkO139','(WF 139) Chargrill @ 139 Tampines'],['chkO140','(WF 140) Chargrill @ Bedok'],['chkO141','(WF 141) Chargrill @ Jurong'],['chkO142','(WF 142) Chargrill @ Orchard']].forEach(function(entry) {
+    if (document.getElementById(entry[0]).checked) outletList.push(entry[1]);
+  });
   if (!groupList.length && !outletList.length) {
     alert('Select at least one outlet group or outlet where this item will be available.');
     document.getElementById('chkChargrill').focus();
@@ -811,6 +811,7 @@ document.addEventListener('click', function(e) {
 
 // Seed one default pricing row
 addPricingRow();
+syncAvailabilitySelectAll();
 </script>
 </body>
 </html>

@@ -293,7 +293,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .pilot-price-fields label { display:block; }
 .pilot-price-fields .pilot-scope-source { display:block; margin:0 0 4px; }
 .pilot-price-fields .modal-field-input { font-size:14px; line-height:20px; font-weight:400; font-variant-numeric:tabular-nums; }
-.pilot-scope-name { min-width:0; font-size:14px; font-weight:500; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pilot-scope-name { min-width:0; font-size:14px; font-weight:500; color:var(--ink); overflow:visible; text-overflow:clip; white-space:normal; overflow-wrap:anywhere; }
 .pilot-pricing-table { margin-top:2px; box-sizing:border-box; table-layout:fixed; }
 .pilot-pricing-table th { padding:9px 10px; }
 .pilot-pricing-table td { padding:10px; font-variant-numeric:tabular-nums; }
@@ -308,12 +308,23 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .pilot-scope-edit { width:32px; height:32px; padding:0; border:0; border-radius:6px; background:transparent; color:var(--spinach); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
 .pilot-scope-edit:hover { background:var(--mint); color:var(--seaweed); }
 .pilot-scope-edit .material-symbols-outlined { font-size:18px; }
+.pilot-uom-conversion-edit { width:20px; height:20px; }
+.pilot-uom-conversion-edit .material-symbols-outlined { font-size:16px; }
 .pilot-scope-editor { display:grid; grid-template-columns:1fr 1fr auto auto; gap:8px; align-items:end; padding:4px 0; }
 .pilot-scope-editor-hint { grid-column:1 / -1; font-size:12px; color:var(--ink-mute); line-height:1.35; }
 .pilot-scope-editor .modal-field-input { min-width:0; height:36px; box-sizing:border-box; padding:7px 9px; }
 .pilot-scope-editor .btn { min-height:36px; height:36px; box-sizing:border-box; padding:0 12px; }
 .pilot-uom-section { display:flex; flex-direction:column; gap:12px; }
 .pilot-scope-source { margin-top:2px; font-size:11px; color:var(--ink-mute); }
+.pilot-uom-add { border:0; background:transparent; color:var(--spinach); padding:4px 0; font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.pilot-uom-add:hover { color:var(--seaweed); }
+.pilot-uom-add .material-symbols-outlined { font-size:16px; vertical-align:-3px; }
+#pilotAddUomName { width:156px; }
+.pilot-add-uom-conversion { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.pilot-add-uom-conversion .modal-field-input { width:92px; }
+.pilot-add-uom-conversion-copy { font-size:14px; color:var(--ink-mute); white-space:nowrap; }
+.pilot-add-uom-flip { border:0; background:transparent; color:var(--spinach); padding:4px 0; font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.pilot-add-uom-flip:hover { color:var(--seaweed); }
 
 /* Sort headers */
 .sort-th { cursor: pointer; user-select: none; transition: background .1s; }
@@ -578,6 +589,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 /* ── Picker modals (Flow 1 & 2) ── */
 .picker-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: flex-start; justify-content: center; padding-top: 60px; }
 .picker-overlay.open { display: flex; }
+.picker-overlay.hq-new-uom-dialog { z-index: 960; }
+.modal-overlay.hq-new-uom-dialog { z-index: 960; }
 .picker-card { background: #fff; border-radius: 12px; width: 700px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); max-height: calc(100vh - 88px); display: flex; flex-direction: column; overflow: hidden; }
 .picker-head { padding: 20px 24px 14px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
 .picker-head-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -797,6 +810,10 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .hq-review-status.changed { color:#B45309; }
 .hq-review-field { width:100%; min-width:0; height:40px; box-sizing:border-box; border:1px solid #DCDEE3; border-radius:6px; padding:0 8px; color:var(--ink); font:inherit; font-size:14px; background:#fff; }
 .hq-review-field:focus { outline:2px solid rgba(42,200,100,.18); border-color:var(--nomni-green); }
+.hq-review-remarks { color:var(--ink-mute); font-size:11px; vertical-align:middle !important; }
+.hq-review-table th:nth-child(6) { width:130px !important; }
+.hq-review-remarks button { border:0; background:none; padding:0; color:#1A8040; font:inherit; font-size:11px; font-weight:500; cursor:pointer; text-align:left; }
+.hq-review-remarks button:hover { color:#146B35; }
 @media (max-width: 900px) { .hq-review-overlay.open { grid-template-columns:1fr; } .hq-review-preview { display:none; } .hq-review-main { grid-row:2; } .hq-review-content,.hq-review-title,.hq-review-invoice-bar { padding-left:18px; padding-right:18px; } }
 /* Config step */
 .config-list { flex: 1; overflow-y: auto; min-height: 0; }
@@ -1846,6 +1863,25 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   </div>
 </div>
 
+<!-- Add UOM dialog -->
+<div class="modal-overlay" id="pilotAddUomModal" style="z-index:950" onclick="if(event.target===this)closePilotAddUomDialog()">
+  <div class="modal-card" style="width:440px">
+    <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0;border-bottom:none">
+      <div class="modal-title" id="pilotAddUomModalTitle">Add UOM</div>
+      <button class="modal-close" type="button" onclick="closePilotAddUomDialog()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" style="padding-top:10px;padding-bottom:10px;gap:16px">
+      <p style="margin:0;font-size:14px;color:var(--ink-mute)">Define this UOM against the item’s base UOM.</p>
+      <div class="modal-field"><label>UOM</label><select class="modal-field-input" id="pilotAddUomName" onchange="updatePilotAddUomConversion()"></select></div>
+      <div class="modal-field"><label>Conversion</label><div class="pilot-add-uom-conversion"><span class="pilot-add-uom-conversion-copy" id="pilotAddUomLhs">1 UOM =</span><input class="modal-field-input" id="pilotAddUomRate" inputmode="decimal" value="1" aria-label="Conversion rate" /><span class="pilot-add-uom-conversion-copy" id="pilotAddUomRhs">base UOM</span><button class="pilot-add-uom-flip" type="button" onclick="flipPilotAddUomConversion()"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px">swap_horiz</span> Flip units</button></div></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-tertiary" type="button" onclick="closePilotAddUomDialog()">Cancel</button>
+      <button class="btn btn-primary" type="button" id="pilotAddUomSave">Save UOM</button>
+    </div>
+  </div>
+</div>
+
 <script>
 
 function showPrototypeHints(type) {
@@ -2450,13 +2486,41 @@ function availabilityLabel(groups, outlets, totalGroups, totalOutlets) {
 // Access state for items: itemIdx -> {name: {enabled, uoms: [bool...], type: 'group'|'outlet'}}
 const itemAccessState = {};
 const HQ_ITEM_EXCLUSION_KEY = 'nomni-hq-item-exclusions-v1';
+const HQ_ITEM_ACCESS_KEY = 'nomni-hq-item-access-v1';
+
+function persistItemScopeUoms(itemIdx) {
+  const item = ITEMS[itemIdx];
+  const state = itemAccessState[itemIdx];
+  if (!item || !state) return;
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  item.scopeUoms = item.scopeUoms || {};
+  ML_GROUPS.concat(ML_UNGROUPED_OUTLETS).forEach(function(scope) {
+    const access = state[scope];
+    if (!access) return;
+    if (access.enabled) {
+      item.scopeUoms[scope] = uoms.filter(function(uom, uomIdx) {
+        return access.uoms[uomIdx];
+      }).map(function(uom) {
+        return String(uom).replace(/^per\s/i, '');
+      });
+    }
+  });
+  item.groupList = ML_GROUPS.filter(function(scope) { return state[scope] && state[scope].enabled; });
+  item.outletList = ML_UNGROUPED_OUTLETS.filter(function(scope) { return state[scope] && state[scope].enabled; });
+}
+
 function saveItemAccessState(itemIdx) {
   const item = ITEMS[itemIdx];
   if (!item) return;
+  persistItemScopeUoms(itemIdx);
   let exclusions = {};
   try { exclusions = JSON.parse(localStorage.getItem(HQ_ITEM_EXCLUSION_KEY) || '{}'); } catch (e) {}
   exclusions[item.name] = Object.keys(itemAccessState[itemIdx]).filter(name => !itemAccessState[itemIdx][name].enabled);
   localStorage.setItem(HQ_ITEM_EXCLUSION_KEY, JSON.stringify(exclusions));
+  let access = {};
+  try { access = JSON.parse(localStorage.getItem(HQ_ITEM_ACCESS_KEY) || '{}'); } catch (e) {}
+  access[item.name] = { groupList:item.groupList.slice(), outletList:item.outletList.slice(), scopeUoms:JSON.parse(JSON.stringify(item.scopeUoms || {})) };
+  localStorage.setItem(HQ_ITEM_ACCESS_KEY, JSON.stringify(access));
 }
 ITEMS.forEach((item, i) => {
   if (!Array.isArray(item.groupList)) item.groupList = (i % 5 === 0) ? [ML_GROUPS[0]] : (i % 5 === 3) ? [ML_GROUPS[1]] : ML_GROUPS.slice();
@@ -2468,6 +2532,18 @@ ITEMS.forEach((item, i) => {
   const uomUnit = uomStr.replace('per ', '');
   if (!item.moq) item.moq = ['5', '2', '10', '1'][i % 4] + ' ' + uomUnit;
 });
+
+(function loadPersistedItemAccess() {
+  let access = {};
+  try { access = JSON.parse(localStorage.getItem(HQ_ITEM_ACCESS_KEY) || '{}'); } catch (e) {}
+  ITEMS.forEach(function(item) {
+    const saved = access[item.name];
+    if (!saved) return;
+    if (Array.isArray(saved.groupList)) item.groupList = saved.groupList.slice();
+    if (Array.isArray(saved.outletList)) item.outletList = saved.outletList.slice();
+    if (saved.scopeUoms && typeof saved.scopeUoms === 'object') item.scopeUoms = JSON.parse(JSON.stringify(saved.scopeUoms));
+  });
+})();
 
 // Populate supplier filter
 (function() {
@@ -2719,11 +2795,14 @@ function openHqItemModal(idx, initialTab) {
     accessState: JSON.parse(JSON.stringify(itemAccessState[idx])),
     exceptions: JSON.parse(JSON.stringify(GROUP_EXCEPTIONS[idx] || [])),
     defaultPricing: JSON.parse(JSON.stringify(item.defaultPricing || [])),
+    uomConversions: JSON.parse(JSON.stringify(item.uomConversions || [])),
+    uomCount: (Array.isArray(item.uom) ? item.uom : [item.uom]).length,
     customName: item.customName || '',
     price: item.price,
     moq: item.moq
   };
   modal.dataset.pilotCommitted = 'false';
+  pilotDraftUomConversions = new Set();
   renderPilotModalTabs(idx);
   document.querySelectorAll('#hqItemModal .hq-modal-panel').forEach(function(panel) {
     panel.style.display = panel.id === 'hqItemDetailsPanel' ? 'flex' : 'none';
@@ -2761,16 +2840,94 @@ function openHqItemModal(idx, initialTab) {
 let pilotPricingEditor = null;
 let pilotPricingUomIdx = 0;
 let pilotModalSnapshot = null;
+let pilotUomConversionEditor = null;
+let pilotDraftUomConversions = new Set();
 
 function renderPilotDetailsUoms(itemIdx, container) {
   const item = ITEMS[itemIdx];
   const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  const baseUom = String(uoms[0] || '').replace(/^per /i, '');
   container.innerHTML = '<div class="modal-field"><label>UOMs</label><div style="display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:6px;overflow:hidden">' +
     uoms.map(function(uom, uomIdx) {
       const enabled = item.uomEnabled[uomIdx];
-      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px' + (uomIdx ? ';border-top:1px solid var(--rule)' : '') + '"><span style="font-size:14px;color:var(--ink);opacity:' + (enabled ? '1' : '.45') + '">' + uom + '</span><button class="access-toggle' + (enabled ? ' on' : '') + '" type="button" onclick="togglePilotUomEnabled(' + itemIdx + ',' + uomIdx + ')" title="' + (enabled ? 'Disable this UOM' : 'Enable this UOM') + '"></button></div>';
+      const unit = String(uom).replace(/^per /i, '');
+      const uomLabel = /^per\s/i.test(String(uom)) ? '<span style="font-weight:400">per </span>' + unit : unit;
+      const savedConversion = item.uomConversions && item.uomConversions[uomIdx];
+      const fallbackRate = (UOM_MULT[uom] || 1) / (UOM_MULT[uoms[0]] || 1);
+      const rate = savedConversion ? savedConversion.rate : fallbackRate;
+      const isDraftConversion = pilotDraftUomConversions.has(itemIdx + ':' + uomIdx);
+      const conversion = uomIdx === 0 ? '' : '<div style="display:flex;align-items:center;gap:6px;margin-top:0"><span style="padding-top:2px;font-size:12px;color:var(--ink-mute)">' + (savedConversion && savedConversion.flipped ? '1 ' + baseUom + ' = ' + rate + ' ' + unit : '1 ' + unit + ' = ' + rate + ' ' + baseUom) + '</span>' + (isDraftConversion ? '<button class="pilot-scope-edit pilot-uom-conversion-edit" type="button" onclick="editPilotUomConversion(' + itemIdx + ',' + uomIdx + ')" aria-label="Edit conversion for ' + unit + '" title="Edit conversion"><span class="material-symbols-outlined">edit</span></button>' : '') + '</div>';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px' + (uomIdx ? ';border-top:1px solid var(--rule)' : '') + '"><div style="min-width:0;opacity:' + (enabled ? '1' : '.45') + '"><span style="display:block;font-size:14px;font-weight:600;color:var(--ink)">' + uomLabel + '</span>' + conversion + '</div><button class="access-toggle' + (enabled ? ' on' : '') + '" type="button" onclick="togglePilotUomEnabled(' + itemIdx + ',' + uomIdx + ')" title="' + (enabled ? 'Disable this UOM' : 'Enable this UOM') + '"></button></div>';
     }).join('') +
-  '</div><p style="margin:8px 0 0;font-size:12px;color:var(--ink-mute)">Turn off a UOM to disable it for every group and outlet. At least one UOM must remain enabled.</p></div>';
+  '</div><button class="pilot-uom-add" type="button" onclick="openPilotAddUomDialog(' + itemIdx + ')"><span class="material-symbols-outlined">add</span> Add UOM</button><p style="margin:8px 0 0;font-size:12px;color:var(--ink-mute)">Turn off a UOM to disable it for every group and outlet. At least one UOM must remain enabled.</p></div>';
+}
+
+function editPilotUomConversion(itemIdx, uomIdx) { if (pilotDraftUomConversions.has(itemIdx + ':' + uomIdx)) openPilotAddUomDialog(itemIdx, uomIdx); }
+
+let pilotAddUomState = null;
+function openPilotAddUomDialog(itemIdx, editUomIdx) {
+  const item = ITEMS[itemIdx];
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  const isEdit = Number.isInteger(editUomIdx);
+  const options = isEdit ? [String(uoms[editUomIdx]).replace(/^per /i, '')] : UOM_OPTIONS.filter(function(unit) { return !uoms.includes('per ' + unit) && !uoms.includes(unit); });
+  if (!options.length) { alert('All available UOMs have already been added to this item.'); return; }
+  const existingConversion = isEdit && item.uomConversions && item.uomConversions[editUomIdx];
+  const fallbackRate = isEdit ? (UOM_MULT[uoms[editUomIdx]] || 1) / (UOM_MULT[uoms[0]] || 1) : 1;
+  pilotAddUomState = { itemIdx:itemIdx, editUomIdx:isEdit ? editUomIdx : null, flipped:!!(existingConversion && existingConversion.flipped) };
+  document.getElementById('pilotAddUomName').innerHTML = options.map(function(unit) { return '<option value="' + unit + '">' + unit + '</option>'; }).join('');
+  document.getElementById('pilotAddUomName').disabled = isEdit;
+  document.getElementById('pilotAddUomRate').value = existingConversion ? existingConversion.rate : fallbackRate;
+  document.getElementById('pilotAddUomModalTitle').textContent = isEdit ? 'Edit UOM' : 'Add UOM';
+  document.getElementById('pilotAddUomSave').textContent = isEdit ? 'Update UOM' : 'Save UOM';
+  document.getElementById('pilotAddUomSave').onclick = savePilotAddedUom;
+  updatePilotAddUomConversion();
+  document.getElementById('pilotAddUomModal').classList.add('open');
+}
+function closePilotAddUomDialog() { pilotAddUomState = null; document.getElementById('pilotAddUomModal').classList.remove('open'); }
+function updatePilotAddUomConversion() {
+  if (!pilotAddUomState) return;
+  const item = ITEMS[pilotAddUomState.itemIdx];
+  const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  const base = String(uoms[0] || '').replace(/^per /i, '');
+  const unit = document.getElementById('pilotAddUomName').value;
+  document.getElementById('pilotAddUomLhs').textContent = pilotAddUomState.flipped ? '1 ' + base + ' =' : '1 ' + unit + ' =';
+  document.getElementById('pilotAddUomRhs').textContent = pilotAddUomState.flipped ? unit : base;
+}
+function flipPilotAddUomConversion() { if (!pilotAddUomState) return; pilotAddUomState.flipped = !pilotAddUomState.flipped; updatePilotAddUomConversion(); }
+function savePilotAddedUom() {
+  if (!pilotAddUomState) return;
+  const itemIdx = pilotAddUomState.itemIdx;
+  const item = ITEMS[itemIdx];
+  const unit = document.getElementById('pilotAddUomName').value;
+  const rate = Number(document.getElementById('pilotAddUomRate').value);
+  if (!unit || !Number.isFinite(rate) || rate <= 0) { alert('Enter a conversion rate greater than zero.'); return; }
+  if (Number.isInteger(pilotAddUomState.editUomIdx)) {
+    item.uomConversions = Array.isArray(item.uomConversions) ? item.uomConversions : [];
+    item.uomConversions[pilotAddUomState.editUomIdx] = { rate:rate, flipped:pilotAddUomState.flipped };
+    closePilotAddUomDialog();
+    renderPilotDetailsUoms(itemIdx, document.getElementById('hqItemPriceSection'));
+    return;
+  }
+  const uoms = Array.isArray(item.uom) ? item.uom.slice() : [item.uom];
+  const label = 'per ' + unit;
+  if (uoms.includes(label) || uoms.includes(unit)) { alert('This UOM already exists for the item.'); return; }
+  uoms.push(label); item.uom = uoms;
+  item.uomEnabled = Array.isArray(item.uomEnabled) ? item.uomEnabled : uoms.slice(0, -1).map(function() { return true; });
+  item.uomEnabled.push(true);
+  item.defaultPricing = Array.isArray(item.defaultPricing) ? item.defaultPricing : [];
+  item.defaultPricing.push({ price:null, moq:null });
+  item.uomConversions = Array.isArray(item.uomConversions) ? item.uomConversions : [];
+  item.uomConversions[uoms.length - 1] = { rate:rate, flipped:pilotAddUomState.flipped };
+  pilotDraftUomConversions.add(itemIdx + ':' + (uoms.length - 1));
+  ensureItemAccessState(itemIdx);
+  Object.keys(itemAccessState[itemIdx]).forEach(function(scope) { itemAccessState[itemIdx][scope].uoms.push(!!itemAccessState[itemIdx][scope].enabled); });
+  if (pilotModalSnapshot && pilotModalSnapshot.itemIdx === itemIdx) pilotModalSnapshot.committedUomConversions = JSON.parse(JSON.stringify(item.uomConversions));
+  closePilotAddUomDialog();
+  renderPilotModalTabs(itemIdx);
+  renderPilotDetailsUoms(itemIdx, document.getElementById('hqItemPriceSection'));
+  renderPilotPricing(itemIdx, document.getElementById('hqItemExcPanel'));
+  renderMl();
+  showHqToast('UOM added', label);
 }
 
 function togglePilotUomEnabled(itemIdx, uomIdx) {
@@ -3153,18 +3310,29 @@ function closeHqItemModal() {
     const snapshot = pilotModalSnapshot;
     const item = ITEMS[snapshot.itemIdx];
     if (item) {
-      item.uomEnabled = snapshot.uomEnabled.slice();
-      item.defaultPricing = JSON.parse(JSON.stringify(snapshot.defaultPricing));
+      const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+      const addedUomCount = Math.max(0, uoms.length - snapshot.uomEnabled.length);
+      item.uomEnabled = snapshot.uomEnabled.concat(Array.from({ length: addedUomCount }, function() { return true; }));
+      item.defaultPricing = JSON.parse(JSON.stringify(snapshot.defaultPricing)).concat(Array.from({ length: addedUomCount }, function() { return { price:null, moq:null }; }));
+      const savedConversions = snapshot.committedUomConversions || snapshot.uomConversions;
+      const savedUomCount = snapshot.committedUomConversions ? savedConversions.length : snapshot.uomCount;
+      item.uomConversions = JSON.parse(JSON.stringify(savedConversions)).concat((item.uomConversions || []).slice(savedUomCount));
       if (snapshot.customName) item.customName = snapshot.customName; else delete item.customName;
       item.price = snapshot.price;
       item.moq = snapshot.moq;
       itemAccessState[snapshot.itemIdx] = JSON.parse(JSON.stringify(snapshot.accessState));
+      Object.keys(itemAccessState[snapshot.itemIdx]).forEach(function(scope) {
+        const access = itemAccessState[snapshot.itemIdx][scope];
+        for (let i = 0; i < addedUomCount; i++) access.uoms.push(!!access.enabled);
+      });
       GROUP_EXCEPTIONS[snapshot.itemIdx] = JSON.parse(JSON.stringify(snapshot.exceptions));
       renderMl();
     }
   }
   pilotModalSnapshot = null;
   pilotPricingEditor = null;
+  pilotUomConversionEditor = null;
+  pilotDraftUomConversions = new Set();
   modal.classList.remove('open');
 }
 
@@ -5646,9 +5814,38 @@ function renderHqInvoiceReview() {
   document.getElementById('hqReviewScopeNote').innerHTML = getHqInvoiceTargetSummary();
   document.getElementById('hqInvoiceLineCount').textContent = hqInvoiceRows.length + ' item' + (hqInvoiceRows.length === 1 ? '' : 's');
   document.getElementById('hqInvoiceReviewRows').innerHTML = hqInvoiceRows.map(function(row, index) {
-    return '<tr><td class="hq-review-line-number">' + (index + 1) + '</td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="name" value="' + escapeOverviewText(row.name) + '"></td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="code" value="' + escapeOverviewText(row.code || '') + '"></td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="uom" value="' + escapeOverviewText(row.uom) + '"></td><td><input class="hq-review-field" type="number" min="0" step="0.01" data-invoice-row="' + index + '" data-invoice-field="price" value="' + Number(row.price || 0).toFixed(2) + '"></td><td><button class="hq-review-close" style="width:34px;height:34px" title="Remove item" onclick="removeHqInvoiceReviewRow(' + index + ')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>';
+    const remark = row.status === 'New UOM' ? (row.conversion || ('1 ' + row.uom + ' = 1 kg')) : '';
+    return '<tr><td class="hq-review-line-number">' + (index + 1) + '</td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="name" value="' + escapeOverviewText(row.name) + '"></td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="code" value="' + escapeOverviewText(row.code || '') + '"></td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="uom" value="' + escapeOverviewText(row.uom) + '"></td><td><input class="hq-review-field" type="number" min="0" step="0.01" data-invoice-row="' + index + '" data-invoice-field="price" value="' + Number(row.price || 0).toFixed(2) + '"></td><td class="hq-review-remarks">' + (remark ? '<button type="button" data-uom-row="' + index + '">' + escapeOverviewText(remark) + ' <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">edit</span></button>' : '—') + '</td><td><button class="hq-review-close" style="width:34px;height:34px" title="Remove item" onclick="removeHqInvoiceReviewRow(' + index + ')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>';
   }).join('');
+  document.querySelectorAll('#hqInvoiceReviewRows .hq-review-remarks button').forEach(function(button) {
+    button.onclick = function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      openHqNewUomDialog(Number(button.dataset.uomRow));
+    };
+  });
 }
+function openHqNewUomDialog(index) {
+  if (!Array.isArray(hqInvoiceRows)) return;
+  captureHqInvoiceRows();
+  const row = hqInvoiceRows[index];
+  if (!row) return;
+  let overlay = document.getElementById('hqNewUomDialog');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'hqNewUomDialog';
+    overlay.className = 'modal-overlay hq-new-uom-dialog';
+    overlay.addEventListener('click', function(event) { if (event.target === overlay) closeHqNewUomDialog(); });
+    document.body.appendChild(overlay);
+  }
+  overlay.classList.add('open');
+  overlay.removeAttribute('hidden');
+  overlay.style.display = 'flex';
+  overlay.innerHTML = '<div class="modal-card" style="width:440px"><div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0;border-bottom:none"><div class="modal-title">New UOM</div><button class="modal-close" type="button" onclick="closeHqNewUomDialog()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="modal-body" style="padding-top:10px;padding-bottom:20px;gap:16px"><p style="margin:0;font-size:14px;color:var(--ink-mute)">Tell us how it converts to a known UOM</p><div class="pilot-add-uom-conversion"><span class="pilot-add-uom-conversion-copy"><strong>1 ' + escapeOverviewText(row.uom) + '</strong> =</span><input class="modal-field-input" id="hqNewUomRate" type="number" min="0.01" step="0.01" value="' + (row.conversionRate || 1) + '" aria-label="Conversion rate"><select class="modal-field-input" id="hqNewUomBase" aria-label="Known UOM"><option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="each">each</option></select><button class="pilot-add-uom-flip" type="button" onclick="flipHqNewUomUnits(' + index + ')"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px">swap_horiz</span> Flip units</button></div></div><div class="modal-foot"><button class="btn btn-tertiary" type="button" onclick="closeHqNewUomDialog()">Cancel</button><button class="btn btn-primary" type="button" onclick="saveHqNewUomDialog(' + index + ')">Save</button></div></div>';
+}
+function closeHqNewUomDialog() { const el = document.getElementById('hqNewUomDialog'); if (el) el.remove(); }
+function saveHqNewUomDialog(index) { const row = hqInvoiceRows[index]; row.conversionRate = Number(document.getElementById('hqNewUomRate').value || 1); row.conversionBase = document.getElementById('hqNewUomBase').value; row.conversion = '1 ' + row.uom + ' = ' + row.conversionRate + ' ' + row.conversionBase; closeHqNewUomDialog(); renderHqInvoiceReview(); }
+function flipHqNewUomUnits(index) { const rate = document.getElementById('hqNewUomRate'); if (rate) rate.value = (1 / Number(rate.value || 1)).toFixed(4).replace(/0+$/,'').replace(/\.$/,''); }
 function captureHqInvoiceRows() { document.querySelectorAll('#hqInvoiceReviewRows [data-invoice-field]').forEach(function(input) { const row = hqInvoiceRows[Number(input.dataset.invoiceRow)]; if (!row) return; row[input.dataset.invoiceField] = input.dataset.invoiceField === 'price' ? Number(input.value || 0) : input.value; }); }
 function addHqInvoiceReviewRow() { captureHqInvoiceRows(); hqInvoiceRows.push({name:'', code:'', uom:'kg', price:0, status:'New item', match:null, cat:'Other'}); renderHqInvoiceReview(); const fields = document.querySelectorAll('#hqInvoiceReviewRows [data-invoice-field="name"]'); if (fields.length) fields[fields.length - 1].focus(); }
 function removeHqInvoiceReviewRow(index) { hqInvoiceRows.splice(index, 1); renderHqInvoiceReview(); showHqToast('Item removed from invoice review'); }
@@ -5670,6 +5867,10 @@ function applyHqInvoiceRow(row) {
   ensureItemAccessState(itemIdx);
   scopeGroups.forEach(function(scope) { if (!item.groupList.includes(scope)) item.groupList.push(scope); itemAccessState[itemIdx][scope].enabled = true; itemAccessState[itemIdx][scope].uoms[uomIdx] = true; });
   scopeOutlets.forEach(function(scope) { if (!item.outletList.includes(scope)) item.outletList.push(scope); itemAccessState[itemIdx][scope].enabled = true; itemAccessState[itemIdx][scope].uoms[uomIdx] = true; });
+  // Keep the selected targets' UOM access with the item, rather than only in
+  // the temporary dialog state, so reopening or reloading restores it.
+  persistItemScopeUoms(itemIdx);
+  saveItemAccessState(itemIdx);
   const moq = /^(kg|g)$/i.test(String(row.uom).trim()) ? '0' : '1';
   const entries = GROUP_EXCEPTIONS[itemIdx] || (GROUP_EXCEPTIONS[itemIdx] = []);
   Array.from(hqInvoiceScopes).forEach(function(scope) { const existing = entries.find(function(entry) { return entry.group === scope && entry.uomIdx === uomIdx; }); const update = {group:scope, uomIdx:uomIdx, price:Number(row.price || 0) || null, moq:moq}; if (existing) Object.assign(existing, update); else entries.push(update); });
@@ -5835,6 +6036,12 @@ function toggleAllAiTargets() {
 function formatCatalogueItemName(name) {
   return String(name || '').toLowerCase().replace(/(^|[\s/\-])([a-z])/g, function(match, prefix, letter) { return prefix + letter.toUpperCase(); });
 }
+function findExistingCatalogueItemIndex(name) {
+  const key = String(name || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  return ITEMS.findIndex(function(item) {
+    return String(item.name || '').trim().replace(/\s+/g, ' ').toLowerCase() === key;
+  });
+}
 function renderAiList() {
   const q = document.getElementById('aiSearch').value.toLowerCase();
   const sup = document.getElementById('aiSupFilter').value;
@@ -5898,9 +6105,10 @@ function confirmAddItems() {
   const n = aiSel.size;
   var groupList = ML_GROUPS.filter(function(name) { return aiTargets.has(name); });
   var outletList = ML_UNGROUPED_OUTLETS.filter(function(name) { return aiTargets.has(name); });
+  var updatedCount = 0;
   aiSel.forEach(function(id) {
     var src = CAT_ITEMS.find(function(item) { return item.id === id; });
-    if (!src || ITEMS.some(function(item) { return item.name === src.name; })) return;
+    if (!src) return;
     var uoms = src.uoms.map(function(uom) { return 'per ' + uom; });
     var enabled = aiUomEnabled[src.id] || src.uoms.map(function() { return true; });
     var pricing = src.uoms.map(function(uom, ui) {
@@ -5909,11 +6117,40 @@ function confirmAddItems() {
       return { uom:uom, price:priceInput ? Number(priceInput.value || 0) : 0, moq:moqInput ? Number(moqInput.value || 0) : 0 };
     });
     var first = pricing[0] || {price:0,moq:0};
+    var existingIdx = findExistingCatalogueItemIndex(src.name);
+    if (existingIdx >= 0) {
+      const existing = ITEMS[existingIdx];
+      const existingUoms = Array.isArray(existing.uom) ? existing.uom : [existing.uom];
+      ensureItemAccessState(existingIdx);
+      groupList.concat(outletList).forEach(function(scope) {
+        const access = itemAccessState[existingIdx][scope];
+        const savedScopeUoms = existing.scopeUoms && existing.scopeUoms[scope];
+        if (!access) return;
+        if (!access.enabled && !Array.isArray(savedScopeUoms)) {
+          access.uoms = existingUoms.map(function(uom, uomIdx) {
+            const sourceUomIdx = src.uoms.indexOf(String(uom).replace(/^per\s/i, ''));
+            return existing.uomEnabled[uomIdx] !== false && (sourceUomIdx < 0 || enabled[sourceUomIdx] !== false);
+          });
+        }
+        access.enabled = true;
+      });
+      saveItemAccessState(existingIdx);
+      updatedCount += 1;
+      return;
+    }
+    var scopeUoms = {};
+    groupList.concat(outletList).forEach(function(scope) {
+      scopeUoms[scope] = uoms.filter(function(uom, uomIdx) {
+        return enabled[uomIdx] !== false;
+      }).map(function(uom) {
+        return String(uom).replace(/^per\s/i, '');
+      });
+    });
     ITEMS.push({
       name:src.name, cat:src.cat, supplier:src.supplier, price:first.price, uom:uoms,
       defaultPricing:pricing.map(function(row) { return {price:row.price > 0 ? row.price : null, moq:row.moq > 0 ? row.moq : null}; }),
       moq:first.moq > 0 ? String(first.moq) : '', active:true, lifecycle:'active', groupList:groupList.slice(), outletList:outletList.slice(),
-      uomEnabled:enabled.slice(), excludedScopes:[], createdAt:new Date().toISOString()
+      uomEnabled:enabled.slice(), scopeUoms:scopeUoms, excludedScopes:[], createdAt:new Date().toISOString()
     });
   });
   renderMl();
@@ -5924,7 +6161,9 @@ function confirmAddItems() {
     savePrototypeState();
   } else if (typeof saveCreatedHqItems === 'function') saveCreatedHqItems();
   closeAddItemModal();
-  showHqToast(n + ' item' + (n>1?'s':'') + ' added to market list');
+  const addedCount = n - updatedCount;
+  const message = updatedCount ? (addedCount ? addedCount + ' added, ' + updatedCount + ' updated' : updatedCount + ' item' + (updatedCount > 1 ? 's' : '') + ' updated') : n + ' item' + (n>1?'s':'') + ' added';
+  showHqToast(message + ' in market list');
 }
 
 // ── Flow 2a: Add SKU to Inventory ──
@@ -6956,7 +7195,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
     <div class="topbar-right"><a href="https://support.zeemart.co/en/" target="_blank" class="help-btn"><span class="material-symbols-outlined">help</span> Help</a><div class="user"><div class="topbar-avt">WA</div><span>William Arya</span><span class="chev"></span></div></div>
   </header>
   <aside class="hq-review-preview"><div class="hq-review-preview-label">1 of 2 · INV-2026-0142</div><div class="hq-invoice-paper"><div class="hq-invoice-paper-head"><div><h3>Kee Song Food</h3><div>Singapore</div></div><div style="text-align:right">Invoice<br><strong>INV-2026-0142</strong></div></div><div>Bill to: Garden Cuisine HQ</div><hr><div class="hq-paper-line"><span>Chicken wings, fresh</span><strong>S$5.20</strong></div><div class="hq-paper-line"><span>Chicken breast fillet</span><strong>S$8.20</strong></div><div class="hq-paper-line"><span>Chicken liver, pack</span><strong>S$6.50</strong></div><div class="hq-paper-line"><span>Chicken skin, fresh</span><strong>S$3.40</strong></div><hr><div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Total</span><span>S$23.30</span></div></div></aside>
-  <main class="hq-review-main"><div class="hq-review-title"><button class="hq-review-back" onclick="closeHqInvoiceReview()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>Items</button><h1>Review items</h1><div class="hq-review-scope-note" id="hqReviewScopeNote"></div></div><div class="hq-review-scroll"><div class="hq-review-invoice-bar"><div class="hq-review-invoice-meta"><div class="hq-review-invoice-num">1</div><div><div class="hq-review-invoice-name">INV-2026-0142</div><div class="hq-review-invoice-sub">8 Oct 2025 · Kee Song Food Corporation (S) Pte Ltd</div></div></div><div class="hq-review-actions"><button class="btn btn-tertiary" onclick="skipHqInvoiceReview()">Skip for later</button><button class="btn btn-primary" onclick="saveHqInvoiceReview()">Save invoice</button></div></div><div class="hq-review-content"><div class="hq-review-summary"><span id="hqInvoiceLineCount">4 items</span></div><table class="hq-review-table"><thead><tr><th style="width:30px">#</th><th>Name in invoice</th><th style="width:92px">Product code</th><th style="width:74px">UOM</th><th style="width:82px">Price</th><th style="width:34px"></th></tr></thead><tbody id="hqInvoiceReviewRows"></tbody></table><button class="hq-review-back" style="margin-top:18px" onclick="addHqInvoiceReviewRow()"><span class="material-symbols-outlined" style="font-size:17px">add</span>Add item</button></div></div></main>
+  <main class="hq-review-main"><div class="hq-review-title"><button class="hq-review-back" onclick="closeHqInvoiceReview()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>Items</button><h1>Review items</h1><div class="hq-review-scope-note" id="hqReviewScopeNote"></div></div><div class="hq-review-scroll"><div class="hq-review-invoice-bar"><div class="hq-review-invoice-meta"><div class="hq-review-invoice-num">1</div><div><div class="hq-review-invoice-name">INV-2026-0142</div><div class="hq-review-invoice-sub">8 Oct 2025 · Kee Song Food Corporation (S) Pte Ltd</div></div></div><div class="hq-review-actions"><button class="btn btn-tertiary" onclick="skipHqInvoiceReview()">Skip for later</button><button class="btn btn-primary" onclick="saveHqInvoiceReview()">Save invoice</button></div></div><div class="hq-review-content"><div class="hq-review-summary"><span id="hqInvoiceLineCount">4 items</span></div><table class="hq-review-table"><thead><tr><th style="width:30px">#</th><th>Name in invoice</th><th style="width:92px">Product code</th><th style="width:74px">UOM</th><th style="width:82px">Price</th><th style="width:150px">Remarks</th><th style="width:34px"></th></tr></thead><tbody id="hqInvoiceReviewRows"></tbody></table><button class="hq-review-back" style="margin-top:18px" onclick="addHqInvoiceReviewRow()"><span class="material-symbols-outlined" style="font-size:17px">add</span>Add item</button></div></div></main>
 </div>
 
 <!-- ── Flow 1: Add Item modal ── -->
