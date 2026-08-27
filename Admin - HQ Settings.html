@@ -523,6 +523,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .access-toggle.on { background: var(--nomni-green); }
 .access-toggle::after { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
 .access-toggle.on::after { transform: translateX(16px); }
+.access-toggle.mixed { background:#b9bcc3; }
+.access-toggle.mixed::after { transform:translateX(8px); }
 .access-row-icon { font-size: 16px; color: var(--ink-mute); font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; flex-shrink: 0; }
 
 /* Placeholder */
@@ -660,9 +662,14 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 }
 .ai-catalogue-picker-list { flex:1; min-height:0; padding:0 24px 16px; overflow-y:auto; scrollbar-width:none; }
 .ai-catalogue-picker-list::-webkit-scrollbar { display:none; }
+.ai-catalogue-row { display:flex; align-items:center; justify-content:space-between; gap:16px; min-width:0; width:100%; }
+.ai-catalogue-copy { min-width:0; flex:1; }
 .ai-catalogue-name { display:block; font-size:14px; font-weight:500; color:var(--ink); }
-.ai-catalogue-sub { display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-top:2px; font-size:12px; color:var(--ink-mute); }
+.ai-catalogue-sub { display:flex; align-items:center; flex-wrap:wrap; gap:5px; margin-top:2px; font-size:12px; color:var(--ink-mute); }
+.ai-existing-hq { color:var(--nomni-green); font-weight:500; }
+.ai-catalogue-uoms { display:flex; align-items:center; justify-content:flex-end; gap:4px; flex-shrink:0; max-width:176px; }
 .ai-catalogue-uom { display:inline-block; background:#f0f1f3; border-radius:4px; padding:1px 7px; font-size:11px; font-weight:600; color:var(--ink-mute); }
+.ai-catalogue-uom-more { color:var(--ink-mute); font-size:12px; font-weight:600; white-space:nowrap; }
 .picker-search-row { display: flex; gap: 8px; padding: 12px 24px 0; flex-shrink: 0; }
 .picker-search-wrap { display: flex; align-items: center; gap: 8px; flex: 1; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; }
 .picker-search-wrap:focus-within { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
@@ -790,6 +797,13 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .hq-review-title .hq-review-back { margin-bottom:14px; font-size:14px; font-weight:500; }
 .hq-review-title h1 { margin:0; font-size:24px; font-weight:700; letter-spacing:-.03em; }
 .hq-review-scope-note { margin-top:10px; padding:14px; border-radius:8px; background:#E2FFE6; color:var(--seaweed); font-size:14px; font-weight:500; }
+.hq-review-scope-link { border:0; border-bottom:1px dotted currentColor; padding:0; background:transparent; color:var(--spinach); font:inherit; font-weight:700; cursor:pointer; }
+.hq-review-scope-link:hover { color:var(--seaweed); }
+.hq-target-summary-list { display:flex; flex-direction:column; border:1px solid var(--rule); border-radius:8px; overflow:hidden; }
+.hq-target-summary-row { padding:12px 14px; border-bottom:1px solid var(--rule); }
+.hq-target-summary-row:last-child { border-bottom:0; }
+.hq-target-summary-name { display:block; font-size:14px; font-weight:500; color:var(--ink); }
+.hq-target-summary-meta { display:block; margin-top:2px; font-size:12px; color:var(--ink-mute); }
 .hq-review-scroll { flex:1; min-height:0; overflow:auto; }
 .hq-review-invoice-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 30px; background:#FFF8D9; border-bottom:1px solid #F3D779; }
 .hq-review-invoice-meta { display:flex; align-items:center; gap:10px; min-width:0; }
@@ -849,7 +863,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .config-grp-row label { font-size: 14px; cursor: pointer; }
 /* Step 2 compact price table */
 .ai-price-tbl { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.ai-step-helper { margin: 0; padding: 0 24px 12px; border-bottom: 1px solid var(--rule); background: #fff; color: var(--ink-mute); font-size: 14px; line-height: 1.5; }
+.ai-step-helper { margin:0 24px 16px; padding:12px 14px; border:0; border-radius:8px; background:var(--mint); color:var(--seaweed); font-size:14px; font-weight:500; line-height:1.5; }
+.ai-step-helper .hq-review-scope-link { font-weight:700; }
 .ai-price-tbl thead th { position: sticky; top: 0; background: #fff; text-align: left; font-size: 11px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .05em; padding: 12px 8px 10px; border-bottom: 1px solid var(--rule); white-space: nowrap; z-index: 1; }
 .ai-price-tbl thead th:first-child { padding-left: 24px; }
 .ai-price-tbl thead th:last-child { padding-right: 24px; }
@@ -857,20 +872,32 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .ai-price-tbl tbody td.col-name { padding-left: 24px; }
 .ai-price-tbl tbody td:last-child { padding-right: 24px; }
 .ai-price-tbl tbody tr:last-child td { border-bottom: none; }
-.ai-price-tbl .col-name { width: 46%; }
+.ai-price-tbl .col-name { width: 60%; }
 .ai-price-tbl .col-name-text { white-space: normal; overflow: visible; max-width: none; font-weight: 500; color: var(--ink); line-height: 1.35; overflow-wrap: anywhere; }
 .ai-price-tbl .col-name-sub { font-size: 12px; color: var(--ink-mute); margin-top: 3px; white-space: normal; max-width: none; }
-.ai-price-tbl .col-uom { width: 16%; }
-.ai-price-tbl .col-price { width: 18%; }
-.ai-price-tbl .col-moq { width: 20%; }
+.ai-price-tbl .col-name-sub .ai-existing-hq { color:var(--nomni-green); }
+.ai-price-tbl .col-uom { width: 11%; }
+.ai-price-tbl .col-price { width: 14%; }
+.ai-price-tbl .col-moq { width: 15%; }
 .ai-price-tbl .item-name-cell { vertical-align: top; padding-top: 14px; }
 .ai-price-tbl .uom-label { display: inline-block; font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-.ai-price-tbl .uom-cell { display: flex; align-items: center; gap:8px; }
+.ai-price-tbl .uom-cell { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; }
 .ai-price-tbl input { width: 100%; border: 1px solid #dcdee3; border-radius: 6px; padding: 6px 9px; font: inherit; font-size: 14px; color: var(--ink); background: #fff; }
 .ai-price-tbl input:focus { outline: 2px solid rgba(42,200,100,.18); outline-offset: 0; border-color: var(--nomni-green); }
 .ai-price-tbl .price-wrap { width: 112px; }
 .ai-price-tbl .moq-wrap { display: flex; align-items: center; gap: 8px; }
-.ai-price-tbl .moq-wrap input { width: 104px; flex: 0 0 104px; }
+.ai-price-tbl .moq-wrap input { width:100%; min-width:0; flex:1 1 auto; }
+.ai-price-scroll { flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; }
+.ai-price-scroll::-webkit-scrollbar { display:none; }
+@media (max-width:900px) {
+  .ai-price-tbl .col-name { width:45%; }
+  .ai-price-tbl .col-uom { width:16%; }
+  .ai-price-tbl .col-price { width:20%; }
+  .ai-price-tbl .col-moq { width:19%; }
+}
+.ai-existing-default { display:inline-flex; align-items:center; min-height:32px; font-variant-numeric:tabular-nums; color:var(--ink); }
+.ai-existing-default.is-unset { color:var(--ink-mute); }
+.ai-existing-uom-off { font-size:12px; color:var(--ink-mute); font-style:italic; }
 .access-uom-chip.hq-disabled { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; pointer-events: none; }
 /* Step 3 groups panel */
 .step3-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 0; }
@@ -1544,7 +1571,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <tr>
               <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">Item name <span class="sort-ind"></span></th>
               <th style="width:100px">UOM</th>
-              <th class="sort-th" id="mlSortTh-price" onclick="setMlSort('price')" style="width:140px">Price range <span class="sort-ind"></span></th>
+              <th id="mlSortTh-price" style="width:140px">Price</th>
               <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
             </tr>
@@ -2451,6 +2478,15 @@ GROUP_EXCEPTIONS[29] = [
   { group: 'Chargrill Outlets', uomIdx: 1, price: 9.50, moq: '4 portions' },
   { group: 'Family Dining Express', uomIdx: 0, price: 44.00, moq: '5 kg' }
 ];
+
+// Standalone Create item can optionally capture pricing for its selected groups
+// and ungrouped outlets. Rehydrate those entries when the HQ Items page opens.
+ITEMS.forEach(function(item, itemIdx) {
+  if (!item || !item.createdAt || !Array.isArray(item.scopePricing) || !item.scopePricing.length) return;
+  GROUP_EXCEPTIONS[itemIdx] = item.scopePricing.map(function(entry) {
+    return { group:entry.group, uomIdx:entry.uomIdx, price:entry.price != null ? Number(entry.price) : null, moq:entry.moq != null ? String(entry.moq) : null };
+  });
+});
 
 const TOTAL_GROUPS = 2;
 const CAT_ORDER = ["Poultry","Beef","Pork","Lamb","Seafood","Produce","Dry Goods","Sauces","Dairy & Eggs","Frozen","Beverages","Supplies","Other"];
@@ -5808,8 +5844,19 @@ function getHqInvoiceTargetSummary() {
   if (groups) parts.push(groups + ' group' + (groups === 1 ? '' : 's'));
   if (outlets) parts.push(outlets + ' outlet' + (outlets === 1 ? '' : 's'));
   const target = parts.join(' · ') || 'no targets';
-  return 'Items will be added/updated for <strong>' + target + '</strong>.';
+  return 'Items (incl. pricing) will be added/updated for <button type="button" class="hq-review-scope-link" onclick="openHqInvoiceTargetSummary()">' + target + '</button>.';
 }
+function openHqInvoiceTargetSummary() {
+  const entries = invoiceScopeEntries().filter(function(entry) { return hqInvoiceScopes.has(entry.name); });
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'display:flex;align-items:center;padding:16px;z-index:970';
+  overlay.id = 'hqInvoiceTargetSummaryDialog';
+  overlay.onclick = function(event) { if (event.target === overlay) closeHqInvoiceTargetSummary(); };
+  overlay.innerHTML = '<div class="modal-card" style="width:520px"><div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0;border-bottom:0"><div class="modal-title">Selected groups and outlets</div><button class="modal-close" type="button" onclick="closeHqInvoiceTargetSummary()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="modal-body" style="padding-top:16px;padding-bottom:16px"><div class="hq-target-summary-list">' + entries.map(function(entry) { return '<div class="hq-target-summary-row"><span class="hq-target-summary-name">' + escapeOverviewText(entry.name) + '</span>' + (entry.meta ? '<span class="hq-target-summary-meta">' + escapeOverviewText(entry.meta) + '</span>' : '') + '</div>'; }).join('') + '</div></div><div class="modal-foot"><span></span><button class="btn btn-primary" type="button" onclick="closeHqInvoiceTargetSummary()">Done</button></div></div>';
+  document.body.appendChild(overlay);
+}
+function closeHqInvoiceTargetSummary() { const dialog = document.getElementById('hqInvoiceTargetSummaryDialog'); if (dialog) dialog.remove(); }
 function renderHqInvoiceReview() {
   document.getElementById('hqReviewScopeNote').innerHTML = getHqInvoiceTargetSummary();
   document.getElementById('hqInvoiceLineCount').textContent = hqInvoiceRows.length + ' item' + (hqInvoiceRows.length === 1 ? '' : 's');
@@ -5981,6 +6028,7 @@ Object.keys(PLATFORM_CATALOGUE_ITEMS).forEach(function(supplier, supplierIndex) 
 });
 let aiSel = new Set();
 let aiUomEnabled = {};
+let aiUomTouched = {};
 let aiTargets = new Set();
 function toggleAddItemMenu(e) {
   e.stopPropagation();
@@ -5991,6 +6039,7 @@ function openAddCatalogueModal() {
   showPrototypeHints('item');
   aiSel.clear();
   aiUomEnabled = {};
+  aiUomTouched = {};
   aiTargets.clear();
   document.getElementById('aiSearch').value = '';
   document.getElementById('aiSupFilter').value = '';
@@ -6008,10 +6057,10 @@ function setAiStep(n) {
     const el = document.getElementById(id);
     el.style.display = (i===n) ? 'flex' : 'none';
   });
-  const titles = ['Add items to…', 'Select items', 'Set default price (optional)'];
+  const titles = ['Add items to…', 'Select items', 'Pricing & MOQ'];
   const modal = document.getElementById('addItemModal');
   modal.dataset.aiStep = String(n);
-  modal.querySelector('.picker-card').style.width = n === 0 ? '680px' : '720px';
+  modal.querySelector('.picker-card').style.width = n === 0 ? '680px' : (n === 2 ? '1100px' : '720px');
   document.getElementById('addItemModalTitle').textContent = titles[n];
 }
 function renderAiTargets() {
@@ -6042,6 +6091,34 @@ function findExistingCatalogueItemIndex(name) {
     return String(item.name || '').trim().replace(/\s+/g, ' ').toLowerCase() === key;
   });
 }
+function getExistingCatalogueItem(item) {
+  const idx = findExistingCatalogueItemIndex(item.name);
+  return idx >= 0 ? ITEMS[idx] : null;
+}
+function renderCatalogueUomSummary(uoms) {
+  const visible = uoms.slice(0, 3).map(function(uom) { return '<span class="ai-catalogue-uom">' + escapeOverviewText(uom) + '</span>'; }).join('');
+  const remainder = uoms.length > 3 ? '<span class="ai-catalogue-uom-more" title="' + escapeOverviewText(uoms.slice(3).join(', ')) + '">+' + (uoms.length - 3) + '</span>' : '';
+  return '<span class="ai-catalogue-uoms">' + visible + remainder + '</span>';
+}
+function getAiTargetSummary() {
+  const groups = Array.from(aiTargets).filter(function(name) { return ML_GROUPS.includes(name); }).length;
+  const outlets = aiTargets.size - groups;
+  const parts = [];
+  if (groups) parts.push(groups + ' group' + (groups === 1 ? '' : 's'));
+  if (outlets) parts.push(outlets + ' outlet' + (outlets === 1 ? '' : 's'));
+  return parts.join(' · ') || 'no groups or outlets';
+}
+function openAiTargetSummary() {
+  const entries = invoiceScopeEntries().filter(function(entry) { return aiTargets.has(entry.name); });
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'display:flex;align-items:center;padding:16px;z-index:970';
+  overlay.id = 'aiTargetSummaryDialog';
+  overlay.onclick = function(event) { if (event.target === overlay) closeAiTargetSummary(); };
+  overlay.innerHTML = '<div class="modal-card" style="width:520px"><div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding-bottom:0;border-bottom:0"><div class="modal-title">Selected groups and outlets</div><button class="modal-close" type="button" onclick="closeAiTargetSummary()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="modal-body" style="padding-top:16px;padding-bottom:16px"><div class="hq-target-summary-list">' + entries.map(function(entry) { return '<div class="hq-target-summary-row"><span class="hq-target-summary-name">' + escapeOverviewText(entry.name) + '</span>' + (entry.meta ? '<span class="hq-target-summary-meta">' + escapeOverviewText(entry.meta) + '</span>' : '') + '</div>'; }).join('') + '</div></div><div class="modal-foot"><span></span><button class="btn btn-primary" type="button" onclick="closeAiTargetSummary()">Done</button></div></div>';
+  document.body.appendChild(overlay);
+}
+function closeAiTargetSummary() { const dialog = document.getElementById('aiTargetSummaryDialog'); if (dialog) dialog.remove(); }
 function renderAiList() {
   const q = document.getElementById('aiSearch').value.toLowerCase();
   const sup = document.getElementById('aiSupFilter').value;
@@ -6053,8 +6130,8 @@ function renderAiList() {
   const allFilteredSelected = filtered.length > 0 && filtered.every(i => aiSel.has(i.id));
   document.getElementById('aiList').innerHTML = filtered.length ? '<div class="hq-invoice-list-actions"><label><input type="checkbox" ' + (allFilteredSelected ? 'checked' : '') + ' onchange="toggleAllAiItems()"><span>Select all</span></label></div><div class="hq-invoice-scope-list">' + filtered.map(i => {
     const s = aiSel.has(i.id);
-    const uomBadges = i.uoms.map(function(uom) { return '<span class="ai-catalogue-uom">' + uom + '</span>'; }).join('');
-    return '<label class="hq-invoice-scope' + (s ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(i.id) + '" ' + (s ? 'checked' : '') + ' onchange="toggleAiItem(this.value)"><span><span class="ai-catalogue-name">' + formatCatalogueItemName(i.name) + '</span><span class="ai-catalogue-sub">' + supplierLabel(i.supplier) + uomBadges + '</span></span></label>';
+    const existing = getExistingCatalogueItem(i);
+    return '<label class="hq-invoice-scope' + (s ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(i.id) + '" ' + (s ? 'checked' : '') + ' onchange="toggleAiItem(this.value)"><span class="ai-catalogue-row"><span class="ai-catalogue-copy"><span class="ai-catalogue-name">' + formatCatalogueItemName(i.name) + '</span><span class="ai-catalogue-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span><span>·</span>' : '') + supplierLabel(i.supplier) + '</span></span>' + renderCatalogueUomSummary(i.uoms) + '</span></label>';
   }).join('') + '</div>' : '<div class="picker-empty">No catalogue items found from the linked suppliers</div>';
   const n = aiSel.size;
   document.getElementById('aiSelLabel').innerHTML = n ? '<strong>' + n + '</strong> item' + (n>1?'s':'') + ' selected' : 'No items selected';
@@ -6073,30 +6150,77 @@ function toggleAllAiItems() {
   filtered.forEach(i => allSelected ? aiSel.delete(i.id) : aiSel.add(i.id));
   renderAiList();
 }
+function getAiExistingUomState(itemIdx, uomIdx) {
+  const item = ITEMS[itemIdx];
+  if (Array.isArray(item.uomEnabled) && item.uomEnabled[uomIdx] === false) return false;
+  ensureItemAccessState(itemIdx);
+  const states = Array.from(aiTargets).map(function(target) {
+    const access = itemAccessState[itemIdx][target];
+    return !access || !access.enabled ? true : access.uoms[uomIdx] !== false;
+  });
+  return states.every(Boolean) ? true : (states.every(function(value) { return !value; }) ? false : 'mixed');
+}
+function getAiInitialPriceValue(itemIdx, uomIdx, field) {
+  const item = ITEMS[itemIdx];
+  const values = Array.from(aiTargets).map(function(target) {
+    const override = (GROUP_EXCEPTIONS[itemIdx] || []).find(function(entry) { return entry.group === target && entry.uomIdx === uomIdx; });
+    const value = field === 'price'
+      ? (override && override.price != null ? Number(override.price) : (getDefaultScopePrice(item, uomIdx) || 0))
+      : (override && override.moq != null ? Number(override.moq) : Number(getDefaultScopeMoq(item, uomIdx) || 0));
+    return Number(value || 0);
+  });
+  const shared = values.length && values.every(function(value) { return value === values[0]; }) ? values[0] : 0;
+  return field === 'price' ? shared.toFixed(2) : String(shared);
+}
+function markAiPricingDirty(input) { input.dataset.dirty = 'true'; }
 function showAiStep2() {
-  const items = CAT_ITEMS.filter(i => aiSel.has(i.id));
-  items.forEach(function(item) { if (!Array.isArray(aiUomEnabled[item.id])) aiUomEnabled[item.id] = item.uoms.map(function() { return true; }); });
+  const items = CAT_ITEMS.filter(i => aiSel.has(i.id)).sort(function(a, b) {
+    return formatCatalogueItemName(a.name).localeCompare(formatCatalogueItemName(b.name));
+  });
+  items.forEach(function(item) {
+    const existingIdx = findExistingCatalogueItemIndex(item.name);
+    const existing = existingIdx >= 0 ? ITEMS[existingIdx] : null;
+    const rowUoms = existing ? (Array.isArray(existing.uom) ? existing.uom : [existing.uom]) : item.uoms;
+    if (!Array.isArray(aiUomEnabled[item.id])) aiUomEnabled[item.id] = rowUoms.map(function(uom, ui) { return existing ? getAiExistingUomState(existingIdx, ui) : true; });
+    if (rowUoms.length === 1 && !(existing && Array.isArray(existing.uomEnabled) && existing.uomEnabled[0] === false)) aiUomEnabled[item.id][0] = true;
+  });
   document.getElementById('aiPriceRows').innerHTML = items.map((item) => {
-    return item.uoms.map((u, ui) => {
+    const existingIdx = findExistingCatalogueItemIndex(item.name);
+    const existing = existingIdx >= 0 ? ITEMS[existingIdx] : null;
+    const rowUoms = existing ? (Array.isArray(existing.uom) ? existing.uom : [existing.uom]).map(function(uom) { return String(uom).replace(/^per\s/i, ''); }) : item.uoms;
+    return rowUoms.map((u, ui) => {
       const isFirst = ui === 0;
-      const uomEnabled = aiUomEnabled[item.id][ui] !== false;
-      const uomCell = '<td class="col-uom"><div class="uom-cell"><button type="button" class="access-toggle' + (uomEnabled ? ' on' : '') + '" onclick="toggleAiUom(\'' + item.id + '\',' + ui + ')" title="' + (uomEnabled ? 'Disable this UOM' : 'Enable this UOM') + '"></button><span class="uom-label">' + u + '</span></div></td>';
+      const state = aiUomEnabled[item.id][ui];
+      const hqDisabled = existing && Array.isArray(existing.uomEnabled) && existing.uomEnabled[ui] === false;
+      const isMixed = state === 'mixed';
+      const isOn = state === true;
+      const toggleClass = isOn ? ' on' : (isMixed ? ' mixed' : '');
+      const uomCell = hqDisabled
+        ? '<td class="col-uom"><div class="uom-cell"><span class="uom-label">' + u + '</span><span class="ai-existing-uom-off">Disabled in HQ</span></div></td>'
+        : rowUoms.length === 1
+          ? '<td class="col-uom"><div class="uom-cell"><span class="uom-label">' + u + '</span></div></td>'
+          : '<td class="col-uom"><div class="uom-cell"><span class="uom-label">' + u + '</span><button type="button" class="access-toggle' + toggleClass + '" onclick="toggleAiUom(\'' + item.id + '\',' + ui + ')" title="' + (isMixed ? 'Available to some selected groups or outlets' : (isOn ? 'Disable this UOM for the selected groups or outlets' : 'Enable this UOM for the selected groups or outlets')) + '"></button></div></td>';
+      const priceValue = existing ? getAiInitialPriceValue(existingIdx, ui, 'price') : '0.00';
+      const moqValue = existing ? getAiInitialPriceValue(existingIdx, ui, 'moq') : '0';
+      const inputDisabled = hqDisabled ? ' disabled title="Enable this UOM in HQ before changing its pricing"' : '';
       return '<tr class="' + (isFirst ? 'item-first' : '') + '" id="aiUomRow_' + item.id + '_' + ui + '">' +
-        (isFirst ? '<td class="col-name item-name-cell" rowspan="' + item.uoms.length + '"><div class="col-name-text">' + formatCatalogueItemName(item.name) + '</div><div class="col-name-sub">' + supplierLabel(item.supplier) + '</div></td>' : '') +
+        (isFirst ? '<td class="col-name item-name-cell" rowspan="' + rowUoms.length + '"><div class="col-name-text">' + formatCatalogueItemName(item.name) + '</div><div class="col-name-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span> · ' : '') + supplierLabel(item.supplier) + '</div></td>' : '') +
         uomCell +
-        '<td class="col-price"><div class="price-wrap"><input type="number" value="0" step="0.01" min="0" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="price" aria-label="Unit price for ' + item.name + ' per ' + u + '" /></div></td>' +
-        '<td class="col-moq"><div class="moq-wrap"><input type="number" value="0" step="1" min="0" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="moq" aria-label="Minimum order quantity for ' + item.name + ' in ' + u + '" /></div></td>' +
+        '<td class="col-price"><div class="price-wrap"' + (!isOn ? ' style="visibility:hidden;pointer-events:none"' : '') + '><input type="number" value="' + priceValue + '" step="0.01" min="0" data-dirty="false" oninput="markAiPricingDirty(this)" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="price" aria-label="Unit price for ' + item.name + ' per ' + u + '"' + inputDisabled + ' /></div></td><td class="col-moq"><div class="moq-wrap"' + (!isOn ? ' style="visibility:hidden;pointer-events:none"' : '') + '><input type="number" value="' + moqValue + '" step="1" min="0" data-dirty="false" oninput="markAiPricingDirty(this)" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="moq" aria-label="Minimum order quantity for ' + item.name + ' in ' + u + '"' + inputDisabled + ' /></div></td>' +
       '</tr>';
     }).join('');
   }).join('');
+  document.getElementById('aiPriceHelp').innerHTML = 'Applies to <button type="button" class="hq-review-scope-link" onclick="openAiTargetSummary()">' + getAiTargetSummary() + '</button>. You can update pricing and MOQ later.';
   document.getElementById('aiAddBtn').textContent = 'Add ' + items.length + ' item' + (items.length>1?'s':'');
   setAiStep(2);
 }
 function toggleAiUom(itemId, uomIdx) {
   var enabled = aiUomEnabled[itemId] || [];
-  if (enabled[uomIdx] && enabled.filter(Boolean).length <= 1) return;
-  enabled[uomIdx] = !enabled[uomIdx];
+  if (enabled[uomIdx] === true && enabled.filter(function(value) { return value === true; }).length <= 1) return;
+  enabled[uomIdx] = enabled[uomIdx] === 'mixed' ? true : !enabled[uomIdx];
   aiUomEnabled[itemId] = enabled;
+  aiUomTouched[itemId] = aiUomTouched[itemId] || [];
+  aiUomTouched[itemId][uomIdx] = true;
   showAiStep2();
 }
 function showAiStep1() { setAiStep(1); setTimeout(function() { document.getElementById('aiSearch').focus(); }, 0); }
@@ -6109,15 +6233,19 @@ function confirmAddItems() {
   aiSel.forEach(function(id) {
     var src = CAT_ITEMS.find(function(item) { return item.id === id; });
     if (!src) return;
-    var uoms = src.uoms.map(function(uom) { return 'per ' + uom; });
+    var existingIdx = findExistingCatalogueItemIndex(src.name);
+    var existingItem = existingIdx >= 0 ? ITEMS[existingIdx] : null;
+    var pricingUoms = existingItem ? (Array.isArray(existingItem.uom) ? existingItem.uom : [existingItem.uom]).map(function(uom) { return String(uom).replace(/^per\s/i, ''); }) : src.uoms;
+    var uoms = pricingUoms.map(function(uom) { return 'per ' + uom; });
     var enabled = aiUomEnabled[src.id] || src.uoms.map(function() { return true; });
-    var pricing = src.uoms.map(function(uom, ui) {
+    var pricing = pricingUoms.map(function(uom, ui) {
       var priceInput = document.querySelector('#aiPriceRows input[data-item-id="' + id + '"][data-uom-index="' + ui + '"][data-field="price"]');
       var moqInput = document.querySelector('#aiPriceRows input[data-item-id="' + id + '"][data-uom-index="' + ui + '"][data-field="moq"]');
-      return { uom:uom, price:priceInput ? Number(priceInput.value || 0) : 0, moq:moqInput ? Number(moqInput.value || 0) : 0 };
+      const uomWritable = existingItem ? true : enabled[ui] === true;
+      const priceChanged = uomWritable && !!(priceInput && priceInput.dataset.dirty === 'true');
+      const moqChanged = uomWritable && !!(moqInput && moqInput.dataset.dirty === 'true');
+      return { uom:uom, priceChanged:priceChanged, moqChanged:moqChanged, price:priceChanged ? (Number(priceInput.value) || null) : null, moq:moqChanged ? (Number(moqInput.value) > 0 ? String(moqInput.value) : null) : null };
     });
-    var first = pricing[0] || {price:0,moq:0};
-    var existingIdx = findExistingCatalogueItemIndex(src.name);
     if (existingIdx >= 0) {
       const existing = ITEMS[existingIdx];
       const existingUoms = Array.isArray(existing.uom) ? existing.uom : [existing.uom];
@@ -6128,12 +6256,16 @@ function confirmAddItems() {
         if (!access) return;
         if (!access.enabled && !Array.isArray(savedScopeUoms)) {
           access.uoms = existingUoms.map(function(uom, uomIdx) {
-            const sourceUomIdx = src.uoms.indexOf(String(uom).replace(/^per\s/i, ''));
-            return existing.uomEnabled[uomIdx] !== false && (sourceUomIdx < 0 || enabled[sourceUomIdx] !== false);
+            return !Array.isArray(existing.uomEnabled) || existing.uomEnabled[uomIdx] !== false;
           });
         }
         access.enabled = true;
+        existingUoms.forEach(function(uom, uomIdx) {
+          const isSingleEnabledUom = existingUoms.length === 1 && (!Array.isArray(existing.uomEnabled) || existing.uomEnabled[uomIdx] !== false);
+          if (isSingleEnabledUom || (aiUomTouched[src.id] && aiUomTouched[src.id][uomIdx])) access.uoms[uomIdx] = enabled[uomIdx] === true && (!Array.isArray(existing.uomEnabled) || existing.uomEnabled[uomIdx] !== false);
+        });
       });
+      applyCatalogueTargetPricing(existingIdx, pricing, groupList.concat(outletList));
       saveItemAccessState(existingIdx);
       updatedCount += 1;
       return;
@@ -6141,17 +6273,18 @@ function confirmAddItems() {
     var scopeUoms = {};
     groupList.concat(outletList).forEach(function(scope) {
       scopeUoms[scope] = uoms.filter(function(uom, uomIdx) {
-        return enabled[uomIdx] !== false;
+        return enabled[uomIdx] === true;
       }).map(function(uom) {
         return String(uom).replace(/^per\s/i, '');
       });
     });
     ITEMS.push({
-      name:src.name, cat:src.cat, supplier:src.supplier, price:first.price, uom:uoms,
-      defaultPricing:pricing.map(function(row) { return {price:row.price > 0 ? row.price : null, moq:row.moq > 0 ? row.moq : null}; }),
-      moq:first.moq > 0 ? String(first.moq) : '', active:true, lifecycle:'active', groupList:groupList.slice(), outletList:outletList.slice(),
-      uomEnabled:enabled.slice(), scopeUoms:scopeUoms, excludedScopes:[], createdAt:new Date().toISOString()
+      name:src.name, cat:src.cat, supplier:src.supplier, price:null, uom:uoms,
+      defaultPricing:pricing.map(function() { return {price:null, moq:null}; }),
+      moq:'', active:true, lifecycle:'active', groupList:groupList.slice(), outletList:outletList.slice(),
+      uomEnabled:enabled.map(function() { return true; }), scopeUoms:scopeUoms, excludedScopes:[], createdAt:new Date().toISOString()
     });
+    applyCatalogueTargetPricing(ITEMS.length - 1, pricing, groupList.concat(outletList));
   });
   renderMl();
   if (window.isNewHQ) {
@@ -6164,6 +6297,21 @@ function confirmAddItems() {
   const addedCount = n - updatedCount;
   const message = updatedCount ? (addedCount ? addedCount + ' added, ' + updatedCount + ' updated' : updatedCount + ' item' + (updatedCount > 1 ? 's' : '') + ' updated') : n + ' item' + (n>1?'s':'') + ' added';
   showHqToast(message + ' in market list');
+}
+function applyCatalogueTargetPricing(itemIdx, pricing, targets) {
+  const entries = GROUP_EXCEPTIONS[itemIdx] || (GROUP_EXCEPTIONS[itemIdx] = []);
+  pricing.forEach(function(row, uomIdx) {
+    if (!row.priceChanged && !row.moqChanged) return;
+    targets.forEach(function(target) {
+      const existing = entries.find(function(entry) { return entry.group === target && entry.uomIdx === uomIdx; });
+      if (existing) {
+        if (row.priceChanged) existing.price = row.price;
+        if (row.moqChanged) existing.moq = row.moq;
+      } else {
+        entries.push({ group:target, uomIdx:uomIdx, price:row.priceChanged ? row.price : null, moq:row.moqChanged ? row.moq : null });
+      }
+    });
+  });
 }
 
 // ── Flow 2a: Add SKU to Inventory ──
@@ -7229,14 +7377,14 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
         <button class="btn btn-tertiary" onclick="showAiTargets()">Back</button>
         <div style="display:flex;align-items:center;gap:14px"><div class="picker-sel-label" id="aiSelLabel">No items selected</div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-primary" id="aiNextBtn" onclick="showAiStep2()" disabled>Set defaults</button>
+          <button class="btn btn-primary" id="aiNextBtn" onclick="showAiStep2()" disabled>Set prices</button>
         </div></div>
       </div>
     </div>
-    <!-- Step 3: Set default price -->
+    <!-- Step 3: Set prices for selected groups and outlets -->
     <div id="aiPanel2" style="display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden">
-      <p class="ai-step-helper">Leave as $0.00 and 0 to set this later.</p>
-      <div style="flex:1;overflow-y:auto;min-height:0">
+      <p class="ai-step-helper" id="aiPriceHelp">Applies to selected groups and outlets. You can update pricing and MOQ later.</p>
+      <div class="ai-price-scroll">
         <table class="ai-price-tbl">
           <thead>
             <tr>
