@@ -419,14 +419,17 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .supplier-availability-copy { margin:0; color:var(--ink-mute); font-size:14px; line-height:1.5; }
 .supplier-availability-list { display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--rule); border-radius:8px; background:#fff; }
 .supplier-availability-actions { display:flex; align-items:center; min-height:44px; padding:0 14px; border-bottom:1px solid var(--rule); background:#F9FAFB; }
-.supplier-availability-actions label,.supplier-availability-target { display:flex; align-items:center; gap:12px; color:var(--ink); font:inherit; font-size:14px; cursor:pointer; }
-.supplier-availability-actions label { font-weight:600; }
+.supplier-availability-actions label,.supplier-availability-target { display:flex; align-items:center; gap:12px; color:var(--ink); font:inherit; font-size:14px; }
+.supplier-availability-actions label { font-weight:600; cursor:pointer; }
 .supplier-availability-actions input,.supplier-availability-target input { width:18px; height:18px; margin:0; accent-color:var(--spinach); flex-shrink:0; }
-.supplier-availability-target { min-height:62px; padding:11px 14px; border-top:1px solid var(--rule); transition:background-color .13s ease; }
+.supplier-availability-target { min-height:62px; padding:11px 14px; border-top:1px solid var(--rule); cursor:pointer; transition:background-color .13s ease; }
 .supplier-availability-target:hover { background:#F7FFF9; }
 .supplier-availability-target.is-selected { background:#F2FFF5; }
+.supplier-availability-target.is-locked { cursor:default; }
+.supplier-availability-target.is-locked:hover { background:#fff; }
 .supplier-availability-target-name { display:block; font-weight:500; }
 .supplier-availability-target-meta { display:block; margin-top:2px; color:var(--ink-mute); font-size:12px; }
+.supplier-availability-target-status { display:block; margin-top:3px; color:var(--spinach); font-size:11px; font-weight:400; }
 #supplierSettingsOverlay .supplier-settings-shell { width:100%; height:auto; margin:0; padding-bottom:0; }
 #supplierSettingsOverlay .supplier-settings-layout { display:grid; grid-template-columns:220px minmax(0,1fr); gap:42px; align-items:stretch; height:auto; min-height:100%; }
 #supplierSettingsOverlay .supplier-scope-nav { position:sticky; top:0; align-self:start; height:calc(100vh - 220px); min-height:0; max-height:calc(100vh - 220px); box-sizing:border-box; padding:22px 20px 0 0; border-right:1px solid var(--rule); display:flex; flex-direction:column; }
@@ -1963,7 +1966,7 @@ function showPrototypeHints(type) {
   if (!hints) return;
   var content = {
     outlet: '<div class="prototype-hints-title">Outlet search hints</div><div class="prototype-hints-row"><strong>Urban Bites</strong> → matching outlets.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
-    supplier: '<div class="prototype-hints-title">Supplier search hints</div><div class="prototype-hints-row"><strong>Wilmar</strong> → active supplier, ready for an Admin user to add.</div><div class="prototype-hints-row"><strong>Golden Harvest</strong> → use UEN <strong>201813940C</strong>.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
+    supplier: '<div class="prototype-hints-title">Supplier search hints</div><div class="prototype-hints-row"><strong>Wilmar</strong>, <strong>Rich</strong> or <strong>Tee Yih</strong> → matching suppliers.</div><div class="prototype-hints-row"><strong>Olam</strong>, <strong>Sim Lim</strong> or <strong>Dairy Farm</strong> → more matching suppliers.</div><div class="prototype-hints-row"><strong>Golden Harvest</strong> → use UEN <strong>201813940C</strong>.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
     item: '<div class="prototype-hints-title">Item search hints</div><div class="prototype-hints-row"><strong>Chicken</strong> → matching items.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results.</div>',
     user: '<div class="prototype-hints-title">User search hints</div><div class="prototype-hints-row"><strong>James</strong> → matching Procure account.</div><div class="prototype-hints-row"><strong>zzz</strong> → no results and Create new user.</div>'
   };
@@ -2558,8 +2561,11 @@ function availabilityLabel(groups, outlets, totalGroups, totalOutlets) {
   const groupCount = groups.length;
   const outletCount = outlets.length;
   if (!groupCount && !outletCount) return 'Not available';
-  if (totalOutlets && groupCount === totalGroups && outletCount === totalOutlets) return 'All outlets';
-  if (groupCount === totalGroups && !outletCount) return 'All groups';
+  const allGroupsLinked = totalGroups > 0 && groupCount === totalGroups;
+  const allOutletsLinked = totalOutlets > 0 && outletCount === totalOutlets;
+  const hasGroups = totalGroups > 0;
+  const hasOutlets = totalOutlets > 0;
+  if ((hasGroups || hasOutlets) && (!hasGroups || allGroupsLinked) && (!hasOutlets || allOutletsLinked)) return hasGroups && hasOutlets ? 'All groups & outlets' : (hasGroups ? 'All groups' : 'All outlets');
   const parts = [];
   if (groupCount) parts.push(groupCount === 1 ? '1 group' : groupCount + ' groups');
   if (outletCount) parts.push(outletCount === 1 ? '1 outlet' : outletCount + ' outlets');
@@ -3691,6 +3697,8 @@ const REC_CAT_ORDER = ['Mains','Starters','Sides','Sauces & Marinades','Desserts
 const REC_GROUPS = ['Chargrill Outlets', 'Family Dining Express'];
 // Only ungrouped outlets can be assigned availability directly. Grouped outlets inherit their group's setting.
 const REC_OUTLETS = ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'];
+// Suppliers use the same ungrouped outlet set in both add-flow access and Manage availability.
+const SUPPLIER_UNGROUPED_OUTLETS = REC_OUTLETS;
 const REC_DATES = ['10 Jun 2026','05 Jun 2026','28 May 2026','20 May 2026','15 May 2026','01 May 2026','24 Apr 2026','10 Apr 2026','01 Apr 2026','15 Mar 2026','10 Mar 2026','28 Feb 2026','15 Feb 2026','01 Feb 2026','20 Jan 2026','10 Jan 2026','05 Jan 2026','20 Dec 2025','10 Dec 2025','01 Dec 2025','15 Nov 2025','01 Nov 2025','15 Oct 2025','01 Oct 2025','15 Sep 2025'];
 const REC_FC_TARGETS = { 'Mains': 0.35, 'Starters': 0.32, 'Sides': 0.26, 'Sauces & Marinades': 0.25, 'Desserts': 0.28, 'Beverages': 0.14 };
 RECIPES.forEach((r, i) => {
@@ -4272,6 +4280,17 @@ function loadHqSupplierState() {
     else SUPPLIERS.push(entry);
   });
 }
+function normaliseSupplierAvailability() {
+  let changed = false;
+  SUPPLIERS.forEach(function(supplier) {
+    const groups = Array.from(new Set((supplier.groupList || []).filter(function(name) { return ML_GROUPS.includes(name); })));
+    const outlets = Array.from(new Set((supplier.outletList || []).filter(function(name) { return SUPPLIER_UNGROUPED_OUTLETS.includes(name); })));
+    if (groups.length !== (supplier.groupList || []).length || outlets.length !== (supplier.outletList || []).length || groups.some(function(name, index) { return name !== supplier.groupList[index]; }) || outlets.some(function(name, index) { return name !== supplier.outletList[index]; })) changed = true;
+    supplier.groupList = groups;
+    supplier.outletList = outlets;
+  });
+  return changed;
+}
 function saveHqSupplierState() {
   localStorage.setItem(HQ_SUPPLIER_STATE_KEY, JSON.stringify(SUPPLIERS));
 }
@@ -4287,6 +4306,7 @@ function migrateSupplierTypesToPassiveMajority() {
   localStorage.setItem(HQ_SUPPLIER_TYPE_MIGRATION_KEY, '1');
 }
 loadHqSupplierState();
+if (normaliseSupplierAvailability()) saveHqSupplierState();
 migrateSupplierTypesToPassiveMajority();
 document.getElementById('supCount').textContent = SUPPLIERS.length;
 
@@ -4354,7 +4374,7 @@ function confirmSupReactivate(alsoItems) {
 function openSupplierAvailability(name) {
   const supplier = SUPPLIERS.find(function(item) { return item.name === name; });
   if (!supplier) return;
-  openAvailabilityManager({ record: supplier, groups: ML_GROUPS, outlets: REC_OUTLETS, save: saveHqSupplierState, render: renderSuppliers, toast: 'Supplier availability updated' });
+  openAvailabilityManager({ record: supplier, groups: ML_GROUPS, outlets: SUPPLIER_UNGROUPED_OUTLETS, save: saveHqSupplierState, render: renderSuppliers, toast: 'Supplier availability updated' });
 }
 
 function renderSuppliers() {
@@ -4368,7 +4388,7 @@ function renderSuppliers() {
     return;
   }
   document.getElementById('supBody').innerHTML = rows.map(s => {
-    const accessLabel = availabilityLabel(s.groupList, s.outletList, ML_GROUPS.length, ALL_OUTLETS.length);
+    const accessLabel = availabilityLabel(s.groupList, s.outletList, ML_GROUPS.length, SUPPLIER_UNGROUPED_OUTLETS.length);
     const contactLines = [];
     if (s.contact && s.contact !== '—') contactLines.push('<div style="color:var(--ink)">' + s.contact + '</div>');
     if (s.phone && s.phone !== '—') contactLines.push('<div style="color:var(--ink-mute);margin-top:' + (contactLines.length ? '2px' : '0') + '">' + s.phone + '</div>');
@@ -4506,7 +4526,10 @@ function openAvailabilityManager(config) {
   document.getElementById('recGroupsDialogHeader').style.borderBottom = '0';
   document.getElementById('recGroupsCount').textContent = config.record.name;
   const badge = function(count) { return '<span class="count">' + count + '</span>'; };
-  const row = function(scope, meta) { return '<label style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);cursor:pointer"><span><span style="display:block;font-size:14px;font-weight:600;color:var(--ink)">' + escapeOverviewText(scope) + '</span>' + (meta ? '<span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + meta + '</span>' : '') + '</span><input type="checkbox" data-rec-scope value="' + escapeOverviewText(scope) + '"' + (selected.has(scope) ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:var(--spinach);cursor:pointer" /></label>'; };
+  const row = function(scope, meta) {
+    const alreadyAvailable = !!config.addOnly && selected.has(scope);
+    return '<label style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);cursor:' + (alreadyAvailable ? 'default' : 'pointer') + '"><span><span style="display:block;font-size:14px;font-weight:600;color:var(--ink)">' + escapeOverviewText(scope) + '</span>' + (meta ? '<span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + meta + '</span>' : '') + (alreadyAvailable ? '<span style="display:block;font-size:11px;color:var(--spinach);font-weight:700;margin-top:3px">Already available</span>' : '') + '</span><input type="checkbox" data-rec-scope value="' + escapeOverviewText(scope) + '"' + (selected.has(scope) ? ' checked' : '') + (alreadyAvailable ? ' disabled' : '') + ' style="width:18px;height:18px;accent-color:var(--spinach);cursor:' + (alreadyAvailable ? 'not-allowed' : 'pointer') + '" /></label>';
+  };
   const groupRows = config.groups.map(function(scope) { return row(scope, availabilityGroupCount(scope) + ' outlets'); }).join('');
   const outletRows = config.outlets.map(function(scope) { return row(scope, ''); }).join('');
   document.getElementById('recGroupsList').innerHTML =
@@ -4517,13 +4540,23 @@ function openAvailabilityManager(config) {
   updateAvailabilityChangeWarning();
   document.getElementById('recGroupsFoot').style.display = 'flex';
   document.getElementById('recGroupsCancel').style.display = '';
+  document.getElementById('recGroupsCancel').textContent = config.cancelLabel || 'Cancel';
   document.getElementById('recGroupsManage').style.display = 'none';
   document.getElementById('recGroupsSave').style.display = '';
+  document.getElementById('recGroupsSave').textContent = config.saveLabel || 'Save';
   document.getElementById('recGroupsOverlay').style.display = 'flex';
 }
 function updateAvailabilityChangeWarning() {
   if (!managedAvailability) return;
   const selected = new Set(Array.from(document.querySelectorAll('[data-rec-scope]:checked')).map(function(input) { return input.value; }));
+  const added = Array.from(selected).filter(function(scope) { return !managedAvailability.initialSelected.has(scope); });
+  if (managedAvailability.addOnly) {
+    document.getElementById('recGroupsSave').disabled = added.length === 0;
+    const addWarning = document.getElementById('availabilityChangeWarning');
+    if (addWarning) addWarning.style.display = 'none';
+    return;
+  }
+  document.getElementById('recGroupsSave').disabled = false;
   const removed = Array.from(managedAvailability.initialSelected).filter(function(scope) { return !selected.has(scope); });
   const groupBadge = document.querySelector('[data-availability-tab="groups"] span');
   const outletBadge = document.querySelector('[data-availability-tab="outlets"] span');
@@ -4559,6 +4592,7 @@ function saveRecAvailability() {
   if (!managedAvailability) return;
   const config = managedAvailability;
   const selected = Array.from(document.querySelectorAll('[data-rec-scope]:checked')).map(function(input) { return input.value; });
+  if (config.addOnly && !selected.some(function(scope) { return !config.initialSelected.has(scope); })) return;
   const groupKey = config.record.groupList ? 'groupList' : 'groups';
   const outletKey = config.record.outletList ? 'outletList' : 'outlets';
   config.record[groupKey] = selected.filter(function(scope) { return config.groups.includes(scope); });
@@ -4568,6 +4602,7 @@ function saveRecAvailability() {
   closeRecGroupsDialog();
   config.render();
   showHqToast(config.toast, config.record.name);
+  if (typeof config.afterComplete === 'function') config.afterComplete(config.record);
   managedAvailability = null;
 }
 
@@ -4788,11 +4823,15 @@ function renderLinkSupList() {
   if (supplierSearchMode === 'registration') { renderAcraSupplierList(q); return; }
 
   var ql = q.toLowerCase();
-  var linkedNames = new Set(SUPPLIERS.map(function(s){ return s.name.toLowerCase(); }));
-  var results = PLATFORM_SUPPLIERS.filter(function(s) {
-    if (linkedNames.has(s.name.toLowerCase())) return false;
+  var platformResults = PLATFORM_SUPPLIERS.filter(function(s) {
     return s.name.toLowerCase().includes(ql) || supplierLabel(s.name).toLowerCase().includes(ql);
   });
+  var existingOnlyResults = SUPPLIERS.filter(function(s) {
+    var matches = s.name.toLowerCase().includes(ql) || supplierLabel(s.name).toLowerCase().includes(ql);
+    var alreadyInPlatform = PLATFORM_SUPPLIERS.some(function(item) { return item.name.toLowerCase() === s.name.toLowerCase(); });
+    return matches && !alreadyInPlatform;
+  });
+  var results = platformResults.concat(existingOnlyResults).sort(function(a, b) { return supplierLabel(a.name).localeCompare(supplierLabel(b.name)); });
 
   if (!results.length) {
     listEl.innerHTML =
@@ -4810,12 +4849,13 @@ function renderLinkSupList() {
   }
 
   listEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:14px;color:var(--ink-mute)"><span>' + results.length + ' matching supplier' + (results.length === 1 ? '' : 's') + '</span><span>Not listed? <button onclick="startExpandedSupplierSearch()" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;cursor:pointer;padding:0">Search by UEN or ABN</button> or <button onclick="openNewSupplierModal(\'' + escapeOverviewText(q).replace(/&#39;/g, "\\'") + '\')" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;cursor:pointer;padding:0">create manually</button></span></div>' + results.map(function(s) {
+    var linked = SUPPLIERS.some(function(item) { return item.name.toLowerCase() === s.name.toLowerCase(); });
     return '<div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--rule)">' +
       '<div style="flex:1;min-width:0">' +
         '<div style="font-weight:500;font-size:14px;color:var(--ink)">' + supplierLabel(s.name) + '</div>' +
-        '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + s.reg + '</div>' +
+        '<div style="font-size:12px;color:' + (linked ? 'var(--spinach)' : 'var(--ink-mute)') + ';margin-top:2px">' + (linked ? 'Already added to this HQ' : s.reg) + '</div>' +
       '</div>' +
-      '<div style="display:flex;align-items:center;flex-shrink:0"><button class="btn btn-primary" style="min-height:36px;padding:0 12px" onclick="addSupplierToHq(\'' + s.name.replace(/'/g,"\\'") + '\')">Add supplier</button></div>' +
+      '<div style="display:flex;align-items:center;flex-shrink:0"><button class="btn btn-primary" style="min-height:36px;padding:0 12px" onclick="addSupplierToHq(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (linked ? 'Add to more locations' : 'Add supplier') + '</button></div>' +
     '</div>';
   }).join('');
 }
@@ -4824,9 +4864,8 @@ function renderLinkSupList() {
 function renderAcraSupplierList(q) {
   var listEl = document.getElementById('linkSupList');
   var ql = q.toLowerCase();
-  var linkedRegs = new Set(SUPPLIERS.map(function(s){ return (s.reg || '').toLowerCase(); }));
   var results = EXTERNAL_REGISTRY_SUPPLIERS.filter(function(s) {
-    return s.reg.toLowerCase().includes(ql) && !linkedRegs.has(s.reg.toLowerCase());
+    return s.reg.toLowerCase().includes(ql);
   });
 
   var backLink = '<button type="button" onclick="backToZeemartSupplierSearch()" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:0;white-space:nowrap">Back to searching within Zeemart</button>';
@@ -4849,12 +4888,13 @@ function renderAcraSupplierList(q) {
       '<div style="margin-top:6px;font-size:13px;font-weight:700;color:var(--ink-mute)">' + results.length + ' result' + (results.length === 1 ? '' : 's') + '</div>' +
     '</div>' +
     results.map(function(s) {
+      var linked = SUPPLIERS.some(function(item) { return (item.reg || '').toLowerCase() === s.reg.toLowerCase(); });
       return '<div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--rule)">' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-weight:600;font-size:14px;color:var(--ink)">' + s.name + '</div>' +
-          '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + s.reg + ' · ' + s.address + '</div>' +
+          '<div style="font-size:12px;color:' + (linked ? 'var(--spinach)' : 'var(--ink-mute)') + ';margin-top:2px">' + (linked ? 'Already added to this HQ' : s.reg + ' · ' + s.address) + '</div>' +
         '</div>' +
-        '<div style="flex-shrink:0"><button class="btn btn-primary" style="min-height:36px;padding:0 12px" onclick="addExternalRegistrySupplier(\'' + s.reg.replace(/'/g,"\\'") + '\')">Add to My Supplier</button></div>' +
+        '<div style="flex-shrink:0"><button class="btn btn-primary" style="min-height:36px;padding:0 12px" onclick="addExternalRegistrySupplier(\'' + s.reg.replace(/'/g,"\\'") + '\')">' + (linked ? 'Add to more locations' : 'Add to My Supplier') + '</button></div>' +
       '</div>';
     }).join('');
 }
@@ -4872,19 +4912,22 @@ function backToZeemartSupplierSearch() {
 }
 
 function addSupplierToHq(name) {
-  var supplier = PLATFORM_SUPPLIERS.find(function(item) { return item.name === name; });
-  if (supplier) openSupplierAvailability(Object.assign({}, supplier), { isNew:false, source:'search' });
+  var existing = SUPPLIERS.find(function(item) { return item.name === name; });
+  var supplier = existing || PLATFORM_SUPPLIERS.find(function(item) { return item.name === name; });
+  if (supplier) openNewSupplierAvailability(existing || Object.assign({}, supplier), { isNew:false, existing:!!existing });
 }
 
 function addExternalRegistrySupplier(reg) {
   var entry = EXTERNAL_REGISTRY_SUPPLIERS.find(function(item) { return item.reg === reg; });
   if (!entry) return;
+  var existing = SUPPLIERS.find(function(item) { return (item.reg || '') === reg; });
+  if (existing) { openNewSupplierAvailability(existing, { isNew:false, existing:true }); return; }
   var supplier = {
     name: entry.name, reg: entry.reg, contact: '—', phone: '—', address: entry.address,
     address2: '', postalCode: '', alias: '',
     active: true, type: 'active', itemCount: 0, groupList: [], outletList: []
   };
-  openSupplierAvailability(supplier, { isNew:true, viaAcra:true, source:'search' });
+  openNewSupplierAvailability(supplier, { isNew:true, viaAcra:true });
 }
 function openActiveSupplierInfo() { document.getElementById('activeSupplierInfoOverlay').classList.add('open'); }
 function closeActiveSupplierInfo() { document.getElementById('activeSupplierInfoOverlay').classList.remove('open'); }
@@ -4907,17 +4950,21 @@ function confirmNewSupplier() {
     alias:document.getElementById('newSupplierAlias').value.trim(),
     active:true, type:'active', itemCount:0, groupList:[], outletList:[]
   };
-  openSupplierAvailability(supplier, { isNew:true, source:'manual' });
+  openNewSupplierAvailability(supplier, { isNew:true });
 }
 
 var pendingSupplierAvailability = null;
 var pendingSupplierAvailabilityTargets = new Set();
+var pendingSupplierAvailabilityInitial = new Set();
 
-function openSupplierAvailability(supplier, options) {
-  pendingSupplierAvailability = { supplier:supplier, options:options || {} };
-  pendingSupplierAvailabilityTargets = new Set((supplier.groupList || []).concat(supplier.outletList || []));
+function openNewSupplierAvailability(supplier, options) {
   closeLinkSupModal();
   closeNewSupplierModal();
+  supplier.groupList = supplier.groupList || [];
+  supplier.outletList = supplier.outletList || [];
+  pendingSupplierAvailability = { supplier:supplier, options:options || {} };
+  pendingSupplierAvailabilityInitial = new Set(supplier.groupList.concat(supplier.outletList));
+  pendingSupplierAvailabilityTargets = new Set(pendingSupplierAvailabilityInitial);
   document.getElementById('supplierAvailabilityName').textContent = supplierLabel(supplier.name);
   renderSupplierAvailabilityTargets();
   document.getElementById('supplierAvailabilityOverlay').classList.add('open');
@@ -4926,49 +4973,59 @@ function closeSupplierAvailability() {
   document.getElementById('supplierAvailabilityOverlay').classList.remove('open');
   pendingSupplierAvailability = null;
   pendingSupplierAvailabilityTargets = new Set();
+  pendingSupplierAvailabilityInitial = new Set();
 }
 function backToSupplierSearch() {
   var pending = pendingSupplierAvailability;
   document.getElementById('supplierAvailabilityOverlay').classList.remove('open');
   pendingSupplierAvailability = null;
   pendingSupplierAvailabilityTargets = new Set();
-  if (pending && pending.options && pending.options.source === 'manual') {
-    document.getElementById('newSupplierOverlay').classList.add('open');
-  } else {
-    document.getElementById('linkSupOverlay').classList.add('open');
-  }
+  pendingSupplierAvailabilityInitial = new Set();
+  if (pending && pending.options && pending.options.isNew && !pending.options.viaAcra) document.getElementById('newSupplierOverlay').classList.add('open');
+  else document.getElementById('linkSupOverlay').classList.add('open');
+}
+function supplierAvailabilityEntries(supplier) {
+  var groups = ML_GROUPS.slice();
+  var outlets = SUPPLIER_UNGROUPED_OUTLETS.slice();
+  return groups.map(function(name) { return { name:name, type:'group', meta:availabilityGroupCount(name) + ' outlets' }; }).concat(outlets.map(function(name) { return { name:name, type:'outlet', meta:'' }; }));
 }
 function renderSupplierAvailabilityTargets() {
   if (!pendingSupplierAvailability) return;
-  var targets = invoiceScopeEntries();
-  var allSelected = targets.length > 0 && targets.every(function(target) { return pendingSupplierAvailabilityTargets.has(target.name); });
+  var existing = !!pendingSupplierAvailability.options.existing;
+  var targets = supplierAvailabilityEntries(pendingSupplierAvailability.supplier);
+  var allNewSelected = targets.filter(function(target) { return !pendingSupplierAvailabilityInitial.has(target.name); }).every(function(target) { return pendingSupplierAvailabilityTargets.has(target.name); });
   var rows = targets.map(function(target) {
-      var selected = pendingSupplierAvailabilityTargets.has(target.name);
-      return '<label class="supplier-availability-target' + (selected ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(target.name) + '" ' + (selected ? 'checked' : '') + ' onchange="toggleSupplierAvailabilityTarget(this.value,this.checked)" /><span><span class="supplier-availability-target-name">' + escapeOverviewText(target.name) + '</span>' + (target.meta ? '<span class="supplier-availability-target-meta">' + escapeOverviewText(target.meta) + '</span>' : '') + '</span></label>';
+    var selected = pendingSupplierAvailabilityTargets.has(target.name);
+    var locked = existing && pendingSupplierAvailabilityInitial.has(target.name);
+    return '<label class="supplier-availability-target' + (selected ? ' is-selected' : '') + (locked ? ' is-locked' : '') + '"><input type="checkbox" value="' + escapeOverviewText(target.name) + '" ' + (selected ? 'checked' : '') + (locked ? ' disabled' : '') + ' onchange="toggleSupplierAvailabilityTarget(this.value,this.checked)" /><span><span class="supplier-availability-target-name">' + escapeOverviewText(target.name) + '</span>' + (target.meta ? '<span class="supplier-availability-target-meta">' + escapeOverviewText(target.meta) + '</span>' : '') + (locked ? '<span class="supplier-availability-target-status">Already available</span>' : '') + '</span></label>';
   }).join('');
-  document.getElementById('supplierAvailabilityList').innerHTML =
-    '<div class="supplier-availability-actions"><label><input type="checkbox" ' + (allSelected ? 'checked' : '') + ' onchange="toggleAllSupplierAvailabilityTargets()" /><span>Select all</span></label></div>' +
-    rows;
-  var count = pendingSupplierAvailabilityTargets.size;
-  document.getElementById('supplierAvailabilityCount').innerHTML = count ? '<strong>' + count + '</strong> selected' : 'No groups or outlets selected';
-  document.getElementById('supplierAvailabilityAdd').disabled = count === 0;
+  var selectable = targets.filter(function(target) { return !pendingSupplierAvailabilityInitial.has(target.name); });
+  document.getElementById('supplierAvailabilityList').innerHTML = '<div class="supplier-availability-actions"><label><input type="checkbox" ' + (selectable.length && allNewSelected ? 'checked' : '') + ' onchange="toggleAllSupplierAvailabilityTargets()" /><span>Select all</span></label></div>' + rows;
+  var selectedCount = pendingSupplierAvailabilityTargets.size;
+  var addedCount = Array.from(pendingSupplierAvailabilityTargets).filter(function(target) { return !pendingSupplierAvailabilityInitial.has(target); }).length;
+  document.getElementById('supplierAvailabilityCount').innerHTML = selectedCount ? '<strong>' + selectedCount + '</strong> selected' : 'No groups or outlets selected';
+  document.getElementById('supplierAvailabilityAdd').textContent = existing ? 'Add selected locations' : 'Add supplier';
+  document.getElementById('supplierAvailabilityAdd').disabled = existing ? addedCount === 0 : selectedCount === 0;
 }
 function toggleSupplierAvailabilityTarget(name, checked) {
   if (checked) pendingSupplierAvailabilityTargets.add(name); else pendingSupplierAvailabilityTargets.delete(name);
   renderSupplierAvailabilityTargets();
 }
 function toggleAllSupplierAvailabilityTargets() {
-  var targets = invoiceScopeEntries().map(function(target) { return target.name; });
-  var allSelected = targets.length > 0 && targets.every(function(name) { return pendingSupplierAvailabilityTargets.has(name); });
-  pendingSupplierAvailabilityTargets = allSelected ? new Set() : new Set(targets);
+  var selectable = supplierAvailabilityEntries(pendingSupplierAvailability.supplier).filter(function(target) { return !pendingSupplierAvailabilityInitial.has(target.name); }).map(function(target) { return target.name; });
+  var allSelected = selectable.length && selectable.every(function(name) { return pendingSupplierAvailabilityTargets.has(name); });
+  selectable.forEach(function(name) { if (allSelected) pendingSupplierAvailabilityTargets.delete(name); else pendingSupplierAvailabilityTargets.add(name); });
   renderSupplierAvailabilityTargets();
 }
 function confirmSupplierAvailability() {
-  if (!pendingSupplierAvailability || !pendingSupplierAvailabilityTargets.size) return;
+  if (!pendingSupplierAvailability) return;
   var pending = pendingSupplierAvailability;
   var supplier = pending.supplier;
-  supplier.groupList = ML_GROUPS.filter(function(name) { return pendingSupplierAvailabilityTargets.has(name); });
-  supplier.outletList = ML_UNGROUPED_OUTLETS.filter(function(name) { return pendingSupplierAvailabilityTargets.has(name); });
+  var added = Array.from(pendingSupplierAvailabilityTargets).filter(function(target) { return !pendingSupplierAvailabilityInitial.has(target); });
+  if (!pendingSupplierAvailabilityTargets.size || (pending.options.existing && !added.length)) return;
+  var targets = supplierAvailabilityEntries(supplier);
+  supplier.groupList = targets.filter(function(target) { return target.type === 'group' && pendingSupplierAvailabilityTargets.has(target.name); }).map(function(target) { return target.name; });
+  supplier.outletList = targets.filter(function(target) { return target.type === 'outlet' && pendingSupplierAvailabilityTargets.has(target.name); }).map(function(target) { return target.name; });
   supplier.active = supplier.active !== false;
   supplier.type = supplier.type || 'passive';
   supplier.itemCount = supplier.itemCount || 0;
@@ -4977,14 +5034,12 @@ function confirmSupplierAvailability() {
   document.getElementById('supCount').textContent = SUPPLIERS.length;
   renderSuppliers();
   if (window.isNewHQ) { refreshNewHqSupplierEmptyState(); refreshNewHqEmptyStates(); renderNewHqSummary(getSavedOutletGroup()); }
-  addPrototypeActivity('market-list', '<strong>' + escapeOverviewText(supplier.name) + '</strong> added to this HQ', 'suppliers', 'Master');
+  addPrototypeActivity('market-list', '<strong>' + escapeOverviewText(supplier.name) + '</strong> ' + (pending.options.existing ? 'made available to more locations' : 'added to this HQ'), 'suppliers', 'Master');
   saveHqSupplierState();
   savePrototypeState();
-  var groupCount = supplier.groupList.length;
-  var outletCount = supplier.outletList.length;
-  var summary = (groupCount ? groupCount + ' group' + (groupCount === 1 ? '' : 's') : '') + (groupCount && outletCount ? ' and ' : '') + (outletCount ? outletCount + ' outlet' + (outletCount === 1 ? '' : 's') : '');
   closeSupplierAvailability();
-  showHqToast('Supplier added', supplierLabel(supplier.name) + ' is available to ' + summary + '.');
+  openSupplierSettings(supplier, false, !!pending.options.existing);
+  showHqToast(pending.options.existing ? 'Supplier availability updated' : 'Supplier added', supplierLabel(supplier.name));
 }
 
 var pendingSupplierLink = null;
@@ -5039,8 +5094,8 @@ function readSupplierSettingsForm() {
 }
 function setSupplierSettingsForm(settings, supplier) {
   settings = settings || {};
-  var recipientEmail = settings.recipientEmail || (supplier.contact && supplier.contact !== '—' ? supplier.contact : '');
-  var whatsapp = settings.whatsapp || (supplier.phone && supplier.phone !== '—' ? supplier.phone : '');
+  var recipientEmail = settings.recipientEmail || '';
+  var whatsapp = settings.whatsapp || '';
   document.getElementById('supplierRecipientEmail').value = recipientEmail;
   document.getElementById('supplierWhatsapp').value = whatsapp;
   document.getElementById('supplierNoEmail').checked = settings.noEmail || !recipientEmail;
@@ -5236,7 +5291,6 @@ function deleteSupplierOverride() {
 function openSupplierSettings(supplier, isNew, isEditing) {
   pendingSupplierLink = { supplier:supplier, isNew:!!isNew, isEditing:!!isEditing };
   closeLinkSupModal(); closeNewSupplierModal();
-  document.getElementById('supplierStepsBar').hidden = !!isEditing;
   document.getElementById('supplierSettingsPageTitle').textContent = "Supplier's settings: " + supplierLabel(supplier.name);
   document.getElementById('supplierSettingsForm').reset();
   document.getElementById('supplierSmsField').hidden = true;
@@ -5346,8 +5400,6 @@ function saveSupplierSettings(afterSave) {
   var savedSettings = readSupplierSettingsForm();
   supplierScopeDrafts[savedScope] = savedSettings;
   if (savedScope === 'hq') {
-    supplier.contact = email.value.trim() || '—';
-    supplier.phone = whatsapp.value.trim() || '—';
     supplier.hqSettings = savedSettings;
   } else {
     supplier.scopeSettings = supplier.scopeSettings || {};
@@ -5421,14 +5473,7 @@ function groupSkuScope(record) {
 
 function groupSkuScopeLabel(record) {
   var scope = groupSkuScope(record);
-  var groupCount = scope.groups.length;
-  var outletCount = scope.outlets.length;
-  if (!scope.partial && groupCount === INV_GROUPS.length && outletCount === 0) return 'All groups';
-  if (!groupCount && !outletCount) return 'Not available';
-  var parts = [];
-  if (groupCount) parts.push(groupCount + ' group' + (groupCount === 1 ? '' : 's'));
-  if (outletCount) parts.push(outletCount + ' outlet' + (outletCount === 1 ? '' : 's'));
-  return parts.join(' · ');
+  return availabilityLabel(scope.groups, scope.outlets, INV_GROUPS.length, REC_OUTLETS.length);
 }
 
 function renderInv() {
@@ -7759,7 +7804,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
 <!-- ── Add supplier page ── -->
 <div class="modal-overlay" id="linkSupOverlay">
   <div class="modal-card">
-    <div class="modal-header"><div><button class="supplier-back" type="button" onclick="closeLinkSupModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Suppliers</button><h2 class="modal-title" id="linkSupPageTitle">Add supplier</h2></div></div>
+    <div class="modal-header"><h2 class="modal-title" id="linkSupPageTitle">Add supplier</h2><button class="modal-close" type="button" onclick="closeLinkSupModal()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
     <div class="modal-body">
       <form class="link-sup-search-row" onsubmit="event.preventDefault();performLinkSupSearch();">
         <div class="ml-search-wrap">
@@ -7773,7 +7818,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
   </div>
 </div>
 
-<!-- ── Supplier availability ── -->
+<!-- ── Supplier availability during add flow ── -->
 <div class="modal-overlay" id="supplierAvailabilityOverlay" onclick="if(event.target===this)closeSupplierAvailability()">
   <div class="modal-card supplier-availability-card">
     <div class="modal-header"><div><h2 class="modal-title">Available to…</h2></div><button class="modal-close" type="button" onclick="closeSupplierAvailability()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
@@ -7896,7 +7941,6 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
 <div class="modal-overlay" id="supplierSettingsOverlay">
   <div class="modal-card" style="width:760px">
     <div class="modal-header"><div><button class="supplier-back" type="button" onclick="backFromSupplierSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Suppliers</button><h2 class="modal-title" id="supplierSettingsPageTitle">Supplier's settings</h2></div></div>
-    <div class="hq-steps" id="supplierStepsBar"><div class="hq-step"><span class="hq-step-number">1</span><span>Search supplier</span></div><div class="hq-step"><span class="hq-step-number">2</span><span>Choose access</span></div><div class="hq-step is-active"><span class="hq-step-number">3</span><span>Set order policies</span></div></div>
     <form id="supplierSettingsForm" class="modal-body" onsubmit="event.preventDefault();saveSupplierSettings()"><div class="supplier-settings-shell"><div class="supplier-settings-layout">
       <aside class="supplier-scope-nav"><button type="button" class="supplier-scope-nav-item is-active" data-supplier-scope="hq" onclick="selectSupplierSettingsScope('hq')">HQ contact<small>Order notifications</small></button><div class="supplier-scope-nav-label">Group policies</div><div class="supplier-scope-nav-overrides" id="supplierScopeNavPolicies"></div><div class="supplier-scope-nav-label">Outlet exceptions</div><div class="supplier-scope-nav-overrides" id="supplierScopeNavOverrides"></div><button type="button" class="btn btn-primary supplier-scope-nav-add" onclick="openSupplierOverridePicker()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add policy or exception</button></aside>
       <div class="supplier-settings-content"><div class="supplier-editing-note"><span>Editing <strong id="supplierEditingScope">the HQ contact details only</strong></span><button type="button" class="supplier-override-delete" id="supplierOverrideDelete" hidden onclick="openDeleteSupplierOverrideConfirm()">Remove policy</button></div>
