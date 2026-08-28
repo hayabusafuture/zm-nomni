@@ -325,6 +325,31 @@
 }
 #panel-outlet-groups .og-hq-rows thead th { background: #fff; }
 
+/* Create HQ is intentionally a compact, single-field dialogue. */
+.hq-create-dialog { position:fixed; inset:0; z-index:900; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(10,20,15,.46); }
+.hq-create-dialog.open { display:flex; }
+.hq-create-dialog .modal-card { width:460px; max-width:100%; background:#fff; border-radius:12px; box-shadow:0 24px 64px rgba(0,0,0,.22); overflow:hidden; }
+.hq-create-dialog .modal-header { display:flex; justify-content:space-between; gap:12px; border-bottom:0; padding:20px 24px 0; align-items:center; }
+.hq-create-dialog .modal-title { margin:0; color:var(--ink); font-size:21px; font-weight:700; letter-spacing:-.02em; }
+.hq-create-dialog .modal-description { margin:5px 0 0; color:var(--ink-mute); font-size:14px; line-height:1.4; }
+.hq-create-dialog .modal-close { display:flex; align-items:center; padding:4px; border:0; border-radius:4px; background:transparent; color:var(--ink-mute); cursor:pointer; }
+.hq-create-dialog .modal-close:hover { color:var(--ink); }
+.hq-create-dialog .modal-body { padding:18px 24px 20px; }
+.hq-create-dialog .modal-field { display:flex; flex-direction:column; gap:6px; }
+.hq-create-dialog .modal-field label { color:var(--ink); font-size:14px; font-weight:500; margin-bottom:0; }
+.hq-create-dialog .modal-field-input { width:100%; padding:9px 12px; border:1px solid #DCDEE3; border-radius:6px; color:var(--ink); font:inherit; font-size:14px; outline:none; }
+.hq-create-dialog .modal-field-input:focus { border-color:var(--nomni-green); }
+.hq-create-dialog .modal-foot { display:flex; align-items:center; gap:10px; border-top:1px solid var(--rule); padding:14px 24px 18px; justify-content:flex-end; }
+.hq-create-dialog .btn { display:inline-flex; align-items:center; min-height:40px; padding:0 16px; border:1px solid transparent; border-radius:6px; color:var(--seaweed); font-family:inherit; font-size:14px; font-weight:600; line-height:1; cursor:pointer; transition:background-color .18s ease,color .18s ease,border-color .18s ease,transform .16s ease; }
+.hq-create-dialog .btn-primary { background:var(--nomni-green); border-color:var(--nomni-green); }
+.hq-create-dialog .btn-primary:hover { background:var(--seaweed); border-color:var(--seaweed); color:var(--nomni-green); }
+.hq-create-dialog .btn-secondary { background:var(--mint); border-color:var(--mint); }
+.hq-create-dialog .btn-secondary:hover { background:#C6F2CE; border-color:#C6F2CE; }
+.hq-create-dialog .btn:active { transform:scale(.96); }
+.hq-create-error { display: none; margin: 0; color: #D0291E; font-size: 12px; line-height: 1.4; }
+.hq-create-error.visible { display: block; }
+.og-hq-empty { color: var(--ink-mute); font-size: 13px; }
+
 </style>
 </head>
 <body>
@@ -421,7 +446,7 @@
           <div class="add-option">New Outlet</div>
           <div class="add-option">New Company</div>
           <div class="add-option">New Cluster</div>
-          <div class="add-option" onclick="window.location.href='Admin - Create HQ.html'">New HQ</div>
+          <div class="add-option" onclick="openCreateHQDialog()">New HQ</div>
           <div class="add-option" onclick="window.location.href='Admin - Create Outlet Group.html'">New Outlet Group</div>
         </div>
       </div>
@@ -1120,6 +1145,29 @@
   </main>
 </div>
 
+<!-- Create HQ -->
+<div class="modal-overlay hq-create-dialog" id="createHQDialog" onclick="if(event.target===this)closeCreateHQDialog()" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="createHQDialogTitle">
+    <div class="modal-header">
+      <div><h2 class="modal-title" id="createHQDialogTitle">Create HQ</h2><p class="modal-description">Manage shared setup across your outlets</p></div>
+      <button class="modal-close" type="button" onclick="closeCreateHQDialog()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label for="createHQName">HQ name</label>
+        <input id="createHQName" class="modal-field-input" type="text" placeholder="e.g. Garden Cuisine HQ" autocomplete="off" />
+        <p class="hq-create-error" id="createHQError" role="alert"></p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" type="button" onclick="closeCreateHQDialog()">Cancel</button>
+      <button class="btn btn-primary" type="button" onclick="saveCreatedHQ()">Create HQ</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // User menu
   document.getElementById('userMenuBtn').addEventListener('click', function(e) {
@@ -1154,6 +1202,118 @@
     e.stopPropagation();
     document.getElementById('addDropdown').classList.toggle('open');
   });
+
+  var CREATED_HQS_KEY = 'nomniCreatedHQs';
+  var HQ_DETAILS_KEY = 'nomniHqDetails';
+
+  function escapeBuyerText(value) {
+    return String(value == null ? '' : value).replace(/[&<>'"]/g, function(char) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char];
+    });
+  }
+
+  function getCreatedHQs() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(CREATED_HQS_KEY) || '[]');
+      return Array.isArray(saved) ? saved.filter(function(hq) { return hq && hq.name; }) : [];
+    } catch (e) { return []; }
+  }
+
+  function getSavedHqDetails() {
+    try { return JSON.parse(localStorage.getItem(HQ_DETAILS_KEY) || 'null'); } catch (e) { return null; }
+  }
+
+  function activateBuyersTab(tabName) {
+    var tab = document.querySelector('.tab[data-tab="' + tabName + '"]');
+    if (tab) tab.click();
+  }
+
+  function applySavedHqDetails() {
+    var saved = getSavedHqDetails();
+    if (!saved || !saved.name) return;
+    var original = document.querySelector('#panel-outlet-groups .og-hq-name[data-hq-key="garden-cuisine"]');
+    if (!original) {
+      document.querySelectorAll('#panel-outlet-groups .og-hq-name').forEach(function(name) {
+        if (name.textContent.trim() === 'Garden Cuisine HQ') {
+          name.dataset.hqKey = 'garden-cuisine';
+          original = name;
+        }
+      });
+    }
+    if (original) original.textContent = saved.name;
+  }
+
+  function buildCreatedHQBlock(hq) {
+    var block = document.createElement('div');
+    block.className = 'og-hq-block';
+    block.dataset.createdHq = hq.name;
+    block.innerHTML =
+      '<div class="og-hq-header" onclick="toggleHQ(this)">' +
+        '<svg class="og-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>' +
+        '<span class="og-hq-name"><a href="Admin - HQ Settings.html?created-hq=' + encodeURIComponent(hq.name) + '" onclick="event.stopPropagation()">' + escapeBuyerText(hq.name) + '</a></span>' +
+        '<span class="og-hq-badge">0</span>' +
+      '</div>' +
+      '<div class="og-hq-rows"><table><tbody><tr><td class="og-hq-empty">No outlet groups or outlets yet.</td><td><span class="date-empty">—</span></td></tr></tbody></table></div>';
+    return block;
+  }
+
+  function renderCreatedHQs() {
+    var panel = document.getElementById('panel-outlet-groups');
+    panel.querySelectorAll('[data-created-hq]').forEach(function(block) { block.remove(); });
+    var anchor = panel.querySelector('.table-wrap');
+    var insertionPoint = anchor;
+    getCreatedHQs().forEach(function(hq) {
+      var block = buildCreatedHQBlock(hq);
+      insertionPoint.insertAdjacentElement('afterend', block);
+      insertionPoint = block;
+    });
+  }
+
+  function openCreateHQDialog() {
+    document.getElementById('addDropdown').classList.remove('open');
+    var dialog = document.getElementById('createHQDialog');
+    var input = document.getElementById('createHQName');
+    document.getElementById('createHQError').classList.remove('visible');
+    dialog.classList.add('open');
+    dialog.setAttribute('aria-hidden', 'false');
+    input.value = '';
+    window.setTimeout(function() { input.focus(); }, 0);
+  }
+
+  function closeCreateHQDialog() {
+    var dialog = document.getElementById('createHQDialog');
+    dialog.classList.remove('open');
+    dialog.setAttribute('aria-hidden', 'true');
+  }
+
+  function saveCreatedHQ() {
+    var input = document.getElementById('createHQName');
+    var error = document.getElementById('createHQError');
+    var name = input.value.trim();
+    var existingNames = Array.from(document.querySelectorAll('#panel-outlet-groups .og-hq-name')).map(function(el) {
+      return el.textContent.trim().toLowerCase();
+    });
+    if (!name) {
+      error.textContent = 'Enter an HQ name.';
+      error.classList.add('visible');
+      input.focus();
+      return;
+    }
+    if (existingNames.indexOf(name.toLowerCase()) !== -1) {
+      error.textContent = 'An HQ with this name already exists.';
+      error.classList.add('visible');
+      input.focus();
+      return;
+    }
+    var hqs = getCreatedHQs();
+    hqs.unshift({ name: name, createdAt: new Date().toISOString() });
+    localStorage.setItem(CREATED_HQS_KEY, JSON.stringify(hqs));
+    renderCreatedHQs();
+    ogCurrentPage = 1;
+    renderOGPager();
+    closeCreateHQDialog();
+    activateBuyersTab('outlet-groups');
+  }
 
   // Outlet group search + pagination
   var OG_PAGE_SIZE = 20;
@@ -1224,7 +1384,10 @@
   function renderOGPager() { applyOGFilter(); }
   function ogSetPage(page) { ogCurrentPage = page; applyOGFilter(); }
 
+  applySavedHqDetails();
+  renderCreatedHQs();
   renderOGPager();
+  if (new URLSearchParams(window.location.search).get('create-hq') === '1') openCreateHQDialog();
 
   // Outlet group HQ accordion
   function toggleHQ(header) {
@@ -1237,9 +1400,8 @@
     chevron.classList.toggle('is-open', !isOpen);
   }
 
-  var HQ_LINKS = {
-    'Garden Cuisine HQ': 'Admin - HQ Settings.html'
-  };
+  var HQ_LINKS = {};
+  HQ_LINKS[(getSavedHqDetails() || {name:'Garden Cuisine HQ'}).name] = 'Admin - HQ Settings.html';
 
   document.querySelectorAll('#panel-outlet-groups .og-hq-header').forEach(function(header) {
     var nameSpan = header.querySelector('.og-hq-name');

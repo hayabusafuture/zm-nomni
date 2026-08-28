@@ -23,6 +23,8 @@ The effective priority is **Removed → Excluded → Disabled → Active**. Excl
 
 The HQ page is the operating view for a buyer's head office. It has a header with the HQ name, last-updated date, **Users** and **Edit details** actions, a summary strip, and seven tabs: Overview, Suppliers, Items, Inventory, Recipes, POS mapping and Activity.
 
+On **Buyers → HQ & Outlet groups**, **Add new → New HQ** opens a compact dialogue with only an HQ-name field. Saving adds the HQ to that list with no outlet groups or outlets yet. New HQs and edits to the prototype HQ name are stored locally until **Reset prototype** is used from the HQ page.
+
 ### Last updated timestamps
 
 - **HQ:** the timestamp reflects the most recent material change to HQ-owned configuration, including HQ details, the master market list, HQ suppliers, inventory or recipes, HQ availability rules, managed-outlet membership, POS integration settings or user/access settings.
@@ -33,7 +35,7 @@ The HQ page is the operating view for a buyer's head office. It has a header wit
 ### Header and summary
 
 - **Users** opens the HQ user list, where existing Procure users can be added, users can be disabled or enabled, and access can be removed.
-- **Edit details** opens the HQ editing screen. An HQ is identified by its HQ name; company is not collected or shown.
+- **Edit details** opens a focused dialogue containing only the HQ name. An HQ is identified by its HQ name; company is not collected or shown.
 - The summary strip shows the total outlets, items, recipes and suppliers associated with the HQ.
 
 ## Overview
@@ -79,8 +81,8 @@ These actions change membership and inheritance; they do not remove the HQ maste
 Suppliers are managed at HQ level and then made available to the relevant outlet groups or outlets.
 
 - The list shows suppliers, available contact methods, supplier type and availability. **Active** always refers to the supplier type; a temporarily unavailable record is described as **Disabled**.
-- **Add supplier** opens a two-step search and supplier-settings flow.
-- Supplier search supports normal Procure suppliers, Active suppliers that require a Live Chat request, UEN/ABN lookup, and manual creation when no match exists.
+- **Add supplier** uses two focused dialogs: **Find supplier**, then **Available to...**. There is no stepper. The availability dialog selects outlet groups first, then ungrouped outlets; grouped outlets inherit their group’s access.
+- Supplier search supports normal Procure suppliers, Active suppliers that require a Live Chat request, UEN/ABN lookup, and manual creation when no match exists. Every successful route continues to the same **Available to...** dialog before the supplier is added to the HQ.
 - Each linked supplier has configurable notification contacts, minimum order rules, delivery days and cut-off times, including **Apply to all** for delivery settings.
 - Email and WhatsApp are individually optional, but at least one contact method is required.
 - The prototype seed data treats Active suppliers as exceptional (one of fourteen); Passive suppliers are the usual path and permit HQ-managed item pricing and MOQ.
