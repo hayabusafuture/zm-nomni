@@ -1757,7 +1757,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <tr>
               <th>Item</th>
               <th style="width:70px">UOM</th>
-              <th style="width:110px">Unit cost</th>
               <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
             </tr>
@@ -5505,10 +5504,6 @@ function renderInv() {
 
     var detail = r.detail || '';
 
-    var costCell = r.cost !== null
-      ? '<td style="' + td + 'font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</td>'
-      : '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">varies</td>';
-
     var groupScope = r.type === 'group' ? groupSkuScope(r) : null;
     var availableGroups = groupScope ? groupScope.groups : (r.groups || []);
     var availableOutlets = groupScope ? groupScope.outlets : (r.outlets || []);
@@ -5521,7 +5516,6 @@ function renderInv() {
     var uomCell = hasUomVariations
       ? '<button class="ml-options-link' + (invUomExpanded.has(globalIdx) ? ' is-open' : '') + '" onclick="toggleInvUoms(' + globalIdx + ',event)">' + r.inventoryUoms.length + ' options<span class="ml-options-chevron"></span></button>'
       : r.uom;
-    var parentCostCell = hasUomVariations ? '<td style="' + td + '"></td>' : costCell;
     var parentGrpHtml = hasUomVariations ? '' : grpHtml;
 
     rows.push('<tr' + inactiveClass + '>' +
@@ -5538,7 +5532,6 @@ function renderInv() {
         '</div></div>' +
       '</td>' +
       '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + uomCell + '</td>' +
-      parentCostCell +
       '<td style="' + td + 'text-align:left">' + parentGrpHtml + '</td>' +
       '<td style="' + td + 'text-align:center">' +
         '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
@@ -5561,7 +5554,6 @@ function renderInv() {
             '<div style="font-size:12px;color:var(--ink-mute)">' + supplierLabel(c.supplier) + '</div>' +
           '</td>' +
           '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + r.uom + '</td>' +
-          '<td style="' + td + 'font-size: 14px;font-weight:600;color:var(--ink)">$' + c.cost.toFixed(2) + '</td>' +
           '<td style="' + td + '"><button onclick="event.stopPropagation();openGroupSkuConstituentAvailability(' + globalIdx + ',' + constituentIndex + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + cLabel + '</button></td><td style="' + td + '"></td>' +
         '</tr>');
       });
@@ -5569,9 +5561,6 @@ function renderInv() {
 
     if (hasUomVariations && invUomExpanded.has(globalIdx)) {
       r.inventoryUoms.forEach(function(entry) {
-        var entryCost = entry.cost !== undefined ? entry.cost : r.cost;
-        var entryCostHtml = entryCost !== null ? '$' + entryCost.toFixed(2) : 'varies';
-        var entryCostStyle = entryCost !== null ? 'font-size:14px;font-weight:600;color:var(--ink)' : 'font-size:14px;color:var(--ink-mute)';
         var entryGroups = entry.groups || [];
         var entryOutlets = entry.outlets || [];
         var entryLabel = availabilityLabel(entryGroups, entryOutlets, INV_GROUPS.length, REC_OUTLETS.length);
@@ -5579,7 +5568,6 @@ function renderInv() {
         rows.push('<tr class="inv-uom-row">' +
           '<td style="' + td + 'padding-left:48px"><span style="font-size:14px;color:var(--ink)">' + r.name + '</span></td>' +
           '<td style="' + td + 'font-size:14px;color:var(--ink)">' + entry.uom + '</td>' +
-          '<td style="' + td + entryCostStyle + '">' + entryCostHtml + '</td>' +
           '<td style="' + td + '">' + entryAccess + '</td><td style="' + td + '"></td>' +
         '</tr>');
       });
