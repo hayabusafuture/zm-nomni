@@ -268,6 +268,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 tr.ml-inactive { opacity: 1; }
 tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .ml-item-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+.ml-item-original { display:block; margin-top:2px; color:var(--ink-mute); font-size:12px; font-style:italic; font-weight:400; line-height:1.35; }
+.item-dialog-original { display:block; margin-top:4px; color:var(--ink); font-size:14px; font-weight:400; line-height:1.4; letter-spacing:normal; }
 .ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #f0f1f3; border-radius: 4px; padding: 1px 7px; margin-top: 3px; }
 .uom-text { font-size: 14px; color: var(--ink); }
 .uom-options-btn { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: inherit; transition: background .12s; margin-top: 2px; }
@@ -310,6 +312,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .pilot-scope-edit .material-symbols-outlined { font-size:18px; }
 .pilot-uom-conversion-edit { width:20px; height:20px; }
 .pilot-uom-conversion-edit .material-symbols-outlined { font-size:16px; }
+.pilot-uom-custom-badge { display:inline-flex; align-items:center; margin-left:6px; padding:2px 5px; border-radius:4px; background:var(--mint); color:var(--seaweed); font-size:10px; font-weight:700; letter-spacing:.04em; line-height:1.2; vertical-align:2px; }
 .pilot-scope-editor { display:grid; grid-template-columns:1fr 1fr auto auto; gap:8px; align-items:end; padding:4px 0; }
 .pilot-scope-editor-hint { grid-column:1 / -1; font-size:12px; color:var(--ink-mute); line-height:1.35; }
 .pilot-scope-editor .modal-field-input { min-width:0; height:36px; box-sizing:border-box; padding:7px 9px; }
@@ -361,6 +364,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .confirm-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 1000; display: none; align-items: center; justify-content: center; }
 .confirm-overlay.open { display: flex; }
 .confirm-card { background: #fff; border-radius: 10px; width: 420px; max-width: calc(100vw - 32px); padding: 24px; box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+#supDisableOverlay .confirm-card { width:500px; }
 .confirm-title { font-size:21px; font-weight:700; letter-spacing:-.02em; margin: 0 0 10px; }
 .confirm-body { font-size: 14px; color: var(--ink-2); line-height: 1.5; margin-bottom: 22px; }
 .confirm-body strong { color: var(--ink); font-weight: 600; }
@@ -2722,6 +2726,20 @@ function itemDisplayName(item) {
   return item.customName || item.name;
 }
 
+function escapeItemDisplayText(value) {
+  return String(value || '').replace(/[&<>"']/g, function(character) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character];
+  });
+}
+
+function itemDisplayNameHtml(item, context) {
+  if (context !== 'dialog') return escapeItemDisplayText(itemDisplayName(item));
+  var displayName = escapeItemDisplayText(itemDisplayName(item));
+  if (!item.customName) return displayName;
+  var originalName = escapeItemDisplayText(item.name);
+  return displayName + '<span class="' + (context === 'dialog' ? 'item-dialog-original' : 'ml-item-original') + '">' + originalName + '</span>';
+}
+
 function setMlSort(key) {
   mlSortKey = mlSortKey === key + '-asc' ? key + '-desc' : key + '-asc';
   ['name','price'].forEach(k => {
@@ -2749,7 +2767,7 @@ function getMlItems() {
   else if (mlSortKey === 'price-desc') items.sort((a,b) => getItemPriceRange(ITEMS.indexOf(b), 0).min - getItemPriceRange(ITEMS.indexOf(a), 0).min);
   else items.sort((a,b) => {
     const ci = CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat);
-    return ci !== 0 ? ci : a.name.localeCompare(b.name);
+    return ci !== 0 ? ci : itemDisplayName(a).localeCompare(itemDisplayName(b));
   });
   return items;
 }
@@ -2869,7 +2887,7 @@ function openHqItemModal(idx, initialTab) {
   const item = ITEMS[idx];
   const modal = document.getElementById('hqItemModal');
   modal.dataset.itemIdx = idx;
-  document.getElementById('hqItemModalTitle').textContent = itemDisplayName(item);
+  document.getElementById('hqItemModalTitle').innerHTML = itemDisplayNameHtml(item, 'dialog');
   document.getElementById('hqItemModalSupplier').textContent = supplierLabel(item.supplier);
   document.getElementById('hqItemCustomName').value = item.customName || '';
   const itemTabBar = document.querySelector('#hqItemModal .modal-tab-bar');
@@ -2944,13 +2962,17 @@ function renderPilotDetailsUoms(itemIdx, container) {
       const fallbackRate = (UOM_MULT[uom] || 1) / (UOM_MULT[uoms[0]] || 1);
       const rate = savedConversion ? savedConversion.rate : fallbackRate;
       const isDraftConversion = pilotDraftUomConversions.has(itemIdx + ':' + uomIdx);
-      const conversion = uomIdx === 0 ? '' : '<div style="display:flex;align-items:center;gap:6px;margin-top:0"><span style="padding-top:2px;font-size:12px;color:var(--ink-mute)">' + (savedConversion && savedConversion.flipped ? '1 ' + baseUom + ' = ' + rate + ' ' + unit : '1 ' + unit + ' = ' + rate + ' ' + baseUom) + '</span>' + (isDraftConversion ? '<button class="pilot-scope-edit pilot-uom-conversion-edit" type="button" onclick="editPilotUomConversion(' + itemIdx + ',' + uomIdx + ')" aria-label="Edit conversion for ' + unit + '" title="Edit conversion"><span class="material-symbols-outlined">edit</span></button>' : '') + '</div>';
-      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px' + (uomIdx ? ';border-top:1px solid var(--rule)' : '') + '"><div style="min-width:0;opacity:' + (enabled ? '1' : '.45') + '"><span style="display:block;font-size:14px;font-weight:600;color:var(--ink)">' + uomLabel + '</span>' + conversion + '</div><button class="access-toggle' + (enabled ? ' on' : '') + '" type="button" onclick="togglePilotUomEnabled(' + itemIdx + ',' + uomIdx + ')" title="' + (enabled ? 'Disable this UOM' : 'Enable this UOM') + '"></button></div>';
+      const isCustomUom = !!(savedConversion && savedConversion.custom);
+      const conversion = uomIdx === 0 ? '' : '<div style="display:flex;align-items:center;gap:6px;margin-top:0"><span style="padding-top:2px;font-size:12px;color:var(--ink-mute)">' + (savedConversion && savedConversion.flipped ? '1 ' + baseUom + ' = ' + rate + ' ' + unit : '1 ' + unit + ' = ' + rate + ' ' + baseUom) + '</span>' + ((isDraftConversion || isCustomUom) ? '<button class="pilot-scope-edit pilot-uom-conversion-edit" type="button" onclick="editPilotUomConversion(' + itemIdx + ',' + uomIdx + ')" aria-label="Edit conversion for ' + unit + '" title="Edit conversion"><span class="material-symbols-outlined">edit</span></button>' : '') + '</div>';
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px' + (uomIdx ? ';border-top:1px solid var(--rule)' : '') + '"><div style="min-width:0;opacity:' + (enabled ? '1' : '.45') + '"><span style="display:block;font-size:14px;font-weight:600;color:var(--ink)">' + uomLabel + (isCustomUom ? '<span class="pilot-uom-custom-badge">CUSTOM</span>' : '') + '</span>' + conversion + '</div><button class="access-toggle' + (enabled ? ' on' : '') + '" type="button" onclick="togglePilotUomEnabled(' + itemIdx + ',' + uomIdx + ')" title="' + (enabled ? 'Disable this UOM' : 'Enable this UOM') + '"></button></div>';
     }).join('') +
   '</div><button class="pilot-uom-add" type="button" onclick="openPilotAddUomDialog(' + itemIdx + ')"><span class="material-symbols-outlined">add</span> Add UOM</button><p style="margin:8px 0 0;font-size:12px;color:var(--ink-mute)">Turn off a UOM to disable it for every group and outlet. At least one UOM must remain enabled.</p></div>';
 }
 
-function editPilotUomConversion(itemIdx, uomIdx) { if (pilotDraftUomConversions.has(itemIdx + ':' + uomIdx)) openPilotAddUomDialog(itemIdx, uomIdx); }
+function editPilotUomConversion(itemIdx, uomIdx) {
+  const conversion = ITEMS[itemIdx] && ITEMS[itemIdx].uomConversions && ITEMS[itemIdx].uomConversions[uomIdx];
+  if (pilotDraftUomConversions.has(itemIdx + ':' + uomIdx) || (conversion && conversion.custom)) openPilotAddUomDialog(itemIdx, uomIdx);
+}
 
 let pilotAddUomState = null;
 function openPilotAddUomDialog(itemIdx, editUomIdx) {
@@ -2991,7 +3013,7 @@ function savePilotAddedUom() {
   if (!unit || !Number.isFinite(rate) || rate <= 0) { alert('Enter a conversion rate greater than zero.'); return; }
   if (Number.isInteger(pilotAddUomState.editUomIdx)) {
     item.uomConversions = Array.isArray(item.uomConversions) ? item.uomConversions : [];
-    item.uomConversions[pilotAddUomState.editUomIdx] = { rate:rate, flipped:pilotAddUomState.flipped };
+    item.uomConversions[pilotAddUomState.editUomIdx] = { rate:rate, flipped:pilotAddUomState.flipped, custom:!!(item.uomConversions[pilotAddUomState.editUomIdx] && item.uomConversions[pilotAddUomState.editUomIdx].custom) };
     closePilotAddUomDialog();
     renderPilotDetailsUoms(itemIdx, document.getElementById('hqItemPriceSection'));
     return;
@@ -3005,7 +3027,7 @@ function savePilotAddedUom() {
   item.defaultPricing = Array.isArray(item.defaultPricing) ? item.defaultPricing : [];
   item.defaultPricing.push({ price:null, moq:null });
   item.uomConversions = Array.isArray(item.uomConversions) ? item.uomConversions : [];
-  item.uomConversions[uoms.length - 1] = { rate:rate, flipped:pilotAddUomState.flipped };
+  item.uomConversions[uoms.length - 1] = { rate:rate, flipped:pilotAddUomState.flipped, custom:true };
   pilotDraftUomConversions.add(itemIdx + ':' + (uoms.length - 1));
   ensureItemAccessState(itemIdx);
   Object.keys(itemAccessState[itemIdx]).forEach(function(scope) { itemAccessState[itemIdx][scope].uoms.push(!!itemAccessState[itemIdx][scope].enabled); });
@@ -3581,7 +3603,7 @@ function renderMl() {
       const onlyUom = enabledUoms[0] || { uom: uoms[0], ui: 0 };
       const uom = onlyUom.uom.replace(/^per /i, '');
       return '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-        '<td><div class="ml-item-name">' + itemDisplayName(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
+        '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
         '<td class="uom-text">' + uom + '</td>' +
         '<td>' + formatItemPriceRange(rawIdx, onlyUom.ui) + '</td>' +
         '<td>' + getAccessInfo(onlyUom.ui).html + '</td>' + actionsTd +
@@ -3589,7 +3611,7 @@ function renderMl() {
     }
 
     const parent = '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-      '<td><div class="ml-item-name">' + itemDisplayName(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
+      '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
       '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
       '<td></td>' +
       '<td></td>' + actionsTd +
@@ -3598,7 +3620,7 @@ function renderMl() {
     const children = isExpanded ? enabledUoms.map(({ uom, ui }) => {
       const unit = uom.replace(/^per /i, '');
       return '<tr class="ml-uom-row' + (lifecycle === 'active' ? '' : ' ml-inactive') + '">' +
-        '<td class="ml-uom-indent">' + itemDisplayName(item) + '</td>' +
+        '<td class="ml-uom-indent">' + itemDisplayNameHtml(item) + '</td>' +
         '<td class="uom-text">' + unit + '</td>' +
         '<td>' + formatItemPriceRange(rawIdx, ui) + '</td>' +
         '<td>' + getAccessInfo(ui).html + '</td><td></td>' +
@@ -4315,6 +4337,10 @@ let pendingSupReactivateName = null;
 function openSupDisableWarning(name) {
   pendingSupDisableName = name;
   document.getElementById('supDisableName').textContent = name;
+  var impact = supplierDisableImpact(name);
+  document.getElementById('supDisableItemCount').textContent = impact.items.length;
+  document.getElementById('supDisableRecipeCount').textContent = impact.recipes.length;
+  document.getElementById('supDisableExport').hidden = impact.items.length === 0 && impact.recipes.length === 0;
   document.getElementById('supDisableOverlay').classList.add('open');
 }
 function closeSupDisableWarning() {
@@ -4332,6 +4358,42 @@ function confirmSupDisable() {
   saveHqSupplierState();
   renderSuppliers();
   renderMl();
+}
+
+function supplierDisableImpact(name) {
+  var items = ITEMS.filter(function(item) { return item.supplier === name; });
+  var itemNames = new Set(items.map(function(item) { return item.name; }));
+  var recipes = RECIPES.filter(function(recipe) {
+    var references = [].concat(recipe.ingredients || [], recipe.inventoryItems || [], recipe.groupSkuNames || []).map(function(entry) {
+      return typeof entry === 'string' ? entry : entry && entry.name;
+    });
+    return references.some(function(reference) { return itemNames.has(reference); });
+  });
+  return { items:items, recipes:recipes };
+}
+
+function downloadSupplierDisableImpact() {
+  if (!pendingSupDisableName) return;
+  var impact = supplierDisableImpact(pendingSupDisableName);
+  var rows = [['Type', 'Name', 'Supplier', 'Referenced affected items']];
+  impact.items.forEach(function(item) {
+    rows.push(['Market-list item', itemDisplayName(item), item.supplier, '']);
+  });
+  impact.recipes.forEach(function(recipe) {
+    var references = [].concat(recipe.ingredients || [], recipe.inventoryItems || [], recipe.groupSkuNames || []).map(function(entry) {
+      return typeof entry === 'string' ? entry : entry && entry.name;
+    }).filter(function(reference) { return impact.items.some(function(item) { return item.name === reference; }); });
+    rows.push(['Recipe', recipe.name, '', references.join(', ')]);
+  });
+  var table = '<table>' + rows.map(function(row) { return '<tr>' + row.map(function(value) { return '<td>' + escapeItemDisplayText(value) + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>';
+  var blob = new Blob(['\ufeff<html><head><meta charset="utf-8"></head><body>' + table + '</body></html>'], { type:'application/vnd.ms-excel' });
+  var link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = pendingSupDisableName.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase() + '-affected-items.xls';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function() { URL.revokeObjectURL(link.href); }, 0);
 }
 
 function toggleSupActive(name) {
@@ -4422,21 +4484,15 @@ function openRecGroupsDialog(btn) {
   const overlay = document.getElementById('recGroupsOverlay');
   overlay.dataset.avKind = btn.dataset.avKind || '';
   overlay.dataset.avRef = btn.dataset.avRef || '';
-  const groupIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--spinach)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>';
-  const outletIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
-  const row = (icon, label, last) =>
-    '<div style="padding:10px 0;' + (last ? '' : 'border-bottom:1px solid var(--rule);') + 'font-size:14px;color:var(--ink);display:flex;align-items:center;gap:8px">' + icon + label + '</div>';
-  const sectionLabel = label => '<div style="font-size:11px;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.06em;padding:12px 0 2px">' + label + '</div>';
-  const emptyState = label => '<div style="padding:10px 0;font-size:14px;color:var(--ink-mute)">' + label + '</div>';
-  let html = sectionLabel('Outlet groups');
-  html += groups.length ? groups.map((g, i) => row(groupIcon, g, i === groups.length - 1)).join('') : emptyState('No outlet groups');
-  html += sectionLabel('Ungrouped outlets');
-  html += outlets.length ? outlets.map((o, i) => row(outletIcon, o, i === outlets.length - 1)).join('') : emptyState('No ungrouped outlets');
+  const entries = groups.map(function(group) { return { name:group, meta:availabilityGroupCount(group) + ' outlets' }; }).concat(outlets.map(function(outlet) { return { name:outlet, meta:'' }; }));
+  const html = entries.length ? entries.map(function(entry, index) {
+    return '<div style="padding:12px 0;' + (index === entries.length - 1 ? '' : 'border-bottom:1px solid var(--rule);') + '"><div style="font-size:14px;font-weight:500;color:var(--ink)">' + escapeItemDisplayText(entry.name) + '</div>' + (entry.meta ? '<div style="margin-top:2px;font-size:12px;color:var(--ink-mute)">' + entry.meta + '</div>' : '') + '</div>';
+  }).join('') : '<div style="padding:14px 0;font-size:14px;color:var(--ink-mute)">Not available</div>';
   const parts = [];
   if (groups.length) parts.push(groups.length === 1 ? '1 group' : groups.length + ' groups');
   if (outlets.length) parts.push(outlets.length === 1 ? '1 outlet' : outlets.length + ' outlets');
   document.getElementById('recGroupsList').innerHTML = html;
-  document.getElementById('recGroupsCount').textContent = parts.join(' · ') + (outlets.length ? '' : (parts.length ? ' · No ungrouped outlets' : 'Not available'));
+  document.getElementById('recGroupsCount').textContent = parts.join(' · ') || 'Not available';
   document.getElementById('recGroupsTitle').textContent = 'Available to';
   document.getElementById('recGroupsCount').style.fontSize = '14px';
   document.getElementById('recGroupsDialogHeader').style.borderBottom = '1px solid var(--rule)';
@@ -4521,13 +4577,13 @@ function openAvailabilityManager(config) {
   const selected = new Set((config.record.groupList || config.record.groups || []).concat(config.record.outletList || config.record.outlets || []));
   config.initialSelected = selected;
   document.getElementById('recGroupsTitle').textContent = 'Manage availability';
-  document.getElementById('recGroupsCount').style.fontSize = '12px';
+  document.getElementById('recGroupsCount').style.fontSize = '14px';
   document.getElementById('recGroupsDialogHeader').style.borderBottom = '0';
   document.getElementById('recGroupsCount').textContent = config.record.name;
   const badge = function(count) { return '<span class="count">' + count + '</span>'; };
   const row = function(scope, meta) {
     const alreadyAvailable = !!config.addOnly && selected.has(scope);
-    return '<label style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);cursor:' + (alreadyAvailable ? 'default' : 'pointer') + '"><span><span style="display:block;font-size:14px;font-weight:600;color:var(--ink)">' + escapeOverviewText(scope) + '</span>' + (meta ? '<span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + meta + '</span>' : '') + (alreadyAvailable ? '<span style="display:block;font-size:11px;color:var(--spinach);font-weight:700;margin-top:3px">Already available</span>' : '') + '</span><input type="checkbox" data-rec-scope value="' + escapeOverviewText(scope) + '"' + (selected.has(scope) ? ' checked' : '') + (alreadyAvailable ? ' disabled' : '') + ' style="width:18px;height:18px;accent-color:var(--spinach);cursor:' + (alreadyAvailable ? 'not-allowed' : 'pointer') + '" /></label>';
+    return '<label style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--rule);cursor:' + (alreadyAvailable ? 'default' : 'pointer') + '"><span><span style="display:block;font-size:14px;font-weight:500;color:var(--ink)">' + escapeOverviewText(scope) + '</span>' + (meta ? '<span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + meta + '</span>' : '') + (alreadyAvailable ? '<span style="display:block;font-size:11px;color:var(--spinach);font-weight:700;margin-top:3px">Already available</span>' : '') + '</span><input type="checkbox" data-rec-scope value="' + escapeOverviewText(scope) + '"' + (selected.has(scope) ? ' checked' : '') + (alreadyAvailable ? ' disabled' : '') + ' style="width:18px;height:18px;accent-color:var(--spinach);cursor:' + (alreadyAvailable ? 'not-allowed' : 'pointer') + '" /></label>';
   };
   const groupRows = config.groups.map(function(scope) { return row(scope, availabilityGroupCount(scope) + ' outlets'); }).join('');
   const outletRows = config.outlets.map(function(scope) { return row(scope, ''); }).join('');
@@ -5475,15 +5531,26 @@ function groupSkuScopeLabel(record) {
   return availabilityLabel(scope.groups, scope.outlets, INV_GROUPS.length, REC_OUTLETS.length);
 }
 
+function inventorySourceItem(record) {
+  if (!record || record.type === 'group') return null;
+  if (Number.isInteger(record.sourceItemIdx)) return ITEMS[record.sourceItemIdx] || null;
+  return ITEMS.find(function(item) { return item.name === record.name; }) || null;
+}
+
+function inventoryDisplayName(record) {
+  var source = inventorySourceItem(record);
+  return source && source.customName ? source.customName : record.name;
+}
+
 function renderInv() {
   applyHqInventorySettingsOverrides();
   var items = INV_ITEMS.slice();
-  if (invSearch) { var q = invSearch.toLowerCase(); items = items.filter(function(r){ return r.name.toLowerCase().includes(q) || (r.detail||'').toLowerCase().includes(q); }); }
+  if (invSearch) { var q = invSearch.toLowerCase(); items = items.filter(function(r){ return inventoryDisplayName(r).toLowerCase().includes(q) || r.name.toLowerCase().includes(q) || (r.detail||'').toLowerCase().includes(q); }); }
   if (invTypeFilter) items = items.filter(function(r){ return r.type === invTypeFilter; });
   if (invStatusFilter === 'active') items = items.filter(function(r){ return inventoryLifecycle(r) === 'active'; });
   else if (invStatusFilter === 'disabled') items = items.filter(function(r){ return inventoryLifecycle(r) === 'disabled'; });
   else if (invStatusFilter === 'removed') items = items.filter(function(r){ return inventoryLifecycle(r) === 'removed'; });
-  items.sort(function(a, b){ return a.name.localeCompare(b.name); });
+  items.sort(function(a, b){ return inventoryDisplayName(a).localeCompare(inventoryDisplayName(b)); });
 
   var total = items.length;
   document.getElementById('invCount').textContent = total;
@@ -5523,7 +5590,7 @@ function renderInv() {
         '<div style="display:flex;align-items:center;gap:8px">' +
         '<div>' +
           '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">' +
-            '<span style="font-size:14px;font-weight:500;color:var(--ink)">' + r.name + lifecycleBadge + '</span>' +
+            '<span style="font-size:14px;font-weight:500;color:var(--ink)">' + escapeItemDisplayText(inventoryDisplayName(r)) + lifecycleBadge + '</span>' +
             (r.type === 'group' ? '<span style="font-size:10px;font-weight:700;letter-spacing:.04em;background:#EDE9FE;color:#6D28D9;border-radius:4px;padding:2px 6px;flex-shrink:0">G</span>' : '') +
           '</div>' +
           (detail ? (r.type === 'group'
@@ -5566,7 +5633,7 @@ function renderInv() {
         var entryLabel = availabilityLabel(entryGroups, entryOutlets, INV_GROUPS.length, REC_OUTLETS.length);
         var entryAccess = '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + entryGroups.join('|') + '" data-outlets="' + entryOutlets.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + entryLabel + '</button>';
         rows.push('<tr class="inv-uom-row">' +
-          '<td style="' + td + 'padding-left:48px"><span style="font-size:14px;color:var(--ink)">' + r.name + '</span></td>' +
+          '<td style="' + td + 'padding-left:48px"><span style="font-size:14px;color:var(--ink)">' + escapeItemDisplayText(inventoryDisplayName(r)) + '</span></td>' +
           '<td style="' + td + 'font-size:14px;color:var(--ink)">' + entry.uom + '</td>' +
           '<td style="' + td + '">' + entryAccess + '</td><td style="' + td + '"></td>' +
         '</tr>');
@@ -7410,8 +7477,8 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
         <div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink)" id="recGroupsTitle">Available to</div>
         <div style="font-size: 14px;color:var(--ink-mute);margin-top:2px" id="recGroupsCount"></div>
       </div>
-      <button class="modal-close" onclick="closeRecGroupsDialog()" aria-label="Close" style="width:40px;height:40px;padding:0;justify-content:center;margin-right:-4px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      <button class="modal-close" type="button" onclick="closeRecGroupsDialog()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
     <div style="padding:0 24px 20px" id="recGroupsList"></div>
@@ -7713,13 +7780,14 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
 <!-- Supplier disable warning (HQ level) -->
 <div class="confirm-overlay" id="supDisableOverlay" onclick="if(event.target===this)closeSupDisableWarning()">
   <div class="confirm-card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-      <div style="width:36px;height:36px;border-radius:8px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <span class="material-symbols-rounded notice-symbol" aria-hidden="true" style="font-size:22px;line-height:22px">warning</span>
-      </div>
-      <div class="confirm-title" style="margin:0">Disable supplier?</div>
+    <div class="confirm-title">Disable supplier?</div>
+    <div class="confirm-body"><strong id="supDisableName"></strong> will be removed from <em>all</em> outlet groups immediately. Buyers will no longer be able to order from this supplier.</div>
+    <div style="display:flex;align-items:flex-start;gap:10px;margin:-6px 0 18px;padding:12px 14px;border:1px solid #F5D97A;border-radius:8px;background:#FFF8EC;font-size:14px;line-height:1.5;color:#7A5F00">
+      <span class="material-symbols-rounded" aria-hidden="true" style="margin-top:1px;color:#D97706;font-size:20px;line-height:20px">warning</span>
+      <div style="flex:1;min-width:0"><strong><span id="supDisableItemCount">0</span> items will be disabled.</strong><br>
+      <span><span id="supDisableRecipeCount">0</span> recipes reference these items. Historical orders, invoices, Inventory and recipes remain intact.</span>
+      <button class="modal-cancel" id="supDisableExport" type="button" onclick="downloadSupplierDisableImpact()" style="display:flex;align-items:center;gap:5px;margin-top:8px;padding:0;color:var(--spinach);font-size:13px"><span class="material-symbols-outlined" aria-hidden="true" style="font-size:16px">download</span>Download affected items &amp; recipes</button></div>
     </div>
-    <div class="confirm-body">Disabling <strong id="supDisableName"></strong> at the HQ level will remove it from <em>all</em> outlet groups immediately. Buyers will no longer be able to order from this supplier. This can be reversed at any time.</div>
     <div class="confirm-foot">
       <button class="modal-cancel" onclick="closeSupDisableWarning()">Cancel</button>
       <button class="btn-danger" onclick="confirmSupDisable()">Disable</button>
