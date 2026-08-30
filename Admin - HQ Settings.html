@@ -1559,12 +1559,12 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <div style="font-size: 14px;color:var(--notice-warning-ink);margin-top:2px">Invoice prices from outlets differ from current market list prices. Review and approve to update.</div>
           </div>
         </div>
-        <button class="btn btn-tertiary" onclick="window.location.href='Admin - HQ - Price Changes.html'" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size: 14px;padding:7px 14px;white-space:nowrap">Review changes</button>
+        <button class="btn btn-tertiary" onclick="window.location.href='Admin - HQ - Price Changes.html'+window.location.search" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size: 14px;padding:7px 14px;white-space:nowrap">Review changes</button>
       </div>
       <div class="panel-label-row">
         <span class="panel-label-text">Items <span class="panel-label-count" id="mlCount"></span></span>
         <div style="display:flex;align-items:center;gap:8px">
-          <a class="btn-secondary" href="Admin - HQ - Price Changes.html" style="text-decoration:none">Price changes</a>
+          <a class="btn-secondary" href="Admin - HQ - Price Changes.html" onclick="this.href='Admin - HQ - Price Changes.html'+window.location.search" style="text-decoration:none">Price changes</a>
           <div style="position:relative">
             <button class="btn-primary" id="addItemBtn" onclick="toggleAddItemMenu(event)" style="gap:8px">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
@@ -7094,15 +7094,26 @@ function refreshHqOutletSummary() {
 function saveManagedOutletList() {
   var tbody = document.querySelector('#ogTable tbody');
   if (!tbody) return;
-  localStorage.setItem('nomniHqManagedOutlets', JSON.stringify({
+  localStorage.setItem(getManagedOutletStateKey(), JSON.stringify({
     tableHtml: tbody.innerHTML,
     ungrouped: UNGROUPED.slice()
   }));
 }
 
+function getManagedOutletStateKey() {
+  var params = new URLSearchParams(window.location.search);
+  var newHqName = params.get('created-hq') || (params.get('new') === '1' ? params.get('hq') : '');
+  return newHqName ? 'nomniHqManagedOutlets:new:' + newHqName : 'nomniHqManagedOutlets';
+}
+
+function isNewHqRoute() {
+  var params = new URLSearchParams(window.location.search);
+  return params.get('new') === '1' || !!params.get('created-hq');
+}
+
 function restoreManagedOutletList() {
   var stored;
-  try { stored = JSON.parse(localStorage.getItem('nomniHqManagedOutlets') || 'null'); } catch (e) { stored = null; }
+  try { stored = JSON.parse(localStorage.getItem(getManagedOutletStateKey()) || 'null'); } catch (e) { stored = null; }
   if (!stored || !stored.tableHtml) return;
   var tbody = document.querySelector('#ogTable tbody');
   if (!tbody) return;
@@ -7123,7 +7134,7 @@ function restoreManagedOutletList() {
 }
 
 restoreManagedOutletList();
-saveManagedOutletList();
+if (!isNewHqRoute()) saveManagedOutletList();
 
 function confirmLinkOutletSelection() {
   var tbody = document.querySelector('#ogTable tbody');
@@ -8160,6 +8171,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
 function initialiseNewHQView() {
   var params = new URLSearchParams(window.location.search);
   var createdHqName = params.get('created-hq');
+  var requestedHqName = params.get('hq');
   if (params.get('new') !== '1' && !createdHqName) return;
 
   var saved;
@@ -8170,6 +8182,12 @@ function initialiseNewHQView() {
     } catch (e) { saved = null; }
   } else {
     try { saved = JSON.parse(localStorage.getItem('nomniNewHQ') || 'null'); } catch (e) { saved = null; }
+    if (requestedHqName && (!saved || saved.name !== requestedHqName)) {
+      try {
+        var savedHqs = JSON.parse(localStorage.getItem('nomniCreatedHQs') || '[]');
+        saved = Array.isArray(savedHqs) ? savedHqs.find(function(hq) { return hq && hq.name === requestedHqName; }) : null;
+      } catch (e) { saved = null; }
+    }
   }
   if (!saved) return;
 

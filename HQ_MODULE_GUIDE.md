@@ -23,7 +23,7 @@ The effective priority is **Removed → Excluded → Disabled → Active**. Excl
 
 The HQ page is the operating view for a buyer's head office. It has a header with the HQ name, last-updated date, **Users** and **Edit details** actions, a summary strip, and seven tabs: Overview, Suppliers, Items, Inventory, Recipes, POS mapping and Activity.
 
-On **Buyers → HQ & Outlet groups**, **Add new → New HQ** opens a compact dialogue with only an HQ-name field. Saving adds the HQ to that list with no outlet groups or outlets yet. New HQs and edits to the prototype HQ name are stored locally until **Reset prototype** is used from the HQ page.
+On **Buyers → HQ & Outlet groups**, **Add new → New HQ** opens a compact dialogue with only an HQ-name field. Saving adds the HQ to that list with no outlet groups or outlets yet. Its outlet-group workspace and local state are isolated from the Garden Cuisine sample HQ, including when a newly created group returns the user to the HQ page. New HQs and edits to the prototype HQ name are stored locally until **Reset prototype** is used from the HQ page.
 
 ### Last updated timestamps
 
@@ -110,6 +110,8 @@ Items is the HQ master market-list view.
 ## Price changes
 
 The dedicated Price changes page is reached from Items, Overview Health check and the Market List warning.
+
+> **Prototype direction:** Price changes will probably become a Procure-only feature in the final prototype. The current `Admin - HQ - Price Changes.html` page is retained to demonstrate the review flow, but is not expected to remain part of Admin's HQ page.
 
 - Lists invoice-detected price changes awaiting review, with current price, invoice price, source HQ/outlet and detection date.
 - Search and supplier filtering are available.
@@ -231,6 +233,8 @@ Manages people with access to the currently viewed HQ.
 ### HQ Price changes — `Admin - HQ - Price Changes.html`
 
 Reviews invoice-detected price changes for managed outlets at HQ level.
+
+> **Likely final ownership:** Procure only. This Admin page is a prototype of the flow and is not expected to remain on the final Admin HQ page.
 
 - Accessible from Overview Health check and the Items tab.
 - Separates **Pending review** from **Reviewed** decisions.
