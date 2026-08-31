@@ -165,6 +165,7 @@ Recipes is the HQ recipe library.
 Activity is the audit-style record for the HQ.
 
 - Supports activity browsing, filters, date range and pagination in the prototype.
+- The module filter separates **Items** from **Suppliers**. Item-price activity records both the actor (HQ user, Nomni Admin or System) and the source: manual edit, uploaded invoice, accepted Price changes review or automatic invoice digitisation. System entries record detection of a digitised invoice price; an HQ user's later acceptance is a separate audit event.
 - It records selected prototype actions, while much of the displayed history remains illustrative.
 - Health check and Activity now listen to the same browser-local HQ change notification. Actions that write Activity (including inventory lifecycle and POS mapping changes) refresh the Health check and the Overview recent-activity feed together, so the two views do not drift after an interaction.
 - The reset control is deliberately kept outside the product UI at the lower-left of the prototype; it clears browser-stored demonstration state.

@@ -516,7 +516,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 <script>
   let rowCount = 0;
 
-  const ING_ITEMS = [
+  let ING_ITEMS = [
     { name: 'Chicken Thigh Fillet', supplier: 'PFD Food Services' },
     { name: 'Chicken Breast', supplier: 'PFD Food Services' },
     { name: 'Pork Shoulder', supplier: 'Fresh Meats Co.' },
@@ -540,6 +540,32 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
     { name: 'Bean Sprouts', supplier: 'Produce Direct' },
     { name: 'Tofu (Firm)', supplier: 'Sydney Direct' },
   ];
+
+  function getNewHqRecipeContext() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('new') !== '1') return null;
+    const hqName = params.get('created-hq') || params.get('hq');
+    return hqName ? { name:hqName, params:params } : null;
+  }
+  function initialiseNewHqRecipeContext() {
+    const context = getNewHqRecipeContext();
+    if (!context) return;
+    document.title = context.name + ' — New recipe';
+    const back = document.querySelector('.back-link');
+    if (back) { back.href = 'Admin - HQ Settings.html?' + context.params.toString() + '#recipes'; back.lastChild.textContent = '\n          ' + context.name + '\n        '; }
+    let state = {};
+    try { state = JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}'); } catch (e) {}
+    ING_ITEMS = Array.isArray(state.items) ? state.items.map(function(item) { return {name:item.customName || item.name, supplier:item.supplier || 'No supplier'}; }).filter(function(item) { return item.name; }) : [];
+    let stored, scopes = [];
+    try { stored = JSON.parse(localStorage.getItem('nomniHqManagedOutlets:new:' + context.name) || 'null'); } catch (e) {}
+    if (stored && stored.tableHtml) {
+      const template = document.createElement('template'); template.innerHTML = stored.tableHtml;
+      scopes = Array.from(template.content.querySelectorAll('tr[data-group-name] .og-name')).map(function(node) { return node.textContent.trim(); }).filter(Boolean);
+    }
+    const chips = document.getElementById('appliesChips');
+    if (chips) chips.innerHTML = scopes.length ? scopes.map(function(name) { return '<button class="chip active" type="button" data-group="' + name.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '"><span class="chip-dot">✓</span>' + name.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</button>'; }).join('') : '<span style="font-size:14px;color:var(--ink-mute)">Add an outlet group before creating a recipe.</span>';
+  }
+  initialiseNewHqRecipeContext();
 
   function makeIngSelectCell() {
     const wrap = document.createElement('div');
@@ -646,6 +672,20 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 
   // Save
   document.getElementById('saveBtn').addEventListener('click', function() {
+    const context = getNewHqRecipeContext();
+    if (context) {
+      let state = {};
+      try { state = JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}'); } catch (e) {}
+      state.recipes = Array.isArray(state.recipes) ? state.recipes : [];
+      const name = document.getElementById('recipeName').value.trim();
+      const groups = Array.from(document.querySelectorAll('#appliesChips .chip.active')).map(function(chip) { return chip.textContent.trim().replace(/^✓/, ''); });
+      if (!groups.length) { alert('Add an outlet group before saving this recipe.'); return; }
+      if (state.recipes.some(function(recipe) { return recipe && recipe.name && recipe.name.toLowerCase() === name.toLowerCase(); })) { alert('A recipe with this name already exists.'); return; }
+      state.recipes.push({name:name,cat:'Other',type:document.getElementById('subRecipe').checked ? 'sub-recipe' : 'recipe',cost:0,price:0,foodCostPct:0,groupList:groups,outletList:[],versions:1,lastUpdated:'Today',active:true,lifecycle:'active'});
+      localStorage.setItem('nomniHqPrototypeState', JSON.stringify(state));
+      window.location.href = 'Admin - HQ Settings.html?' + context.params.toString() + '#recipes';
+      return;
+    }
     window.location.href = 'Admin - HQ Settings.html#recipes';
   });
 

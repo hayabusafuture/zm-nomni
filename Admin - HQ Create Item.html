@@ -678,14 +678,56 @@ function flipPricingConversion(id) {
   const qty = controls[0].value; controls[0].value = controls[2].value; controls[2].value = qty;
   const unit = controls[1].textContent.replace(/\s*=\s*$/, ''); controls[1].textContent = controls[2].value + ' =';
 }
-const CREATE_ITEM_TARGETS = [
+let CREATE_ITEM_TARGETS = [
   ['chkChargrill','uomChargrill','Chargrill Outlets'],
   ['chkFamily','uomFamily','Family Dining Express'],
   ['chkO139','uomO139','(WF 139) Chargrill @ 139 Tampines'],
   ['chkO140','uomO140','(WF 140) Chargrill @ Bedok'],
   ['chkO141','uomO141','(WF 141) Chargrill @ Jurong'],
-  ['chkO142','uomO142','(WF 142) Chargrill @ Orchard']
+  ['chkO142','uomO142','(WF 142) Chargrill @ Orchard','outlet']
 ];
+CREATE_ITEM_TARGETS = CREATE_ITEM_TARGETS.map(function(entry) {
+  return [entry[0], entry[1], entry[2], entry[3] || (entry[0] === 'chkChargrill' || entry[0] === 'chkFamily' ? 'group' : 'outlet')];
+});
+function createItemEscape(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]; });
+}
+function isNewHqCreateItem() { return new URLSearchParams(window.location.search).get('new') === '1'; }
+function getNewHqCreateItemScopes() {
+  var params = new URLSearchParams(window.location.search);
+  var hqName = params.get('created-hq') || params.get('hq');
+  if (!hqName) return [];
+  var stored;
+  try { stored = JSON.parse(localStorage.getItem('nomniHqManagedOutlets:new:' + hqName) || 'null'); } catch (e) { stored = null; }
+  if (!stored || !stored.tableHtml) return [];
+  var template = document.createElement('template'); template.innerHTML = stored.tableHtml;
+  var groups = Array.from(template.content.querySelectorAll('tr[data-group-name]')).map(function(row) {
+    var name = row.querySelector('.og-name'); var count = row.querySelector('.og-outlet-count');
+    return name ? {name:name.textContent.trim(),type:'group',meta:count ? count.textContent.trim() : ''} : null;
+  }).filter(Boolean);
+  var outlets = Array.from(template.content.querySelectorAll('tr[data-ungrouped-name] .og-name')).map(function(node) { return {name:node.textContent.trim(),type:'outlet',meta:''}; }).filter(function(entry) { return entry.name; });
+  return groups.concat(outlets);
+}
+function getCreateItemTargets() { return CREATE_ITEM_TARGETS.filter(function(entry) { return document.getElementById(entry[0]); }); }
+function hydrateNewHqCreateItem() {
+  if (!isNewHqCreateItem()) return;
+  var scopes = getNewHqCreateItemScopes(); var grid = document.getElementById('groupsGrid');
+  if (grid) {
+    CREATE_ITEM_TARGETS = scopes.map(function(scope, index) { return ['chkNewScope' + index,'uomNewScope' + index,scope.name,scope.type]; });
+    var targets = scopes.map(function(scope, index) {
+      var id = 'chkNewScope' + index, uomId = 'uomNewScope' + index;
+      return '<div class="availability-target is-selected"><label class="availability-target-row"><input type="checkbox" id="' + id + '" checked onchange="onAvailabilityTargetChange(this, \'' + uomId + '\')" /><span class="availability-target-info"><span class="availability-target-name">' + createItemEscape(scope.name) + '</span>' + (scope.meta ? '<span class="availability-target-meta">' + createItemEscape(scope.meta) + '</span>' : '') + '</span></label><div class="group-uom-row visible" id="' + uomId + '"></div></div>';
+    }).join('');
+    grid.innerHTML = '<div class="availability-select-all"><label><input type="checkbox" id="chkAllAvailability" onchange="toggleAllAvailabilityTargets(this.checked)" />Select all</label></div>' + (targets || '<div style="padding:14px;color:var(--ink-mute)">Add an outlet group or ungrouped outlet before creating an item.</div>');
+  }
+  var select = document.getElementById('supplierSelect');
+  if (select) {
+    var state; try { state = JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}'); } catch (e) { state = {}; }
+    var suppliers = Array.isArray(state.suppliers) ? state.suppliers.map(function(supplier) { return supplier && (supplier.name || supplier.supplier || supplier.label); }).filter(Boolean) : [];
+    select.innerHTML = '<option value="">' + (suppliers.length ? 'Select supplier' : 'Link a supplier first') + '</option>' + suppliers.map(function(name) { return '<option value="' + createItemEscape(name) + '">' + createItemEscape(name) + '</option>'; }).join('');
+    select.disabled = !suppliers.length;
+  }
+}
 let createItemPricingDraft = {};
 function getCreateFormUoms() {
   return Array.from(document.querySelectorAll('#pricingRows tr:not(.pricing-conversion-detail) .uom-select, #orderingRows tr:not(.pricing-conversion-detail) .uom-select'))
@@ -693,13 +735,13 @@ function getCreateFormUoms() {
     .filter(function(uom, index, all) { return uom && all.indexOf(uom) === index; });
 }
 function getCreatePricingTargets() {
-  return CREATE_ITEM_TARGETS.filter(function(entry) {
+  return getCreateItemTargets().filter(function(entry) {
     const checkbox = document.getElementById(entry[0]);
     return checkbox && checkbox.checked;
   });
 }
 function getCreateTargetSummary(targets) {
-  const groups = targets.filter(function(entry) { return entry[0] === 'chkChargrill' || entry[0] === 'chkFamily'; }).length;
+  const groups = targets.filter(function(entry) { return entry[3] === 'group'; }).length;
   const outlets = targets.length - groups;
   const parts = [];
   if (groups) parts.push(groups + ' group' + (groups === 1 ? '' : 's'));
@@ -881,25 +923,21 @@ function saveNewHqItem() {
   let created = [];
   try { created = JSON.parse(localStorage.getItem('nomni-hq-created-items-v1') || '[]'); } catch (e) {}
   if (!Array.isArray(created)) created = [];
-  if (created.some(function(item) { return item && item.name.toLowerCase() === name.toLowerCase(); })) {
+  if (!isNewHqCreateItem() && created.some(function(item) { return item && item.name.toLowerCase() === name.toLowerCase(); })) {
     alert('An item with this name has already been created.'); return;
   }
 
-  const groupList = [];
-  if (document.getElementById('chkChargrill').checked) groupList.push('Chargrill Outlets');
-  if (document.getElementById('chkFamily').checked) groupList.push('Family Dining Express');
-  const outletList = [];
-  [['chkO139','(WF 139) Chargrill @ 139 Tampines'],['chkO140','(WF 140) Chargrill @ Bedok'],['chkO141','(WF 141) Chargrill @ Jurong'],['chkO142','(WF 142) Chargrill @ Orchard']].forEach(function(entry) {
-    if (document.getElementById(entry[0]).checked) outletList.push(entry[1]);
-  });
+  const groupList = getCreateItemTargets().filter(function(entry) { return entry[3] === 'group' && document.getElementById(entry[0]).checked; }).map(function(entry) { return entry[2]; });
+  const outletList = getCreateItemTargets().filter(function(entry) { return entry[3] === 'outlet' && document.getElementById(entry[0]).checked; }).map(function(entry) { return entry[2]; });
   if (!groupList.length && !outletList.length) {
     alert('Select at least one outlet group or outlet where this item will be available.');
-    document.getElementById('chkChargrill').focus();
+    const firstTarget = document.querySelector('.availability-target-row input[type=checkbox]');
+    if (firstTarget) firstTarget.focus();
     return;
   }
   const uoms = pricing.map(function(row) { return 'per ' + row.uom; });
   const scopeUoms = {};
-  [['chkChargrill','uomChargrill','Chargrill Outlets'],['chkFamily','uomFamily','Family Dining Express'],['chkO139','uomO139','(WF 139) Chargrill @ 139 Tampines'],['chkO140','uomO140','(WF 140) Chargrill @ Bedok'],['chkO141','uomO141','(WF 141) Chargrill @ Jurong'],['chkO142','uomO142','(WF 142) Chargrill @ Orchard']].forEach(function(entry) {
+  getCreateItemTargets().forEach(function(entry) {
     const access = document.getElementById(entry[0]);
     const uomWrap = document.getElementById(entry[1]);
     if (!access || !access.checked || !uomWrap) return;
@@ -938,8 +976,10 @@ function saveNewHqItem() {
     excludedScopes: [],
     createdAt: new Date().toISOString()
   };
-  created.push(item);
-  localStorage.setItem('nomni-hq-created-items-v1', JSON.stringify(created));
+  if (!isNewHqCreateItem()) {
+    created.push(item);
+    localStorage.setItem('nomni-hq-created-items-v1', JSON.stringify(created));
+  }
 
   // New-HQ prototypes keep their own copied state, so update it as well.
   try {
@@ -947,15 +987,17 @@ function saveNewHqItem() {
     if (newHq) {
       const state = JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}');
       state.items = Array.isArray(state.items) ? state.items : [];
+      if (state.items.some(function(existing) { return existing && existing.name && existing.name.toLowerCase() === name.toLowerCase(); })) {
+        alert('An item with this name has already been created.'); return;
+      }
       state.items.push(item);
       localStorage.setItem('nomniHqPrototypeState', JSON.stringify(state));
     }
   } catch (e) {}
 
   localStorage.setItem('nomniHqCreatedItemToastPending', name);
-  // Return to the normal HQ Items list after saving. A stale new-HQ flag
-  // should not redirect an item created from the existing HQ workspace.
-  window.location.href = 'Admin - HQ Settings.html#market-list';
+  const params = new URLSearchParams(window.location.search);
+  window.location.href = 'Admin - HQ Settings.html' + (isNewHqCreateItem() && params.toString() ? '?' + params.toString() : '') + '#market-list';
 }
 
 // UOM chip toggle
@@ -969,6 +1011,7 @@ document.addEventListener('click', function(e) {
   if (inp) inp.checked = chip.classList.contains('on');
 });
 
+hydrateNewHqCreateItem();
 // Seed one default pricing row
 addPricingRow();
 syncAvailabilitySelectAll();
