@@ -78,6 +78,13 @@ These actions change membership and inheritance; they do not remove the HQ maste
 
 ## Suppliers
 
+- Supplier order settings are configured independently for every available outlet group and every available ungrouped outlet; there is no HQ-level default. A grouped outlet can additionally receive its own explicit exception without changing the group’s settings.
+- The supplier settings page marks each required location as **Order settings required** until its notification contact, delivery and cut-off rules are complete. Its location list shows an outlet count for groups and the parent group for an outlet exception.
+- **Copy settings** is a one-time prefill from another completed location. It does not create a linked or synchronised policy.
+- Adding supplier availability—either in the add flow or through Manage availability—ends with an optional **Set ordering settings now?** prompt. Deferring it leaves a supplier banner, Health check warning and an inline **Order settings required** indicator in the Suppliers table until every required location is ready.
+- In supplier **Manage availability**, newly enabled locations are marked **Needs order settings**. The save action becomes **Save & continue to set up** while any new locations are selected.
+- Active suppliers manage their own ordering settings in Nomni Supply. HQ users can view those settings read-only, with the supplier-managed explanation on the settings page; they are excluded from the HQ settings-required warnings.
+
 Suppliers are managed at HQ level and then made available to the relevant outlet groups or outlets.
 
 - The list shows suppliers, available contact methods, supplier type and availability. **Active** always refers to the supplier type; a temporarily unavailable record is described as **Disabled**.
@@ -113,8 +120,9 @@ The dedicated Price changes page is reached from Items, Overview Health check an
 
 > **Prototype direction:** Price changes will probably become a Procure-only feature in the final prototype. The current `Admin - HQ - Price Changes.html` page is retained to demonstrate the review flow, but is not expected to remain part of Admin's HQ page.
 
-- Lists invoice-detected price changes awaiting review, with current price, invoice price, source HQ/outlet and detection date.
-- Search and supplier filtering are available.
+- Lists all invoice-detected price changes, with current price, invoice price, source HQ/outlet, detection date and update status. The page defaults to the past 90 days. The Items warning and Overview Health check use that same period and show only entries still pending review.
+- **Two-step price acceptance:** Step 1 accepts the detected price for its source group/outlet, confirms with a toast, and resolves every other pending change for that item in the same scope as **Skipped**. Step 2 optionally lets the HQ user apply that accepted price to other eligible groups or ungrouped outlets. **Apply price** remains disabled until at least one location is selected; saving applies the accepted price to each selected location, marks that item’s pending changes in those scopes as **Skipped**, and confirms with a toast. Choosing **Not now** leaves other locations unchanged.
+- Search, supplier, group/outlet and date-range filtering are available.
 - **Update price** applies the new price to the HQ market list and confirms the HQ-wide effect.
 - **Keep current** records a decision not to update.
 - Reviewed decisions move to the Reviewed tab for the current browser session.
