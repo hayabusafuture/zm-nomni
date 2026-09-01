@@ -251,6 +251,13 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .ml-filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .ml-search-wrap { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; min-width: 220px; }
 .ml-search-wrap:focus-within { border-color: var(--nomni-green); }
+.supplier-settings-filter-chip { display:inline-flex; align-items:center; gap:6px; min-height:32px; padding:0 9px 0 10px; border:1px solid #B9F0C5; border-radius:6px; background:var(--mint); color:var(--seaweed); font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.supplier-settings-filter-chip[hidden] { display:none !important; }
+.supplier-settings-filter-chip:hover { background:#C6F2CE; }
+.supplier-settings-filter-chip .material-symbols-rounded { font-size:16px; }
+.supplier-settings-filter-clear { display:inline-flex; align-items:center; gap:5px; align-self:center; padding:6px 2px; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.supplier-settings-filter-clear:hover { color:var(--seaweed); }
+.supplier-settings-filter-clear .material-symbols-rounded { font-size:17px; }
 .ml-search-input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
 .ml-search-input::placeholder { color: var(--ink-mute); }
 .ml-filter-select { height: 36px; padding: 0 28px 0 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; appearance: none; outline: none; cursor: pointer; }
@@ -1715,8 +1722,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
     <!-- ── Suppliers ── -->
     <div class="tab-panel" id="panel-suppliers">
-      <div id="supplierSettingsBanner" style="display:none;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:flex-start;gap:10px;margin-bottom:20px">
-        <span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span><div><div id="supplierSettingsBannerCount" style="font-size:14px;font-weight:700;color:var(--notice-warning-ink)"></div><div style="font-size:14px;color:var(--notice-warning-ink);margin-top:2px">These locations cannot order from their supplier until their settings are added.</div></div>
+      <div id="supplierSettingsBanner" style="display:none;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
+        <div style="display:flex;align-items:flex-start;gap:10px"><span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span><div><div id="supplierSettingsBannerCount" style="font-size:14px;font-weight:700;color:var(--notice-warning-ink)"></div><div style="font-size:14px;color:var(--notice-warning-ink);margin-top:2px">These locations cannot order from their supplier until their settings are added.</div></div></div><button type="button" class="btn btn-tertiary" id="supplierSettingsFilterButton" onclick="toggleSupplierSettingsFilter()" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap">View suppliers</button>
       </div>
       <div class="panel-label-row">
         <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supCount"></span></span>
@@ -1732,6 +1739,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" class="ml-search-input" id="supSearch" placeholder="Search suppliers…" oninput="renderSuppliers()" />
         </div>
+        <button type="button" class="supplier-settings-filter-chip" id="supplierSettingsFilterChip" onclick="setSupplierSettingsFilter(false)" hidden><span>Settings required</span><span class="material-symbols-rounded" aria-hidden="true">close</span></button>
       </div>
       <div style="overflow:clip">
         <table class="ml-table" id="supplierTable">
@@ -4629,6 +4637,7 @@ function supplierMissingOrderingScopes(supplier) {
 function getIncompleteSupplierSettings() {
   return SUPPLIERS.filter(function(supplier) { return supplier.active !== false && supplierMissingOrderingScopes(supplier).length; });
 }
+var showSuppliersMissingSettingsOnly = false;
 function renderSupplierSettingsAttention() {
   var incomplete = getIncompleteSupplierSettings();
   var missingLocations = incomplete.reduce(function(total, supplier) { return total + supplierMissingOrderingScopes(supplier).length; }, 0);
@@ -4636,6 +4645,22 @@ function renderSupplierSettingsAttention() {
   if (banner) banner.style.display = missingLocations ? 'flex' : 'none';
   var count = document.getElementById('supplierSettingsBannerCount');
   if (count) count.textContent = missingLocations + ' location' + (missingLocations === 1 ? ' needs' : 's need') + ' order settings';
+  var filterButton = document.getElementById('supplierSettingsFilterButton');
+  if (filterButton) {
+    filterButton.style.display = missingLocations ? '' : 'none';
+    filterButton.className = showSuppliersMissingSettingsOnly ? 'supplier-settings-filter-clear' : 'btn btn-tertiary';
+    filterButton.style.cssText = showSuppliersMissingSettingsOnly ? 'align-self:center' : 'flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap';
+    filterButton.innerHTML = showSuppliersMissingSettingsOnly ? '<span class="material-symbols-rounded" aria-hidden="true">close</span>Clear filter' : 'View suppliers';
+  }
+  var filterChip = document.getElementById('supplierSettingsFilterChip');
+  if (filterChip) filterChip.hidden = !showSuppliersMissingSettingsOnly;
+}
+function toggleSupplierSettingsFilter() {
+  setSupplierSettingsFilter(!showSuppliersMissingSettingsOnly);
+}
+function setSupplierSettingsFilter(enabled) {
+  showSuppliersMissingSettingsOnly = !!enabled;
+  renderSuppliers();
 }
 function openFirstIncompleteSupplierSettings() {
   var supplier = getIncompleteSupplierSettings()[0];
@@ -4648,10 +4673,11 @@ function renderSuppliers() {
   const q = (document.getElementById('supSearch').value || '').toLowerCase();
   const rows = SUPPLIERS.filter(s => {
     if (q && !s.name.toLowerCase().includes(q) && !supplierLabel(s.name).toLowerCase().includes(q)) return false;
+    if (showSuppliersMissingSettingsOnly && !supplierMissingOrderingScopes(s).length) return false;
     return true;
   }).sort((a, b) => a.name.localeCompare(b.name));
   if (!rows.length) {
-    document.getElementById('supBody').innerHTML = '<tr><td colspan="6"><div style="padding:52px 24px;text-align:center"><div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin-bottom:6px">No suppliers linked</div><div style="font-size:14px;line-height:1.5;color:var(--ink-mute)">Link a supplier to make it available to this HQ.</div></div></td></tr>';
+    document.getElementById('supBody').innerHTML = '<tr><td colspan="6"><div style="padding:52px 24px;text-align:center"><div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin-bottom:6px">' + (showSuppliersMissingSettingsOnly ? 'No suppliers need settings' : 'No suppliers linked') + '</div><div style="font-size:14px;line-height:1.5;color:var(--ink-mute)">' + (showSuppliersMissingSettingsOnly ? 'Try showing all suppliers or clear the search.' : 'Link a supplier to make it available to this HQ.') + '</div></div></td></tr>';
     renderSupplierSettingsAttention();
     return;
   }
