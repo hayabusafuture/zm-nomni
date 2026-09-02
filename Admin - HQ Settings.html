@@ -2187,6 +2187,15 @@ function refreshNewHqEmptyStates() {
   } else {
     clearNewHqEmptyState('panel-activity');
   }
+
+  if (newHqPosOutletScopes().length === 0) {
+    showNewHqEmptyState('panel-pos-mapping', 'No outlets yet', 'Add outlets to start setting up POS mapping.', {
+      label: 'Add outlets',
+      onclick: 'openLinkOutletPicker()'
+    });
+  } else {
+    clearNewHqEmptyState('panel-pos-mapping');
+  }
 }
 
 
@@ -2387,6 +2396,7 @@ const PRICE_REVIEW_STATE_KEY = 'nomni-hq-price-review-v2';
 const PRICE_REVIEW_WINDOW_DAYS = 90;
 
 function getPendingPriceChanges() {
+  if (window.isNewHQ) return [];
   let priceChanges = PRICE_CHANGES;
   try {
     const saved = JSON.parse(localStorage.getItem(PRICE_REVIEW_STATE_KEY) || 'null');
@@ -8733,7 +8743,7 @@ var panel = document.getElementById('panel-outlet-groups');
     '<div id="newHqOverviewMain">' +
       '<div class="new-hq-empty"><div class="new-hq-empty-inner">' +
         '<h2 class="new-hq-empty-title">No groups or outlets yet</h2>' +
-        '<p class="new-hq-empty-copy">This HQ is ready. Add a group when its outlets are ready to be organised.</p>' +
+        '<p class="new-hq-empty-copy">Create a group to organise your outlets. You can add outlets now or later.</p>' +
         '<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">' +
           '<button class="btn-primary" id="newHqCreateGroupBtn">' +
             '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>New group' +
