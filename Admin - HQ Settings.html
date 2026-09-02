@@ -1413,7 +1413,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="stats-strip" id="statsStrip"></div>
 
     <div class="tabs">
-      <div class="tab active" data-tab="outlet-groups">Outlets &amp; groups</div>
+      <div class="tab active" data-tab="outlet-groups">Groups &amp; outlets</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
       <div class="tab" data-tab="market-list"><span class="tab-label">Items</span><span class="tab-indicators"><span class="tab-status-dot" aria-label="New activity" title="New activity"></span></span></div>
       <div class="tab" data-tab="inventory">Inventory</div>
@@ -1429,7 +1429,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <!-- Left: groups + outlets table -->
         <div>
           <div class="panel-label-row">
-            <span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">4</span></span>
+            <span class="panel-label-text">Groups &amp; outlets <span class="panel-label-count">4</span></span>
             <div style="display:flex;align-items:center;gap:8px">
               <button class="btn-secondary" onclick="openLinkOutletPicker()">Add outlets</button>
               <button class="btn-primary" onclick="window.location.href='Admin - Create Outlet Group.html?hq=Garden+Cuisine+HQ'">
@@ -8729,7 +8729,7 @@ var panel = document.getElementById('panel-outlet-groups');
   '<div style="display:grid;grid-template-columns:1fr 272px;gap:32px;align-items:start">' +
     '<div id="newHqOverviewMain">' +
       '<div class="new-hq-empty"><div class="new-hq-empty-inner">' +
-        '<h2 class="new-hq-empty-title">No outlets or groups yet</h2>' +
+        '<h2 class="new-hq-empty-title">No groups or outlets yet</h2>' +
         '<p class="new-hq-empty-copy">This HQ is ready. Add a group when its outlets are ready to be organised.</p>' +
         '<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">' +
           '<button class="btn-primary" id="newHqCreateGroupBtn">' +
@@ -8831,7 +8831,7 @@ function renderNewHqGroupsTableShell(container, hqName) {
   if (!container) return;
   container.innerHTML =
     '<div class="panel-label-row">' +
-    '<span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">0</span></span>' +
+    '<span class="panel-label-text">Groups &amp; outlets <span class="panel-label-count">0</span></span>' +
       '<div style="display:flex;align-items:center;gap:8px"><button class="btn-secondary" onclick="openLinkOutletPicker()">Add outlets</button><button class="btn-primary" onclick="window.location.href=\'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(hqName) + '&amp;returnNew=1\'">' +
         '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>New group' +
       '</button></div>' +
@@ -9000,7 +9000,7 @@ function renderCreatedOutletGroup() {
     var overviewMain = document.getElementById('newHqOverviewMain') || panel;
     overviewMain.innerHTML =
       '<div class="panel-label-row">' +
-        '<span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">1</span></span>' +
+        '<span class="panel-label-text">Groups &amp; outlets <span class="panel-label-count">1</span></span>' +
         '<div style="display:flex;align-items:center;gap:8px"><button class="btn-secondary" onclick="openLinkOutletPicker()">Add outlets</button><button class="btn-primary" onclick="window.location.href=\'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(group.hq) + '&amp;returnNew=1\'">' +
           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>New group' +
         '</button></div>' +
@@ -9064,7 +9064,7 @@ function renderCreatedOutletGroup() {
     localStorage.removeItem('nomniNewOutletGroupToastPending');
     var splitMessage = group.splitFrom ? '<strong>' + safeName + '</strong> created by splitting an outlet from ' + escapeOverviewText(group.splitFrom) : '<strong>' + safeName + '</strong> outlet group created';
     addPrototypeActivity('outlet-groups', splitMessage, 'outlet-groups', group.name);
-    showHqToast(group.splitFrom ? 'Outlet split into new group' : 'Outlet group created', group.splitFrom ? safeName + ' is now shown in Outlets & groups.' : group.name + ' has been added.');
+    showHqToast(group.splitFrom ? 'Outlet split into new group' : 'Outlet group created', group.splitFrom ? safeName + ' is now shown in Groups & outlets.' : group.name + ' has been added.');
   }
 }
 
@@ -9102,7 +9102,7 @@ function syncNewHqPosOutlets() {
   var groups = Array.from(new Set(outlets.map(function(outlet) { return outlet.group; }).filter(function(group) { return group !== 'Ungrouped'; }))).sort();
   groupFilter.innerHTML = '<option value="">All outlet groups</option>' + groups.map(function(group) { return '<option value="' + escapeOverviewText(group) + '">' + escapeOverviewText(group) + '</option>'; }).join('') + (outlets.some(function(outlet) { return outlet.group === 'Ungrouped'; }) ? '<option value="Ungrouped">Ungrouped</option>' : '');
   if (!outlets.length) {
-    body.innerHTML = '<tr id="posOutletEmpty"><td colspan="5" style="padding:40px 32px;text-align:center;color:var(--ink-mute)"><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:5px">No outlets yet</div>Add outlets in Outlets &amp; groups to set up POS mapping.</td></tr>';
+    body.innerHTML = '<tr id="posOutletEmpty"><td colspan="5" style="padding:40px 32px;text-align:center;color:var(--ink-mute)"><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:5px">No outlets yet</div>Add outlets in Groups &amp; outlets to set up POS mapping.</td></tr>';
   } else {
     body.innerHTML = outlets.map(function(outlet) {
       return '<tr><td><div style="font-weight:600">' + escapeOverviewText(outlet.name) + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(outlet.group) + '</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><a href="Admin - HQ - POS Mapping.html#pos-mapping" style="color:var(--spinach);font-weight:600;text-decoration:none">Set up</a></td></tr>';
