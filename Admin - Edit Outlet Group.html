@@ -1225,7 +1225,7 @@ let   pendingRemoveId = null;
   });
   document.getElementById('groupPageTitle').textContent = group.name;
   document.getElementById('groupHqLink').textContent = group.hq;
-  document.getElementById('groupHqLink').href = 'Admin - HQ Settings.html?groupCreated=1';
+  document.getElementById('groupHqLink').href = 'Admin - HQ Settings.html?created-hq=' + encodeURIComponent(group.hq || '');
   document.getElementById('detailSettingsTitle').textContent = group.name;
   document.getElementById('detailSettingsName').value = group.name;
   document.getElementById('detailSettingsDescription').value = group.description || '';
@@ -1749,6 +1749,7 @@ function renderStatsStrip() {
 }
 
 function getDisplayItems() {
+  if (window.isCreatedGroupPrototype) return [];
   // Removed at HQ means unavailable to this group. Disabled stays visible.
   let items = ITEMS.filter(i => inheritedHqItemLifecycle(i) !== 'removed' && !isExcludedByHq(i));
   items = items.filter(i => {
@@ -2813,8 +2814,16 @@ function showToast(msg) {
   var link = document.getElementById('backLink');
   var label = document.getElementById('backLinkLabel');
   if (from === 'hq') {
-    link.href = 'Admin - HQ Settings.html';
-    label.textContent = 'Garden Cuisine HQ';
+    var createdGroup;
+    try { createdGroup = JSON.parse(localStorage.getItem('nomniNewOutletGroup') || 'null'); } catch (e) { createdGroup = null; }
+    var hqName = params.get('created-hq') || (createdGroup && createdGroup.hq) || '';
+    if (params.get('newGroup') === '1' && hqName) {
+      link.href = 'Admin - HQ Settings.html?created-hq=' + encodeURIComponent(hqName);
+      label.textContent = hqName;
+    } else {
+      link.href = 'Admin - HQ Settings.html';
+      label.textContent = 'Garden Cuisine HQ';
+    }
   } else {
     link.href = 'Admin - Buyers.html#outlet-groups';
     label.textContent = 'Outlet groups';

@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
 <style>
 :root {
-  --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
+  --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6; --cream: #FAF7E9;
   --ink: #1a1f2b; --ink-2: #4a4f5a; --ink-mute: #8a8f98; --ink-soft: #c7c9cf;
   --rule: #e7e8ec; --row-hover: #f7f8fa; --primary: #2AC864; --settings-cream: #FFF9DE;
   --notice-warning-bg: #FFF3CD; --notice-warning-border: #F5D87A; --notice-warning-ink: #7A5F00;
@@ -398,6 +398,23 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .modal-card { display: flex; flex-direction: column; max-height: calc(100vh - 80px); }
 .modal-body { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
 .modal-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+.recipe-cost-link { appearance:none; border:0; background:none; padding:4px 0; color:var(--ink); font:600 14px/1.35 "Inter",system-ui,sans-serif; font-variant-numeric:tabular-nums; cursor:pointer; text-align:left; text-decoration-line:underline; text-decoration-style:dashed; text-decoration-color:rgba(26,31,43,.38); text-underline-offset:3px; white-space:nowrap; }
+.recipe-cost-link:hover { color:var(--ink); text-decoration-color:currentColor; }
+.recipe-cost-link.is-alert { color:#D0291E; text-decoration-color:rgba(208,41,30,.45); }
+.recipe-cost-link.is-alert:hover { color:#D0291E; text-decoration-color:currentColor; }
+.recipe-cost-link:focus-visible { outline:2px solid var(--nomni-green); outline-offset:3px; border-radius:2px; }
+.recipe-cost-dialog-meta { margin:2px 0 0; color:var(--ink-mute); font-size:14px; }
+.recipe-cost-summary { display:grid; grid-template-columns:repeat(2,1fr); border:1px solid var(--rule); border-radius:8px; overflow:hidden; }
+.recipe-cost-summary-item { padding:13px 16px; }
+.recipe-cost-summary-item + .recipe-cost-summary-item { border-left:1px solid var(--rule); }
+.recipe-cost-summary-label { display:block; color:var(--ink-mute); font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+.recipe-cost-summary-value { display:block; margin-top:4px; color:var(--ink); font-family:"Hanken Grotesk",system-ui,sans-serif; font-size:22px; font-weight:800; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.recipe-cost-target-table { width:100%; border-collapse:separate; border-spacing:0; font-size:14px; }
+.recipe-cost-target-table th { padding:9px 10px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); background:#f9fafb; color:var(--ink-mute); font-size:11px; font-weight:700; letter-spacing:.04em; text-align:left; text-transform:uppercase; white-space:nowrap; }
+.recipe-cost-target-table td { padding:12px 10px; border-bottom:1px solid var(--rule); vertical-align:middle; }
+.recipe-cost-target-table tr:last-child td { border-bottom:0; }
+.recipe-cost-target-table .numeric { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.recipe-cost-target-sub { display:block; margin-top:2px; color:var(--ink-mute); font-size:12px; }
 .field-label { display:block; font-size:14px; font-weight:500; color:var(--ink); margin-bottom:6px; }
 .field-label .opt { font-weight:400; color:var(--ink-mute); }
 .field-input { width:100%; min-height:40px; padding:9px 12px; border:1px solid #dcdee3; border-radius:6px; background:#fff; color:var(--ink); font:inherit; font-size:14px; outline:none; box-sizing:border-box; }
@@ -406,6 +423,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay, #linkSupOverlay { inset:56px 0 0 232px; z-index:8; padding:0; background:#fff; align-items:stretch; justify-content:stretch; }
 #supplierSettingsOverlay.open, #linkSupOverlay.open { display:block; }
 #supplierSettingsOverlay .modal-card, #linkSupOverlay .modal-card { width:100% !important; height:100%; min-height:0; max-width:none; max-height:none; border-radius:0; box-shadow:none; overflow:hidden; }
+#supplierSettingsOverlay .modal-card { position:relative; }
 #supplierSettingsOverlay .modal-header, #linkSupOverlay .modal-header { padding:28px 40px 16px; border-bottom:1px solid var(--rule); }
 #supplierSettingsOverlay #supplierSettingsPageTitle, #linkSupOverlay #linkSupPageTitle { font-size:24px !important; letter-spacing:-.03em; }
 #supplierSettingsOverlay .supplier-back, #linkSupOverlay .supplier-back { display:inline-flex; align-items:center; gap:5px; min-height:18px; margin-bottom:10px; padding:0; border:0; background:none; color:var(--ink-mute); font:inherit; font-size:14px; font-weight:500; line-height:18px; cursor:pointer; }
@@ -444,8 +462,9 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .supplier-availability-target-meta { display:block; margin-top:2px; color:var(--ink-mute); font-size:12px; }
 .supplier-availability-target-status { display:block; margin-top:3px; color:var(--spinach); font-size:11px; font-weight:400; }
 #supplierSettingsOverlay .supplier-settings-shell { width:100%; height:auto; margin:0; padding-bottom:0; }
-#supplierSettingsOverlay .supplier-settings-layout { display:grid; grid-template-columns:220px minmax(0,1fr); gap:42px; align-items:stretch; height:auto; min-height:100%; }
-#supplierSettingsOverlay .supplier-scope-nav { position:sticky; top:0; align-self:start; height:calc(100vh - 220px); min-height:0; max-height:calc(100vh - 220px); box-sizing:border-box; padding:22px 20px 0 0; border-right:1px solid var(--rule); display:flex; flex-direction:column; }
+#supplierSettingsOverlay .supplier-settings-layout { position:relative; display:grid; grid-template-columns:220px minmax(0,1fr); gap:42px; align-items:stretch; height:auto; min-height:100%; }
+#supplierSettingsOverlay .supplier-settings-layout::before { content:""; position:absolute; top:0; bottom:0; left:220px; width:1px; background:var(--rule); }
+#supplierSettingsOverlay .supplier-scope-nav { position:sticky; top:0; align-self:start; height:calc(100vh - 220px); min-height:0; max-height:calc(100vh - 220px); box-sizing:border-box; padding:19px 20px 0 0; border-right:0; display:flex; flex-direction:column; }
 #supplierSettingsOverlay .supplier-scope-nav-item { width:100%; min-height:52px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:11px 12px; border:1px solid var(--rule); border-radius:8px; background:#fff; color:var(--ink-2); font:inherit; font-size:14px; font-weight:700; text-align:left; cursor:pointer; }
 #supplierSettingsOverlay .supplier-scope-nav-item:hover { border-color:#A9DDB6; background:#F7FFF9; color:var(--spinach); }
 #supplierSettingsOverlay .supplier-scope-nav-item.is-active { background:#E2FFE6; border-color:#91CEA0; color:var(--seaweed); }
@@ -456,9 +475,11 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-scope-nav-item.is-active.is-incomplete { border:2px solid var(--spinach); background:var(--mint); box-shadow:none; }
 #supplierSettingsOverlay .supplier-scope-nav-item.is-active.is-incomplete .supplier-scope-status-line { color:#A16207; }
 #supplierSettingsOverlay .supplier-scope-nav-item .supplier-scope-status-line .material-symbols-rounded { font-size:14px; line-height:1; }
-#supplierSettingsOverlay .supplier-scope-nav-add { width:100%; justify-content:center; margin-top:10px; }
+#supplierSettingsOverlay .supplier-scope-nav-add { width:100%; justify-content:center; margin-top:4px; }
 #supplierSettingsOverlay .supplier-scope-nav-overrides { display:flex; flex:0 1 auto; min-height:0; max-height:calc(100vh - 330px); flex-direction:column; gap:8px; margin-top:10px; overflow-y:auto; }
+#supplierSettingsOverlay #supplierScopeNavPolicies { margin-top:0; }
 #supplierSettingsOverlay .supplier-scope-nav-overrides:empty { flex:0 0 auto; }
+#supplierSettingsOverlay #supplierScopeNavOverrides:empty { margin-top:0; }
 #supplierSettingsOverlay .supplier-scope-nav-label { margin:18px 0 7px; color:var(--ink-mute); font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; }
 #supplierSettingsOverlay .supplier-scope-nav-help { margin:8px 0 0; color:var(--ink-mute); font-size:12px; line-height:1.4; }
 #supplierSettingsOverlay .supplier-scope-nav-item.is-inherited { font-weight:600; }
@@ -471,7 +492,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay #supplierExceptionsLabel[hidden],
 #supplierSettingsOverlay .supplier-copy-settings[hidden],
 #supplierSettingsOverlay .supplier-override-delete[hidden],
-#supplierSettingsOverlay .modal-foot[hidden] { display:none !important; }
+#supplierSettingsOverlay #supplierSettingsFooter[hidden] { display:none !important; }
 #supplierSettingsOverlay.is-read-only .field-input:disabled { background:#F3F4F6; border-color:#E1E4E8; color:#7A808A; opacity:1; cursor:not-allowed; }
 #supplierSettingsOverlay.is-read-only .supplier-settings-check { color:#7A808A; cursor:default; }
 #supplierSettingsOverlay.is-read-only .supplier-cutoff.is-disabled { opacity:.65; }
@@ -482,8 +503,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay.is-read-only .supplier-copy-settings,
 #supplierSettingsOverlay.is-read-only .supplier-override-delete,
 #supplierSettingsOverlay.is-read-only .supplier-editing-note,
-#supplierSettingsOverlay.is-read-only .modal-foot { display:none !important; }
-#supplierSettingsOverlay .supplier-settings-content { width:min(640px,100%); height:auto; min-width:0; justify-self:center; overflow:visible; padding-bottom:24px; box-sizing:border-box; }
+#supplierSettingsOverlay.is-read-only #supplierSettingsFooter { display:none !important; }
+#supplierSettingsOverlay .supplier-settings-content { width:min(640px,100%); height:auto; min-width:0; justify-self:center; overflow:visible; padding-bottom:32px; box-sizing:border-box; }
 #supplierSettingsOverlay .supplier-scope-card { margin-top:28px; padding:18px 20px; border:1px solid #C9F6D3; border-radius:10px; background:#F7FFF9; }
 #supplierSettingsOverlay .supplier-scope-title { margin:0; color:var(--ink); font-size:16px; font-weight:700; letter-spacing:-.01em; }
 #supplierSettingsOverlay .supplier-scope-intro { margin:5px 0 14px; color:var(--ink-mute); font-size:13px; line-height:1.45; }
@@ -500,12 +521,16 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-scope-edit:hover { background:#E8F7EC; }
 #supplierSettingsOverlay .supplier-scope-edit:active { transform:scale(.96); }
 #supplierSettingsOverlay .supplier-scope-row.is-current .supplier-scope-edit { background:var(--spinach); color:#fff; border-color:var(--spinach); }
-#supplierSettingsOverlay .supplier-editing-note { min-height:52px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:22px 0 -10px; padding:13px 15px; border-radius:8px; background:var(--mint); color:#356343; font-size:14px; line-height:1.35; }
+#supplierSettingsOverlay .supplier-editing-note { position:sticky; top:18px; z-index:3; min-height:52px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:18px; margin:30px 0 -10px; padding:20px 25px; border:2px solid var(--rule); border-radius:8px; background:#fff; box-shadow:0 3px 8px rgba(10,20,15,.08); color:var(--ink); font-size:14px; line-height:1.35; }
 #supplierSettingsOverlay .supplier-editing-note strong { color:var(--ink); }
+#supplierSettingsOverlay .supplier-editing-intro { display:flex; flex-direction:column; gap:2px; color:var(--ink-mute); font-size:12px; font-weight:500; line-height:1.3; }
+#supplierSettingsOverlay .supplier-editing-intro strong { font-size:21px; font-weight:700; letter-spacing:-.02em; line-height:1.2; }
+#supplierSettingsOverlay .supplier-settings-actions { display:flex; align-items:center; justify-content:flex-end; gap:14px; }
+#supplierSettingsOverlay .supplier-copy-settings { padding:5px 0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:600; white-space:nowrap; cursor:pointer; }
+#supplierSettingsOverlay .supplier-copy-settings:hover { color:var(--seaweed); text-decoration:underline; text-underline-offset:3px; }
+#supplierSettingsOverlay #supplierSaveButton:disabled { border-color:#E7E8EC; background:#E7E8EC; color:var(--ink-mute); cursor:not-allowed; }
 #supplierSettingsOverlay .supplier-override-delete { border:0; background:transparent; padding:5px 0; color:#B42318; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
 #supplierSettingsOverlay .supplier-override-delete:hover { color:#8D1B12; }
-#supplierSettingsOverlay .supplier-copy-settings { border:0; background:transparent; padding:5px 0; color:var(--spinach); font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
-#supplierSettingsOverlay .supplier-copy-settings:hover { color:var(--seaweed); }
 #supplier-override-picker-card { width:600px !important; }
 #supplierOverridePicker .modal-header { align-items:center; padding:10px 24px; }
 #supplierOverridePicker .modal-close { width:40px; height:40px; padding:0; justify-content:center; border-radius:6px; color:var(--ink-mute); }
@@ -535,6 +560,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierCopyPicker .supplier-override-target span span { display:block; margin-top:3px; color:var(--ink-mute); font-size:12px; }
 #supplierSettingsOverlay .supplier-settings-section { display:flex; flex-direction:column; }
 #supplierSettingsOverlay .supplier-settings-heading { margin:34px 0 18px; font-size:21px; line-height:1.2; font-weight:700; letter-spacing:-.02em; color:var(--ink); }
+#supplierSettingsOverlay #supplierContactSection .supplier-settings-heading { margin-top:50px; }
 #supplierSettingsOverlay .supplier-settings-card { padding:28px; border:0; border-radius:8px; background:#F7F7F7; display:flex; flex-direction:column; gap:14px; }
 #supplierSettingsOverlay .supplier-settings-card + .supplier-settings-card { margin-top:20px; }
 #supplierSettingsOverlay .supplier-settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -560,11 +586,13 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-apply-all.is-visible { opacity:1; pointer-events:auto; }
 #supplierSettingsOverlay .supplier-apply-all:active { transform:scale(.96); }
 #supplierSettingsOverlay .supplier-policy-applied { margin:12px 0 0; color:var(--spinach); font-size:12px; font-weight:700; }
-#supplierSettingsOverlay .modal-foot { padding:14px 40px 18px; background:#fff; box-shadow:0 -8px 20px rgba(10,20,15,.06); }
-#supplierSettingsOverlay .supplier-page-cancel { min-height:40px; padding:0; border:0; background:transparent; color:var(--ink-mute); font:inherit; font-size:14px; font-weight:500; cursor:pointer; }
+#supplierSettingsOverlay .supplier-settings-footer { position:absolute; left:calc(50% - 189px); bottom:28px; z-index:2; width:min(640px,calc(100% - 64px)); box-sizing:border-box; padding:14px 20px; border:1px solid var(--rule); border-radius:10px; background:#fff; box-shadow:0 12px 32px rgba(10,20,15,.14); }
+#supplierSettingsOverlay .supplier-settings-footer-actions { width:min(640px,100%); margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+#supplierSettingsOverlay .supplier-page-cancel { min-height:40px; padding:0 10px; border:0; background:transparent; color:var(--ink-mute); font:inherit; font-size:14px; font-weight:500; cursor:pointer; }
 #supplierSettingsOverlay .supplier-page-cancel:hover { color:var(--ink); }
 @media (max-width:1280px) { #supplierSettingsOverlay, #linkSupOverlay { left:64px; } }
-@media (max-width:700px) { #supplierSettingsOverlay, #linkSupOverlay { left:0; } #supplierSettingsOverlay .modal-header,#supplierSettingsOverlay .modal-body,#supplierSettingsOverlay .modal-foot,#linkSupOverlay .modal-header,#linkSupOverlay .modal-body,#supplierSettingsOverlay .hq-steps,#linkSupOverlay .hq-steps { padding-left:20px; padding-right:20px; } #supplierSettingsOverlay .modal-body { overflow-y:auto; } #supplierSettingsOverlay .supplier-policy-head,#supplierSettingsOverlay .supplier-policy-row { grid-template-columns:110px 1fr; } #supplierSettingsOverlay .supplier-apply-all { grid-column:2; justify-self:start; } #supplierSettingsOverlay .supplier-settings-shell,#supplierSettingsOverlay .supplier-settings-layout { height:auto; } #supplierSettingsOverlay .supplier-settings-layout { grid-template-columns:1fr; gap:18px; } #supplierSettingsOverlay .supplier-scope-nav { position:static; height:auto; max-height:none; border-right:0; padding:0; } #supplierSettingsOverlay .supplier-settings-content { height:auto; overflow:visible; } }
+@media (max-width:700px) { #supplierSettingsOverlay, #linkSupOverlay { left:0; } #supplierSettingsOverlay .modal-header,#supplierSettingsOverlay .modal-body,#supplierSettingsOverlay .modal-foot,#linkSupOverlay .modal-header,#linkSupOverlay .modal-body,#supplierSettingsOverlay .hq-steps,#linkSupOverlay .hq-steps { padding-left:20px; padding-right:20px; } #supplierSettingsOverlay .modal-body { overflow-y:auto; } #supplierSettingsOverlay .supplier-policy-head,#supplierSettingsOverlay .supplier-policy-row { grid-template-columns:110px 1fr; } #supplierSettingsOverlay .supplier-apply-all { grid-column:2; justify-self:start; } #supplierSettingsOverlay .supplier-settings-shell,#supplierSettingsOverlay .supplier-settings-layout { height:auto; } #supplierSettingsOverlay .supplier-settings-layout { grid-template-columns:1fr; gap:18px; } #supplierSettingsOverlay .supplier-scope-nav { position:static; height:auto; max-height:none; border-right:0; padding:0; } #supplierSettingsOverlay .supplier-settings-content { height:auto; overflow:visible; } #supplierSettingsOverlay .supplier-settings-footer { position:static; width:auto; margin:0; padding:14px 20px 18px; border-right:0; border-bottom:0; border-left:0; border-radius:0; box-shadow:0 -6px 16px rgba(10,20,15,.08); } }
+@media (max-width:700px) { #supplierSettingsOverlay .supplier-settings-layout::before { display:none; } #supplierSettingsOverlay .supplier-editing-note { top:12px; margin:12px 0 -10px; } }
 .modal-field { display: flex; flex-direction: column; gap: 5px; }
 .modal-field label { font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; }
 .modal-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -1066,8 +1094,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   cursor: not-allowed;
 }
 
-.btn-secondary,
-.btn-tertiary {
+.btn-secondary {
   min-height: 40px;
   padding: 0 16px;
   border: 1px solid #E2FFE6;
@@ -1084,10 +1111,40 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   white-space: nowrap;
   transition: background-color .18s ease, border-color .18s ease, transform .16s ease;
 }
-.btn-secondary:hover:not(:disabled),
-.btn-tertiary:hover:not(:disabled) {
+.btn-tertiary {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #F3F4F6;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: background-color .18s ease, border-color .18s ease, transform .16s ease;
+}
+.btn-secondary:hover:not(:disabled) {
   background: #C6F2CE;
   border-color: #C6F2CE;
+}
+.btn-tertiary:hover:not(:disabled) {
+  background: #E6E8EC;
+  border-color: #E6E8EC;
+}
+.btn-tertiary-outline {
+  background:#fff;
+  border-color:var(--seaweed);
+  color:var(--seaweed);
+}
+.btn-tertiary-outline:hover:not(:disabled) {
+  background:var(--mint);
+  border-color:var(--seaweed);
+  color:var(--seaweed);
 }
 .btn-secondary:active:not(:disabled),
 .btn-tertiary:active:not(:disabled) { transform: scale(.96); }
@@ -1356,7 +1413,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="stats-strip" id="statsStrip"></div>
 
     <div class="tabs">
-      <div class="tab active" data-tab="outlet-groups">Overview</div>
+      <div class="tab active" data-tab="outlet-groups">Outlets &amp; groups</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
       <div class="tab" data-tab="market-list"><span class="tab-label">Items</span><span class="tab-indicators"><span class="tab-status-dot" aria-label="New activity" title="New activity"></span></span></div>
       <div class="tab" data-tab="inventory">Inventory</div>
@@ -1593,7 +1650,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
     <!-- ── Market List ── -->
     <div class="tab-panel" id="panel-market-list">
-      <div id="priceReviewBanner" style="background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
+      <div id="priceReviewBanner" hidden style="display:none;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
         <div style="display:flex;align-items:flex-start;gap:10px">
           <span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span>
           <div>
@@ -1646,7 +1703,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <tr>
               <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">Item name <span class="sort-ind"></span></th>
               <th style="width:100px">UOM</th>
-              <th id="mlSortTh-price" style="width:140px">Price</th>
+              <th id="mlSortTh-price" style="width:180px">Price</th>
               <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
             </tr>
@@ -1707,8 +1764,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <thead>
             <tr>
               <th class="sort-th" id="recSortTh-name" onclick="setRecSort('name')">Recipe <span class="sort-ind"></span></th>
-              <th class="sort-th" id="recSortTh-cost" onclick="setRecSort('cost')" style="width:100px">Cost <span class="sort-ind"></span></th>
-              <th style="width:110px">Food cost %</th>
+              <th class="sort-th" id="recSortTh-cost" onclick="setRecSort('cost')" style="width:170px">Cost range <span class="sort-ind"></span></th>
+              <th style="width:140px">Food cost range</th>
               <th style="width:160px">Available to</th>
               <th style="width:120px">Last updated</th>
               <th style="width:48px"></th>
@@ -1722,7 +1779,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
     <!-- ── Suppliers ── -->
     <div class="tab-panel" id="panel-suppliers">
-      <div id="supplierSettingsBanner" style="display:none;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
+      <div id="supplierSettingsBanner" hidden style="display:none;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
         <div style="display:flex;align-items:flex-start;gap:10px"><span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span><div><div id="supplierSettingsBannerCount" style="font-size:14px;font-weight:700;color:var(--notice-warning-ink)"></div><div style="font-size:14px;color:var(--notice-warning-ink);margin-top:2px">These locations cannot order from their supplier until their settings are added.</div></div></div><button type="button" class="btn btn-tertiary" id="supplierSettingsFilterButton" onclick="toggleSupplierSettingsFilter()" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap">View suppliers</button>
       </div>
       <div class="panel-label-row">
@@ -1933,6 +1990,28 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
       <button class="btn btn-secondary" type="button" onclick="closeEditHqDialog()">Cancel</button>
       <button class="btn btn-primary" type="button" onclick="saveEditHqDialog()">Save changes</button>
     </div>
+  </div>
+</div>
+
+<!-- Recipe cost comparison dialog -->
+<div class="modal-overlay" id="recipeCostDialog" onclick="if(event.target===this)closeRecipeCostDialog()">
+  <div class="modal-card" style="width:760px">
+    <div class="modal-header" style="padding-bottom:16px">
+      <div style="min-width:0">
+        <h2 class="modal-title" id="recipeCostDialogTitle">Recipe cost by target</h2>
+      </div>
+      <button class="modal-close" type="button" onclick="closeRecipeCostDialog()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="gap:18px">
+      <div class="recipe-cost-summary" id="recipeCostDialogSummary"></div>
+      <table class="recipe-cost-target-table">
+        <thead><tr><th>Pricing target</th><th>Recipe variation</th><th class="numeric">Cost</th><th class="numeric">Selling price</th><th class="numeric">Food cost</th></tr></thead>
+        <tbody id="recipeCostDialogRows"></tbody>
+      </table>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" type="button" onclick="closeRecipeCostDialog()">Done</button></div>
   </div>
 </div>
 
@@ -2326,9 +2405,13 @@ function getPendingPriceChanges() {
 function renderPriceReviewBanner(pendingPriceChanges) {
   const banner = document.getElementById('priceReviewBanner');
   const count = pendingPriceChanges.length;
-  if (banner) banner.style.display = count ? 'flex' : 'none';
+  const hasPendingChanges = Number(count) > 0;
+  if (banner) {
+    banner.hidden = !hasPendingChanges;
+    banner.style.display = hasPendingChanges ? 'flex' : 'none';
+  }
   const countLabel = document.getElementById('priceReviewBannerCount');
-  if (countLabel) countLabel.textContent = count + ' price change' + (count === 1 ? '' : 's') + ' pending review';
+  if (countLabel) countLabel.textContent = hasPendingChanges ? count + ' price change' + (count === 1 ? '' : 's') + ' pending review' : '';
 }
 
 function renderHealthCheck() {
@@ -3027,7 +3110,7 @@ function getDefaultScopeMoq(item, uomIdx) {
 function formatItemPriceRange(itemIdx, uomIdx) {
   const range = getItemPriceRange(itemIdx, uomIdx);
   const price = range.varies
-    ? 'S$' + range.min.toFixed(2) + '–' + range.max.toFixed(2)
+    ? 'S$' + range.min.toFixed(2) + ' – S$' + range.max.toFixed(2)
     : 'S$' + range.min.toFixed(2);
   return '<div class="ml-price-main">' + price + '</div>';
 }
@@ -3952,7 +4035,7 @@ function setRecSort(key) {
 function getRecItems() {
   let items = RECIPES.slice();
   if (recTypeFilter) items = items.filter(r => r.type === recTypeFilter);
-  if (recFoodCostFilter === 'above-threshold') items = items.filter(r => r.foodCostPct > recFcThreshold);
+  if (recFoodCostFilter === 'above-threshold') items = items.filter(r => recipeCostTargets(r).rows.some(function(target) { return target.foodCostPct > recFcThreshold; }));
   if (recCatFilter) items = items.filter(r => r.cat === recCatFilter);
   if (recStatusFilter) items = items.filter(r => recipeLifecycle(r) === recStatusFilter);
   else items = items.filter(r => recipeLifecycle(r) !== 'removed');
@@ -3962,14 +4045,94 @@ function getRecItems() {
   }
   if (recSortKey === 'name-asc') items.sort((a,b) => a.name.localeCompare(b.name));
   else if (recSortKey === 'name-desc') items.sort((a,b) => b.name.localeCompare(a.name));
-  else if (recSortKey === 'cost-asc') items.sort((a,b) => a.foodCostPct - b.foodCostPct);
-  else if (recSortKey === 'cost-desc') items.sort((a,b) => b.foodCostPct - a.foodCostPct);
+  else if (recSortKey === 'cost-asc') items.sort((a,b) => recipeCostTargets(a).minCost - recipeCostTargets(b).minCost);
+  else if (recSortKey === 'cost-desc') items.sort((a,b) => recipeCostTargets(b).minCost - recipeCostTargets(a).minCost);
   else items.sort((a,b) => {
     const ci = REC_CAT_ORDER.indexOf(a.cat) - REC_CAT_ORDER.indexOf(b.cat);
     return ci !== 0 ? ci : a.name.localeCompare(b.name);
   });
   return items;
 }
+
+const RECIPE_TARGET_FACTORS = {
+  'Chargrill Outlets': { cost: 0.98, price: 1 },
+  'Family Dining Express': { cost: 1.03, price: 1 },
+  '(WF 139) Chargrill @ 139 Tampines': { cost: 0.96, price: 0.98 },
+  '(WF 290) Garden Express @ 290 Sengkang': { cost: 1.05, price: 1.02 }
+};
+const RECIPE_GROUP_OUTLET_COUNTS = { 'Chargrill Outlets': 4, 'Family Dining Express': 6 };
+
+function formatRecipeMoney(value) {
+  return '$' + value.toFixed(2);
+}
+
+function formatRecipeRange(values, formatter) {
+  const min = Math.min.apply(null, values);
+  const max = Math.max.apply(null, values);
+  return Math.abs(min - max) < 0.005 ? formatter(min) : formatter(min) + ' – ' + formatter(max);
+}
+
+function recipeTargetMeta(row) {
+  if (row.type !== 'Outlet group') return '';
+  const count = RECIPE_GROUP_OUTLET_COUNTS[row.name] || 0;
+  return count === 1 ? '1 outlet' : count + ' outlets';
+}
+
+function recipeCostTargets(recipe) {
+  const rawIndex = RECIPES.indexOf(recipe);
+  const targets = [];
+  (recipe.groupList || []).forEach(function(name) { targets.push({ name:name, type:'Outlet group' }); });
+  (recipe.outletList || []).forEach(function(name) { targets.push({ name:name, type:'Ungrouped outlet' }); });
+  const rows = targets.map(function(target, targetIndex) {
+    const factor = RECIPE_TARGET_FACTORS[target.name] || { cost:1, price:1 };
+    const variationAdjustment = ((rawIndex + targetIndex) % 3 - 1) * 0.01;
+    const cost = Math.max(0, recipe.cost * (factor.cost + variationAdjustment));
+    const price = Math.max(0, recipe.price * factor.price);
+    const usesVariation = recipe.versions > 1 && (rawIndex + targetIndex) % 2 === 0;
+    return {
+      name:target.name,
+      type:target.type,
+      variation:usesVariation ? target.name + ' variation' : 'Base recipe',
+      cost:cost,
+      price:price,
+      foodCostPct:price ? cost / price * 100 : 0
+    };
+  });
+  return {
+    rows:rows,
+    minCost:rows.length ? Math.min.apply(null, rows.map(function(row) { return row.cost; })) : 0,
+    costRange:rows.length ? formatRecipeRange(rows.map(function(row) { return row.cost; }), formatRecipeMoney) : '—',
+    foodCostRange:rows.length ? formatRecipeRange(rows.map(function(row) { return row.foodCostPct; }), function(value) { return value.toFixed(1) + '%'; }) : '—'
+  };
+}
+
+function closeRecipeCostDialog() {
+  document.getElementById('recipeCostDialog').classList.remove('open');
+}
+
+function openRecipeCostDialog(recipeIndex) {
+  const recipe = RECIPES[recipeIndex];
+  if (!recipe) return;
+  const comparison = recipeCostTargets(recipe);
+  document.getElementById('recipeCostDialogTitle').textContent = recipe.name;
+  document.getElementById('recipeCostDialogSummary').innerHTML =
+    '<div class="recipe-cost-summary-item"><span class="recipe-cost-summary-label">Cost range</span><span class="recipe-cost-summary-value">' + comparison.costRange + '</span></div>' +
+    '<div class="recipe-cost-summary-item"><span class="recipe-cost-summary-label">Food cost range</span><span class="recipe-cost-summary-value">' + comparison.foodCostRange + '</span></div>';
+  document.getElementById('recipeCostDialogRows').innerHTML = comparison.rows.map(function(row) {
+    return '<tr>' +
+      '<td><strong>' + row.name + '</strong>' + (recipeTargetMeta(row) ? '<span class="recipe-cost-target-sub">' + recipeTargetMeta(row) + '</span>' : '') + '</td>' +
+      '<td>' + row.variation + '</td>' +
+      '<td class="numeric">' + formatRecipeMoney(row.cost) + '</td>' +
+      '<td class="numeric">' + formatRecipeMoney(row.price) + '</td>' +
+      '<td class="numeric"><strong style="color:' + (row.foodCostPct > recFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + row.foodCostPct.toFixed(1) + '%</strong></td>' +
+    '</tr>';
+  }).join('');
+  document.getElementById('recipeCostDialog').classList.add('open');
+}
+
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') closeRecipeCostDialog();
+});
 
 function renderRec() {
   const items = getRecItems();
@@ -3982,23 +4145,25 @@ function renderRec() {
   document.getElementById('recBody').innerHTML = page.map(r => {
     const accessLabel = availabilityLabel(r.groupList, r.outletList, REC_GROUPS.length, REC_OUTLETS.length);
     const grpAttr = 'data-groups="' + r.groupList.join('|') + '" data-outlets="' + r.outletList.join('|') + '" data-av-kind="recipe" data-av-ref="' + RECIPES.indexOf(r) + '"';
-    const grpHtml = '<button onclick="openRecGroupsDialog(this)" ' + grpAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + accessLabel + '</button>';
+    const grpHtml = '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" ' + grpAttr + ' style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + accessLabel + '</button>';
     const versionsHtml = r.versions > 1
       ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' variations</span>'
       : '';
     const lifecycle = recipeLifecycle(r);
     const stateBadge = lifecycle === 'active' ? '' : '<span class="item-exc-badge" style="margin-left:7px;color:' + (lifecycle === 'removed' ? 'var(--chip-rejected-ink)' : 'var(--ink-mute)') + '">' + (lifecycle === 'removed' ? 'Removed' : 'Disabled') + '</span>';
     const rawIdx = RECIPES.indexOf(r);
-    return '<tr' + (lifecycle === 'active' ? '' : ' class="ml-inactive"') + '>' +
+    const comparison = recipeCostTargets(r);
+    const hasHighFoodCost = comparison.rows.some(function(target) { return target.foodCostPct > recFcThreshold; });
+    return '<tr' + (lifecycle === 'active' ? '' : ' class="ml-inactive"') + ' onclick="window.location.href=\'Admin - HQ Recipe Create.html\'" style="cursor:pointer">' +
       '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + stateBadge + versionsHtml + '</div><span class="ml-cat-tag">' + (r.type === 'sub-recipe' ? 'Sub-recipe · ' : 'Recipe · ') + r.cat + '</span></td>' +
-      '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">sell $' + r.price.toFixed(2) + '</div></td>' +
-      '<td><span style="font-size: 14px;font-weight:700;color:' + (r.foodCostPct > recFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
+      '<td><button class="recipe-cost-link" type="button" onclick="event.stopPropagation();openRecipeCostDialog(' + rawIdx + ')">' + comparison.costRange + '</button></td>' +
+      '<td><button class="recipe-cost-link' + (hasHighFoodCost ? ' is-alert' : '') + '" type="button" onclick="event.stopPropagation();openRecipeCostDialog(' + rawIdx + ')">' + comparison.foodCostRange + '</button></td>' +
       '<td style="text-align:left">' + grpHtml + '</td>' +
       '<td style="font-size: 14px;color:var(--ink-mute)">' + r.lastUpdated + '</td>' +
-      '<td><div class="row-actions-wrap">' +
+      '<td><div class="row-actions-wrap" onclick="event.stopPropagation()">' +
         '<button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
         '<div class="row-actions-menu">' +
-          '<div class="row-action-item">Edit</div>' +
+          '<div class="row-action-item" onclick="window.location.href=\'Admin - HQ Recipe Create.html\'">Edit</div>' +
           (lifecycle === 'removed'
             ? '<div class="row-action-item" onclick="event.stopPropagation();setRecipeLifecycle(' + rawIdx + ',\'active\')">Restore</div>'
             : '<div class="row-action-item" onclick="event.stopPropagation();setRecipeLifecycle(' + rawIdx + ',\'' + (lifecycle === 'disabled' ? 'active' : 'disabled') + '\')">' + (lifecycle === 'disabled' ? 'Enable' : 'Disable') + '</div>' +
@@ -4624,7 +4789,9 @@ function openSupplierAvailability(name) {
 }
 
 function supplierRequiredOrderingScopes(supplier) {
-  return (supplier.groupList || []).map(function(name) { return 'group-' + name; }).concat((supplier.outletList || []).map(function(name) { return 'outlet-' + name; }));
+  var groups = (supplier.groupList || []).map(function(name) { return 'group-' + name; }).sort(function(a, b) { return a.slice(6).localeCompare(b.slice(6)); });
+  var outlets = (supplier.outletList || []).map(function(name) { return 'outlet-' + name; }).sort(function(a, b) { return a.slice(7).localeCompare(b.slice(7)); });
+  return groups.concat(outlets);
 }
 function supplierSettingsAreComplete(settings) {
   return !!(settings && (settings.recipientEmail || settings.whatsapp) && Array.isArray(settings.deliveryDays) && settings.deliveryDays.length);
@@ -4634,6 +4801,19 @@ function supplierMissingOrderingScopes(supplier) {
   var settings = supplier.scopeSettings || {};
   return supplierRequiredOrderingScopes(supplier).filter(function(scope) { return !supplierSettingsAreComplete(settings[scope]); });
 }
+function nextSupplierScopeRequiringSettings(supplier, currentScope) {
+  var scopes = supplierRequiredOrderingScopes(supplier);
+  var missingScopes = supplierMissingOrderingScopes(supplier);
+  if (!missingScopes.length) return '';
+  var currentIndex = scopes.indexOf(currentScope);
+  for (var index = currentIndex + 1; index < scopes.length; index++) {
+    if (missingScopes.indexOf(scopes[index]) !== -1) return scopes[index];
+  }
+  for (var wrappedIndex = 0; wrappedIndex <= currentIndex; wrappedIndex++) {
+    if (missingScopes.indexOf(scopes[wrappedIndex]) !== -1) return scopes[wrappedIndex];
+  }
+  return missingScopes[0];
+}
 function getIncompleteSupplierSettings() {
   return SUPPLIERS.filter(function(supplier) { return supplier.active !== false && supplierMissingOrderingScopes(supplier).length; });
 }
@@ -4641,19 +4821,23 @@ var showSuppliersMissingSettingsOnly = false;
 function renderSupplierSettingsAttention() {
   var incomplete = getIncompleteSupplierSettings();
   var missingLocations = incomplete.reduce(function(total, supplier) { return total + supplierMissingOrderingScopes(supplier).length; }, 0);
+  var hasMissingLocations = Number(missingLocations) > 0;
   var banner = document.getElementById('supplierSettingsBanner');
-  if (banner) banner.style.display = missingLocations ? 'flex' : 'none';
+  if (banner) {
+    banner.hidden = !hasMissingLocations;
+    banner.style.display = hasMissingLocations ? 'flex' : 'none';
+  }
   var count = document.getElementById('supplierSettingsBannerCount');
-  if (count) count.textContent = missingLocations + ' location' + (missingLocations === 1 ? ' needs' : 's need') + ' order settings';
+  if (count) count.textContent = hasMissingLocations ? missingLocations + ' location' + (missingLocations === 1 ? ' needs' : 's need') + ' order settings' : '';
   var filterButton = document.getElementById('supplierSettingsFilterButton');
   if (filterButton) {
-    filterButton.style.display = missingLocations ? '' : 'none';
+    filterButton.style.display = hasMissingLocations ? '' : 'none';
     filterButton.className = showSuppliersMissingSettingsOnly ? 'supplier-settings-filter-clear' : 'btn btn-tertiary';
     filterButton.style.cssText = showSuppliersMissingSettingsOnly ? 'align-self:center' : 'flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap';
     filterButton.innerHTML = showSuppliersMissingSettingsOnly ? '<span class="material-symbols-rounded" aria-hidden="true">close</span>Clear filter' : 'View suppliers';
   }
   var filterChip = document.getElementById('supplierSettingsFilterChip');
-  if (filterChip) filterChip.hidden = !showSuppliersMissingSettingsOnly;
+  if (filterChip) filterChip.hidden = !hasMissingLocations || !showSuppliersMissingSettingsOnly;
 }
 function toggleSupplierSettingsFilter() {
   setSupplierSettingsFilter(!showSuppliersMissingSettingsOnly);
@@ -5408,7 +5592,7 @@ function setSupplierSettingsForm(settings, supplier) {
   var whatsapp = settings.whatsapp || '';
   document.getElementById('supplierRecipientEmail').value = recipientEmail;
   document.getElementById('supplierWhatsapp').value = whatsapp;
-  document.getElementById('supplierNoEmail').checked = settings.noEmail || !recipientEmail;
+  document.getElementById('supplierNoEmail').checked = settings.noEmail === true;
   document.getElementById('supplierRecipientEmail').disabled = false;
   document.getElementById('supplierRecipientEmail').required = false;
   document.getElementById('supplierMinOrder').value = settings.minOrder || '0';
@@ -5423,10 +5607,14 @@ function setSupplierSettingsForm(settings, supplier) {
     setSupplierPolicyRow(row, !!delivery);
   });
   if (document.getElementById('supplierNoEmail').checked) toggleSupplierNoEmail();
+  updateSupplierSaveState();
+}
+function cloneSupplierScopeSettings(settings) {
+  return settings ? JSON.parse(JSON.stringify(settings)) : {};
 }
 function supplierScopeSettings(supplier, scope) {
-  if (supplierScopeDrafts[scope]) return supplierScopeDrafts[scope];
-  if (supplier.scopeSettings && supplier.scopeSettings[scope]) return supplier.scopeSettings[scope];
+  if (supplier.scopeSettings && supplier.scopeSettings[scope]) return cloneSupplierScopeSettings(supplier.scopeSettings[scope]);
+  if (supplierScopeDrafts[scope]) return cloneSupplierScopeSettings(supplierScopeDrafts[scope]);
   if (supplier.type === 'active') return { recipientEmail:supplier.contact === '—' ? '' : (supplier.contact || ''), whatsapp:'', minOrder:'0', blockBelowMinimum:true, deliveryDays:[{ day:'Monday', daysEarlier:'2', cutoff:'12:00' }, { day:'Wednesday', daysEarlier:'2', cutoff:'12:00' }, { day:'Friday', daysEarlier:'2', cutoff:'12:00' }] };
   return {};
 }
@@ -5437,7 +5625,7 @@ function supplierSettingsDirty() {
 function updateSupplierScopePresentation() {
   var savedOverrides = pendingSupplierLink && pendingSupplierLink.supplier.scopeSettings ? Object.keys(pendingSupplierLink.supplier.scopeSettings) : [];
   var draftOverrides = Object.keys(supplierScopeDrafts);
-  var overrides = Array.from(new Set(savedOverrides.concat(draftOverrides)));
+  var overrides = Array.from(new Set(savedOverrides.concat(draftOverrides))).sort(function(a, b) { return supplierScopeLabel(a).localeCompare(supplierScopeLabel(b)); });
   var nav = document.getElementById('supplierScopeNavOverrides');
   var supplier = pendingSupplierLink && pendingSupplierLink.supplier;
   var supplierManaged = supplier && supplier.type === 'active';
@@ -5447,7 +5635,7 @@ function updateSupplierScopePresentation() {
     var meta = supplierScopeMeta(scope);
     var label = supplierScopeLabel(scope);
     supplierScopeLabels[scope] = label;
-    var complete = supplierManaged || supplierSettingsAreComplete(supplierScopeSettings(supplier, scope));
+    var complete = supplierManaged || supplierSettingsAreComplete((supplier.scopeSettings || {})[scope]);
     var detail = scope.indexOf('group-') === 0 ? (meta || '0 outlets') : '';
     return '<button type="button" class="supplier-scope-nav-item' + (complete ? '' : ' is-incomplete') + '" data-supplier-scope="' + escapeOverviewText(scope) + '" onclick="selectSupplierSettingsScope(\'' + scope.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(label) + (detail ? '<small>' + escapeOverviewText(detail) + '</small>' : '') + (supplierManaged || complete ? '' : '<small class="supplier-scope-status-line"><span class="material-symbols-rounded">warning</span> Settings required</small>') + '</button>';
   }).join('') : '<p class="supplier-scope-nav-help">Add access to a group or ungrouped outlet before setting order rules.</p>';
@@ -5456,7 +5644,7 @@ function updateSupplierScopePresentation() {
     return '<button type="button" class="supplier-scope-nav-item" data-supplier-scope="' + escapeOverviewText(scope) + '" onclick="openSavedSupplierOverride(\'' + scope.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(supplierScopeLabel(scope)) + (meta ? '<small>' + escapeOverviewText(meta) + '</small>' : '') + '</button>';
   }).join('');
   document.querySelectorAll('#supplierSettingsOverlay [data-supplier-scope]').forEach(function(item) { item.classList.toggle('is-active', item.dataset.supplierScope === supplierSettingsScope); });
-  document.getElementById('supplierEditingIntro').innerHTML = 'Editing <strong id="supplierEditingScope">' + escapeOverviewText(supplierScopeLabel(supplierSettingsScope)) + '</strong>';
+  document.getElementById('supplierEditingIntro').innerHTML = '<span>Settings for</span><strong id="supplierEditingScope">' + escapeOverviewText(supplierScopeLabel(supplierSettingsScope)) + '</strong>';
   document.getElementById('supplierEditingNote').hidden = !!supplierManaged;
   document.getElementById('supplierOverrideDelete').hidden = policyScopes.indexOf(supplierSettingsScope) !== -1;
   document.getElementById('supplierContactSection').hidden = false;
@@ -5472,17 +5660,17 @@ function updateSupplierScopePresentation() {
   nav.hidden = !!supplierManaged;
   document.getElementById('supplierOverrideDelete').hidden = supplierManaged || policyScopes.indexOf(supplierSettingsScope) !== -1;
   var saveButton = document.getElementById('supplierSaveButton');
-  if (saveButton) { saveButton.hidden = !!supplierManaged; saveButton.textContent = 'Save order settings'; }
-  var settingsFooter = document.querySelector('#supplierSettingsOverlay .modal-foot');
-  settingsFooter.hidden = !!supplierManaged;
-  settingsFooter.style.display = supplierManaged ? 'none' : '';
+  if (saveButton) { saveButton.hidden = !!supplierManaged; saveButton.textContent = 'Save'; }
+  var settingsFooter = document.getElementById('supplierSettingsFooter');
+  if (settingsFooter) { settingsFooter.hidden = !!supplierManaged; settingsFooter.style.display = supplierManaged ? 'none' : ''; }
+  updateSupplierSaveState();
 }
 function switchSupplierSettingsScope(scope) {
   if (!pendingSupplierLink || scope === supplierSettingsScope) return;
-  supplierScopeDrafts[supplierSettingsScope] = readSupplierSettingsForm();
+  if (supplierSettingsDirty()) supplierScopeDrafts[supplierSettingsScope] = cloneSupplierScopeSettings(readSupplierSettingsForm());
+  else delete supplierScopeDrafts[supplierSettingsScope];
   supplierSettingsScope = scope;
   var nextSettings = supplierScopeSettings(pendingSupplierLink.supplier, scope);
-  if (!supplierScopeDrafts[scope]) supplierScopeDrafts[scope] = nextSettings;
   setSupplierSettingsForm(nextSettings, pendingSupplierLink.supplier);
   setSupplierSettingsReadOnly(pendingSupplierLink.supplier.type === 'active');
   var settingsForm = document.getElementById('supplierSettingsForm');
@@ -5628,26 +5816,19 @@ function copySupplierSettingsFrom(scope) {
   var supplier = pendingSupplierLink.supplier;
   var source = supplier.scopeSettings && supplier.scopeSettings[scope];
   if (!source) return;
-  var copied = JSON.parse(JSON.stringify(source));
+  var copied = cloneSupplierScopeSettings(source);
   var targetScope = supplierSettingsScope;
-  supplier.scopeSettings = supplier.scopeSettings || {};
-  supplier.scopeSettings[targetScope] = copied;
-  supplier.scopeLabels = supplier.scopeLabels || {};
-  supplier.scopeLabels[targetScope] = supplierScopeLabel(targetScope);
-  delete supplierScopeDrafts[targetScope];
+  supplierScopeDrafts[targetScope] = copied;
   setSupplierSettingsForm(copied, supplier);
-  supplierSettingsBaseline = readSupplierSettingsForm();
+  document.getElementById('supplierSettingsForm').scrollTop = 0;
+  supplierSettingsBaseline = cloneSupplierScopeSettings((supplier.scopeSettings || {})[targetScope]);
   updateSupplierScopePresentation();
-  renderSuppliers();
-  renderHealthCheck();
-  addPrototypeActivity('suppliers', '<strong>' + escapeOverviewText(supplier.name) + '</strong> order settings copied to ' + escapeOverviewText(supplierScopeLabel(targetScope)), 'suppliers', 'Master', 'William Arya');
-  saveHqSupplierState();
-  savePrototypeState();
   closeSupplierCopyPicker();
-  showHqToast('Settings copied and saved', supplierScopeLabel(targetScope) + ' can now place orders with this supplier.');
+  showHqToast('Settings copied', 'Review and save to apply.');
 }
 function openSupplierSettings(supplier, isNew, isEditing) {
   pendingSupplierLink = { supplier:supplier, isNew:!!isNew, isEditing:!!isEditing };
+  document.querySelectorAll('.row-actions-menu.open').forEach(function(menu) { menu.classList.remove('open'); menu.removeAttribute('style'); });
   closeLinkSupModal(); closeNewSupplierModal();
   document.getElementById('supplierSettingsPageTitle').textContent = "Supplier's settings: " + supplierLabel(supplier.name);
   document.getElementById('supplierSettingsForm').reset();
@@ -5704,11 +5885,21 @@ function revealSupplierSmsField() {
 function clearSupplierContactError() {
   var error = document.getElementById('supplierContactError');
   if (error) error.hidden = true;
+  updateSupplierSaveState();
 }
 function hasSupplierContact() {
   return !!(document.getElementById('supplierRecipientEmail').value.trim() || document.getElementById('supplierWhatsapp').value.trim());
 }
-function toggleSupplierDay(check) { setSupplierPolicyRow(check.closest('.supplier-policy-row'), check.checked); updateSupplierApplyAll(); }
+function hasSupplierDeliveryAndCutoff() {
+  return Array.from(document.querySelectorAll('#supplierSettingsOverlay .supplier-policy-row')).some(supplierPolicyRowReady);
+}
+function updateSupplierSaveState() {
+  var button = document.getElementById('supplierSaveButton');
+  if (!button) return;
+  var supplierManaged = pendingSupplierLink && pendingSupplierLink.supplier && pendingSupplierLink.supplier.type === 'active';
+  button.disabled = !!supplierManaged || !hasSupplierContact() || !hasSupplierDeliveryAndCutoff();
+}
+function toggleSupplierDay(check) { setSupplierPolicyRow(check.closest('.supplier-policy-row'), check.checked); updateSupplierApplyAll(); updateSupplierSaveState(); }
 function setSupplierPolicyRow(row, enabled) {
   var fields = row.querySelector('.supplier-cutoff');
   fields.classList.toggle('is-disabled', !enabled);
@@ -5738,6 +5929,7 @@ function applySupplierCutoffToAll(sourceRow) {
   });
   document.getElementById('supplierPolicyApplied').hidden = false;
   updateSupplierApplyAll();
+  updateSupplierSaveState();
 }
 function ensureSupplierApplyAllButtons() {
   document.querySelectorAll('#supplierSettingsOverlay .supplier-policy-row').forEach(function(row) {
@@ -5747,8 +5939,8 @@ function ensureSupplierApplyAllButtons() {
     button.addEventListener('click', function() { applySupplierCutoffToAll(row); });
     row.appendChild(button);
     row.querySelectorAll('[data-supplier-days], [data-supplier-time]').forEach(function(input) {
-      input.addEventListener('input', updateSupplierApplyAll);
-      input.addEventListener('change', updateSupplierApplyAll);
+      input.addEventListener('input', function() { updateSupplierApplyAll(); updateSupplierSaveState(); });
+      input.addEventListener('change', function() { updateSupplierApplyAll(); updateSupplierSaveState(); });
     });
   });
 }
@@ -5762,17 +5954,20 @@ function saveSupplierSettings(afterSave) {
     (document.getElementById('supplierNoEmail').checked ? whatsapp : email).focus();
     return;
   }
+  if (!hasSupplierDeliveryAndCutoff()) return;
   var supplier = pendingSupplierLink.supplier;
   var isNew = pendingSupplierLink.isNew;
   var isEditing = pendingSupplierLink.isEditing;
   var savedScope = supplierSettingsScope;
-  var savedSettings = readSupplierSettingsForm();
-  supplierScopeDrafts[savedScope] = savedSettings;
+  var savedSettings = cloneSupplierScopeSettings(readSupplierSettingsForm());
+  supplierScopeDrafts[savedScope] = cloneSupplierScopeSettings(savedSettings);
   supplier.scopeSettings = supplier.scopeSettings || {};
-  supplier.scopeSettings[savedScope] = savedSettings;
+  supplier.scopeSettings[savedScope] = cloneSupplierScopeSettings(savedSettings);
   supplier.scopeLabels = supplier.scopeLabels || {};
   supplier.scopeLabels[savedScope] = supplierScopeLabel(savedScope);
   delete supplierScopeDrafts[savedScope];
+  var nextScope = typeof afterSave === 'function' ? '' : nextSupplierScopeRequiringSettings(supplier, savedScope);
+  var savedScopeLabel = supplierScopeLabel(savedScope);
   if (isNew && !PLATFORM_SUPPLIERS.some(function(item) { return item.name === supplier.name; })) PLATFORM_SUPPLIERS.push(supplier);
   if (!SUPPLIERS.some(function(item) { return item.name === supplier.name; })) SUPPLIERS.push(supplier);
   document.getElementById('supCount').textContent = SUPPLIERS.length;
@@ -5783,9 +5978,15 @@ function saveSupplierSettings(afterSave) {
   savePrototypeState();
   supplierSettingsScope = savedScope;
   supplierSettingsBaseline = savedSettings;
-  updateSupplierScopePresentation();
-  if (typeof afterSave === 'function') afterSave();
-  showHqToast('Order settings saved', supplierScopeLabel(savedScope) + ' can now place orders with this supplier.');
+  if (typeof afterSave === 'function') {
+    updateSupplierScopePresentation();
+    afterSave();
+  } else if (nextScope) {
+    switchSupplierSettingsScope(nextScope);
+  } else {
+    updateSupplierScopePresentation();
+  }
+  showHqToast('Settings saved', savedScopeLabel + ' is ready to order.');
 }
 
 function inventoryLifecycle(item) {
@@ -8319,7 +8520,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
     <div class="modal-header"><div><button class="supplier-back" type="button" onclick="backFromSupplierSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Suppliers</button><h2 class="modal-title" id="supplierSettingsPageTitle">Supplier's settings</h2></div></div>
     <form id="supplierSettingsForm" class="modal-body" onsubmit="event.preventDefault();saveSupplierSettings()"><div class="supplier-settings-shell"><div class="supplier-settings-layout">
       <aside class="supplier-scope-nav"><div class="supplier-scope-nav-overrides" id="supplierScopeNavPolicies"></div><div class="supplier-scope-nav-label" id="supplierExceptionsLabel">Outlet exceptions</div><div class="supplier-scope-nav-overrides" id="supplierScopeNavOverrides"></div><button type="button" class="btn btn-primary supplier-scope-nav-add" onclick="openSupplierOverridePicker()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add outlet exception</button></aside>
-      <div class="supplier-settings-content"><div class="supplier-editing-note" id="supplierEditingNote"><span id="supplierEditingIntro">Editing <strong id="supplierEditingScope"></strong></span><div style="display:flex;gap:12px;align-items:center"><button type="button" class="supplier-copy-settings" onclick="openSupplierCopyPicker()">Copy settings</button><button type="button" class="supplier-override-delete" id="supplierOverrideDelete" hidden onclick="openDeleteSupplierOverrideConfirm()">Remove exception</button></div></div><div id="supplierManagedSettingsNotice" hidden style="display:flex;gap:10px;margin-top:22px;padding:14px 16px;border:1px solid var(--notice-info-border);border-radius:8px;background:var(--mint);color:var(--seaweed);font-size:14px;line-height:1.45"><span class="material-symbols-rounded" style="font-size:19px;color:var(--spinach)" aria-hidden="true">info</span><span><strong>Supplier-managed settings</strong><br>These settings are managed by the supplier in Nomni Supply and are shown here for reference.</span></div>
+      <div class="supplier-settings-content"><div class="supplier-editing-note" id="supplierEditingNote"><span id="supplierEditingIntro" class="supplier-editing-intro"><span>Settings for</span><strong id="supplierEditingScope"></strong></span><div class="supplier-settings-actions"><button type="button" class="supplier-copy-settings" onclick="openSupplierCopyPicker()">Copy from…</button><button type="button" class="supplier-override-delete" id="supplierOverrideDelete" hidden onclick="openDeleteSupplierOverrideConfirm()">Remove exception</button><button type="button" class="btn btn-primary" id="supplierSaveButton" onclick="saveSupplierSettings()" disabled>Save</button></div></div><div id="supplierManagedSettingsNotice" hidden style="display:flex;gap:10px;margin-top:22px;padding:14px 16px;border:1px solid var(--notice-info-border);border-radius:8px;background:var(--mint);color:var(--seaweed);font-size:14px;line-height:1.45"><span class="material-symbols-rounded" style="font-size:19px;color:var(--spinach)" aria-hidden="true">info</span><span><strong>Supplier-managed settings</strong><br>These settings are managed by the supplier in Nomni Supply and are shown here for reference.</span></div>
       <section class="supplier-settings-section" id="supplierContactSection"><h3 class="supplier-settings-heading">Order notification contact</h3><div class="supplier-settings-card">
         <div><label class="field-label">Supplier email(s)</label><input class="field-input" id="supplierRecipientEmail" type="text" placeholder="Email" oninput="clearSupplierContactError()" /><p class="supplier-settings-help" style="margin-top:6px">Separate multiple email addresses with commas.</p></div>
         <label class="supplier-settings-check"><input id="supplierNoEmail" type="checkbox" onchange="toggleSupplierNoEmail()" /><span><strong>No email address?</strong> Tick to confirm</span></label>
@@ -8327,7 +8528,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
         <div id="supplierSmsField" hidden><label class="field-label">SMS</label><input class="field-input" id="supplierSms" type="tel" placeholder="Enter mobile number" /></div>
         <button type="button" class="supplier-more-link" id="supplierMoreContact" onclick="revealSupplierSmsField()">More⌄</button>
       </div></section>
-      <section class="supplier-settings-section" id="supplierPolicySection"><h3 class="supplier-settings-heading">Order &amp; delivery settings</h3><p class="supplier-settings-help" style="margin:-10px 0 18px">Set the contact and delivery rules for this location.</p><div class="supplier-settings-card"><div class="supplier-settings-grid"><div><label class="field-label">Min. order (S$)</label><input class="field-input" id="supplierMinOrder" inputmode="decimal" value="0" /></div></div><label class="supplier-settings-check"><input id="supplierBlockMin" type="checkbox" checked /><span>Block orders below minimum order</span></label></div>
+      <section class="supplier-settings-section" id="supplierPolicySection"><h3 class="supplier-settings-heading">Order &amp; delivery settings</h3><div class="supplier-settings-card"><div class="supplier-settings-grid"><div><label class="field-label">Min. order (S$)</label><input class="field-input" id="supplierMinOrder" inputmode="decimal" value="0" /></div></div><label class="supplier-settings-check"><input id="supplierBlockMin" type="checkbox" checked /><span>Block orders below minimum order</span></label></div>
         <div class="supplier-settings-card supplier-delivery-card"><p class="supplier-policy-note"><strong>Not sure of the cut-off?</strong> Use 2 days earlier at 12:00 PM for now. You can update it later.</p><div class="supplier-policy-table"><div class="supplier-policy-head"><span>Deliver on</span><span>Cut-off time</span><span></span></div>
           <div class="supplier-policy-row" data-day="Monday"><label class="supplier-settings-check"><input data-supplier-day type="checkbox" onchange="toggleSupplierDay(this)" />Monday</label><div class="supplier-cutoff is-disabled"><input class="field-input" data-supplier-days inputmode="numeric" value="2" disabled /><span>day(s) earlier</span><input class="field-input" data-supplier-time type="time" value="12:00" disabled /></div></div>
           <div class="supplier-policy-row" data-day="Tuesday"><label class="supplier-settings-check"><input data-supplier-day type="checkbox" onchange="toggleSupplierDay(this)" />Tuesday</label><div class="supplier-cutoff is-disabled"><input class="field-input" data-supplier-days inputmode="numeric" value="2" disabled /><span>day(s) earlier</span><input class="field-input" data-supplier-time type="time" value="12:00" disabled /></div></div>
@@ -8339,7 +8540,6 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
         </div><p class="supplier-policy-applied" id="supplierPolicyApplied" hidden>Delivery cut-off copied to all days.</p></div>
       </section></div></div></div>
     </form>
-    <div class="modal-foot" style="justify-content:space-between"><button class="supplier-page-cancel" onclick="backFromSupplierSettings()">Close</button><button class="btn btn-primary" id="supplierSaveButton" onclick="saveSupplierSettings()">Save order settings</button></div>
   </div>
 </div>
 
@@ -8531,6 +8731,7 @@ var panel = document.getElementById('panel-outlet-groups');
         '<h2 class="new-hq-empty-title">No outlets or outlet groups yet</h2>' +
         '<p class="new-hq-empty-copy">This HQ is ready. Add a group when its outlets are ready to be organised.</p>' +
         '<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">' +
+          '<button class="btn-secondary" id="newHqAddOutletsBtn">Add outlets</button>' +
           '<button class="btn-primary" id="newHqCreateGroupBtn">' +
             '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>New group' +
           '</button>' +
@@ -8601,6 +8802,11 @@ var panel = document.getElementById('panel-outlet-groups');
   if (newHqCreateGroupBtn) newHqCreateGroupBtn.addEventListener('click', function() {
     window.location.href = 'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(saved.name) + '&returnNew=1';
   });
+  var newHqAddOutletsBtn = document.getElementById('newHqAddOutletsBtn');
+  if (newHqAddOutletsBtn) newHqAddOutletsBtn.addEventListener('click', function() {
+    renderNewHqGroupsTableShell(document.getElementById('newHqOverviewMain'), saved.name);
+    openLinkOutletPicker();
+  });
 
   if (localStorage.getItem('nomniNewHQToastPending') === '1') {
     localStorage.removeItem('nomniNewHQToastPending');
@@ -8627,10 +8833,10 @@ function renderNewHqGroupsTableShell(container, hqName) {
   if (!container) return;
   container.innerHTML =
     '<div class="panel-label-row">' +
-      '<span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">0</span></span>' +
-      '<button class="btn-primary" onclick="window.location.href=\'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(hqName) + '&amp;returnNew=1\'">' +
+    '<span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">0</span></span>' +
+      '<div style="display:flex;align-items:center;gap:8px"><button class="btn-secondary" onclick="openLinkOutletPicker()">Add outlets</button><button class="btn-primary" onclick="window.location.href=\'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(hqName) + '&amp;returnNew=1\'">' +
         '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>New group' +
-      '</button>' +
+      '</button></div>' +
     '</div>' +
     '<div class="og-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="ogSearch" placeholder="Search outlets or groups…" oninput="filterOgTable(this.value)" /></div>' +
     '<div style="overflow:clip"><table class="og-table" id="ogTable"><thead><tr>' +
@@ -8797,9 +9003,9 @@ function renderCreatedOutletGroup() {
     overviewMain.innerHTML =
       '<div class="panel-label-row">' +
         '<span class="panel-label-text">Outlets &amp; groups <span class="panel-label-count">1</span></span>' +
-        '<button class="btn-primary" onclick="window.location.href=\'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(group.hq) + '&amp;returnNew=1\'">' +
+        '<div style="display:flex;align-items:center;gap:8px"><button class="btn-secondary" onclick="openLinkOutletPicker()">Add outlets</button><button class="btn-primary" onclick="window.location.href=\'Admin - Create Outlet Group.html?hq=' + encodeURIComponent(group.hq) + '&amp;returnNew=1\'">' +
           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>New group' +
-        '</button>' +
+        '</button></div>' +
       '</div>' +
       '<div class="og-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="ogSearch" placeholder="Search outlets or groups…" oninput="filterOgTable(this.value)" /></div>' +
       '<div style="overflow:clip"><table class="og-table" id="ogTable"><thead><tr>' +
@@ -8820,7 +9026,7 @@ function renderCreatedOutletGroup() {
   groupRow.dataset.groupOutlets = outletNames.join('|').toLowerCase();
   groupRow.innerHTML =
     '<td><div class="og-name-cell"><button class="og-expand-btn" onclick="toggleOgExpand(this,\'' + rowId + '\')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>' +
-      '<div class="og-name-cell-inner"><a href="Admin - Edit Outlet Group.html?from=hq&amp;newGroup=1" class="og-name">' + safeName + '</a><span class="og-outlet-count">' + outletNames.length + ' outlet' + (outletNames.length === 1 ? '' : 's') + '</span></div></div></td>' +
+      '<div class="og-name-cell-inner"><a href="Admin - Edit Outlet Group.html?from=hq&amp;newGroup=1&amp;created-hq=' + encodeURIComponent(group.hq || '') + '" class="og-name">' + safeName + '</a><span class="og-outlet-count">' + outletNames.length + ' outlet' + (outletNames.length === 1 ? '' : 's') + '</span></div></div></td>' +
     '<td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td>' +
     '<td style="color:var(--ink-mute)">Today</td><td><div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu">' +
       '<div class="row-action-item" data-group-name="' + safeName + '" onclick="openGroupOutletPicker(this.dataset.groupName,this)">Add outlets</div>' +
