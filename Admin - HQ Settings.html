@@ -7607,6 +7607,7 @@ function saveManagedOutletList() {
     tableHtml: tbody.innerHTML,
     ungrouped: UNGROUPED.slice()
   }));
+  syncNewHqPosOutlets();
 }
 
 function getManagedOutletStateKey() {
@@ -8728,16 +8729,13 @@ var panel = document.getElementById('panel-outlet-groups');
   '<div style="display:grid;grid-template-columns:1fr 272px;gap:32px;align-items:start">' +
     '<div id="newHqOverviewMain">' +
       '<div class="new-hq-empty"><div class="new-hq-empty-inner">' +
-        '<h2 class="new-hq-empty-title">No outlets or outlet groups yet</h2>' +
+        '<h2 class="new-hq-empty-title">No outlets or groups yet</h2>' +
         '<p class="new-hq-empty-copy">This HQ is ready. Add a group when its outlets are ready to be organised.</p>' +
         '<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">' +
-          '<button class="btn-secondary" id="newHqAddOutletsBtn">Add outlets</button>' +
           '<button class="btn-primary" id="newHqCreateGroupBtn">' +
             '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>New group' +
           '</button>' +
-          '<button class="btn-secondary" id="newHqLinkSupplierBtn">' +
-            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Add supplier' +
-          '</button>' +
+          '<button class="btn-secondary" id="newHqAddOutletsBtn">Add outlets</button>' +
         '</div>' +
       '</div></div>' +
     '</div>' +
@@ -9075,6 +9073,46 @@ renderCreatedOutletGroup();
 applyCompletedOutletSplit();
 addSplitActionsToOverview();
 initialiseHqInventorySettingsPage();
+
+function newHqPosOutletScopes() {
+  var scopes = [];
+  document.querySelectorAll('#ogTable tbody > tr[data-group-name]').forEach(function(groupRow) {
+    var groupName = (groupRow.querySelector('.og-name') || {}).textContent;
+    groupName = (groupName || '').trim();
+    var outletRow = groupRow.nextElementSibling;
+    if (!groupName || !outletRow || !outletRow.classList.contains('og-outlet-sub-row')) return;
+    outletRow.querySelectorAll('.outlet-list-item').forEach(function(item) {
+      var outletName = (item.querySelector('.outlet-item-name') || {}).textContent;
+      if (outletName && outletName.trim()) scopes.push({ name:outletName.trim(), group:groupName });
+    });
+  });
+  document.querySelectorAll('#ogTable tbody > tr[data-ungrouped-name]').forEach(function(row) {
+    var outletName = (row.querySelector('.og-name') || {}).textContent;
+    if (outletName && outletName.trim()) scopes.push({ name:outletName.trim(), group:'Ungrouped' });
+  });
+  return scopes;
+}
+
+function syncNewHqPosOutlets() {
+  if (!window.isNewHQ) return;
+  var body = document.getElementById('posOutletTableBody');
+  var groupFilter = document.getElementById('posGroupFilter');
+  if (!body || !groupFilter) return;
+  var outlets = newHqPosOutletScopes();
+  var groups = Array.from(new Set(outlets.map(function(outlet) { return outlet.group; }).filter(function(group) { return group !== 'Ungrouped'; }))).sort();
+  groupFilter.innerHTML = '<option value="">All outlet groups</option>' + groups.map(function(group) { return '<option value="' + escapeOverviewText(group) + '">' + escapeOverviewText(group) + '</option>'; }).join('') + (outlets.some(function(outlet) { return outlet.group === 'Ungrouped'; }) ? '<option value="Ungrouped">Ungrouped</option>' : '');
+  if (!outlets.length) {
+    body.innerHTML = '<tr id="posOutletEmpty"><td colspan="5" style="padding:40px 32px;text-align:center;color:var(--ink-mute)"><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:5px">No outlets yet</div>Add outlets in Outlets &amp; groups to set up POS mapping.</td></tr>';
+  } else {
+    body.innerHTML = outlets.map(function(outlet) {
+      return '<tr><td><div style="font-weight:600">' + escapeOverviewText(outlet.name) + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(outlet.group) + '</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><a href="Admin - HQ - POS Mapping.html#pos-mapping" style="color:var(--spinach);font-weight:600;text-decoration:none">Set up</a></td></tr>';
+    }).join('') + '<tr id="posOutletEmpty" hidden><td colspan="5" style="padding:32px;text-align:center;color:var(--ink-mute)">No outlets match these filters.</td></tr>';
+  }
+  filterPosOutlets();
+  if (typeof renderHealthCheck === 'function') renderHealthCheck();
+}
+
+syncNewHqPosOutlets();
 
 function filterPosOutlets() {
   const query = (document.getElementById('posOutletSearch')?.value || '').trim().toLowerCase();
