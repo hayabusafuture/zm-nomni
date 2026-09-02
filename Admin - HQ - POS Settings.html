@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="assets/favicon.svg"><title>Admin — POS settings</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+<style>
+:root{--nomni-green:#2AC864;--seaweed:#0E3727;--spinach:#1A8040;--mint:#E2FFE6;--ink:#1A1F2B;--ink-mute:#8A8F98;--rule:#E7E8EC;--row-hover:#F7F8FA}*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{font:14px/1.4 Inter,system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:232px 1fr;grid-template-rows:56px minmax(calc(100vh - 56px),1fr);min-height:100vh}
+.topbar{grid-column:1/-1;height:56px;background:var(--nomni-green);color:var(--seaweed);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:8px}.brand-logo-img{height:26px}.brand-sub{color:var(--seaweed);font:500 21px/1 'Hanken Grotesk',sans-serif}
+.topbar-right,.user{display:flex;align-items:center}.topbar-right{gap:4px}.help-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;color:rgba(14,55,39,.78);text-decoration:none;font-size:14px}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-size:18px}
+.user{gap:10px;margin-left:4px}.topbar-avt{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--seaweed);color:var(--nomni-green);font:700 11px 'Hanken Grotesk',sans-serif}
+.chev{width:10px;height:10px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translate(-1px,-1px)}
+.sidebar{grid-column:1;grid-row:2;background:#F5F5F5;position:sticky;top:56px;height:calc(100vh - 56px);overflow:auto}
+.nav{margin-top:4px;padding:6px 10px}.nav a{display:flex;align-items:center;gap:12px;min-height:40px;padding:10px 12px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:14px}
+.nav a:hover{background:rgba(0,0,0,.05)}.nav a.active{background:rgba(42,200,100,.14);color:var(--seaweed);font-weight:600}
+.nav svg{width:18px;height:18px;color:#888}.nav a.active svg{color:var(--spinach)}
+.nav .badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:grid;place-items:center;background:var(--nomni-green);color:var(--seaweed);font-size:10px;font-weight:700}
+.icon-wrap{width:18px;height:18px;position:relative;flex:0 0 18px}.icon{position:absolute;inset:0;width:18px;height:18px}
+.main{grid-column:2;grid-row:2;min-width:0;padding:28px 40px 0;display:flex;flex-direction:column}
+.back-link{display:inline-flex;align-items:center;gap:5px;width:max-content;color:var(--spinach);text-decoration:none;font-weight:600;margin-bottom:14px}
+.back-link:hover{color:var(--seaweed)}
+.page-head{padding-bottom:20px;border-bottom:1px solid var(--rule)}
+.page-title{margin:0;font-size:24px;line-height:1.2;letter-spacing:-.03em}
+
+.settings-body{max-width:920px;padding:32px 0 40px}
+.settings-row{display:grid;grid-template-columns:220px 1fr;gap:24px;margin-bottom:36px}
+.settings-row:last-child{margin-bottom:0}
+.settings-label{font-weight:600;padding-top:10px}
+.settings-field input[type="text"]{width:320px;max-width:100%;border:1px solid #DCDEE3;border-radius:6px;padding:10px 12px;font:inherit;color:var(--ink)}
+.settings-field input[type="text"]:focus{outline:none;border-color:var(--nomni-green);box-shadow:0 0 0 3px rgba(42,200,100,.14)}
+.field-hint{margin:8px 0 0;font-size:12px;color:var(--ink-mute)}
+
+.checkbox-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;font-size:14px;color:var(--ink)}
+.checkbox-row:last-child{margin-bottom:0}
+.checkbox-row input[type="checkbox"]{accent-color:var(--spinach);width:16px;height:16px;cursor:pointer;flex-shrink:0;margin-top:1px}
+.checkbox-row label{cursor:pointer;line-height:1.4}
+
+.cat-picker-wrap{margin:14px 0 0 26px;max-width:600px}
+.tag-picker{position:relative}
+.tag-input-shell{min-height:44px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 48px 6px 10px;border:1px solid #dcdee3;border-radius:8px;background:#fff;transition:border-color .13s,box-shadow .13s}
+.tag-picker.open .tag-input-shell{border-color:#b9efc8;box-shadow:0 0 0 3px rgba(42,200,100,.14)}
+.tag-chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px 0 8px;border-radius:13px;background:var(--mint);color:var(--seaweed);border:1px solid #b9efc8;font-size:13px;font-weight:600}
+.tag-chip-remove{width:14px;height:14px;border:0;background:transparent;color:var(--spinach);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.tag-input{flex:1 1 130px;min-width:110px;border:0;outline:0;background:transparent;font:inherit;font-size:14px;color:var(--ink);padding:3px 0}
+.tag-input::placeholder{color:var(--ink-mute)}
+.tag-picker-actions{position:absolute;right:11px;top:14px;display:flex;align-items:center;gap:10px;color:var(--ink-mute)}
+.tag-picker-clear{border:0;background:transparent;color:var(--spinach);cursor:pointer;font-size:18px;line-height:1;padding:0}
+.tag-picker-caret{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #a8acb4}
+.tag-dropdown{position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:80;display:none;max-height:230px;overflow-y:auto;background:#fff;border:1px solid #dcdee3;border-radius:0 0 8px 8px;box-shadow:0 12px 28px rgba(10,20,15,.12)}
+.tag-picker.open .tag-dropdown{display:block}
+.tag-option{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:14px;color:var(--ink);cursor:pointer}
+.tag-option:hover,.tag-option.selected{background:#eef7ff}
+.tag-option input{width:15px;height:15px;margin:0;accent-color:var(--nomni-green);pointer-events:none}
+.tag-add-option{padding:10px 12px;font-size:14px;color:var(--ink);background:#f8fbff;border-top:1px solid var(--rule);cursor:pointer}
+.tag-add-option:hover{background:#eef7ff}
+
+.danger-warning{font-size:14px;color:var(--ink);max-width:640px}
+.danger-warning strong{font-weight:700}
+.danger-link{display:inline-block;margin-top:14px;border:0;background:none;padding:0;color:#D0291E;font:600 14px Inter,sans-serif;cursor:pointer}
+.danger-link:hover{text-decoration:underline}
+
+.settings-footer{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--rule);padding:16px 0;display:flex;justify-content:flex-end;gap:10px;margin-top:auto}
+.btn{border:0;border-radius:6px;padding:10px 16px;cursor:pointer;font:600 14px/1 Inter,system-ui,sans-serif;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--nomni-green);color:var(--seaweed)}.btn-primary:hover{background:#1FA551}
+.btn-cancel{background:none;color:var(--ink-mute)}.btn-cancel:hover{color:var(--ink)}
+
+@media(max-width:900px){.app{grid-template-columns:64px 1fr}.sidebar{width:64px}.nav a span:not(.badge),.nav .icon-wrap{display:none}.nav a{justify-content:center;padding:10px}.settings-row{grid-template-columns:1fr;gap:8px}.settings-label{padding-top:0}.cat-picker-wrap{margin-left:0}}
+</style></head><body>
+<div class="app">
+<header class="topbar"><div class="brand"><img class="brand-logo-img" src="assets/nomni_full_greenbar.svg" alt="nomni"><div class="brand-sub">Procure Admin</div></div><div class="topbar-right"><a class="help-btn" href="https://support.zeemart.co/en/" target="_blank"><span class="material-symbols-outlined">help</span>Help</a><div class="user"><span class="topbar-avt">WA</span><span>William Arya</span><span class="chev"></span></div></div></header>
+<aside class="sidebar"><nav class="nav"><a href="#"><span class="icon-wrap"><img class="icon" src="sidenav icons/Orders - grey.png" alt=""></span><span>Orders</span></a><a href="#"><span class="icon-wrap"><img class="icon" src="sidenav icons/Invoice - grey.png" alt=""></span><span>Invoices</span></a><a href="#"><span class="icon-wrap"><img class="icon" src="sidenav icons/Reports - grey.png" alt=""></span><span>Reports</span></a><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 12V22H4V12M22 7H2v5h20M12 22V7"/></svg><span>Promotions</span></a><a class="active" href="Admin - Buyers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Buyers</span></a><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><span>Suppliers</span></a><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg><span>Notifications</span><span class="badge">4</span></a><a href="Admin - Buyer User.html"><span class="icon-wrap"><img class="icon" src="sidenav icons/Users - grey.png" alt=""></span><span>Users</span></a></nav></aside>
+<main class="main">
+  <a class="back-link" id="backLink" href="Admin - HQ - POS Mapping.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>Nomni POS</a>
+  <div class="page-head"><h1 class="page-title">Settings</h1></div>
+
+  <div class="settings-body">
+    <div class="settings-row">
+      <div class="settings-label">Location ID:</div>
+      <div class="settings-field">
+        <input type="text" id="locationId" placeholder="Enter Location ID">
+        <p class="field-hint">To find the Location ID, log in to Nomni POS on your computer and select 'Stock Management' &gt; 'Locations'.</p>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Product visibility:</div>
+      <div class="settings-field">
+        <div class="checkbox-row">
+          <input type="checkbox" id="showUnpublished" checked>
+          <label for="showUnpublished">Show unpublished POS products</label>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="excludeCategories" checked>
+          <label for="excludeCategories">Exclude products in selected categories</label>
+        </div>
+        <div class="cat-picker-wrap" id="catPickerWrap">
+          <div class="tag-picker" id="tagPicker">
+            <div class="tag-input-shell" id="tagInputShell">
+              <div id="tagChips" style="display:contents"></div>
+              <input type="text" class="tag-input" id="tagInput" autocomplete="off" placeholder="Select categories">
+            </div>
+            <div class="tag-picker-actions">
+              <button class="tag-picker-clear" id="tagClearBtn" type="button" aria-label="Clear categories">×</button>
+              <span class="tag-picker-caret" aria-hidden="true"></span>
+            </div>
+            <div class="tag-dropdown" id="tagDropdown"></div>
+          </div>
+          <p class="field-hint">Use this if there are product categories you do not want to appear on Nomni Procure.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Delete mappings:</div>
+      <div class="settings-field">
+        <p class="danger-warning"><strong>WARNING:</strong> This action removes all existing mappings. Automatic inventory depletion will not work and COGS and T-COGS reports will no longer be updated.</p>
+        <button class="danger-link" id="deleteMappingsBtn" type="button">Delete all mappings</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-footer">
+    <button class="btn btn-cancel" id="cancelBtn">Cancel</button>
+    <button class="btn btn-primary" id="saveBtn">Save</button>
+  </div>
+</main>
+</div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const outlet = params.get('outlet');
+  const createdHq = params.get('created-hq');
+  const storageKey = outlet ? ('nomniPosApiKey:' + outlet) : 'nomniHqPosApiKey';
+  const mappingUrl = 'Admin - HQ - POS Mapping.html' + (outlet ? '?outlet=' + encodeURIComponent(outlet) : (createdHq ? '?created-hq=' + encodeURIComponent(createdHq) : ''));
+  document.getElementById('backLink').href = mappingUrl;
+  document.getElementById('cancelBtn').onclick = () => { location.href = mappingUrl; };
+
+  const CATEGORY_OPTIONS = ['Burgers', 'Rice & noodles', 'Sides', 'Beverages', 'All Day Breakfast', 'Desserts'];
+  const selectedCategories = new Set(['Beverages', 'All Day Breakfast']);
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
+  }
+
+  function renderCatChips() {
+    const chipsEl = document.getElementById('tagChips');
+    chipsEl.innerHTML = Array.from(selectedCategories).map(cat =>
+      '<span class="tag-chip"><button class="tag-chip-remove" type="button" data-cat="' + escapeHtml(cat) + '" aria-label="Remove ' + escapeHtml(cat) + '">×</button>' + escapeHtml(cat) + '</span>'
+    ).join('');
+    chipsEl.querySelectorAll('.tag-chip-remove').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        selectedCategories.delete(btn.dataset.cat);
+        renderCatChips();
+        renderCatDropdown();
+      });
+    });
+  }
+
+  function renderCatDropdown() {
+    const input = document.getElementById('tagInput');
+    const dropdown = document.getElementById('tagDropdown');
+    const query = input.value.trim().toLowerCase();
+    const options = CATEGORY_OPTIONS.filter(c => c.toLowerCase().includes(query));
+    dropdown.innerHTML = options.map(cat => {
+      const checked = selectedCategories.has(cat);
+      return '<label class="tag-option' + (checked ? ' selected' : '') + '" data-cat="' + escapeHtml(cat) + '"><input type="checkbox"' + (checked ? ' checked' : '') + '><span>' + escapeHtml(cat) + '</span></label>';
+    }).join('') || '<div class="tag-add-option" style="cursor:default">No matching categories</div>';
+    dropdown.querySelectorAll('.tag-option').forEach(option => {
+      option.addEventListener('mousedown', e => {
+        e.preventDefault();
+        const cat = option.dataset.cat;
+        if (selectedCategories.has(cat)) selectedCategories.delete(cat); else selectedCategories.add(cat);
+        input.value = '';
+        renderCatChips();
+        renderCatDropdown();
+        input.focus();
+      });
+    });
+  }
+
+  function openTagPicker() {
+    document.getElementById('tagPicker').classList.add('open');
+    renderCatDropdown();
+  }
+
+  document.getElementById('tagInputShell').addEventListener('click', () => {
+    document.getElementById('tagInput').focus();
+    openTagPicker();
+  });
+  document.getElementById('tagInput').addEventListener('focus', openTagPicker);
+  document.getElementById('tagInput').addEventListener('input', renderCatDropdown);
+  document.getElementById('tagInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { document.getElementById('tagPicker').classList.remove('open'); this.blur(); }
+    if (e.key === 'Backspace' && !this.value && selectedCategories.size) {
+      const last = Array.from(selectedCategories).pop();
+      selectedCategories.delete(last);
+      renderCatChips();
+      renderCatDropdown();
+    }
+  });
+  document.getElementById('tagClearBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    selectedCategories.clear();
+    renderCatChips();
+    renderCatDropdown();
+    document.getElementById('tagInput').focus();
+    openTagPicker();
+  });
+  document.addEventListener('click', e => {
+    const picker = document.getElementById('tagPicker');
+    if (picker && !picker.contains(e.target)) picker.classList.remove('open');
+  });
+  renderCatChips();
+
+  function syncCatVisibility() {
+    document.getElementById('catPickerWrap').style.display = document.getElementById('excludeCategories').checked ? '' : 'none';
+  }
+  document.getElementById('excludeCategories').addEventListener('change', syncCatVisibility);
+  syncCatVisibility();
+
+  document.getElementById('deleteMappingsBtn').addEventListener('click', () => {
+    if (confirm('Delete all mappings for this outlet? This cannot be undone.')) {
+      alert('All mappings deleted.');
+    }
+  });
+
+  document.getElementById('locationId').value = localStorage.getItem(storageKey) || '';
+  document.getElementById('saveBtn').onclick = () => {
+    localStorage.setItem(storageKey, document.getElementById('locationId').value || 'prototype-location-id');
+    location.href = mappingUrl;
+  };
+</script>
+</body></html>
