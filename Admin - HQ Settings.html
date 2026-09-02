@@ -1878,7 +1878,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <div class="tab-panel" id="panel-pos-mapping">
       <div class="panel-label-row">
         <span class="panel-label-text">POS mapping</span>
-        <a class="btn btn-primary" href="Admin - HQ - POS Mapping.html" style="text-decoration:none">Open POS mapping</a>
+        <a class="btn btn-primary" href="Admin - HQ - POS Mapping.html" onclick="if(!configuredPosOutlets().length){event.preventDefault();openPosSettings();}" style="text-decoration:none">Open POS mapping</a>
       </div>
       <div class="ml-filter-row" aria-label="Filter outlets for POS mapping">
         <div class="ml-search-wrap" style="min-width:260px">
@@ -1897,7 +1897,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
         <select class="ml-filter-select" id="posStatusFilter" onchange="filterPosOutlets()" aria-label="Filter by mapping status">
           <option value="">All mapping statuses</option><option value="mapped">Mapped</option><option value="unmapped">Unmapped</option>
         </select>
-        <span id="posOutletResultCount" style="font-size:12px;color:var(--ink-mute);margin-left:auto">12 outlets</span>
       </div>
       <table class="ml-table"><thead><tr><th>Outlet</th><th style="width:160px">POS connection</th><th style="width:220px">Mapping status</th><th style="width:150px">Last synced</th><th style="width:110px"></th></tr></thead><tbody id="posOutletTableBody">
         <tr><td><div style="font-weight:600">(WF 301) Chargrill @ 301 Punggol</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:82%;height:100%;background:var(--nomni-green)"></div></div><strong>18 / 22</strong></div></td><td style="color:var(--ink-mute)">10 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20301%20Punggol" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
@@ -7684,6 +7683,8 @@ function confirmLinkOutletSelection() {
   saveManagedOutletList();
   addPrototypeActivity('outlet-groups', '<strong>' + linked.length + ' outlet' + (linked.length === 1 ? '' : 's') + ' added</strong> to this HQ', 'outlet-groups', groupOutletTargetName);
   closeGroupOutletPicker();
+  if (typeof syncNewHqPosOutlets === 'function') syncNewHqPosOutlets();
+  if (window.isNewHQ) return;
   openLinkOutletGroupStep(linked);
 }
 
@@ -7908,9 +7909,12 @@ var posMappings = {};
 var posIgnoredMappings = new Set();
 var posMappingSelection = null;
 var posMappingTargetType = 'inventory';
+var posSetupOutlet = null;
+function configuredPosOutlets(){ try{return JSON.parse(localStorage.getItem('nomniPosConfiguredOutlets')||'[]');}catch(e){return[];} }
+function isOutletPosConfigured(name){ return configuredPosOutlets().indexOf(name)>=0; }
 
 function posKey(productId, variantId) { return productId + ':' + (variantId || 'product'); }
-function isPosConfigured() { return !!localStorage.getItem('nomniPosApiKey'); }
+function isPosConfigured() { return !!(localStorage.getItem('nomniPosApiKey') && localStorage.getItem('nomniPosLocationId')); }
 function renderPosMappingState() {
   var setup = document.getElementById('posMappingSetup');
   var content = document.getElementById('posMappingContent');
@@ -7941,21 +7945,41 @@ function renderPosMappings() {
   var mapped = Object.keys(posMappings).length;
   document.getElementById('posMappedCount').textContent = mapped ? mapped + ' mapped' : '';
 }
-function openPosSettings() {
+function openPosSettings(outletName) {
+  posSetupOutlet = outletName || null;
   document.getElementById('posApiKey').value = localStorage.getItem('nomniPosApiKey') || '';
+  document.getElementById('posLocationId').value = localStorage.getItem('nomniPosLocationId') || '';
   document.getElementById('posSettingsOverlay').classList.add('open');
   setTimeout(function(){ document.getElementById('posApiKey').focus(); }, 0);
 }
 function closePosSettings() { document.getElementById('posSettingsOverlay').classList.remove('open'); }
 function savePosSettings() {
   var key = document.getElementById('posApiKey').value.trim();
+  var locationId = document.getElementById('posLocationId').value.trim();
   var error = document.getElementById('posApiKeyError');
-  if (!key) { error.style.display = 'block'; return; }
+  var locationError = document.getElementById('posLocationIdError');
+  if (!key || !locationId) { error.style.display = key ? 'none' : 'block'; locationError.style.display = locationId ? 'none' : 'block'; return; }
   error.style.display = 'none';
+  locationError.style.display = 'none';
   localStorage.setItem('nomniPosApiKey', key);
+  localStorage.setItem('nomniPosLocationId', locationId);
+  if (posSetupOutlet) { var configured = configuredPosOutlets(); if (configured.indexOf(posSetupOutlet)<0) configured.push(posSetupOutlet); localStorage.setItem('nomniPosConfiguredOutlets', JSON.stringify(configured)); }
   closePosSettings(); renderPosMappingState();
+  refreshStaticPosOutletRows();
+  if (typeof syncNewHqPosOutlets === 'function') syncNewHqPosOutlets();
   addPrototypeActivity('hq', 'Nomni POS connection settings updated', 'pos-mapping', 'HQ');
   showHqToast('Nomni POS connected', 'POS products are ready to map.');
+}
+function refreshStaticPosOutletRows() {
+  var body = document.getElementById('posOutletTableBody');
+  if (!body || window.isNewHQ) return;
+  body.querySelectorAll('tr').forEach(function(row) {
+    if (row.id === 'posOutletEmpty') return;
+    var status = row.cells[1], action = row.cells[4];
+    if (!status || !action || !status.textContent.toLowerCase().includes('not connected')) return;
+    status.innerHTML = '<span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span>';
+    action.innerHTML = '<a href="Admin - HQ - POS Mapping.html#pos-mapping" style="color:var(--spinach);font-weight:600;text-decoration:none">Open mapping</a>';
+  });
 }
 function openPosMappingDialog(productId, variantId) {
   posMappingSelection = { productId:productId, variantId:variantId };
@@ -8001,7 +8025,7 @@ function ignorePosMapping() {
   addPrototypeActivity('hq', 'POS product mapping ignored', 'pos-mapping', 'HQ');
   showHqToast('Mapping ignored', 'This POS product or variant will not affect stock depletion.');
 }
-document.addEventListener('DOMContentLoaded', renderPosMappingState);
+document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(); refreshStaticPosOutletRows(); });
 </script>
 
 <!-- Recipe Groups Dialog -->
@@ -8376,7 +8400,7 @@ document.addEventListener('DOMContentLoaded', renderPosMappingState);
     <div class="modal-body" style="gap:14px">
       <div class="modal-warning modal-info" style="margin:0"><span class="material-symbols-rounded">info</span><span>Connect a Nomni POS location to load its products and variants for mapping.</span></div>
       <div><label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">API key</label><input id="posApiKey" type="password" placeholder="Enter Nomni POS API key" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit" oninput="document.getElementById('posApiKeyError').style.display='none'" /><div id="posApiKeyError" style="display:none;color:#D0291E;font-size:12px;margin-top:6px">Enter an API key to continue.</div></div>
-      <p style="margin:0;color:var(--ink-mute);font-size:12px;line-height:1.5">For this prototype, saving any API key connects the sample Nomni POS location. Connection credentials and location settings will be finalised with the integration design.</p>
+      <div><label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">Location ID</label><input id="posLocationId" type="text" placeholder="Enter Nomni POS Location ID" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit" oninput="document.getElementById('posLocationIdError').style.display='none'" /><div id="posLocationIdError" style="display:none;color:#D0291E;font-size:12px;margin-top:6px">Enter a Location ID to continue.</div></div>
     </div>
     <div class="modal-foot"><button class="modal-cancel" onclick="closePosSettings()">Cancel</button><button class="btn btn-primary" onclick="savePosSettings()">Save &amp; connect</button></div>
   </div>
@@ -9117,10 +9141,12 @@ function syncNewHqPosOutlets() {
     body.innerHTML = '<tr id="posOutletEmpty"><td colspan="5" style="padding:40px 32px;text-align:center;color:var(--ink-mute)"><div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:5px">No outlets yet</div>Add outlets in Groups &amp; outlets to set up POS mapping.</td></tr>';
   } else {
     body.innerHTML = outlets.map(function(outlet) {
-      return '<tr><td><div style="font-weight:600">' + escapeOverviewText(outlet.name) + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(outlet.group) + '</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><a href="Admin - HQ - POS Mapping.html#pos-mapping" style="color:var(--spinach);font-weight:600;text-decoration:none">Set up</a></td></tr>';
+      var configured = isOutletPosConfigured(outlet.name);
+      return '<tr><td><div style="font-weight:600">' + escapeOverviewText(outlet.name) + '</div>' + (outlet.group !== 'Ungrouped' ? '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(outlet.group) + '</div>' : '') + '</td><td><span class="pos-chip ' + (configured ? '' : 'off') + '"' + (configured ? ' style="background:var(--mint);color:var(--spinach)"' : '') + '>' + (configured ? 'Connected' : 'Not connected') + '</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td>' + (configured ? '<a href="Admin - HQ - POS Mapping.html#pos-mapping" style="color:var(--spinach);font-weight:600;text-decoration:none">Open mapping</a>' : '<button type="button" onclick="openPosSettings(\'' + escapeOverviewText(outlet.name).replace(/&#39;/g,"\\'") + '\')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button>') + '</td></tr>';
     }).join('') + '<tr id="posOutletEmpty" hidden><td colspan="5" style="padding:32px;text-align:center;color:var(--ink-mute)">No outlets match these filters.</td></tr>';
   }
   filterPosOutlets();
+  if (typeof refreshNewHqEmptyStates === 'function') refreshNewHqEmptyStates();
   if (typeof renderHealthCheck === 'function') renderHealthCheck();
 }
 
