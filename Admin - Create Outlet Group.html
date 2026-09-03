@@ -716,7 +716,10 @@ function handleCreate() {
   localStorage.setItem('nomniNewOutletGroupToastPending', '1');
   var params = new URLSearchParams(window.location.search);
   var returnUrl = 'Admin - HQ Settings.html?groupCreated=1&hq=' + encodeURIComponent(hqName);
-  if (params.get('returnNew') === '1') returnUrl += '&new=1';
+  if (params.get('returnNew') === '1') {
+    returnUrl += '&new=1';
+    if (params.get('created-hq')) returnUrl += '&created-hq=' + encodeURIComponent(params.get('created-hq'));
+  }
   window.location.href = returnUrl;
 }
 
@@ -732,7 +735,8 @@ document.getElementById('clearAllBtn').style.visibility = 'hidden';
 
 // Pre-fill HQ from URL param (e.g. ?hq=Garden+Cuisine+HQ)
 (function() {
-  var hqParam = new URLSearchParams(window.location.search).get('hq');
+  var params = new URLSearchParams(window.location.search);
+  var hqParam = params.get('hq');
   if (!hqParam) return;
   document.getElementById('backHqName').textContent = hqParam;
   var sel = document.getElementById('hqSelect');
@@ -748,6 +752,27 @@ document.getElementById('clearAllBtn').style.visibility = 'hidden';
     var option = new Option(hqParam, hqParam, true, true);
     sel.add(option);
   }
+  var outletNames = [];
+  try {
+    var preselectedOutlets = JSON.parse(params.get('outlets') || '[]');
+    outletNames = Array.isArray(preselectedOutlets) ? preselectedOutlets : [];
+  } catch (e) {}
+  var nextOutletId = OUTLETS.reduce(function(maxId, outlet) { return Math.max(maxId, outlet.id); }, 0) + 1;
+  outletNames.forEach(function(name) {
+    var outlet = OUTLETS.find(function(candidate) { return candidate.name === name; });
+    if (!outlet) {
+      outlet = {
+        id: nextOutletId++,
+        name: name,
+        company: hqParam,
+        cluster: 'Ungrouped outlet'
+      };
+      OUTLETS.push(outlet);
+    }
+    if (outlet) selected.add(outlet.id);
+  });
+  renderPageSelected();
+  renderSelected();
   checkReady();
 })();
 </script>
