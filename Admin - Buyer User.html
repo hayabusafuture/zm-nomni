@@ -116,8 +116,8 @@
   .tag-select-box.open { border-color: var(--nomni-green); }
   .tag-placeholder { font-size: 14px; color: var(--ink-mute); padding: 1px 4px; }
   .tag-select-arrow { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; }
-  .tag { display: inline-flex; align-items: center; gap: 3px; border-radius: 4px; padding: 2px 4px 2px 8px; font-size: 12px; font-weight: 600; color: var(--ink); background: #fff; border: 1px solid #dcdee3; }
-  .tag-x { background: none; border: none; cursor: pointer; color: var(--nomni-green); font-size: 14px; font-weight: 700; line-height: 1; padding: 0; display: flex; align-items: center; transition: color .1s; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; height: 26px; box-sizing: border-box; border-radius: 13px; padding: 0 8px 0 10px; font-size: 14px; font-weight: 500; color: var(--seaweed); background: var(--mint); border: 1px solid #b9efc8; }
+  .tag-x { width: 14px; height: 14px; background: none; border: none; cursor: pointer; color: var(--spinach); font-size: 16px; font-weight: 500; line-height: 1; padding: 0; display: inline-flex; align-items: center; justify-content: center; transition: color .1s; }
   .tag-x:hover { color: var(--seaweed); }
   .tag-dropdown { display: none; position: absolute; left: 0; top: calc(100% + 4px); min-width: 100%; background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 50; overflow: hidden; max-height: 220px; overflow-y: auto; }
   .tag-dropdown.open { display: block; }
@@ -204,6 +204,11 @@
   .hq-feat-desc { font-size: 11px; color: var(--ink-mute); margin-top: 2px; line-height: 1.4; }
   .hq-perm-group { transition: opacity .2s; }
   .hq-perm-group.disabled { opacity: .35; pointer-events: none; }
+  .hq-perm-group.owner-locked .hq-feat-item { cursor: default; }
+  .hq-perm-group.owner-locked .hq-feat-item input[type="checkbox"] { cursor: not-allowed; }
+  .hq-owner-note { display: none; align-items: center; gap: 6px; font-size: 14px; color: var(--spinach); font-weight: 600; margin-top: 10px; line-height: 1.4; }
+  .hq-perm-group.owner-locked .hq-owner-note { display: flex; }
+  .hq-owner-note-icon { width: 16px; height: 16px; border-radius: 50%; background: var(--nomni-green); color: var(--seaweed); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; line-height: 1; }
 
   /* Access cards */
   .access-box { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 20px 22px; margin-bottom: 12px; transition: border-color .13s; }
@@ -696,42 +701,43 @@
           <span class="field-hint">The user will have access to HQ features for each linked HQ</span>
         </div>
 
+        <div class="inner-divider"></div>
+
+        <div class="field-group" style="margin-bottom:16px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px">HQ Owner</div>
+              <div style="font-size:11px;color:var(--ink-mute);line-height:1.5">Protects this user from being disabled or removed by other HQ users. Can only be changed from Admin.</div>
+            </div>
+            <span class="toggle-track off" id="hqOwnerToggle" style="flex-shrink:0;margin-top:2px" role="switch" aria-label="HQ Owner" aria-checked="false"></span>
+          </div>
+        </div>
+
         <div class="hq-feat-group hq-perm-group disabled" id="hqPermGroup">
           <label class="field-label" style="margin-bottom:4px;display:block">Permissions</label>
           <span class="field-hint" style="display:block;margin-bottom:12px">These permissions only apply while the user is in HQ mode</span>
           <label class="hq-feat-item">
-            <input type="checkbox" />
+            <input type="checkbox" data-hq-permission />
             <div class="hq-feat-item-text">
               <div class="hq-feat-label">Manage user accounts</div>
-              <div class="hq-feat-desc">Can create accounts, update contact details, and disable outlet accounts (except Owners) and HQ users</div>
+              <div class="hq-feat-desc">Can create Outlet user accounts, update contact details, and create HQ users</div>
             </div>
           </label>
           <label class="hq-feat-item">
-            <input type="checkbox" />
+            <input type="checkbox" data-hq-permission />
             <div class="hq-feat-item-text">
               <div class="hq-feat-label">Grant HQ access</div>
               <div class="hq-feat-desc">Can enable HQ mode on a user account</div>
             </div>
           </label>
           <label class="hq-feat-item">
-            <input type="checkbox" />
+            <input type="checkbox" data-hq-permission />
             <div class="hq-feat-item-text">
               <div class="hq-feat-label">Revoke HQ access</div>
-              <div class="hq-feat-desc">Can disable HQ mode on a user account</div>
+              <div class="hq-feat-desc">Can disable HQ mode on a user account (except HQ Owners)</div>
             </div>
           </label>
-        </div>
-
-        <div class="inner-divider"></div>
-
-        <div class="field-group" style="margin-bottom:0">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
-            <div>
-              <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px">HQ Owner</div>
-              <div style="font-size:11px;color:var(--ink-mute);line-height:1.5">Protects this user from being disabled or removed by other HQ users. Can only be changed from Admin.</div>
-            </div>
-            <span class="toggle-track off" id="hqOwnerToggle" style="flex-shrink:0;margin-top:2px"></span>
-          </div>
+          <div class="hq-owner-note"><span class="hq-owner-note-icon" aria-hidden="true">✓</span><span>HQ Owners receive all HQ permissions.</span></div>
         </div>
 
       </div><!-- /hq-features -->
@@ -840,10 +846,23 @@
     document.getElementById('hqPermGroup').classList.toggle('disabled', !hasLinkedHQ);
   }
 
+  function syncHqOwnerPermissions() {
+    const ownerToggle = document.getElementById('hqOwnerToggle');
+    const isOwner = ownerToggle.classList.contains('on');
+    const permGroup = document.getElementById('hqPermGroup');
+    permGroup.classList.toggle('owner-locked', isOwner);
+    document.querySelectorAll('[data-hq-permission]').forEach(function(input) {
+      if (isOwner) input.checked = true;
+      input.disabled = isOwner;
+    });
+    ownerToggle.setAttribute('aria-checked', String(isOwner));
+  }
+
   // HQ Owner toggle
   document.getElementById('hqOwnerToggle').addEventListener('click', function(e) {
     e.stopPropagation();
     this.classList.toggle('on');
+    syncHqOwnerPermissions();
   });
 
   // Access type selector — Outlet access and HQ access can each be toggled independently,
@@ -947,7 +966,10 @@
       if (jobTitle) document.getElementById('jobTitleInput').value = jobTitle;
       var email = params.get('email');
       if (email) document.getElementById('emailInput').value = email;
-      if (params.get('owner') === '1') document.getElementById('hqOwnerToggle').classList.add('on');
+      if (params.get('owner') === '1') {
+        document.getElementById('hqOwnerToggle').classList.add('on');
+        syncHqOwnerPermissions();
+      }
       document.querySelector('.page-title').textContent = 'Edit user';
 
       // Editing an existing user — jump straight to HQ access instead of making them hunt for it.
