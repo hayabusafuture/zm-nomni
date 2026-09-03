@@ -1,6 +1,6 @@
 # HQ Module — Prototype Guide
 
-Last updated: 24 August 2026
+Last updated: 3 September 2026
 
 This guide is the single source of truth for the current user-facing HQ prototype, its delivery status, limitations and follow-up work.
 
@@ -151,10 +151,16 @@ POS mapping connects the HQ to Nomni POS and defines how POS sales affect the HQ
 - The overview can be filtered by outlet name, outlet group, POS connection state and mapping status. An outlet is treated as **Mapped** in this overview once it has at least one mapped POS product; otherwise it is **Unmapped**.
 - The Overview health-check alert for outlets not connected to POS opens this tab. Its count is derived from the same outlet records, so it remains consistent with the table.
 - The first visit to the HQ workspace presents a setup state. The user opens **POS settings** and saves the HQ Nomni POS API key; in the prototype, any key connects sample EMS products.
-- Once connected, the workspace is split into a POS-product list and a Procure mapping area.
-- A POS product or variant can map to any HQ inventory entry, including standard inventory items, Group SKUs and recipes that have been added to inventory.
-- It can alternatively map directly to a recipe that is not an inventory item.
-- **Ignore mapping** is available for POS products or variants that should not affect inventory. An ignored mapping is shown explicitly.
+- Once connected, the workspace is split into a categorised POS-product list and a mapping area. Both HQ and outlet views demonstrate multiple products within Burgers, Rice & noodles, Sides and Beverages; category headers appear once per group. Product counts in the filters reflect the shown sample data.
+- The HQ header has a **View mapping for…** control beside Settings. Its dialogue uses the same selector treatment in both directions: HQ master mapping and all outlets, with the current context visibly ticked.
+- HQ mapping is not an item-selection decision: the user is confirming how the selected POS product or variant behaves. The right pane therefore surfaces the relevant facts at the point of review: POS-product/variant availability, the mapped recipe or item and its ingredients, and food-cost information.
+- Availability is shown as a mint strip (for example, **Product available in 6 outlets**). It opens an outlet list when needed. The mapped result shows its recipe/item details directly; product food cost is summarised as the range across available outlets and opens the detailed outlet breakdown.
+- If the HQ target is unavailable in one or more outlets, a yellow warning identifies that the mapping is not applied there and directs the user to resolve it. The resolution flow keeps the scalable choice at the top level: make the mapping target available for the affected outlets, or continue to the relevant outlet mapping to create an alternate mapping. It does not expose three actions for every outlet at once.
+- A POS product or variant can map to any HQ inventory entry, including standard inventory items, Group SKUs and recipes that have been added to inventory. It can alternatively map directly to a recipe that is not an inventory item. Unmapped results are previewed inline and have an explicit **Map** action; **Ignore mapping** remains available for entries that should not affect inventory.
+- At an outlet, the page stays close to the HQ layout but is explicitly local. Inherited mappings show a mint **Mapping inherited from [HQ]** strip; outlet-specific mappings use the corresponding override state. The product list distinguishes inherited, overridden and **Unmapped** entries.
+- If an inherited target cannot be applied at the current outlet, the outlet page replaces the mapped card with an amber **HQ mapping not applied** state. It names the unavailable target and offers **Create outlet override**; no recipe ingredients or food-cost summary are shown until a valid outlet mapping exists.
+- Outlet food cost is displayed directly, rather than in a dialogue: Food cost, selling price and Food cost %. Food cost % is highlighted when it is above the Recipes food-cost target (25% in the prototype). The direct-inventory explanatory copy is omitted.
+- An outlet can create an alternate mapping only where needed. A saved outlet-specific mapping can be removed, restoring the inherited HQ mapping. **Copy mapping to…** copies an outlet's local mapping changes to selected outlets; standard toast feedback confirms copy and availability actions.
 - The current regular-outlet Procure flow also supports a more advanced variant model—add/modify ingredients, replace an ingredient, or apply a multiplier to the base recipe. The HQ prototype should adopt these variant behaviours when the detailed mapping editor is designed, rather than duplicating a recipe for each variant.
 
 ## Recipes
@@ -258,9 +264,12 @@ The POS mapping tab is the HQ-level version of the existing Nomni Procure POS ma
 - The HQ tab provides outlet-level connection and mapping status, while **Open POS mapping** opens the dedicated wide HQ master-mapping screen.
 - Users can search the managed outlets and filter the overview by group, connection state or mapping status before opening a specific outlet for validation or setup.
 - The HQ mapping screen starts in a Nomni POS connection state and opens a small settings dialog for the HQ EMS API key. Outlet-level views are for validating the derived mapping against each outlet's separate POS connection.
-- Its left pane lists POS products with product codes, category and Mapped/Unmapped filters. Products expose their variants in an accordion.
-- Its right pane is the Procure search-and-map workspace. The user selects Inventory or Recipes and then maps the selected POS entry.
+- Its left pane lists POS products with product codes, one header per category, status filters and expandable variants. Outlet lists distinguish inherited, overridden and unmapped products.
+- Its right pane presents the mapping outcome and mapping availability before asking for an action. Mapped recipes/items are shown directly with ingredients; unmapped results are shown inline with a clear **Map** action.
 - Inventory choices deliberately include regular inventory items, Group SKUs and inventory recipes; Recipe choices are recipes not held in inventory.
+- HQ mapping availability uses a mint availability strip; mappings that cannot be applied to selected outlets use an amber resolution state. At outlet level, inherited and override states are explicit, and an unavailable HQ target is replaced by an outlet-override prompt rather than a misleading mapped result.
+- Outlet food cost is inline (cost, selling price and food-cost percentage), with the percentage highlighted above the 25% prototype target. It is unavailable until that outlet has a valid mapping.
+- **View mapping for…** switches consistently between HQ and outlet contexts. **Copy mapping to…** copies local outlet mapping changes to one or more other outlets. Mapping availability and copy operations use standard Nomni confirmation toasts.
 - For variants, the workspace presents the existing Procure behaviours: Add/modify, Replace and Multiplier. Detailed ingredient selection for those behaviours remains to be built.
 - The API-key-only connection is a current prototype assumption. Connection requirements, POS location selection and visibility/category settings still need confirmation.
 
