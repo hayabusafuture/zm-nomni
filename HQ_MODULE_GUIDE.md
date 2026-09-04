@@ -157,8 +157,9 @@ POS mapping links POS sales to the recipes or inventory records that should be u
 
 - Outlet pages use the same product list and right-hand mapping pane, but make the source of each mapping clear: **Mapping inherited from Garden Cuisine HQ** or an outlet-specific mapping.
 - When an HQ mapping cannot be used locally, the outlet shows **HQ mapping not applied** and takes the user straight to the usual mapping selector. When the product has no HQ mapping at all, it shows the concise **No HQ mapping** state and uses that same local-mapping flow.
-- A local mapping is saved for that outlet. **Change outlet mapping** replaces a usable inherited mapping; **Use HQ mapping** removes that replacement and restores inheritance. If no usable HQ mapping exists, the action is **Remove** instead. Removing it leaves the product unmapped and warns that automatic stock depletion and stock-on-hand updates will stop.
-- **Copy mapping to…** copies local mapping changes to selected outlets. Mapping and availability actions give standard confirmation toasts.
+- A local mapping is saved for that outlet. **Set outlet-specific mapping** replaces a usable inherited mapping; **Use HQ mapping** removes that replacement and restores inheritance. If no usable HQ mapping exists, the action is **Remove** instead. Removing it leaves the product unmapped and warns that automatic stock depletion and stock-on-hand updates will stop.
+- Outlet POS settings can remove every outlet-specific mapping at once. This leaves the POS connection and HQ mapping unchanged, so products return to HQ inheritance where possible.
+- **Copy mapping to…** is a complete replacement of the selected outlets’ local mappings: their existing local mappings are removed first, then the source outlet’s local mappings are copied over. Products without a local mapping automatically inherit the HQ mapping where it is available. The confirmation makes this impact clear; HQ mappings are not changed. Mapping and availability actions give standard confirmation toasts.
 
 ### Variants and costs
 

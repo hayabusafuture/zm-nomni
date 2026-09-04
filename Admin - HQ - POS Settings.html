@@ -61,7 +61,7 @@
 .danger-link:hover{text-decoration:underline}
 
 .settings-footer{position:fixed;bottom:0;left:232px;right:0;background:#fff;border-top:1px solid var(--rule);padding:12px 40px;display:flex;justify-content:flex-end;gap:10px;margin:0;z-index:10}
-.delete-dialog{display:none;position:fixed;inset:0;z-index:30;background:rgba(10,20,15,.46);align-items:center;justify-content:center;padding:16px}.delete-dialog.open{display:flex}.delete-card{width:440px;max-width:100%;background:#fff;border-radius:12px;box-shadow:0 24px 64px rgba(0,0,0,.22);overflow:hidden}.delete-card-head{padding:20px 24px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between}.delete-card-head h2{margin:0;font-size:18px}.delete-card-body{padding:22px 24px;color:var(--ink);line-height:1.5}.delete-card-body strong{color:#D0291E}.delete-card-foot{padding:14px 24px;border-top:1px solid var(--rule);display:flex;justify-content:flex-end;gap:10px}.delete-close{border:0;background:none;color:var(--ink-mute);font-size:22px;line-height:1;cursor:pointer;padding:2px}
+.delete-dialog{display:none;position:fixed;inset:0;z-index:30;background:rgba(10,20,15,.46);align-items:center;justify-content:center;padding:16px}.delete-dialog.open{display:flex}.delete-card{width:440px;max-width:100%;background:#fff;border-radius:12px;box-shadow:0 24px 64px rgba(0,0,0,.22);overflow:hidden}.delete-card-head{padding:20px 24px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between}.delete-card-head h2{margin:0;font-size:18px}.delete-card-body{padding:22px 24px;color:var(--ink);line-height:1.5}.delete-card-body strong{color:#D0291E}.delete-card-foot{padding:14px 24px;border-top:1px solid var(--rule);display:flex;justify-content:flex-end;gap:10px}.delete-close{border:0;background:none;color:var(--ink-mute);font-size:22px;line-height:1;cursor:pointer;padding:2px}.outlet-delete-dialog .delete-card-head{border-bottom:0;padding-bottom:0}.outlet-delete-dialog .delete-card-head h2{font-size:21px}.outlet-delete-dialog .delete-card-body{padding-top:16px}
 .btn{border:0;border-radius:6px;padding:10px 16px;cursor:pointer;font:600 14px/1 Inter,system-ui,sans-serif;display:inline-flex;align-items:center;gap:8px}
 .btn-primary{background:var(--nomni-green);color:var(--seaweed)}.btn-primary:hover{background:#1FA551}
 .btn-cancel{background:none;color:var(--ink-mute)}.btn-cancel:hover{color:var(--ink)}
@@ -148,6 +148,17 @@
   const mappingUrl = 'Admin - HQ - POS Mapping.html' + (outlet ? '?outlet=' + encodeURIComponent(outlet) : (createdHq ? '?created-hq=' + encodeURIComponent(createdHq) : ''));
   document.getElementById('backLink').href = mappingUrl;
   document.getElementById('cancelBtn').onclick = () => { location.href = mappingUrl; };
+  if (outlet) {
+    document.getElementById('deleteDialog').classList.add('outlet-delete-dialog');
+    document.querySelector('.settings-label').textContent = 'Outlet-specific mappings:';
+    document.querySelector('.danger-warning').textContent = 'Remove local mapping changes for this outlet only. HQ mappings and the POS connection will not be affected.';
+    document.getElementById('deleteMappingsBtn').textContent = 'Remove outlet-specific mappings';
+    document.getElementById('deleteDialogTitle').textContent = 'Remove outlet-specific mappings?';
+    document.querySelector('.delete-card-body').innerHTML = '<p style="margin:0;line-height:1.5">This will remove this outlet’s local mapping changes. Products will use the HQ mapping again where one is available.</p><p style="margin:12px 0 0;line-height:1.5;color:var(--ink-mute)">Products with no usable HQ mapping will remain unmapped.</p>';
+    document.querySelector('.delete-card-foot .btn-cancel').textContent = 'Cancel';
+    document.querySelector('.delete-card-foot .btn-danger').textContent = 'Remove mappings';
+    document.querySelector('.delete-card-foot .btn-danger').disabled = false;
+  }
 
   const CATEGORY_OPTIONS = ['Burgers', 'Rice & noodles', 'Sides', 'Beverages', 'All Day Breakfast', 'Desserts'];
   const selectedCategories = new Set(['Beverages', 'All Day Breakfast']);
@@ -234,10 +245,10 @@
   syncCatVisibility();
 
   document.getElementById('deleteMappingsBtn').addEventListener('click', () => window.openDeleteDialog());
-  window.openDeleteDialog = function(){ document.getElementById('deleteConfirmInput').value=''; document.getElementById('deleteDialog').classList.add('open'); updateDeleteConfirmation(); };
+  window.openDeleteDialog = function(){ var input=document.getElementById('deleteConfirmInput'); if (input) input.value=''; document.getElementById('deleteDialog').classList.add('open'); if (!outlet) updateDeleteConfirmation(); };
   window.closeDeleteDialog = function(){ document.getElementById('deleteDialog').classList.remove('open'); };
   window.updateDeleteConfirmation = function(){ document.querySelector('#deleteDialog .btn-danger').disabled = document.getElementById('deleteConfirmInput').value.trim().toLowerCase() !== 'delete'; };
-  window.confirmDeleteMappings = function(){ if (document.getElementById('deleteConfirmInput').value.trim().toLowerCase() !== 'delete') return; localStorage.removeItem(storageKey); localStorage.removeItem('nomniHqPosApiKey'); localStorage.removeItem('nomniPosApiKey'); localStorage.removeItem('nomniPosHqConfigured'); closeDeleteDialog(); location.href = mappingUrl; };
+  window.confirmDeleteMappings = function(){ if (outlet) { var suffix=':' + outlet; Object.keys(localStorage).filter(function(key){ return key.indexOf('nomniPosOutletMapping:v2:') === 0 && key.slice(-suffix.length) === suffix; }).forEach(function(key){ localStorage.removeItem(key); }); closeDeleteDialog(); location.href = mappingUrl; return; } if (document.getElementById('deleteConfirmInput').value.trim().toLowerCase() !== 'delete') return; localStorage.removeItem(storageKey); localStorage.removeItem('nomniHqPosApiKey'); localStorage.removeItem('nomniPosApiKey'); localStorage.removeItem('nomniPosHqConfigured'); closeDeleteDialog(); location.href = mappingUrl; };
 
   document.getElementById('locationId').value = localStorage.getItem(storageKey) || '';
   document.getElementById('saveBtn').onclick = () => {

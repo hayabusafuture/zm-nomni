@@ -8044,8 +8044,11 @@ function refreshStaticPosOutletRows() {
     if (row.id === 'posOutletEmpty') return;
     var status = row.cells[1], action = row.cells[4];
     if (!status || !action || !status.textContent.toLowerCase().includes('not connected')) return;
+    var outletCell = row.cells[0], outletLabel = outletCell && outletCell.querySelector('div');
+    if (!outletLabel || configuredPosOutlets().indexOf(outletLabel.textContent.trim()) === -1) return;
+    var connectedOutletName = outletLabel.textContent.trim();
     status.innerHTML = '<span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span>';
-    action.innerHTML = '<a href="Admin - HQ - POS Mapping.html#pos-mapping" style="color:var(--spinach);font-weight:600;text-decoration:none">Open mapping</a>';
+    action.innerHTML = '<a href="Admin - HQ - POS Mapping.html?outlet=' + encodeURIComponent(connectedOutletName) + '" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a>';
   });
 }
 function openPosMappingDialog(productId, variantId) {
@@ -9213,7 +9216,7 @@ function syncNewHqPosOutlets() {
   } else {
     body.innerHTML = outlets.map(function(outlet) {
       var configured = isOutletPosConfigured(outlet.name);
-      return '<tr><td><div style="font-weight:600">' + escapeOverviewText(outlet.name) + '</div>' + (outlet.group !== 'Ungrouped' ? '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(outlet.group) + '</div>' : '') + '</td><td><span class="pos-chip ' + (configured ? '' : 'off') + '"' + (configured ? ' style="background:var(--mint);color:var(--spinach)"' : '') + '>' + (configured ? 'Connected' : 'Not connected') + '</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td>' + (configured ? '<a href="Admin - HQ - POS Mapping.html?outlet=' + encodeURIComponent(outlet.name) + '" style="color:var(--spinach);font-weight:600;text-decoration:none">Open mapping</a>' : '<button type="button" onclick="openPosSettings(\'' + escapeOverviewText(outlet.name).replace(/&#39;/g,"\\'") + '\')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button>') + '</td></tr>';
+      return '<tr><td><div style="font-weight:600">' + escapeOverviewText(outlet.name) + '</div>' + (outlet.group !== 'Ungrouped' ? '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(outlet.group) + '</div>' : '') + '</td><td><span class="pos-chip ' + (configured ? '' : 'off') + '"' + (configured ? ' style="background:var(--mint);color:var(--spinach)"' : '') + '>' + (configured ? 'Connected' : 'Not connected') + '</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td>' + (configured ? '<a href="Admin - HQ - POS Mapping.html?outlet=' + encodeURIComponent(outlet.name) + '" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a>' : '<button type="button" onclick="openPosSettings(\'' + escapeOverviewText(outlet.name).replace(/&#39;/g,"\\'") + '\')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button>') + '</td></tr>';
     }).join('') + '<tr id="posOutletEmpty" hidden><td colspan="5" style="padding:32px;text-align:center;color:var(--ink-mute)">No outlets match these filters.</td></tr>';
   }
   filterPosOutlets();
