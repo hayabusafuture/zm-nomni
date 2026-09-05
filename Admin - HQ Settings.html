@@ -488,6 +488,11 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-scope-nav-add.is-active small { color:var(--ink-mute); font-size:11px; font-weight:500; }
 #supplierSettingsOverlay .supplier-default-helper { order:1; margin:-14px 0 14px; padding:0 10px; color:var(--ink-mute); font-size:12px; line-height:1.35; text-align:center; }
 #supplierSettingsOverlay .supplier-scope-nav-add.is-active small { display:none !important; }
+#supplierSettingsOverlay .supplier-outlet-empty-state { padding:36px 18px 20px; text-align:center; }
+#supplierSettingsOverlay .supplier-outlet-empty-state strong { display:block; color:var(--ink); font-size:16px; font-weight:700; }
+#supplierSettingsOverlay .supplier-outlet-empty-state span { display:block; margin-top:8px; color:var(--ink-mute); font-size:13px; line-height:1.45; }
+#supplierSettingsOverlay .supplier-outlet-empty-state button { margin-top:20px; min-height:40px; padding:10px 16px; border:0; border-radius:6px; background:var(--nomni-green); color:var(--seaweed); font:600 14px Inter,sans-serif; cursor:pointer; }
+#supplierSettingsOverlay .supplier-scope-nav > .supplier-scope-nav-add[hidden] { display:none !important; }
 #supplierSettingsOverlay .supplier-outlet-search { order: 2; }
 #supplierSettingsOverlay #supplierScopeNavPolicies { order: 3; }
 #supplierSettingsOverlay #supplierExceptionsLabel { display:none !important; }
@@ -4859,7 +4864,7 @@ function openSupplierAvailability(name) {
   const initialLocations = new Set((supplier.groupList || []).concat(supplier.outletList || []));
   openAvailabilityManager({ record: supplier, groups: ML_GROUPS, outlets: SUPPLIER_UNGROUPED_OUTLETS, orderSettings:true, save: saveHqSupplierState, render: renderSuppliers, toast: 'Supplier availability updated', afterComplete: function(record) {
     const addedLocations = (record.groupList || []).concat(record.outletList || []).filter(function(location) { return !initialLocations.has(location); });
-    if (record.type !== 'active' && addedLocations.length) openSupplierSettings(record, false, true);
+    if (record.type !== 'active' && addedLocations.length) openSupplierSettings(record, false, true, true);
   } });
 }
 
@@ -4988,6 +4993,9 @@ document.getElementById('supBody').addEventListener('click', function (event) {
   if (!row || event.target.closest('.row-actions-wrap, button')) return;
   var name = row.getAttribute('data-supplier-name');
   if (name) editLinkedSupplierSettings(name);
+});
+document.addEventListener('input', function (event) {
+  if (event.target.closest && event.target.closest('#supplierSettingsOverlay')) updateSupplierSaveState();
 });
 
 function editLinkedSupplierSettings(name) {
@@ -5635,7 +5643,7 @@ function confirmSupplierAvailability() {
   savePrototypeState();
   closeSupplierAvailability();
   showHqToast(pending.options.existing ? 'Supplier availability updated' : 'Supplier linked', supplierLabel(supplier.name));
-  if (supplier.type !== 'active' && added.length) openSupplierSettings(supplier, false, true);
+  if (supplier.type !== 'active' && added.length) openSupplierSettings(supplier, false, true, true);
 }
 
 var pendingSupplierLink = null;
@@ -5802,9 +5810,9 @@ function setSupplierScopeView(view) {
   var outletFilterHead = document.querySelector('.supplier-outlet-filter-head');
   var outletSearch = document.getElementById('supplierOutletSearch');
   groups.hidden = view !== 'groups'; outlets.hidden = view === 'groups';
-  if (addDefault) addDefault.hidden = view === 'groups';
-  if (defaultHelper) defaultHelper.hidden = view === 'groups';
-  if (addGroup) addGroup.hidden = view !== 'groups';
+  if (addDefault) { addDefault.hidden = view === 'groups'; addDefault.style.display = view === 'groups' ? 'none' : ''; }
+  if (defaultHelper) { defaultHelper.hidden = view === 'groups'; defaultHelper.style.display = view === 'groups' ? 'none' : ''; }
+  if (addGroup) { addGroup.hidden = view !== 'groups'; addGroup.style.display = view !== 'groups' ? 'none' : ''; }
   if (outletFilterHead) outletFilterHead.hidden = view === 'groups';
   if (outletSearch) outletSearch.hidden = view === 'groups';
   document.querySelectorAll('.supplier-scope-segmented button').forEach(function(button) { button.classList.toggle('is-active', button.textContent.toLowerCase() === view); });
@@ -5843,12 +5851,20 @@ function filterSupplierOutletNav() {
   var search = document.getElementById('supplierOutletSearch');
   if (!search) return;
   var query = (search.value || '').toLowerCase();
-  document.querySelectorAll('#supplierScopeNavPolicies [data-supplier-scope], #supplierScopeNavOverrides [data-supplier-scope]').forEach(function(item) {
+  var items = document.querySelectorAll('#supplierScopeNavPolicies [data-supplier-scope], #supplierScopeNavOverrides [data-supplier-scope]');
+  items.forEach(function(item) {
     var matchText = item.textContent.toLowerCase();
     var noSettings = item.classList.contains('is-incomplete');
     var groupMatch = supplierOutletFilter.indexOf('group:') === 0 ? matchText.indexOf(supplierOutletFilter.slice(6).toLowerCase()) !== -1 : true;
     item.hidden = !!(query && matchText.indexOf(query) === -1) || (supplierOutletFilter === 'none' && !noSettings) || !groupMatch;
   });
+  var empty = document.getElementById('supplierOutletEmptyState');
+  var visible = Array.from(items).filter(function(item) { return !item.hidden; }).length;
+  if (supplierOutletFilter === 'none' && !visible && supplierScopeView === 'outlets') {
+    if (!empty) { empty = document.createElement('div'); empty.id = 'supplierOutletEmptyState'; empty.className = 'supplier-outlet-empty-state'; document.getElementById('supplierScopeNavPolicies').appendChild(empty); }
+    empty.innerHTML = '<strong>No outlets need settings</strong><span>All outlets are covered by default or group settings.</span><button type="button" onclick="setSupplierOutletFilter(\'all\')">Show all outlets</button>';
+    empty.hidden = false;
+  } else if (empty) empty.hidden = true;
 }
 document.addEventListener('click', function(event) {
   var menu = document.getElementById('supplierOutletFilterMenu');
@@ -5956,17 +5972,32 @@ function closeSupplierOverrideList() { document.getElementById('supplierOverride
 function openSavedSupplierOverride(scope) { closeSupplierOverrideList(); selectSupplierSettingsScope(scope); }
 function openDeleteSupplierOverrideConfirm() {
   if (!supplierSettingsScope || !pendingSupplierLink) return;
+  var savedScopeSettings = pendingSupplierLink.supplier.scopeSettings && pendingSupplierLink.supplier.scopeSettings[supplierSettingsScope];
+  if (!savedScopeSettings && supplierSettingsDirty()) {
+    var switchOverlay = document.getElementById('supplierScopeSwitchOverlay');
+    document.getElementById('supplierScopeSwitchName').textContent = supplierScopeLabel(supplierSettingsScope);
+    switchOverlay.querySelector('.confirm-body').innerHTML = 'You have unsaved changes for <strong>' + escapeOverviewText(supplierScopeLabel(supplierSettingsScope)) + '</strong>. What would you like to do?';
+    var discardButton = switchOverlay.querySelector('.btn-tertiary');
+    var saveButton = switchOverlay.querySelector('.btn-primary');
+    discardButton.textContent = 'Discard changes';
+    discardButton.onclick = function () { delete supplierScopeDrafts[supplierSettingsScope]; setSupplierSettingsForm(supplierScopeSettings(pendingSupplierLink.supplier, supplierSettingsScope), pendingSupplierLink.supplier); supplierSettingsBaseline = readSupplierSettingsForm(); closeSupplierScopeSwitchConfirm(); updateSupplierScopePresentation(); };
+    saveButton.textContent = 'Save changes';
+    saveButton.onclick = function () { closeSupplierScopeSwitchConfirm(); saveSupplierSettings(); };
+    switchOverlay.classList.add('open');
+    return;
+  }
   var label = supplierScopeLabel(supplierSettingsScope);
   document.getElementById('deleteSupplierOverrideScope').textContent = label;
   var isDefault = supplierSettingsScope === 'default';
+  var isGroup = supplierSettingsScope.indexOf('group-') === 0;
   var defaultTargets = isDefault && typeof sourceForOutlet === 'function' ? supplierRequiredOrderingScopes(pendingSupplierLink.supplier).filter(function(scope) {
     return sourceForOutlet(pendingSupplierLink.supplier, scope).kind === 'default';
   }) : [];
-  document.getElementById('deleteSupplierOverrideTitle').textContent = isDefault ? 'Remove default settings?' : 'Delete outlet settings?';
+  document.getElementById('deleteSupplierOverrideTitle').textContent = isDefault ? 'Remove default settings?' : (isGroup ? 'Delete group settings?' : 'Delete outlet settings?');
   document.getElementById('deleteSupplierOverrideCopy').innerHTML = isDefault
     ? 'The current settings will be saved as outlet settings for <strong>' + defaultTargets.length + ' outlet' + (defaultTargets.length === 1 ? '' : 's') + '</strong> that use them. Their settings will not change.'
-    : 'The settings for <strong id="deleteSupplierOverrideScope">' + escapeOverviewText(label) + '</strong> will be deleted. This outlet will use the next available supplier settings.';
-  document.getElementById('deleteSupplierOverrideButton').textContent = isDefault ? 'Remove default settings' : 'Delete outlet settings';
+    : 'The settings for <strong id="deleteSupplierOverrideScope">' + escapeOverviewText(label) + '</strong> will be deleted. ' + (isGroup ? 'These outlets will fall back to default settings, if configured.' : 'This outlet will fall back to default settings, if configured.');
+  document.getElementById('deleteSupplierOverrideButton').textContent = isDefault ? 'Remove default settings' : (isGroup ? 'Delete group settings' : 'Delete outlet settings');
   document.getElementById('deleteSupplierOverrideOverlay').classList.add('open');
 }
 function closeDeleteSupplierOverrideConfirm() {
@@ -6012,7 +6043,7 @@ function deleteSupplierOverride() {
   var toastCopy;
   toastCopy = scope === 'default'
     ? 'Settings were kept for ' + preservedOutletCount + ' outlet' + (preservedOutletCount === 1 ? '' : 's') + '.'
-    : deletedScopeLabel + ' was removed. Affected outlets will use the next available settings.';
+    : deletedScopeLabel + ' was removed. Affected outlets will fall back to default settings, if configured.';
   showHqToast('Settings removed', toastCopy);
 }
 function openSupplierSetupPrompt(supplier, locationCount) {
@@ -6030,7 +6061,7 @@ function closeSupplierSetupPrompt() {
 function startSupplierSettingsFromPrompt() {
   var pending = pendingSupplierLink;
   document.getElementById('supplierSetupPrompt').classList.remove('open');
-  if (pending && pending.supplier) openSupplierSettings(pending.supplier, false, true);
+  if (pending && pending.supplier) openSupplierSettings(pending.supplier, false, true, true);
 }
 function openSupplierCopyPicker() {
   if (!pendingSupplierLink || !supplierSettingsScope) return;
@@ -6061,7 +6092,7 @@ function copySupplierSettingsFrom(scope) {
   closeSupplierCopyPicker();
   showHqToast('Settings copied', 'Review and save to apply.');
 }
-function openSupplierSettings(supplier, isNew, isEditing) {
+function openSupplierSettings(supplier, isNew, isEditing, showSettingsRequired) {
   pendingSupplierLink = { supplier:supplier, isNew:!!isNew, isEditing:!!isEditing };
   document.getElementById('supplierSettingsOverlay').classList.add('open');
   document.querySelectorAll('.row-actions-menu.open').forEach(function(menu) { menu.classList.remove('open'); menu.removeAttribute('style'); });
@@ -6071,6 +6102,7 @@ function openSupplierSettings(supplier, isNew, isEditing) {
   document.getElementById('supplierSmsField').hidden = true;
   document.getElementById('supplierMoreContact').hidden = false;
   supplierScopeDrafts = {};
+  if (showSettingsRequired) supplierOutletFilter = 'none';
   supplierScopeLabels = supplier.scopeLabels || {};
   supplierSettingsScope = supplierMissingOrderingScopes(supplier)[0] || supplierRequiredOrderingScopes(supplier)[0] || Object.keys(supplier.scopeSettings || {})[0] || '';
   if (!supplierSettingsScope) { showHqToast('No locations available', 'Add supplier availability before entering order settings.'); return; }
@@ -6081,7 +6113,20 @@ function openSupplierSettings(supplier, isNew, isEditing) {
   ensureSupplierApplyAllButtons();
   updateSupplierApplyAll();
   setSupplierSettingsReadOnly(supplier.type === 'active');
+  if (showSettingsRequired) setSupplierOutletFilter('none');
+  if (showSettingsRequired) setTimeout(showSupplierSettingsIntro, 0);
   if (supplier.type !== 'active') setTimeout(function(){ document.getElementById('supplierRecipientEmail').focus(); }, 80);
+}
+function showSupplierSettingsIntro() {
+  var overlay = document.getElementById('supplierSettingsIntro');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'supplierSettingsIntro';
+    overlay.className = 'confirm-overlay';
+    overlay.innerHTML = '<div class="confirm-card" style="width:500px"><div class="confirm-title">Review or add ordering settings</div><div class="confirm-body">Check that ordering settings are filled in for the outlets you have just linked to this supplier.</div><div class="confirm-foot" style="justify-content:flex-end"><button type="button" class="btn btn-primary" onclick="document.getElementById(\'supplierSettingsIntro\').classList.remove(\'open\')">OK</button></div></div>';
+    document.body.appendChild(overlay);
+  }
+  overlay.classList.add('open');
 }
 function setSupplierSettingsReadOnly(readOnly) {
   var overlay = document.getElementById('supplierSettingsOverlay');
@@ -6132,7 +6177,7 @@ function updateSupplierSaveState() {
   var button = document.getElementById('supplierSaveButton');
   if (!button) return;
   var supplierManaged = pendingSupplierLink && pendingSupplierLink.supplier && pendingSupplierLink.supplier.type === 'active';
-  button.disabled = !!supplierManaged || !hasSupplierContact() || !hasSupplierDeliveryAndCutoff();
+  button.disabled = !!supplierManaged || !supplierSettingsDirty() || !hasSupplierContact() || !hasSupplierDeliveryAndCutoff();
 }
 function toggleSupplierDay(check) { setSupplierPolicyRow(check.closest('.supplier-policy-row'), check.checked); updateSupplierApplyAll(); updateSupplierSaveState(); }
 function setSupplierPolicyRow(row, enabled) {
@@ -6201,7 +6246,7 @@ function saveSupplierSettings(afterSave) {
   supplier.scopeLabels = supplier.scopeLabels || {};
   supplier.scopeLabels[savedScope] = supplierScopeLabel(savedScope);
   delete supplierScopeDrafts[savedScope];
-  var nextScope = typeof afterSave === 'function' ? '' : nextSupplierScopeRequiringSettings(supplier, savedScope);
+  var nextScope = typeof afterSave === 'function' || savedScope.indexOf('group-') === 0 ? '' : nextSupplierScopeRequiringSettings(supplier, savedScope);
   var savedScopeLabel = supplierScopeLabel(savedScope);
   if (isNew && !PLATFORM_SUPPLIERS.some(function(item) { return item.name === supplier.name; })) PLATFORM_SUPPLIERS.push(supplier);
   if (!SUPPLIERS.some(function(item) { return item.name === supplier.name; })) SUPPLIERS.push(supplier);
@@ -8864,7 +8909,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
 <div class="confirm-overlay" id="deleteSupplierOverrideOverlay" onclick="if(event.target===this)closeDeleteSupplierOverrideConfirm()">
   <div class="danger-confirm-card">
     <div class="danger-confirm-title" id="deleteSupplierOverrideTitle">Delete supplier override?</div>
-    <div class="danger-confirm-body" id="deleteSupplierOverrideCopy">The <strong id="deleteSupplierOverrideScope"></strong> override will be deleted. This location will use the next available supplier settings.</div>
+    <div class="danger-confirm-body" id="deleteSupplierOverrideCopy">The <strong id="deleteSupplierOverrideScope"></strong> settings will be deleted. This outlet will fall back to default settings, if configured.</div>
     <div class="danger-confirm-actions">
       <button class="btn-cancel-plain" onclick="closeDeleteSupplierOverrideConfirm()">Cancel</button>
       <button class="btn-danger-confirm" id="deleteSupplierOverrideButton" onclick="deleteSupplierOverride()">Delete override</button>
@@ -9445,6 +9490,7 @@ function filterPosOutlets() {
 <style>
 /* Supplier settings inheritance — mirrors the POS mapping inheritance strip. */
 #supplierSettingsOverlay .supplier-inheritance-strip { display:flex; align-items:center; gap:12px; margin:24px 0 8px; padding:10px 16px; border:0; border-radius:8px; background:var(--mint); color:var(--seaweed); }
+#supplierSettingsOverlay #supplierInheritanceStrip { height:60px; box-sizing:border-box; }
 #supplierSettingsOverlay .supplier-inheritance-copy { min-width:0; flex:1; }
 #supplierSettingsOverlay .supplier-inheritance-copy strong,#supplierSettingsOverlay .supplier-inheritance-copy span { display:block; }
 #supplierSettingsOverlay .supplier-inheritance-copy strong { font-size:14px; font-weight:700; }
@@ -9520,6 +9566,19 @@ function filterPosOutlets() {
     if (!overlay || !content) return;
     var existing = document.getElementById('supplierInheritanceStrip');
     var inherited = inheritedState();
+    var supplier = pendingSupplierLink && pendingSupplierLink.supplier;
+    var directOutlet = supplier && supplierSettingsScope && supplierSettingsScope.indexOf('outlet-') === 0 && sourceForOutlet(supplier, supplierSettingsScope).kind === 'outlet';
+    if (!inherited && directOutlet) {
+      if (!existing) {
+        existing = document.createElement('div');
+        existing.id = 'supplierInheritanceStrip';
+        existing.className = 'supplier-inheritance-strip';
+        document.getElementById('supplierEditingNote').insertAdjacentElement('afterend', existing);
+      }
+      existing.innerHTML = '<span class="supplier-inheritance-copy"><strong>Using outlet settings</strong></span>';
+      overlay.classList.remove('is-inherited-settings');
+      return;
+    }
     if (!inherited) {
       if (existing) existing.remove();
       overlay.classList.remove('is-inherited-settings');
@@ -9552,11 +9611,15 @@ function filterPosOutlets() {
     var supplier = pendingSupplierLink && pendingSupplierLink.supplier;
     var header = document.getElementById('supplierEditingNote');
     var existing = document.getElementById('supplierDefaultCoverageStrip');
-    if (!supplier || supplierSettingsScope !== 'default' || supplier.type === 'active') {
+    if (!supplier || supplier.type === 'active' || (supplierSettingsScope !== 'default' && supplierSettingsScope.indexOf('group-') !== 0)) {
       if (existing) existing.remove();
       return;
     }
-    var scopes = defaultCoverageScopes(supplier);
+    var scopes = supplierSettingsScope === 'default'
+      ? defaultCoverageScopes(supplier)
+      : supplierRequiredOrderingScopes(supplier).filter(function (scope) {
+          return supplierParentGroupScope(scope) === supplierSettingsScope && sourceForOutlet(supplier, scope).kind === 'group';
+        });
     if (!existing) {
       existing = document.createElement('div');
       existing.id = 'supplierDefaultCoverageStrip';
@@ -9570,7 +9633,11 @@ function filterPosOutlets() {
   window.openDefaultCoverageDialog = function () {
     var supplier = pendingSupplierLink && pendingSupplierLink.supplier;
     if (!supplier) return;
-    var scopes = defaultCoverageScopes(supplier);
+    var scopes = supplierSettingsScope.indexOf('group-') === 0
+      ? supplierRequiredOrderingScopes(supplier).filter(function (scope) {
+          return supplierParentGroupScope(scope) === supplierSettingsScope && sourceForOutlet(supplier, scope).kind === 'group';
+        })
+      : defaultCoverageScopes(supplier);
     var overlay = document.getElementById('supplierDefaultCoverageOverlay');
     if (!overlay) {
       overlay = document.createElement('div');
@@ -9580,6 +9647,8 @@ function filterPosOutlets() {
       overlay.innerHTML = '<div class="modal-card" style="width:520px"><div class="modal-header"><h2 class="modal-title">Outlets using default settings</h2><button type="button" class="modal-close" onclick="closeDefaultCoverageDialog()" aria-label="Close">×</button></div><div class="modal-body"><div class="supplier-default-coverage-list" id="supplierDefaultCoverageList"></div></div><div class="modal-foot" style="display:flex;justify-content:flex-end"><button type="button" class="modal-cancel" onclick="closeDefaultCoverageDialog()">Close</button></div></div>';
       document.body.appendChild(overlay);
     }
+    var coverageTitle = overlay.querySelector('.modal-title');
+    if (coverageTitle) coverageTitle.textContent = supplierSettingsScope.indexOf('group-') === 0 ? 'Outlets using group settings' : 'Outlets using default settings';
     document.getElementById('supplierDefaultCoverageList').innerHTML = scopes.map(function (scope) { return '<div>' + escapeOverviewText(supplierScopeLabel(scope)) + '</div>'; }).join('') || '<div>No outlets will use these settings.</div>';
     overlay.classList.add('open');
   };
@@ -9662,6 +9731,11 @@ function filterPosOutlets() {
   updateSupplierScopePresentation = function () {
     originalUpdateSupplierScopePresentation();
     syncDefaultSettingsAction();
+    var defaultNavButton = document.querySelector('#supplierSettingsOverlay .supplier-scope-nav-add:not(#supplierGroupSettingsButton)');
+    if (defaultNavButton) {
+      defaultNavButton.hidden = supplierScopeView === 'groups';
+      defaultNavButton.style.display = supplierScopeView === 'groups' ? 'none' : '';
+    }
     var defaultButton = document.querySelector('#supplierSettingsOverlay .supplier-scope-nav-add:not(#supplierGroupSettingsButton)');
     if (defaultButton) defaultButton.classList.toggle('is-active', supplierSettingsScope === 'default');
     var supplier = pendingSupplierLink && pendingSupplierLink.supplier;
