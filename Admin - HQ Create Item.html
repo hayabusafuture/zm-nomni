@@ -427,10 +427,10 @@
         <label class="field-label">Supplier <span class="req">*</span></label>
         <select class="field-select" id="supplierSelect">
           <option value="">Select supplier</option>
-          <option>Kee Song Group</option>
-          <option>Meat King</option>
-          <option>Provenir</option>
-          <option>Deli Hub</option>
+          <option value="Kee Song Group">Kee Song</option>
+          <option value="Meat King">Meat King Pte Ltd</option>
+          <option value="Provenir">Provenir Singapore Pte Ltd</option>
+          <option value="Deli Hub">Deli Hub Catering Pte Ltd</option>
         </select>
       </div>
 
@@ -709,6 +709,11 @@ function getNewHqCreateItemScopes() {
   return groups.concat(outlets);
 }
 function getCreateItemTargets() { return CREATE_ITEM_TARGETS.filter(function(entry) { return document.getElementById(entry[0]); }); }
+const CREATE_ITEM_SUPPLIER_NAMES = {
+  'Kee Song Group': 'Kee Song', 'Song Fish Dealer': 'Song Fish', 'Sustenir Agriculture': 'Sustenir', 'AmoyFoods': 'Amoy Foods', 'Grill Master SG': 'Grill Master',
+  'NH Foods': 'NH Foods Singapore Pte Ltd', 'Provenir': 'Provenir Singapore Pte Ltd', 'Meat King': 'Meat King Pte Ltd', 'Ocean Fresh': 'Ocean Fresh Seafood Pte Ltd', 'Deli Hub': 'Deli Hub Catering Pte Ltd', 'Lee Kum Kee': 'Lee Kum Kee (Singapore) Pte Ltd', 'Kikkoman': 'Kikkoman (S) Pte Ltd', 'Fonterra': 'Fonterra Brands (Singapore) Pte Ltd', 'Seng Choon Farm': 'Seng Choon Farm Pte Ltd'
+};
+function createItemSupplierDisplayName(name) { return CREATE_ITEM_SUPPLIER_NAMES[name] || name; }
 function hydrateNewHqCreateItem() {
   if (!isNewHqCreateItem()) return;
   var scopes = getNewHqCreateItemScopes(); var grid = document.getElementById('groupsGrid');
@@ -724,7 +729,7 @@ function hydrateNewHqCreateItem() {
   if (select) {
     var state; try { state = JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}'); } catch (e) { state = {}; }
     var suppliers = Array.isArray(state.suppliers) ? state.suppliers.map(function(supplier) { return supplier && (supplier.name || supplier.supplier || supplier.label); }).filter(Boolean) : [];
-    select.innerHTML = '<option value="">' + (suppliers.length ? 'Select supplier' : 'Link a supplier first') + '</option>' + suppliers.map(function(name) { return '<option value="' + createItemEscape(name) + '">' + createItemEscape(name) + '</option>'; }).join('');
+    select.innerHTML = '<option value="">' + (suppliers.length ? 'Select supplier' : 'Link a supplier first') + '</option>' + suppliers.map(function(name) { return '<option value="' + createItemEscape(name) + '">' + createItemEscape(createItemSupplierDisplayName(name)) + '</option>'; }).join('');
     select.disabled = !suppliers.length;
   }
 }

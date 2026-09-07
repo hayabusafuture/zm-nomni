@@ -164,6 +164,7 @@
   .modal-close:hover { color: var(--ink); }
   .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
   .modal-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+  #settingsModal .modal-foot { flex-direction: row-reverse; }
   .modal-cancel { font-size: 14px; font-weight: 600; color: var(--ink-mute); cursor: pointer; background: none; border: none; font-family: inherit; transition: color .13s; }
   .modal-cancel:hover { color: var(--ink); }
   .modal-add-btn { background: var(--nomni-green); color: var(--seaweed); border: none; border-radius: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 9px 20px; cursor: pointer; transition: background .15s; }
@@ -265,6 +266,7 @@
 
   /* ── Overview two-column layout ── */
   .overview-grid { display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: start; }
+  .overview-grid > div { min-width: 0; }
   .overview-right { display: flex; flex-direction: column; gap: 28px; }
 
   /* ── Items table ── */
@@ -373,12 +375,12 @@
   .item-supplier-text { font-size: 12px; color: var(--ink-mute); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Items filter row */
-  .items-filter-row { display: flex; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--rule); background: #fff; align-items: center; }
-  .item-search-wrap { flex: none; width:320px; max-width:100%; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 38px; }
+  .items-filter-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--rule); background: #fff; align-items: center; min-width: 0; }
+  .item-search-wrap { flex: 1 1 280px; width: auto; min-width: 0; max-width: 100%; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 38px; }
   .item-search-wrap:focus-within { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
   .item-search-input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; min-width: 0; }
   .item-search-input::placeholder { color: var(--ink-mute); }
-  .items-cat-select { border: 1px solid #dcdee3; border-radius: 6px; padding: 0 28px 0 10px; height: 38px; font: inherit; font-size: 14px; color: var(--ink); background: #fff; appearance: none; -webkit-appearance: none; cursor: pointer; outline: none; white-space: nowrap; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A8F98' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; }
+  .items-cat-select { flex: 1 1 130px; min-width: 0; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 28px 0 10px; height: 38px; font: inherit; font-size: 14px; color: var(--ink); background: #fff; appearance: none; -webkit-appearance: none; cursor: pointer; outline: none; white-space: nowrap; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A8F98' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; }
   .items-cat-select:focus { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
 
   /* Sortable column headers */
@@ -393,7 +395,34 @@
   .uom-options-btn:hover { background: #c6f2ce; }
 
   /* Recipes tab — shared table/filter styles */
-  .ml-filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.ml-filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.supplier-type-chip { display:inline-block; font-size:11px; font-weight:600; border-radius:4px; padding:1px 7px; margin-top:3px; }
+.supplier-type-chip.active { background:#D9F5E4; color:#1A8040; }
+.supplier-type-chip.passive { background:#F0F0F2; color:#555; }
+.pos-status-chip { display:inline-flex; align-items:center; border-radius:4px; padding:3px 8px; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+.pos-status-chip.is-connected,.pos-status-chip.is-complete { background:#D9F5E4; color:#1A8040; }
+.pos-status-chip.is-disconnected,.pos-status-chip.is-unavailable { background:#F0F0F2; color:#666; }
+.pos-status-chip.is-warning { background:#FFF3CD; color:#7A5F00; }
+.pos-chip { font-size:10px; font-weight:700; letter-spacing:.03em; border-radius:3px; padding:1px 6px; flex-shrink:0; display:inline-flex; align-items:center; gap:3px; }
+.pos-chip.ok { background:var(--mint); color:var(--spinach); }
+.pos-chip.off { background:#F3F4F6; color:#9CA3AF; }
+.pos-mapping-progress { display:flex; align-items:center; gap:9px; }
+.pos-mapping-progress .progress-track { width:96px; height:6px; border-radius:4px; background:#E7E8EC; overflow:hidden; }
+.pos-mapping-progress .progress-fill { height:100%; background:var(--nomni-green); }
+.pos-view-link { color:var(--spinach); text-decoration:none; white-space:nowrap; background:none; border:0; padding:0; font:inherit; font-weight:600; cursor:pointer; }
+.pos-view-link:hover { text-decoration:underline; }
+.pos-summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.pos-summary-grid > div { display:flex; flex-direction:column; gap:6px; }
+.pos-summary-label { font-size:12px; font-weight:600; color:var(--ink-mute); }
+.pos-summary-card { padding:16px 18px; }
+.pos-summary-connection { margin-bottom:14px; }
+.pos-summary-progress-copy { display:block; font-size:14px; font-weight:600; color:var(--ink); margin-bottom:8px; }
+.pos-summary-card .pos-mapping-progress { gap:0; }
+.pos-summary-card .pos-mapping-progress .progress-track { width:auto; flex:1; }
+.pos-summary-card .pos-mapping-progress strong { display:none; }
+.pos-summary-sync { margin:10px 0 0; font-size:12px; color:var(--ink-mute); }
+.pos-summary-card .pos-view-link { display:inline-flex; align-items:center; margin-top:14px; }
+.pos-summary-card .btn-primary { width:100%; justify-content:center; margin-top:14px; }
   .ml-search-wrap { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; min-width: 220px; }
   .ml-search-wrap:focus-within { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
   .ml-search-input { border: none; outline: none; font-size: 14px; font-family: inherit; color: var(--ink); background: transparent; width: 100%; }
@@ -450,6 +479,9 @@
     .nav a span { display: none; }
     .sidebar:hover .nav a span { display: inline; }
     .detail-grid { grid-template-columns: 1fr; }
+    .overview-grid { grid-template-columns: 1fr 300px; }
+    .overview-grid > div:last-child { position: static !important; min-width: 0; }
+    .overview-grid .overview-right { max-width: 100%; min-width: 0; }
   }
 
   /* Procure-style Admin side navigation */
@@ -630,8 +662,6 @@
         <div class="page-hq">
           <span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--ink-mute);border-radius:4px;padding:1px 6px;color:var(--ink-mute);line-height:1.4">HQ</span>
           <a href="Admin - HQ Settings.html" id="groupHqLink">Garden Cuisine HQ</a>
-          <span style="color:var(--rule);margin:0 2px">·</span>
-          <span>Last updated 10 Jun 2026</span>
         </div>
       </div>
       <div class="head-actions">
@@ -650,10 +680,10 @@
 
     <div class="tabs">
       <div class="tab active" data-tab="overview">Items</div>
-      <div class="tab" data-tab="outlets">Outlets</div>
       <div class="tab" data-tab="inventory">Inventory</div>
       <div class="tab" data-tab="recipes">Recipes</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
+      <div class="tab" data-tab="outlets">Outlets</div>
       <div class="tab" data-tab="activity">Activity</div>
     </div>
 
@@ -688,6 +718,9 @@
               <option>Beverages</option>
               <option>Supplies</option>
             </select>
+            <select class="items-cat-select" id="itemSupplierSelect" onchange="setItemSupplierFilter(this.value)">
+              <option value="">All suppliers</option>
+            </select>
             <select class="items-cat-select" id="itemStatusSelect" onchange="setItemStatusFilter(this.value)">
               <option value="available">Available</option>
               <option value="excluded">Excluded</option>
@@ -715,19 +748,9 @@
           <div>
             <div class="panel-label-row">
               <span class="panel-label-text">Outlets <span class="panel-label-count" id="outletCountOverview">4</span></span>
-              <button class="section-action" onclick="openPickerModal()">Add outlets</button>
             </div>
             <div class="section-card">
               <div id="miniOutletList"></div>
-            </div>
-          </div>
-          <div>
-            <div class="panel-label-row">
-              <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supplierCountOverview">0</span></span>
-              <button class="section-action" onclick="switchToTab('suppliers')">View all</button>
-            </div>
-            <div class="section-card">
-              <div id="miniSupplierList"></div>
             </div>
           </div>
         </div>
@@ -739,14 +762,15 @@
     <div class="tab-panel" id="panel-outlets">
       <div class="panel-label-row">
         <span class="panel-label-text">Outlets <span class="panel-label-count" id="outletCountLabel">4</span></span>
-        <button class="section-action" onclick="openPickerModal()">Add outlets</button>
       </div>
       <table class="ml-table">
         <thead>
           <tr>
             <th>Outlet</th>
-            <th>Company</th>
-            <th style="width:48px"></th>
+            <th style="width:160px">POS connection</th>
+            <th style="width:220px">Mapping status</th>
+            <th style="width:150px">Last synced</th>
+            <th style="width:110px">Action</th>
           </tr>
         </thead>
         <tbody id="outletsBody"></tbody>
@@ -767,11 +791,7 @@
       </div>
       <table class="ml-table">
         <thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th></tr></thead>
-        <tbody>
-          <tr><td><div class="ml-item-name">Anchor Unsalted Butter 25kg Bulk Block</div><div class="item-supplier-text">Fonterra Brands</div></td><td>kg</td><td>S$11.80</td></tr>
-          <tr><td><div class="ml-item-name">Chaokoh UHT Coconut Milk 400ml x 24 Ctn</div><div class="item-supplier-text">Chaokoh F&amp;B</div></td><td>tin</td><td>S$1.80</td></tr>
-          <tr><td><div class="ml-item-name">Char Siu Marinade</div><div class="item-supplier-text">Sub-recipe · Batch 1 L</div></td><td>L</td><td>S$3.60</td></tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
 
@@ -780,7 +800,7 @@
       <div class="panel-label-row">
         <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supplierCountLabel">0</span></span>
       </div>
-      <div class="ml-filter-row"><select class="ml-filter-select" id="supplierStatusFilter" onchange="setSupplierStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>
+      <div class="ml-filter-row"><div class="ml-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="ml-search-input" id="supplierSearch" placeholder="Search suppliers…" oninput="setSupplierSearch(this.value)" /></div><select class="ml-filter-select" id="supplierStatusFilter" onchange="setSupplierStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>
       <div id="suppliersBody"></div>
     </div>
 
@@ -803,6 +823,10 @@
           <option>Desserts</option>
           <option>Beverages</option>
         </select>
+        <select class="ml-filter-select" id="ogRecFoodCostFilter" onchange="setOgRecFoodCostFilter(this.value)">
+          <option value="">All food costs</option>
+          <option value="above-threshold">Higher than threshold</option>
+        </select>
         <select class="ml-filter-select" id="ogRecStatusFilter" onchange="setOgRecStatusFilter(this.value)">
           <option value="available">Available</option>
           <option value="excluded">Excluded</option>
@@ -815,6 +839,7 @@
             <tr>
               <th class="sort-th" id="ogRecSortTh-name" onclick="setOgRecSort('name')">Recipe <span class="sort-ind"></span></th>
               <th class="sort-th" id="ogRecSortTh-cost" onclick="setOgRecSort('cost')" style="width:100px">Cost <span class="sort-ind"></span></th>
+              <th style="width:110px">Selling price</th>
               <th style="width:110px">Food cost %</th>
               <th style="width:140px">Last updated</th>
               <th style="width:48px"></th>
@@ -1112,11 +1137,11 @@
 
 <script>
 const OUTLETS = [
-  { id:  1, name: "(WF 301) Chargrill @ 301 Punggol",       company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: false },
-  { id:  2, name: "(WF 107) Chargrill @ 107 Serangoon",     company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: false },
+  { id:  1, name: "(WF 301) Chargrill @ 301 Punggol",       company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: true,  mappedCount:18, totalMappable:22, lastSynced:"10 Jun 2026" },
+  { id:  2, name: "(WF 107) Chargrill @ 107 Serangoon",     company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: true,  mappedCount:12, totalMappable:20, lastSynced:"09 Jun 2026" },
   { id:  3, name: "(WF 259) Chargrill @ 259 Bukit Panjang", company: "GC West Holdings Pte Ltd",      active: true,  posConnected: false },
   { id:  4, name: "(WF 280) Chargrill @ 280 Bishan",        company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: false },
-  { id:  5, name: "(WF 139) Chargrill @ 139 Tampines",      company: "GC East Operations Pte Ltd",   active: true,  posConnected: false },
+  { id:  5, name: "(WF 139) Chargrill @ 139 Tampines",      company: "GC East Operations Pte Ltd",   active: true,  posConnected: true,  mappedCount:20, totalMappable:24, lastSynced:"08 Jun 2026" },
   { id:  6, name: "1-Alfaro - Bar",                          company: "1-Alfaro Pte Ltd",              active: true,  posConnected: true },
   { id:  7, name: "1-Arden - Bar",                           company: "1-Spring Pte Ltd",              active: true,  posConnected: true },
   { id:  8, name: "1-Arden - Culinary",                      company: "1-Spring Pte Ltd",              active: true,  posConnected: true },
@@ -1220,7 +1245,7 @@ let   pendingRemoveId = null;
   document.getElementById('backLink').href = 'Admin - HQ Settings.html';
   document.getElementById('backLinkLabel').textContent = 'Garden Cuisine HQ';
   document.querySelector('.page-hq').innerHTML = '<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--ink-mute);border-radius:4px;padding:1px 6px;color:var(--ink-mute);line-height:1.4">HQ</span><a href="Admin - HQ Settings.html">Garden Cuisine HQ</a>';
-  document.querySelector('.head-actions .btn-secondary').innerHTML = 'Settings';
+  document.querySelector('.head-actions .btn-secondary').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33 2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings';
   document.querySelector('.head-actions .btn-primary').style.display = 'none';
   document.getElementById('detailSettingsTitle').textContent = 'Outlet settings';
   document.getElementById('detailSettingsName').value = outletName;
@@ -1233,21 +1258,42 @@ let   pendingRemoveId = null;
 
   var tabs = document.querySelector('.tabs');
   tabs.querySelector('[data-tab="outlets"]').remove();
-  tabs.querySelector('[data-tab="suppliers"]').insertAdjacentHTML('afterend', '<div class="tab" data-tab="pos">POS mapping</div>');
 
   document.getElementById('panel-overview').innerHTML =
     '<div style="padding:16px 18px;border:1px solid #B9F0C5;border-radius:8px;background:var(--mint);color:var(--seaweed);display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">✓</span><div><strong>Ungrouped outlet</strong><div style="margin-top:3px;font-size:13px;line-height:1.45">This outlet is managed independently from outlet groups. It follows the HQ setup by default; changes made here apply only to this outlet.</div></div></div>' +
     '<div class="overview-grid" style="margin-top:24px;grid-template-columns:1fr 1fr;gap:32px"><div><div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="section-action" onclick="switchToTab(\'outlets\')">Manage</button></div><div class="section-card" style="padding:16px 18px;min-height:66px"><div style="font-weight:600">74 items available</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Based on Garden Cuisine HQ, with outlet-level changes available.</div></div><div class="panel-label-row" style="margin-top:22px"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="section-action" onclick="switchToTab(\'inventory\')">Manage</button></div><div class="section-card" style="padding:16px 18px;min-height:66px"><div style="font-weight:600">28 inventory records</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">UOMs and stock-tracking settings are managed for this outlet.</div></div></div><div class="overview-right" style="gap:22px"><div><div class="panel-label-row"><span class="panel-label-text">Recipes <span class="panel-label-count">5</span></span><button class="section-action" onclick="switchToTab(\'recipes\')">View all</button></div><div class="section-card" style="padding:16px 18px;min-height:66px"><div style="font-weight:600">5 recipes available</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Recipe availability is specific to this outlet.</div></div></div><div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span><button class="section-action" onclick="switchToTab(\'pos\')">View</button></div><div class="section-card" style="padding:16px 18px;min-height:66px"><div style="font-weight:600">Not connected</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px">Connect this outlet’s Nomni POS API key to review its mapping.</div></div></div></div></div>';
 
-  document.getElementById('panel-overview').innerHTML = '<div class="overview-grid"><div><div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="section-action" onclick="openManageModal()">Manage</button></div><div class="items-filter-row"><div class="item-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="item-search-input" placeholder="Search items or suppliers…" /></div><select class="items-cat-select"><option>All categories</option></select><select class="items-cat-select" id="individualItemStatusSelect" onchange="setItemStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div><table class="items-table"><thead><tr><th>Item name</th><th style="width:120px">UOM</th><th style="width:140px">Unit price</th><th style="width:88px">MOQ</th><th style="width:48px"></th></tr></thead><tbody id="individualOverviewItemsBody"></tbody></table></div><div class="overview-right"><div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span><button class="section-action" onclick="switchToTab(\'pos\')">View</button></div><div class="section-card" style="padding:16px 18px"><div style="font-weight:600">Not connected</div><div style="margin-top:4px;color:var(--ink-mute);font-size:13px;line-height:1.45">Connect this outlet’s Nomni POS API key to review its mapping.</div></div></div></div></div>';
-  setTimeout(function() { renderIndividualOverviewItems(); }, 0);
+  var individualOutlet = OUTLETS.find(function(outlet) { return outlet.name === (new URLSearchParams(window.location.search).get('outlet') || ''); }) || { name:'', posConnected:false };
+  var individualPosMeta = getOutletPosMeta(individualOutlet);
+  var individualPosPanel = renderIndividualPosSummary(individualPosMeta, individualOutlet);
+  document.getElementById('panel-overview').innerHTML = '<div class="overview-grid"><div><div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="section-action" onclick="openManageModal()">Manage</button></div><div class="items-filter-row"><div class="item-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="item-search-input" placeholder="Search items or suppliers…" /></div><select class="items-cat-select"><option>All categories</option></select><select class="items-cat-select" id="individualItemStatusSelect" onchange="setItemStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div><table class="items-table"><thead><tr><th>Item name</th><th style="width:120px">UOM</th><th style="width:140px">Unit price</th><th style="width:88px">MOQ</th><th style="width:48px"></th></tr></thead><tbody id="individualOverviewItemsBody"></tbody></table></div><div class="overview-right">' + individualPosPanel + '</div></div>';
+  document.querySelectorAll('#panel-overview .overview-right .panel-label-row button').forEach(function(button) {
+    if (button.textContent.trim() === 'Add outlets' || button.textContent.trim() === 'View all') button.remove();
+  });
+  var individualItemSearch = document.querySelector('#panel-overview .item-search-input');
+  if (individualItemSearch) {
+    individualItemSearch.id = 'individualItemSearchInput';
+    individualItemSearch.oninput = function() { setItemSearch(this.value); };
+  }
+  var individualItemStatus = document.getElementById('individualItemStatusSelect');
+  if (individualItemStatus) {
+    var individualSupplierFilter = document.createElement('select');
+    individualSupplierFilter.className = 'items-cat-select';
+    individualSupplierFilter.id = 'individualItemSupplierSelect';
+    individualSupplierFilter.setAttribute('onchange', 'setItemSupplierFilter(this.value)');
+    individualItemStatus.parentNode.insertBefore(individualSupplierFilter, individualItemStatus);
+  }
+  setTimeout(function() { renderItemSupplierOptions(); renderIndividualOverviewItems(); }, 0);
   document.getElementById('panel-outlets').innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Items <span class="panel-label-count">74</span></span><button class="btn-primary" onclick="showToast(\'Item management is ready for this outlet\')">Manage items</button></div><div style="margin:-4px 0 16px;color:var(--ink-mute);font-size:13px">Items available to this outlet, including any outlet-level overrides.</div><div class="ml-filter-row"><div class="search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg><input placeholder="Search items or suppliers…" /></div></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit price</th><th>Source</th></tr></thead><tbody><tr><td><strong>Chilled Boneless Duck Breast</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td>S$18.00</td><td><span style="color:var(--spinach);font-weight:600">HQ setup</span></td></tr><tr><td><strong>Chilled Chicken Breast Fillet</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td>S$8.20</td><td><span style="color:var(--spinach);font-weight:600">Outlet override</span></td></tr><tr><td><strong>Char Siu Marinade</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Sub-recipe · Batch 11 L</div></td><td>L</td><td>—</td><td><span style="color:var(--spinach);font-weight:600">HQ setup</span></td></tr></tbody></table>';
   var inventory = document.getElementById('panel-inventory');
   inventory.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="section-action" onclick="showToast(\'Inventory settings are ready for this outlet\')">Manage inventory</button></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th></tr></thead><tbody><tr><td><div class="ml-item-name">Anchor Unsalted Butter 25kg Bulk Block</div><div class="item-supplier-text">Fonterra Brands</div></td><td>kg</td><td>S$11.80</td></tr><tr><td><div class="ml-item-name">Chaokoh UHT Coconut Milk 400ml x 24 Ctn</div><div class="item-supplier-text">Chaokoh F&amp;B</div></td><td>tin</td><td>S$1.80</td></tr><tr><td><div class="ml-item-name">Char Siu Marinade</div><div class="item-supplier-text">Sub-recipe · Batch 1 L</div></td><td>L</td><td>S$3.60</td></tr></tbody></table>';
   setTimeout(function() { renderScopeInventory(); }, 0);
   var pos = document.createElement('div');
   pos.className = 'tab-panel'; pos.id = 'panel-pos';
-  pos.innerHTML = '<div style="max-width:620px;margin:56px auto;text-align:center"><div style="width:44px;height:44px;margin:0 auto 16px;border-radius:10px;background:var(--mint);display:grid;place-items:center;color:var(--spinach);font-size:21px">▦</div><h2 style="margin:0;font-size:21px;letter-spacing:-.02em">Connect Nomni POS for this outlet</h2><p style="margin:10px 0 20px;color:var(--ink-mute);line-height:1.5">Add this outlet’s API key to review its POS products and variants, then map them to this outlet’s inventory or recipes.</p><button class="btn btn-primary" onclick="showToast(\'POS settings opened\')">Set up Nomni POS</button></div>';
+  var tabPosMeta = getIndividualOutletPosMeta();
+  pos.innerHTML = tabPosMeta.connected
+    ? '<div style="max-width:620px;margin:56px auto"><div class="section-card pos-summary-card" style="padding:22px"><h2 style="margin:0 0 18px;font-size:21px">POS mapping</h2><div class="pos-summary-grid"><div><span class="pos-summary-label">POS connection</span><span class="pos-chip ok">Connected</span></div><div><span class="pos-summary-label">Mapping status</span>' + renderPosMappingProgress(tabPosMeta) + '</div><div><span class="pos-summary-label">Last synced</span><strong style="color:var(--ink-mute)">' + tabPosMeta.synced + '</strong></div></div><a class="btn btn-primary" href="' + outletPosHref(OUTLETS.find(function(outlet) { return outlet.name === (new URLSearchParams(window.location.search).get('outlet') || ''); }) || {name:''}) + '">View mapping</a></div></div>'
+    : '<div style="max-width:620px;margin:56px auto;text-align:center"><div style="width:44px;height:44px;margin:0 auto 16px;border-radius:10px;background:var(--mint);display:grid;place-items:center;color:var(--spinach);font-size:21px">▦</div><h2 style="margin:0;font-size:21px;letter-spacing:-.02em">Connect Nomni POS for this outlet</h2><p style="margin:10px 0 20px;color:var(--ink-mute);line-height:1.5">Add this outlet’s API key to review its POS products and variants, then map them to this outlet’s inventory or recipes.</p><a class="btn btn-primary" href="Admin - HQ Settings.html#pos-mapping">Set up</a></div>';
   inventory.after(pos);
   var activity = document.getElementById('panel-activity');
   activity.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Activity</span></div><div class="section-card" style="padding:0;overflow:hidden"><div class="act-entry"><div class="act-dot" style="background:#2AC864"></div><div class="act-body"><div class="act-text"><strong>Outlet settings updated</strong> · Outlet-level configuration saved</div><div class="act-meta"><span class="act-time">21 Aug 2026 · 10:20</span><span class="act-module-tag" style="background:#E2FFE6;color:#1A8040">Outlet Groups</span><span class="act-user">William Arya</span></div></div><svg class="act-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div><div class="act-entry"><div class="act-dot" style="background:#2563EB"></div><div class="act-body"><div class="act-text"><strong>Item override added</strong> · Chilled Chicken Breast Fillet</div><div class="act-meta"><span class="act-time">20 Aug 2026 · 15:10</span><span class="act-module-tag" style="background:#EFF6FF;color:#2563EB">Items</span><span class="act-user">William Arya</span></div></div><svg class="act-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div><div class="act-entry"><div class="act-dot" style="background:#D97706"></div><div class="act-body"><div class="act-text"><strong>Outlet removed from outlet group</strong> · Now managed independently</div><div class="act-meta"><span class="act-time">20 Aug 2026 · 09:45</span><span class="act-module-tag" style="background:#FEF3C7;color:#D97706">Outlet Groups</span><span class="act-user">William Arya</span></div></div><svg class="act-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div></div>';
@@ -1263,6 +1309,85 @@ function initials(name) {
   return name.replace(/[^a-zA-Z ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase() || '??';
 }
 
+function getOutletPosMeta(outlet) {
+  const connected = !!outlet && outlet.posConnected !== false;
+  const mappedCount = connected ? Number(outlet.mappedCount || 0) : 0;
+  const totalMappable = connected ? Number(outlet.totalMappable || 0) : 0;
+  const progress = totalMappable ? Math.min(100, Math.round((mappedCount / totalMappable) * 100)) : 0;
+  return {
+    connected: connected,
+    mappedCount: mappedCount,
+    totalMappable: totalMappable,
+    progress: progress,
+    mapping: connected ? (mappedCount >= totalMappable && totalMappable ? 'Complete' : 'Needs mapping') : 'Not available',
+    synced: connected ? (outlet.lastSynced || '—') : '—'
+  };
+}
+
+function outletPosHref(outlet) {
+  if (!outlet || outlet.posConnected === false) return 'Admin - HQ Settings.html#pos-mapping';
+  var returnLabel = document.getElementById('groupPageTitle');
+  var returnTo = 'Admin - Edit Outlet Group.html' + window.location.search;
+  return 'Admin - HQ - POS Mapping.html?outlet=' + encodeURIComponent(outlet.name) +
+    '&returnTo=' + encodeURIComponent(returnTo) +
+    '&returnLabel=' + encodeURIComponent(returnLabel ? returnLabel.textContent.trim() : 'Outlet groups');
+}
+
+function openOutletPosSetup(outletName) {
+  window.posSetupOutlet = outletName;
+  document.getElementById('groupPosApiKey').value = localStorage.getItem('nomniPosApiKey') || '';
+  document.getElementById('groupPosLocationId').value = localStorage.getItem('nomniPosLocationId') || '';
+  document.getElementById('groupPosSettingsOverlay').classList.add('open');
+  setTimeout(function() { document.getElementById('groupPosApiKey').focus(); }, 0);
+}
+
+function closeGroupPosSettings() { document.getElementById('groupPosSettingsOverlay').classList.remove('open'); }
+function saveGroupPosSettings() {
+  var key = document.getElementById('groupPosApiKey').value.trim();
+  var locationId = document.getElementById('groupPosLocationId').value.trim();
+  if (!key || !locationId) {
+    document.getElementById('groupPosApiKeyError').style.display = key ? 'none' : 'block';
+    document.getElementById('groupPosLocationIdError').style.display = locationId ? 'none' : 'block';
+    return;
+  }
+  localStorage.setItem('nomniPosApiKey', key);
+  localStorage.setItem('nomniPosLocationId', locationId);
+  var outlet = OUTLETS.find(function(item) { return item.name === window.posSetupOutlet; });
+  if (outlet) { outlet.posConnected = true; outlet.mappedCount = outlet.mappedCount || 0; outlet.totalMappable = outlet.totalMappable || 24; outlet.lastSynced = 'Just now'; }
+  closeGroupPosSettings();
+  renderOutlets();
+}
+
+function renderPosMappingProgress(meta) {
+  return meta.connected
+    ? '<div class="pos-mapping-progress"><div class="progress-track"><div class="progress-fill" style="width:' + meta.progress + '%"></div></div><strong>' + meta.mappedCount + ' / ' + meta.totalMappable + '</strong></div>'
+    : '<span style="color:var(--ink-mute)">—</span>';
+}
+
+function renderIndividualPosSummary(meta, outlet) {
+  if (!meta.connected) {
+    return '<div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span></div>' +
+      '<div class="section-card pos-summary-card">' +
+        '<div class="pos-summary-connection"><span class="pos-chip off">Not connected</span></div>' +
+        '<p style="margin:0;color:var(--ink-mute);font-size:13px;line-height:1.45">Connect Nomni POS to map this outlet’s products.</p>' +
+        '<a class="btn btn-primary" href="' + outletPosHref(outlet) + '">Connect POS</a>' +
+      '</div></div>';
+  }
+  return '<div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span></div>' +
+    '<div class="section-card pos-summary-card">' +
+      '<div class="pos-summary-connection"><span class="pos-chip ok">Connected</span></div>' +
+      '<span class="pos-summary-progress-copy">' + meta.mappedCount + ' of ' + meta.totalMappable + ' products mapped</span>' +
+      renderPosMappingProgress(meta) +
+      '<p class="pos-summary-sync">Last synced ' + meta.synced + '</p>' +
+      '<a class="pos-view-link" href="' + outletPosHref(outlet) + '">View mapping <span aria-hidden="true">→</span></a>' +
+    '</div></div>';
+}
+
+function getIndividualOutletPosMeta() {
+  const outletName = new URLSearchParams(window.location.search).get('outlet') || '';
+  return getOutletPosMeta(OUTLETS.find(function(outlet) { return outlet.name === outletName; }) || { posConnected:false });
+}
+
 function renderOutlets() {
   const body = document.getElementById('outletsBody');
   const items = OUTLETS.filter(o => currentGroup.has(o.id));
@@ -1271,17 +1396,19 @@ function renderOutlets() {
   const ov = document.getElementById('outletCountOverview');
   if (ov) ov.textContent = count;
 
-  const posChip = o => o.posConnected === false
-    ? '<span style="font-size:10px;font-weight:700;border-radius:3px;padding:2px 6px;background:#F3F4F6;color:#9CA3AF">POS ✕</span>'
-    : '<span style="font-size:10px;font-weight:700;border-radius:3px;padding:2px 6px;background:#D9F5E4;color:#1A8040">POS ✓</span>';
+  const posMeta = getOutletPosMeta;
 
   body.innerHTML = items.map(o => `
     <tr style="cursor:default"${o.active === false ? ' class="ml-inactive"' : ''}>
       <td>
-        <span style="font-weight:500">${o.name}</span> ${posChip(o)}
+        <span style="font-weight:500">${o.name}</span>
       </td>
-      <td style="color:var(--ink-mute)">${o.company}</td>
+      <td><span class="pos-chip ${posMeta(o).connected ? 'ok' : 'off'}">${posMeta(o).connected ? 'Connected' : 'Not connected'}</span></td>
+      <td>${renderPosMappingProgress(posMeta(o))}</td>
+      <td style="color:var(--ink-mute)">${posMeta(o).synced}</td>
       <td>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px">
+        ${posMeta(o).connected ? `<a class="pos-view-link" href="${outletPosHref(o)}">View mapping</a>` : `<button class="pos-view-link" type="button" onclick="openOutletPosSetup('${o.name.replace(/'/g,"\\'")}')">Set up</button>`}
         <div class="row-actions-wrap">
           <button class="btn-row-actions" onclick="toggleRowMenu(this)" title="Actions">•••</button>
           <div class="row-actions-menu">
@@ -1289,6 +1416,7 @@ function renderOutlets() {
             <div class="row-action-item danger" onclick="openConfirm(${o.id}, '${o.name.replace(/'/g,"\\'")}')">Remove from group</div>
             <div class="row-action-item danger" onclick="openConfirmHQ(${o.id}, '${o.name.replace(/'/g,"\\'")}')">Remove from HQ</div>
           </div>
+        </div>
         </div>
       </td>
     </tr>
@@ -1469,6 +1597,7 @@ let itemsPage = 1;
 const ITEMS_PER_PAGE = 20;
 let itemSearch = '';
 let itemCatFilter = '';
+let itemSupplierFilter = '';
 let itemSortKey = 'default';
 const groupExpandedUoms = new Set();
 let currentItemIdx = null;
@@ -1491,25 +1620,53 @@ const UOM_MULTIPLIER = {
 // ── Supplier inheritance ────────────────────────────────────
 // Mirrors the HQ supplier list; only HQ-active suppliers are inherited.
 const HQ_SUPPLIERS = [
-  { name: 'Kee Song Group',       cat: 'Poultry',             type: 'active'  },
-  { name: 'NH Foods',             cat: 'Beef & Lamb',         type: 'active'  },
+  { name: 'Kee Song Group',       cat: 'Poultry',             type: 'passive' },
+  { name: 'NH Foods',             cat: 'Beef & Lamb',         type: 'passive' },
   { name: 'Provenir',             cat: 'Beef & Lamb',         type: 'passive' },
-  { name: 'Meat King',            cat: 'Beef & Lamb',         type: 'active'  },
-  { name: 'Ocean Fresh',          cat: 'Seafood',             type: 'active'  },
+  { name: 'Meat King',            cat: 'Beef & Lamb',         type: 'passive' },
+  { name: 'Ocean Fresh',          cat: 'Seafood',             type: 'passive' },
   { name: 'Song Fish Dealer',     cat: 'Seafood',             type: 'passive' },
   { name: 'Deli Hub',             cat: 'Seafood',             type: 'passive' },
-  { name: 'Sustenir Agriculture', cat: 'Produce',             type: 'active'  },
-  { name: 'Lee Kum Kee',          cat: 'Sauces & Condiments', type: 'active'  },
+  { name: 'Sustenir Agriculture', cat: 'Produce',             type: 'passive' },
+  { name: 'Lee Kum Kee',          cat: 'Sauces & Condiments', type: 'passive' },
   { name: 'AmoyFoods',            cat: 'Sauces & Condiments', type: 'passive' },
   { name: 'Fonterra',             cat: 'Dairy & Eggs',        type: 'active'  },
-  { name: 'Seng Choon Farm',      cat: 'Dairy & Eggs',        type: 'active'  },
+  { name: 'Seng Choon Farm',      cat: 'Dairy & Eggs',        type: 'passive' },
   { name: 'Grill Master SG',      cat: 'Supplies',            type: 'passive' },
-  { name: 'Kikkoman',             cat: 'Sauces & Condiments', type: 'active',  hqDisabled: true },
+  { name: 'Kikkoman',             cat: 'Sauces & Condiments', type: 'passive', hqDisabled: true },
 ];
 HQ_SUPPLIERS.forEach(s => { s.itemCount = ITEMS.filter(item => item.supplier === s.name).length; });
+// Keep group and ungrouped-outlet supplier labels aligned with the HQ supplier source of truth.
+try {
+  const savedHqSuppliers = JSON.parse(localStorage.getItem('nomni-hq-supplier-state-v1') || '[]');
+  if (Array.isArray(savedHqSuppliers)) {
+    const savedTypes = new Map(savedHqSuppliers.filter(s => s && s.name && (s.type === 'active' || s.type === 'passive')).map(s => [s.name, s.type]));
+    HQ_SUPPLIERS.forEach(s => { if (savedTypes.has(s.name)) s.type = savedTypes.get(s.name); });
+  }
+} catch (e) {}
+
+const SUPPLIER_LEGAL_NAMES = {
+  'Kee Song Group': 'Kee Song Food Corporation (S) Pte Ltd', 'NH Foods': 'NH Foods Singapore Pte Ltd', 'Provenir': 'Provenir Singapore Pte Ltd', 'Meat King': 'Meat King Pte Ltd', 'Ocean Fresh': 'Ocean Fresh Seafood Pte Ltd', 'Song Fish Dealer': 'Song Fish Dealer Pte Ltd', 'Deli Hub': 'Deli Hub Catering Pte Ltd', 'Sustenir Agriculture': 'Sustenir Agriculture Pte Ltd', 'Lee Kum Kee': 'Lee Kum Kee (Singapore) Pte Ltd', 'AmoyFoods': 'Amoy Food (Singapore) Pte Ltd', 'Kikkoman': 'Kikkoman (S) Pte Ltd', 'Fonterra': 'Fonterra Brands (Singapore) Pte Ltd', 'Seng Choon Farm': 'Seng Choon Farm Pte Ltd', 'Grill Master SG': 'Grill Master Supplies Pte Ltd'
+};
+const SUPPLIER_TRADING_NAMES = {
+  'Kee Song Group': 'Kee Song',
+  'Song Fish Dealer': 'Song Fish',
+  'Sustenir Agriculture': 'Sustenir',
+  'AmoyFoods': 'Amoy Foods',
+  'Grill Master SG': 'Grill Master'
+};
+function supplierRegisteredName(name) { return SUPPLIER_LEGAL_NAMES[name] || name; }
+function supplierTradingName(name) { return SUPPLIER_TRADING_NAMES[name] || name; }
+function supplierDisplayName(name) { return SUPPLIER_TRADING_NAMES[name] || supplierRegisteredName(name); }
+function supplierTableNameHtml(name) {
+  const legalName = supplierRegisteredName(name);
+  const tradingName = SUPPLIER_TRADING_NAMES[name];
+  if (!tradingName) return '<div class="ml-item-name">' + legalName + '</div>';
+  return '<div class="ml-item-name">' + tradingName + '</div><div style="margin-top:2px;font-size:12px;color:var(--ink-mute)">' + legalName + '</div>';
+}
 
 const groupDisabledSuppliers = new Set(); // supplier names disabled at group level
-let groupSupplierStatusFilter = 'available';
+let groupSupplierStatusFilter = 'available', supplierSearch = '';
 const scopeExcludedSuppliers = new Set(); // supplier names excluded only in this outlet scope
 let individualSupplierStatusFilter = 'available';
 const scopeExcludedInventory = new Set(); // inventory item names excluded only in this group/outlet
@@ -1529,14 +1686,31 @@ function getUOMBreakdown(item) {
   }));
 }
 
-const SUPPLIER_TYPES = {
-  'Kee Song Group': 'active', 'NH Foods': 'active', 'Meat King': 'active',
-  'Ocean Fresh': 'active', 'Sustenir Agriculture': 'active', 'Lee Kum Kee': 'active',
-  'Fonterra': 'active', 'Seng Choon Farm': 'active',
-  'Provenir': 'passive', 'Song Fish Dealer': 'passive', 'Deli Hub': 'passive',
-  'AmoyFoods': 'passive', 'Kikkoman': 'passive', 'Grill Master SG': 'passive',
-  'Prima Deli': 'passive', 'FairPrice Finest': 'passive',
-};
+const SUPPLIER_TYPES = Object.assign(
+  { 'Prima Deli': 'passive', 'FairPrice Finest': 'passive' },
+  Object.fromEntries(HQ_SUPPLIERS.map(supplier => [supplier.name, supplier.type]))
+);
+
+function syncSupplierTypesFromHqState() {
+  try {
+    const savedHqSuppliers = JSON.parse(localStorage.getItem('nomni-hq-supplier-state-v1') || '[]');
+    if (!Array.isArray(savedHqSuppliers)) return;
+    const savedTypes = new Map(savedHqSuppliers.filter(supplier => supplier && supplier.name && (supplier.type === 'active' || supplier.type === 'passive')).map(supplier => [supplier.name, supplier.type]));
+    HQ_SUPPLIERS.forEach(supplier => {
+      if (!savedTypes.has(supplier.name)) return;
+      supplier.type = savedTypes.get(supplier.name);
+      SUPPLIER_TYPES[supplier.name] = supplier.type;
+    });
+  } catch (e) {}
+}
+
+window.addEventListener('storage', function(event) {
+  if (event.key !== 'nomni-hq-supplier-state-v1') return;
+  syncSupplierTypesFromHqState();
+  if (window.isIndividualOutletPrototype) renderIndividualSuppliers();
+  else renderSuppliers();
+  renderMiniSuppliers();
+});
 
 function getGroupedSuppliers() {
   return HQ_SUPPLIERS.map(s => ({
@@ -1560,6 +1734,11 @@ function setSupplierStatusFilter(value) {
   groupSupplierStatusFilter = value || 'available';
   renderSuppliers();
 }
+function setSupplierSearch(value) {
+  supplierSearch = value || '';
+  if (window.isIndividualOutletPrototype) renderIndividualSuppliers();
+  else renderSuppliers();
+}
 
 function setIndividualSupplierStatusFilter(value) {
   individualSupplierStatusFilter = value || 'available';
@@ -1577,7 +1756,7 @@ function renderMiniSuppliers() {
   const show = activeSuppliers.slice(0, MINI_SUPPLIERS_MAX);
   mini.innerHTML = show.map(s =>
     '<div class="outlet-mini-row">' +
-      '<div class="outlet-mini-name">' + s.name + '</div>' +
+      '<div class="outlet-mini-name">' + supplierDisplayName(s.name) + '</div>' +
       '<div class="outlet-mini-company">' + s.itemCount + ' item' + (s.itemCount !== 1 ? 's' : '') + '</div>' +
     '</div>'
   ).join('');
@@ -1593,7 +1772,7 @@ function renderMiniSuppliers() {
 function renderSuppliers() {
   const body = document.getElementById('suppliersBody');
   if (!body) return;
-  const suppliers = getGroupedSuppliers().filter(s => groupSupplierStatusFilter === 'all' || (groupSupplierStatusFilter === 'excluded' ? s.groupDisabled : !s.groupDisabled));
+  const suppliers = getGroupedSuppliers().filter(s => (!supplierSearch || s.name.toLowerCase().includes(supplierSearch.toLowerCase()) || supplierTradingName(s.name).toLowerCase().includes(supplierSearch.toLowerCase()) || supplierRegisteredName(s.name).toLowerCase().includes(supplierSearch.toLowerCase())) && (groupSupplierStatusFilter === 'all' || (groupSupplierStatusFilter === 'excluded' ? s.groupDisabled : !s.groupDisabled))).sort((a, b) => a.name.localeCompare(b.name));
   const activeCount = getGroupedSuppliers().filter(s => !s.groupDisabled && !s.hqDisabled).length;
   const badge = document.getElementById('supplierCountLabel');
   if (badge) badge.textContent = activeCount;
@@ -1607,9 +1786,7 @@ function renderSuppliers() {
       '<th style="width:48px"></th>' +
     '</tr></thead><tbody>' +
     suppliers.map(s => {
-      const typeChip = s.type === 'active'
-        ? '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:3px 10px;background:#D9F5E4;color:#1A8040">Active</span>'
-        : '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:3px 10px;background:#F0F0F2;color:#555">Passive</span>';
+      const typeChip = s.type === 'active' ? '<span class="supplier-type-chip active">Active</span>' : '<span class="supplier-type-chip passive">Passive</span>';
       const safeName = s.name.replace(/'/g, "\\'");
       const dimTd = 'opacity:0.45;';
       if (s.hqDisabled) {
@@ -1622,7 +1799,7 @@ function renderSuppliers() {
       }
       const actionLabel = s.groupDisabled ? 'Include in this group' : 'Exclude from this group';
       return '<tr>' +
-        '<td style="' + tdBase + 'font-weight:500;' + (s.groupDisabled ? dimTd : '') + '">' + s.name + (s.groupDisabled ? ' <span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#FDD6DC;color:#D0291E;margin-left:6px">Excluded</span>' : '') + '</td>' +
+        '<td style="' + tdBase + (s.groupDisabled ? dimTd : '') + '">' + supplierTableNameHtml(s.name) + (s.groupDisabled ? ' <span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#FDD6DC;color:#D0291E;margin-left:6px">Excluded</span>' : '') + '</td>' +
         '<td style="' + tdBase + (s.groupDisabled ? dimTd : '') + '">' + typeChip + '</td>' +
         '<td style="' + tdBase + 'color:var(--ink-mute);' + (s.groupDisabled ? dimTd : '') + '">' + s.itemCount + '</td>' +
         '<td style="' + tdBase + '">' +
@@ -1641,22 +1818,28 @@ function renderSuppliers() {
 function renderIndividualSuppliers() {
   const panel = document.getElementById('panel-suppliers');
   if (!panel) return;
-  const suppliers = getGroupedSuppliers().filter(s => {
+  const suppliers = getGroupedSuppliers().filter(s => !s.hqDisabled && (!supplierSearch || s.name.toLowerCase().includes(supplierSearch.toLowerCase()) || supplierTradingName(s.name).toLowerCase().includes(supplierSearch.toLowerCase()) || supplierRegisteredName(s.name).toLowerCase().includes(supplierSearch.toLowerCase()))).filter(s => {
     const excluded = scopeExcludedSuppliers.has(s.name);
     return individualSupplierStatusFilter === 'all' || (individualSupplierStatusFilter === 'excluded' ? excluded : !excluded);
-  });
-  panel.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Suppliers <span class="panel-label-count">' + getGroupedSuppliers().filter(s => !scopeExcludedSuppliers.has(s.name) && !s.hqDisabled).length + '</span></span></div>' +
-    '<div class="ml-filter-row"><select class="ml-filter-select" id="individualSupplierStatusFilter" onchange="setIndividualSupplierStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
-    '<table class="ml-table"><thead><tr><th>Supplier</th><th>Type</th><th>Items</th><th style="width:48px"></th></tr></thead><tbody>' +
+  }).sort((a, b) => a.name.localeCompare(b.name));
+  const availableCount = getGroupedSuppliers().filter(s => !scopeExcludedSuppliers.has(s.name) && !s.hqDisabled).length;
+  const tdBase = 'padding:14px 14px;border-bottom:1px solid var(--rule);';
+  panel.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Suppliers <span class="panel-label-count" id="supplierCountLabel">' + availableCount + '</span></span></div>' +
+    '<div class="ml-filter-row"><div class="ml-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="ml-search-input" id="supplierSearch" placeholder="Search suppliers…" value="' + supplierSearch.replace(/"/g, '&quot;') + '" oninput="setSupplierSearch(this.value)" /></div><select class="ml-filter-select" id="supplierStatusFilter" onchange="setIndividualSupplierStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
+    '<div id="suppliersBody"><table class="ml-table"><thead><tr><th>Supplier</th><th>Type</th><th>Items</th><th style="width:48px"></th></tr></thead><tbody>' +
     suppliers.map(s => {
       const excluded = scopeExcludedSuppliers.has(s.name);
-      const dim = excluded || s.hqDisabled ? ' style="opacity:.45"' : '';
-      const status = s.hqDisabled ? '<span class="supplier-status-chip">Disabled at HQ</span>' : (excluded ? '<span class="supplier-status-chip excluded">Excluded</span>' : '<span class="supplier-status-chip active">Active</span>');
-      const action = s.hqDisabled ? '<div class="row-action-note">Disabled at HQ</div>' : '<div class="row-action-item' + (excluded ? '' : ' danger') + '" onclick="toggleIndividualSupplier(\'' + s.name.replace(/'/g, "\\'") + '\')">' + (excluded ? 'Include in this outlet' : 'Exclude from this outlet') + '</div>';
-      return '<tr' + dim + '><td><div class="ml-item-name">' + s.name + '</div></td><td>' + status + '</td><td>' + s.itemCount + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu">' + action + '</div></div></td></tr>';
+      const typeChip = s.type === 'active' ? '<span class="supplier-type-chip active">Active</span>' : '<span class="supplier-type-chip passive">Passive</span>';
+      const safeName = s.name.replace(/'/g, "\\'");
+      return '<tr>' +
+        '<td style="' + tdBase + (excluded ? 'opacity:0.45;' : '') + '">' + supplierTableNameHtml(s.name) + (excluded ? ' <span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#FDD6DC;color:#D0291E;margin-left:6px">Excluded</span>' : '') + '</td>' +
+        '<td style="' + tdBase + (excluded ? 'opacity:0.45;' : '') + '">' + typeChip + '</td>' +
+        '<td style="' + tdBase + 'color:var(--ink-mute);' + (excluded ? 'opacity:0.45;' : '') + '">' + s.itemCount + '</td>' +
+        '<td style="' + tdBase + '"><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu"><div class="row-action-item' + (excluded ? '' : ' danger') + '" onclick="toggleIndividualSupplier(\'' + safeName + '\')">' + (excluded ? 'Include in this outlet' : 'Exclude from this outlet') + '</div></div></div></td>' +
+      '</tr>';
     }).join('') +
-    '</tbody></table>';
-  const statusSelect = document.getElementById('individualSupplierStatusFilter');
+    '</tbody></table></div>';
+  const statusSelect = document.getElementById('supplierStatusFilter');
   if (statusSelect) statusSelect.value = individualSupplierStatusFilter;
 }
 
@@ -1672,11 +1855,28 @@ function toggleIndividualSupplier(name) {
   renderIndividualOverviewItems();
 }
 
+// Inventory is a selected subset of the same catalogue used in the Items tab.
+// Keep the inventory UOM here; names, suppliers and catalogue prices resolve from ITEMS.
 const SCOPE_INVENTORY_ITEMS = [
-  { name: 'Anchor Unsalted Butter 25kg Bulk Block', supplier: 'Fonterra Brands', uom: 'kg', cost: 'S$11.80' },
-  { name: 'Chaokoh UHT Coconut Milk 400ml x 24 Ctn', supplier: 'Chaokoh F&B', uom: 'tin', cost: 'S$1.80' },
-  { name: 'Char Siu Marinade', supplier: 'Sub-recipe · Batch 1 L', uom: 'L', cost: 'S$3.60' },
+  { itemName: 'Anchor Unsalted Butter Blocks New Zealand Pasteurised 1kg Carton', inventoryUom: 'block', unitFactor: 1 },
+  { itemName: 'Bulla Thickened Cream Full Fat 35% Butterfat Homogenised 1L Bottle', inventoryUom: 'L', unitFactor: 1 },
+  { itemName: 'Coconut Shell Charcoal Briquettes Restaurant Grade Hexagonal 5kg Sack', inventoryUom: 'kg', unitFactor: 5 },
 ];
+function getScopeInventoryItems() {
+  return SCOPE_INVENTORY_ITEMS.map(function(config) {
+    const item = ITEMS.find(function(entry) { return entry.name === config.itemName; });
+    if (!item) return null;
+    const itemIndex = ITEMS.indexOf(item);
+    const override = itemOverrides[itemIndex] || {};
+    const price = override.price != null ? override.price : (Array.isArray(override.prices) && override.prices[0] != null ? override.prices[0] : item.price);
+    return {
+      name: item.name,
+      supplier: item.supplier,
+      uom: config.inventoryUom,
+      cost: 'S$' + (Number(price || 0) / config.unitFactor).toFixed(2),
+    };
+  }).filter(Boolean);
+}
 function setInventoryStatusFilter(value) {
   inventoryStatusFilter = value || 'available';
   renderScopeInventory();
@@ -1695,11 +1895,12 @@ function renderScopeInventory() {
   const panel = document.getElementById('panel-inventory');
   if (!panel) return;
   const scopeLabel = window.isIndividualOutletPrototype ? 'this outlet' : 'this group';
-  const rows = SCOPE_INVENTORY_ITEMS.filter(item => inventoryStatusFilter === 'all' || (inventoryStatusFilter === 'excluded' ? scopeExcludedInventory.has(item.name) : !scopeExcludedInventory.has(item.name)));
-  panel.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">' + SCOPE_INVENTORY_ITEMS.filter(item => !scopeExcludedInventory.has(item.name)).length + '</span></span></div>' +
+  const inventoryItems = getScopeInventoryItems();
+  const rows = inventoryItems.filter(item => inventoryStatusFilter === 'all' || (inventoryStatusFilter === 'excluded' ? scopeExcludedInventory.has(item.name) : !scopeExcludedInventory.has(item.name)));
+  panel.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">' + inventoryItems.filter(item => !scopeExcludedInventory.has(item.name)).length + '</span></span></div>' +
     '<div class="ml-filter-row"><div class="ml-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="ml-search-input" placeholder="Search inventory…" /></div><select class="ml-filter-select" onchange="setInventoryStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
     '<table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th><th style="width:48px"></th></tr></thead><tbody>' +
-    (rows.length ? rows.map(item => { const excluded = scopeExcludedInventory.has(item.name); return '<tr' + (excluded ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + item.name + '</div><div class="item-supplier-text">' + item.supplier + '</div></td><td>' + item.uom + '</td><td>' + item.cost + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu"><div class="row-action-item' + (excluded ? '' : ' danger') + '" onclick="toggleInventoryExclusion(\'' + item.name.replace(/'/g, "\\'") + '\')">' + (excluded ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div></div></div></td></tr>'; }).join('') : '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-mute)">No inventory items match this status</td></tr>') +
+    (rows.length ? rows.map(item => { const excluded = scopeExcludedInventory.has(item.name); return '<tr' + (excluded ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + item.name + '</div><div class="item-supplier-text">' + supplierDisplayName(item.supplier) + '</div></td><td>' + item.uom + '</td><td>' + item.cost + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu"><div class="row-action-item' + (excluded ? '' : ' danger') + '" onclick="toggleInventoryExclusion(\'' + item.name.replace(/'/g, "\\'") + '\')">' + (excluded ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div></div></div></td></tr>'; }).join('') : '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-mute)">No inventory items match this status</td></tr>') +
     '</tbody></table>';
 }
 
@@ -1736,6 +1937,7 @@ function getDisplayItems() {
     return itemStatusFilter === 'excluded' ? excluded : (itemStatusFilter === 'all' ? true : !excluded);
   });
   if (itemCatFilter) items = items.filter(i => i.cat === itemCatFilter);
+  if (itemSupplierFilter) items = items.filter(i => i.supplier === itemSupplierFilter);
   if (itemSearch) {
     const q = itemSearch.toLowerCase();
     items = items.filter(i =>
@@ -1762,13 +1964,36 @@ function getDisplayItems() {
 function setItemSearch(val) {
   itemSearch = val;
   itemsPage = 1;
-  renderItems();
+  if (window.isIndividualOutletPrototype) renderIndividualOverviewItems();
+  else renderItems();
 }
 
 function setItemCatFilter(val) {
   itemCatFilter = val;
   itemsPage = 1;
-  renderItems();
+  if (window.isIndividualOutletPrototype) renderIndividualOverviewItems();
+  else renderItems();
+}
+
+function setItemSupplierFilter(val) {
+  itemSupplierFilter = val || '';
+  itemsPage = 1;
+  if (window.isIndividualOutletPrototype) renderIndividualOverviewItems();
+  else renderItems();
+}
+
+function renderItemSupplierOptions() {
+  const suppliers = [...new Set(ITEMS.filter(item => inheritedHqItemLifecycle(item) !== 'removed' && !isExcludedByHq(item)).map(item => item.supplier))]
+    .sort((a, b) => supplierDisplayName(a).localeCompare(supplierDisplayName(b)));
+  ['itemSupplierSelect', 'individualItemSupplierSelect'].forEach(function(id) {
+    const select = document.getElementById(id);
+    if (!select) return;
+    const current = itemSupplierFilter;
+    select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(name) {
+      return '<option value="' + name.replace(/"/g, '&quot;') + '">' + supplierDisplayName(name) + '</option>';
+    }).join('');
+    select.value = suppliers.includes(current) ? current : '';
+  });
 }
 
 function setItemStatusFilter(val) {
@@ -1788,7 +2013,7 @@ function renderIndividualOverviewItems() {
     const excluded = scopeExcludedItems.has(rawIdx) || groupDisabledItems.has(rawIdx) || scopeExcludedSuppliers.has(item.supplier);
     const hqDisabled = inheritedHqItemLifecycle(item) === 'disabled';
     const label = hqDisabled ? 'Disabled at HQ' : (excluded ? 'Include in this outlet' : 'Exclude from this outlet');
-    return '<tr' + (hqDisabled || excluded ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + item.name + '</div><span class="item-supplier-text">' + item.supplier + '</span></td><td>' + String(uom || '').replace(/^per\s+/, '') + '</td><td>S$' + Number(item.price || 0).toFixed(2) + '</td><td>' + (item.moq || '—') + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu"><div class="row-action-item' + (hqDisabled ? ' disabled' : (!excluded ? ' danger' : '')) + '"' + (hqDisabled ? '' : ' onclick="itemActionClick(' + rawIdx + ')"') + '>' + label + '</div></div></div></td></tr>';
+    return '<tr' + (hqDisabled || excluded ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + item.name + '</div><span class="item-supplier-text">' + supplierDisplayName(item.supplier) + '</span></td><td>' + String(uom || '').replace(/^per\s+/, '') + '</td><td>S$' + Number(item.price || 0).toFixed(2) + '</td><td>' + (item.moq || '—') + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu"><div class="row-action-item' + (hqDisabled ? ' disabled' : (!excluded ? ' danger' : '')) + '"' + (hqDisabled ? '' : ' onclick="itemActionClick(' + rawIdx + ')"') + '>' + label + '</div></div></div></td></tr>';
   }).join('') : '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink-mute)">No items match this status</td></tr>';
 }
 
@@ -1808,6 +2033,7 @@ function toggleGroupUoms(itemIdx, event) {
 function renderItems() {
   const body = document.getElementById('itemsBody');
   if (!body) return;
+  renderItemSupplierOptions();
   const display = getDisplayItems();
   const total = display.length;
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1;
@@ -1849,7 +2075,7 @@ function renderItems() {
     const rowClass = (isDisabled ? ' ml-inactive' : '') + (pageIdx % 2 ? ' item-row-even' : '');
     const nameCell = '<td class="item-name-cell" onclick="' + openFn + '" style="cursor:pointer">' +
       '<div class="item-name-text">' + displayName + customTag + overrideTag + '</div>' +
-      '<div class="item-supplier-text">' + item.supplier + '</div>' +
+      '<div class="item-supplier-text">' + supplierDisplayName(item.supplier) + '</div>' +
     '</td>';
     const actionCell = '<td style="padding:10px 8px;border-bottom:1px solid var(--rule);text-align:right">' +
       '<div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button>' +
@@ -1932,7 +2158,7 @@ function openItemModal(idx) {
   const item = ITEMS[idx];
   const ov = itemOverrides[idx] || {};
   document.getElementById('itemModalTitle').textContent = item.name;
-  document.getElementById('itemModalSupplier').textContent = item.supplier;
+  document.getElementById('itemModalSupplier').textContent = supplierDisplayName(item.supplier);
   document.getElementById('itemCustomName').value = ov.customName || '';
 
   const isActiveSup = SUPPLIER_TYPES[item.supplier] === 'active';
@@ -1944,7 +2170,7 @@ function openItemModal(idx) {
     banner.style.display = '';
     banner.innerHTML =
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
-      '<span>Prices and MOQ for items from <strong>' + item.supplier + '</strong> are managed by the supplier and cannot be edited here.</span>';
+      '<span>Prices and MOQ for items from <strong>' + supplierDisplayName(item.supplier) + '</strong> are managed by the supplier and cannot be edited here.</span>';
   } else {
     banner.style.display = 'none';
   }
@@ -2091,7 +2317,9 @@ function saveItemModal() {
     itemOverrides[currentItemIdx] = { customName, price: overridePrice, moq: overrideMoq };
   }
   closeItemModal();
-  renderItems();
+  if (window.isIndividualOutletPrototype) renderIndividualOverviewItems();
+  else renderItems();
+  renderScopeInventory();
 }
 
 function resetItemOverrides() {
@@ -2099,7 +2327,9 @@ function resetItemOverrides() {
   const ov = itemOverrides[currentItemIdx] || {};
   itemOverrides[currentItemIdx] = { customName: ov.customName };
   openItemModal(currentItemIdx);
-  renderItems();
+  if (window.isIndividualOutletPrototype) renderIndividualOverviewItems();
+  else renderItems();
+  renderScopeInventory();
 }
 
 function openManageModal() {
@@ -2135,7 +2365,7 @@ function renderManageList(q) {
     '<div class="manage-item-row">' +
       '<div style="flex:1;min-width:0">' +
         '<div class="manage-item-name">' + item.name + '</div>' +
-        '<div class="manage-item-meta">' + item.cat + ' · ' + item.supplier + '</div>' +
+        '<div class="manage-item-meta">' + item.cat + ' · ' + supplierDisplayName(item.supplier) + '</div>' +
       '</div>' +
       '<div style="display:flex;align-items:center;gap:12px;flex-shrink:0">' +
         '<span class="manage-item-price">S$' + item.price.toFixed(2) + '</span>' +
@@ -2535,12 +2765,15 @@ OG_RECIPES.forEach((r, i) => {
   r.foodCostPct = r.cost / r.price * 100;
 });
 
-let ogRecPage = 1, ogRecSearch = '', ogRecCatFilter = '', ogRecSortKey = 'default', ogRecStatusFilter = 'available';
+let ogRecPage = 1, ogRecSearch = '', ogRecCatFilter = '', ogRecFoodCostFilter = '', ogRecSortKey = 'default', ogRecStatusFilter = 'available';
 const ogRecipeExclusions = new Set();
 const OG_REC_PER_PAGE = 20;
+let ogRecFcThreshold = 25;
+try { ogRecFcThreshold = Number(localStorage.getItem('nomni-hq-recipe-food-cost-threshold-v1') || 25) || 25; } catch (e) {}
 
 function setOgRecSearch(v) { ogRecSearch = v; ogRecPage = 1; renderOgRec(); }
 function setOgRecCatFilter(v) { ogRecCatFilter = v; ogRecPage = 1; renderOgRec(); }
+function setOgRecFoodCostFilter(v) { ogRecFoodCostFilter = v; ogRecPage = 1; renderOgRec(); }
 function setOgRecStatusFilter(v) { ogRecStatusFilter = v || 'available'; ogRecPage = 1; renderOgRec(); }
 function setOgRecSort(key) {
   ogRecSortKey = ogRecSortKey === key + '-asc' ? key + '-desc' : key + '-asc';
@@ -2559,6 +2792,7 @@ function getOgRecItems() {
     return ogRecStatusFilter === 'excluded' ? excluded : (ogRecStatusFilter === 'all' ? true : !excluded);
   });
   if (ogRecCatFilter) items = items.filter(r => r.cat === ogRecCatFilter);
+  if (ogRecFoodCostFilter === 'above-threshold') items = items.filter(r => r.foodCostPct > ogRecFcThreshold);
   if (ogRecSearch) { const q = ogRecSearch.toLowerCase(); items = items.filter(r => r.name.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q)); }
   if (ogRecSortKey === 'name-asc') items.sort((a,b) => a.name.localeCompare(b.name));
   else if (ogRecSortKey === 'name-desc') items.sort((a,b) => b.name.localeCompare(a.name));
@@ -2576,8 +2810,9 @@ function renderOgRec() {
   document.getElementById('ogRecBody').innerHTML = page.map(r => {
     return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
       '<td><div class="ml-item-name">' + r.name + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
-      '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span><div style="font-size:11px;color:var(--ink-mute);margin-top:1px">sell $' + r.price.toFixed(2) + '</div></td>' +
-      '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
+      '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span></td>' +
+      '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.price.toFixed(2) + '</span></td>' +
+      '<td><span style="font-size: 14px;font-weight:600;color:' + (r.foodCostPct > ogRecFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
       '<td style="font-size: 14px;color:var(--ink-mute)">' + r.lastUpdated + '</td>' +
       '<td><div class="row-actions-wrap">' +
         '<button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button>' +
@@ -2704,7 +2939,7 @@ function itemActionClick(rawIdx) {
   if (isSupplierDisabled) {
     const supplierName = ITEMS[rawIdx].supplier;
     const supplierItemCount = ITEMS.filter(item => item.supplier === supplierName).length;
-    document.getElementById('itemSupBlockedName').textContent = supplierName;
+    document.getElementById('itemSupBlockedName').textContent = supplierDisplayName(supplierName);
     document.getElementById('itemSupBlockedCount').textContent = supplierItemCount;
     document.getElementById('itemSupBlockedOverlay').classList.add('open');
   } else if (isIndivDisabled) {
@@ -2882,6 +3117,21 @@ function showToast(msg) {
         <button class="btn btn-primary" onclick="itemSupBlockedEnableAll()">All items from supplier</button>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="groupPosSettingsOverlay" onclick="if(event.target===this)closeGroupPosSettings()">
+  <div class="modal-card" style="width:520px">
+    <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:16px">
+      <div class="modal-title">Set up POS connection</div>
+      <button class="modal-close" type="button" onclick="closeGroupPosSettings()">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0;color:var(--ink-mute);line-height:1.45">Enter the Nomni POS credentials for this outlet to connect it and review its mapping.</p>
+      <div><label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">API key</label><input id="groupPosApiKey" type="password" placeholder="Enter Nomni POS API key" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit" /><div id="groupPosApiKeyError" style="display:none;color:#D0291E;font-size:12px;margin-top:6px">Enter an API key to continue.</div></div>
+      <div><label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">Location ID</label><input id="groupPosLocationId" type="text" placeholder="Enter Nomni POS Location ID" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit" /><div id="groupPosLocationIdError" style="display:none;color:#D0291E;font-size:12px;margin-top:6px">Enter a Location ID to continue.</div></div>
+    </div>
+    <div class="modal-foot"><button class="modal-cancel" type="button" onclick="closeGroupPosSettings()">Cancel</button><button class="btn btn-primary" type="button" onclick="saveGroupPosSettings()">Save connection</button></div>
   </div>
 </div>
 

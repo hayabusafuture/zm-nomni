@@ -1880,7 +1880,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
             <tr>
               <th>Supplier</th>
               <th style="width:80px;text-align:center">Items</th>
-              <th style="width:200px">Contact</th>
               <th style="width:130px">Supplier type</th>
               <th style="width:190px">Available to</th>
               <th style="width:48px"></th>
@@ -2632,7 +2631,22 @@ function renderHealthCheck() {
 const SUPPLIER_LEGAL_NAMES = {
   'Kee Song Group': 'Kee Song Food Corporation (S) Pte Ltd', 'NH Foods': 'NH Foods Singapore Pte Ltd', 'Provenir': 'Provenir Singapore Pte Ltd', 'Meat King': 'Meat King Pte Ltd', 'Ocean Fresh': 'Ocean Fresh Seafood Pte Ltd', 'Song Fish Dealer': 'Song Fish Dealer Pte Ltd', 'Deli Hub': 'Deli Hub Catering Pte Ltd', 'Sustenir Agriculture': 'Sustenir Agriculture Pte Ltd', 'Lee Kum Kee': 'Lee Kum Kee (Singapore) Pte Ltd', 'AmoyFoods': 'Amoy Food (Singapore) Pte Ltd', 'Kikkoman': 'Kikkoman (S) Pte Ltd', 'Fonterra': 'Fonterra Brands (Singapore) Pte Ltd', 'Seng Choon Farm': 'Seng Choon Farm Pte Ltd', 'Grill Master SG': 'Grill Master Supplies Pte Ltd', 'Rich Products Corporation': 'Rich Products Singapore Pte Ltd', 'Tee Yih Jia Food Mfg': 'Tee Yih Jia Food Manufacturing Pte Ltd', 'Prima Food Pte Ltd': 'Prima Food Pte Ltd', 'Olam International': 'Olam Food Ingredients Singapore Pte Ltd', 'Lim Ah Boy Seafood': 'Lim Ah Boy Seafood Pte Ltd', 'Sim Lim Meats Pte Ltd': 'Sim Lim Meats Pte Ltd', 'Sun Huat Heng Produce': 'Sun Huat Heng Produce Pte Ltd', 'Bunge Asia Pte Ltd': 'Bunge Asia Pte Ltd', 'Dairy Farm International': 'Dairy Farm Singapore Pte Ltd', 'Wilmar International': 'Wilmar International Pte Ltd'
 };
+const SUPPLIER_TRADING_NAMES = {
+  'Kee Song Group': 'Kee Song',
+  'Song Fish Dealer': 'Song Fish',
+  'Sustenir Agriculture': 'Sustenir',
+  'AmoyFoods': 'Amoy Foods',
+  'Grill Master SG': 'Grill Master'
+};
 function supplierLabel(name) { return SUPPLIER_LEGAL_NAMES[name] || name; }
+function supplierTradingName(name) { return SUPPLIER_TRADING_NAMES[name] || name; }
+function supplierDisplayName(name) { return SUPPLIER_TRADING_NAMES[name] || supplierLabel(name); }
+function supplierTableNameHtml(name) {
+  const legalName = supplierLabel(name);
+  const tradingName = SUPPLIER_TRADING_NAMES[name];
+  if (!tradingName) return '<div class="ml-item-name">' + legalName + '</div>';
+  return '<div class="ml-item-name">' + tradingName + '</div><div style="margin-top:2px;font-size:12px;color:var(--ink-mute)">' + legalName + '</div>';
+}
 
 // Items data
 const ITEMS = [
@@ -2959,7 +2973,7 @@ ITEMS.forEach((item, i) => {
   const sel = document.getElementById('mlSupplierFilter');
   suppliers.forEach(s => {
     const o = document.createElement('option');
-    o.value = s; o.textContent = supplierLabel(s);
+    o.value = s; o.textContent = supplierDisplayName(s);
     sel.appendChild(o);
   });
 })();
@@ -3207,7 +3221,7 @@ function openHqItemModal(idx, initialTab) {
   const modal = document.getElementById('hqItemModal');
   modal.dataset.itemIdx = idx;
   document.getElementById('hqItemModalTitle').innerHTML = itemDisplayNameHtml(item, 'dialog');
-  document.getElementById('hqItemModalSupplier').textContent = supplierLabel(item.supplier);
+  document.getElementById('hqItemModalSupplier').textContent = supplierDisplayName(item.supplier);
   document.getElementById('hqItemCustomName').value = item.customName || '';
   const itemTabBar = document.querySelector('#hqItemModal .modal-tab-bar');
   const foot = document.getElementById('hqItemModalFoot');
@@ -3243,7 +3257,7 @@ function openHqItemModal(idx, initialTab) {
     banner.style.display = 'flex';
     banner.innerHTML =
       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-label="Information" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="9.5"/><text x="12" y="16" text-anchor="middle" fill="currentColor" stroke="none" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="700">i</text></svg>' +
-      '<span>Prices and MOQ for items from <strong>' + supplierLabel(item.supplier) + '</strong> are managed by the supplier and cannot be edited here.</span>';
+      '<span>Prices and MOQ for items from <strong>' + supplierDisplayName(item.supplier) + '</strong> are managed by the supplier and cannot be edited here.</span>';
   } else {
     banner.style.display = 'none';
   }
@@ -3929,7 +3943,7 @@ function renderMl() {
       const onlyUom = enabledUoms[0] || { uom: uoms[0], ui: 0 };
       const uom = onlyUom.uom.replace(/^per /i, '');
       return '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-        '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
+        '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</div></td>' +
         '<td class="uom-text">' + uom + '</td>' +
         '<td>' + formatItemPriceRange(rawIdx, onlyUom.ui) + '</td>' +
         '<td>' + getAccessInfo(onlyUom.ui).html + '</td>' + actionsTd +
@@ -3937,7 +3951,7 @@ function renderMl() {
     }
 
     const parent = '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
-      '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</div></td>' +
+      '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</div></td>' +
       '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
       '<td></td>' +
       '<td></td>' + actionsTd +
@@ -4808,7 +4822,7 @@ function downloadSupplierDisableImpact() {
   var impact = supplierDisableImpact(pendingSupDisableName);
   var rows = [['Type', 'Name', 'Supplier', 'Referenced affected items']];
   impact.items.forEach(function(item) {
-    rows.push(['Market-list item', itemDisplayName(item), item.supplier, '']);
+    rows.push(['Market-list item', itemDisplayName(item), supplierDisplayName(item.supplier), '']);
   });
   impact.recipes.forEach(function(recipe) {
     var references = [].concat(recipe.ingredients || [], recipe.inventoryItems || [], recipe.groupSkuNames || []).map(function(entry) {
@@ -4956,28 +4970,23 @@ function openFirstIncompleteSupplierSettings() {
 function renderSuppliers() {
   const q = (document.getElementById('supSearch').value || '').toLowerCase();
   const rows = SUPPLIERS.filter(s => {
-    if (q && !s.name.toLowerCase().includes(q) && !supplierLabel(s.name).toLowerCase().includes(q)) return false;
+    if (q && !s.name.toLowerCase().includes(q) && !supplierTradingName(s.name).toLowerCase().includes(q) && !supplierLabel(s.name).toLowerCase().includes(q)) return false;
     if (showSuppliersMissingSettingsOnly && !supplierMissingOrderingScopes(s).length) return false;
     return true;
   }).sort((a, b) => a.name.localeCompare(b.name));
   if (!rows.length) {
-    document.getElementById('supBody').innerHTML = '<tr><td colspan="6"><div style="padding:52px 24px;text-align:center"><div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin-bottom:6px">' + (showSuppliersMissingSettingsOnly ? 'No suppliers need settings' : 'No suppliers linked') + '</div><div style="font-size:14px;line-height:1.5;color:var(--ink-mute)">' + (showSuppliersMissingSettingsOnly ? 'Try showing all suppliers or clear the search.' : 'Link a supplier to make it available to this HQ.') + '</div></div></td></tr>';
+    document.getElementById('supBody').innerHTML = '<tr><td colspan="5"><div style="padding:52px 24px;text-align:center"><div style="font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin-bottom:6px">' + (showSuppliersMissingSettingsOnly ? 'No suppliers need settings' : 'No suppliers linked') + '</div><div style="font-size:14px;line-height:1.5;color:var(--ink-mute)">' + (showSuppliersMissingSettingsOnly ? 'Try showing all suppliers or clear the search.' : 'Link a supplier to make it available to this HQ.') + '</div></div></td></tr>';
     renderSupplierSettingsAttention();
     return;
   }
   document.getElementById('supBody').innerHTML = rows.map(s => {
     const accessLabel = availabilityLabel(s.groupList, s.outletList, ML_GROUPS.length, SUPPLIER_UNGROUPED_OUTLETS.length);
     const supplierSettingsAction = "editLinkedSupplierSettings('" + s.name.replace(/'/g, "\\'") + "')";
-    const contactLines = [];
-    if (s.contact && s.contact !== '—') contactLines.push('<div style="color:var(--ink)">' + s.contact + '</div>');
-    if (s.phone && s.phone !== '—') contactLines.push('<div style="color:var(--ink-mute);margin-top:' + (contactLines.length ? '2px' : '0') + '">' + s.phone + '</div>');
-    const contactHtml = contactLines.join('') || '<span style="color:var(--ink-mute)">No contact details</span>';
     const missingSettings = supplierMissingOrderingScopes(s).length;
     const grpHtml = '<button type="button" onclick="event.stopPropagation();openRecGroupsDialog(this);return false;" data-groups="' + s.groupList.join('|') + '" data-outlets="' + s.outletList.join('|') + '" data-av-kind="supplier" data-av-ref="' + s.name.replace(/"/g, '&quot;') + '" style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + accessLabel + '</button>' + (missingSettings ? '<div style="display:flex;align-items:center;gap:4px;margin-top:4px;color:#A16207;font-size:12px;font-weight:500;white-space:nowrap"><span class="material-symbols-rounded" style="font-size:15px">warning</span>Settings required</div>' : '');
     return '<tr class="supplier-settings-row' + (s.active ? '' : ' ml-inactive') + '" data-supplier-name="' + s.name.replace(/"/g, '&quot;') + '" tabindex="0" role="link" aria-label="Open settings for ' + escapeItemDisplayText(supplierLabel(s.name)) + '" onclick="' + supplierSettingsAction + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + supplierSettingsAction + '}">' +
-    '<td><div class="ml-item-name">' + supplierLabel(s.name) + '</div></td>' +
+    '<td>' + supplierTableNameHtml(s.name) + '</td>' +
     '<td style="text-align:center;font-size: 14px;color:var(--ink)">' + (s.itemCount || '—') + '</td>' +
-    '<td style="font-size: 14px">' + contactHtml + '</td>' +
     '<td><span class="ml-cat-tag" style="' + (s.type === 'active' ? 'background:#D9F5E4;color:#1A8040' : 'background:#F0F0F2;color:#555') + '">' + (s.type === 'active' ? 'Active' : 'Passive') + '</span></td>' +
     '<td style="text-align:left">' + grpHtml + '</td>' +
     '<td><div class="row-actions-wrap" onclick="event.stopPropagation()">' +
@@ -4988,7 +4997,7 @@ function renderSuppliers() {
         '<div class="row-action-item' + (s.active ? ' danger' : '') + '" onclick="toggleSupActive(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (s.active ? 'Disable' : 'Enable') + '</div>' +
       '</div></div></td>' +
     '</tr>';
-  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--ink-mute)">No suppliers found</td></tr>';
+  }).join('') || '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--ink-mute)">No suppliers found</td></tr>';
   renderSupplierSettingsAttention();
 }
 renderSuppliers();
@@ -5066,7 +5075,7 @@ function openGroupSkuAvailability(index) {
     var outlets = c.outlets || record.outlets || [];
     var label = availabilityLabel(groups, outlets, INV_GROUPS.length, REC_OUTLETS.length);
     return '<div style="padding:14px 0;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;gap:14px">' +
-      '<div style="min-width:0"><div style="font-size:14px;font-weight:600;color:var(--ink)">' + hqSettingsEscape(c.name) + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:3px">' + hqSettingsEscape(supplierLabel(c.supplier)) + ' · ' + groupIcon + ' ' + label + '</div></div>' +
+      '<div style="min-width:0"><div style="font-size:14px;font-weight:600;color:var(--ink)">' + hqSettingsEscape(c.name) + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:3px">' + hqSettingsEscape(supplierDisplayName(c.supplier)) + ' · ' + groupIcon + ' ' + label + '</div></div>' +
       '<button class="btn btn-tertiary" style="flex-shrink:0;font-size:12px;padding:7px 10px" onclick="openGroupSkuConstituentManager(' + index + ',' + constituentIndex + ')">Manage</button>' +
     '</div>';
   }).join('');
@@ -5605,7 +5614,7 @@ function openNewSupplierAvailability(supplier, options) {
   pendingSupplierAvailability = { supplier:supplier, options:options || {} };
   pendingSupplierAvailabilityInitial = new Set(supplier.groupList.concat(supplier.outletList));
   pendingSupplierAvailabilityTargets = new Set(pendingSupplierAvailabilityInitial);
-  document.getElementById('supplierAvailabilityName').textContent = supplierLabel(supplier.name);
+  document.getElementById('supplierAvailabilityName').textContent = supplierDisplayName(supplier.name);
   renderSupplierAvailabilityTargets();
   document.getElementById('supplierAvailabilityOverlay').classList.add('open');
 }
@@ -5678,7 +5687,7 @@ function confirmSupplierAvailability() {
   saveHqSupplierState();
   savePrototypeState();
   closeSupplierAvailability();
-  showHqToast(pending.options.existing ? 'Supplier availability updated' : 'Supplier linked', supplierLabel(supplier.name));
+  showHqToast(pending.options.existing ? 'Supplier availability updated' : 'Supplier linked', supplierDisplayName(supplier.name));
   if (supplier.type !== 'active' && added.length) openSupplierSettings(supplier, false, true, true);
 }
 
@@ -6133,7 +6142,7 @@ function openSupplierSettings(supplier, isNew, isEditing, showSettingsRequired) 
   document.getElementById('supplierSettingsOverlay').classList.add('open');
   document.querySelectorAll('.row-actions-menu.open').forEach(function(menu) { menu.classList.remove('open'); menu.removeAttribute('style'); });
   closeLinkSupModal(); closeNewSupplierModal();
-  document.getElementById('supplierSettingsPageTitle').textContent = "Supplier's settings: " + supplierLabel(supplier.name);
+  document.getElementById('supplierSettingsPageTitle').textContent = "Supplier's settings: " + supplierDisplayName(supplier.name);
   document.getElementById('supplierSettingsForm').reset();
   document.getElementById('supplierSmsField').hidden = true;
   document.getElementById('supplierMoreContact').hidden = false;
@@ -6432,7 +6441,7 @@ function renderInv() {
         rows.push('<tr style="background:#F9FAFB">' +
           '<td style="' + td + 'padding-left:52px">' +
             '<div style="font-size: 14px;font-weight:500;color:var(--ink);margin-bottom:2px">' + c.name + '</div>' +
-            '<div style="font-size:12px;color:var(--ink-mute)">' + supplierLabel(c.supplier) + '</div>' +
+            '<div style="font-size:12px;color:var(--ink-mute)">' + supplierDisplayName(c.supplier) + '</div>' +
           '</td>' +
           '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + r.uom + '</td>' +
           '<td style="' + td + '"><button onclick="event.stopPropagation();openGroupSkuConstituentAvailability(' + globalIdx + ',' + constituentIndex + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + cLabel + '</button></td><td style="' + td + '"></td>' +
@@ -6519,7 +6528,7 @@ function renderGroupSkuContent() {
     body.innerHTML = groupSkuDraft.items.map(function(item) {
       return '<tr>' +
         '<td style="padding:12px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" data-group-content-check="' + hqSettingsEscape(item.name) + '" onchange="updateGroupSkuDeleteVisibility()" style="margin-top:3px" />' +
-          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.supplier) + '</span></span></label></td>' +
+          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</span></span></label></td>' +
         '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' +
       '</tr>';
     }).join('');
@@ -6575,7 +6584,7 @@ function closeGroupSkuPicker() {
 function renderGroupSkuPickerSupplierOptions() {
   var select = document.getElementById('groupSkuPickerSupplier');
   var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'sku'; }).map(function(i){ return i.detail; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
-  select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(s){ return '<option value="' + hqSettingsEscape(s) + '">' + supplierLabel(s) + '</option>'; }).join('');
+  select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(s){ return '<option value="' + hqSettingsEscape(s) + '">' + supplierDisplayName(s) + '</option>'; }).join('');
 }
 function setGroupSkuPickerSearch(v) { groupSkuPickerSearch = v; renderGroupSkuPickerList(); }
 function setGroupSkuPickerSupplier(v) { groupSkuPickerSupplier = v; renderGroupSkuPickerList(); }
@@ -6603,7 +6612,7 @@ function renderGroupSkuPickerList() {
       var checked = groupSkuPickerSelected.has(item.name);
       return '<tr>' +
         '<td style="padding:10px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleGroupSkuPickerItem(\'' + item.name.replace(/'/g,"\\'") + '\',this.checked)" style="margin-top:3px" />' +
-          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierLabel(item.detail) + '</span></span></label></td>' +
+          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.detail) + '</span></span></label></td>' +
         '<td style="padding:10px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' +
       '</tr>';
     }).join('');
@@ -6831,7 +6840,7 @@ function initialiseHqInventorySettingsPage() {
   var page = document.createElement('section');
   page.className = 'hq-inventory-settings-page';
   page.innerHTML = '<button class="hq-inv-settings-back" type="button" onclick="closeHqInventorySettingsPage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Inventory</button>' +
-    '<div class="hq-inv-settings-head"><div><h1>' + hqSettingsEscape(item.name) + '</h1><div class="hq-inv-settings-meta"><span>' + hqSettingsEscape(supplierLabel(item.supplier || item.detail || 'Not assigned')) + '</span><span aria-hidden="true">•</span><span>' + hqSettingsEscape(hqName.trim()) + '</span><span aria-hidden="true">•</span><span>HQ-wide</span></div></div></div>' +
+    '<div class="hq-inv-settings-head"><div><h1>' + hqSettingsEscape(item.name) + '</h1><div class="hq-inv-settings-meta"><span>' + hqSettingsEscape(supplierDisplayName(item.supplier || item.detail || 'Not assigned')) + '</span><span aria-hidden="true">•</span><span>' + hqSettingsEscape(hqName.trim()) + '</span><span aria-hidden="true">•</span><span>HQ-wide</span></div></div></div>' +
     '<form class="hq-inv-settings-form" onsubmit="saveHqInventorySettings(event)">' +
     '<div class="hq-inv-field"><label for="hqInventoryUom">Inventory UOM:</label><select class="hq-inv-control" id="hqInventoryUom" onchange="renderHqInventoryCountingUoms(window.hqActiveInventorySettingsItem)"></select></div>' +
     '<div class="hq-inv-field"><div aria-hidden="true"></div><div class="hq-counting-uom-section"><p class="hq-counting-uom-intro"><strong>Use these UOMs for stock counts and adjustments</strong><br>Quantities convert to the Inventory UOM when saved. Catalogue UOMs cannot be edited or removed.</p><div class="hq-counting-uoms" id="hqCountingUomList"></div><button class="hq-text-action hq-add-uom" type="button" onclick="openHqCustomUomEditor()"><span aria-hidden="true">+</span>Add UOM</button><div class="hq-custom-uom-editor" id="hqCustomUomEditor" hidden><div class="hq-custom-uom-grid"><label for="hqCustomUomName">UOM</label><select class="hq-inv-control" id="hqCustomUomName"></select><label>Conversion</label><div class="hq-uom-equation"><span>1</span><span id="hqCustomUomLabel">custom UOM</span><span>=</span><input class="hq-inv-control" id="hqCustomUomQty" type="number" min="0.01" step="0.01" value="1"><select class="hq-inv-control" id="hqCustomUomReference"></select></div></div><div class="hq-custom-uom-editor-actions"><button class="hq-text-action" type="button" onclick="closeHqCustomUomEditor()">Cancel</button><button class="btn-primary" id="hqCustomUomSave" type="button" onclick="saveHqCustomUom()">Add</button></div></div></div></div>' +
@@ -7151,7 +7160,7 @@ function openAddCatalogueModal() {
   document.getElementById('aiSupFilter').value = '';
   var linkedNames = new Set(SUPPLIERS.map(function(supplier) { return supplier.name; }));
   var availableNames = Array.from(new Set(CAT_ITEMS.filter(function(item) { return linkedNames.has(item.supplier); }).map(function(item) { return item.supplier; }))).sort();
-  document.getElementById('aiSupFilter').innerHTML = '<option value="">All linked suppliers</option>' + availableNames.map(function(name) { return '<option value="' + escapeOverviewText(name) + '">' + escapeOverviewText(supplierLabel(name)) + '</option>'; }).join('');
+  document.getElementById('aiSupFilter').innerHTML = '<option value="">All linked suppliers</option>' + availableNames.map(function(name) { return '<option value="' + escapeOverviewText(name) + '">' + escapeOverviewText(supplierDisplayName(name)) + '</option>'; }).join('');
   setAiStep(0);
   renderAiTargets();
   renderAiList();
@@ -7237,7 +7246,7 @@ function renderAiList() {
   document.getElementById('aiList').innerHTML = filtered.length ? '<div class="hq-invoice-list-actions"><label><input type="checkbox" ' + (allFilteredSelected ? 'checked' : '') + ' onchange="toggleAllAiItems()"><span>Select all</span></label></div><div class="hq-invoice-scope-list">' + filtered.map(i => {
     const s = aiSel.has(i.id);
     const existing = getExistingCatalogueItem(i);
-    return '<label class="hq-invoice-scope' + (s ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(i.id) + '" ' + (s ? 'checked' : '') + ' onchange="toggleAiItem(this.value)"><span class="ai-catalogue-row"><span class="ai-catalogue-copy"><span class="ai-catalogue-name">' + formatCatalogueItemName(i.name) + '</span><span class="ai-catalogue-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span><span>·</span>' : '') + supplierLabel(i.supplier) + '</span></span>' + renderCatalogueUomSummary(i.uoms) + '</span></label>';
+    return '<label class="hq-invoice-scope' + (s ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(i.id) + '" ' + (s ? 'checked' : '') + ' onchange="toggleAiItem(this.value)"><span class="ai-catalogue-row"><span class="ai-catalogue-copy"><span class="ai-catalogue-name">' + formatCatalogueItemName(i.name) + '</span><span class="ai-catalogue-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span><span>·</span>' : '') + supplierDisplayName(i.supplier) + '</span></span>' + renderCatalogueUomSummary(i.uoms) + '</span></label>';
   }).join('') + '</div>' : '<div class="picker-empty">No catalogue items found from the linked suppliers</div>';
   const n = aiSel.size;
   document.getElementById('aiSelLabel').innerHTML = n ? '<strong>' + n + '</strong> item' + (n>1?'s':'') + ' selected' : 'No items selected';
@@ -7310,7 +7319,7 @@ function showAiStep2() {
       const moqValue = existing ? getAiInitialPriceValue(existingIdx, ui, 'moq') : '0';
       const inputDisabled = hqDisabled ? ' disabled title="Enable this UOM in HQ before changing its pricing"' : '';
       return '<tr class="' + (isFirst ? 'item-first' : '') + '" id="aiUomRow_' + item.id + '_' + ui + '">' +
-        (isFirst ? '<td class="col-name item-name-cell" rowspan="' + rowUoms.length + '"><div class="col-name-text">' + formatCatalogueItemName(item.name) + '</div><div class="col-name-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span> · ' : '') + supplierLabel(item.supplier) + '</div></td>' : '') +
+        (isFirst ? '<td class="col-name item-name-cell" rowspan="' + rowUoms.length + '"><div class="col-name-text">' + formatCatalogueItemName(item.name) + '</div><div class="col-name-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span> · ' : '') + supplierDisplayName(item.supplier) + '</div></td>' : '') +
         uomCell +
         '<td class="col-price"><div class="price-wrap"' + (!isOn ? ' style="visibility:hidden;pointer-events:none"' : '') + '><input type="number" value="' + priceValue + '" step="0.01" min="0" data-dirty="false" oninput="markAiPricingDirty(this)" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="price" aria-label="Unit price for ' + item.name + ' per ' + u + '"' + inputDisabled + ' /></div></td><td class="col-moq"><div class="moq-wrap"' + (!isOn ? ' style="visibility:hidden;pointer-events:none"' : '') + '><input type="number" value="' + moqValue + '" step="1" min="0" data-dirty="false" oninput="markAiPricingDirty(this)" data-item-id="' + item.id + '" data-uom-index="' + ui + '" data-field="moq" aria-label="Minimum order quantity for ' + item.name + ' in ' + u + '"' + inputDisabled + ' /></div></td>' +
       '</tr>';
@@ -7473,7 +7482,7 @@ function populateInvSupplierFilter(items) {
   const select = document.getElementById('isSupFilter');
   const current = select.value;
   const suppliers = [...new Set(items.map(item => item.supplier))].sort();
-  select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(s => '<option value="' + s + '">' + supplierLabel(s) + '</option>').join('');
+  select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(s => '<option value="' + s + '">' + supplierDisplayName(s) + '</option>').join('');
   if (suppliers.includes(current)) select.value = current;
 }
 function openAddInvSkuModal() {
@@ -7508,7 +7517,7 @@ function renderIsList() {
       : '<div class="inventory-conversion"><span>1 ' + (cfg.flipped ? cfg.orderUom : cfg.inventoryUom) + '</span><span>=</span><input class="inventory-inline-field" type="number" min="0.001" step="any" value="' + cfg.conversion + '" onchange="updateIsConfig(\'' + i.id + '\',\'conversion\',this.value)"><span>' + (cfg.flipped ? cfg.inventoryUom : cfg.orderUom) + '</span><button class="inventory-flip" type="button" onclick="flipIsConversion(\'' + i.id + '\')"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>Flip units</button></div>';
     return '<div class="inventory-add-row' + (s?' selected':'') + '">' +
       '<input type="checkbox" ' + (s?'checked':'') + ' onclick="toggleIsItem(\'' + i.id + '\')">' +
-      '<div><div class="picker-row-name">' + i.name + '</div><div class="picker-row-sub">' + (i.isRecipe ? i.supplier : supplierLabel(i.supplier)) + '</div></div>' +
+      '<div><div class="picker-row-name">' + i.name + '</div><div class="picker-row-sub">' + (i.isRecipe ? i.supplier : supplierDisplayName(i.supplier)) + '</div></div>' +
       '<div class="inventory-config"><select class="inventory-inline-field" onchange="updateIsConfig(\'' + i.id + '\',\'inventoryUom\',this.value)">' + uomOpts + '</select></div>' +
       '<div class="inventory-config">' + conversion + '</div>' +
       '<div class="inventory-config"><input class="inventory-inline-field" type="number" min="0" value="' + cfg.par + '" onchange="updateIsConfig(\'' + i.id + '\',\'par\',this.value)"></div>' +
@@ -8282,6 +8291,9 @@ function openPosSettings(outletName) {
   document.getElementById('posLocationId').value = localStorage.getItem('nomniPosLocationId') || '';
   document.getElementById('posSettingsOverlay').classList.add('open');
   setTimeout(function(){ document.getElementById('posApiKey').focus(); }, 0);
+}
+if (new URLSearchParams(window.location.search).get('posSetup')) {
+  setTimeout(function() { openPosSettings(new URLSearchParams(window.location.search).get('posSetup')); }, 0);
 }
 function closePosSettings() { document.getElementById('posSettingsOverlay').classList.remove('open'); }
 function savePosSettings() {
