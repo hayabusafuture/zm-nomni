@@ -735,6 +735,10 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   .nav a span { display: none; }
   .sidebar:hover .nav a span { display: inline; }
   .overview-grid { grid-template-columns: 1fr; }
+  .overview-grid > div:last-child { position: static !important; min-width: 0; }
+  .overview-grid .health-check-panel,
+  .overview-grid .activity-feed { max-width: 100%; min-width: 0; }
+  .overview-grid .activity-text { overflow-wrap: anywhere; }
 }
 .act-filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .act-entry { display: flex; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--rule); align-items: flex-start; }
@@ -1361,9 +1365,10 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
   /* HQ inventory item settings page */
   body.hq-inventory-settings-mode .main { padding:0; }
   body.hq-inventory-settings-mode .main > :not(.hq-inventory-settings-page) { display:none !important; }
-  .hq-inventory-settings-page { min-height:calc(100vh - 64px); padding:18px 0 96px; background:#fff; }
+  .hq-inventory-settings-page { min-height:calc(100vh - 64px); padding:28px 0 96px; background:#fff; }
   .hq-inventory-settings-page[hidden] { display:none; }
-  .hq-inv-settings-back { display:inline-flex; align-items:center; gap:6px; min-height:40px; margin:0 40px 2px; padding:0; border:0; background:transparent; color:var(--spinach); font:600 14px Inter,sans-serif; cursor:pointer; }
+  .hq-inv-settings-back { display:inline-flex; align-items:center; gap:5px; min-height:18px; margin:0 40px 14px; padding:0; border:0; background:transparent; color:var(--ink-mute); font:500 14px Inter,sans-serif; text-decoration:none; cursor:pointer; transition:color .13s; }
+  .hq-inv-settings-back:hover { color:var(--seaweed); }
   .hq-inv-settings-back svg { width:16px; height:16px; }
   .hq-inv-settings-head { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin:0 0 60px; padding:0 40px 16px; border-bottom:1px solid var(--rule); }
   .hq-inv-settings-head h1 { max-width:920px; margin:0; font:700 24px/1.2 Inter,sans-serif; letter-spacing:-.03em; }
@@ -1494,7 +1499,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 
     <!-- ── Outlet Groups ── -->
     <div class="tab-panel active" id="panel-outlet-groups">
-      <div style="display:grid;grid-template-columns:1fr 272px;gap:32px;align-items:start">
+      <div style="display:grid;grid-template-columns:1fr 408px;gap:32px;align-items:start">
 
         <!-- Left: groups + outlets table -->
         <div>
@@ -1851,7 +1856,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
     <!-- ── Suppliers ── -->
     <div class="tab-panel" id="panel-suppliers">
       <div id="supplierSettingsBanner" hidden style="display:none;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
-        <div style="display:flex;align-items:flex-start;gap:10px"><span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span><div><div id="supplierSettingsBannerCount" style="font-size:14px;font-weight:700;color:var(--notice-warning-ink)"></div><div style="font-size:14px;color:var(--notice-warning-ink);margin-top:2px">These locations cannot order from their supplier until their settings are added.</div></div></div><button type="button" class="btn btn-tertiary" id="supplierSettingsFilterButton" onclick="toggleSupplierSettingsFilter()" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap">View suppliers</button>
+        <div style="display:flex;align-items:flex-start;gap:10px"><span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span><div><div id="supplierSettingsBannerCount" style="font-size:14px;font-weight:700;color:var(--notice-warning-ink)"></div><div style="font-size:14px;color:var(--notice-warning-ink);margin-top:2px">Affected outlets cannot order from their supplier until the relevant settings are added.</div></div></div><button type="button" class="btn btn-tertiary" id="supplierSettingsFilterButton" onclick="toggleSupplierSettingsFilter()" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap">View suppliers</button>
       </div>
       <div class="panel-label-row">
         <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supCount"></span></span>
@@ -2502,8 +2507,10 @@ function renderHealthCheck() {
 
   if (pendingPriceChanges.length) issues.push({ type: 'priceChanges', symbol: 'warning', text: '<strong>' + pendingPriceChanges.length + ' price change' + (pendingPriceChanges.length > 1 ? 's' : '') + '</strong> pending review', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: pendingPriceChanges });
   const incompleteSuppliers = typeof getIncompleteSupplierSettings === 'function' ? getIncompleteSupplierSettings() : [];
-  if (incompleteSuppliers.length) issues.push({ type: 'supplierSettings', symbol: 'warning', text: '<strong>' + incompleteSuppliers.length + ' supplier' + (incompleteSuppliers.length === 1 ? '' : 's') + '</strong> need settings', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: incompleteSuppliers });
-  if (UNGROUPED.length) issues.push({ type: 'ungrouped', symbol: 'info', text: '<strong>' + UNGROUPED.length + ' outlet' + (UNGROUPED.length > 1 ? 's' : '') + '</strong> not assigned to any group', color: 'var(--spinach)', iconColor: 'var(--nomni-green)', bg: 'var(--mint)', border: 'var(--notice-info-border)', items: UNGROUPED });
+  const supplierSettingsNeedingAttention = incompleteSuppliers.reduce(function(total, supplier) {
+    return total + supplierMissingOrderingScopes(supplier).length;
+  }, 0);
+  if (supplierSettingsNeedingAttention) issues.push({ type: 'supplierSettings', symbol: 'warning', text: '<strong>' + supplierSettingsNeedingAttention + ' supplier setting' + (supplierSettingsNeedingAttention === 1 ? '' : 's') + '</strong> need attention', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: incompleteSuppliers });
 
   const highFcRecipes = RECIPES.filter(r => r.foodCostPct > recFcThreshold);
   if (highFcRecipes.length) issues.push({ type: 'highfc', symbol: 'warning', text: '<strong>' + highFcRecipes.length + ' recipe' + (highFcRecipes.length > 1 ? 's' : '') + '</strong> above ' + recFcThreshold + '% food cost target', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: highFcRecipes });
@@ -4913,24 +4920,24 @@ function getIncompleteSupplierSettings() {
 var showSuppliersMissingSettingsOnly = false;
 function renderSupplierSettingsAttention() {
   var incomplete = getIncompleteSupplierSettings();
-  var missingLocations = incomplete.reduce(function(total, supplier) { return total + supplierMissingOrderingScopes(supplier).length; }, 0);
-  var hasMissingLocations = Number(missingLocations) > 0;
+  var missingSettings = incomplete.reduce(function(total, supplier) { return total + supplierMissingOrderingScopes(supplier).length; }, 0);
+  var hasMissingSettings = Number(missingSettings) > 0;
   var banner = document.getElementById('supplierSettingsBanner');
   if (banner) {
-    banner.hidden = !hasMissingLocations;
-    banner.style.display = hasMissingLocations ? 'flex' : 'none';
+    banner.hidden = !hasMissingSettings;
+    banner.style.display = hasMissingSettings ? 'flex' : 'none';
   }
   var count = document.getElementById('supplierSettingsBannerCount');
-  if (count) count.textContent = hasMissingLocations ? missingLocations + ' location' + (missingLocations === 1 ? ' needs' : 's need') + ' order settings' : '';
+  if (count) count.textContent = hasMissingSettings ? missingSettings + ' supplier setting' + (missingSettings === 1 ? ' needs' : 's need') + ' attention' : '';
   var filterButton = document.getElementById('supplierSettingsFilterButton');
   if (filterButton) {
-    filterButton.style.display = hasMissingLocations ? '' : 'none';
+    filterButton.style.display = hasMissingSettings ? '' : 'none';
     filterButton.className = showSuppliersMissingSettingsOnly ? 'supplier-settings-filter-clear' : 'btn btn-tertiary';
     filterButton.style.cssText = showSuppliersMissingSettingsOnly ? 'align-self:center' : 'flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap';
     filterButton.innerHTML = showSuppliersMissingSettingsOnly ? '<span class="material-symbols-rounded" aria-hidden="true">close</span>Clear filter' : 'View suppliers';
   }
   var filterChip = document.getElementById('supplierSettingsFilterChip');
-  if (filterChip) filterChip.hidden = !hasMissingLocations || !showSuppliersMissingSettingsOnly;
+  if (filterChip) filterChip.hidden = !hasMissingSettings || !showSuppliersMissingSettingsOnly;
 }
 function toggleSupplierSettingsFilter() {
   setSupplierSettingsFilter(!showSuppliersMissingSettingsOnly);
@@ -5285,18 +5292,18 @@ const INV_ITEMS = [
   { type:'sku', name:'Binchotan White Charcoal Premium 15kg Bag', detail:'Grill Master SG', uom:'kg', cost:14.20, active:true, groups:['Chargrill Outlets'] },
   { type:'sku', name:'Anchor Unsalted Butter 25kg Bulk Block', detail:'Fonterra Brands', uom:'kg', cost:11.80, active:true, groups:INV_GROUPS.slice() },
   // Group SKUs
-  { type:'group', name:'Chicken Thigh Boneless', detail:'2 SKUs', uom:'kg', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
-    { name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier:'Kee Song Group', cost:6.80, groups:['Chargrill Outlets','Family Dining Express'], outlets:['(WF 139) Chargrill @ 139 Tampines'] },
-    { name:'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier:'Poultry Masters SG', cost:6.40, groups:['Chargrill Outlets'], outlets:['(WF 290) Garden Express @ 290 Sengkang'] },
+  { type:'group', name:'Chicken Thigh Boneless', detail:'2 SKUs', uom:'kg', cost:null, active:true, groups:INV_GROUPS.slice(), outlets:[], constituents:[
+    { name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier:'Kee Song Group', cost:6.80, groups:['Chargrill Outlets'], outlets:[] },
+    { name:'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier:'Poultry Masters SG', cost:6.40, groups:['Family Dining Express'], outlets:[] },
   ]},
-  { type:'group', name:'Dark Soy Sauce', detail:'2 SKUs', uom:'L', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
-    { name:'Kikkoman Dark Soy Sauce 2L', supplier:'Kikkoman', cost:8.80, groups:['Family Dining Express'] },
-    { name:'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier:'Asian Dry Goods', cost:6.90, groups:['Chargrill Outlets'], outlets:['(WF 107) Chargrill @ 107 Serangoon'] },
+  { type:'group', name:'Dark Soy Sauce', detail:'2 SKUs', uom:'L', cost:null, active:true, groups:['Chargrill Outlets'], outlets:['(WF 290) Garden Express @ 290 Sengkang'], constituents:[
+    { name:'Kikkoman Dark Soy Sauce 2L', supplier:'Kikkoman', cost:8.80, groups:['Chargrill Outlets'], outlets:[] },
+    { name:'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier:'Asian Dry Goods', cost:6.90, groups:[], outlets:['(WF 290) Garden Express @ 290 Sengkang'] },
   ]},
-  { type:'group', name:'Cooking Oil', detail:'3 SKUs', uom:'L', cost:null, active:true, groups:INV_GROUPS.slice(), constituents:[
-    { name:'Sime Darby Canola Oil RBD 20L', supplier:'Sunny Gold F&B Supplies', cost:3.20 },
-    { name:'Blended Vegetable Cooking Oil 20L', supplier:'Sunny Gold F&B Supplies', cost:2.80 },
-    { name:'Golden Chef Rice Bran Oil 18L', supplier:'Asian Dry Goods', cost:3.60 },
+  { type:'group', name:'Cooking Oil', detail:'3 SKUs', uom:'L', cost:null, active:true, groups:['Family Dining Express'], outlets:['(WF 139) Chargrill @ 139 Tampines','(WF 290) Garden Express @ 290 Sengkang'], constituents:[
+    { name:'Sime Darby Canola Oil RBD 20L', supplier:'Sunny Gold F&B Supplies', cost:3.20, groups:['Family Dining Express'], outlets:[] },
+    { name:'Blended Vegetable Cooking Oil 20L', supplier:'Sunny Gold F&B Supplies', cost:2.80, groups:[], outlets:['(WF 139) Chargrill @ 139 Tampines'] },
+    { name:'Golden Chef Rice Bran Oil 18L', supplier:'Asian Dry Goods', cost:3.60, groups:[], outlets:['(WF 290) Garden Express @ 290 Sengkang'] },
   ]},
   // Sub-recipes
   { type:'sub-recipe', name:'House BBQ Sauce', detail:'Sub-recipe · Batch 2 L', uom:'L', cost:4.20, active:true, groups:['Chargrill Outlets'] },
@@ -5338,6 +5345,35 @@ function saveHqInventoryState() {
   localStorage.setItem(HQ_INVENTORY_STATE_KEY, JSON.stringify(INV_ITEMS));
 }
 loadHqInventoryState();
+
+// Recipe ingredient links use only records stocked in Inventory. Every recipe
+// also uses one Group SKU, chosen to match its available outlet group(s).
+function seedRecipeIngredientLinks() {
+  var inventoryByCategory = {
+    'Mains': ['Fresh Garlic Peeled 10kg Vac Bag', 'Anchor Unsalted Butter 25kg Bulk Block'],
+    'Starters': ['Fresh Garlic Peeled 10kg Vac Bag', 'Fresh Bird\'s Eye Chilli 1kg Punnet'],
+    'Sides': ['Thai Hom Mali Jasmine Rice AA Grade 25kg PP Bag', 'Fresh Garlic Peeled 10kg Vac Bag'],
+    'Sauces & Marinades': ['Fresh Garlic Peeled 10kg Vac Bag', 'Thai Palm Sugar Block 450g x 24 Ctn', 'Fresh Bird\'s Eye Chilli 1kg Punnet'],
+    'Desserts': ['Anchor Unsalted Butter 25kg Bulk Block', 'Chaokoh UHT Coconut Milk 400ml x 24 Ctn', 'Thai Palm Sugar Block 450g x 24 Ctn'],
+    'Beverages': ['Thai Palm Sugar Block 450g x 24 Ctn']
+  };
+  var subRecipeByCategory = {
+    'Mains': ['House BBQ Sauce', 'Char Siu Marinade', 'Chimichurri', 'Satay Peanut Sauce', 'Nam Jim Dipping Sauce'],
+    'Starters': ['Nam Jim Dipping Sauce', 'Satay Peanut Sauce']
+  };
+  RECIPES.forEach(function(recipe, index) {
+    var recipeGroups = recipe.groupList || [];
+    var groupSku = recipeGroups.length > 1
+      ? 'Chicken Thigh Boneless'
+      : (recipeGroups[0] === 'Family Dining Express' ? 'Cooking Oil' : 'Dark Soy Sauce');
+    var directItems = (inventoryByCategory[recipe.cat] || inventoryByCategory['Mains']).slice();
+    var subRecipes = subRecipeByCategory[recipe.cat] || [];
+    if (subRecipes.length) directItems.push(subRecipes[index % subRecipes.length]);
+    recipe.ingredients = directItems;
+    recipe.groupSkuNames = [groupSku];
+  });
+}
+seedRecipeIngredientLinks();
 
 let invPage = 1, invSearch = '', invTypeFilter = '', invStatusFilter = '';
 const INV_PER_PAGE = 20;
@@ -8856,7 +8892,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
 <!-- ── Supplier relationship settings page ── -->
 <div class="modal-overlay" id="supplierSettingsOverlay">
   <div class="modal-card" style="width:760px">
-    <div class="modal-header"><div><button class="supplier-back" type="button" onclick="backFromSupplierSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Suppliers</button><h2 class="modal-title" id="supplierSettingsPageTitle">Supplier's settings</h2></div></div>
+    <div class="modal-header"><div><button class="supplier-back" type="button" onclick="backFromSupplierSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Garden Cuisine HQ</button><h2 class="modal-title" id="supplierSettingsPageTitle">Supplier's settings</h2></div></div>
     <form id="supplierSettingsForm" class="modal-body" onsubmit="event.preventDefault();saveSupplierSettings()"><div class="supplier-settings-shell"><div class="supplier-settings-layout">
       <aside class="supplier-scope-nav"><div class="supplier-scope-setby-label">Set by…</div><div class="supplier-scope-segmented"><button type="button" class="is-active" onclick="setSupplierScopeView('outlets')">Outlets</button><button type="button" onclick="setSupplierScopeView('groups')">Groups</button></div><div class="supplier-outlet-filter-head"><span class="supplier-outlet-count" id="supplierOutletCount">0 outlets</span><button type="button" class="supplier-outlet-filter-button" id="supplierOutletFilterButton" onclick="toggleSupplierOutletFilter()">All <span class="material-symbols-rounded" style="font-size:16px">expand_more</span></button><div class="supplier-outlet-filter-menu" id="supplierOutletFilterMenu" hidden><button type="button" onclick="setSupplierOutletFilter('all')">All</button><button type="button" onclick="setSupplierOutletFilter('none')">Settings required</button></div></div><input class="field-input supplier-outlet-search" id="supplierOutletSearch" type="search" placeholder="Search outlets…" oninput="filterSupplierOutletNav()" /><div class="supplier-scope-nav-overrides" id="supplierScopeNavGroups" hidden></div><div class="supplier-scope-nav-overrides" id="supplierScopeNavPolicies"></div><div class="supplier-scope-nav-label" id="supplierExceptionsLabel">Outlet exceptions</div><div class="supplier-scope-nav-overrides" id="supplierScopeNavOverrides"></div><button type="button" class="btn btn-primary supplier-scope-nav-add" onclick="openSupplierDefaultSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Set default settings</button><div class="supplier-default-helper">Applies to all—set a group or outlet setting to override</div><button type="button" id="supplierGroupSettingsButton" class="btn btn-primary supplier-scope-nav-add" hidden onclick="openSupplierOverridePicker()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Set group settings</button></aside>
       <div class="supplier-settings-content"><div class="supplier-editing-note" id="supplierEditingNote"><span id="supplierEditingIntro" class="supplier-editing-intro"><span>Settings for</span><strong id="supplierEditingScope"></strong></span><div class="supplier-settings-actions"><button type="button" class="supplier-copy-settings" onclick="openSupplierCopyPicker()">Copy from…</button><button type="button" class="supplier-copy-settings" id="supplierOutletDraftCancel" hidden onclick="cancelPendingOutletSettings()">Cancel</button><button type="button" class="supplier-override-delete" id="supplierOverrideDelete" hidden onclick="openDeleteSupplierOverrideConfirm()" aria-label="Remove exception" title="Remove exception"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg></button><button type="button" class="btn btn-primary" id="supplierSaveButton" onclick="saveSupplierSettings()" disabled>Save</button></div></div><div id="supplierManagedSettingsNotice" hidden style="display:flex;gap:10px;margin-top:22px;padding:14px 16px;border:1px solid var(--notice-info-border);border-radius:8px;background:var(--mint);color:var(--seaweed);font-size:14px;line-height:1.45"><span class="material-symbols-rounded" style="font-size:19px;color:var(--spinach)" aria-hidden="true">info</span><span><strong>Supplier-managed settings</strong><br>These settings are managed by the supplier in Nomni Supply and are shown here for reference.</span></div>
@@ -9066,7 +9102,7 @@ function initialiseNewHQView() {
 
 var panel = document.getElementById('panel-outlet-groups');
   panel.innerHTML =
-  '<div style="display:grid;grid-template-columns:1fr 272px;gap:32px;align-items:start">' +
+  '<div style="display:grid;grid-template-columns:1fr 408px;gap:32px;align-items:start">' +
     '<div id="newHqOverviewMain">' +
       '<div class="new-hq-empty"><div class="new-hq-empty-inner">' +
         '<h2 class="new-hq-empty-title">No groups or outlets yet</h2>' +
