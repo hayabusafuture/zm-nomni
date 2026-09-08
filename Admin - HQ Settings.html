@@ -616,8 +616,15 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierCopyPicker .supplier-override-target span span { display:block; margin-top:3px; color:var(--ink-mute); font-size:12px; }
 #supplierSettingsOverlay .supplier-settings-section { display:flex; flex-direction:column; }
 #supplierSettingsOverlay .supplier-settings-heading { margin:34px 0 18px; font-size:21px; line-height:1.2; font-weight:700; letter-spacing:-.02em; color:var(--ink); }
-#supplierSettingsOverlay #supplierContactSection .supplier-settings-heading { margin-top:50px; }
+#supplierSettingsOverlay #supplierProfileSection .supplier-settings-heading { margin-top:50px; }
+#supplierSettingsOverlay #supplierContactSection .supplier-settings-heading { margin-top:34px; }
 #supplierSettingsOverlay .supplier-settings-card { padding:28px; border:0; border-radius:8px; background:#F7F7F7; display:flex; flex-direction:column; gap:14px; }
+#supplierSettingsOverlay .supplier-profile-card { gap:18px; }
+#supplierSettingsOverlay .supplier-profile-summary { padding:16px; border:1px solid var(--rule); border-radius:6px; background:#fff; }
+#supplierSettingsOverlay .supplier-profile-summary-head { display:flex; align-items:center; gap:12px; }
+#supplierSettingsOverlay .supplier-profile-summary strong { font-size:14px; font-weight:700; }
+#supplierSettingsOverlay .supplier-profile-summary p { margin:6px 0 0; color:var(--ink-mute); font-size:13px; line-height:1.45; }
+#supplierSettingsOverlay .supplier-profile-summary p + p { margin-top:3px; }
 #supplierSettingsOverlay .field-label { font-weight:600; }
 #supplierSettingsOverlay .supplier-settings-card + .supplier-settings-card { margin-top:20px; }
 #supplierSettingsOverlay .supplier-settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -2638,6 +2645,28 @@ const SUPPLIER_TRADING_NAMES = {
   'AmoyFoods': 'Amoy Foods',
   'Grill Master SG': 'Grill Master'
 };
+// Supplier profiles are maintained in the Admin supplier directory. Every
+// supplier has a company-address profile; some have additional registered
+// locations for the documents issued to a particular outlet or group.
+const SUPPLIER_PROFILES = {
+  'AmoyFoods': [
+    { id:'default', name:'Company address', address:'93 McNair Road, Singapore 328560', companyReg:'201525600G', gstTax:'M2-0000000-0' },
+    { id:'amoy-west', name:'West distribution centre', address:'15 Jalan Tepong, Singapore 619336', companyReg:'201525600G', gstTax:'M2-0000000-0' },
+    { id:'amoy-malaysia', name:'Johor distribution centre', address:'18 Jalan Tembaga, Johor Bahru 81700, Malaysia', companyReg:'201525600G', gstTax:'' }
+  ],
+  'Kee Song Group': [
+    { id:'default', name:'Company address', address:'45 Jalan Lekar, Singapore 698946', companyReg:'197200921N', gstTax:'M2-0000000-0' },
+    { id:'kee-song-east', name:'East distribution centre', address:'7 Loyang Way, Singapore 508721', companyReg:'197200921N', gstTax:'M2-0000000-0' }
+  ]
+};
+function supplierProfilesFor(supplier) {
+  var profiles = SUPPLIER_PROFILES[supplier && supplier.name] || [];
+  return profiles.length ? profiles : [{ id:'default', name:'Company address', address:'Registered company address on file', companyReg:'Company registration number on file', gstTax:'' }];
+}
+function supplierProfileFor(supplier, profileId) {
+  var profiles = supplierProfilesFor(supplier);
+  return profiles.find(function(profile) { return profile.id === profileId; }) || profiles[0];
+}
 function supplierLabel(name) { return SUPPLIER_LEGAL_NAMES[name] || name; }
 function supplierTradingName(name) { return SUPPLIER_TRADING_NAMES[name] || name; }
 function supplierDisplayName(name) { return SUPPLIER_TRADING_NAMES[name] || supplierLabel(name); }
@@ -5734,6 +5763,7 @@ function supplierParentGroupScope(scope) {
 }
 function readSupplierSettingsForm() {
   return {
+    supplierProfileId:document.getElementById('supplierProfile').value || 'default',
     recipientEmail:document.getElementById('supplierRecipientEmail').value.trim(),
     noEmail:document.getElementById('supplierNoEmail').checked,
     whatsapp:document.getElementById('supplierWhatsapp').value.trim(),
@@ -5748,6 +5778,7 @@ function readSupplierSettingsForm() {
 }
 function setSupplierSettingsForm(settings, supplier) {
   settings = settings || {};
+  renderSupplierProfileSelection(supplier, settings.supplierProfileId || 'default');
   var recipientEmail = settings.recipientEmail || '';
   var whatsapp = settings.whatsapp || '';
   document.getElementById('supplierRecipientEmail').value = recipientEmail;
@@ -5774,6 +5805,36 @@ function setSupplierSettingsForm(settings, supplier) {
     setSupplierPolicyRow(row, !!delivery);
   });
   if (document.getElementById('supplierNoEmail').checked) toggleSupplierNoEmail();
+  updateSupplierSaveState();
+}
+function renderSupplierProfileSelection(supplier, profileId) {
+  var select = document.getElementById('supplierProfile');
+  var profiles = supplierProfilesFor(supplier);
+  if (!select) return;
+  select.innerHTML = profiles.map(function(profile) {
+    return '<option value="' + escapeOverviewText(profile.id) + '">' + escapeOverviewText(profile.name + (profile.id === 'default' ? ' (default)' : '')) + '</option>';
+  }).join('');
+  select.value = profiles.some(function(profile) { return profile.id === profileId; }) ? profileId : 'default';
+  renderSupplierProfileDetails(supplier, select.value);
+}
+function renderSupplierProfileDetails(supplier, profileId) {
+  var profile = supplierProfileFor(supplier, profileId);
+  var name = document.getElementById('supplierProfileName');
+  var address = document.getElementById('supplierProfileAddress');
+  var registration = document.getElementById('supplierProfileRegistration');
+  var tax = document.getElementById('supplierProfileTax');
+  if (!profile || !name || !address || !registration || !tax) return;
+  name.textContent = profile.name;
+  address.textContent = profile.address;
+  registration.textContent = 'Company Reg. No. ' + profile.companyReg;
+  tax.textContent = profile.gstTax ? 'GST/Tax Reg. No. ' + profile.gstTax : '';
+  tax.hidden = !profile.gstTax;
+}
+function selectSupplierProfile() {
+  var supplier = pendingSupplierLink && pendingSupplierLink.supplier;
+  var select = document.getElementById('supplierProfile');
+  if (!supplier || !select) return;
+  renderSupplierProfileDetails(supplier, select.value);
   updateSupplierSaveState();
 }
 function toggleSupplierDeliveryFee() {
@@ -6176,7 +6237,7 @@ function showSupplierSettingsIntro() {
 function setSupplierSettingsReadOnly(readOnly) {
   var overlay = document.getElementById('supplierSettingsOverlay');
   overlay.classList.toggle('is-read-only', !!readOnly);
-  document.querySelectorAll('#supplierSettingsOverlay input').forEach(function(input) { input.disabled = !!readOnly; });
+  document.querySelectorAll('#supplierSettingsOverlay input, #supplierSettingsOverlay select').forEach(function(input) { input.disabled = !!readOnly; });
   if (!readOnly) document.querySelectorAll('#supplierSettingsOverlay .supplier-policy-row').forEach(function(row) { setSupplierPolicyRow(row, row.querySelector('[data-supplier-day]').checked); });
   document.getElementById('supplierMoreContact').hidden = !!readOnly;
   document.querySelectorAll('#supplierSettingsOverlay .supplier-apply-all').forEach(function(button) { button.hidden = !!readOnly; });
@@ -8908,6 +8969,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
     <form id="supplierSettingsForm" class="modal-body" onsubmit="event.preventDefault();saveSupplierSettings()"><div class="supplier-settings-shell"><div class="supplier-settings-layout">
       <aside class="supplier-scope-nav"><div class="supplier-scope-setby-label">Set by…</div><div class="supplier-scope-segmented"><button type="button" class="is-active" onclick="setSupplierScopeView('outlets')">Outlets</button><button type="button" onclick="setSupplierScopeView('groups')">Groups</button></div><div class="supplier-outlet-filter-head"><span class="supplier-outlet-count" id="supplierOutletCount">0 outlets</span><button type="button" class="supplier-outlet-filter-button" id="supplierOutletFilterButton" onclick="toggleSupplierOutletFilter()">All <span class="material-symbols-rounded" style="font-size:16px">expand_more</span></button><div class="supplier-outlet-filter-menu" id="supplierOutletFilterMenu" hidden><button type="button" onclick="setSupplierOutletFilter('all')">All</button><button type="button" onclick="setSupplierOutletFilter('none')">Settings required</button></div></div><input class="field-input supplier-outlet-search" id="supplierOutletSearch" type="search" placeholder="Search outlets…" oninput="filterSupplierOutletNav()" /><div class="supplier-scope-nav-overrides" id="supplierScopeNavGroups" hidden></div><div class="supplier-scope-nav-overrides" id="supplierScopeNavPolicies"></div><div class="supplier-scope-nav-label" id="supplierExceptionsLabel">Outlet exceptions</div><div class="supplier-scope-nav-overrides" id="supplierScopeNavOverrides"></div><button type="button" class="btn btn-primary supplier-scope-nav-add" onclick="openSupplierDefaultSettings()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Set default settings</button><div class="supplier-default-helper">Applies to all—set a group or outlet setting to override</div><button type="button" id="supplierGroupSettingsButton" class="btn btn-primary supplier-scope-nav-add" hidden onclick="openSupplierOverridePicker()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Set group settings</button></aside>
       <div class="supplier-settings-content"><div class="supplier-editing-note" id="supplierEditingNote"><span id="supplierEditingIntro" class="supplier-editing-intro"><span>Settings for</span><strong id="supplierEditingScope"></strong></span><div class="supplier-settings-actions"><button type="button" class="supplier-copy-settings" onclick="openSupplierCopyPicker()">Copy from…</button><button type="button" class="supplier-copy-settings" id="supplierOutletDraftCancel" hidden onclick="cancelPendingOutletSettings()">Cancel</button><button type="button" class="supplier-override-delete" id="supplierOverrideDelete" hidden onclick="openDeleteSupplierOverrideConfirm()" aria-label="Remove exception" title="Remove exception"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg></button><button type="button" class="btn btn-primary" id="supplierSaveButton" onclick="saveSupplierSettings()" disabled>Save</button></div></div><div id="supplierManagedSettingsNotice" hidden style="display:flex;gap:10px;margin-top:22px;padding:14px 16px;border:1px solid var(--notice-info-border);border-radius:8px;background:var(--mint);color:var(--seaweed);font-size:14px;line-height:1.45"><span class="material-symbols-rounded" style="font-size:19px;color:var(--spinach)" aria-hidden="true">info</span><span><strong>Supplier-managed settings</strong><br>These settings are managed by the supplier in Nomni Supply and are shown here for reference.</span></div>
+      <section class="supplier-settings-section" id="supplierProfileSection"><h3 class="supplier-settings-heading">Supplier profile</h3><div class="supplier-settings-card supplier-profile-card"><div><label class="field-label" for="supplierProfile">Profile</label><select class="field-input" id="supplierProfile" onchange="selectSupplierProfile()"></select><p class="supplier-settings-help">Used for the supplier address and registration details on documents for this location.</p></div><div class="supplier-profile-summary"><div class="supplier-profile-summary-head"><strong id="supplierProfileName">Company address</strong></div><p id="supplierProfileAddress"></p><p id="supplierProfileRegistration"></p><p id="supplierProfileTax"></p></div></div></section>
       <section class="supplier-settings-section" id="supplierContactSection"><h3 class="supplier-settings-heading">Send order notifications to…</h3><div class="supplier-settings-card">
         <div><label class="field-label">Supplier email(s)</label><input class="field-input" id="supplierRecipientEmail" type="text" placeholder="Email" oninput="clearSupplierContactError()" /><p class="supplier-settings-help" style="margin-top:6px">Separate multiple email addresses with commas.</p></div>
         <label class="supplier-settings-check"><input id="supplierNoEmail" type="checkbox" onchange="toggleSupplierNoEmail()" /><span><strong>No email address?</strong> Tick to confirm</span></label>
@@ -9118,7 +9180,7 @@ var panel = document.getElementById('panel-outlet-groups');
     '<div id="newHqOverviewMain">' +
       '<div class="new-hq-empty"><div class="new-hq-empty-inner">' +
         '<h2 class="new-hq-empty-title">No groups or outlets yet</h2>' +
-        '<p class="new-hq-empty-copy">Create a group to organise your outlets. You can add outlets now or later.</p>' +
+        '<p class="new-hq-empty-copy">Group outlets that share the same suppliers, items and operating settings.</p>' +
         '<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">' +
           '<button class="btn-primary" id="newHqCreateGroupBtn">' +
             '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>New group' +
