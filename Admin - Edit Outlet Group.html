@@ -409,6 +409,11 @@
 .pos-mapping-progress { display:flex; align-items:center; gap:9px; }
 .pos-mapping-progress .progress-track { width:96px; height:6px; border-radius:4px; background:#E7E8EC; overflow:hidden; }
 .pos-mapping-progress .progress-fill { height:100%; background:var(--nomni-green); }
+.pos-mapping-metric-progress { gap:7px; }
+.pos-mapping-metric-progress .progress-track { width:64px; flex:0 0 64px; }
+.pos-mapping-columns { display:grid; grid-template-columns:1fr; gap:14px; margin-bottom:14px; }
+.pos-mapping-column { min-width:0; }
+.pos-mapping-column .pos-summary-label { display:block; margin-bottom:7px; }
 .pos-view-link { color:var(--spinach); text-decoration:none; white-space:nowrap; background:none; border:0; padding:0; font:inherit; font-weight:600; cursor:pointer; }
 .pos-view-link:hover { text-decoration:underline; }
 .pos-summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
@@ -768,9 +773,10 @@
           <tr>
             <th>Outlet</th>
             <th style="width:160px">POS connection</th>
-            <th style="width:220px">Mapping status</th>
-            <th style="width:150px">Last synced</th>
-            <th style="width:110px">Action</th>
+            <th style="width:150px">Product mapping</th>
+            <th style="width:150px">Variant mapping</th>
+            <th style="width:130px">Last mapped</th>
+            <th style="width:130px">Action</th>
           </tr>
         </thead>
         <tbody id="outletsBody"></tbody>
@@ -1137,11 +1143,11 @@
 
 <script>
 const OUTLETS = [
-  { id:  1, name: "(WF 301) Chargrill @ 301 Punggol",       company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: true,  mappedCount:18, totalMappable:22, lastSynced:"10 Jun 2026" },
-  { id:  2, name: "(WF 107) Chargrill @ 107 Serangoon",     company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: true,  mappedCount:12, totalMappable:20, lastSynced:"09 Jun 2026" },
+  { id:  1, name: "(WF 301) Chargrill @ 301 Punggol",       company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: true,  mappedCount:22, totalMappable:22, productMapped:8, productTotal:8, variantMapped:14, variantTotal:14, lastSynced:"10 Jun 2026" },
+  { id:  2, name: "(WF 107) Chargrill @ 107 Serangoon",     company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: true,  mappedCount:12, totalMappable:20, productMapped:5, productTotal:8, variantMapped:7, variantTotal:12, lastSynced:"09 Jun 2026" },
   { id:  3, name: "(WF 259) Chargrill @ 259 Bukit Panjang", company: "GC West Holdings Pte Ltd",      active: true,  posConnected: false },
   { id:  4, name: "(WF 280) Chargrill @ 280 Bishan",        company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: false },
-  { id:  5, name: "(WF 139) Chargrill @ 139 Tampines",      company: "GC East Operations Pte Ltd",   active: true,  posConnected: true,  mappedCount:20, totalMappable:24, lastSynced:"08 Jun 2026" },
+  { id:  5, name: "(WF 139) Chargrill @ 139 Tampines",      company: "GC East Operations Pte Ltd",   active: true,  posConnected: true,  mappedCount:20, totalMappable:24, productMapped:8, productTotal:8, variantMapped:12, variantTotal:16, lastSynced:"08 Jun 2026" },
   { id:  6, name: "1-Alfaro - Bar",                          company: "1-Alfaro Pte Ltd",              active: true,  posConnected: true },
   { id:  7, name: "1-Arden - Bar",                           company: "1-Spring Pte Ltd",              active: true,  posConnected: true },
   { id:  8, name: "1-Arden - Culinary",                      company: "1-Spring Pte Ltd",              active: true,  posConnected: true },
@@ -1313,11 +1319,19 @@ function getOutletPosMeta(outlet) {
   const connected = !!outlet && outlet.posConnected !== false;
   const mappedCount = connected ? Number(outlet.mappedCount || 0) : 0;
   const totalMappable = connected ? Number(outlet.totalMappable || 0) : 0;
+  const productTotal = connected ? Number(outlet.productTotal != null ? outlet.productTotal : 8) : 0;
+  const variantTotal = connected ? Number(outlet.variantTotal != null ? outlet.variantTotal : Math.max(totalMappable - productTotal, 0)) : 0;
+  const productMapped = connected ? Number(outlet.productMapped != null ? outlet.productMapped : Math.min(mappedCount, productTotal)) : 0;
+  const variantMapped = connected ? Number(outlet.variantMapped != null ? outlet.variantMapped : Math.max(mappedCount - productMapped, 0)) : 0;
   const progress = totalMappable ? Math.min(100, Math.round((mappedCount / totalMappable) * 100)) : 0;
   return {
     connected: connected,
     mappedCount: mappedCount,
     totalMappable: totalMappable,
+    productMapped: productMapped,
+    productTotal: productTotal,
+    variantMapped: variantMapped,
+    variantTotal: variantTotal,
     progress: progress,
     mapping: connected ? (mappedCount >= totalMappable && totalMappable ? 'Complete' : 'Needs mapping') : 'Not available',
     synced: connected ? (outlet.lastSynced || '—') : '—'
@@ -1364,6 +1378,18 @@ function renderPosMappingProgress(meta) {
     : '<span style="color:var(--ink-mute)">—</span>';
 }
 
+function renderPosMappingMetric(mapped, total, connected) {
+  if (!connected) return '<span style="color:var(--ink-mute)">—</span>';
+  var progress = total ? Math.min(100, Math.round((mapped / total) * 100)) : 0;
+  return '<div class="pos-mapping-progress pos-mapping-metric-progress"><div class="progress-track"><div class="progress-fill" style="width:' + progress + '%"></div></div><strong>' + mapped + ' / ' + total + '</strong></div>';
+}
+
+function renderPosMappingBar(mapped, total, connected) {
+  if (!connected) return '<span style="color:var(--ink-mute)">—</span>';
+  var progress = total ? Math.min(100, Math.round((mapped / total) * 100)) : 0;
+  return '<div class="pos-mapping-progress"><div class="progress-track"><div class="progress-fill" style="width:' + progress + '%"></div></div></div>';
+}
+
 function renderIndividualPosSummary(meta, outlet) {
   if (!meta.connected) {
     return '<div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span></div>' +
@@ -1376,9 +1402,8 @@ function renderIndividualPosSummary(meta, outlet) {
   return '<div><div class="panel-label-row"><span class="panel-label-text">POS mapping</span></div>' +
     '<div class="section-card pos-summary-card">' +
       '<div class="pos-summary-connection"><span class="pos-chip ok">Connected</span></div>' +
-      '<span class="pos-summary-progress-copy">' + meta.mappedCount + ' of ' + meta.totalMappable + ' products mapped</span>' +
-      renderPosMappingProgress(meta) +
-      '<p class="pos-summary-sync">Last synced ' + meta.synced + '</p>' +
+      '<div class="pos-mapping-columns"><div class="pos-mapping-column"><span class="pos-summary-label">Products</span><span class="pos-summary-progress-copy">' + meta.productMapped + ' of ' + meta.productTotal + ' products mapped</span>' + renderPosMappingBar(meta.productMapped, meta.productTotal, meta.connected) + '</div><div class="pos-mapping-column"><span class="pos-summary-label">Variants</span><span class="pos-summary-progress-copy">' + meta.variantMapped + ' of ' + meta.variantTotal + ' variants mapped</span>' + renderPosMappingBar(meta.variantMapped, meta.variantTotal, meta.connected) + '</div></div>' +
+      '<p class="pos-summary-sync">Last mapped ' + meta.synced + '</p>' +
       '<a class="pos-view-link" href="' + outletPosHref(outlet) + '">View mapping <span aria-hidden="true">→</span></a>' +
     '</div></div>';
 }
@@ -1404,7 +1429,8 @@ function renderOutlets() {
         <span style="font-weight:500">${o.name}</span>
       </td>
       <td><span class="pos-chip ${posMeta(o).connected ? 'ok' : 'off'}">${posMeta(o).connected ? 'Connected' : 'Not connected'}</span></td>
-      <td>${renderPosMappingProgress(posMeta(o))}</td>
+      <td>${renderPosMappingMetric(posMeta(o).productMapped, posMeta(o).productTotal, posMeta(o).connected)}</td>
+      <td>${renderPosMappingMetric(posMeta(o).variantMapped, posMeta(o).variantTotal, posMeta(o).connected)}</td>
       <td style="color:var(--ink-mute)">${posMeta(o).synced}</td>
       <td>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px">

@@ -272,6 +272,11 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .ml-table tbody tr:last-child td { border-bottom: none; }
 .ml-table tbody tr:nth-child(even) td { background: #f9fafb; }
 .ml-table tbody tr:hover td { background: var(--row-hover) !important; }
+.pos-mapping-status { display:flex; align-items:center; gap:8px; min-width:0; }
+.pos-mapping-progress { width:64px; height:6px; border-radius:4px; background:#E7E8EC; overflow:hidden; flex:0 0 64px; }
+.pos-mapping-progress > span { display:block; height:100%; background:var(--nomni-green); }
+.pos-mapping-count { font-variant-numeric:tabular-nums; white-space:nowrap; }
+#posOutletTableBody > tr > td:last-child { white-space:nowrap; }
 #supBody tr.supplier-settings-row { cursor:pointer; }
 #supBody tr.supplier-settings-row:focus-visible td { background:var(--row-hover) !important; box-shadow:inset 0 2px 0 var(--nomni-green),inset 0 -2px 0 var(--nomni-green); }
 .ml-inactive { opacity: 0.45; }
@@ -477,6 +482,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-scope-nav-item.is-active { background:var(--mint); border-color:var(--spinach); box-shadow:inset 0 0 0 1px var(--spinach); color:var(--seaweed); }
 #supplierSettingsOverlay .supplier-scope-nav-item small { display:block; margin-top:3px; color:var(--ink-mute); font-size:11px; font-weight:500; }
 #supplierSettingsOverlay #supplierScopeNavPolicies .supplier-scope-nav-item small:not(.supplier-scope-status-line) { display:none; }
+#supplierSettingsOverlay #supplierScopeNavPolicies .supplier-scope-nav-item small.supplier-scope-group-label { display:block !important; margin:0 0 3px; color:var(--spinach); font-size:11px; font-weight:600; }
+#supplierSettingsOverlay #supplierScopeNavPolicies .supplier-scope-nav-item .supplier-scope-outlet-name { display:block; }
 #supplierSettingsOverlay .supplier-scope-nav-item .supplier-scope-status-line { display:flex; align-items:center; gap:4px; color:var(--spinach); font-weight:600; }
 #supplierSettingsOverlay .supplier-scope-nav-item.is-incomplete { border-color:var(--rule); background:#fff; }
 #supplierSettingsOverlay .supplier-scope-nav-item.is-incomplete .supplier-scope-status-line { color:#A16207; }
@@ -578,6 +585,8 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-editing-note strong { color:var(--ink); }
 #supplierSettingsOverlay .supplier-editing-intro { display:flex; flex-direction:column; gap:2px; color:var(--ink-mute); font-size:12px; font-weight:500; line-height:1.3; }
 #supplierSettingsOverlay .supplier-editing-intro strong { font-size:21px; font-weight:700; letter-spacing:-.02em; line-height:1.2; }
+#supplierSettingsOverlay .supplier-editing-group { display:block; margin-top:4px; color:var(--ink-mute); font-size:12px; font-weight:500; line-height:1.3; }
+#supplierSettingsOverlay .supplier-editing-group span { color:var(--spinach); font-weight:600; }
 #supplierSettingsOverlay .supplier-settings-actions { display:flex; align-items:center; justify-content:flex-end; gap:14px; }
 #supplierSettingsOverlay .supplier-copy-settings { padding:5px 0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:600; white-space:nowrap; cursor:pointer; }
 #supplierSettingsOverlay .supplier-copy-settings:hover { color:var(--seaweed); text-decoration:none; }
@@ -1977,23 +1986,23 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
           <option value="">All connections</option><option value="connected">Connected</option><option value="not connected">Not connected</option>
         </select>
         <select class="ml-filter-select" id="posStatusFilter" onchange="filterPosOutlets()" aria-label="Filter by mapping status">
-          <option value="">All mapping statuses</option><option value="mapped">Mapped</option><option value="unmapped">Unmapped</option>
+          <option value="">All mapping statuses</option><option value="mapped">Mapped</option><option value="partially-mapped">Partially mapped</option><option value="unmapped">Unmapped</option>
         </select>
       </div>
-      <table class="ml-table"><thead><tr><th>Outlet</th><th style="width:160px">POS connection</th><th style="width:220px">Mapping status</th><th style="width:150px">Last synced</th><th style="width:110px"></th></tr></thead><tbody id="posOutletTableBody">
-        <tr><td><div style="font-weight:500">(WF 301) Chargrill @ 301 Punggol</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:82%;height:100%;background:var(--nomni-green)"></div></div><strong>18 / 22</strong></div></td><td style="color:var(--ink-mute)">10 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20301%20Punggol" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr><td><div style="font-weight:600">(WF 107) Chargrill @ 107 Serangoon</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:60%;height:100%;background:var(--nomni-green)"></div></div><strong>12 / 20</strong></div></td><td style="color:var(--ink-mute)">09 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20107%20Serangoon" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr><td><div style="font-weight:600">(WF 139) Chargrill @ 139 Tampines</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:76%;height:100%;background:var(--nomni-green)"></div></div><strong>16 / 22</strong></div></td><td style="color:var(--ink-mute)">4 Sep 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=%28WF%20139%29%20Chargrill%20%40%20139%20Tampines" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr><td><div style="font-weight:600">(WF 259) Chargrill @ 259 Bukit Panjang</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 259) Chargrill @ 259 Bukit Panjang')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
-        <tr><td><div style="font-weight:600">(WF 280) Chargrill @ 280 Bishan</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 280) Chargrill @ 280 Bishan')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
-        <tr><td><div style="font-weight:600">(WF 055) Garden Express @ 055 Jurong East</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:67%;height:100%;background:var(--nomni-green)"></div></div><strong>16 / 24</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20055%20Jurong%20East" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr><td><div style="font-weight:600">(WF 088) Garden Express @ 088 Clementi</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:54%;height:100%;background:var(--nomni-green)"></div></div><strong>13 / 24</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20088%20Clementi" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr><td><div style="font-weight:600">(WF 112) Garden Bistro @ 112 Novena</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:42%;height:100%;background:var(--nomni-green)"></div></div><strong>10 / 24</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20112%20Novena" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr><td><div style="font-weight:600">(WF 167) Garden Bistro @ 167 Ang Mo Kio</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:75%;height:100%;background:var(--nomni-green)"></div></div><strong>18 / 24</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20167%20Ang%20Mo%20Kio" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr><td><div style="font-weight:600">(WF 203) Garden Café @ 203 Bedok</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 203) Garden Café @ 203 Bedok')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
-        <tr><td><div style="font-weight:600">(WF 244) Garden Café @ 244 Woodlands</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:63%;height:100%;background:var(--nomni-green)"></div></div><strong>15 / 24</strong></div></td><td style="color:var(--ink-mute)">06 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Caf%C3%A9%20%40%20244%20Woodlands" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr><td><div style="font-weight:600">(WF 290) Garden Express @ 290 Sengkang</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div style="display:flex;align-items:center;gap:9px"><div style="width:96px;height:6px;border-radius:4px;background:#E7E8EC;overflow:hidden"><div style="width:68%;height:100%;background:var(--nomni-green)"></div></div><strong>14 / 22</strong></div></td><td style="color:var(--ink-mute)">4 Sep 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=%28WF%20290%29%20Garden%20Express%20%40%20290%20Sengkang" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr id="posOutletEmpty" hidden><td colspan="5" style="padding:32px;text-align:center;color:var(--ink-mute)">No outlets match these filters.</td></tr>
+      <table class="ml-table"><thead><tr><th>Outlet</th><th style="width:150px">POS connection</th><th style="width:150px">Products</th><th style="width:150px">Variants</th><th style="width:130px">Last mapped</th><th style="width:130px"></th></tr></thead><tbody id="posOutletTableBody">
+        <tr data-mapping-status="mapped"><td><div style="font-weight:500">(WF 301) Chargrill @ 301 Punggol</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:100%"></span></div><strong class="pos-mapping-count">8 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:100%"></span></div><strong class="pos-mapping-count">14 / 14</strong></div></td><td style="color:var(--ink-mute)">10 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20301%20Punggol" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 107) Chargrill @ 107 Serangoon</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:58%"></span></div><strong class="pos-mapping-count">7 / 12</strong></div></td><td style="color:var(--ink-mute)">09 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20107%20Serangoon" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 139) Chargrill @ 139 Tampines</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:88%"></span></div><strong class="pos-mapping-count">7 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:64%"></span></div><strong class="pos-mapping-count">9 / 14</strong></div></td><td style="color:var(--ink-mute)">4 Sep 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=%28WF%20139%29%20Chargrill%20%40%20139%20Tampines" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="unmapped"><td><div style="font-weight:600">(WF 259) Chargrill @ 259 Bukit Panjang</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 259) Chargrill @ 259 Bukit Panjang')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
+        <tr data-mapping-status="unmapped"><td><div style="font-weight:600">(WF 280) Chargrill @ 280 Bishan</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 280) Chargrill @ 280 Bishan')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 055) Garden Express @ 055 Jurong East</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:75%"></span></div><strong class="pos-mapping-count">6 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">10 / 16</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20055%20Jurong%20East" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 088) Garden Express @ 088 Clementi</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:50%"></span></div><strong class="pos-mapping-count">8 / 16</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20088%20Clementi" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 112) Garden Bistro @ 112 Novena</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:50%"></span></div><strong class="pos-mapping-count">4 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:38%"></span></div><strong class="pos-mapping-count">6 / 16</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20112%20Novena" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 167) Garden Bistro @ 167 Ang Mo Kio</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:88%"></span></div><strong class="pos-mapping-count">7 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:69%"></span></div><strong class="pos-mapping-count">11 / 16</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20167%20Ang%20Mo%20Kio" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="unmapped"><td><div style="font-weight:600">(WF 203) Garden Café @ 203 Bedok</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 203) Garden Café @ 203 Bedok')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 244) Garden Café @ 244 Woodlands</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:75%"></span></div><strong class="pos-mapping-count">6 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:56%"></span></div><strong class="pos-mapping-count">9 / 16</strong></div></td><td style="color:var(--ink-mute)">06 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Caf%C3%A9%20%40%20244%20Woodlands" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 290) Garden Express @ 290 Sengkang</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:64%"></span></div><strong class="pos-mapping-count">9 / 14</strong></div></td><td style="color:var(--ink-mute)">4 Sep 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=%28WF%20290%29%20Garden%20Express%20%40%20290%20Sengkang" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr id="posOutletEmpty" hidden><td colspan="6" style="padding:32px;text-align:center;color:var(--ink-mute)">No outlets match these filters.</td></tr>
       </tbody></table>
     </div>
 
@@ -4914,7 +4923,12 @@ function openSupplierAvailability(name) {
   const initialLocations = new Set((supplier.groupList || []).concat(supplier.outletList || []));
   openAvailabilityManager({ record: supplier, groups: ML_GROUPS, outlets: SUPPLIER_UNGROUPED_OUTLETS, orderSettings:true, save: saveHqSupplierState, render: renderSuppliers, toast: 'Supplier availability updated', afterComplete: function(record) {
     const addedLocations = (record.groupList || []).concat(record.outletList || []).filter(function(location) { return !initialLocations.has(location); });
-    if (record.type !== 'active' && addedLocations.length) openSupplierSettings(record, false, true, true);
+    if (addedLocations.length) {
+      record.availabilityAddedAt = record.availabilityAddedAt || {};
+      addedLocations.forEach(function(location) { record.availabilityAddedAt[location] = new Date().toISOString(); });
+      saveHqSupplierState();
+    }
+    if (record.type !== 'active' && addedLocations.length) openSupplierSettings(record, false, true, true, 'recent');
   } });
 }
 
@@ -5546,7 +5560,7 @@ function renderAcraSupplierList(q) {
     return s.reg.toLowerCase().includes(ql);
   });
 
-  var backLink = '<button type="button" onclick="backToZeemartSupplierSearch()" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:0;white-space:nowrap">Back to searching within Zeemart</button>';
+  var backLink = '<button type="button" onclick="backToZeemartSupplierSearch()" style="border:0;background:none;color:var(--spinach);font:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:0;white-space:nowrap">Back to searching within Nomni Procure</button>';
 
   if (!results.length) {
     listEl.innerHTML =
@@ -5707,6 +5721,10 @@ function confirmSupplierAvailability() {
   supplier.active = supplier.active !== false;
   supplier.type = supplier.type || 'passive';
   supplier.itemCount = supplier.itemCount || 0;
+  if (added.length) {
+    supplier.availabilityAddedAt = supplier.availabilityAddedAt || {};
+    added.forEach(function(location) { supplier.availabilityAddedAt[location] = new Date().toISOString(); });
+  }
   if (pending.options.isNew && !PLATFORM_SUPPLIERS.some(function(item) { return item.name === supplier.name || (supplier.reg && item.reg === supplier.reg); })) PLATFORM_SUPPLIERS.push(supplier);
   if (!SUPPLIERS.some(function(item) { return item.name === supplier.name; })) SUPPLIERS.push(supplier);
   document.getElementById('supCount').textContent = SUPPLIERS.length;
@@ -5717,7 +5735,7 @@ function confirmSupplierAvailability() {
   savePrototypeState();
   closeSupplierAvailability();
   showHqToast(pending.options.existing ? 'Supplier availability updated' : 'Supplier linked', supplierDisplayName(supplier.name));
-  if (supplier.type !== 'active' && added.length) openSupplierSettings(supplier, false, true, true);
+  if (supplier.type !== 'active' && added.length) openSupplierSettings(supplier, false, true, true, 'recent');
 }
 
 var pendingSupplierLink = null;
@@ -5760,6 +5778,14 @@ function supplierParentGroupScope(scope) {
   var groupRow = item && item.closest('.og-outlet-sub-row') ? item.closest('.og-outlet-sub-row').previousElementSibling : null;
   var groupName = groupRow && groupRow.querySelector('.og-name');
   return groupName ? 'group-' + groupName.textContent.trim() : '';
+}
+function supplierOutletWasRecentlyAdded(supplier, scope) {
+  if (!supplier || !scope || scope.indexOf('outlet-') !== 0) return false;
+  var addedAt = supplier.availabilityAddedAt || {};
+  var outlet = scope.slice(7);
+  var group = supplierParentGroupScope(scope).slice(6);
+  var timestamp = addedAt[outlet] || addedAt[group];
+  return !!timestamp && (Date.now() - new Date(timestamp).getTime()) <= 14 * 24 * 60 * 60 * 1000;
 }
 function readSupplierSettingsForm() {
   return {
@@ -5873,7 +5899,8 @@ function updateSupplierScopePresentation() {
     supplierScopeLabels[scope] = label;
     var complete = supplierManaged || supplierSettingsAreComplete((supplier.scopeSettings || {})[scope]);
     var detail = meta || '';
-    return '<button type="button" class="supplier-scope-nav-item' + (complete ? '' : ' is-incomplete') + '" data-supplier-scope="' + escapeOverviewText(scope) + '" onclick="selectSupplierSettingsScope(\'' + scope.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(label) + (detail ? '<small>' + escapeOverviewText(detail) + '</small>' : '') + (supplierManaged || complete ? '' : '<small class="supplier-scope-status-line"><span class="material-symbols-rounded">warning</span> Settings required</small>') + '</button>';
+    var groupLabel = detail ? '<small class="supplier-scope-group-label">' + escapeOverviewText(detail) + '</small>' : '';
+    return '<button type="button" class="supplier-scope-nav-item' + (complete ? '' : ' is-incomplete') + '" data-supplier-scope="' + escapeOverviewText(scope) + '" onclick="selectSupplierSettingsScope(\'' + scope.replace(/'/g, "\\'") + '\')">' + groupLabel + '<span class="supplier-scope-outlet-name">' + escapeOverviewText(label) + '</span>' + (supplierManaged || complete ? '' : '<small class="supplier-scope-status-line"><span class="material-symbols-rounded">warning</span> Settings required</small>') + '</button>';
   }).join('') : '<p class="supplier-scope-nav-help">Add access to a group or ungrouped outlet before setting order rules.</p>';
   nav.innerHTML = overrides.filter(function(scope) { return policyScopes.indexOf(scope) === -1 && scope.indexOf('outlet-') === 0; }).map(function(scope) {
     var meta = supplierScopeMeta(scope);
@@ -5881,7 +5908,8 @@ function updateSupplierScopePresentation() {
     return '<button type="button" class="supplier-scope-nav-item' + (complete ? '' : ' is-incomplete') + '" data-supplier-scope="' + escapeOverviewText(scope) + '" onclick="openSavedSupplierOverride(\'' + scope.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(supplierScopeLabel(scope)) + (meta ? '<small>' + escapeOverviewText(meta) + '</small>' : '') + (complete ? '' : '<small class="supplier-scope-status-line"><span class="material-symbols-rounded">warning</span> Settings required</small>') + '</button>';
   }).join('');
   document.querySelectorAll('#supplierSettingsOverlay [data-supplier-scope]').forEach(function(item) { item.classList.toggle('is-active', item.dataset.supplierScope === supplierSettingsScope); });
-  document.getElementById('supplierEditingIntro').innerHTML = '<span>Settings for</span><strong id="supplierEditingScope">' + escapeOverviewText(supplierScopeLabel(supplierSettingsScope)) + '</strong>';
+  var editingGroup = supplierSettingsScope.indexOf('outlet-') === 0 ? supplierScopeMeta(supplierSettingsScope) : '';
+  document.getElementById('supplierEditingIntro').innerHTML = '<span>Settings for</span><strong id="supplierEditingScope">' + escapeOverviewText(supplierScopeLabel(supplierSettingsScope)) + '</strong>' + (editingGroup ? '<span class="supplier-editing-group">In <span>' + escapeOverviewText(editingGroup) + '</span></span>' : '');
   document.getElementById('supplierEditingNote').hidden = !!supplierManaged;
   document.getElementById('supplierOverrideDelete').hidden = policyScopes.indexOf(supplierSettingsScope) !== -1;
   document.getElementById('supplierContactSection').hidden = false;
@@ -5942,13 +5970,13 @@ function toggleSupplierOutletFilter() {
   var menu = document.getElementById('supplierOutletFilterMenu');
   if (menu.hidden && pendingSupplierLink) {
     var groups = pendingSupplierLink.supplier.groupList || [];
-    menu.innerHTML = '<button type="button" onclick="setSupplierOutletFilter(\'all\')">All</button><button type="button" onclick="setSupplierOutletFilter(\'none\')">Settings required</button>' + groups.map(function(group) { return '<button type="button" onclick="setSupplierOutletFilter(\'group:' + group.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(group) + '</button>'; }).join('');
+    menu.innerHTML = '<button type="button" onclick="setSupplierOutletFilter(\'all\')">All</button><button type="button" onclick="setSupplierOutletFilter(\'none\')">Settings required</button><button type="button" onclick="setSupplierOutletFilter(\'recent\')">Newly added</button>' + groups.map(function(group) { return '<button type="button" onclick="setSupplierOutletFilter(\'group:' + group.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(group) + '</button>'; }).join('');
   }
   menu.hidden = !menu.hidden;
 }
 function setSupplierOutletFilter(filter) {
   supplierOutletFilter = filter;
-  var label = filter === 'all' ? 'All' : (filter === 'none' ? 'Settings required' : filter.slice(6));
+  var label = filter === 'all' ? 'All' : (filter === 'none' ? 'Settings required' : (filter === 'recent' ? 'Newly added' : filter.slice(6)));
   document.getElementById('supplierOutletFilterButton').firstChild.textContent = label + ' ';
   document.getElementById('supplierOutletFilterMenu').hidden = true;
   filterSupplierOutletNav();
@@ -5961,14 +5989,15 @@ function filterSupplierOutletNav() {
   items.forEach(function(item) {
     var matchText = item.textContent.toLowerCase();
     var noSettings = item.classList.contains('is-incomplete');
+    var newlyAdded = supplierOutletWasRecentlyAdded(pendingSupplierLink && pendingSupplierLink.supplier, item.dataset.supplierScope || '');
     var groupMatch = supplierOutletFilter.indexOf('group:') === 0 ? matchText.indexOf(supplierOutletFilter.slice(6).toLowerCase()) !== -1 : true;
-    item.hidden = !!(query && matchText.indexOf(query) === -1) || (supplierOutletFilter === 'none' && !noSettings) || !groupMatch;
+    item.hidden = !!(query && matchText.indexOf(query) === -1) || (supplierOutletFilter === 'none' && !noSettings) || (supplierOutletFilter === 'recent' && !newlyAdded) || !groupMatch;
   });
   var empty = document.getElementById('supplierOutletEmptyState');
   var visible = Array.from(items).filter(function(item) { return !item.hidden; }).length;
-  if (supplierOutletFilter === 'none' && !visible && supplierScopeView === 'outlets') {
+  if ((supplierOutletFilter === 'none' || supplierOutletFilter === 'recent') && !visible && supplierScopeView === 'outlets') {
     if (!empty) { empty = document.createElement('div'); empty.id = 'supplierOutletEmptyState'; empty.className = 'supplier-outlet-empty-state'; document.getElementById('supplierScopeNavPolicies').appendChild(empty); }
-    empty.innerHTML = '<strong>No outlets need settings</strong><span>All outlets are covered by default or group settings.</span><button type="button" onclick="setSupplierOutletFilter(\'all\')">Show all outlets</button>';
+    empty.innerHTML = supplierOutletFilter === 'recent' ? '<strong>No newly added outlets</strong><span>No supplier availability was added in the past 14 days.</span><button type="button" onclick="setSupplierOutletFilter(\'all\')">Show all outlets</button>' : '<strong>No outlets need settings</strong><span>All outlets are covered by default or group settings.</span><button type="button" onclick="setSupplierOutletFilter(\'all\')">Show all outlets</button>';
     empty.hidden = false;
   } else if (empty) empty.hidden = true;
 }
@@ -6198,7 +6227,7 @@ function copySupplierSettingsFrom(scope) {
   closeSupplierCopyPicker();
   showHqToast('Settings copied', 'Review and save to apply.');
 }
-function openSupplierSettings(supplier, isNew, isEditing, showSettingsRequired) {
+function openSupplierSettings(supplier, isNew, isEditing, showSettingsRequired, initialOutletFilter) {
   pendingSupplierLink = { supplier:supplier, isNew:!!isNew, isEditing:!!isEditing };
   document.getElementById('supplierSettingsOverlay').classList.add('open');
   document.querySelectorAll('.row-actions-menu.open').forEach(function(menu) { menu.classList.remove('open'); menu.removeAttribute('style'); });
@@ -6208,9 +6237,10 @@ function openSupplierSettings(supplier, isNew, isEditing, showSettingsRequired) 
   document.getElementById('supplierSmsField').hidden = true;
   document.getElementById('supplierMoreContact').hidden = false;
   supplierScopeDrafts = {};
-  if (showSettingsRequired) supplierOutletFilter = 'none';
+  if (showSettingsRequired) supplierOutletFilter = initialOutletFilter || 'none';
   supplierScopeLabels = supplier.scopeLabels || {};
-  supplierSettingsScope = supplierMissingOrderingScopes(supplier)[0] || supplierRequiredOrderingScopes(supplier)[0] || Object.keys(supplier.scopeSettings || {})[0] || '';
+  var recentlyAddedScope = initialOutletFilter === 'recent' ? supplierRequiredOrderingScopes(supplier).find(function(scope) { return supplierOutletWasRecentlyAdded(supplier, scope); }) : '';
+  supplierSettingsScope = recentlyAddedScope || supplierMissingOrderingScopes(supplier)[0] || supplierRequiredOrderingScopes(supplier)[0] || Object.keys(supplier.scopeSettings || {})[0] || '';
   if (!supplierSettingsScope) { showHqToast('No locations available', 'Add supplier availability before entering order settings.'); return; }
   setSupplierSettingsForm(supplierScopeSettings(supplier, supplierSettingsScope), supplier);
   supplierSettingsBaseline = readSupplierSettingsForm();
@@ -6219,7 +6249,7 @@ function openSupplierSettings(supplier, isNew, isEditing, showSettingsRequired) 
   ensureSupplierApplyAllButtons();
   updateSupplierApplyAll();
   setSupplierSettingsReadOnly(supplier.type === 'active');
-  if (showSettingsRequired) setSupplierOutletFilter('none');
+  if (showSettingsRequired) setSupplierOutletFilter(initialOutletFilter || 'none');
   if (showSettingsRequired) setTimeout(showSupplierSettingsIntro, 0);
   if (supplier.type !== 'active') setTimeout(function(){ document.getElementById('supplierRecipientEmail').focus(); }, 80);
 }
@@ -9580,7 +9610,7 @@ function filterPosOutlets() {
     const outlet = (cells[0]?.querySelector('div')?.textContent || '').toLowerCase();
     const outletGroup = (cells[0]?.querySelectorAll('div')[1]?.textContent || '').trim();
     const posConnection = (cells[1]?.textContent || '').trim().toLowerCase();
-    const mappingStatus = cells[2]?.querySelector('strong') ? 'mapped' : 'unmapped';
+    const mappingStatus = row.dataset.mappingStatus || ((cells[2]?.querySelector('strong') || cells[3]?.querySelector('strong')) ? 'partially-mapped' : 'unmapped');
     const matches = (!query || outlet.includes(query))
       && (!group || outletGroup === group)
       && (!connection || posConnection === connection)
