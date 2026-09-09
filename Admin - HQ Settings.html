@@ -290,7 +290,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .pos-mapping-status { display:flex; align-items:center; gap:8px; min-width:0; }
 .pos-mapping-progress { width:64px; height:6px; border-radius:4px; background:#E7E8EC; overflow:hidden; flex:0 0 64px; }
 .pos-mapping-progress > span { display:block; height:100%; background:var(--nomni-green); }
-.pos-mapping-count { font-variant-numeric:tabular-nums; white-space:nowrap; }
+.pos-mapping-count { font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:600; }
 #posOutletTableBody > tr > td:last-child { white-space:nowrap; }
 #supBody tr.supplier-settings-row { cursor:pointer; }
 #supBody tr.supplier-settings-row:focus-visible td { background:var(--row-hover) !important; box-shadow:inset 0 2px 0 var(--nomni-green),inset 0 -2px 0 var(--nomni-green); }
@@ -300,7 +300,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .ml-item-name { font-size: 14px; font-weight: 500; color: var(--ink); }
 .ml-item-original { display:block; margin-top:2px; color:var(--ink-mute); font-size:12px; font-style:italic; font-weight:400; line-height:1.35; }
 .item-dialog-original { display:block; margin-top:4px; color:var(--ink); font-size:14px; font-weight:400; line-height:1.4; letter-spacing:normal; }
-.ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; color: var(--ink-mute); background: #f0f1f3; border-radius: 4px; padding: 1px 7px; margin-top: 3px; }
+.ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; color: #555; background: #f0f1f3; border-radius: 4px; padding: 1px 7px; margin-top: 3px; }
 .uom-text { font-size: 14px; color: var(--ink); }
 .uom-options-btn { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: inherit; transition: background .12s; margin-top: 2px; }
 .uom-options-btn:hover { background: #c6f2ce; }
@@ -415,6 +415,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .uom-breakdown-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .04em; padding: 8px 14px; background: #f9fafb; border-bottom: 1px solid var(--rule); }
 .uom-breakdown-table td { padding: 10px 14px; border-bottom: 1px solid var(--rule); }
 .uom-breakdown-table tr:last-child td { border-bottom: none; }
+.inventory-row-clickable { cursor: pointer; }
 
 .modal-card { display: flex; flex-direction: column; max-height: calc(100vh - 80px); }
 .modal-body { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
@@ -1420,6 +1421,9 @@ body.supplier-settings-open { overflow:hidden; }
   .hq-inv-settings-head { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin:0 0 60px; padding:0 40px 16px; border-bottom:1px solid var(--rule); }
   .hq-inv-settings-head h1 { max-width:920px; margin:0; font:700 24px/1.2 Inter,sans-serif; letter-spacing:-.03em; }
   .hq-inv-settings-meta { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:2px 0 0; color:var(--ink-mute); font-size:14px; }
+  .hq-inv-availability-summary { margin-left:10px; }
+  .hq-inv-availability-link { padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; cursor:pointer; text-decoration:underline; text-decoration-style:dashed; text-underline-offset:2px; }
+  .hq-inv-availability-link:hover { color:var(--seaweed); }
   .hq-inv-settings-form { width:min(770px,calc(100% - 80px)); margin-left:40px; }
   .hq-inv-field { display:grid; grid-template-columns:148px minmax(0,1fr); gap:28px; align-items:start; margin-bottom:18px; }
   .hq-inv-field label { padding-top:10px; font-size:14px; font-weight:600; }
@@ -2281,8 +2285,8 @@ function refreshNewHqEmptyStates() {
   }
 
   if (INV_ITEMS.length === 0) {
-    showNewHqEmptyState('panel-inventory', 'No inventory items yet', 'Add items from the HQ item list to start managing inventory.', {
-      label: 'Add to inventory',
+    showNewHqEmptyState('panel-inventory', 'No SKUs or inventory items yet', 'SKUs added to the catalogue will appear here automatically.', {
+      label: 'Create inventory item',
       onclick: 'openAddInvSkuModal()',
       disabled: ITEMS.length === 0,
       reason: ITEMS.length === 0 ? 'Add an item first' : ''
@@ -2522,13 +2526,10 @@ function getPendingPriceChanges() {
     const saved = JSON.parse(localStorage.getItem(PRICE_REVIEW_STATE_KEY) || 'null');
     if (saved && Array.isArray(saved.changes)) priceChanges = saved.changes;
   } catch (e) {}
-  const reviewEnd = new Date();
-  const reviewStart = new Date(reviewEnd);
-  reviewStart.setDate(reviewStart.getDate() - PRICE_REVIEW_WINDOW_DAYS);
-  const from = reviewStart.toISOString().slice(0, 10);
-  const to = reviewEnd.toISOString().slice(0, 10);
+  // Prototype changes remain pending until they are reviewed; do not hide the
+  // banner merely because the seeded example dates have aged.
   return priceChanges.filter(function(change) {
-    return (!change.status || change.status === 'new') && change.dateValue >= from && change.dateValue <= to;
+    return !change.status || change.status === 'new';
   });
 }
 
@@ -2561,7 +2562,7 @@ function renderHealthCheck() {
   if (highFcRecipes.length) issues.push({ type: 'highfc', symbol: 'warning', text: '<strong>' + highFcRecipes.length + ' recipe' + (highFcRecipes.length > 1 ? 's' : '') + '</strong> above ' + recFcThreshold + '% food cost target', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: highFcRecipes });
 
   const inventoryWithoutOptions = (window.nomniInventoryItems || []).filter(function(item) { return item.type === 'group' && !(item.constituents || []).length; });
-  if (inventoryWithoutOptions.length) issues.push({ type: 'inventoryOptions', symbol: 'warning', text: '<strong>' + inventoryWithoutOptions.length + ' inventory item' + (inventoryWithoutOptions.length === 1 ? '' : 's') + '</strong> need supplier options', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: inventoryWithoutOptions });
+  if (inventoryWithoutOptions.length) infos.push({ type: 'inventoryOptions', symbol: 'info', text: '<strong>' + inventoryWithoutOptions.length + ' inventory item' + (inventoryWithoutOptions.length === 1 ? '' : 's') + '</strong> need supplier options', color: 'var(--spinach)', iconColor: 'var(--nomni-green)', bg: 'var(--mint)', border: 'var(--notice-info-border)', items: inventoryWithoutOptions });
 
   // Keep the health-check count aligned with the POS mapping overview table.
   const POS_UNCONNECTED = Array.from(document.querySelectorAll('#posOutletTableBody > tr:not(#posOutletEmpty)'))
@@ -2640,6 +2641,13 @@ function renderHealthCheck() {
   const infoHtmlParts = infos.map(function(i, idx) {
     if (i.type === 'pos') {
       return '<div class="health-check-panel" onclick="navigateToTab(\'pos-mapping\')" style="' + healthPanelStyle(i) + ';display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">' +
+        healthIcon(i.symbol || 'info', i.iconColor || i.color) +
+        '<span style="color:var(--ink);font-weight:400;flex:1">' + i.text + '</span>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
+      '</div>';
+    }
+    if (i.type === 'inventoryOptions') {
+      return '<div class="health-check-panel" onclick="navigateToTab(\'inventory\');setInvTypeFilter(\'needs-options\');document.getElementById(\'invTypeFilter\').value=\'needs-options\'" style="' + healthPanelStyle(i) + ';display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">' +
         healthIcon(i.symbol || 'info', i.iconColor || i.color) +
         '<span style="color:var(--ink);font-weight:400;flex:1">' + i.text + '</span>' +
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
@@ -2902,6 +2910,11 @@ const UOM_MULT = {
   'per pack (10)':10,'per pack (12)':12,'per pack (24)':24,'per flat (30)':30,'per sack (5kg)':5,
 };
 
+// Keep stored supplier units intact, but use compact labels consistently in UI.
+function compactUom(value) {
+  return String(value == null ? '' : value).replace(/^per\s+/i, '').replace(/\bmillilitres?\b/gi, 'mL').replace(/\blitres?\b/gi, 'L').replace(/\bkilograms?\b/gi, 'kg').replace(/\bgrams?\b/gi, 'g').replace(/\bportions?\b/gi, 'ptn').replace(/\bpieces?\b/gi, 'pc').replace(/\bblocks?\b/gi, 'blk').replace(/\bpacks?(?=\b|\s*\()/gi, 'pk').replace(/\bsleeves?\b/gi, 'slv').replace(/\bbottles?\b/gi, 'btl').replace(/\bcartons?\b/gi, 'ctn').replace(/\bcases?\b/gi, 'cs').replace(/\bboxes?\b/gi, 'bx').replace(/\bbundles?\b/gi, 'bdl').replace(/\bpunnet(s)?\b/gi, 'pun').replace(/\bpacket(s)?\b/gi, 'pkt');
+}
+
 const ML_GROUPS = ['Chargrill Outlets', 'Family Dining Express'];
 // Availability is assigned at group level, or directly to an ungrouped outlet.
 // An outlet in a group inherits its group's availability and is never an availability target.
@@ -3098,6 +3111,7 @@ function applyMasterItemLifecycle(rawIdx, lifecycle) {
   saveItemLifecycle(item, lifecycle);
   mlPage = 1;
   renderMl();
+  if (typeof renderInv === 'function') renderInv();
   const messages = { disabled: 'Item disabled across included groups and outlets', active: 'Item restored to the supplier catalogue', removed: 'Item removed from the supplier catalogue' };
   if (typeof showToast === 'function') showToast(messages[lifecycle]);
 }
@@ -3118,6 +3132,7 @@ function confirmRemoveMasterItem() {
   closeRemoveMasterItemModal();
   mlPage = 1;
   renderMl();
+  if (typeof renderInv === 'function') renderInv();
   if (typeof showToast === 'function') showToast('Item removed from the supplier catalogue');
 }
 
@@ -3176,10 +3191,7 @@ function getMlItems() {
   else if (mlSortKey === 'name-desc') items.sort((a,b) => itemDisplayName(b).localeCompare(itemDisplayName(a)));
   else if (mlSortKey === 'price-asc') items.sort((a,b) => getItemPriceRange(ITEMS.indexOf(a), 0).min - getItemPriceRange(ITEMS.indexOf(b), 0).min);
   else if (mlSortKey === 'price-desc') items.sort((a,b) => getItemPriceRange(ITEMS.indexOf(b), 0).min - getItemPriceRange(ITEMS.indexOf(a), 0).min);
-  else items.sort((a,b) => {
-    const ci = CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat);
-    return ci !== 0 ? ci : itemDisplayName(a).localeCompare(itemDisplayName(b));
-  });
+  else items.sort((a,b) => itemDisplayName(a).localeCompare(itemDisplayName(b)));
   return items;
 }
 
@@ -3289,8 +3301,8 @@ function getDefaultScopeMoq(item, uomIdx) {
 function formatItemPriceRange(itemIdx, uomIdx) {
   const range = getItemPriceRange(itemIdx, uomIdx);
   const price = range.varies
-    ? 'S$' + range.min.toFixed(2) + ' – S$' + range.max.toFixed(2)
-    : 'S$' + range.min.toFixed(2);
+    ? '$' + range.min.toFixed(2) + ' – $' + range.max.toFixed(2)
+    : '$' + range.min.toFixed(2);
   return '<div class="ml-price-main">' + price + '</div>';
 }
 
@@ -3482,10 +3494,10 @@ function renderPilotPricing(itemIdx, container) {
       const price = usesDefaultPrice ? getDefaultScopePrice(item, uomIdx) : Number(override.price);
       const moq = usesDefaultMoq ? getDefaultScopeMoq(item, uomIdx) : override.moq;
       const editor = isEditing
-        ? '<tr><td colspan="4"><div class="pilot-scope-editor"><div class="pilot-scope-editor-hint">Leave a field empty to use its default.</div><input class="modal-field-input" id="pilotScopePrice" inputmode="decimal" placeholder="Price (S$)" value="' + (override && override.price != null ? override.price : '') + '" /><input class="modal-field-input" id="pilotScopeMoq" inputmode="decimal" placeholder="MOQ" value="' + (override && override.moq ? formatMoqValue(override.moq) : '') + '" /><button class="btn btn-tertiary" type="button" onclick="cancelPilotScopePrice(' + itemIdx + ')">Cancel</button><button class="btn btn-primary" type="button" onclick="savePilotScopePrice(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + uomIdx + ')">Update</button></div></td></tr>'
+        ? '<tr><td colspan="4"><div class="pilot-scope-editor"><div class="pilot-scope-editor-hint">Leave a field empty to use its default.</div><input class="modal-field-input" id="pilotScopePrice" inputmode="decimal" placeholder="Price ($)" value="' + (override && override.price != null ? override.price : '') + '" /><input class="modal-field-input" id="pilotScopeMoq" inputmode="decimal" placeholder="MOQ" value="' + (override && override.moq ? formatMoqValue(override.moq) : '') + '" /><button class="btn btn-tertiary" type="button" onclick="cancelPilotScopePrice(' + itemIdx + ')">Cancel</button><button class="btn btn-primary" type="button" onclick="savePilotScopePrice(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + uomIdx + ')">Update</button></div></td></tr>'
         : '';
       const scopeMeta = groupOutletCounts[name] ? '<div class="pilot-scope-source">' + groupOutletCounts[name] + ' outlets</div>' : '';
-      const priceDisplay = !uomAvailable ? '—' : (price != null ? 'S$' + price.toFixed(2) : '<span class="pilot-scope-unset">S$0.00</span>');
+      const priceDisplay = !uomAvailable ? '—' : (price != null ? '$' + price.toFixed(2) : '<span class="pilot-scope-unset">$0.00</span>');
       const moqDisplay = !uomAvailable ? '—' : (moq ? formatMoqValue(moq) : '<span class="pilot-scope-unset">0</span>');
       const editButton = pricingEditable && uomAvailable ? '<button class="pilot-scope-edit" type="button" onclick="editPilotScopePrice(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + uomIdx + ')" aria-label="' + (override ? 'Edit' : 'Set') + ' pricing for ' + name + '" title="' + (override ? 'Edit pricing' : 'Set pricing') + '"><span class="material-symbols-outlined">edit</span></button>' : '';
       return '<tr class="' + (uomAvailable ? '' : 'pilot-scope-row-off') + '"><td><div class="pilot-scope-cell"><button class="access-toggle' + (uomAvailable ? ' on' : '') + '" type="button" onclick="togglePilotScopeUom(' + itemIdx + ',\'' + name.replace(/'/g, "\\'") + '\',' + uomIdx + ')" title="' + (uomAvailable ? 'Make this UOM unavailable to ' : 'Make this UOM available to ') + name + '"></button><div class="pilot-scope-name">' + name + scopeMeta + '</div></div></td><td' + (usesDefaultPrice ? ' class="pilot-scope-inherited"' : '') + '>' + priceDisplay + '</td><td' + (usesDefaultMoq ? ' class="pilot-scope-inherited"' : '') + '>' + moqDisplay + '</td><td>' + editButton + '</td></tr>' + editor;
@@ -3495,7 +3507,7 @@ function renderPilotPricing(itemIdx, container) {
   const defaultPrice = getDefaultScopePrice(item, pilotPricingUomIdx);
   const defaultMoq = getDefaultScopeMoq(item, pilotPricingUomIdx);
   container.innerHTML = '<div class="pilot-pricing">' +
-    '<section class="pilot-uom-section"><div class="pilot-default-card"><div class="pilot-price-label">Default <span style="font-weight:400;color:var(--ink-mute)">(optional)</span></div><div class="pilot-price-fields"><label><span class="pilot-scope-source">Price (S$)</span><input class="modal-field-input" id="pilotDefaultPrice_' + pilotPricingUomIdx + '" inputmode="decimal" value="' + (defaultPrice != null ? defaultPrice.toFixed(2) : '0.00') + '" aria-label="Default price for ' + uom + '"' + (pricingEditable ? '' : ' disabled') + ' /></label><label><span class="pilot-scope-source">MOQ</span><input class="modal-field-input" id="pilotDefaultMoq_' + pilotPricingUomIdx + '" inputmode="decimal" value="' + (defaultMoq ? formatMoqValue(defaultMoq) : '0') + '" aria-label="Default MOQ for ' + uom + '"' + (pricingEditable ? '' : ' disabled') + ' /></label></div></div>' +
+    '<section class="pilot-uom-section"><div class="pilot-default-card"><div class="pilot-price-label">Default <span style="font-weight:400;color:var(--ink-mute)">(optional)</span></div><div class="pilot-price-fields"><label><span class="pilot-scope-source">Price ($)</span><input class="modal-field-input" id="pilotDefaultPrice_' + pilotPricingUomIdx + '" inputmode="decimal" value="' + (defaultPrice != null ? defaultPrice.toFixed(2) : '0.00') + '" aria-label="Default price for ' + uom + '"' + (pricingEditable ? '' : ' disabled') + ' /></label><label><span class="pilot-scope-source">MOQ</span><input class="modal-field-input" id="pilotDefaultMoq_' + pilotPricingUomIdx + '" inputmode="decimal" value="' + (defaultMoq ? formatMoqValue(defaultMoq) : '0') + '" aria-label="Default MOQ for ' + uom + '"' + (pricingEditable ? '' : ' disabled') + ' /></label></div></div>' +
     '<table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>Available to…</th><th>Price</th><th>MOQ</th><th></th></tr></thead><tbody>' + scopeRows(pilotPricingUomIdx) + '</tbody></table></section>' +
   '</div>';
 }
@@ -3651,7 +3663,7 @@ function renderExcRow(itemIdx, ei, exc, uoms) {
         '<select class="modal-field-input" id="excEditUom_' + itemIdx + '_' + ei + '" style="cursor:pointer" onchange="updateExcEditHint(' + itemIdx + ',' + ei + ',this.value)">' +
           uoms.map((u, ui) => '<option value="' + ui + '"' + (ui === exc.uomIdx ? ' selected' : '') + '>' + u + '</option>').join('') +
         '</select></div>' : '') +
-      '<div><label>Price (S$) <span class="exc-field-hq" id="excEditPriceHq_' + itemIdx + '_' + ei + '">HQ: $' + hqPrice + '</span><span style="font-weight:400;color:var(--ink-mute)"> (optional)</span></label>' +
+      '<div><label>Price ($) <span class="exc-field-hq" id="excEditPriceHq_' + itemIdx + '_' + ei + '">HQ: $' + hqPrice + '</span><span style="font-weight:400;color:var(--ink-mute)"> (optional)</span></label>' +
         '<input class="modal-field-input" type="text" id="excEditPrice_' + itemIdx + '_' + ei + '" placeholder="e.g. 6.50" value="' + (exc.price != null ? exc.price : '') + '" /></div>' +
       '<div><label>MOQ <span class="exc-field-hq">HQ: ' + item.moq + '</span><span style="font-weight:400;color:var(--ink-mute)"> (optional)</span></label>' +
         '<input class="modal-field-input" type="text" id="excEditMoq_' + itemIdx + '_' + ei + '" placeholder="e.g. 3 kg" value="' + (exc.moq != null ? exc.moq : '') + '" /></div>' +
@@ -3718,7 +3730,7 @@ function renderGroupExceptions(itemIdx, container) {
         '<select class="modal-field-input" id="excUom_' + itemIdx + '" style="cursor:pointer" onchange="updateExcHqHint(' + itemIdx + ',this.value)">' +
           uoms.map((u, ui) => '<option value="' + ui + '">' + u + '</option>').join('') +
         '</select></div>' : '') +
-      '<div><label>Price (S$) <span class="exc-field-hq" id="excAddPriceHq_' + itemIdx + '">HQ: $' + excHqPrice(item, 0) + '</span><span style="font-weight:400;color:var(--ink-mute)"> (optional)</span></label>' +
+      '<div><label>Price ($) <span class="exc-field-hq" id="excAddPriceHq_' + itemIdx + '">HQ: $' + excHqPrice(item, 0) + '</span><span style="font-weight:400;color:var(--ink-mute)"> (optional)</span></label>' +
         '<input class="modal-field-input" type="text" id="excPrice_' + itemIdx + '" placeholder="e.g. 6.50" /></div>' +
       '<div><label>MOQ <span class="exc-field-hq">HQ: ' + item.moq + '</span><span style="font-weight:400;color:var(--ink-mute)"> (optional)</span></label>' +
         '<input class="modal-field-input" type="text" id="excMoq_' + itemIdx + '" placeholder="e.g. 3 kg" /></div>' +
@@ -4019,7 +4031,7 @@ function renderMl() {
 
     if (!isMultiUom) {
       const onlyUom = enabledUoms[0] || { uom: uoms[0], ui: 0 };
-      const uom = onlyUom.uom.replace(/^per /i, '');
+      const uom = compactUom(onlyUom.uom);
       return '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
         '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</div></td>' +
         '<td class="uom-text">' + uom + '</td>' +
@@ -4036,7 +4048,7 @@ function renderMl() {
     '</tr>';
 
     const children = isExpanded ? enabledUoms.map(({ uom, ui }) => {
-      const unit = uom.replace(/^per /i, '');
+      const unit = compactUom(uom);
       return '<tr class="ml-uom-row' + (lifecycle === 'active' ? '' : ' ml-inactive') + '">' +
         '<td class="ml-uom-indent">' + itemDisplayNameHtml(item) + '</td>' +
         '<td class="uom-text">' + unit + '</td>' +
@@ -4124,9 +4136,9 @@ const RECIPES = [
   { name: 'Basque Burnt Cheesecake — Individual Portion', cat: 'Desserts', portions: 1, cost: 4.80 },
   { name: 'Dark Chocolate Lava Cake with Vanilla Bean Ice Cream', cat: 'Desserts', portions: 1, cost: 4.20 },
   { name: 'Alphonso Mango Sorbet — 2 Scoops', cat: 'Desserts', portions: 1, cost: 2.40 },
-  { name: 'Affogato — Double Espresso over Vanilla Ice Cream', cat: 'Desserts', portions: 1, cost: 2.80 },
+  { name: 'Affogato — Double Espresso over Vanilla Ice Cream', cat: '', portions: 1, cost: 2.80 },
   // Beverages
-  { name: 'House Lemonade — Fresh Squeezed with Mint', cat: 'Beverages', portions: 1, cost: 0.80 },
+  { name: 'House Lemonade — Fresh Squeezed with Mint', cat: '', portions: 1, cost: 0.80 },
   { name: 'Iced Kopi-O Kosong — Local Cold Brew', cat: 'Beverages', portions: 1, cost: 0.60 },
   { name: 'Lime Soda with Himalayan Salt', cat: 'Beverages', portions: 1, cost: 0.50 },
   { name: 'Fresh Watermelon Juice — No Sugar Added', cat: 'Beverages', portions: 1, cost: 1.20 },
@@ -4334,7 +4346,7 @@ function renderRec() {
     const comparison = recipeCostTargets(r);
     const hasHighFoodCost = comparison.rows.some(function(target) { return target.foodCostPct > recFcThreshold; });
     return '<tr' + (lifecycle === 'active' ? '' : ' class="ml-inactive"') + ' onclick="window.location.href=\'Admin - HQ Recipe Create.html\'" style="cursor:pointer">' +
-      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + stateBadge + versionsHtml + '</div><span class="ml-cat-tag">' + (r.type === 'sub-recipe' ? 'Sub-recipe · ' : 'Recipe · ') + r.cat + '</span></td>' +
+      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + stateBadge + versionsHtml + '</div>' + (r.cat ? '<span class="ml-cat-tag">' + (r.type === 'sub-recipe' ? 'Sub-recipe · ' : 'Recipe · ') + r.cat + '</span>' : '') + '</td>' +
       '<td><button class="recipe-cost-link" type="button" onclick="event.stopPropagation();openRecipeCostDialog(' + rawIdx + ')">' + comparison.costRange + '</button></td>' +
       '<td><button class="recipe-cost-link' + (hasHighFoodCost ? ' is-alert' : '') + '" type="button" onclick="event.stopPropagation();openRecipeCostDialog(' + rawIdx + ')">' + comparison.foodCostRange + '</button></td>' +
       '<td style="text-align:left">' + grpHtml + '</td>' +
@@ -4419,6 +4431,13 @@ function confirmDisableConfirmation() {
 function toggleInventoryLifecycle(index) {
   const record = INV_ITEMS[index];
   if (!record) return;
+  const sourceItem = inventorySourceItem(record);
+  if (record.type === 'sku' && sourceItem) {
+    const sourceIndex = ITEMS.indexOf(sourceItem);
+    const nextLifecycle = itemLifecycle(sourceItem) === 'active' ? 'disabled' : 'active';
+    setMasterItemLifecycle(sourceIndex, nextLifecycle);
+    return;
+  }
   if (inventoryLifecycle(record) === 'removed') {
     record.removed = false;
     record.lifecycle = 'active';
@@ -5384,15 +5403,15 @@ const INV_ITEMS = [
   { type:'sku', name:'Binchotan White Charcoal Premium 15kg Bag', detail:'Grill Master SG', uom:'kg', cost:14.20, active:true, groups:['Chargrill Outlets'] },
   { type:'sku', name:'Anchor Unsalted Butter 25kg Bulk Block', detail:'Fonterra Brands', uom:'kg', cost:11.80, active:true, groups:INV_GROUPS.slice() },
   // Inventory items: reusable items with zero or more supplier options.
-  { type:'group', name:'Chicken Thigh Boneless', detail:'2 supplier options', uom:'kg', cost:null, active:true, groups:INV_GROUPS.slice(), outlets:[], constituents:[
+  { type:'group', name:'Chicken Thigh Boneless', detail:'2 options', uom:'kg', cost:null, active:true, groups:INV_GROUPS.slice(), outlets:[], constituents:[
     { name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier:'Kee Song Group', cost:6.80, groups:['Chargrill Outlets'], outlets:[] },
     { name:'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier:'Poultry Masters SG', cost:6.40, groups:['Family Dining Express'], outlets:[] },
   ]},
-  { type:'group', name:'Dark Soy Sauce', detail:'2 supplier options', uom:'L', cost:null, active:true, groups:['Chargrill Outlets'], outlets:['(WF 290) Garden Express @ 290 Sengkang'], constituents:[
+  { type:'group', name:'Dark Soy Sauce', detail:'2 options', uom:'L', cost:null, active:true, groups:['Chargrill Outlets'], outlets:['(WF 290) Garden Express @ 290 Sengkang'], constituents:[
     { name:'Kikkoman Dark Soy Sauce 2L', supplier:'Kikkoman', cost:8.80, groups:['Chargrill Outlets'], outlets:[] },
     { name:'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier:'Asian Dry Goods', cost:6.90, groups:[], outlets:['(WF 290) Garden Express @ 290 Sengkang'] },
   ]},
-  { type:'group', name:'Cooking Oil', detail:'3 supplier options', uom:'L', cost:null, active:true, groups:['Family Dining Express'], outlets:['(WF 139) Chargrill @ 139 Tampines','(WF 290) Garden Express @ 290 Sengkang'], constituents:[
+  { type:'group', name:'Cooking Oil', detail:'3 options', uom:'L', cost:null, active:true, groups:['Family Dining Express'], outlets:['(WF 139) Chargrill @ 139 Tampines','(WF 290) Garden Express @ 290 Sengkang'], constituents:[
     { name:'Sime Darby Canola Oil RBD 20L', supplier:'Sunny Gold F&B Supplies', cost:3.20, groups:['Family Dining Express'], outlets:[] },
     { name:'Blended Vegetable Cooking Oil 20L', supplier:'Sunny Gold F&B Supplies', cost:2.80, groups:[], outlets:['(WF 139) Chargrill @ 139 Tampines'] },
     { name:'Golden Chef Rice Bran Oil 18L', supplier:'Asian Dry Goods', cost:3.60, groups:[], outlets:['(WF 290) Garden Express @ 290 Sengkang'] },
@@ -5410,6 +5429,31 @@ const INV_ITEMS = [
   { type:'recipe', name:'Pork Belly Burnt Ends', detail:'Recipe', uom:'ptn', cost:10.20, active:true, groups:['Chargrill Outlets'] },
   { type:'recipe', name:'Chargrill Spring Onion Bunches with Soy & Sesame', detail:'Recipe', uom:'ptn', cost:1.20, active:true, groups:['Chargrill Outlets'] },
 ];
+
+function inventorySkuUom(item) {
+  var uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
+  return String(uoms[0] || '').replace(/^per\s+/i, '');
+}
+
+function syncAutomaticInventorySkus() {
+  var nonSkuRecords = INV_ITEMS.filter(function(record) { return record.type !== 'sku'; });
+  var automaticSkuRecords = ITEMS.map(function(item, sourceItemIdx) {
+    ensureItemAccessState(sourceItemIdx);
+    return {
+      type: 'sku',
+      autoIncluded: true,
+      sourceItemIdx: sourceItemIdx,
+      name: item.name,
+      detail: item.supplier,
+      uom: inventorySkuUom(item),
+      cost: item.price,
+      active: itemLifecycle(item) === 'active',
+      groups: (item.groupList || []).slice(),
+      outlets: (item.outletList || []).slice()
+    };
+  });
+  INV_ITEMS.splice.apply(INV_ITEMS, [0, INV_ITEMS.length].concat(automaticSkuRecords, nonSkuRecords));
+}
 
 const HQ_INVENTORY_STATE_KEY = 'nomni-hq-inventory-state-v1';
 function loadHqInventoryState() {
@@ -5437,7 +5481,9 @@ function saveHqInventoryState() {
   if (window.isNewHQ) { savePrototypeState(); return; }
   localStorage.setItem(HQ_INVENTORY_STATE_KEY, JSON.stringify(INV_ITEMS));
 }
+syncAutomaticInventorySkus();
 loadHqInventoryState();
+syncAutomaticInventorySkus();
 window.nomniInventoryItems = INV_ITEMS;
 renderHealthCheck();
 
@@ -5482,6 +5528,7 @@ function setInvStatusFilter(v) { invStatusFilter = v; invPage = 1; renderInv(); 
 function setInvPage(p) { invPage = p; renderInv(); window.scrollTo(0,0); }
 function toggleInvExpand(idx) { invExpanded.has(idx) ? invExpanded.delete(idx) : invExpanded.add(idx); renderInv(); }
 function toggleInvUoms(idx, event) { event.stopPropagation(); invUomExpanded.has(idx) ? invUomExpanded.delete(idx) : invUomExpanded.add(idx); renderInv(); }
+function openInvRowEdit(index, type) { if (type === 'group') openGroupSkuModal(index); else openHqInventorySettings(index); }
 function toggleInventorySelection(idx, checked) { if (checked) selectedInventoryIndices.add(idx); else selectedInventoryIndices.delete(idx); updateInventoryBulkActions(); }
 function clearInventorySelection() { selectedInventoryIndices.clear(); renderInv(); }
 function updateInventoryBulkActions() {
@@ -5545,7 +5592,7 @@ function addToExistingInventoryItem() {
     if (target.constituents.some(function(option) { return option.name === source.name; })) return;
     target.constituents.push({ name: source.name, supplier: source.detail, cost: source.cost, uom: source.uom, groups: (source.groups || []).slice(), outlets: (source.outlets || []).slice(), active: source.active !== false, conversion: 1, conversionFlipped: false });
   });
-  target.detail = target.constituents.length + ' supplier option' + (target.constituents.length === 1 ? '' : 's');
+  target.detail = target.constituents.length + ' option' + (target.constituents.length === 1 ? '' : 's');
   target.groups = Array.from(new Set(target.constituents.reduce(function(all, option) { return all.concat(option.groups || []); }, [])));
   target.outlets = Array.from(new Set(target.constituents.reduce(function(all, option) { return all.concat(option.outlets || []); }, [])));
   closeGroupSkusChoice();
@@ -6524,6 +6571,8 @@ function saveSupplierSettings(afterSave) {
 }
 
 function inventoryLifecycle(item) {
+  var source = inventorySourceItem(item);
+  if (item && item.type === 'sku' && source) return itemLifecycle(source);
   if (item.lifecycle === 'removed' || item.removed === true) return 'removed';
   return item.active === false ? 'disabled' : 'active';
 }
@@ -6575,6 +6624,7 @@ function inventoryDisplayName(record) {
 }
 
 function renderInv() {
+  syncAutomaticInventorySkus();
   applyHqInventorySettingsOverrides();
   var items = INV_ITEMS.slice();
   if (invSearch) { var q = invSearch.toLowerCase(); items = items.filter(function(r){ return inventoryDisplayName(r).toLowerCase().includes(q) || r.name.toLowerCase().includes(q) || (r.detail||'').toLowerCase().includes(q); }); }
@@ -6597,14 +6647,14 @@ function renderInv() {
   page.forEach(function(r) {
     var globalIdx = INV_ITEMS.indexOf(r);
     var lifecycle = inventoryLifecycle(r);
-    var inactiveClass = lifecycle === 'active' ? '' : ' class="ml-inactive"';
+    var rowClass = 'inventory-row-clickable' + (lifecycle === 'active' ? '' : ' ml-inactive');
     var lifecycleBadge = lifecycle === 'removed'
       ? '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#FDD6DC;color:#B42318;margin-left:6px">Removed</span>'
       : (lifecycle === 'disabled' ? '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#F0F0F2;color:#555;margin-left:6px">Disabled</span>' : '');
 
 
     var detail = r.type === 'group'
-      ? 'Item' + ((r.constituents || []).length ? ' · ' + (r.constituents || []).length + ' supplier option' + ((r.constituents || []).length === 1 ? '' : 's') : ' · No supplier options')
+      ? 'Item' + ((r.constituents || []).length ? ' · ' + (r.constituents || []).length + ' option' + ((r.constituents || []).length === 1 ? '' : 's') : ' · No supplier options')
       : (r.type === 'sku'
         ? ('SKU' + (r.detail ? ' · ' + supplierDisplayName(r.detail) : ''))
         : (r.type === 'sub-recipe' ? 'Sub-recipe' : 'Recipe'));
@@ -6620,20 +6670,20 @@ function renderInv() {
     var hasUomVariations = Array.isArray(r.inventoryUoms) && r.inventoryUoms.length > 1;
     var uomCell = hasUomVariations
       ? '<button class="ml-options-link' + (invUomExpanded.has(globalIdx) ? ' is-open' : '') + '" onclick="toggleInvUoms(' + globalIdx + ',event)">' + r.inventoryUoms.length + ' options<span class="ml-options-chevron"></span></button>'
-      : r.uom;
+      : compactUom(r.uom);
     var parentGrpHtml = hasUomVariations ? '' : grpHtml;
     var selectHtml = r.type !== 'sku'
       ? '<td class="inventory-select-cell"></td>'
       : '<td class="inventory-select-cell" onclick="event.stopPropagation()"><input type="checkbox" class="inventory-select-checkbox" aria-label="Select ' + escapeItemDisplayText(inventoryDisplayName(r)).replace(/"/g, '&quot;') + '"' + (selectedInventoryIndices.has(globalIdx) ? ' checked' : '') + ' onchange="toggleInventorySelection(' + globalIdx + ', this.checked)" /></td>';
 
-    rows.push('<tr' + inactiveClass + '>' +
+    rows.push('<tr class="' + rowClass + '" tabindex="0" onclick="if (!event.target.closest(\'button,a,input\')) openInvRowEdit(' + globalIdx + ',\'' + r.type + '\')" onkeydown="if ((event.key === \'Enter\' || event.key === \' \') && !event.target.closest(\'button,a,input\')) { event.preventDefault(); openInvRowEdit(' + globalIdx + ',\'' + r.type + '\'); }">' +
       selectHtml + '<td style="' + td + 'padding-left:4px;">' +
         '<div style="display:flex;align-items:center;gap:8px">' +
         '<div>' +
           '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">' +
             '<span style="font-size:14px;font-weight:500;color:var(--ink)">' + escapeItemDisplayText(inventoryDisplayName(r)) + lifecycleBadge + '</span>' +
           '</div>' +
-          (detail ? (r.type === 'group'
+          (detail ? (r.type === 'group' && (r.constituents || []).length
             ? '<button onclick="event.stopPropagation();toggleInvExpand(' + globalIdx + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;font-weight:600;color:var(--spinach);cursor:pointer;display:inline-flex;align-items:center;gap:3px;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + detail + '<svg style="transition:transform .15s;transform:' + (invExpanded.has(globalIdx) ? 'rotate(180deg)' : '') + '" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>'
             : '<div style="font-size:12px;color:var(--ink-mute)">' + detail + '</div>') : '') +
         '</div></div>' +
@@ -6661,7 +6711,7 @@ function renderInv() {
             '<div style="font-size: 14px;font-weight:500;color:var(--ink);margin-bottom:2px">' + c.name + '</div>' +
             '<div style="font-size:12px;color:var(--ink-mute)">SKU · ' + supplierDisplayName(c.supplier) + '</div>' +
           '</td>' +
-          '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + r.uom + '</td>' +
+          '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + compactUom(r.uom) + '</td>' +
           '<td style="' + td + '"><button onclick="event.stopPropagation();openGroupSkuConstituentAvailability(' + globalIdx + ',' + constituentIndex + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + cLabel + '</button></td><td style="' + td + '"></td>' +
         '</tr>');
       });
@@ -6675,7 +6725,7 @@ function renderInv() {
         var entryAccess = '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + entryGroups.join('|') + '" data-outlets="' + entryOutlets.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + entryLabel + '</button>';
         rows.push('<tr class="inv-uom-row">' +
           '<td class="inventory-select-cell"></td><td style="' + td + 'padding-left:48px"><span style="font-size:14px;color:var(--ink)">' + escapeItemDisplayText(inventoryDisplayName(r)) + '</span></td>' +
-          '<td style="' + td + 'font-size:14px;color:var(--ink)">' + entry.uom + '</td>' +
+          '<td style="' + td + 'font-size:14px;color:var(--ink)">' + compactUom(entry.uom) + '</td>' +
           '<td style="' + td + '">' + entryAccess + '</td><td style="' + td + '"></td>' +
         '</tr>');
       });
@@ -6694,6 +6744,12 @@ function renderInv() {
   pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + '</span><div class="pager-btns">' + btns + '</div>';
   saveHqInventoryState();
 }
+// Resolve current outlet groups and ungrouped outlets before rendering the
+// SKU and Inventory availability controls. This keeps the picker in step
+// with the Groups & outlets tab, including Sengkang.
+syncHqScopeTargets();
+Object.keys(itemAccessState).forEach(function(index) { delete itemAccessState[index]; });
+renderMl();
 renderInv();
 
 // ── Group SKU (create/edit) ──
@@ -6921,7 +6977,7 @@ function saveGroupSku() {
   var groupAvailability = Array.from(new Set(groupSkuDraft.items.reduce(function(all, item) { return all.concat(item.groups || []); }, [])));
   var outletAvailability = Array.from(new Set(groupSkuDraft.items.reduce(function(all, item) { return all.concat(item.outlets || []); }, [])));
   var entry = {
-    type: 'group', name: name, detail: groupSkuDraft.items.length + ' supplier option' + (groupSkuDraft.items.length === 1 ? '' : 's'),
+    type: 'group', name: name, detail: groupSkuDraft.items.length + ' option' + (groupSkuDraft.items.length === 1 ? '' : 's'),
     uom: uom, cost: null, active: true,
     groups: groupAvailability,
     outlets: outletAvailability,
@@ -7038,10 +7094,10 @@ function renderHqInventoryCountingUoms(item) {
     var isCatalogue = (item.catalogueUoms || [item.orderingUom || item.uom]).indexOf(uom) > -1;
     var source = uom === primary ? (isCatalogue ? 'Catalogue · Inventory UOM' : 'Inventory UOM') : 'Catalogue';
     var conversion = uom === primary ? 'Used as the inventory base unit' : 'Catalogue UOM · read-only';
-    return '<div class="hq-counting-uom-row"><div class="hq-counting-uom-name">' + hqSettingsEscape(uom) + '</div><div>' + conversion + '</div><div class="hq-counting-uom-source">' + source + '</div><div></div></div>';
+    return '<div class="hq-counting-uom-row"><div class="hq-counting-uom-name">' + hqSettingsEscape(compactUom(uom)) + '</div><div>' + conversion + '</div><div class="hq-counting-uom-source">' + source + '</div><div></div></div>';
   }).join('') + hqInventorySettingsDraft.map(function(entry,index) {
-    var conversion = entry.flipped ? '1 ' + entry.referenceUom + ' = ' + entry.quantity + ' ' + entry.uom : '1 ' + entry.uom + ' = ' + entry.quantity + ' ' + entry.referenceUom;
-    return '<div class="hq-counting-uom-row"><div class="hq-counting-uom-name">' + hqSettingsEscape(entry.uom) + '</div><div>' + hqSettingsEscape(conversion) + '</div><div class="hq-counting-uom-source">Custom</div><div class="hq-counting-uom-actions"><button class="hq-text-action" type="button" onclick="openHqCustomUomEditor(' + index + ')">Edit</button><button class="hq-text-action danger" type="button" onclick="removeHqCustomUom(' + index + ')">Remove</button></div></div>';
+    var conversion = entry.flipped ? '1 ' + compactUom(entry.referenceUom) + ' = ' + entry.quantity + ' ' + compactUom(entry.uom) : '1 ' + compactUom(entry.uom) + ' = ' + entry.quantity + ' ' + compactUom(entry.referenceUom);
+    return '<div class="hq-counting-uom-row"><div class="hq-counting-uom-name">' + hqSettingsEscape(compactUom(entry.uom)) + '</div><div>' + hqSettingsEscape(conversion) + '</div><div class="hq-counting-uom-source">Custom</div><div class="hq-counting-uom-actions"><button class="hq-text-action" type="button" onclick="openHqCustomUomEditor(' + index + ')">Edit</button><button class="hq-text-action danger" type="button" onclick="removeHqCustomUom(' + index + ')">Remove</button></div></div>';
   }).join('');
 }
 function hqAvailableCustomUoms(item,current) {
@@ -7101,10 +7157,15 @@ function initialiseHqInventorySettingsPage() {
   item.catalogueUoms = Array.isArray(saved.catalogueUoms) ? saved.catalogueUoms.slice() : (item.catalogueUoms || [item.orderingUom || item.uom].filter(Boolean));
   hqInventorySettingsDraft = Array.isArray(saved.customUoms) ? saved.customUoms.map(function(entry){return Object.assign({},entry);}) : (item.countingUoms || []).map(function(entry){return Object.assign({},entry);});
   var hqName = (document.querySelector('.page-title') || {}).textContent || 'HQ';
+  var inventoryIndex = INV_ITEMS.indexOf(item);
+  var availableGroups = item.groups || [];
+  var availableOutlets = item.outlets || [];
+  var availableLabel = availabilityLabel(availableGroups, availableOutlets, INV_GROUPS.length, REC_OUTLETS.length);
+  var availabilitySummary = '<span>Available in </span><button type="button" class="hq-inv-availability-link" onclick="openInventoryAvailability(' + inventoryIndex + ')">' + hqSettingsEscape(availableLabel) + '</button>';
   var page = document.createElement('section');
   page.className = 'hq-inventory-settings-page';
-  page.innerHTML = '<button class="hq-inv-settings-back" type="button" onclick="closeHqInventorySettingsPage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Inventory</button>' +
-    '<div class="hq-inv-settings-head"><div><h1>' + hqSettingsEscape(item.name) + '</h1><div class="hq-inv-settings-meta"><span>' + hqSettingsEscape(supplierDisplayName(item.supplier || item.detail || 'Not assigned')) + '</span><span aria-hidden="true">•</span><span>' + hqSettingsEscape(hqName.trim()) + '</span><span aria-hidden="true">•</span><span>HQ-wide</span></div></div></div>' +
+  page.innerHTML = '<button class="hq-inv-settings-back" type="button" onclick="closeHqInventorySettingsPage()"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Inventory</button>' +
+    '<div class="hq-inv-settings-head"><div><h1>' + hqSettingsEscape(item.name) + '</h1><div class="hq-inv-settings-meta"><span>' + hqSettingsEscape(supplierDisplayName(item.supplier || item.detail || 'Not assigned')) + '</span><span class="hq-inv-availability-summary">' + availabilitySummary + '</span></div></div></div>' +
     '<form class="hq-inv-settings-form" onsubmit="saveHqInventorySettings(event)">' +
     '<div class="hq-inv-field"><label for="hqInventoryUom">Inventory UOM:</label><select class="hq-inv-control" id="hqInventoryUom" onchange="renderHqInventoryCountingUoms(window.hqActiveInventorySettingsItem)"></select></div>' +
     '<div class="hq-inv-field"><div aria-hidden="true"></div><div class="hq-counting-uom-section"><p class="hq-counting-uom-intro"><strong>Use these UOMs for stock counts and adjustments</strong><br>Quantities convert to the Inventory UOM when saved. Catalogue UOMs cannot be edited or removed.</p><div class="hq-counting-uoms" id="hqCountingUomList"></div><button class="hq-text-action hq-add-uom" type="button" onclick="openHqCustomUomEditor()"><span aria-hidden="true">+</span>Add UOM</button><div class="hq-custom-uom-editor" id="hqCustomUomEditor" hidden><div class="hq-custom-uom-grid"><label for="hqCustomUomName">UOM</label><select class="hq-inv-control" id="hqCustomUomName"></select><label>Conversion</label><div class="hq-uom-equation"><span>1</span><span id="hqCustomUomLabel">custom UOM</span><span>=</span><input class="hq-inv-control" id="hqCustomUomQty" type="number" min="0.01" step="0.01" value="1"><select class="hq-inv-control" id="hqCustomUomReference"></select></div></div><div class="hq-custom-uom-editor-actions"><button class="hq-text-action" type="button" onclick="closeHqCustomUomEditor()">Cancel</button><button class="btn-primary" id="hqCustomUomSave" type="button" onclick="saveHqCustomUom()">Add</button></div></div></div></div>' +
@@ -8793,7 +8854,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
     <div class="topbar-left"><div class="brand"><img class="brand-logo-img" src="assets/nomni_full_greenbar.svg" alt="nomni" /><div class="brand-sub">Procure Admin</div></div></div>
     <div class="topbar-right"><a href="https://support.zeemart.co/en/" target="_blank" class="help-btn"><span class="material-symbols-outlined">help</span> Help</a><div class="user"><div class="topbar-avt">WA</div><span>William Arya</span><span class="chev"></span></div></div>
   </header>
-  <aside class="hq-review-preview"><div class="hq-review-preview-label">1 of 2 · INV-2026-0142</div><div class="hq-invoice-paper"><div class="hq-invoice-paper-head"><div><h3>Kee Song Food</h3><div>Singapore</div></div><div style="text-align:right">Invoice<br><strong>INV-2026-0142</strong></div></div><div>Bill to: Garden Cuisine HQ</div><hr><div class="hq-paper-line"><span>Chicken wings, fresh</span><strong>S$5.20</strong></div><div class="hq-paper-line"><span>Chicken breast fillet</span><strong>S$8.20</strong></div><div class="hq-paper-line"><span>Chicken liver, pack</span><strong>S$6.50</strong></div><div class="hq-paper-line"><span>Chicken skin, fresh</span><strong>S$3.40</strong></div><hr><div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Total</span><span>S$23.30</span></div></div></aside>
+  <aside class="hq-review-preview"><div class="hq-review-preview-label">1 of 2 · INV-2026-0142</div><div class="hq-invoice-paper"><div class="hq-invoice-paper-head"><div><h3>Kee Song Food</h3><div>Singapore</div></div><div style="text-align:right">Invoice<br><strong>INV-2026-0142</strong></div></div><div>Bill to: Garden Cuisine HQ</div><hr><div class="hq-paper-line"><span>Chicken wings, fresh</span><strong>$5.20</strong></div><div class="hq-paper-line"><span>Chicken breast fillet</span><strong>$8.20</strong></div><div class="hq-paper-line"><span>Chicken liver, pack</span><strong>$6.50</strong></div><div class="hq-paper-line"><span>Chicken skin, fresh</span><strong>$3.40</strong></div><hr><div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Total</span><span>$23.30</span></div></div></aside>
   <main class="hq-review-main"><div class="hq-review-title"><button class="hq-review-back" onclick="closeHqInvoiceReview()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>Items</button><h1>Review items</h1><div class="hq-review-scope-note" id="hqReviewScopeNote"></div></div><div class="hq-review-scroll"><div class="hq-review-invoice-bar"><div class="hq-review-invoice-meta"><div class="hq-review-invoice-num">1</div><div><div class="hq-review-invoice-name">INV-2026-0142</div><div class="hq-review-invoice-sub">8 Oct 2025 · Kee Song Food Corporation (S) Pte Ltd</div></div></div><div class="hq-review-actions"><button class="btn btn-tertiary" onclick="skipHqInvoiceReview()">Skip for later</button><button class="btn btn-primary" onclick="saveHqInvoiceReview()">Save invoice</button></div></div><div class="hq-review-content"><div class="hq-review-summary"><span id="hqInvoiceLineCount">4 items</span></div><table class="hq-review-table"><thead><tr><th style="width:30px">#</th><th>Name in invoice</th><th style="width:92px">Product code</th><th style="width:74px">UOM</th><th style="width:82px">Price</th><th style="width:150px">Remarks</th><th style="width:34px"></th></tr></thead><tbody id="hqInvoiceReviewRows"></tbody></table><button class="hq-review-back" style="margin-top:18px" onclick="addHqInvoiceReviewRow()"><span class="material-symbols-outlined" style="font-size:17px">add</span>Add item</button></div></div></main>
 </div>
 
@@ -8841,7 +8902,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
             <tr>
               <th class="col-name">Item</th>
               <th class="col-uom">UOM</th>
-              <th class="col-price">Unit price (S$)</th>
+              <th class="col-price">Unit price ($)</th>
               <th class="col-moq">MOQ</th>
             </tr>
           </thead>
@@ -9196,8 +9257,8 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
         <div id="supplierSmsField" hidden><label class="field-label">SMS</label><input class="field-input" id="supplierSms" type="tel" placeholder="Enter mobile number" /></div>
         <button type="button" class="supplier-more-link" id="supplierMoreContact" onclick="revealSupplierSmsField()">More⌄</button>
       </div></section>
-      <section class="supplier-settings-section" id="supplierPolicySection"><h3 class="supplier-settings-heading">Order &amp; delivery policy</h3><div class="supplier-settings-card"><div class="supplier-settings-grid"><div><label class="field-label">Min. order (S$)</label><input class="field-input" id="supplierMinOrder" inputmode="decimal" value="0" /></div></div><label class="supplier-settings-check"><input id="supplierBlockMin" type="checkbox" checked /><span>Block orders below minimum order</span></label></div>
-        <div class="supplier-settings-card"><label class="field-label">Delivery fee policy</label><div class="supplier-delivery-fee-options"><label class="supplier-delivery-fee-option"><input type="radio" name="supplierDeliveryFee" value="none" onchange="toggleSupplierDeliveryFee()" /><span>Do not apply delivery fee</span></label><label class="supplier-delivery-fee-option"><input type="radio" name="supplierDeliveryFee" value="apply" onchange="toggleSupplierDeliveryFee()" /><span>Apply fee (S$)</span><span class="supplier-delivery-fee-fields"><input class="field-input" id="supplierDeliveryFeeAmount" inputmode="decimal" value="3" /><select class="field-input" id="supplierDeliveryFeeRule"><option value="all">to all orders</option><option value="below-minimum">to orders below minimum order</option></select></span></label></div></div>
+      <section class="supplier-settings-section" id="supplierPolicySection"><h3 class="supplier-settings-heading">Order &amp; delivery policy</h3><div class="supplier-settings-card"><div class="supplier-settings-grid"><div><label class="field-label">Min. order ($)</label><input class="field-input" id="supplierMinOrder" inputmode="decimal" value="0" /></div></div><label class="supplier-settings-check"><input id="supplierBlockMin" type="checkbox" checked /><span>Block orders below minimum order</span></label></div>
+        <div class="supplier-settings-card"><label class="field-label">Delivery fee policy</label><div class="supplier-delivery-fee-options"><label class="supplier-delivery-fee-option"><input type="radio" name="supplierDeliveryFee" value="none" onchange="toggleSupplierDeliveryFee()" /><span>Do not apply delivery fee</span></label><label class="supplier-delivery-fee-option"><input type="radio" name="supplierDeliveryFee" value="apply" onchange="toggleSupplierDeliveryFee()" /><span>Apply fee ($)</span><span class="supplier-delivery-fee-fields"><input class="field-input" id="supplierDeliveryFeeAmount" inputmode="decimal" value="3" /><select class="field-input" id="supplierDeliveryFeeRule"><option value="all">to all orders</option><option value="below-minimum">to orders below minimum order</option></select></span></label></div></div>
         <div class="supplier-settings-card"><label class="field-label">Cancelling after cut-off</label><label class="supplier-settings-check supplier-cancellation-check"><input id="supplierNoCancelAfterCutoff" type="checkbox" /><span>Orders cannot be cancelled after cut-off time</span></label></div>
         <div class="supplier-settings-card supplier-delivery-card"><p class="supplier-policy-note"><strong>Not sure of the cut-off?</strong> Use 2 days earlier at 12:00 PM for now. You can update it later.</p><div class="supplier-policy-table"><div class="supplier-policy-head"><span>Deliver on</span><span>Cut-off time</span><span></span></div>
           <div class="supplier-policy-row" data-day="Monday"><label class="supplier-settings-check"><input data-supplier-day type="checkbox" onchange="toggleSupplierDay(this)" />Monday</label><div class="supplier-cutoff is-disabled"><input class="field-input" data-supplier-days inputmode="numeric" value="2" disabled /><span>day(s) earlier</span><input class="field-input" data-supplier-time type="time" value="12:00" disabled /></div></div>

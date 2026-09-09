@@ -288,8 +288,9 @@
 
   /* ── Items table extras ── */
   .uom-options { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border-radius: 4px; padding: 1px 6px; margin-left: 3px; }
-  .uom-text { font-size: 12px; color: var(--ink-mute); }
-  .price-cell { white-space: nowrap; font-weight: 500; }
+  .uom-text { font-size: 14px; color: var(--ink-mute); }
+  .price-cell { white-space: nowrap; font-weight: 600; }
+  .inventory-cost { font-weight: 600; }
   .moq-cell { color: var(--ink-mute); white-space: nowrap; }
   .supplier-cell { color: var(--ink-mute); }
 
@@ -375,7 +376,7 @@
   .items-table .item-uom-row td { background:#f7f8fa !important; }
   .items-table .item-uom-row:hover td { background:#f2f4f5 !important; }
   .item-uom-name { padding-left:36px !important; color:var(--ink-mute) !important; }
-  .item-options-link { display:inline-flex; align-items:center; gap:7px; padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .item-options-link { display:inline-flex; align-items:center; gap:3px; padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; text-decoration:underline; text-underline-offset:2px; text-decoration-style:dashed; }
   .item-options-link:hover { color:var(--nomni-green); }
   .item-options-chevron { width:8px; height:8px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg) translateY(-2px); transition:transform .15s ease; }
   .item-options-chevron.open { transform:rotate(225deg) translate(-1px,-1px); }
@@ -418,6 +419,7 @@
 .pos-chip.ok { background:var(--mint); color:var(--spinach); }
 .pos-chip.off { background:#F3F4F6; color:#9CA3AF; }
 .pos-mapping-progress { display:flex; align-items:center; gap:9px; }
+.pos-mapping-progress strong { font-weight:600; }
 .pos-mapping-progress .progress-track { width:96px; height:6px; border-radius:4px; background:#E7E8EC; overflow:hidden; }
 .pos-mapping-progress .progress-fill { height:100%; background:var(--nomni-green); }
 .pos-mapping-metric-progress { gap:7px; }
@@ -452,7 +454,7 @@
   .supplier-status-chip.active { background:#D9F5E4; color:#1A8040; }
   .supplier-status-chip.excluded { background:#FDD6DC; color:#D0291E; }
   .ml-item-name { font-weight: 500; color: var(--ink); margin-bottom: 2px; }
-  .ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 700; background: #F0F0F2; color: #555; border-radius: 4px; padding: 2px 8px; text-transform: uppercase; letter-spacing: .04em; }
+  .ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; background: #F0F0F2; color: #555; border-radius: 4px; padding: 2px 8px; letter-spacing: .04em; }
   .ml-inactive { opacity: 0.45; }
   tr.ml-inactive { opacity: 1; }
   tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
@@ -1279,7 +1281,9 @@ let   pendingRemoveId = null;
   var individualOutlet = OUTLETS.find(function(outlet) { return outlet.name === (new URLSearchParams(window.location.search).get('outlet') || ''); }) || { name:'', posConnected:false };
   var individualPosMeta = getOutletPosMeta(individualOutlet);
   var individualPosPanel = renderIndividualPosSummary(individualPosMeta, individualOutlet);
-  document.getElementById('panel-overview').innerHTML = '<div class="overview-grid"><div><div class="panel-label-row"><span class="panel-label-text">SKUs <span class="panel-label-count" id="itemCountBadge">74</span></span></div><div class="items-filter-row"><div class="item-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="item-search-input" id="itemSearchInput" placeholder="Search SKUs or suppliers…" oninput="setItemSearch(this.value)" /></div><select class="items-cat-select" id="itemCatSelect" onchange="setItemCatFilter(this.value)"><option value="">All categories</option><option>Poultry</option><option>Beef</option><option>Pork</option><option>Lamb</option><option>Seafood</option><option>Produce</option><option>Dry Goods</option><option>Sauces</option><option>Dairy &amp; Eggs</option><option>Frozen</option><option>Beverages</option><option>Supplies</option></select><select class="items-cat-select" id="itemSupplierSelect" onchange="setItemSupplierFilter(this.value)"><option value="">All suppliers</option></select><select class="items-cat-select" id="itemStatusSelect" onchange="setItemStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div><table class="items-table"><thead><tr><th id="sortTh-name" class="sort-th" onclick="setItemSort(\'name\')">SKU <span class="sort-ind"></span></th><th style="width:120px">UOM</th><th id="sortTh-price" class="sort-th" style="width:140px" onclick="setItemSort(\'price\')">Unit price <span class="sort-ind"></span></th><th style="width:88px">MOQ</th><th style="width:48px"></th></tr></thead><tbody id="itemsBody"></tbody></table><div id="itemsPager" class="items-pager-wrap"></div></div><div class="overview-right">' + individualPosPanel + '</div></div>';
+  document.getElementById('panel-overview').innerHTML = '<div class="overview-grid"><div><div class="panel-label-row"><span class="panel-label-text">SKUs <span class="panel-label-count" id="itemCountBadge">74</span></span></div><p style="margin:-14px 0 16px;font-size:14px;line-height:1.45;color:var(--ink-mute)">Items in this list are used for ordering and appear in invoices</p><div class="items-filter-row"><div class="item-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="item-search-input" id="itemSearchInput" placeholder="Search SKUs or suppliers…" oninput="setItemSearch(this.value)" /></div><select class="items-cat-select" id="itemCatSelect" onchange="setItemCatFilter(this.value)"><option value="">All categories</option><option>Poultry</option><option>Beef</option><option>Pork</option><option>Lamb</option><option>Seafood</option><option>Produce</option><option>Dry Goods</option><option>Sauces</option><option>Dairy &amp; Eggs</option><option>Frozen</option><option>Beverages</option><option>Supplies</option></select><select class="items-cat-select" id="itemSupplierSelect" onchange="setItemSupplierFilter(this.value)"><option value="">All suppliers</option></select><select class="items-cat-select" id="itemStatusSelect" onchange="setItemStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div><table class="items-table"><thead><tr><th id="sortTh-name" class="sort-th" onclick="setItemSort(\'name\')">SKU <span class="sort-ind"></span></th><th style="width:120px">UOM</th><th id="sortTh-price" class="sort-th" style="width:140px" onclick="setItemSort(\'price\')">Unit price <span class="sort-ind"></span></th><th style="width:88px">MOQ</th><th style="width:48px"></th></tr></thead><tbody id="itemsBody"></tbody></table><div id="itemsPager" class="items-pager-wrap"></div></div><div class="overview-right">' + individualPosPanel + '</div></div>';
+  var overviewOrderingNote = document.querySelector('#panel-overview p');
+  if (overviewOrderingNote && overviewOrderingNote.textContent.indexOf('Items in this list') === 0) overviewOrderingNote.remove();
   var categoryFilter = document.getElementById('itemCatSelect');
   if (categoryFilter) categoryFilter.remove();
   document.querySelectorAll('#panel-overview .overview-right .panel-label-row button').forEach(function(button) {
@@ -1290,13 +1294,15 @@ let   pendingRemoveId = null;
     var manageButton = ungroupedSkuLabel.querySelector('button');
     if (manageButton) manageButton.remove();
     ungroupedSkuLabel.insertAdjacentHTML('afterend', '<div class="item-bulk-actions" id="itemBulkActions"><span class="item-bulk-count" id="itemBulkCount">0 selected</span><button type="button" class="item-bulk-btn" id="itemBulkExclude" onclick="bulkItemAction(\'exclude\')">Exclude from group</button><button type="button" class="item-bulk-btn" id="itemBulkInclude" onclick="bulkItemAction(\'include\')">Include in group</button><button type="button" class="item-bulk-cancel" onclick="clearItemSelection()">Cancel</button></div>');
+    document.getElementById('itemBulkExclude').textContent = 'Exclude from outlet';
+    document.getElementById('itemBulkInclude').textContent = 'Include in outlet';
     var ungroupedHeader = document.querySelector('#panel-overview .items-table thead tr');
     if (ungroupedHeader) ungroupedHeader.insertAdjacentHTML('afterbegin', '<th style="width:34px"></th>');
   }
   setTimeout(renderItems, 0);
-  document.getElementById('panel-outlets').innerHTML = '<div class="panel-label-row"><span class="panel-label-text">SKUs <span class="panel-label-count">74</span></span><button class="btn-primary" onclick="showToast(\'SKU management is ready for this outlet\')">Manage SKUs</button></div><div style="margin:-4px 0 16px;color:var(--ink-mute);font-size:13px">SKUs available to this outlet, including any outlet-level overrides.</div><div class="ml-filter-row"><div class="search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg><input placeholder="Search SKUs or suppliers…" /></div></div><table class="ml-table"><thead><tr><th>SKU</th><th>UOM</th><th>Unit price</th><th>Source</th></tr></thead><tbody><tr><td><strong>Chilled Boneless Duck Breast</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td>S$18.00</td><td><span style="color:var(--spinach);font-weight:600">HQ setup</span></td></tr><tr><td><strong>Chilled Chicken Breast Fillet</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td>S$8.20</td><td><span style="color:var(--spinach);font-weight:600">Outlet override</span></td></tr><tr><td><strong>Char Siu Marinade</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Sub-recipe · Batch 11 L</div></td><td>L</td><td>—</td><td><span style="color:var(--spinach);font-weight:600">HQ setup</span></td></tr></tbody></table>';
+  document.getElementById('panel-outlets').innerHTML = '<div class="panel-label-row"><span class="panel-label-text">SKUs <span class="panel-label-count">74</span></span><button class="btn-primary" onclick="showToast(\'SKU management is ready for this outlet\')">Manage SKUs</button></div><div style="margin:-4px 0 16px;color:var(--ink-mute);font-size:13px">SKUs available to this outlet, including any outlet-level overrides.</div><div class="ml-filter-row"><div class="search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg><input placeholder="Search SKUs or suppliers…" /></div></div><table class="ml-table"><thead><tr><th>SKU</th><th>UOM</th><th>Unit price</th><th>Source</th></tr></thead><tbody><tr><td><strong>Chilled Boneless Duck Breast</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td>$18.00</td><td><span style="color:var(--spinach);font-weight:600">HQ setup</span></td></tr><tr><td><strong>Chilled Chicken Breast Fillet</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Kee Song Group</div></td><td>kg</td><td>$8.20</td><td><span style="color:var(--spinach);font-weight:600">Outlet override</span></td></tr><tr><td><strong>Char Siu Marinade</strong><div style="margin-top:3px;color:var(--ink-mute);font-size:12px">Sub-recipe · Batch 11 L</div></td><td>L</td><td>—</td><td><span style="color:var(--spinach);font-weight:600">HQ setup</span></td></tr></tbody></table>';
   var inventory = document.getElementById('panel-inventory');
-  inventory.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="section-action" onclick="showToast(\'Inventory settings are ready for this outlet\')">Manage inventory</button></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th></tr></thead><tbody><tr><td><div class="ml-item-name">Anchor Unsalted Butter 25kg Bulk Block</div><div class="item-supplier-text">Fonterra Brands</div></td><td>kg</td><td>S$11.80</td></tr><tr><td><div class="ml-item-name">Chaokoh UHT Coconut Milk 400ml x 24 Ctn</div><div class="item-supplier-text">Chaokoh F&amp;B</div></td><td>tin</td><td>S$1.80</td></tr><tr><td><div class="ml-item-name">Char Siu Marinade</div><div class="item-supplier-text">Sub-recipe · Batch 1 L</div></td><td>L</td><td>S$3.60</td></tr></tbody></table>';
+  inventory.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">28</span></span><button class="section-action" onclick="showToast(\'Inventory settings are ready for this outlet\')">Manage inventory</button></div><table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th></tr></thead><tbody><tr><td><div class="ml-item-name">Anchor Unsalted Butter 25kg Bulk Block</div><div class="item-supplier-text">Fonterra Brands</div></td><td>kg</td><td>$11.80</td></tr><tr><td><div class="ml-item-name">Chaokoh UHT Coconut Milk 400ml x 24 Ctn</div><div class="item-supplier-text">Chaokoh F&amp;B</div></td><td>tin</td><td>$1.80</td></tr><tr><td><div class="ml-item-name">Char Siu Marinade</div><div class="item-supplier-text">Sub-recipe · Batch 1 L</div></td><td>L</td><td>$3.60</td></tr></tbody></table>';
   setTimeout(function() { renderScopeInventory(); }, 0);
   var pos = document.createElement('div');
   pos.className = 'tab-panel'; pos.id = 'panel-pos';
@@ -1647,6 +1653,11 @@ const UOM_MULTIPLIER = {
   'per flat (30)': 30,
 };
 
+// Supplier data keeps its original UOM, while every list uses a compact label.
+function compactUom(value) {
+  return String(value == null ? '' : value).replace(/^per\s+/i, '').replace(/\bmillilitres?\b/gi, 'mL').replace(/\blitres?\b/gi, 'L').replace(/\bkilograms?\b/gi, 'kg').replace(/\bgrams?\b/gi, 'g').replace(/\bportions?\b/gi, 'ptn').replace(/\bpieces?\b/gi, 'pc').replace(/\bblocks?\b/gi, 'blk').replace(/\bpacks?(?=\b|\s*\()/gi, 'pk').replace(/\bsleeves?\b/gi, 'slv').replace(/\bbottles?\b/gi, 'btl').replace(/\bcartons?\b/gi, 'ctn').replace(/\bcases?\b/gi, 'cs').replace(/\bboxes?\b/gi, 'bx').replace(/\bbundles?\b/gi, 'bdl').replace(/\bpunnet(s)?\b/gi, 'pun').replace(/\bpacket(s)?\b/gi, 'pkt');
+}
+
 // ── Supplier inheritance ────────────────────────────────────
 // Mirrors the HQ supplier list; only HQ-active suppliers are inherited.
 const HQ_SUPPLIERS = [
@@ -1886,36 +1897,78 @@ function toggleIndividualSupplier(name) {
   renderIndividualOverviewItems();
 }
 
-// Inventory is inherited from HQ. SKUs may be used directly, while
-// inventory items can keep multiple supplier options without duplicating data.
-const SCOPE_INVENTORY_ITEMS = [
-  { kind: 'inventory', name: 'Chicken Thigh Boneless', detail: '2 supplier options', inventoryUom: 'kg', cost: 'From S$6.40' },
-  { itemName: 'Anchor Unsalted Butter Blocks New Zealand Pasteurised 1kg Carton', inventoryUom: 'block', unitFactor: 1 },
-  { itemName: 'Bulla Thickened Cream Full Fat 35% Butterfat Homogenised 1L Bottle', inventoryUom: 'L', unitFactor: 1 },
-  { kind: 'inventory', name: 'Burger Bun', detail: 'No supplier options', inventoryUom: 'pc', cost: '—' },
-  { kind: 'sub-recipe', name: 'Char Siu Marinade', detail: 'Sub-recipe · Batch 1 L', inventoryUom: 'L', cost: 'S$3.60' },
+// Inventory inherits every SKU that is available to this group or outlet. It
+// also contains the HQ inventory items, recipes and sub-recipes for the scope.
+const SCOPE_INVENTORY_ITEM_DEFINITIONS = [
+  { name: 'Chicken Thigh Boneless', uom: 'kg', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [], constituents: [
+    { name: 'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier: 'Kee Song Group', cost: 6.80, groups: ['Chargrill Outlets'], outlets: [] },
+    { name: 'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier: 'Poultry Masters SG', cost: 6.40, groups: ['Family Dining Express'], outlets: [] }
+  ] },
+  { name: 'Dark Soy Sauce', uom: 'L', groups: ['Chargrill Outlets'], outlets: ['(WF 290) Garden Express @ 290 Sengkang'], constituents: [
+    { name: 'Kikkoman Dark Soy Sauce 2L', supplier: 'Kikkoman', cost: 8.80, groups: ['Chargrill Outlets'], outlets: [] },
+    { name: 'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier: 'Asian Dry Goods', cost: 6.90, groups: [], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
+  ] },
+  { name: 'Cooking Oil', uom: 'L', groups: ['Family Dining Express'], outlets: ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'], constituents: [
+    { name: 'Sime Darby Canola Oil RBD 20L', supplier: 'Sunny Gold F&B Supplies', cost: 3.20, groups: ['Family Dining Express'], outlets: [] },
+    { name: 'Blended Vegetable Cooking Oil 20L', supplier: 'Sunny Gold F&B Supplies', cost: 2.80, groups: [], outlets: ['(WF 139) Chargrill @ 139 Tampines'] },
+    { name: 'Golden Chef Rice Bran Oil 18L', supplier: 'Asian Dry Goods', cost: 3.60, groups: [], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
+  ] },
+  { name: 'Burger Bun', uom: 'pc', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [], constituents: [] }
 ];
-function getScopeInventoryItems() {
-  return SCOPE_INVENTORY_ITEMS.map(function(config) {
-    if (config.kind) return { name: config.name, supplier: '', detail: config.detail, kind: config.kind, uom: config.inventoryUom, cost: config.cost };
-    const item = ITEMS.find(function(entry) { return entry.name === config.itemName; });
-    if (!item) return null;
-    const itemIndex = ITEMS.indexOf(item);
-    const override = itemOverrides[itemIndex] || {};
+const SCOPE_SUB_RECIPES = [
+  { name: 'House BBQ Sauce', uom: 'L', groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Char Siu Marinade', uom: 'L', groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Chimichurri', uom: 'ml', groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Satay Peanut Sauce', uom: 'L', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [] },
+  { name: 'Nam Jim Dipping Sauce', uom: 'ml', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [] }
+];
+const SCOPE_RECIPES = [
+  { name: 'Chargrill Half Chicken with Garlic Herb Butter', uom: 'ptn', groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Wagyu Beef Striploin 200g', uom: 'ptn', groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Pork Belly Burnt Ends', uom: 'ptn', groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Chargrill Spring Onion Bunches with Soy & Sesame', uom: 'ptn', groups: ['Chargrill Outlets'], outlets: [] }
+];
+let scopeInventorySearch = '';
+let scopeInventoryTypeFilter = '';
+let scopeInventoryPage = 1;
+const scopeInventoryExpanded = new Set();
+const SCOPE_INVENTORY_PER_PAGE = 20;
+
+function scopeUsesHqRecord(record) {
+  const scopeName = window.isIndividualOutletPrototype
+    ? (new URLSearchParams(window.location.search).get('outlet') || '')
+    : (document.getElementById('groupPageTitle') || {}).textContent;
+  return window.isIndividualOutletPrototype ? (record.outlets || []).includes(scopeName) : (record.groups || []).includes(scopeName);
+}
+
+function scopeSkuIsUnavailable(item, index) {
+  return inheritedHqItemLifecycle(item) !== 'active' || isExcludedByHq(item) || scopeExcludedItems.has(index) || groupDisabledItems.has(index) || individuallyDisabledItems.has(index) || scopeExcludedSuppliers.has(item.supplier);
+}
+function getScopeInventoryRecords() {
+  const skuRecords = ITEMS.map(function(item, index) {
+    if (inheritedHqItemLifecycle(item) === 'removed' || isExcludedByHq(item)) return null;
+    const override = itemOverrides[index] || {};
+    const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
     const price = override.price != null ? override.price : (Array.isArray(override.prices) && override.prices[0] != null ? override.prices[0] : item.price);
-    return {
-      name: item.name,
-      supplier: item.supplier,
-      kind: 'supplier',
-      uom: config.inventoryUom,
-      cost: 'S$' + (Number(price || 0) / config.unitFactor).toFixed(2),
-    };
+    return { type: 'sku', name: override.customName || item.name, sourceName: item.name, supplier: supplierDisplayName(item.supplier), uom: uoms[0].replace(/^per\s+/i, ''), cost: '$' + Number(price).toFixed(2), unavailable: scopeSkuIsUnavailable(item, index), sourceIndex: index };
   }).filter(Boolean);
+  const inventoryItems = SCOPE_INVENTORY_ITEM_DEFINITIONS.filter(scopeUsesHqRecord).map(function(definition) {
+    const options = (definition.constituents || []).filter(scopeUsesHqRecord);
+    return { type: 'item', name: definition.name, uom: definition.uom, cost: '—', options: options, unavailable: scopeExcludedInventory.has(definition.name) };
+  });
+  const recipes = SCOPE_RECIPES.filter(scopeUsesHqRecord).map(function(recipe) {
+    return { type: 'recipe', name: recipe.name, uom: recipe.uom, cost: '—', unavailable: scopeExcludedInventory.has(recipe.name) };
+  });
+  const subRecipes = SCOPE_SUB_RECIPES.filter(scopeUsesHqRecord).map(function(recipe) {
+    return { type: 'sub-recipe', name: recipe.name, uom: recipe.uom, cost: '—', unavailable: scopeExcludedInventory.has(recipe.name) };
+  });
+  return skuRecords.concat(inventoryItems, recipes, subRecipes);
 }
-function setInventoryStatusFilter(value) {
-  inventoryStatusFilter = value || 'available';
-  renderScopeInventory();
-}
+function setScopeInventorySearch(value) { scopeInventorySearch = value || ''; scopeInventoryPage = 1; renderScopeInventory(); }
+function setScopeInventoryTypeFilter(value) { scopeInventoryTypeFilter = value || ''; scopeInventoryPage = 1; renderScopeInventory(); }
+function setInventoryStatusFilter(value) { inventoryStatusFilter = value || 'available'; scopeInventoryPage = 1; renderScopeInventory(); }
+function setScopeInventoryPage(page) { scopeInventoryPage = Math.max(1, page); renderScopeInventory(); }
+function toggleScopeInventoryExpand(name) { scopeInventoryExpanded.has(name) ? scopeInventoryExpanded.delete(name) : scopeInventoryExpanded.add(name); renderScopeInventory(); }
 function toggleInventoryExclusion(name) {
   if (scopeExcludedInventory.has(name)) {
     scopeExcludedInventory.delete(name);
@@ -1926,17 +1979,51 @@ function toggleInventoryExclusion(name) {
   }
   renderScopeInventory();
 }
+function renderScopeInventoryPager(page, totalPages, total) {
+  if (totalPages <= 1) return '';
+  return '<div class="items-pager-wrap"><span class="pager-info">' + total + ' records</span><div class="pager-buttons"><button class="pager-btn" ' + (page === 1 ? 'disabled' : '') + ' onclick="setScopeInventoryPage(' + (page - 1) + ')">‹</button><span class="pager-current">' + page + ' of ' + totalPages + '</span><button class="pager-btn" ' + (page === totalPages ? 'disabled' : '') + ' onclick="setScopeInventoryPage(' + (page + 1) + ')">›</button></div></div>';
+}
 function renderScopeInventory() {
   const panel = document.getElementById('panel-inventory');
   if (!panel) return;
   const scopeLabel = window.isIndividualOutletPrototype ? 'this outlet' : 'this group';
-  const inventoryItems = getScopeInventoryItems();
-  const rows = inventoryItems.filter(item => inventoryStatusFilter === 'all' || (inventoryStatusFilter === 'excluded' ? scopeExcludedInventory.has(item.name) : !scopeExcludedInventory.has(item.name)));
-  panel.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">' + inventoryItems.filter(item => !scopeExcludedInventory.has(item.name)).length + '</span></span><span style="font-size:12px;color:var(--ink-mute)">Managed at HQ</span></div>' +
-    '<div class="ml-filter-row"><div class="ml-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="ml-search-input" placeholder="Search inventory…" /></div><select class="ml-filter-select" onchange="setInventoryStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
-    '<table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th><th style="width:48px"></th></tr></thead><tbody>' +
-    (rows.length ? rows.map(item => { const excluded = scopeExcludedInventory.has(item.name); const secondary = item.kind === 'inventory' ? '<span style="color:var(--spinach);font-weight:600">' + item.detail + '</span>' : (item.kind === 'sub-recipe' ? item.detail : supplierDisplayName(item.supplier)); return '<tr' + (excluded ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + item.name + '</div><div class="item-supplier-text">' + secondary + '</div></td><td>' + item.uom + '</td><td>' + item.cost + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu"><div class="row-action-item' + (excluded ? '' : ' danger') + '" onclick="toggleInventoryExclusion(\'' + item.name.replace(/'/g, "\\'") + '\')">' + (excluded ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div></div></div></td></tr>'; }).join('') : '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-mute)">No inventory items match this status</td></tr>') +
-    '</tbody></table>';
+  const allRecords = getScopeInventoryRecords();
+  let records = allRecords.filter(function(record) {
+    if (scopeInventoryTypeFilter && record.type !== scopeInventoryTypeFilter) return false;
+    if (inventoryStatusFilter === 'available' && record.unavailable) return false;
+    if (inventoryStatusFilter === 'excluded' && !record.unavailable) return false;
+    if (!scopeInventorySearch) return true;
+    const query = scopeInventorySearch.toLowerCase();
+    return record.name.toLowerCase().includes(query) || (record.supplier || '').toLowerCase().includes(query);
+  });
+  records.sort(function(a, b) { return a.name.localeCompare(b.name); });
+  const totalPages = Math.max(1, Math.ceil(records.length / SCOPE_INVENTORY_PER_PAGE));
+  if (scopeInventoryPage > totalPages) scopeInventoryPage = totalPages;
+  const visibleRecords = records.slice((scopeInventoryPage - 1) * SCOPE_INVENTORY_PER_PAGE, scopeInventoryPage * SCOPE_INVENTORY_PER_PAGE);
+  const availableCount = allRecords.filter(function(record) { return !record.unavailable; }).length;
+  const rows = visibleRecords.map(function(record) {
+    const hasOptions = record.type === 'item' && record.options.length;
+    const isExpanded = hasOptions && scopeInventoryExpanded.has(record.name);
+    const metadata = record.type === 'sku' ? 'SKU · ' + record.supplier : record.type === 'item' ? 'Item · ' + (record.options.length ? record.options.length + ' option' + (record.options.length === 1 ? '' : 's') : 'No supplier options') : record.type === 'recipe' ? 'Recipe' : 'Sub-recipe';
+    const metadataHtml = hasOptions
+      ? '<button class="item-options-link" onclick="event.stopPropagation();toggleScopeInventoryExpand(\'' + record.name.replace(/'/g, "\\'") + '\')">' + metadata + ' <span class="item-options-chevron' + (isExpanded ? ' open' : '') + '"></span></button>'
+      : '<div class="item-supplier-text item-options-static">' + metadata + '</div>';
+    const action = record.type === 'sku'
+      ? '<div class="row-action-note">Manage availability in SKUs</div>'
+      : '<div class="row-action-item' + (record.unavailable ? '' : ' danger') + '" onclick="toggleInventoryExclusion(\'' + record.name.replace(/'/g, "\\'") + '\')">' + (record.unavailable ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div>';
+    const parent = '<tr' + (record.unavailable ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + record.name + '</div>' + metadataHtml + '</td><td>' + compactUom(record.uom) + '</td><td class="inventory-cost">' + record.cost + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu">' + action + '</div></div></td></tr>';
+    if (!isExpanded) return parent;
+    const optionRows = record.options.map(function(option) {
+      return '<tr style="background:#F9FAFB"><td style="padding-left:24px"><div class="ml-item-name">' + option.name + '</div><div class="item-supplier-text">SKU · ' + supplierDisplayName(option.supplier) + '</div></td><td>' + compactUom(record.uom) + '</td><td class="inventory-cost">$' + Number(option.cost).toFixed(2) + '</td><td></td></tr>';
+    }).join('');
+    return parent + optionRows;
+  }).join('');
+  panel.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">' + availableCount + '</span></span></div>' +
+    '<div class="ml-filter-row"><div class="ml-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="ml-search-input" value="' + scopeInventorySearch.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" placeholder="Search inventory…" oninput="setScopeInventorySearch(this.value)" /></div><select class="ml-filter-select" onchange="setScopeInventoryTypeFilter(this.value)"><option value="">All types</option><option value="sku">SKU</option><option value="item">Item</option><option value="recipe">Recipe</option><option value="sub-recipe">Sub-recipe</option></select><select class="ml-filter-select" onchange="setInventoryStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
+    '<table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th><th style="width:48px"></th></tr></thead><tbody>' + (rows || '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-mute)">No inventory records match these filters</td></tr>') + '</tbody></table>' + renderScopeInventoryPager(scopeInventoryPage, totalPages, records.length);
+  const selects = panel.querySelectorAll('select');
+  if (selects[0]) selects[0].value = scopeInventoryTypeFilter;
+  if (selects[1]) selects[1].value = inventoryStatusFilter;
 }
 
 function renderStatsStrip() {
@@ -2089,6 +2176,7 @@ function bulkItemAction(action) {
   });
   selectedItemIndices.clear();
   renderItems();
+  renderScopeInventory();
   showToast(action === 'exclude' ? 'SKUs excluded from this group' : 'SKUs included in this group');
 }
 
@@ -2150,9 +2238,9 @@ function renderItems() {
       const displayPrice = (ov.price != null) ? ov.price : item.price;
       const displayMOQ = ov.moq || item.moq;
       return '<tr class="item-row item-parent-row' + rowClass + '">' + selectCell + nameCell +
-        '<td class="uom-text" onclick="' + openFn + '" style="cursor:pointer">' + uoms[0].replace(/^per\s+/i, '') + '</td>' +
-        '<td class="price-cell" onclick="' + openFn + '" style="cursor:pointer">S$' + parseFloat(displayPrice).toFixed(2) + ' <span class="uom-text">/ ' + uoms[0].replace(/^per\s+/i, '') + '</span></td>' +
-        '<td class="moq-cell" onclick="' + openFn + '" style="cursor:pointer">' + displayMOQ + '</td>' + actionCell + '</tr>';
+        '<td class="uom-text" onclick="' + openFn + '" style="cursor:pointer">' + compactUom(uoms[0]) + '</td>' +
+        '<td class="price-cell" onclick="' + openFn + '" style="cursor:pointer">$' + parseFloat(displayPrice).toFixed(2) + '</td>' +
+        '<td class="moq-cell" onclick="' + openFn + '" style="cursor:pointer">' + compactUom(displayMOQ) + '</td>' + actionCell + '</tr>';
     }
 
     const expanded = groupExpandedUoms.has(rawIdx);
@@ -2164,12 +2252,12 @@ function renderItems() {
     const children = breakdown.map(function(entry, uomIdx) {
       const childPrice = ov.prices && ov.prices[uomIdx] != null ? ov.prices[uomIdx] : entry.price;
       const childMOQ = ov.moqs && ov.moqs[uomIdx] != null ? ov.moqs[uomIdx] : (ov.moq || item.moq);
-      const unit = entry.uom.replace(/^per\s+/i, '');
+      const unit = compactUom(entry.uom);
       return '<tr class="item-uom-row' + (isDisabled ? ' ml-inactive' : '') + '">' +
         '<td class="item-select-cell"></td><td class="item-uom-name">' + displayName + '</td>' +
         '<td class="uom-text">' + unit + '</td>' +
-        '<td class="price-cell">S$' + parseFloat(childPrice).toFixed(2) + ' <span class="uom-text">/ ' + unit + '</span></td>' +
-        '<td class="moq-cell">' + childMOQ + '</td><td></td></tr>';
+        '<td class="price-cell">$' + parseFloat(childPrice).toFixed(2) + ' <span class="uom-text">/ ' + unit + '</span></td>' +
+        '<td class="moq-cell">' + compactUom(childMOQ) + '</td><td></td></tr>';
     }).join('');
     return parent + children;
   }).join('');
@@ -2249,13 +2337,13 @@ function openItemModal(idx) {
   if (isActiveSup) {
     if (Array.isArray(item.uom)) {
       const breakdown = getUOMBreakdown(item);
-      const rows = breakdown.map(r => '<tr><td><div class="pilot-scope-cell"><button class="access-toggle on" type="button" data-uom-enabled onclick="toggleUomRow(this)" aria-label="Enable ' + r.uom + '"></button><div class="pilot-scope-name">' + formatUomLabel(r.uom) + '</div></div></td><td class="pilot-scope-inherited">S$' + r.price.toFixed(2) + '</td><td class="pilot-scope-inherited">' + item.moq + '</td><td></td></tr>').join('');
+      const rows = breakdown.map(r => '<tr><td><div class="pilot-scope-cell"><button class="access-toggle on" type="button" data-uom-enabled onclick="toggleUomRow(this)" aria-label="Enable ' + r.uom + '"></button><div class="pilot-scope-name">' + formatUomLabel(r.uom) + '</div></div></td><td class="pilot-scope-inherited">$' + r.price.toFixed(2) + '</td><td class="pilot-scope-inherited">' + item.moq + '</td><td></td></tr>').join('');
       section.innerHTML =
-        '<div class="modal-field"><label>Pricing</label><table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>UOM</th><th>Price (S$)</th><th>MOQ</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+        '<div class="modal-field"><label>Pricing</label><table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>UOM</th><th>Price ($)</th><th>MOQ</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
     } else {
       section.innerHTML =
-        '<div class="modal-field"><label>Pricing</label><table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>UOM</th><th>Price (S$)</th><th>MOQ</th><th></th></tr></thead><tbody>' +
-        '<tr><td><div class="pilot-scope-cell"><div class="pilot-scope-name">' + formatUomLabel(item.uom) + '</div></div></td><td class="pilot-scope-inherited">S$' + item.price.toFixed(2) + '</td><td class="pilot-scope-inherited">' + item.moq + '</td><td></td></tr>' +
+        '<div class="modal-field"><label>Pricing</label><table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>UOM</th><th>Price ($)</th><th>MOQ</th><th></th></tr></thead><tbody>' +
+        '<tr><td><div class="pilot-scope-cell"><div class="pilot-scope-name">' + formatUomLabel(item.uom) + '</div></div></td><td class="pilot-scope-inherited">$' + item.price.toFixed(2) + '</td><td class="pilot-scope-inherited">' + item.moq + '</td><td></td></tr>' +
         '</tbody></table></div>';
     }
   } else {
@@ -2272,7 +2360,7 @@ function openItemModal(idx) {
         const effPrice = ovPrices[i] != null ? parseFloat(ovPrices[i]).toFixed(2) : '';
         const effMoq = ovMoqs[i] != null ? ovMoqs[i] : '';
         const enabled = ovUomEnabled[i] !== false;
-        const displayPrice = ovPrices[i] != null ? 'S$' + parseFloat(ovPrices[i]).toFixed(2) : 'S$' + hqPrice;
+        const displayPrice = ovPrices[i] != null ? '$' + parseFloat(ovPrices[i]).toFixed(2) : '$' + hqPrice;
         const displayMoq = ovMoqs[i] != null ? ovMoqs[i] : hqMoq;
 
         return '<tr class="uom-view-row ' + (enabled ? '' : 'uom-row-disabled') + '" data-default-price="' + hqPrice + '" data-default-moq="' + hqMoq + '">' +
@@ -2281,31 +2369,31 @@ function openItemModal(idx) {
           '<td class="' + (ovMoqs[i] == null ? 'pilot-scope-inherited' : '') + '"><span class="uom-moq-display">' + displayMoq + '</span></td>' +
           '<td><button class="pilot-scope-edit" type="button" onclick="toggleUomEdit(this)" aria-label="Edit pricing" title="Edit pricing"><span class="material-symbols-outlined">edit</span></button></td>' +
         '</tr>' +
-        '<tr class="uom-edit-row" style="display:none"><td colspan="4"><div class="pilot-scope-editor" data-hq-val=""><div class="pilot-scope-editor-hint">Leave a field empty to use its default.</div><input class="modal-field-input uom-price-input" type="text" value="' + effPrice + '" placeholder="Price (S$)" /><input class="modal-field-input uom-moq-input" type="text" value="' + effMoq + '" placeholder="MOQ" /><button class="btn btn-tertiary" type="button" onclick="cancelUomEdit(this)">Cancel</button><button class="btn btn-primary" type="button" onclick="updateUomEdit(this)">Update</button></div></td></tr>';
+        '<tr class="uom-edit-row" style="display:none"><td colspan="4"><div class="pilot-scope-editor" data-hq-val=""><div class="pilot-scope-editor-hint">Leave a field empty to use its default.</div><input class="modal-field-input uom-price-input" type="text" value="' + effPrice + '" placeholder="Price ($)" /><input class="modal-field-input uom-moq-input" type="text" value="' + effMoq + '" placeholder="MOQ" /><button class="btn btn-tertiary" type="button" onclick="cancelUomEdit(this)">Cancel</button><button class="btn btn-primary" type="button" onclick="updateUomEdit(this)">Update</button></div></td></tr>';
       }).join('');
 
       section.innerHTML =
         '<div class="modal-field"><label>Pricing</label><p class="supplier-settings-help" style="margin:0 0 8px;color:var(--ink-mute)">Leave price or MOQ blank to use the HQ default. If no HQ price is set, it defaults to 0.00.</p>' +
-        '<table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>UOM</th><th>Price (S$)</th><th>MOQ</th><th></th></tr></thead><tbody>' +
+        '<table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>UOM</th><th>Price ($)</th><th>MOQ</th><th></th></tr></thead><tbody>' +
         rows + '</tbody></table></div>';
     } else {
       const hqPrice = item.price.toFixed(2);
       const hqMoq = item.moq;
       const effPrice = ov.price != null ? parseFloat(ov.price).toFixed(2) : '';
       const effMoq = ov.moq != null ? ov.moq : '';
-      const displayPrice = ov.price != null ? 'S$' + parseFloat(ov.price).toFixed(2) : 'S$' + hqPrice;
+      const displayPrice = ov.price != null ? '$' + parseFloat(ov.price).toFixed(2) : '$' + hqPrice;
       const displayMoq = ov.moq != null ? ov.moq : hqMoq;
 
       section.innerHTML =
         '<div class="modal-field"><label>Pricing</label><p class="supplier-settings-help" style="margin:0 0 8px;color:var(--ink-mute)">Leave price or MOQ blank to use the HQ default. If no HQ price is set, it defaults to 0.00.</p>' +
-        '<table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>UOM</th><th>Price (S$)</th><th>MOQ</th><th></th></tr></thead><tbody>' +
+        '<table class="uom-breakdown-table pilot-pricing-table"><thead><tr><th>UOM</th><th>Price ($)</th><th>MOQ</th><th></th></tr></thead><tbody>' +
         '<tr class="uom-view-row" data-default-price="' + hqPrice + '" data-default-moq="' + hqMoq + '">' +
           '<td><div class="pilot-scope-cell"><div class="pilot-scope-name">' + formatUomLabel(item.uom) + '</div></div></td>' +
           '<td class="' + (ov.price == null ? 'pilot-scope-inherited' : '') + '"><span class="uom-price-display">' + displayPrice + '</span></td>' +
           '<td class="' + (ov.moq == null ? 'pilot-scope-inherited' : '') + '"><span class="uom-moq-display">' + displayMoq + '</span></td>' +
           '<td><button class="pilot-scope-edit" type="button" onclick="toggleUomEdit(this)" aria-label="Edit pricing" title="Edit pricing"><span class="material-symbols-outlined">edit</span></button></td>' +
         '</tr>' +
-        '<tr class="uom-edit-row" style="display:none"><td colspan="4"><div class="pilot-scope-editor"><div class="pilot-scope-editor-hint">Leave a field empty to use its default.</div><input id="itemPrice" class="modal-field-input uom-price-input" type="text" value="' + effPrice + '" placeholder="Price (S$)" /><input id="itemMOQ" class="modal-field-input uom-moq-input" type="text" value="' + effMoq + '" placeholder="MOQ" /><button class="btn btn-tertiary" type="button" onclick="cancelUomEdit(this)">Cancel</button><button class="btn btn-primary" type="button" onclick="updateUomEdit(this)">Update</button></div></td></tr>' +
+        '<tr class="uom-edit-row" style="display:none"><td colspan="4"><div class="pilot-scope-editor"><div class="pilot-scope-editor-hint">Leave a field empty to use its default.</div><input id="itemPrice" class="modal-field-input uom-price-input" type="text" value="' + effPrice + '" placeholder="Price ($)" /><input id="itemMOQ" class="modal-field-input uom-moq-input" type="text" value="' + effMoq + '" placeholder="MOQ" /><button class="btn btn-tertiary" type="button" onclick="cancelUomEdit(this)">Cancel</button><button class="btn btn-primary" type="button" onclick="updateUomEdit(this)">Update</button></div></td></tr>' +
         '</tbody></table></div>';
     }
   }
@@ -2349,7 +2437,7 @@ function updateUomEdit(button) {
   if (!editRow || !row) return;
   const priceInput = editRow.querySelector('.uom-price-input');
   const moqInput = editRow.querySelector('.uom-moq-input');
-  const price = priceInput && priceInput.value.trim() ? 'S$' + parseFloat(priceInput.value).toFixed(2) : 'S$' + row.dataset.defaultPrice;
+  const price = priceInput && priceInput.value.trim() ? '$' + parseFloat(priceInput.value).toFixed(2) : '$' + row.dataset.defaultPrice;
   const moq = moqInput && moqInput.value.trim() ? moqInput.value.trim() : row.dataset.defaultMoq;
   row.querySelector('.uom-price-display').textContent = price;
   row.querySelector('.uom-moq-display').textContent = moq;
@@ -2789,9 +2877,9 @@ const OG_RECIPES = [
   { name: 'Basque Burnt Cheesecake — Individual Portion',           cat: 'Desserts',           cost: 4.80  },
   { name: 'Dark Chocolate Lava Cake with Vanilla Bean Ice Cream',   cat: 'Desserts',           cost: 4.20  },
   { name: 'Alphonso Mango Sorbet — 2 Scoops',                       cat: 'Desserts',           cost: 2.40  },
-  { name: 'Affogato — Double Espresso over Vanilla Ice Cream',      cat: 'Desserts',           cost: 2.80  },
+  { name: 'Affogato — Double Espresso over Vanilla Ice Cream',      cat: '',                  cost: 2.80  },
   // Beverages
-  { name: 'House Lemonade — Fresh Squeezed with Mint',              cat: 'Beverages',          cost: 0.80  },
+  { name: 'House Lemonade — Fresh Squeezed with Mint',              cat: '',                  cost: 0.80  },
   { name: 'Iced Kopi-O Kosong — Local Cold Brew',                   cat: 'Beverages',          cost: 0.60  },
   { name: 'Lime Soda with Himalayan Salt',                          cat: 'Beverages',          cost: 0.50  },
   { name: 'Fresh Watermelon Juice — No Sugar Added',                cat: 'Beverages',          cost: 1.20  },
@@ -2851,7 +2939,7 @@ function renderOgRec() {
   document.getElementById('ogRecCount').textContent = total;
   document.getElementById('ogRecBody').innerHTML = page.map(r => {
     return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
-      '<td><div class="ml-item-name">' + r.name + '</div><span class="ml-cat-tag">' + r.cat + '</span></td>' +
+      '<td><div class="ml-item-name">' + r.name + '</div>' + (r.cat ? '<span class="ml-cat-tag">' + r.cat + '</span>' : '') + '</td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.price.toFixed(2) + '</span></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:' + (r.foodCostPct > ogRecFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + r.foodCostPct.toFixed(1) + '%</span></td>' +
@@ -2910,6 +2998,7 @@ function toggleGroupSupplier(name) {
       groupDisabledSuppliers.delete(name);
       renderSuppliers();
       renderItems();
+      renderScopeInventory();
       renderStatsStrip();
     }
   } else {
@@ -2930,6 +3019,7 @@ function confirmGroupSupDisable() {
   closeGroupSupDisableWarning();
   renderSuppliers();
   renderItems();
+  renderScopeInventory();
   renderStatsStrip();
 }
 function closeGroupSupReactivateOverlay() {
@@ -2945,6 +3035,7 @@ function confirmGroupSupReactivate(alsoItems) {
   closeGroupSupReactivateOverlay();
   renderSuppliers();
   renderItems();
+  renderScopeInventory();
   renderStatsStrip();
 }
 window.addEventListener('DOMContentLoaded', () => {
@@ -3001,6 +3092,7 @@ function confirmItemDisable() {
   scopeExcludedItems.add(pendingItemIdx);
   closeItemDisableConfirm();
   if (window.isIndividualOutletPrototype) renderIndividualOverviewItems(); else renderItems();
+  renderScopeInventory();
   showToast(window.isIndividualOutletPrototype ? 'SKU excluded from this outlet' : 'SKU excluded from this group');
 }
 
@@ -3014,6 +3106,7 @@ function confirmItemEnable() {
   individuallyDisabledItems.delete(pendingItemIdx);
   closeItemEnableConfirm();
   if (window.isIndividualOutletPrototype) renderIndividualOverviewItems(); else renderItems();
+  renderScopeInventory();
   showToast(window.isIndividualOutletPrototype ? 'SKU included in this outlet' : 'SKU included in this group');
 }
 
