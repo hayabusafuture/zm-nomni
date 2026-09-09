@@ -454,7 +454,10 @@
   .supplier-status-chip.active { background:#D9F5E4; color:#1A8040; }
   .supplier-status-chip.excluded { background:#FDD6DC; color:#D0291E; }
   .ml-item-name { font-weight: 500; color: var(--ink); margin-bottom: 2px; }
-  .ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; background: #F0F0F2; color: #555; border-radius: 4px; padding: 2px 8px; letter-spacing: .04em; }
+  .ml-cat-tag { display: inline; font-size: 11px; font-weight: 600; color: #555; }
+  .ml-recipe-meta { display:flex; align-items:center; gap:4px; margin-top:3px; }
+  .ml-recipe-type, .ml-recipe-separator { font-size:11px; color:var(--ink-mute); }
+  .ml-recipe-separator { display:inline-block; margin:0 2px; }
   .ml-inactive { opacity: 0.45; }
   tr.ml-inactive { opacity: 1; }
   tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
@@ -2832,10 +2835,10 @@ const OG_RECIPES = [
   // Mains
   { name: 'Chargrill Chicken Thigh with Herb & Garlic Marinade',   cat: 'Mains',              cost: 8.40  },
   { name: 'Wagyu Beef Burger with Caramelised Onion Relish',        cat: 'Mains',              cost: 22.50 },
-  { name: 'BBQ Baby Back Pork Ribs with House Sauce — Half Rack',   cat: 'Mains',              cost: 18.20 },
+  { name: 'BBQ Baby Back Pork Ribs with House Sauce — Half Rack',   cat: 'Mains', tags: ['Mains', 'Signature'], cost: 18.20 },
   { name: 'Chargrill NZ Lamb Rack Frenched with Rosemary Jus',      cat: 'Mains',              cost: 32.00 },
   { name: 'Crispy Pork Belly with Apple & Fennel Slaw',             cat: 'Mains',              cost: 14.80 },
-  { name: 'Char Siu Chicken Thigh Fillet — Cantonese Style',        cat: 'Mains',              cost: 9.20  },
+  { name: 'Char Siu Chicken Thigh Fillet — Cantonese Style',        cat: 'Mains', tags: ['Mains', 'Popular'], cost: 9.20  },
   { name: 'Chargrill Barramundi Fillet with Lemon Butter Sauce',    cat: 'Mains',              cost: 16.50 },
   { name: 'Chargrill Salmon Fillet with Dill Cream & Capers',       cat: 'Mains',              cost: 19.80 },
   { name: 'Beef Chuck Roll 6hr Slow Braise with Red Wine Jus',      cat: 'Mains',              cost: 15.60 },
@@ -2846,7 +2849,7 @@ const OG_RECIPES = [
   { name: 'Chargrill Duck Breast with Cherry & Port Reduction',     cat: 'Mains',              cost: 28.00 },
   { name: 'Black Tiger Prawn Skewers with Garlic Butter — 4pcs',    cat: 'Mains',              cost: 14.20 },
   // Starters
-  { name: 'BBQ Chicken Mid-Joint Wings with House Dry Rub — 6pcs',  cat: 'Starters',           cost: 5.80  },
+  { name: 'BBQ Chicken Mid-Joint Wings with House Dry Rub — 6pcs',  cat: 'Starters', tags: ['Starters', 'Grill'], cost: 5.80  },
   { name: 'Crispy Squid Rings Breaded with Sriracha Aioli',         cat: 'Starters',           cost: 6.40  },
   { name: 'Prawn Crackers Fried with Nam Jim Dipping Sauce',        cat: 'Starters',           cost: 1.20  },
   { name: 'Smoked Edamame with Maldon Sea Salt & Chilli Flakes',    cat: 'Starters',           cost: 2.80  },
@@ -2931,6 +2934,11 @@ function getOgRecItems() {
   else items.sort((a,b) => { const ci = OG_REC_CAT_ORDER.indexOf(a.cat) - OG_REC_CAT_ORDER.indexOf(b.cat); return ci !== 0 ? ci : a.name.localeCompare(b.name); });
   return items;
 }
+function renderOgRecipeMetaLine(recipe) {
+  const tags = Array.isArray(recipe.tags) ? recipe.tags : (recipe.cat ? [recipe.cat] : []);
+  const tagHtml = tags.map(function(tag, index) { return (index ? '<span class="ml-recipe-separator">•</span>' : '') + '<span class="ml-cat-tag">' + tag + '</span>'; }).join('');
+  return '<div class="ml-recipe-meta"><span class="ml-recipe-type">' + (recipe.type === 'sub-recipe' ? 'Sub-recipe' : 'Recipe') + '</span>' + (tags.length ? '<span class="ml-recipe-separator">•</span>' + tagHtml : '') + '</div>';
+}
 function renderOgRec() {
   const items = getOgRecItems();
   const total = items.length;
@@ -2939,7 +2947,7 @@ function renderOgRec() {
   document.getElementById('ogRecCount').textContent = total;
   document.getElementById('ogRecBody').innerHTML = page.map(r => {
     return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
-      '<td><div class="ml-item-name">' + r.name + '</div>' + (r.cat ? '<span class="ml-cat-tag">' + r.cat + '</span>' : '') + '</td>' +
+      '<td><div class="ml-item-name">' + r.name + '</div>' + renderOgRecipeMetaLine(r) + '</td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.price.toFixed(2) + '</span></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:' + (r.foodCostPct > ogRecFcThreshold ? '#D0291E' : 'var(--ink)') + '">' + r.foodCostPct.toFixed(1) + '%</span></td>' +

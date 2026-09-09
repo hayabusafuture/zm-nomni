@@ -300,7 +300,11 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 .ml-item-name { font-size: 14px; font-weight: 500; color: var(--ink); }
 .ml-item-original { display:block; margin-top:2px; color:var(--ink-mute); font-size:12px; font-style:italic; font-weight:400; line-height:1.35; }
 .item-dialog-original { display:block; margin-top:4px; color:var(--ink); font-size:14px; font-weight:400; line-height:1.4; letter-spacing:normal; }
-.ml-cat-tag { display: inline-block; font-size: 11px; font-weight: 600; color: #555; background: #f0f1f3; border-radius: 4px; padding: 1px 7px; margin-top: 3px; }
+.ml-cat-tag { display: inline; font-size: 11px; font-weight: 600; color: #555; }
+.ml-recipe-meta { display:flex; align-items:center; gap:4px; margin-top:3px; }
+.ml-recipe-type { font-size:11px; color:var(--ink-mute); }
+.ml-recipe-separator { display:inline-block; margin:0 2px; font-size:11px; color:var(--ink-mute); }
+.ml-recipe-meta .ml-cat-tag { margin-top:0; }
 .uom-text { font-size: 14px; color: var(--ink); }
 .uom-options-btn { display: inline-block; font-size: 11px; font-weight: 600; color: var(--spinach); background: var(--mint); border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-family: inherit; transition: background .12s; margin-top: 2px; }
 .uom-options-btn:hover { background: #c6f2ce; }
@@ -4091,10 +4095,10 @@ const RECIPES = [
   // Mains
   { name: 'Chargrill Chicken Thigh with Herb & Garlic Marinade', cat: 'Mains', portions: 1, cost: 8.40 },
   { name: 'Wagyu Beef Burger with Caramelised Onion Relish', cat: 'Mains', portions: 1, cost: 22.50 },
-  { name: 'BBQ Baby Back Pork Ribs with House Sauce — Half Rack', cat: 'Mains', portions: 1, cost: 18.20 },
+  { name: 'BBQ Baby Back Pork Ribs with House Sauce — Half Rack', cat: 'Mains', tags: ['Mains', 'Signature'], portions: 1, cost: 18.20 },
   { name: 'Chargrill NZ Lamb Rack Frenched with Rosemary Jus', cat: 'Mains', portions: 1, cost: 32.00 },
   { name: 'Crispy Pork Belly with Apple & Fennel Slaw', cat: 'Mains', portions: 1, cost: 14.80 },
-  { name: 'Char Siu Chicken Thigh Fillet — Cantonese Style', cat: 'Mains', portions: 1, cost: 9.20 },
+  { name: 'Char Siu Chicken Thigh Fillet — Cantonese Style', cat: 'Mains', tags: ['Mains', 'Popular'], portions: 1, cost: 9.20 },
   { name: 'Chargrill Barramundi Fillet with Lemon Butter Sauce', cat: 'Mains', portions: 1, cost: 16.50 },
   { name: 'Chargrill Salmon Fillet with Dill Cream & Capers', cat: 'Mains', portions: 1, cost: 19.80 },
   { name: 'Beef Chuck Roll 6hr Slow Braise with Red Wine Jus', cat: 'Mains', portions: 1, cost: 15.60 },
@@ -4105,7 +4109,7 @@ const RECIPES = [
   { name: 'Chargrill Duck Breast with Cherry & Port Reduction', cat: 'Mains', portions: 1, cost: 28.00 },
   { name: 'Black Tiger Prawn Skewers with Garlic Butter — 4pcs', cat: 'Mains', portions: 1, cost: 14.20 },
   // Starters
-  { name: 'BBQ Chicken Mid-Joint Wings with House Dry Rub — 6pcs', cat: 'Starters', portions: 1, cost: 5.80 },
+  { name: 'BBQ Chicken Mid-Joint Wings with House Dry Rub — 6pcs', cat: 'Starters', tags: ['Starters', 'Grill'], portions: 1, cost: 5.80 },
   { name: 'Crispy Squid Rings Breaded with Sriracha Aioli', cat: 'Starters', portions: 1, cost: 6.40 },
   { name: 'Prawn Crackers Fried with Nam Jim Dipping Sauce', cat: 'Starters', portions: 4, cost: 1.20 },
   { name: 'Smoked Edamame with Maldon Sea Salt & Chilli Flakes', cat: 'Starters', portions: 1, cost: 2.80 },
@@ -4325,6 +4329,13 @@ document.addEventListener('keydown', function(event) {
   if (event.key === 'Escape') closeRecipeCostDialog();
 });
 
+function renderRecipeMetaLine(recipe) {
+  const tags = Array.isArray(recipe.tags) ? recipe.tags : (recipe.cat ? [recipe.cat] : []);
+  const typeLabel = recipe.type === 'sub-recipe' ? 'Sub-recipe' : 'Recipe';
+  const tagHtml = tags.map(function(tag, index) { return (index ? '<span class="ml-recipe-separator">•</span>' : '') + '<span class="ml-cat-tag">' + tag + '</span>'; }).join('');
+  return '<div class="ml-recipe-meta"><span class="ml-recipe-type">' + typeLabel + '</span>' + (tags.length ? '<span class="ml-recipe-separator">•</span>' + tagHtml : '') + '</div>';
+}
+
 function renderRec() {
   const items = getRecItems();
   const total = items.length;
@@ -4341,12 +4352,12 @@ function renderRec() {
       ? '<span style="display:inline-block;font-size:11px;font-weight:600;background:#EFF6FF;color:#2563EB;border-radius:4px;padding:2px 7px;margin-left:6px">' + r.versions + ' variations</span>'
       : '';
     const lifecycle = recipeLifecycle(r);
-    const stateBadge = lifecycle === 'active' ? '' : '<span class="item-exc-badge" style="margin-left:7px;color:' + (lifecycle === 'removed' ? 'var(--chip-rejected-ink)' : 'var(--ink-mute)') + '">' + (lifecycle === 'removed' ? 'Removed' : 'Disabled') + '</span>';
+    const stateBadge = lifecycle === 'removed' ? '<span class="item-exc-badge" style="margin-left:7px;color:var(--chip-rejected-ink)">Removed</span>' : '';
     const rawIdx = RECIPES.indexOf(r);
     const comparison = recipeCostTargets(r);
     const hasHighFoodCost = comparison.rows.some(function(target) { return target.foodCostPct > recFcThreshold; });
     return '<tr' + (lifecycle === 'active' ? '' : ' class="ml-inactive"') + ' onclick="window.location.href=\'Admin - HQ Recipe Create.html\'" style="cursor:pointer">' +
-      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + stateBadge + versionsHtml + '</div>' + (r.cat ? '<span class="ml-cat-tag">' + (r.type === 'sub-recipe' ? 'Sub-recipe · ' : 'Recipe · ') + r.cat + '</span>' : '') + '</td>' +
+      '<td><div class="ml-item-name"><a href="Admin - HQ Recipe Create.html" style="color:inherit;text-decoration:none" onmouseover="this.style.color=\'var(--spinach)\'" onmouseout="this.style.color=\'inherit\'">' + r.name + '</a>' + stateBadge + versionsHtml + '</div>' + renderRecipeMetaLine(r) + '</td>' +
       '<td><button class="recipe-cost-link" type="button" onclick="event.stopPropagation();openRecipeCostDialog(' + rawIdx + ')">' + comparison.costRange + '</button></td>' +
       '<td><button class="recipe-cost-link' + (hasHighFoodCost ? ' is-alert' : '') + '" type="button" onclick="event.stopPropagation();openRecipeCostDialog(' + rawIdx + ')">' + comparison.foodCostRange + '</button></td>' +
       '<td style="text-align:left">' + grpHtml + '</td>' +
