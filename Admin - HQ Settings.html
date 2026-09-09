@@ -473,8 +473,15 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-settings-shell { width:100%; height:auto; margin:0; padding-bottom:0; }
 #supplierSettingsOverlay .supplier-settings-layout { position:relative; display:grid; grid-template-columns:280px minmax(0,1fr); gap:42px; align-items:stretch; height:auto; min-height:100%; }
 #supplierSettingsOverlay .supplier-settings-layout::before { content:""; position:absolute; top:0; bottom:0; left:280px; width:1px; background:var(--rule); }
-#supplierSettingsOverlay .supplier-scope-nav { position:sticky; top:0; align-self:start; height:calc(100vh - 220px); min-height:0; max-height:calc(100vh - 220px); box-sizing:border-box; padding:19px 20px 0 0; border-right:0; display:flex; flex-direction:column; scrollbar-width:none; -ms-overflow-style:none; }
+#supplierSettingsOverlay .supplier-scope-nav { position:sticky; top:0; align-self:start; height:calc(100vh - 160px); min-height:0; max-height:calc(100vh - 160px); box-sizing:border-box; padding:19px 20px 16px 0; border-right:0; display:flex; flex-direction:column; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
 #supplierSettingsOverlay .supplier-scope-nav::-webkit-scrollbar { display:none; }
+#supplierSettingsOverlay .supplier-scope-nav::before,
+#supplierSettingsOverlay .supplier-scope-nav::after { content:""; position:absolute; left:0; right:20px; height:24px; z-index:2; pointer-events:none; opacity:0; transition:opacity .18s ease; }
+#supplierSettingsOverlay .supplier-scope-nav::before { top:0; background:linear-gradient(to bottom, rgba(255,255,255,.98), rgba(255,255,255,0)); }
+#supplierSettingsOverlay .supplier-scope-nav::after { bottom:0; background:linear-gradient(to top, rgba(255,255,255,.98), rgba(255,255,255,0)); }
+#supplierSettingsOverlay .supplier-scope-nav.has-top-overflow::before,
+#supplierSettingsOverlay .supplier-scope-nav.has-bottom-overflow::after { opacity:1; }
+@media(max-width:700px){#supplierSettingsOverlay .supplier-scope-nav::before,#supplierSettingsOverlay .supplier-scope-nav::after{display:none!important;}}
 #supplierSettingsOverlay .supplier-scope-nav-item { width:100%; min-height:52px; flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:11px 12px; border:1px solid var(--rule); border-radius:8px; background:#fff; color:var(--ink-2); font:inherit; font-size:14px; font-weight: 500; text-align:left; cursor:pointer; }
 #supplierSettingsOverlay .supplier-scope-nav-item[hidden] { display:none !important; }
 #supplierSettingsOverlay #supplierScopeNavGroups .supplier-scope-nav-item { font-family:"Inter",system-ui,sans-serif; font-weight:500 !important; }
@@ -506,6 +513,14 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay #supplierScopeNavOverrides { order:4; }
 #supplierSettingsOverlay .supplier-scope-nav-overrides { display:flex; flex:0 1 auto; min-height:0; max-height:calc(100vh - 330px); flex-direction:column; gap:8px; margin-top:10px; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
 #supplierSettingsOverlay .supplier-scope-nav-overrides::-webkit-scrollbar { display:none; }
+#supplierSettingsOverlay .supplier-scope-nav-overrides { position:relative; }
+#supplierSettingsOverlay .supplier-scope-nav-overrides::before,
+#supplierSettingsOverlay .supplier-scope-nav-overrides::after { content:""; position:absolute; display:block; left:0; right:0; height:18px; z-index:2; pointer-events:none; opacity:0; transition:opacity .18s ease; }
+#supplierSettingsOverlay .supplier-scope-nav-overrides::before { top:0; background:linear-gradient(to bottom, rgba(255,255,255,.98), rgba(255,255,255,0)); }
+#supplierSettingsOverlay .supplier-scope-nav-overrides::after { bottom:0; background:linear-gradient(to top, rgba(255,255,255,.98), rgba(255,255,255,0)); }
+#supplierSettingsOverlay .supplier-scope-nav-overrides.has-top-overflow::before,
+#supplierSettingsOverlay .supplier-scope-nav-overrides.has-bottom-overflow::after { opacity:1; }
+@media(max-width:700px){#supplierSettingsOverlay .supplier-scope-nav-overrides::before,#supplierSettingsOverlay .supplier-scope-nav-overrides::after{display:none!important;}}
 #supplierSettingsOverlay .supplier-outlet-filter-head { position:relative; display:flex; align-items:center; justify-content:space-between; margin:0 0 10px; }
 #supplierSettingsOverlay .supplier-outlet-filter-head[hidden], #supplierSettingsOverlay .supplier-outlet-search[hidden] { display:none !important; }
 #supplierSettingsOverlay .supplier-outlet-count { font-size: 14px; font-weight:700; color:var(--ink); }
@@ -564,6 +579,7 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay.is-read-only #supplierSettingsFooter { display:none !important; }
 #supplierSettingsOverlay .supplier-settings-content { width:min(640px,100%); height:auto; min-width:0; justify-self:center; overflow:visible; padding-bottom:32px; box-sizing:border-box; }
 #supplierSettingsOverlay { scrollbar-width:none; -ms-overflow-style:none; }
+body.supplier-settings-open { overflow:hidden; }
 #supplierSettingsOverlay::-webkit-scrollbar { display:none; }
 #supplierSettingsOverlay .supplier-scope-card { margin-top:28px; padding:18px 20px; border:1px solid #C9F6D3; border-radius:10px; background:#F7FFF9; }
 #supplierSettingsOverlay .supplier-scope-title { margin:0; color:var(--ink); font-size:16px; font-weight:700; letter-spacing:-.01em; }
@@ -5952,7 +5968,7 @@ function setSupplierScopeView(view) {
   document.querySelectorAll('.supplier-scope-segmented button').forEach(function(button) { button.classList.toggle('is-active', button.textContent.toLowerCase() === view); });
   if (view === 'groups' && pendingSupplierLink) {
     var supplier = pendingSupplierLink.supplier;
-    groups.innerHTML = (supplier.groupList || []).filter(function(group) { return supplierSettingsAreComplete((supplier.scopeSettings || {})['group-' + group]); }).map(function(group) { return '<button type="button" class="supplier-scope-nav-item" data-supplier-scope="group-' + escapeOverviewText(group) + '" onclick="switchSupplierSettingsScope(\'group-' + group.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(group) + '<small>' + availabilityGroupCount(group) + ' outlets</small></button>'; }).join('') || '<p class="supplier-scope-nav-help"><strong>No group settings</strong><span>Use group settings when outlets in the same group share the same supplier settings.</span></p>';
+    groups.innerHTML = (supplier.groupList || []).filter(function(group) { return supplierSettingsAreComplete((supplier.scopeSettings || {})['group-' + group]); }).map(function(group) { return '<button type="button" class="supplier-scope-nav-item" data-supplier-scope="group-' + escapeOverviewText(group) + '" onclick="switchSupplierSettingsScope(\'group-' + group.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(group) + '<small>' + availabilityGroupCount(group) + ' outlets</small></button>'; }).join('') || '<p class="supplier-scope-nav-help"><strong>No group settings</strong><span>Use this to apply same settings to all outlets in a Group.</span></p>';
     if (addGroup) addGroup.classList.toggle('has-group-settings', groups.querySelectorAll('[data-supplier-scope]').length > 0);
   }
 }
@@ -6229,6 +6245,7 @@ function copySupplierSettingsFrom(scope) {
 }
 function openSupplierSettings(supplier, isNew, isEditing, showSettingsRequired, initialOutletFilter) {
   pendingSupplierLink = { supplier:supplier, isNew:!!isNew, isEditing:!!isEditing };
+  document.body.classList.add('supplier-settings-open');
   document.getElementById('supplierSettingsOverlay').classList.add('open');
   document.querySelectorAll('.row-actions-menu.open').forEach(function(menu) { menu.classList.remove('open'); menu.removeAttribute('style'); });
   closeLinkSupModal(); closeNewSupplierModal();
@@ -6272,13 +6289,14 @@ function setSupplierSettingsReadOnly(readOnly) {
   document.getElementById('supplierMoreContact').hidden = !!readOnly;
   document.querySelectorAll('#supplierSettingsOverlay .supplier-apply-all').forEach(function(button) { button.hidden = !!readOnly; });
 }
-function closeSupplierSettings() { document.getElementById('supplierSettingsOverlay').classList.remove('open'); pendingSupplierLink = null; }
+function closeSupplierSettings() { document.getElementById('supplierSettingsOverlay').classList.remove('open'); document.body.classList.remove('supplier-settings-open'); pendingSupplierLink = null; }
 function backFromSupplierSettings() {
   var pending = pendingSupplierLink;
   supplierScopeDrafts = {};
   if (pending && pending.supplier) supplierScopeLabels = pending.supplier.scopeLabels || {};
   supplierSettingsBaseline = null;
   document.getElementById('supplierSettingsOverlay').classList.remove('open');
+  document.body.classList.remove('supplier-settings-open');
   if (!pending) return;
   if (pending.isNew && !pending.viaAcra) {
     document.getElementById('linkSupOverlay').classList.add('open');
@@ -9947,6 +9965,27 @@ function filterPosOutlets() {
     return result;
   };
 })();
+</script>
+<script>
+  (function () {
+    function updateOutletListFade(target) {
+      target.classList.toggle('has-top-overflow', target.scrollTop > 1);
+      target.classList.toggle('has-bottom-overflow', target.scrollTop + target.clientHeight < target.scrollHeight - 1);
+    }
+    function initialiseSupplierSettingsPolish() {
+      document.querySelectorAll('#supplierSettingsOverlay .supplier-scope-nav, #supplierSettingsOverlay .supplier-scope-nav-overrides').forEach(function (target) {
+        if (!target.dataset.fadeReady) {
+          target.dataset.fadeReady = 'true';
+          target.addEventListener('scroll', function () { updateOutletListFade(target); }, { passive:true });
+          if (window.ResizeObserver) new ResizeObserver(function () { updateOutletListFade(target); }).observe(target);
+          if (window.MutationObserver) new MutationObserver(function () { updateOutletListFade(target); }).observe(target, { childList:true, subtree:true });
+        }
+        updateOutletListFade(target);
+      });
+    }
+    document.addEventListener('DOMContentLoaded', initialiseSupplierSettingsPolish);
+    setTimeout(initialiseSupplierSettingsPolish, 0);
+  }());
 </script>
 </body>
 </html>

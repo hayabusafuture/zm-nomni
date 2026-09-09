@@ -343,6 +343,18 @@
   .panel-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; min-height: 28px; }
   .panel-label-text { font-size: 21px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
   .panel-label-count { font-size: 14px; font-weight: 400; color: var(--ink-mute); }
+  .item-bulk-actions { display:none; align-items:center; gap:10px; height:59px; margin:0; box-sizing:border-box; }
+  .item-bulk-actions.is-visible { display:flex; }
+  .item-bulk-count { margin-right:0; font-size:14px; font-weight:600; color:var(--ink); }
+  .item-bulk-btn { border:1px solid transparent; border-radius:6px; padding:10px 14px; font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+  .item-bulk-btn.exclude, .item-bulk-btn.include { background:var(--mint); color:var(--seaweed); border-color:var(--mint); }
+  .item-bulk-cancel { border:0; background:transparent; color:var(--ink-mute); padding:8px 4px; font:inherit; font-size:13px; cursor:pointer; }
+  .item-select-cell { width:34px; padding-left:10px !important; padding-right:0 !important; }
+  .item-select-checkbox { appearance:none; box-sizing:border-box; width:16px; height:16px; margin:0 11px 0 6px; border:1.5px solid #8A8F98; border-radius:4px; background:#fff; cursor:pointer; flex:0 0 16px; }
+  .item-select-checkbox:checked { border-color:var(--seaweed); background:var(--seaweed) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.1 4.8 8.6 9.8 3.5' fill='none' stroke='white' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px 12px no-repeat; }
+  .item-select-checkbox:focus-visible { outline:2px solid rgba(42,200,100,.35); outline-offset:2px; }
+  .items-table tbody tr:has(.item-select-checkbox:checked) td { background:rgba(42,200,100,.07) !important; }
+  .items-table #sortTh-name, .items-table .item-name-cell { padding-left:4px; }
 
   /* Stats strip */
   .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
@@ -700,8 +712,8 @@
         <div>
           <div class="panel-label-row">
             <span class="panel-label-text">Items <span class="panel-label-count" id="itemCountBadge">100</span></span>
-            <button class="section-action" onclick="openManageModal()">Manage</button>
           </div>
+          <div class="item-bulk-actions" id="itemBulkActions"><span class="item-bulk-count" id="itemBulkCount">0 selected</span><button type="button" class="item-bulk-btn exclude" id="itemBulkExclude" onclick="bulkItemAction('exclude')">Exclude</button><button type="button" class="item-bulk-btn include" id="itemBulkInclude" onclick="bulkItemAction('include')">Include</button><button type="button" class="item-bulk-cancel" onclick="clearItemSelection()">Cancel</button></div>
           <div>
           <div class="items-filter-row">
             <div class="item-search-wrap">
@@ -735,7 +747,7 @@
           <table class="items-table">
             <thead>
               <tr>
-                <th id="sortTh-name" class="sort-th" onclick="setItemSort('name')">Item name <span class="sort-ind"></span></th>
+                <th class="item-select-cell"></th><th id="sortTh-name" class="sort-th" onclick="setItemSort('name')">Item name <span class="sort-ind"></span></th>
                 <th style="width:120px">UOM</th>
                 <th id="sortTh-price" class="sort-th" style="width:140px" onclick="setItemSort('price')">Unit price <span class="sort-ind"></span></th>
                 <th style="width:88px">MOQ</th>
@@ -1700,6 +1712,7 @@ let inventoryStatusFilter = 'available';
 const groupDisabledItems = new Set();     // item indices auto-disabled due to supplier disable
 const individuallyDisabledItems = new Set(); // item indices disabled individually
 const scopeExcludedItems = new Set();      // item indices excluded only in this group/outlet
+const selectedItemIndices = new Set();
 let itemStatusFilter = 'available';
 
 function getUOMBreakdown(item) {
@@ -2056,6 +2069,48 @@ function toggleGroupUoms(itemIdx, event) {
   renderItems();
 }
 
+function toggleItemSelection(rawIdx, checked) {
+  if (checked) selectedItemIndices.add(rawIdx); else selectedItemIndices.delete(rawIdx);
+  updateItemBulkActions();
+}
+
+function clearItemSelection() {
+  selectedItemIndices.clear();
+  renderItems();
+}
+
+function updateItemBulkActions() {
+  const bar = document.getElementById('itemBulkActions');
+  const count = document.getElementById('itemBulkCount');
+  if (!bar || !count) return;
+  const n = selectedItemIndices.size;
+  const filterRow = document.querySelector('#panel-overview .items-filter-row');
+  bar.classList.toggle('is-visible', n > 0);
+  if (filterRow) filterRow.style.display = n ? 'none' : '';
+  count.textContent = n + (n === 1 ? ' item selected' : ' items selected');
+  const excludeButton = document.getElementById('itemBulkExclude');
+  const includeButton = document.getElementById('itemBulkInclude');
+  let hasAvailable = false, hasExcluded = false;
+  selectedItemIndices.forEach(function(rawIdx) {
+    const excluded = groupDisabledItems.has(rawIdx) || individuallyDisabledItems.has(rawIdx) || scopeExcludedItems.has(rawIdx);
+    if (excluded) hasExcluded = true; else hasAvailable = true;
+  });
+  if (excludeButton) excludeButton.hidden = !hasAvailable;
+  if (includeButton) includeButton.hidden = !hasExcluded;
+}
+
+function bulkItemAction(action) {
+  if (!selectedItemIndices.size) return;
+  selectedItemIndices.forEach(function(rawIdx) {
+    if (action === 'exclude') scopeExcludedItems.add(rawIdx);
+    else { scopeExcludedItems.delete(rawIdx); individuallyDisabledItems.delete(rawIdx); }
+  });
+  selectedItemIndices.clear();
+  renderItems();
+  updateItemBulkActions();
+  showToast(action === 'exclude' ? 'Items excluded from this group' : 'Items included in this group');
+}
+
 function renderItems() {
   const body = document.getElementById('itemsBody');
   if (!body) return;
@@ -2065,6 +2120,7 @@ function renderItems() {
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE) || 1;
   if (itemsPage > totalPages) itemsPage = totalPages;
   document.getElementById('itemCountBadge').textContent = total;
+  updateItemBulkActions();
 
   ['name', 'price'].forEach(key => {
     const th = document.getElementById('sortTh-' + key);
@@ -2078,7 +2134,7 @@ function renderItems() {
   const page = display.slice(start, start + ITEMS_PER_PAGE);
 
   if (!page.length) {
-    body.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink-mute)">No items match your search</td></tr>';
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--ink-mute)">No items match your search</td></tr>';
     renderItemsPager(0, total);
     return;
   }
@@ -2099,6 +2155,7 @@ function renderItems() {
     const actionClass = isDisabled ? '' : ' danger';
     const openFn = 'openItemModal(' + rawIdx + ')';
     const rowClass = (isDisabled ? ' ml-inactive' : '') + (pageIdx % 2 ? ' item-row-even' : '');
+    const selectCell = '<td class="item-select-cell" onclick="event.stopPropagation()"><input type="checkbox" class="item-select-checkbox" aria-label="Select ' + displayName.replace(/"/g, '&quot;') + '"' + (selectedItemIndices.has(rawIdx) ? ' checked' : '') + ' onchange="toggleItemSelection(' + rawIdx + ', this.checked)" /></td>';
     const nameCell = '<td class="item-name-cell" onclick="' + openFn + '" style="cursor:pointer">' +
       '<div class="item-name-text">' + displayName + customTag + overrideTag + '</div>' +
       '<div class="item-supplier-text">' + supplierDisplayName(item.supplier) + '</div>' +
@@ -2111,14 +2168,14 @@ function renderItems() {
     if (uoms.length === 1) {
       const displayPrice = (ov.price != null) ? ov.price : item.price;
       const displayMOQ = ov.moq || item.moq;
-      return '<tr class="item-row item-parent-row' + rowClass + '">' + nameCell +
+      return '<tr class="item-row item-parent-row' + rowClass + '">' + selectCell + nameCell +
         '<td class="uom-text" onclick="' + openFn + '" style="cursor:pointer">' + uoms[0].replace(/^per\s+/i, '') + '</td>' +
         '<td class="price-cell" onclick="' + openFn + '" style="cursor:pointer">S$' + parseFloat(displayPrice).toFixed(2) + ' <span class="uom-text">/ ' + uoms[0].replace(/^per\s+/i, '') + '</span></td>' +
         '<td class="moq-cell" onclick="' + openFn + '" style="cursor:pointer">' + displayMOQ + '</td>' + actionCell + '</tr>';
     }
 
     const expanded = groupExpandedUoms.has(rawIdx);
-    const parent = '<tr class="item-row item-parent-row' + rowClass + '">' + nameCell +
+    const parent = '<tr class="item-row item-parent-row' + rowClass + '">' + selectCell + nameCell +
       '<td><button class="item-options-link" onclick="toggleGroupUoms(' + rawIdx + ', event)">' + uoms.length + ' options <span class="item-options-chevron' + (expanded ? ' open' : '') + '"></span></button></td>' +
       '<td></td><td></td>' + actionCell + '</tr>';
     if (!expanded) return parent;
@@ -2128,7 +2185,7 @@ function renderItems() {
       const childMOQ = ov.moqs && ov.moqs[uomIdx] != null ? ov.moqs[uomIdx] : (ov.moq || item.moq);
       const unit = entry.uom.replace(/^per\s+/i, '');
       return '<tr class="item-uom-row' + (isDisabled ? ' ml-inactive' : '') + '">' +
-        '<td class="item-uom-name">' + displayName + '</td>' +
+        '<td class="item-select-cell"></td><td class="item-uom-name">' + displayName + '</td>' +
         '<td class="uom-text">' + unit + '</td>' +
         '<td class="price-cell">S$' + parseFloat(childPrice).toFixed(2) + ' <span class="uom-text">/ ' + unit + '</span></td>' +
         '<td class="moq-cell">' + childMOQ + '</td><td></td></tr>';
