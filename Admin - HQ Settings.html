@@ -210,6 +210,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .og-search-wrap svg { flex-shrink: 0; color: var(--ink-mute); }
 .og-search-wrap input { border: none; outline: none; font: inherit; font-size: 14px; color: var(--ink); background: transparent; width: 100%; }
 .og-search-wrap input::placeholder { color: var(--ink-mute); }
+#ogBulkActions { box-sizing:border-box; min-height:38px; }
 /* Add-to-group modal */
 .modal-warning { background: var(--notice-warning-bg); border: 1px solid var(--notice-warning-border); border-radius: 8px; padding: 12px 14px; font-size: 14px; color: var(--notice-warning-ink); line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
 .modal-warning svg, .modal-warning .material-symbols-rounded { flex-shrink: 0; margin-top: 1px; color: #D97706; }
@@ -272,6 +273,20 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .ml-table tbody tr:last-child td { border-bottom: none; }
 .ml-table tbody tr:nth-child(even) td { background: #f9fafb; }
 .ml-table tbody tr:hover td { background: var(--row-hover) !important; }
+#panel-market-list .ml-table thead th:first-child, #panel-market-list .ml-table tbody td:first-child,
+#panel-inventory .ml-table thead th:first-child, #panel-inventory .ml-table tbody td:first-child { padding-left:4px; }
+#panel-inventory .ml-table thead th:nth-child(2), #panel-inventory .ml-table tbody td:nth-child(2) { padding-left:4px; }
+#groupSkuOverlay > .modal-card > .modal-header { border-bottom:0; padding-bottom:0; }
+.inventory-bulk-actions { display:none; align-items:center; gap:10px; height:54px; margin:0; box-sizing:border-box; }
+.inventory-bulk-actions.is-visible { display:flex; }
+.inventory-bulk-count { margin-right:0; font-size:14px; font-weight:600; color:var(--ink); }
+.inventory-bulk-btn { border:1px solid var(--mint); border-radius:6px; padding:10px 14px; background:var(--mint); color:var(--seaweed); font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.inventory-bulk-cancel { border:0; background:transparent; color:var(--ink-mute); padding:8px 4px; font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.inventory-select-cell { width:34px; padding-left:10px !important; padding-right:0 !important; }
+.inventory-select-checkbox { appearance:none; box-sizing:border-box; width:16px; height:16px; margin:0 11px 0 6px; border:1.5px solid #8A8F98; border-radius:4px; background:#fff; cursor:pointer; flex:0 0 16px; }
+.inventory-select-checkbox:checked { border-color:var(--seaweed); background:var(--seaweed) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.1 4.8 8.6 9.8 3.5' fill='none' stroke='white' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px 12px no-repeat; }
+.inventory-select-checkbox:focus-visible { outline:2px solid rgba(42,200,100,.35); outline-offset:2px; }
+.ml-table tbody tr:has(.inventory-select-checkbox:checked) td { background:rgba(42,200,100,.07) !important; }
 .pos-mapping-status { display:flex; align-items:center; gap:8px; min-width:0; }
 .pos-mapping-progress { width:64px; height:6px; border-radius:4px; background:#E7E8EC; overflow:hidden; flex:0 0 64px; }
 .pos-mapping-progress > span { display:block; height:100%; background:var(--nomni-green); }
@@ -482,6 +497,14 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay .supplier-scope-nav.has-top-overflow::before,
 #supplierSettingsOverlay .supplier-scope-nav.has-bottom-overflow::after { opacity:1; }
 @media(max-width:700px){#supplierSettingsOverlay .supplier-scope-nav::before,#supplierSettingsOverlay .supplier-scope-nav::after{display:none!important;}}
+#supplierSettingsOverlay .supplier-scope-nav-overrides { position:relative; }
+#supplierSettingsOverlay .supplier-scope-nav-overrides::before,
+#supplierSettingsOverlay .supplier-scope-nav-overrides::after { content:""; position:absolute; display:block; left:0; right:0; height:18px; z-index:2; pointer-events:none; opacity:0; transition:opacity .18s ease; }
+#supplierSettingsOverlay .supplier-scope-nav-overrides::before { top:0; background:linear-gradient(to bottom, rgba(255,255,255,.98), rgba(255,255,255,0)); }
+#supplierSettingsOverlay .supplier-scope-nav-overrides::after { bottom:0; background:linear-gradient(to top, rgba(255,255,255,.98), rgba(255,255,255,0)); }
+#supplierSettingsOverlay .supplier-scope-nav-overrides.has-top-overflow::before,
+#supplierSettingsOverlay .supplier-scope-nav-overrides.has-bottom-overflow::after { opacity:1; }
+@media(max-width:700px){#supplierSettingsOverlay .supplier-scope-nav-overrides::before,#supplierSettingsOverlay .supplier-scope-nav-overrides::after{display:none!important;}}
 #supplierSettingsOverlay .supplier-scope-nav-item { width:100%; min-height:52px; flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:11px 12px; border:1px solid var(--rule); border-radius:8px; background:#fff; color:var(--ink-2); font:inherit; font-size:14px; font-weight: 500; text-align:left; cursor:pointer; }
 #supplierSettingsOverlay .supplier-scope-nav-item[hidden] { display:none !important; }
 #supplierSettingsOverlay #supplierScopeNavGroups .supplier-scope-nav-item { font-family:"Inter",system-ui,sans-serif; font-weight:500 !important; }
@@ -513,14 +536,6 @@ tr.ml-inactive td:not(:last-child) { opacity: 0.45; }
 #supplierSettingsOverlay #supplierScopeNavOverrides { order:4; }
 #supplierSettingsOverlay .supplier-scope-nav-overrides { display:flex; flex:0 1 auto; min-height:0; max-height:calc(100vh - 330px); flex-direction:column; gap:8px; margin-top:10px; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
 #supplierSettingsOverlay .supplier-scope-nav-overrides::-webkit-scrollbar { display:none; }
-#supplierSettingsOverlay .supplier-scope-nav-overrides { position:relative; }
-#supplierSettingsOverlay .supplier-scope-nav-overrides::before,
-#supplierSettingsOverlay .supplier-scope-nav-overrides::after { content:""; position:absolute; display:block; left:0; right:0; height:18px; z-index:2; pointer-events:none; opacity:0; transition:opacity .18s ease; }
-#supplierSettingsOverlay .supplier-scope-nav-overrides::before { top:0; background:linear-gradient(to bottom, rgba(255,255,255,.98), rgba(255,255,255,0)); }
-#supplierSettingsOverlay .supplier-scope-nav-overrides::after { bottom:0; background:linear-gradient(to top, rgba(255,255,255,.98), rgba(255,255,255,0)); }
-#supplierSettingsOverlay .supplier-scope-nav-overrides.has-top-overflow::before,
-#supplierSettingsOverlay .supplier-scope-nav-overrides.has-bottom-overflow::after { opacity:1; }
-@media(max-width:700px){#supplierSettingsOverlay .supplier-scope-nav-overrides::before,#supplierSettingsOverlay .supplier-scope-nav-overrides::after{display:none!important;}}
 #supplierSettingsOverlay .supplier-outlet-filter-head { position:relative; display:flex; align-items:center; justify-content:space-between; margin:0 0 10px; }
 #supplierSettingsOverlay .supplier-outlet-filter-head[hidden], #supplierSettingsOverlay .supplier-outlet-search[hidden] { display:none !important; }
 #supplierSettingsOverlay .supplier-outlet-count { font-size: 14px; font-weight:700; color:var(--ink); }
@@ -1522,7 +1537,7 @@ body.supplier-settings-open { overflow:hidden; }
     <div class="tabs">
       <div class="tab active" data-tab="outlet-groups">Groups &amp; outlets</div>
       <div class="tab" data-tab="suppliers">Suppliers</div>
-      <div class="tab" data-tab="market-list"><span class="tab-label">Items</span><span class="tab-indicators"><span class="tab-status-dot" aria-label="New activity" title="New activity"></span></span></div>
+      <div class="tab" data-tab="market-list"><span class="tab-label">SKUs</span><span class="tab-indicators"><span class="tab-status-dot" aria-label="New activity" title="New activity"></span></span></div>
       <div class="tab" data-tab="inventory">Inventory</div>
       <div class="tab" data-tab="recipes">Recipes</div>
       <div class="tab" data-tab="pos-mapping">POS mapping</div>
@@ -1716,14 +1731,14 @@ body.supplier-settings-open { overflow:hidden; }
               <div class="activity-item">
                 <div class="activity-dot" style="background:#2AC864"></div>
                 <div class="activity-body">
-                  <div class="activity-text"><strong>3 items added</strong> to master market list</div>
+                  <div class="activity-text"><strong>3 SKUs added</strong> to supplier catalogue</div>
                   <div class="activity-time">10 Jun 2026 · William Arya</div>
                 </div>
               </div>
               <div class="activity-item">
                 <div class="activity-dot" style="background:#2AC864"></div>
                 <div class="activity-body">
-                  <div class="activity-text">Family Dining Express market list <strong>updated</strong> — 92 items</div>
+                  <div class="activity-text">Family Dining Express supplier catalogue <strong>updated</strong> — 92 items</div>
                   <div class="activity-time">08 Jun 2026 · James Tan</div>
                 </div>
               </div>
@@ -1756,40 +1771,41 @@ body.supplier-settings-open { overflow:hidden; }
       </div><!-- /two-panel grid -->
     </div>
 
-    <!-- ── Market List ── -->
+    <!-- ── Supplier items ── -->
     <div class="tab-panel" id="panel-market-list">
       <div id="priceReviewBanner" hidden style="display:none;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
         <div style="display:flex;align-items:flex-start;gap:10px">
           <span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span>
           <div>
             <div id="priceReviewBannerCount" style="font-size:14px;font-weight:700;color:var(--notice-warning-ink)">3 price changes pending review</div>
-            <div style="font-size: 14px;color:var(--notice-warning-ink);margin-top:2px">Invoice prices from outlets differ from current market list prices. Review and approve to update.</div>
+            <div style="font-size: 14px;color:var(--notice-warning-ink);margin-top:2px">Invoice prices from outlets differ from current supplier catalogue prices. Review and approve to update.</div>
           </div>
         </div>
         <button class="btn btn-tertiary" onclick="window.location.href='Admin - HQ - Price Changes.html'+window.location.search" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size: 14px;padding:7px 14px;white-space:nowrap">Review changes</button>
       </div>
       <div class="panel-label-row">
-        <span class="panel-label-text">Items <span class="panel-label-count" id="mlCount"></span></span>
+        <span class="panel-label-text">SKUs <span class="panel-label-count" id="mlCount"></span></span>
         <div style="display:flex;align-items:center;gap:8px">
           <a class="btn-secondary" href="Admin - HQ - Price Changes.html" onclick="this.href='Admin - HQ - Price Changes.html'+window.location.search" style="text-decoration:none">Price changes</a>
           <div style="position:relative">
             <button class="btn-primary" id="addItemBtn" onclick="toggleAddItemMenu(event)" style="gap:8px">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            Add item
+            Add
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div id="addItemMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:230px;overflow:hidden">
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openHqInvoiceModal()">Add from invoice</div>
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openAddCatalogueModal()">Add from supplier catalogue</div>
-              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';window.location.href='Admin - HQ Create Item.html'+window.location.search">Create new item</div>
+              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';window.location.href='Admin - HQ Create Item.html'+window.location.search">Create SKU</div>
             </div>
           </div>
         </div>
       </div>
+      <p style="margin:-14px 0 16px;font-size:14px;line-height:1.45;color:var(--ink-mute)">Items in this list are used for ordering and appear in invoices</p>
       <div class="ml-filter-row">
-        <div class="ml-search-wrap">
+        <div class="ml-search-wrap" style="min-width:270px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" class="ml-search-input" id="mlSearch" placeholder="Search items or suppliers…" oninput="setMlSearch(this.value)" />
+          <input type="text" class="ml-search-input" id="mlSearch" placeholder="Search SKUs or suppliers…" oninput="setMlSearch(this.value)" />
         </div>
         <select class="ml-filter-select" id="mlCatFilter" onchange="setMlCatFilter(this.value)">
           <option value="">All categories</option>
@@ -1801,7 +1817,7 @@ body.supplier-settings-open { overflow:hidden; }
           <option value="">All suppliers</option>
         </select>
         <select class="ml-filter-select" id="mlStatusFilter" onchange="setMlStatusFilter(this.value)">
-          <option value="">All items</option>
+          <option value="">All SKUs</option>
           <option value="removed">Removed</option>
         </select>
       </div>
@@ -1809,7 +1825,7 @@ body.supplier-settings-open { overflow:hidden; }
         <table class="ml-table">
           <thead>
             <tr>
-              <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">Item name <span class="sort-ind"></span></th>
+              <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">SKU <span class="sort-ind"></span></th>
               <th style="width:100px">UOM</th>
               <th id="mlSortTh-price" style="width:180px">Price</th>
               <th style="width:160px">Available to</th>
@@ -1934,18 +1950,14 @@ body.supplier-settings-open { overflow:hidden; }
     <div class="tab-panel" id="panel-inventory">
       <div class="panel-label-row">
         <span class="panel-label-text">Inventory <span class="panel-label-count" id="invCount"></span></span>
-        <div style="position:relative">
-          <button class="btn-primary" id="invAddBtn" onclick="toggleInvAddMenu(event)" style="font-size:14px;padding:9px 14px;gap:8px">
+        <div>
+          <button class="btn-primary" id="invAddBtn" onclick="openGroupSkuModal()" style="font-size:14px;padding:9px 14px;gap:8px">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            Add to inventory
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+            Create inventory item
           </button>
-          <div id="invAddMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:200px;overflow:hidden">
-            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none';openAddInvSkuModal()">Add SKU/recipe</div>
-            <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="invAddMenu.style.display='none';openGroupSkuModal()">Add Group SKU</div>
-          </div>
         </div>
       </div>
+      <p style="margin:-14px 0 16px;font-size:14px;line-height:1.45;color:var(--ink-mute)">Items used for stocktaking and recipes</p>
       <div class="ml-filter-row">
         <div class="ml-search-wrap" style="min-width:220px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -1956,7 +1968,8 @@ body.supplier-settings-open { overflow:hidden; }
           <option value="sku">SKU</option>
           <option value="recipe">Recipe</option>
           <option value="sub-recipe">Sub-recipe</option>
-          <option value="group">Group SKU</option>
+          <option value="group">Item</option>
+          <option value="needs-options">Needs supplier options</option>
         </select>
         <select class="ml-filter-select" id="invStatusFilter" onchange="setInvStatusFilter(this.value)">
           <option value="">All statuses</option>
@@ -1965,11 +1978,12 @@ body.supplier-settings-open { overflow:hidden; }
           <option value="removed">Removed</option>
         </select>
       </div>
+      <div class="inventory-bulk-actions" id="inventoryBulkActions"><span class="inventory-bulk-count" id="inventoryBulkCount">0 selected</span><button type="button" class="inventory-bulk-btn" onclick="createInventoryItemFromSkus(Array.from(selectedInventoryIndices))">Create inventory item</button><button type="button" class="inventory-bulk-btn" onclick="openAddToExistingInventoryItem()">Add to existing item</button><button type="button" class="inventory-bulk-cancel" onclick="clearInventorySelection()">Cancel</button></div>
       <div style="overflow:clip">
         <table class="ml-table">
           <thead>
             <tr>
-              <th>Item</th>
+              <th class="inventory-select-cell"></th><th>Item</th>
               <th style="width:70px">UOM</th>
               <th style="width:160px">Available to</th>
               <th style="width:48px"></th>
@@ -2034,7 +2048,7 @@ body.supplier-settings-open { overflow:hidden; }
         </div>
         <select class="ml-filter-select" id="actModuleFilter" onchange="renderActivity()">
           <option value="">All modules</option>
-          <option value="market-list">Items</option>
+          <option value="market-list">SKUs</option>
           <option value="suppliers">Suppliers</option>
           <option value="recipes">Recipes</option>
           <option value="inventory">Inventory</option>
@@ -2256,8 +2270,8 @@ function clearNewHqEmptyState(panelId) {
 function refreshNewHqEmptyStates() {
   if (!window.isNewHQ) return;
   if (ITEMS.length === 0) {
-    showNewHqEmptyState('panel-market-list', 'No items yet', 'Items are added from suppliers linked to this HQ.', {
-      label: 'Add item',
+    showNewHqEmptyState('panel-market-list', 'No SKUs yet', 'SKUs are added from suppliers linked to this HQ.', {
+      label: 'Add SKU',
       onclick: 'openAddCatalogueModal()',
       disabled: SUPPLIERS.length === 0,
       reason: SUPPLIERS.length === 0 ? 'Link a supplier first' : ''
@@ -2546,6 +2560,9 @@ function renderHealthCheck() {
   const highFcRecipes = RECIPES.filter(r => r.foodCostPct > recFcThreshold);
   if (highFcRecipes.length) issues.push({ type: 'highfc', symbol: 'warning', text: '<strong>' + highFcRecipes.length + ' recipe' + (highFcRecipes.length > 1 ? 's' : '') + '</strong> above ' + recFcThreshold + '% food cost target', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: highFcRecipes });
 
+  const inventoryWithoutOptions = (window.nomniInventoryItems || []).filter(function(item) { return item.type === 'group' && !(item.constituents || []).length; });
+  if (inventoryWithoutOptions.length) issues.push({ type: 'inventoryOptions', symbol: 'warning', text: '<strong>' + inventoryWithoutOptions.length + ' inventory item' + (inventoryWithoutOptions.length === 1 ? '' : 's') + '</strong> need supplier options', color: 'var(--notice-warning-ink)', iconColor: '#D97706', bg: 'var(--notice-warning-bg)', border: 'var(--notice-warning-border)', items: inventoryWithoutOptions });
+
   // Keep the health-check count aligned with the POS mapping overview table.
   const POS_UNCONNECTED = Array.from(document.querySelectorAll('#posOutletTableBody > tr:not(#posOutletEmpty)'))
     .filter(row => row.cells[1] && row.cells[1].textContent.trim().toLowerCase() === 'not connected')
@@ -2610,6 +2627,13 @@ function renderHealthCheck() {
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
       '</div>';
     }
+    if (i.type === 'inventoryOptions') {
+      return '<div class="health-check-panel" onclick="navigateToTab(\'inventory\');setInvTypeFilter(\'needs-options\');document.getElementById(\'invTypeFilter\').value=\'needs-options\'" style="' + healthPanelStyle(i) + ';display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">' +
+        healthIcon(i.symbol, i.iconColor || i.color) +
+        '<span style="color:var(--ink);font-weight:400;flex:1">' + i.text + '</span>' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + i.color + '" stroke-width="2.5" style="flex-shrink:0"><polyline points="9 6 15 12 9 18"/></svg>' +
+      '</div>';
+    }
     return '';
   });
 
@@ -2646,7 +2670,7 @@ function renderHealthCheck() {
   const totalOutlets = outletsInGroups + UNGROUPED.length;
   const stats = [
     { icon: 'home',        value: totalOutlets, label: '<span>Outlets</span> in this HQ',      accent: true, iconColor: '#1A8040', accentColor: '#2AC864' },
-    { icon: 'layout-grid', value: 100, label: '<span>Items</span> in market list',    accent: true, iconColor: '#185FA5', accentColor: '#3B82F6' },
+    { icon: 'layout-grid', value: 100, label: '<span>SKUs</span> in catalogue', accent: true, iconColor: '#185FA5', accentColor: '#3B82F6' },
     { icon: 'star',        value: 48,  label: '<span>Recipes</span> in library',      accent: true, iconColor: '#854F0B', accentColor: '#F59E0B' },
     { icon: 'briefcase',   value: 14,  label: '<span>Suppliers</span> group-wide',    accent: true, iconColor: '#6D28D9', accentColor: '#8B5CF6' },
   ];
@@ -3074,7 +3098,7 @@ function applyMasterItemLifecycle(rawIdx, lifecycle) {
   saveItemLifecycle(item, lifecycle);
   mlPage = 1;
   renderMl();
-  const messages = { disabled: 'Item disabled across included groups and outlets', active: 'Item restored to the master market list', removed: 'Item removed from the master market list' };
+  const messages = { disabled: 'Item disabled across included groups and outlets', active: 'Item restored to the supplier catalogue', removed: 'Item removed from the supplier catalogue' };
   if (typeof showToast === 'function') showToast(messages[lifecycle]);
 }
 let pendingMasterItemRemoval = null;
@@ -3094,7 +3118,7 @@ function confirmRemoveMasterItem() {
   closeRemoveMasterItemModal();
   mlPage = 1;
   renderMl();
-  if (typeof showToast === 'function') showToast('Item removed from the master market list');
+  if (typeof showToast === 'function') showToast('Item removed from the supplier catalogue');
 }
 
 function toggleMlUoms(itemIdx, event) {
@@ -4423,7 +4447,7 @@ renderRec();
 
 // ── Activity log ──
 const ACT_MODULE = {
-  'market-list': { label: 'Items',       color: '#2AC864', bg: '#D9F5E4' },
+  'market-list': { label: 'SKUs', color: '#2AC864', bg: '#D9F5E4' },
   'suppliers':    { label: 'Suppliers',  color: '#6D28D9', bg: '#F3F0FF' },
   'recipes':     { label: 'Recipes',     color: '#D97706', bg: '#FEF3C7' },
   'inventory':   { label: 'Inventory',   color: '#2563EB', bg: '#EFF6FF' },
@@ -4433,11 +4457,11 @@ const ACT_MODULE = {
 
 const ACTIVITY_LOG = [
   // Market List — items added to master (large batch, count only)
-  { date: '10 Jun 2026', time: '14:32', user: 'William Arya', module: 'market-list', text: '<strong>75 items added</strong> to master market list', scope: 'Master', tab: 'market-list' },
+  { date: '10 Jun 2026', time: '14:32', user: 'William Arya', module: 'market-list', text: '<strong>75 items added</strong> to supplier catalogue', scope: 'Master', tab: 'market-list' },
   // Market List — items added to master (≤3, names shown)
-  { date: '09 Jun 2026', time: '10:18', user: 'William Arya', module: 'market-list', text: '<strong>3 items added</strong> to master market list — Chilled Australian Wagyu Beef Ribeye MS4 500g Vacuum, Chilled NZ Lamb Rack Frenched 8-Rib 400g Vacuum, Frozen Black Tiger Prawn HLSO 16/20 IQF 500g', scope: 'Master', tab: 'market-list' },
+  { date: '09 Jun 2026', time: '10:18', user: 'William Arya', module: 'market-list', text: '<strong>3 items added</strong> to supplier catalogue — Chilled Australian Wagyu Beef Ribeye MS4 500g Vacuum, Chilled NZ Lamb Rack Frenched 8-Rib 400g Vacuum, Frozen Black Tiger Prawn HLSO 16/20 IQF 500g', scope: 'Master', tab: 'market-list' },
   // Market List — items removed from master
-  { date: '08 Jun 2026', time: '11:05', user: 'James Tan',    module: 'market-list', text: '<strong>2 items removed</strong> from master market list — Chilled Pork Belly Slab Skin-On Bone-Out AU 2kg, J-Basket Frozen Edamame Beans Shelled IQF 500g', scope: 'Master', tab: 'market-list' },
+  { date: '08 Jun 2026', time: '11:05', user: 'James Tan',    module: 'market-list', text: '<strong>2 items removed</strong> from supplier catalogue — Chilled Pork Belly Slab Skin-On Bone-Out AU 2kg, J-Basket Frozen Edamame Beans Shelled IQF 500g', scope: 'Master', tab: 'market-list' },
   // Items — price changes retain their source and actor.
   { date: '11 Jun 2026', time: '08:45', user: 'System', module: 'market-list', text: 'New invoice price detected for <strong>Chicken Thigh Boneless 2kg</strong> from an automatically digitised invoice', scope: 'Chargrill Outlets', tab: 'market-list' },
   { date: '10 Jun 2026', time: '16:10', user: 'William Arya', module: 'market-list', text: '<strong>3 item prices</strong> updated from an uploaded invoice', scope: 'Family Dining Express', tab: 'market-list' },
@@ -4876,7 +4900,7 @@ function downloadSupplierDisableImpact() {
   var impact = supplierDisableImpact(pendingSupDisableName);
   var rows = [['Type', 'Name', 'Supplier', 'Referenced affected items']];
   impact.items.forEach(function(item) {
-    rows.push(['Market-list item', itemDisplayName(item), supplierDisplayName(item.supplier), '']);
+    rows.push(['SKU', itemDisplayName(item), supplierDisplayName(item.supplier), '']);
   });
   impact.recipes.forEach(function(recipe) {
     var references = [].concat(recipe.ingredients || [], recipe.inventoryItems || [], recipe.groupSkuNames || []).map(function(entry) {
@@ -5052,7 +5076,7 @@ function renderSuppliers() {
       '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
       '<div class="row-actions-menu">' +
         '<div class="row-action-item" onclick="editLinkedSupplierSettings(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (s.type === 'active' ? 'View supplier settings' : 'Edit supplier settings') + '</div>' +
-        '<div class="row-action-item" onclick="viewSupplierItems(\'' + s.name.replace(/'/g,"\\'") + '\')">View items</div>' +
+        '<div class="row-action-item" onclick="viewSupplierItems(\'' + s.name.replace(/'/g,"\\'") + '\')">View supplier items</div>' +
         '<div class="row-action-item' + (s.active ? ' danger' : '') + '" onclick="toggleSupActive(\'' + s.name.replace(/'/g,"\\'") + '\')">' + (s.active ? 'Disable' : 'Enable') + '</div>' +
       '</div></div></td>' +
     '</tr>';
@@ -5138,7 +5162,7 @@ function openGroupSkuAvailability(index) {
       '<button class="btn btn-tertiary" style="flex-shrink:0;font-size:12px;padding:7px 10px" onclick="openGroupSkuConstituentManager(' + index + ',' + constituentIndex + ')">Manage</button>' +
     '</div>';
   }).join('');
-  document.getElementById('recGroupsTitle').textContent = 'Group SKU availability';
+  document.getElementById('recGroupsTitle').textContent = 'Inventory item availability';
   document.getElementById('recGroupsCount').textContent = record.name;
   document.getElementById('recGroupsCount').style.fontSize = '14px';
   document.getElementById('recGroupsList').innerHTML = rows || '<div style="padding:14px 0;color:var(--ink-mute);font-size:14px">No constituent items.</div>';
@@ -5167,7 +5191,7 @@ function openGroupSkuConstituentAvailability(groupIndex, constituentIndex) {
       saveHqInventoryState();
     },
     render: renderInv,
-    toast: 'Group SKU availability updated'
+    toast: 'Inventory item availability updated'
   });
 }
 let managedAvailability = null;
@@ -5359,26 +5383,27 @@ const INV_ITEMS = [
   { type:'sku', name:'Fresh Rosemary Sprig 100g Bunch', detail:'Veggie Fresh Pte Ltd', uom:'kg', cost:18.00, active:true, groups:['Chargrill Outlets'] },
   { type:'sku', name:'Binchotan White Charcoal Premium 15kg Bag', detail:'Grill Master SG', uom:'kg', cost:14.20, active:true, groups:['Chargrill Outlets'] },
   { type:'sku', name:'Anchor Unsalted Butter 25kg Bulk Block', detail:'Fonterra Brands', uom:'kg', cost:11.80, active:true, groups:INV_GROUPS.slice() },
-  // Group SKUs
-  { type:'group', name:'Chicken Thigh Boneless', detail:'2 SKUs', uom:'kg', cost:null, active:true, groups:INV_GROUPS.slice(), outlets:[], constituents:[
+  // Inventory items: reusable items with zero or more supplier options.
+  { type:'group', name:'Chicken Thigh Boneless', detail:'2 supplier options', uom:'kg', cost:null, active:true, groups:INV_GROUPS.slice(), outlets:[], constituents:[
     { name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier:'Kee Song Group', cost:6.80, groups:['Chargrill Outlets'], outlets:[] },
     { name:'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier:'Poultry Masters SG', cost:6.40, groups:['Family Dining Express'], outlets:[] },
   ]},
-  { type:'group', name:'Dark Soy Sauce', detail:'2 SKUs', uom:'L', cost:null, active:true, groups:['Chargrill Outlets'], outlets:['(WF 290) Garden Express @ 290 Sengkang'], constituents:[
+  { type:'group', name:'Dark Soy Sauce', detail:'2 supplier options', uom:'L', cost:null, active:true, groups:['Chargrill Outlets'], outlets:['(WF 290) Garden Express @ 290 Sengkang'], constituents:[
     { name:'Kikkoman Dark Soy Sauce 2L', supplier:'Kikkoman', cost:8.80, groups:['Chargrill Outlets'], outlets:[] },
     { name:'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier:'Asian Dry Goods', cost:6.90, groups:[], outlets:['(WF 290) Garden Express @ 290 Sengkang'] },
   ]},
-  { type:'group', name:'Cooking Oil', detail:'3 SKUs', uom:'L', cost:null, active:true, groups:['Family Dining Express'], outlets:['(WF 139) Chargrill @ 139 Tampines','(WF 290) Garden Express @ 290 Sengkang'], constituents:[
+  { type:'group', name:'Cooking Oil', detail:'3 supplier options', uom:'L', cost:null, active:true, groups:['Family Dining Express'], outlets:['(WF 139) Chargrill @ 139 Tampines','(WF 290) Garden Express @ 290 Sengkang'], constituents:[
     { name:'Sime Darby Canola Oil RBD 20L', supplier:'Sunny Gold F&B Supplies', cost:3.20, groups:['Family Dining Express'], outlets:[] },
     { name:'Blended Vegetable Cooking Oil 20L', supplier:'Sunny Gold F&B Supplies', cost:2.80, groups:[], outlets:['(WF 139) Chargrill @ 139 Tampines'] },
     { name:'Golden Chef Rice Bran Oil 18L', supplier:'Asian Dry Goods', cost:3.60, groups:[], outlets:['(WF 290) Garden Express @ 290 Sengkang'] },
   ]},
+  { type:'group', name:'Burger Bun', detail:'No supplier options', uom:'pc', cost:null, active:true, groups:INV_GROUPS.slice(), outlets:[], constituents:[] },
   // Sub-recipes
-  { type:'sub-recipe', name:'House BBQ Sauce', detail:'Sub-recipe · Batch 2 L', uom:'L', cost:4.20, active:true, groups:['Chargrill Outlets'] },
-  { type:'sub-recipe', name:'Char Siu Marinade', detail:'Sub-recipe · Batch 1 L', uom:'L', cost:3.60, active:true, groups:['Chargrill Outlets'] },
-  { type:'sub-recipe', name:'Chimichurri', detail:'Sub-recipe · Batch 500 ml', uom:'ml', cost:1.80, active:true, groups:['Chargrill Outlets'] },
-  { type:'sub-recipe', name:'Satay Peanut Sauce', detail:'Sub-recipe · Batch 1.5 L', uom:'L', cost:5.20, active:true, groups:INV_GROUPS.slice() },
-  { type:'sub-recipe', name:'Nam Jim Dipping Sauce', detail:'Sub-recipe · Batch 500 ml', uom:'ml', cost:1.40, active:true, groups:INV_GROUPS.slice() },
+  { type:'sub-recipe', name:'House BBQ Sauce', detail:'Sub-recipe', uom:'L', cost:4.20, active:true, groups:['Chargrill Outlets'] },
+  { type:'sub-recipe', name:'Char Siu Marinade', detail:'Sub-recipe', uom:'L', cost:3.60, active:true, groups:['Chargrill Outlets'] },
+  { type:'sub-recipe', name:'Chimichurri', detail:'Sub-recipe', uom:'ml', cost:1.80, active:true, groups:['Chargrill Outlets'] },
+  { type:'sub-recipe', name:'Satay Peanut Sauce', detail:'Sub-recipe', uom:'L', cost:5.20, active:true, groups:INV_GROUPS.slice() },
+  { type:'sub-recipe', name:'Nam Jim Dipping Sauce', detail:'Sub-recipe', uom:'ml', cost:1.40, active:true, groups:INV_GROUPS.slice() },
   // Recipes
   { type:'recipe', name:'Chargrill Half Chicken with Garlic Herb Butter', detail:'Recipe', uom:'ptn', cost:8.40, active:true, groups:['Chargrill Outlets'] },
   { type:'recipe', name:'Wagyu Beef Striploin 200g', detail:'Recipe', uom:'ptn', cost:18.50, active:true, groups:['Chargrill Outlets'] },
@@ -5413,9 +5438,11 @@ function saveHqInventoryState() {
   localStorage.setItem(HQ_INVENTORY_STATE_KEY, JSON.stringify(INV_ITEMS));
 }
 loadHqInventoryState();
+window.nomniInventoryItems = INV_ITEMS;
+renderHealthCheck();
 
 // Recipe ingredient links use only records stocked in Inventory. Every recipe
-// also uses one Group SKU, chosen to match its available outlet group(s).
+// also uses one inventory item, chosen to match its available outlet group(s).
 function seedRecipeIngredientLinks() {
   var inventoryByCategory = {
     'Mains': ['Fresh Garlic Peeled 10kg Vac Bag', 'Anchor Unsalted Butter 25kg Bulk Block'],
@@ -5447,6 +5474,7 @@ let invPage = 1, invSearch = '', invTypeFilter = '', invStatusFilter = '';
 const INV_PER_PAGE = 20;
 const invExpanded = new Set();
 const invUomExpanded = new Set();
+const selectedInventoryIndices = new Set();
 
 function setInvSearch(v) { invSearch = v; invPage = 1; renderInv(); }
 function setInvTypeFilter(v) { invTypeFilter = v; invPage = 1; renderInv(); }
@@ -5454,6 +5482,78 @@ function setInvStatusFilter(v) { invStatusFilter = v; invPage = 1; renderInv(); 
 function setInvPage(p) { invPage = p; renderInv(); window.scrollTo(0,0); }
 function toggleInvExpand(idx) { invExpanded.has(idx) ? invExpanded.delete(idx) : invExpanded.add(idx); renderInv(); }
 function toggleInvUoms(idx, event) { event.stopPropagation(); invUomExpanded.has(idx) ? invUomExpanded.delete(idx) : invUomExpanded.add(idx); renderInv(); }
+function toggleInventorySelection(idx, checked) { if (checked) selectedInventoryIndices.add(idx); else selectedInventoryIndices.delete(idx); updateInventoryBulkActions(); }
+function clearInventorySelection() { selectedInventoryIndices.clear(); renderInv(); }
+function updateInventoryBulkActions() {
+  var bar = document.getElementById('inventoryBulkActions'), count = document.getElementById('inventoryBulkCount');
+  if (!bar || !count) return;
+  var n = selectedInventoryIndices.size;
+  bar.classList.toggle('is-visible', n > 0);
+  var filter = document.querySelector('#panel-inventory .ml-filter-row');
+  if (filter) filter.style.display = n ? 'none' : '';
+  count.textContent = n + (n === 1 ? ' item selected' : ' items selected');
+}
+var pendingGroupSkuSourceIndices = [];
+function groupSkuSources(indices) {
+  return (indices || []).map(function(idx) { return INV_ITEMS[idx]; }).filter(function(item) { return item && item.type === 'sku'; });
+}
+function openAddToExistingInventoryItem(starterIndex) {
+  var sourceIndices = Number.isInteger(starterIndex) ? [starterIndex] : Array.from(selectedInventoryIndices);
+  var sources = groupSkuSources(sourceIndices);
+  if (!sources.length) return;
+  pendingGroupSkuSourceIndices = sourceIndices;
+  document.getElementById('groupSkusChoiceTitle').textContent = 'Add to existing inventory item';
+  document.getElementById('groupSkusChoiceCopy').textContent = sources.length === 1
+    ? 'Choose the inventory item that should include this SKU.'
+    : 'Choose the inventory item that should include these SKUs.';
+  var existing = INV_ITEMS.filter(function(item) { return item.type === 'group'; }).sort(function(a, b) { return a.name.localeCompare(b.name); });
+  document.getElementById('groupSkusExistingSelect').innerHTML = existing.map(function(item) {
+    return '<option value="' + INV_ITEMS.indexOf(item) + '">' + hqSettingsEscape(item.name) + '</option>';
+  }).join('');
+  document.getElementById('groupSkusChoiceOverlay').classList.add('open');
+}
+function closeGroupSkusChoice() {
+  document.getElementById('groupSkusChoiceOverlay').classList.remove('open');
+  pendingGroupSkuSourceIndices = [];
+}
+function createInventoryItemFromSkus(sourceIndices) {
+  var selectedItems = groupSkuSources(sourceIndices);
+  if (!selectedItems.length) return;
+  openGroupSkuModal();
+  groupSkuDraft.items = selectedItems.map(function(item) {
+    return { name: item.name, supplier: item.detail, cost: item.cost, uom: item.uom, groups: (item.groups || []).slice(), outlets: (item.outlets || []).slice(), active: item.active !== false, conversion: 1, conversionFlipped: false };
+  });
+  var selectedUoms = selectedItems.map(function(item) { return normaliseGroupSkuUom(item.uom); }).filter(function(value, index, values) { return values.indexOf(value) === index; });
+  var uomField = document.getElementById('groupSkuUom');
+  if (selectedUoms.length === 1) {
+    var matchingOption = Array.from(uomField.options).find(function(option) { return normaliseGroupSkuUom(option.value) === selectedUoms[0]; });
+    uomField.value = matchingOption ? matchingOption.value : selectedItems[0].uom;
+  } else {
+    uomField.value = '';
+  }
+  renderGroupSkuContent();
+  updateGroupSkuSaveState();
+}
+function addToExistingInventoryItem() {
+  var select = document.getElementById('groupSkusExistingSelect');
+  var targetIndex = Number(select.value);
+  var target = INV_ITEMS[targetIndex];
+  var sources = groupSkuSources(pendingGroupSkuSourceIndices);
+  if (!target || target.type !== 'group' || !sources.length) return;
+  target.constituents = target.constituents || [];
+  sources.forEach(function(source) {
+    if (target.constituents.some(function(option) { return option.name === source.name; })) return;
+    target.constituents.push({ name: source.name, supplier: source.detail, cost: source.cost, uom: source.uom, groups: (source.groups || []).slice(), outlets: (source.outlets || []).slice(), active: source.active !== false, conversion: 1, conversionFlipped: false });
+  });
+  target.detail = target.constituents.length + ' supplier option' + (target.constituents.length === 1 ? '' : 's');
+  target.groups = Array.from(new Set(target.constituents.reduce(function(all, option) { return all.concat(option.groups || []); }, [])));
+  target.outlets = Array.from(new Set(target.constituents.reduce(function(all, option) { return all.concat(option.outlets || []); }, [])));
+  closeGroupSkusChoice();
+  selectedInventoryIndices.clear();
+  saveHqInventoryState();
+  renderInv();
+  showHqToast('SKUs grouped', 'Added to ' + target.name + '.');
+}
 function toggleInvAddMenu(e) {
   e.stopPropagation();
   var m = document.getElementById('invAddMenu');
@@ -5968,7 +6068,7 @@ function setSupplierScopeView(view) {
   document.querySelectorAll('.supplier-scope-segmented button').forEach(function(button) { button.classList.toggle('is-active', button.textContent.toLowerCase() === view); });
   if (view === 'groups' && pendingSupplierLink) {
     var supplier = pendingSupplierLink.supplier;
-    groups.innerHTML = (supplier.groupList || []).filter(function(group) { return supplierSettingsAreComplete((supplier.scopeSettings || {})['group-' + group]); }).map(function(group) { return '<button type="button" class="supplier-scope-nav-item" data-supplier-scope="group-' + escapeOverviewText(group) + '" onclick="switchSupplierSettingsScope(\'group-' + group.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(group) + '<small>' + availabilityGroupCount(group) + ' outlets</small></button>'; }).join('') || '<p class="supplier-scope-nav-help"><strong>No group settings</strong><span>Use this to apply same settings to all outlets in a Group.</span></p>';
+    groups.innerHTML = (supplier.groupList || []).filter(function(group) { return supplierSettingsAreComplete((supplier.scopeSettings || {})['group-' + group]); }).map(function(group) { return '<button type="button" class="supplier-scope-nav-item" data-supplier-scope="group-' + escapeOverviewText(group) + '" onclick="switchSupplierSettingsScope(\'group-' + group.replace(/'/g, "\\'") + '\')">' + escapeOverviewText(group) + '<small>' + availabilityGroupCount(group) + ' outlets</small></button>'; }).join('') || '<p class="supplier-scope-nav-help"><strong>No group settings</strong><span>Use group settings when outlets in the same group share the same supplier settings. Applies to all in the group unless outlet settings are added.</span></p>';
     if (addGroup) addGroup.classList.toggle('has-group-settings', groups.querySelectorAll('[data-supplier-scope]').length > 0);
   }
 }
@@ -6478,7 +6578,8 @@ function renderInv() {
   applyHqInventorySettingsOverrides();
   var items = INV_ITEMS.slice();
   if (invSearch) { var q = invSearch.toLowerCase(); items = items.filter(function(r){ return inventoryDisplayName(r).toLowerCase().includes(q) || r.name.toLowerCase().includes(q) || (r.detail||'').toLowerCase().includes(q); }); }
-  if (invTypeFilter) items = items.filter(function(r){ return r.type === invTypeFilter; });
+  if (invTypeFilter === 'needs-options') items = items.filter(function(r){ return r.type === 'group' && !(r.constituents || []).length; });
+  else if (invTypeFilter) items = items.filter(function(r){ return r.type === invTypeFilter; });
   if (invStatusFilter === 'active') items = items.filter(function(r){ return inventoryLifecycle(r) === 'active'; });
   else if (invStatusFilter === 'disabled') items = items.filter(function(r){ return inventoryLifecycle(r) === 'disabled'; });
   else if (invStatusFilter === 'removed') items = items.filter(function(r){ return inventoryLifecycle(r) === 'removed'; });
@@ -6486,6 +6587,7 @@ function renderInv() {
 
   var total = items.length;
   document.getElementById('invCount').textContent = total;
+  updateInventoryBulkActions();
   var start = (invPage - 1) * INV_PER_PAGE;
   var page = items.slice(start, start + INV_PER_PAGE);
 
@@ -6501,7 +6603,11 @@ function renderInv() {
       : (lifecycle === 'disabled' ? '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#F0F0F2;color:#555;margin-left:6px">Disabled</span>' : '');
 
 
-    var detail = r.detail || '';
+    var detail = r.type === 'group'
+      ? 'Item' + ((r.constituents || []).length ? ' · ' + (r.constituents || []).length + ' supplier option' + ((r.constituents || []).length === 1 ? '' : 's') : ' · No supplier options')
+      : (r.type === 'sku'
+        ? ('SKU' + (r.detail ? ' · ' + supplierDisplayName(r.detail) : ''))
+        : (r.type === 'sub-recipe' ? 'Sub-recipe' : 'Recipe'));
 
     var groupScope = r.type === 'group' ? groupSkuScope(r) : null;
     var availableGroups = groupScope ? groupScope.groups : (r.groups || []);
@@ -6516,14 +6622,16 @@ function renderInv() {
       ? '<button class="ml-options-link' + (invUomExpanded.has(globalIdx) ? ' is-open' : '') + '" onclick="toggleInvUoms(' + globalIdx + ',event)">' + r.inventoryUoms.length + ' options<span class="ml-options-chevron"></span></button>'
       : r.uom;
     var parentGrpHtml = hasUomVariations ? '' : grpHtml;
+    var selectHtml = r.type !== 'sku'
+      ? '<td class="inventory-select-cell"></td>'
+      : '<td class="inventory-select-cell" onclick="event.stopPropagation()"><input type="checkbox" class="inventory-select-checkbox" aria-label="Select ' + escapeItemDisplayText(inventoryDisplayName(r)).replace(/"/g, '&quot;') + '"' + (selectedInventoryIndices.has(globalIdx) ? ' checked' : '') + ' onchange="toggleInventorySelection(' + globalIdx + ', this.checked)" /></td>';
 
     rows.push('<tr' + inactiveClass + '>' +
-      '<td style="' + td + '">' +
+      selectHtml + '<td style="' + td + 'padding-left:4px;">' +
         '<div style="display:flex;align-items:center;gap:8px">' +
         '<div>' +
           '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">' +
             '<span style="font-size:14px;font-weight:500;color:var(--ink)">' + escapeItemDisplayText(inventoryDisplayName(r)) + lifecycleBadge + '</span>' +
-            (r.type === 'group' ? '<span style="font-size:10px;font-weight:700;letter-spacing:.04em;background:#EDE9FE;color:#6D28D9;border-radius:4px;padding:2px 6px;flex-shrink:0">G</span>' : '') +
           '</div>' +
           (detail ? (r.type === 'group'
             ? '<button onclick="event.stopPropagation();toggleInvExpand(' + globalIdx + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;font-weight:600;color:var(--spinach);cursor:pointer;display:inline-flex;align-items:center;gap:3px;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + detail + '<svg style="transition:transform .15s;transform:' + (invExpanded.has(globalIdx) ? 'rotate(180deg)' : '') + '" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>'
@@ -6536,6 +6644,7 @@ function renderInv() {
         '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
           '<div class="row-actions-menu inventory-actions-menu">' +
           '<div class="row-action-item" onclick="event.stopPropagation();' + (r.type === 'group' ? 'openGroupSkuModal(' + globalIdx + ')' : 'openHqInventorySettings(' + globalIdx + ')') + '">Edit</div>' +
+          (r.type === 'sku' ? '<div class="row-action-item" onclick="event.stopPropagation();createInventoryItemFromSkus([' + globalIdx + '])">Create inventory item</div><div class="row-action-item" onclick="event.stopPropagation();openAddToExistingInventoryItem(' + globalIdx + ')">Add to existing item</div>' : '') +
           '<div class="row-action-item" onclick="event.stopPropagation();toggleInventoryLifecycle(' + globalIdx + ')">' + (lifecycle === 'removed' ? 'Restore' : (lifecycle === 'active' ? 'Disable' : 'Enable')) + '</div>' +
           '<div class="row-action-item danger" onclick="event.stopPropagation();' + (r.type === 'group' ? 'requestDeleteGroupSku(' + globalIdx + ')' : 'toggleInventoryLifecycle(' + globalIdx + ')') + '">' + (r.type === 'group' ? 'Delete' : 'Remove') + '</div>' +
         '</div></div>' +
@@ -6548,9 +6657,9 @@ function renderInv() {
         var cOutlets = c.outlets || r.outlets || [];
         var cLabel = availabilityLabel(cGroups, cOutlets, INV_GROUPS.length, REC_OUTLETS.length);
         rows.push('<tr style="background:#F9FAFB">' +
-          '<td style="' + td + 'padding-left:52px">' +
+          '<td class="inventory-select-cell"></td><td style="' + td + 'padding-left:24px">' +
             '<div style="font-size: 14px;font-weight:500;color:var(--ink);margin-bottom:2px">' + c.name + '</div>' +
-            '<div style="font-size:12px;color:var(--ink-mute)">' + supplierDisplayName(c.supplier) + '</div>' +
+            '<div style="font-size:12px;color:var(--ink-mute)">SKU · ' + supplierDisplayName(c.supplier) + '</div>' +
           '</td>' +
           '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + r.uom + '</td>' +
           '<td style="' + td + '"><button onclick="event.stopPropagation();openGroupSkuConstituentAvailability(' + globalIdx + ',' + constituentIndex + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + cLabel + '</button></td><td style="' + td + '"></td>' +
@@ -6565,7 +6674,7 @@ function renderInv() {
         var entryLabel = availabilityLabel(entryGroups, entryOutlets, INV_GROUPS.length, REC_OUTLETS.length);
         var entryAccess = '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + entryGroups.join('|') + '" data-outlets="' + entryOutlets.join('|') + '" style="background:none;border:none;padding:0;font:inherit;font-size:14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + entryLabel + '</button>';
         rows.push('<tr class="inv-uom-row">' +
-          '<td style="' + td + 'padding-left:48px"><span style="font-size:14px;color:var(--ink)">' + escapeItemDisplayText(inventoryDisplayName(r)) + '</span></td>' +
+          '<td class="inventory-select-cell"></td><td style="' + td + 'padding-left:48px"><span style="font-size:14px;color:var(--ink)">' + escapeItemDisplayText(inventoryDisplayName(r)) + '</span></td>' +
           '<td style="' + td + 'font-size:14px;color:var(--ink)">' + entry.uom + '</td>' +
           '<td style="' + td + '">' + entryAccess + '</td><td style="' + td + '"></td>' +
         '</tr>');
@@ -6592,10 +6701,12 @@ var groupSkuDraft = null;
 var groupSkuPickerSelected = null;
 var groupSkuPickerSearch = '';
 var groupSkuPickerSupplier = '';
+var groupSkuPickerConversions = {};
 
-function openGroupSkuModal(editIndex) {
+function openGroupSkuModal(editIndex, starterIndex) {
   var isEditing = typeof editIndex === 'number' && editIndex > -1;
   var existing = isEditing ? INV_ITEMS[editIndex] : null;
+  var starter = Number.isInteger(starterIndex) ? INV_ITEMS[starterIndex] : null;
   groupSkuDraft = {
     editIndex: isEditing ? editIndex : -1,
     name: existing ? existing.name : '',
@@ -6608,10 +6719,11 @@ function openGroupSkuModal(editIndex) {
         groups: source ? (source.groups || []).slice() : (c.groups || (existing.groups || [])).slice(),
         outlets: source ? (source.outlets || []).slice() : (c.outlets || (existing.outlets || [])).slice()
       }, c);
-    }) : []
+    }) : (starter && starter.type === 'sku' ? [{ name: starter.name, supplier: starter.detail, cost: starter.cost, uom: starter.uom, groups: (starter.groups || []).slice(), outlets: (starter.outlets || []).slice(), active: starter.active !== false }] : [])
   };
-  document.getElementById('groupSkuModalTitle').textContent = isEditing ? 'Edit Group SKU' : 'Create Group SKU';
+  document.getElementById('groupSkuModalTitle').textContent = isEditing ? 'Edit inventory item' : 'Create inventory item';
   document.getElementById('groupSkuName').value = groupSkuDraft.name;
+  document.getElementById('groupSkuUom').value = existing ? existing.uom : (starter ? starter.uom : '');
   document.getElementById('groupSkuPar').value = groupSkuDraft.par;
   document.getElementById('groupSkuSaveBtn').textContent = isEditing ? 'Save' : 'Create';
   renderGroupSkuContent();
@@ -6629,21 +6741,35 @@ function renderGroupSkuContent() {
   var body = document.getElementById('groupSkuContentBody');
   var deleteBtn = document.getElementById('groupSkuDeleteBtn');
   var table = body ? body.closest('table') : null;
+  var targetUom = document.getElementById('groupSkuUom').value.trim();
+  var showConversion = groupSkuDraft.items.length > 0;
+  var head = table ? table.querySelector('thead tr') : null;
+  if (head) head.innerHTML = '<th style="width:52%;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Item</th><th style="width:70px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">UOM</th>' + (showConversion ? '<th style="width:250px;min-width:250px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Convert existing UOM</th>' : '');
   if (!groupSkuDraft.items.length) {
     if (table) table.style.display = 'none';
     body.innerHTML = '<tr><td colspan="2" style="padding:16px 0;color:var(--ink-mute);font-size:13px">No items added yet.</td></tr>';
   } else {
     if (table) table.style.display = '';
     body.innerHTML = groupSkuDraft.items.map(function(item) {
+      var needsConversion = !!targetUom && normaliseGroupSkuUom(item.uom) !== normaliseGroupSkuUom(targetUom);
+      var conversion = showConversion ? '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + (needsConversion ? '<div class="inventory-conversion"><span>1 ' + hqSettingsEscape(item.conversionFlipped ? item.uom : targetUom) + '</span><span>=</span><input class="inventory-inline-field" type="number" min="0.001" step="any" value="' + (item.conversion || 1) + '" onchange="updateGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\',this.value)" /><span>' + hqSettingsEscape(item.conversionFlipped ? targetUom : item.uom) + '</span><button class="inventory-flip" type="button" onclick="flipGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\')"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>Flip units</button></div>' : '<span class="inventory-not-required">Not required</span>') + '</td>' : '';
       return '<tr>' +
-        '<td style="padding:12px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" data-group-content-check="' + hqSettingsEscape(item.name) + '" onchange="updateGroupSkuDeleteVisibility()" style="margin-top:3px" />' +
+        '<td style="padding:12px 10px 12px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" data-group-content-check="' + hqSettingsEscape(item.name) + '" onchange="updateGroupSkuDeleteVisibility()" style="margin-top:3px" />' +
           '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</span></span></label></td>' +
-        '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' +
+        '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' + conversion +
       '</tr>';
     }).join('');
   }
   deleteBtn.hidden = true;
   updateGroupSkuSaveState();
+}
+function updateGroupSkuContentConversion(name, value) {
+  var item = (groupSkuDraft.items || []).find(function(candidate) { return candidate.name === name; });
+  if (item) item.conversion = Math.max(0.001, Number(value) || 1);
+}
+function flipGroupSkuContentConversion(name) {
+  var item = (groupSkuDraft.items || []).find(function(candidate) { return candidate.name === name; });
+  if (item) { item.conversionFlipped = !item.conversionFlipped; renderGroupSkuContent(); }
 }
 function updateGroupSkuDeleteVisibility() {
   document.getElementById('groupSkuDeleteBtn').hidden = groupSkuContentChecked().length === 0;
@@ -6672,13 +6798,15 @@ function confirmGroupSkuContentDelete() {
 function updateGroupSkuSaveState() {
   var name = document.getElementById('groupSkuName').value.trim();
   var par = document.getElementById('groupSkuPar').value;
+  var uom = document.getElementById('groupSkuUom').value.trim();
   var uomLabel = document.getElementById('groupSkuParUom');
-  uomLabel.textContent = groupSkuDraft.items.length ? groupSkuDraft.items[0].uom : '';
-  var ready = !!name && groupSkuDraft.items.length > 0 && par !== '' && Number(par) >= 0;
+  uomLabel.textContent = uom;
+  var ready = !!name && !!uom && par !== '' && Number(par) >= 0;
   document.getElementById('groupSkuSaveBtn').disabled = !ready;
 }
 function openGroupSkuPicker() {
   groupSkuPickerSelected = new Set();
+  groupSkuPickerConversions = {};
   groupSkuPickerSearch = '';
   groupSkuPickerSupplier = '';
   document.getElementById('groupSkuPickerSearch').value = '';
@@ -6692,7 +6820,8 @@ function closeGroupSkuPicker() {
 }
 function renderGroupSkuPickerSupplierOptions() {
   var select = document.getElementById('groupSkuPickerSupplier');
-  var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'sku'; }).map(function(i){ return i.detail; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
+  var used = groupSkuUsedNames();
+  var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'sku' && !used.has(i.name); }).map(function(i){ return i.detail; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
   select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(s){ return '<option value="' + hqSettingsEscape(s) + '">' + supplierDisplayName(s) + '</option>'; }).join('');
 }
 function setGroupSkuPickerSearch(v) { groupSkuPickerSearch = v; renderGroupSkuPickerList(); }
@@ -6702,6 +6831,28 @@ function groupSkuUsedNames() {
   INV_ITEMS.forEach(function(item, idx) { if (item.type === 'group' && item.constituents && idx !== groupSkuDraft.editIndex) item.constituents.forEach(function(c){ used.add(c.name); }); });
   (groupSkuDraft.items || []).forEach(function(item) { used.add(item.name); });
   return used;
+}
+function normaliseGroupSkuUom(value) {
+  var uom = String(value || '').replace(/^per\s+/i, '').trim().toLowerCase();
+  var aliases = { btl:'bottle', bottles:'bottle', pc:'piece', pcs:'piece', pieces:'piece', l:'litre', litres:'litre', ml:'millilitre', mls:'millilitre', ctn:'carton', bch:'bunch', pk:'pack' };
+  return aliases[uom] || uom;
+}
+function groupSkuPickerTargetUom() {
+  var field = document.getElementById('groupSkuUom');
+  return field ? field.value.trim() : '';
+}
+function groupSkuPickerNeedsConversion(item) {
+  var target = groupSkuPickerTargetUom();
+  return !!target && normaliseGroupSkuUom(item.uom) !== normaliseGroupSkuUom(target);
+}
+function updateGroupSkuPickerConversion(name, value) {
+  groupSkuPickerConversions[name] = groupSkuPickerConversions[name] || { conversion: 1, flipped: false };
+  groupSkuPickerConversions[name].conversion = Math.max(0.001, Number(value) || 1);
+}
+function flipGroupSkuPickerConversion(name) {
+  groupSkuPickerConversions[name] = groupSkuPickerConversions[name] || { conversion: 1, flipped: false };
+  groupSkuPickerConversions[name].flipped = !groupSkuPickerConversions[name].flipped;
+  renderGroupSkuPickerList();
 }
 function renderGroupSkuPickerList() {
   var used = groupSkuUsedNames();
@@ -6713,7 +6864,18 @@ function renderGroupSkuPickerList() {
     if (q && item.name.toLowerCase().indexOf(q) === -1) return false;
     return true;
   });
+  candidates.sort(function(a, b) {
+    var targetUom = groupSkuPickerTargetUom();
+    if (targetUom) {
+      var aDifferent = groupSkuPickerNeedsConversion(a) ? 1 : 0;
+      var bDifferent = groupSkuPickerNeedsConversion(b) ? 1 : 0;
+      if (aDifferent !== bDifferent) return bDifferent - aDifferent;
+    }
+    return a.uom.localeCompare(b.uom) || a.name.localeCompare(b.name);
+  });
   var body = document.getElementById('groupSkuPickerBody');
+  var head = document.querySelector('#groupSkuPickerOverlay thead tr');
+  if (head) head.innerHTML = '<th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">SKU</th><th style="width:80px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">UOM</th>';
   if (!candidates.length) {
     body.innerHTML = '<tr><td colspan="2" style="padding:24px 0;text-align:center;color:var(--ink-mute);font-size:13px">No matching items.</td></tr>';
   } else {
@@ -6726,7 +6888,7 @@ function renderGroupSkuPickerList() {
       '</tr>';
     }).join('');
   }
-  document.getElementById('groupSkuPickerCount').textContent = groupSkuPickerSelected.size + ' item' + (groupSkuPickerSelected.size === 1 ? '' : 's') + ' selected';
+  document.getElementById('groupSkuPickerCount').textContent = groupSkuPickerSelected.size + ' SKU' + (groupSkuPickerSelected.size === 1 ? '' : 's') + ' selected';
   document.getElementById('groupSkuPickerError').hidden = true;
 }
 function toggleGroupSkuPickerItem(name, checked) {
@@ -6735,35 +6897,31 @@ function toggleGroupSkuPickerItem(name, checked) {
   } else {
     groupSkuPickerSelected.delete(name);
   }
-  document.getElementById('groupSkuPickerCount').textContent = groupSkuPickerSelected.size + ' item' + (groupSkuPickerSelected.size === 1 ? '' : 's') + ' selected';
+  renderGroupSkuPickerList();
 }
 function confirmGroupSkuPicker() {
   var chosen = INV_ITEMS.filter(function(item) { return groupSkuPickerSelected.has(item.name); });
   if (!chosen.length) return;
-  var uoms = groupSkuDraft.items.map(function(i){ return i.uom; }).concat(chosen.map(function(i){ return i.uom; }));
-  var distinctUoms = uoms.filter(function(v,i,a){ return a.indexOf(v) === i; });
-  if (distinctUoms.length > 1) {
-    document.getElementById('groupSkuPickerError').hidden = false;
-    return;
-  }
+  var targetUom = groupSkuPickerTargetUom() || chosen[0].uom;
   chosen.forEach(function(item) {
-    groupSkuDraft.items.push({ name: item.name, supplier: item.detail, cost: item.cost, uom: item.uom, groups: (item.groups || []).slice(), outlets: (item.outlets || []).slice(), active: item.active !== false });
+    var cfg = groupSkuPickerConversions[item.name] || { conversion: 1, flipped: false };
+    groupSkuDraft.items.push({ name: item.name, supplier: item.detail, cost: item.cost, uom: item.uom, inventoryUom: targetUom, conversion: cfg.conversion, conversionFlipped: cfg.flipped, groups: (item.groups || []).slice(), outlets: (item.outlets || []).slice(), active: item.active !== false });
   });
+  if (!document.getElementById('groupSkuUom').value.trim() && chosen[0]) document.getElementById('groupSkuUom').value = targetUom;
   closeGroupSkuPicker();
   renderGroupSkuContent();
 }
 function saveGroupSku() {
   var name = document.getElementById('groupSkuName').value.trim();
   var par = Number(document.getElementById('groupSkuPar').value || 0);
-  if (!name || !groupSkuDraft.items.length) return;
+  var uom = document.getElementById('groupSkuUom').value.trim();
+  if (!name || !uom) return;
   var duplicate = INV_ITEMS.some(function(item, idx) { return idx !== groupSkuDraft.editIndex && item.name.toLowerCase() === name.toLowerCase(); });
   if (duplicate) { var nameField = document.getElementById('groupSkuName'); nameField.focus(); return; }
-  var uom = groupSkuDraft.items[0].uom;
   var groupAvailability = Array.from(new Set(groupSkuDraft.items.reduce(function(all, item) { return all.concat(item.groups || []); }, [])));
   var outletAvailability = Array.from(new Set(groupSkuDraft.items.reduce(function(all, item) { return all.concat(item.outlets || []); }, [])));
-  var newNames = groupSkuDraft.items.map(function(c){ return c.name; });
   var entry = {
-    type: 'group', name: name, detail: groupSkuDraft.items.length + ' SKU' + (groupSkuDraft.items.length === 1 ? '' : 's'),
+    type: 'group', name: name, detail: groupSkuDraft.items.length + ' supplier option' + (groupSkuDraft.items.length === 1 ? '' : 's'),
     uom: uom, cost: null, active: true,
     groups: groupAvailability,
     outlets: outletAvailability,
@@ -6771,18 +6929,15 @@ function saveGroupSku() {
   };
   if (groupSkuDraft.editIndex > -1) {
     INV_ITEMS[groupSkuDraft.editIndex] = entry;
-    showHqToast('Group SKU updated', name + ' has been updated.');
-    addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(name) + '</strong> Group SKU updated', 'inventory', 'Master');
+    showHqToast('Inventory item updated', name + ' has been updated.');
+    addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(name) + '</strong> inventory item updated', 'inventory', 'Master');
   } else {
     INV_ITEMS.push(entry);
-    showHqToast('Group SKU created', name + ' has been added to inventory.');
-    addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(name) + '</strong> Group SKU created from ' + entry.constituents.length + ' items', 'inventory', 'Master');
+    showHqToast('Inventory item created', name + ' has been added to inventory.');
+    addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(name) + '</strong> inventory item created', 'inventory', 'Master');
   }
-  // Constituents now live only nested under the group; drop their standalone rows.
-  newNames.forEach(function(itemName) {
-    var idx = INV_ITEMS.findIndex(function(item){ return item.type === 'sku' && item.name === itemName; });
-    if (idx > -1) INV_ITEMS.splice(idx, 1);
-  });
+  // Supplier items remain independent records. Adding them as options never removes
+  // purchase history, inventory history, or direct ordering availability.
   closeGroupSkuModal();
   saveHqInventoryState();
   renderInv();
@@ -6822,9 +6977,9 @@ function confirmDeleteGroupSku() {
   INV_ITEMS.splice(pendingGroupSkuDeleteIndex, 1);
   closeGroupSkuDeleteConfirm();
   saveHqInventoryState();
-  addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(record.name) + '</strong> Group SKU deleted and removed from inventory', 'inventory', 'Master');
+  addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(record.name) + '</strong> inventory item deleted and removed from inventory', 'inventory', 'Master');
   renderInv();
-  showHqToast('Group SKU deleted', record.name + ' has been removed from inventory.');
+  showHqToast('Inventory item deleted', record.name + ' has been removed from inventory.');
 }
 function viewGroupSkuDependencies() {
   closeGroupSkuDeleteBlocked();
@@ -7281,7 +7436,7 @@ function setAiStep(n) {
     const el = document.getElementById(id);
     el.style.display = (i===n) ? 'flex' : 'none';
   });
-  const titles = ['Add items to…', 'Select items', 'Pricing & MOQ'];
+  const titles = ['Add supplier items to…', 'Select supplier items', 'Pricing & MOQ'];
   const modal = document.getElementById('addItemModal');
   modal.dataset.aiStep = String(n);
   modal.querySelector('.picker-card').style.width = n === 0 ? '680px' : (n === 2 ? '1100px' : '720px');
@@ -7514,7 +7669,7 @@ function confirmAddItems() {
   if (window.isNewHQ) {
     refreshNewHqEmptyStates();
     renderNewHqSummary(getSavedOutletGroup());
-    addPrototypeActivity('market-list', '<strong>' + n + ' item' + (n === 1 ? '' : 's') + ' added</strong> to master market list', 'market-list', 'Master');
+    addPrototypeActivity('market-list', '<strong>' + n + ' item' + (n === 1 ? '' : 's') + ' added</strong> to supplier catalogue', 'market-list', 'Master');
     savePrototypeState();
   } else if (typeof saveCreatedHqItems === 'function') saveCreatedHqItems();
   closeAddItemModal();
@@ -8344,7 +8499,7 @@ var POS_MAPPING_TARGETS = {
     { id:'inv-chicken', name:'Chilled Chicken Breast Fillet Skinless Boneless 2kg', meta:'Inventory item · kg' },
     { id:'inv-fries', name:'Frozen Shoestring Fries 2kg', meta:'Inventory item · bag' },
     { id:'inv-tea', name:'Iced Tea Concentrate', meta:'Inventory item · L' },
-    { id:'inv-burger', name:'Chargrill Burger Bundle', meta:'Group SKU · 1 set' },
+    { id:'inv-burger', name:'Chargrill Burger Bundle', meta:'Inventory item · 1 set' },
     { id:'inv-char-siu', name:'Char Siu Marinade', meta:'Inventory recipe · L' }
   ],
   recipes: [
@@ -8647,7 +8802,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
   <div class="picker-card">
     <div class="picker-head">
       <div class="picker-head-row">
-        <div class="picker-title" id="addItemModalTitle">Add items to…</div>
+        <div class="picker-title" id="addItemModalTitle">Add supplier items to…</div>
         <button class="picker-close-btn" onclick="closeAddItemModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
     </div>
@@ -8656,7 +8811,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
       <div class="hq-invoice-scopes" id="aiTargetList"></div>
       <div class="picker-foot"><span class="picker-sel-label" id="aiTargetCount">No groups or outlets selected</span><div style="display:flex;gap:8px"><button class="btn btn-tertiary" onclick="closeAddItemModal()">Cancel</button><button class="btn btn-primary" id="aiTargetNext" onclick="showAiStep1()" disabled>Continue</button></div></div>
     </div>
-    <!-- Step 2: Select items -->
+    <!-- Step 2: Select supplier items -->
     <div id="aiPanel1" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
       <div class="picker-search-row">
         <div class="picker-search-wrap">
@@ -8695,7 +8850,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
       </div>
       <div class="picker-foot">
         <button class="btn btn-tertiary" onclick="showAiStep1()">Back</button>
-        <span class="ai-price-footer-note">Pricing &amp; MOQ can still be updated later</span><button class="btn btn-primary" id="aiAddBtn" onclick="confirmAddItems()">Add items</button>
+        <span class="ai-price-footer-note">Pricing &amp; MOQ can still be updated later</span><button class="btn btn-primary" id="aiAddBtn" onclick="confirmAddItems()">Add supplier items</button>
       </div>
     </div>
   </div>
@@ -8912,48 +9067,65 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
   </div>
 </div>
 
-<!-- ── Create / edit Group SKU ── -->
+<!-- ── Create / edit inventory item ── -->
+<div class="modal-overlay" id="groupSkusChoiceOverlay" onclick="if(event.target===this)closeGroupSkusChoice()">
+  <div class="modal-card" style="width:520px">
+    <div class="modal-header"><h2 class="modal-title" id="groupSkusChoiceTitle">Add to existing inventory item</h2><button class="modal-close" onclick="closeGroupSkusChoice()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+    <div class="modal-body" style="gap:18px"><p id="groupSkusChoiceCopy" style="margin:0;color:var(--ink-mute);font-size:14px">Choose the inventory item that should include these SKUs.</p><div><label class="field-label" for="groupSkusExistingSelect">Inventory item</label><select class="field-input" id="groupSkusExistingSelect"></select></div></div>
+    <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkusChoice()">Cancel</button><button type="button" class="btn btn-primary" onclick="addToExistingInventoryItem()">Add SKUs</button></div>
+  </div>
+</div>
 <div class="confirm-overlay" id="groupSkuContentDeleteOverlay" onclick="if(event.target===this)closeGroupSkuContentDelete()">
   <div class="danger-confirm-card">
     <div class="danger-confirm-title">Delete selected item(s)?</div>
-    <div class="danger-confirm-body"><strong id="groupSkuContentDeleteCount"></strong> will no longer be in Inventory. To see the item(s) in Inventory, you’ll need to add them to Inventory again.</div>
+    <div class="danger-confirm-body"><strong id="groupSkuContentDeleteCount"></strong> will no longer be buying options for this inventory item. They remain available as SKUs in Inventory.</div>
     <div class="danger-confirm-actions"><button class="btn-cancel-plain" onclick="closeGroupSkuContentDelete()">Cancel</button><button class="btn-danger-confirm" onclick="confirmGroupSkuContentDelete()">OK</button></div>
   </div>
 </div>
 <div class="confirm-overlay" id="groupSkuDeleteConfirmOverlay" onclick="if(event.target===this)closeGroupSkuDeleteConfirm()">
   <div class="danger-confirm-card">
     <div class="danger-confirm-title">Are you sure?</div>
-    <div class="danger-confirm-body">Items that are not linked to any other lists will be <strong>completely removed from Inventory</strong>.</div>
+    <div class="danger-confirm-body">This removes the inventory item. Its SKUs remain available for ordering and in Inventory.</div>
     <div class="danger-confirm-actions"><button class="btn-cancel-plain" onclick="closeGroupSkuDeleteConfirm()">Cancel</button><button class="btn-danger-confirm" onclick="confirmDeleteGroupSku()">Delete</button></div>
   </div>
 </div>
 <div class="confirm-overlay" id="groupSkuDeleteBlockedOverlay" onclick="if(event.target===this)closeGroupSkuDeleteBlocked()">
   <div class="danger-confirm-card">
-    <div class="danger-confirm-title">This Group SKU can’t be deleted</div>
-    <div class="danger-confirm-body">This Group SKU is currently being used in recipes and/or POS mapping. Remove it from all affected recipes/POS mapping and try to delete again.<div id="groupSkuBlockedList" style="margin-top:12px;color:var(--ink);font-size:13px;font-weight:600"></div></div>
+    <div class="danger-confirm-title">This inventory item can’t be deleted</div>
+    <div class="danger-confirm-body">This inventory item is currently being used in recipes and/or POS mapping. Remove it from all affected recipes/POS mapping and try to delete again.<div id="groupSkuBlockedList" style="margin-top:12px;color:var(--ink);font-size:13px;font-weight:600"></div></div>
     <div class="danger-confirm-actions"><button class="btn-cancel-plain" onclick="closeGroupSkuDeleteBlocked()">Cancel</button><button class="btn-secondary" onclick="viewGroupSkuDependencies()">View affected recipes/mapping</button></div>
   </div>
 </div>
 <div class="modal-overlay" id="groupSkuOverlay" onclick="if(event.target===this)closeGroupSkuModal()">
-  <div class="modal-card" style="width:620px">
+  <div class="modal-card" style="width:760px">
     <div class="modal-header">
-      <h2 class="modal-title" id="groupSkuModalTitle" style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;font-weight:700;letter-spacing:.04em;background:#EDE9FE;color:#6D28D9;border-radius:4px;padding:2px 6px">G</span>Create Group SKU</h2>
+      <h2 class="modal-title" id="groupSkuModalTitle">Create inventory item</h2>
       <button class="modal-close" onclick="closeGroupSkuModal()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="modal-body" style="gap:18px">
-      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--ink-mute)">Group several SKUs to track them as a single item in Inventory — useful if there are multiple buying options for an item.</p>
+      <p style="margin:0;font-size:14px;line-height:1.5;color:var(--ink-mute)">Create an inventory item to track stock and use it in recipes and stocktaking.</p>
       <div>
-        <label class="field-label">Group SKU name:</label>
+        <label class="field-label">Inventory item name:</label>
         <input class="field-input" id="groupSkuName" type="text" placeholder="E.g Fine White Sugar" oninput="updateGroupSkuSaveState()" />
       </div>
+      <div style="max-width:220px">
+        <label class="field-label">Inventory UOM:</label>
+        <select class="field-input" id="groupSkuUom" onchange="updateGroupSkuSaveState(); if (groupSkuDraft) renderGroupSkuContent()">
+          <option value="">Select UOM</option>
+          <option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="mL">mL</option>
+          <option value="piece">piece</option><option value="portion">portion</option><option value="bottle">bottle</option><option value="can">can</option>
+          <option value="bag">bag</option><option value="box">box</option><option value="carton">carton</option><option value="pack">pack</option>
+          <option value="bunch">bunch</option><option value="roll">roll</option><option value="tray">tray</option>
+        </select>
+      </div>
       <div>
-        <label class="field-label" style="margin-bottom:10px">Group content</label>
+        <label class="field-label" style="margin-bottom:10px">Buying options (optional):</label>
         <table style="width:100%;border-collapse:collapse">
           <thead><tr><th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Item</th><th style="width:70px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">UOM</th></tr></thead>
           <tbody id="groupSkuContentBody"></tbody>
         </table>
         <button type="button" id="groupSkuDeleteBtn" class="btn-danger" hidden onclick="deleteCheckedGroupSkuContent()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>Delete</button>
-        <button type="button" class="btn-secondary" onclick="openGroupSkuPicker()" style="margin-top:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add new</button>
+        <button type="button" class="btn-secondary" onclick="openGroupSkuPicker()" style="margin-top:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add SKUs</button>
       </div>
       <div style="max-width:220px">
         <label class="field-label">Par level:</label>
@@ -8966,24 +9138,23 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
   </div>
 </div>
 
-<!-- ── Choose items for Group SKU ── -->
+<!-- ── Choose supplier options for an inventory item ── -->
 <div class="modal-overlay" id="groupSkuPickerOverlay" onclick="if(event.target===this)closeGroupSkuPicker()">
   <div class="modal-card" style="width:620px">
-    <div class="modal-header"><h2 class="modal-title">Choose items for Group SKU</h2><button class="modal-close" onclick="closeGroupSkuPicker()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
+    <div class="modal-header"><h2 class="modal-title">Add SKUs</h2><button class="modal-close" onclick="closeGroupSkuPicker()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
     <div class="modal-body" style="gap:14px">
-      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--ink)"><strong>Note:</strong> Select any number of items with the same UOM (Unit of Measurement) to create a group SKU.</p>
-      <div class="modal-warning modal-info" style="margin:0"><span class="material-symbols-rounded" aria-hidden="true">info</span><span>Any existing data (history, stock count, adjustments) of the items you selected will be lost when added to a Group SKU.</span></div>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--ink)">Select SKUs that are not already assigned to an inventory item.</p>
       <div style="display:flex;gap:10px">
         <div class="ml-search-wrap" style="flex:1">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" class="ml-search-input" id="groupSkuPickerSearch" placeholder="SKU name" oninput="setGroupSkuPickerSearch(this.value)" style="width:100%" />
+          <input type="text" class="ml-search-input" id="groupSkuPickerSearch" placeholder="Search SKUs" oninput="setGroupSkuPickerSearch(this.value)" style="width:100%" />
         </div>
         <select class="ml-filter-select" id="groupSkuPickerSupplier" onchange="setGroupSkuPickerSupplier(this.value)" style="min-width:160px"><option value="">All suppliers</option></select>
       </div>
-      <p class="supplier-contact-error" id="groupSkuPickerError" hidden style="margin:0">UOMs of selected items are not the same.</p>
+      <p class="supplier-contact-error" id="groupSkuPickerError" hidden style="margin:0">Add a conversion rate for items with a different UOM.</p>
       <div style="max-height:280px;overflow-y:auto">
         <table style="width:100%;border-collapse:collapse">
-          <thead><tr><th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">SKU</th><th style="width:80px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Inventory UOM</th></tr></thead>
+          <thead><tr><th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">SKU</th><th style="width:80px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">UOM</th></tr></thead>
           <tbody id="groupSkuPickerBody"></tbody>
         </table>
       </div>
@@ -9968,23 +10139,40 @@ function filterPosOutlets() {
 </script>
 <script>
   (function () {
-    function updateOutletListFade(target) {
-      target.classList.toggle('has-top-overflow', target.scrollTop > 1);
-      target.classList.toggle('has-bottom-overflow', target.scrollTop + target.clientHeight < target.scrollHeight - 1);
+    function updateOutletListFade(nav) {
+      var topOverflow = nav.scrollTop > 1;
+      var bottomOverflow = nav.scrollTop + nav.clientHeight < nav.scrollHeight - 1;
+      nav.classList.toggle('has-top-overflow', topOverflow);
+      nav.classList.toggle('has-bottom-overflow', bottomOverflow);
     }
-    function initialiseSupplierSettingsPolish() {
-      document.querySelectorAll('#supplierSettingsOverlay .supplier-scope-nav, #supplierSettingsOverlay .supplier-scope-nav-overrides').forEach(function (target) {
-        if (!target.dataset.fadeReady) {
-          target.dataset.fadeReady = 'true';
-          target.addEventListener('scroll', function () { updateOutletListFade(target); }, { passive:true });
-          if (window.ResizeObserver) new ResizeObserver(function () { updateOutletListFade(target); }).observe(target);
-          if (window.MutationObserver) new MutationObserver(function () { updateOutletListFade(target); }).observe(target, { childList:true, subtree:true });
-        }
+    function initialiseOutletListFade() {
+      var targets = Array.from(document.querySelectorAll('#supplierSettingsOverlay .supplier-scope-nav, #supplierSettingsOverlay .supplier-scope-nav-overrides'));
+      targets.forEach(function (target) {
+        if (target.dataset.fadeReady) return;
+        target.dataset.fadeReady = 'true';
+        target.addEventListener('scroll', function () { updateOutletListFade(target); }, { passive: true });
+        if (window.ResizeObserver) new ResizeObserver(function () { updateOutletListFade(target); }).observe(target);
+        if (window.MutationObserver) new MutationObserver(function () { updateOutletListFade(target); }).observe(target, { childList: true, subtree: true });
         updateOutletListFade(target);
       });
     }
-    document.addEventListener('DOMContentLoaded', initialiseSupplierSettingsPolish);
-    setTimeout(initialiseSupplierSettingsPolish, 0);
+    document.addEventListener('DOMContentLoaded', initialiseOutletListFade);
+    setTimeout(initialiseOutletListFade, 0);
+  }());
+</script>
+<script>
+  (function () {
+    var oldCopy = 'Use group settings when outlets in the same group share the same supplier settings. Applies to all in the group unless outlet settings are added.';
+    var previousCopy = 'Use this when outlets in a group share the same settings. Applies to all in the group unless outlet settings are added.';
+    var newCopy = 'Use this to apply same settings to all outlets in a Group.';
+    function updateGroupHelp() {
+      document.querySelectorAll('#supplierScopeNavGroups .supplier-scope-nav-help span').forEach(function (node) {
+        if (node.textContent.indexOf(oldCopy) !== -1 || node.textContent.indexOf(previousCopy) !== -1) node.textContent = newCopy;
+      });
+    }
+    document.addEventListener('DOMContentLoaded', updateGroupHelp);
+    setTimeout(updateGroupHelp, 0);
+    if (window.MutationObserver) new MutationObserver(updateGroupHelp).observe(document.body, { childList:true, subtree:true });
   }());
 </script>
 </body>
