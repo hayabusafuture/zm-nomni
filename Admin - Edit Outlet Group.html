@@ -376,7 +376,8 @@
   .items-table .item-uom-row td { background:#f7f8fa !important; }
   .items-table .item-uom-row:hover td { background:#f2f4f5 !important; }
   .item-uom-name { padding-left:36px !important; color:var(--ink-mute) !important; }
-  .item-options-link { display:inline-flex; align-items:center; gap:3px; padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .item-options-link { display:inline-flex; align-items:center; gap:3px; padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; text-decoration:underline; text-underline-offset:2px; text-decoration-style:dashed; }
+  .sku-options-link { display:inline-flex; align-items:center; gap:3px; padding:0; border:0; background:transparent; color:var(--spinach); font:inherit; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
   .item-options-link:hover { color:var(--nomni-green); }
   .item-options-chevron { width:8px; height:8px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg) translateY(-2px); transition:transform .15s ease; }
   .item-options-chevron.open { transform:rotate(225deg) translate(-1px,-1px); }
@@ -1153,6 +1154,18 @@
   </div>
 </div>
 
+<!-- SKU availability information -->
+<div class="confirm-overlay" id="skuAvailabilityInfoOverlay" onclick="if(event.target===this)closeSkuAvailabilityInfo()">
+  <div class="confirm-card">
+    <div class="confirm-title">Availability managed in SKUs</div>
+    <div class="confirm-body">SKU availability is controlled from the SKUs list. Open the SKUs tab to include or exclude this item from the group.</div>
+    <div class="confirm-foot">
+      <button class="modal-cancel" onclick="closeSkuAvailabilityInfo()">Close</button>
+      <button class="btn btn-primary" onclick="closeSkuAvailabilityInfo();switchToTab('skus')">Open SKUs</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const OUTLETS = [
   { id:  1, name: "(WF 301) Chargrill @ 301 Punggol",       company: "Garden Cuisine Pte Ltd",        active: true,  posConnected: true,  mappedCount:22, totalMappable:22, productMapped:8, productTotal:8, variantMapped:14, variantTotal:14, lastSynced:"10 Jun 2026" },
@@ -1903,33 +1916,33 @@ function toggleIndividualSupplier(name) {
 // Inventory inherits every SKU that is available to this group or outlet. It
 // also contains the HQ inventory items, recipes and sub-recipes for the scope.
 const SCOPE_INVENTORY_ITEM_DEFINITIONS = [
-  { name: 'Chicken Thigh Boneless', uom: 'kg', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [], constituents: [
+  { name: 'Chicken Thigh Boneless', uom: 'kg', cost: 0, groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [], constituents: [
     { name: 'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier: 'Kee Song Group', cost: 6.80, groups: ['Chargrill Outlets'], outlets: [] },
     { name: 'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier: 'Poultry Masters SG', cost: 6.40, groups: ['Family Dining Express'], outlets: [] }
   ] },
-  { name: 'Dark Soy Sauce', uom: 'L', groups: ['Chargrill Outlets'], outlets: ['(WF 290) Garden Express @ 290 Sengkang'], constituents: [
+  { name: 'Dark Soy Sauce', uom: 'L', cost: 0, groups: ['Chargrill Outlets'], outlets: ['(WF 290) Garden Express @ 290 Sengkang'], constituents: [
     { name: 'Kikkoman Dark Soy Sauce 2L', supplier: 'Kikkoman', cost: 8.80, groups: ['Chargrill Outlets'], outlets: [] },
     { name: 'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier: 'Asian Dry Goods', cost: 6.90, groups: [], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
   ] },
-  { name: 'Cooking Oil', uom: 'L', groups: ['Family Dining Express'], outlets: ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'], constituents: [
+  { name: 'Cooking Oil', uom: 'L', cost: 0, groups: ['Family Dining Express'], outlets: ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'], constituents: [
     { name: 'Sime Darby Canola Oil RBD 20L', supplier: 'Sunny Gold F&B Supplies', cost: 3.20, groups: ['Family Dining Express'], outlets: [] },
     { name: 'Blended Vegetable Cooking Oil 20L', supplier: 'Sunny Gold F&B Supplies', cost: 2.80, groups: [], outlets: ['(WF 139) Chargrill @ 139 Tampines'] },
     { name: 'Golden Chef Rice Bran Oil 18L', supplier: 'Asian Dry Goods', cost: 3.60, groups: [], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
   ] },
-  { name: 'Burger Bun', uom: 'pc', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [], constituents: [] }
+  { name: 'Burger Bun', uom: 'pc', cost: 0, groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [], constituents: [] }
 ];
 const SCOPE_SUB_RECIPES = [
-  { name: 'House BBQ Sauce', uom: 'L', groups: ['Chargrill Outlets'], outlets: [] },
-  { name: 'Char Siu Marinade', uom: 'L', groups: ['Chargrill Outlets'], outlets: [] },
-  { name: 'Chimichurri', uom: 'ml', groups: ['Chargrill Outlets'], outlets: [] },
-  { name: 'Satay Peanut Sauce', uom: 'L', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [] },
-  { name: 'Nam Jim Dipping Sauce', uom: 'ml', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [] }
+  { name: 'House BBQ Sauce', uom: 'L', cost: 0.60, groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Char Siu Marinade', uom: 'L', cost: 0.80, groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Chimichurri', uom: 'ml', cost: 0.50, groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Satay Peanut Sauce', uom: 'L', cost: 0.75, groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [] },
+  { name: 'Nam Jim Dipping Sauce', uom: 'ml', cost: 0.40, groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [] }
 ];
 const SCOPE_RECIPES = [
-  { name: 'Chargrill Half Chicken with Garlic Herb Butter', uom: 'ptn', groups: ['Chargrill Outlets'], outlets: [] },
-  { name: 'Wagyu Beef Striploin 200g', uom: 'ptn', groups: ['Chargrill Outlets'], outlets: [] },
-  { name: 'Pork Belly Burnt Ends', uom: 'ptn', groups: ['Chargrill Outlets'], outlets: [] },
-  { name: 'Chargrill Spring Onion Bunches with Soy & Sesame', uom: 'ptn', groups: ['Chargrill Outlets'], outlets: [] }
+  { name: 'Chargrill Half Chicken with Garlic Herb Butter', uom: 'ptn', cost: 8.40, groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Wagyu Beef Striploin 200g', uom: 'ptn', cost: 22.50, groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Pork Belly Burnt Ends', uom: 'ptn', cost: 14.80, groups: ['Chargrill Outlets'], outlets: [] },
+  { name: 'Chargrill Spring Onion Bunches with Soy & Sesame', uom: 'ptn', cost: 1.20, groups: ['Chargrill Outlets'], outlets: [] }
 ];
 let scopeInventorySearch = '';
 let scopeInventoryTypeFilter = '';
@@ -1947,6 +1960,15 @@ function scopeUsesHqRecord(record) {
 function scopeSkuIsUnavailable(item, index) {
   return inheritedHqItemLifecycle(item) !== 'active' || isExcludedByHq(item) || scopeExcludedItems.has(index) || groupDisabledItems.has(index) || individuallyDisabledItems.has(index) || scopeExcludedSuppliers.has(item.supplier);
 }
+function inheritedHqInventoryItems() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('nomni-hq-inventory-state-v1') || '[]');
+    const groups = saved.filter(function(item) { return item && item.type === 'group'; });
+    return groups.length ? groups : SCOPE_INVENTORY_ITEM_DEFINITIONS;
+  } catch (e) {
+    return SCOPE_INVENTORY_ITEM_DEFINITIONS;
+  }
+}
 function getScopeInventoryRecords() {
   const skuRecords = ITEMS.map(function(item, index) {
     if (inheritedHqItemLifecycle(item) === 'removed' || isExcludedByHq(item)) return null;
@@ -1955,15 +1977,15 @@ function getScopeInventoryRecords() {
     const price = override.price != null ? override.price : (Array.isArray(override.prices) && override.prices[0] != null ? override.prices[0] : item.price);
     return { type: 'sku', name: override.customName || item.name, sourceName: item.name, supplier: supplierDisplayName(item.supplier), uom: uoms[0].replace(/^per\s+/i, ''), cost: '$' + Number(price).toFixed(2), unavailable: scopeSkuIsUnavailable(item, index), sourceIndex: index };
   }).filter(Boolean);
-  const inventoryItems = SCOPE_INVENTORY_ITEM_DEFINITIONS.filter(scopeUsesHqRecord).map(function(definition) {
+  const inventoryItems = inheritedHqInventoryItems().filter(scopeUsesHqRecord).map(function(definition) {
     const options = (definition.constituents || []).filter(scopeUsesHqRecord);
-    return { type: 'item', name: definition.name, uom: definition.uom, cost: '—', options: options, unavailable: scopeExcludedInventory.has(definition.name) };
+    return { type: 'item', name: definition.name, uom: definition.uom, cost: 'S$' + Number(definition.cost || 0).toFixed(2), options: options, unavailable: scopeExcludedInventory.has(definition.name) };
   });
   const recipes = SCOPE_RECIPES.filter(scopeUsesHqRecord).map(function(recipe) {
-    return { type: 'recipe', name: recipe.name, uom: recipe.uom, cost: '—', unavailable: scopeExcludedInventory.has(recipe.name) };
+    return { type: 'recipe', name: recipe.name, uom: recipe.uom, cost: '$' + Number(recipe.cost).toFixed(2), unavailable: scopeExcludedInventory.has(recipe.name) };
   });
   const subRecipes = SCOPE_SUB_RECIPES.filter(scopeUsesHqRecord).map(function(recipe) {
-    return { type: 'sub-recipe', name: recipe.name, uom: recipe.uom, cost: '—', unavailable: scopeExcludedInventory.has(recipe.name) };
+    return { type: 'sub-recipe', name: recipe.name, uom: recipe.uom, cost: '$' + Number(recipe.cost).toFixed(2), unavailable: scopeExcludedInventory.has(recipe.name) };
   });
   return skuRecords.concat(inventoryItems, recipes, subRecipes);
 }
@@ -1982,6 +2004,8 @@ function toggleInventoryExclusion(name) {
   }
   renderScopeInventory();
 }
+function openSkuAvailabilityInfo() { document.getElementById('skuAvailabilityInfoOverlay').classList.add('open'); }
+function closeSkuAvailabilityInfo() { document.getElementById('skuAvailabilityInfoOverlay').classList.remove('open'); }
 function renderScopeInventoryPager(page, totalPages, total) {
   if (totalPages <= 1) return '';
   return '<div class="items-pager-wrap"><span class="pager-info">' + total + ' records</span><div class="pager-buttons"><button class="pager-btn" ' + (page === 1 ? 'disabled' : '') + ' onclick="setScopeInventoryPage(' + (page - 1) + ')">‹</button><span class="pager-current">' + page + ' of ' + totalPages + '</span><button class="pager-btn" ' + (page === totalPages ? 'disabled' : '') + ' onclick="setScopeInventoryPage(' + (page + 1) + ')">›</button></div></div>';
@@ -2012,7 +2036,7 @@ function renderScopeInventory() {
       ? '<button class="item-options-link" onclick="event.stopPropagation();toggleScopeInventoryExpand(\'' + record.name.replace(/'/g, "\\'") + '\')">' + metadata + ' <span class="item-options-chevron' + (isExpanded ? ' open' : '') + '"></span></button>'
       : '<div class="item-supplier-text item-options-static">' + metadata + '</div>';
     const action = record.type === 'sku'
-      ? '<div class="row-action-note">Manage availability in SKUs</div>'
+      ? '<div class="row-action-item" onclick="event.stopPropagation();openSkuAvailabilityInfo()">' + (record.unavailable ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div>'
       : '<div class="row-action-item' + (record.unavailable ? '' : ' danger') + '" onclick="toggleInventoryExclusion(\'' + record.name.replace(/'/g, "\\'") + '\')">' + (record.unavailable ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div>';
     const parent = '<tr' + (record.unavailable ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + record.name + '</div>' + metadataHtml + '</td><td>' + compactUom(record.uom) + '</td><td class="inventory-cost">' + record.cost + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu">' + action + '</div></div></td></tr>';
     if (!isExpanded) return parent;
@@ -2248,7 +2272,7 @@ function renderItems() {
 
     const expanded = groupExpandedUoms.has(rawIdx);
     const parent = '<tr class="item-row item-parent-row' + rowClass + '">' + selectCell + nameCell +
-      '<td><button class="item-options-link" onclick="toggleGroupUoms(' + rawIdx + ', event)">' + uoms.length + ' options <span class="item-options-chevron' + (expanded ? ' open' : '') + '"></span></button></td>' +
+      '<td><button class="sku-options-link" onclick="toggleGroupUoms(' + rawIdx + ', event)">' + uoms.length + ' options <span class="item-options-chevron' + (expanded ? ' open' : '') + '"></span></button></td>' +
       '<td></td><td></td>' + actionCell + '</tr>';
     if (!expanded) return parent;
     const breakdown = getUOMBreakdown(item) || [];
