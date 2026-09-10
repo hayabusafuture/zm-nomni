@@ -1154,14 +1154,14 @@
   </div>
 </div>
 
-<!-- SKU availability information -->
+<!-- SKU inventory inclusion guidance -->
 <div class="confirm-overlay" id="skuAvailabilityInfoOverlay" onclick="if(event.target===this)closeSkuAvailabilityInfo()">
   <div class="confirm-card">
-    <div class="confirm-title">Availability managed in SKUs</div>
-    <div class="confirm-body">SKU availability is controlled from the SKUs list. Open the SKUs tab to include or exclude this item from the group.</div>
+    <div class="confirm-title" id="skuAvailabilityInfoTitle">Include SKU in inventory?</div>
+    <div class="confirm-body" id="skuAvailabilityInfoCopy">This SKU is excluded in the SKUs tab. Include it there first to add it back to Inventory.</div>
     <div class="confirm-foot">
       <button class="modal-cancel" onclick="closeSkuAvailabilityInfo()">Close</button>
-      <button class="btn btn-primary" onclick="closeSkuAvailabilityInfo();switchToTab('skus')">Open SKUs</button>
+      <button class="btn btn-primary" id="skuAvailabilityInfoCta" onclick="closeSkuAvailabilityInfo();switchToTab('skus')">Open SKUs</button>
     </div>
   </div>
 </div>
@@ -1727,12 +1727,33 @@ let groupSupplierStatusFilter = 'available', supplierSearch = '';
 const scopeExcludedSuppliers = new Set(); // supplier names excluded only in this outlet scope
 let individualSupplierStatusFilter = 'available';
 const scopeExcludedInventory = new Set(); // inventory item names excluded only in this group/outlet
+const scopeExcludedInventorySkus = new Set(); // SKU inventory records excluded separately from market-list SKUs
 let inventoryStatusFilter = 'available';
 const groupDisabledItems = new Set();     // item indices auto-disabled due to supplier disable
 const individuallyDisabledItems = new Set(); // item indices disabled individually
 const scopeExcludedItems = new Set();      // item indices excluded only in this group/outlet
 let itemStatusFilter = 'available';
 const selectedItemIndices = new Set();
+let pendingScopeExclusion = null;
+
+function scopeExclusionTarget() {
+  return window.isIndividualOutletPrototype ? 'this outlet' : 'this group';
+}
+function requestScopeExclusion(subject, onConfirm) {
+  pendingScopeExclusion = onConfirm;
+  document.getElementById('scopeExcludeConfirmTitle').textContent = 'Exclude from ' + scopeExclusionTarget() + '?';
+  document.getElementById('scopeExcludeConfirmBody').textContent = subject + ' will no longer be available in ' + scopeExclusionTarget() + '. You can include it again at any time.';
+  document.getElementById('scopeExcludeConfirmOverlay').classList.add('open');
+}
+function closeScopeExclusionConfirm() {
+  pendingScopeExclusion = null;
+  document.getElementById('scopeExcludeConfirmOverlay').classList.remove('open');
+}
+function confirmScopeExclusion() {
+  const action = pendingScopeExclusion;
+  closeScopeExclusionConfirm();
+  if (action) action();
+}
 
 function getUOMBreakdown(item) {
   if (!Array.isArray(item.uom)) return null;
@@ -1960,6 +1981,9 @@ function scopeUsesHqRecord(record) {
 function scopeSkuIsUnavailable(item, index) {
   return inheritedHqItemLifecycle(item) !== 'active' || isExcludedByHq(item) || scopeExcludedItems.has(index) || groupDisabledItems.has(index) || individuallyDisabledItems.has(index) || scopeExcludedSuppliers.has(item.supplier);
 }
+function scopeInventorySkuIsUnavailable(item, index) {
+  return inheritedHqItemLifecycle(item) !== 'active' || isExcludedByHq(item) || scopeExcludedInventorySkus.has(index);
+}
 function inheritedHqInventoryItems() {
   try {
     const saved = JSON.parse(localStorage.getItem('nomni-hq-inventory-state-v1') || '[]');
@@ -1976,7 +2000,7 @@ function scopeInventoryItemCost(definition, options) {
 }
 function scopeInventoryOptionIsAvailable(option) {
   const sourceIndex = ITEMS.findIndex(function(item) { return item.name === option.name; });
-  return sourceIndex < 0 ? !scopeExcludedSuppliers.has(option.supplier) : !scopeSkuIsUnavailable(ITEMS[sourceIndex], sourceIndex);
+  return sourceIndex < 0 ? true : !scopeInventorySkuIsUnavailable(ITEMS[sourceIndex], sourceIndex);
 }
 function getScopeInventoryRecords() {
   const skuRecords = ITEMS.map(function(item, index) {
@@ -1984,7 +2008,7 @@ function getScopeInventoryRecords() {
     const override = itemOverrides[index] || {};
     const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
     const price = override.price != null ? override.price : (Array.isArray(override.prices) && override.prices[0] != null ? override.prices[0] : item.price);
-    return { type: 'sku', name: override.customName || item.name, sourceName: item.name, supplier: supplierDisplayName(item.supplier), uom: uoms[0].replace(/^per\s+/i, ''), cost: '$' + Number(price).toFixed(2), unavailable: scopeSkuIsUnavailable(item, index), sourceIndex: index };
+    return { type: 'sku', name: override.customName || item.name, sourceName: item.name, supplier: supplierDisplayName(item.supplier), uom: uoms[0].replace(/^per\s+/i, ''), cost: '$' + Number(price).toFixed(2), unavailable: scopeInventorySkuIsUnavailable(item, index), sourceIndex: index };
   }).filter(Boolean);
   const inventoryItems = inheritedHqInventoryItems().filter(scopeUsesHqRecord).map(function(definition) {
     const options = (definition.constituents || []).filter(scopeUsesHqRecord).filter(scopeInventoryOptionIsAvailable);
@@ -2007,13 +2031,40 @@ function toggleInventoryExclusion(name) {
   if (scopeExcludedInventory.has(name)) {
     scopeExcludedInventory.delete(name);
     showToast(window.isIndividualOutletPrototype ? 'Inventory item included in this outlet' : 'Inventory item included in this group');
+    renderScopeInventory();
   } else {
-    scopeExcludedInventory.add(name);
-    showToast(window.isIndividualOutletPrototype ? 'Inventory item excluded from this outlet' : 'Inventory item excluded from this group');
+    requestScopeExclusion('“' + name + '”', function() {
+      scopeExcludedInventory.add(name);
+      renderScopeInventory();
+      showToast(window.isIndividualOutletPrototype ? 'Inventory item excluded from this outlet' : 'Inventory item excluded from this group');
+    });
   }
-  renderScopeInventory();
 }
-function openSkuAvailabilityInfo() { document.getElementById('skuAvailabilityInfoOverlay').classList.add('open'); }
+function toggleInventorySkuExclusion(index) {
+  const item = ITEMS[index];
+  if (!item) return;
+  if (scopeExcludedInventorySkus.has(index)) {
+    if (scopeSkuIsUnavailable(item, index)) {
+      openSkuAvailabilityInfo();
+      return;
+    }
+    scopeExcludedInventorySkus.delete(index);
+    renderScopeInventory();
+    showToast(window.isIndividualOutletPrototype ? 'SKU included in inventory for this outlet' : 'SKU included in inventory for this group');
+  } else {
+    requestScopeExclusion('SKU “' + item.name + '” from Inventory', function() {
+      scopeExcludedInventorySkus.add(index);
+      renderScopeInventory();
+      showToast(window.isIndividualOutletPrototype ? 'SKU excluded from inventory for this outlet' : 'SKU excluded from inventory for this group');
+    });
+  }
+}
+function openSkuAvailabilityInfo() {
+  document.getElementById('skuAvailabilityInfoTitle').textContent = 'Include SKU in inventory?';
+  document.getElementById('skuAvailabilityInfoCopy').textContent = 'This SKU is excluded in the SKUs tab. Include it there first to add it back to Inventory.';
+  document.getElementById('skuAvailabilityInfoCta').textContent = 'Open SKUs';
+  document.getElementById('skuAvailabilityInfoOverlay').classList.add('open');
+}
 function closeSkuAvailabilityInfo() { document.getElementById('skuAvailabilityInfoOverlay').classList.remove('open'); }
 function renderScopeInventoryPager(page, totalPages, total) {
   if (totalPages <= 1) return '';
@@ -2044,8 +2095,11 @@ function renderScopeInventory() {
     const metadataHtml = hasOptions
       ? '<button class="item-options-link" onclick="event.stopPropagation();toggleScopeInventoryExpand(\'' + record.name.replace(/'/g, "\\'") + '\')">' + metadata + ' <span class="item-options-chevron' + (isExpanded ? ' open' : '') + '"></span></button>'
       : '<div class="item-supplier-text item-options-static">' + metadata + '</div>';
+    const skuExcludedFromMarket = record.type === 'sku' && scopeSkuIsUnavailable(ITEMS[record.sourceIndex], record.sourceIndex);
     const action = record.type === 'sku'
-      ? '<div class="row-action-item" onclick="event.stopPropagation();openSkuAvailabilityInfo()">' + (record.unavailable ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div>'
+      ? (record.unavailable && skuExcludedFromMarket
+        ? '<div class="row-action-item" onclick="event.stopPropagation();openSkuAvailabilityInfo()">Include in inventory</div>'
+        : '<div class="row-action-item' + (record.unavailable ? '' : ' danger') + '" onclick="event.stopPropagation();toggleInventorySkuExclusion(' + record.sourceIndex + ')">' + (record.unavailable ? 'Include in inventory' : 'Exclude from inventory') + '</div>')
       : '<div class="row-action-item' + (record.unavailable ? '' : ' danger') + '" onclick="toggleInventoryExclusion(\'' + record.name.replace(/'/g, "\\'") + '\')">' + (record.unavailable ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div>';
     const parent = '<tr' + (record.unavailable ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + record.name + '</div>' + metadataHtml + '</td><td>' + compactUom(record.uom) + '</td><td class="inventory-cost">' + record.cost + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu">' + action + '</div></div></td></tr>';
     if (!isExpanded) return parent;
@@ -2111,10 +2165,7 @@ function getDisplayItems() {
   } else if (itemSortKey === 'price-desc') {
     items.sort((a, b) => b.price - a.price);
   } else {
-    items.sort((a, b) => {
-      const ci = CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat);
-      return ci !== 0 ? ci : a.name.localeCompare(b.name);
-    });
+    items.sort((a, b) => a.name.localeCompare(b.name));
   }
   return items;
 }
@@ -2206,14 +2257,23 @@ function updateItemBulkActions() {
 
 function bulkItemAction(action) {
   if (!selectedItemIndices.size) return;
-  selectedItemIndices.forEach(function(rawIdx) {
-    if (action === 'exclude') scopeExcludedItems.add(rawIdx);
-    else { scopeExcludedItems.delete(rawIdx); individuallyDisabledItems.delete(rawIdx); }
-  });
-  selectedItemIndices.clear();
-  renderItems();
-  renderScopeInventory();
-  showToast(action === 'exclude' ? 'SKUs excluded from this group' : 'SKUs included in this group');
+  const apply = function() {
+    selectedItemIndices.forEach(function(rawIdx) {
+      if (action === 'exclude') scopeExcludedItems.add(rawIdx);
+      else { scopeExcludedItems.delete(rawIdx); individuallyDisabledItems.delete(rawIdx); scopeExcludedInventorySkus.delete(rawIdx); }
+    });
+    selectedItemIndices.clear();
+    renderItems();
+    renderScopeInventory();
+    const scope = window.isIndividualOutletPrototype ? 'outlet' : 'group';
+    showToast(action === 'exclude' ? 'SKUs excluded from this ' + scope : 'SKUs included in this ' + scope);
+  };
+  if (action === 'exclude') {
+    const count = selectedItemIndices.size;
+    requestScopeExclusion(count + ' selected SKU' + (count === 1 ? '' : 's'), apply);
+  } else {
+    apply();
+  }
 }
 
 function renderItems() {
@@ -3003,9 +3063,17 @@ function renderOgRec() {
   pager.innerHTML = '<span>Showing ' + from + '–' + to + ' of ' + total + ' recipes</span><div style="display:flex;align-items:center;gap:3px">' + btns + '</div>';
 }
 function toggleOgRecipeExclusion(name) {
-  if (ogRecipeExclusions.has(name)) { ogRecipeExclusions.delete(name); showToast(window.isIndividualOutletPrototype ? 'Recipe included in this outlet' : 'Recipe included in this group'); }
-  else { ogRecipeExclusions.add(name); showToast(window.isIndividualOutletPrototype ? 'Recipe excluded from this outlet' : 'Recipe excluded from this group'); }
-  renderOgRec();
+  if (ogRecipeExclusions.has(name)) {
+    ogRecipeExclusions.delete(name);
+    showToast(window.isIndividualOutletPrototype ? 'Recipe included in this outlet' : 'Recipe included in this group');
+    renderOgRec();
+  } else {
+    requestScopeExclusion('“' + name + '”', function() {
+      ogRecipeExclusions.add(name);
+      renderOgRec();
+      showToast(window.isIndividualOutletPrototype ? 'Recipe excluded from this outlet' : 'Recipe excluded from this group');
+    });
+  }
 }
 function setOgRecPage(p) { ogRecPage = p; renderOgRec(); window.scrollTo(0,0); }
 renderOgRec();
@@ -3041,6 +3109,7 @@ function toggleGroupSupplier(name) {
       renderItems();
       renderScopeInventory();
       renderStatsStrip();
+      showToast('Supplier included in this group');
     }
   } else {
     pendingGroupSupName = name;
@@ -3062,6 +3131,7 @@ function confirmGroupSupDisable() {
   renderItems();
   renderScopeInventory();
   renderStatsStrip();
+  showToast('Supplier excluded from this group');
 }
 function closeGroupSupReactivateOverlay() {
   pendingGroupSupName = null;
@@ -3078,6 +3148,7 @@ function confirmGroupSupReactivate(alsoItems) {
   renderItems();
   renderScopeInventory();
   renderStatsStrip();
+  showToast('Supplier included in this group');
 }
 window.addEventListener('DOMContentLoaded', () => {
   const gsd = document.getElementById('groupSupDisableOverlay');
@@ -3132,9 +3203,9 @@ function confirmItemDisable() {
   if (pendingItemIdx === null) return;
   scopeExcludedItems.add(pendingItemIdx);
   closeItemDisableConfirm();
+  showToast(window.isIndividualOutletPrototype ? 'SKU excluded from this outlet' : 'SKU excluded from this group');
   if (window.isIndividualOutletPrototype) renderIndividualOverviewItems(); else renderItems();
   renderScopeInventory();
-  showToast(window.isIndividualOutletPrototype ? 'SKU excluded from this outlet' : 'SKU excluded from this group');
 }
 
 function closeItemEnableConfirm() {
@@ -3145,10 +3216,11 @@ function confirmItemEnable() {
   if (pendingItemIdx === null) return;
   scopeExcludedItems.delete(pendingItemIdx);
   individuallyDisabledItems.delete(pendingItemIdx);
+  scopeExcludedInventorySkus.delete(pendingItemIdx);
   closeItemEnableConfirm();
+  showToast(window.isIndividualOutletPrototype ? 'SKU included in this outlet' : 'SKU included in this group');
   if (window.isIndividualOutletPrototype) renderIndividualOverviewItems(); else renderItems();
   renderScopeInventory();
-  showToast(window.isIndividualOutletPrototype ? 'SKU included in this outlet' : 'SKU included in this group');
 }
 
 function closeItemSupBlocked() {
@@ -3163,6 +3235,7 @@ function itemSupBlockedEnableThisOnly() {
   ITEMS.forEach((item, i) => {
     if (item.supplier === supplierName && groupDisabledItems.has(i)) {
       groupDisabledItems.delete(i);
+      if (i === pendingItemIdx) scopeExcludedInventorySkus.delete(i);
       if (i !== pendingItemIdx) individuallyDisabledItems.add(i);
     }
   });
@@ -3177,7 +3250,7 @@ function itemSupBlockedEnableAll() {
   if (pendingItemIdx === null) return;
   const supplierName = ITEMS[pendingItemIdx].supplier;
   groupDisabledSuppliers.delete(supplierName);
-  ITEMS.forEach((item, i) => { if (item.supplier === supplierName) groupDisabledItems.delete(i); });
+  ITEMS.forEach((item, i) => { if (item.supplier === supplierName) { groupDisabledItems.delete(i); scopeExcludedInventorySkus.delete(i); } });
   const count = ITEMS.filter(item => item.supplier === supplierName).length;
   closeItemSupBlocked();
   renderSuppliers();
@@ -3189,10 +3262,23 @@ function itemSupBlockedEnableAll() {
 let toastTimer = null;
 function showToast(msg) {
   const t = document.getElementById('appToast');
-  t.textContent = msg;
+  if (!t) return;
+  // Keep the toast above modal and page stacking contexts after a table re-renders.
+  if (t.parentElement !== document.body) document.body.appendChild(t);
+  const text = document.getElementById('appToastText') || t;
+  text.textContent = msg;
+  t.style.display = 'flex';
+  t.style.zIndex = '10000';
+  t.style.visibility = 'visible';
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  toastTimer = setTimeout(() => {
+    t.classList.remove('show');
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(-8px)';
+  }, 3200);
 }
 
 // Context-aware back link
@@ -3219,6 +3305,18 @@ function showToast(msg) {
 })();
 
 </script>
+
+<!-- Shared scope exclusion confirmation -->
+<div class="confirm-overlay" id="scopeExcludeConfirmOverlay" onclick="if(event.target===this)closeScopeExclusionConfirm()">
+  <div class="confirm-card">
+    <div class="confirm-title" id="scopeExcludeConfirmTitle">Exclude from this group?</div>
+    <div class="confirm-body" id="scopeExcludeConfirmBody"></div>
+    <div class="confirm-foot">
+      <button class="modal-cancel" onclick="closeScopeExclusionConfirm()">Cancel</button>
+      <button class="btn-danger" onclick="confirmScopeExclusion()">Exclude</button>
+    </div>
+  </div>
+</div>
 
 <!-- Group-level supplier include with SKU option -->
 <div class="confirm-overlay" id="groupSupReactivateOverlay" onclick="if(event.target===this)closeGroupSupReactivateOverlay()">
@@ -3311,9 +3409,9 @@ function showToast(msg) {
 </div>
 
 <!-- Toast -->
-<div id="appToast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:#1A1F2B;color:#fff;font-size: 14px;font-weight:500;padding:10px 20px;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.22);opacity:0;transition:opacity .2s ease,transform .2s ease;pointer-events:none;z-index:9999;white-space:nowrap"></div>
+<div id="appToast" style="position:fixed;right:28px;top:78px;z-index:10000;min-width:300px;display:flex;align-items:center;gap:14px;padding:15px 18px;border:1px solid #AFE7C2;border-radius:4px;background:var(--mint);box-shadow:0 16px 44px rgba(10,20,15,.16);color:var(--seaweed);font-size:14px;font-weight:600;opacity:0;transform:translateY(-8px);transition:opacity .2s ease,transform .2s ease;pointer-events:none"><span style="width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:#0BBE3F;color:#fff;font-size:27px;line-height:1">✓</span><span id="appToastText"></span></div>
 <style>
-#appToast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+#appToast.show { opacity:1; transform:translateY(0); }
 
   /* Procure-style Admin side navigation */
   .app { grid-template-columns: 232px 1fr; }
