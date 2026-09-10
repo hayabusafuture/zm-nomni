@@ -1969,6 +1969,15 @@ function inheritedHqInventoryItems() {
     return SCOPE_INVENTORY_ITEM_DEFINITIONS;
   }
 }
+function scopeInventoryItemCost(definition, options) {
+  const optionCosts = options.map(function(option) { return Number(option.cost); }).filter(function(cost) { return Number.isFinite(cost); });
+  if (!optionCosts.length) return Number(definition.cost || 0);
+  return optionCosts.reduce(function(total, cost) { return total + cost; }, 0) / optionCosts.length;
+}
+function scopeInventoryOptionIsAvailable(option) {
+  const sourceIndex = ITEMS.findIndex(function(item) { return item.name === option.name; });
+  return sourceIndex < 0 ? !scopeExcludedSuppliers.has(option.supplier) : !scopeSkuIsUnavailable(ITEMS[sourceIndex], sourceIndex);
+}
 function getScopeInventoryRecords() {
   const skuRecords = ITEMS.map(function(item, index) {
     if (inheritedHqItemLifecycle(item) === 'removed' || isExcludedByHq(item)) return null;
@@ -1978,8 +1987,8 @@ function getScopeInventoryRecords() {
     return { type: 'sku', name: override.customName || item.name, sourceName: item.name, supplier: supplierDisplayName(item.supplier), uom: uoms[0].replace(/^per\s+/i, ''), cost: '$' + Number(price).toFixed(2), unavailable: scopeSkuIsUnavailable(item, index), sourceIndex: index };
   }).filter(Boolean);
   const inventoryItems = inheritedHqInventoryItems().filter(scopeUsesHqRecord).map(function(definition) {
-    const options = (definition.constituents || []).filter(scopeUsesHqRecord);
-    return { type: 'item', name: definition.name, uom: definition.uom, cost: 'S$' + Number(definition.cost || 0).toFixed(2), options: options, unavailable: scopeExcludedInventory.has(definition.name) };
+    const options = (definition.constituents || []).filter(scopeUsesHqRecord).filter(scopeInventoryOptionIsAvailable);
+    return { type: 'item', name: definition.name, uom: definition.uom, cost: 'S$' + scopeInventoryItemCost(definition, options).toFixed(2), options: options, unavailable: scopeExcludedInventory.has(definition.name) };
   });
   const recipes = SCOPE_RECIPES.filter(scopeUsesHqRecord).map(function(recipe) {
     return { type: 'recipe', name: recipe.name, uom: recipe.uom, cost: '$' + Number(recipe.cost).toFixed(2), unavailable: scopeExcludedInventory.has(recipe.name) };
