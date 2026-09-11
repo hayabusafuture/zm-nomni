@@ -14,6 +14,7 @@
   --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
   --ink: #1a1f2b; --ink-2: #4a4f5a; --ink-mute: #8a8f98; --ink-soft: #c7c9cf;
   --rule: #e7e8ec; --row-hover: #f7f8fa; --primary: #2AC864;
+  --context-bg: #EEF6FF; --context-ink: #24527A; --context-border: #B8D7F5;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -172,8 +173,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .ing-table tbody tr:hover td { background: var(--row-hover); }
 .col-ctrl { width: 80px; }
 .col-qty { width: 190px; }
-.col-price { width: 90px; }
-.col-amount { width: 90px; }
+.col-price { width: 150px; }
+.col-amount { width: 120px; }
 .ing-table thead th.r { text-align: right; }
 .ing-table tbody td.r { text-align: right; }
 
@@ -198,6 +199,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .ing-name-input:focus { border-color: var(--nomni-green); }
 .ing-name-input::placeholder { color: var(--ink-mute); }
 .ing-dropdown { position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; box-shadow: 0 6px 16px rgba(0,0,0,.12); z-index: 200; max-height: 200px; overflow-y: auto; display: none; }
+.ing-dropdown.is-fixed { position: fixed; z-index: 1001; right: auto; }
 .ing-dd-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--rule); }
 .ing-dd-item:last-child { border-bottom: none; }
 .ing-dd-item:hover { background: #f0fdf5; }
@@ -350,9 +352,9 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
    This keeps the same content, but makes the selected variation feel
    like the object being edited.
    ────────────────────────────────────────────────────────────── */
-.main { background: #fff; padding-top: 28px; }
+.main { background: #fff; padding-top: 0; }
 .body-wrap { max-width: 1040px; width: 100%; margin: 0 auto; }
-.page-header { max-width: none; width: auto; margin: 0 -40px 24px; border-bottom: 1px solid var(--rule); padding: 0 40px 20px; }
+.page-header { max-width: none; width: auto; margin: 0 -40px 24px; border-bottom: 1px solid var(--rule); padding: 28px 40px 28px; position: sticky; top: 56px; z-index: 3; background: #fff; }
 .page-header-left { max-width:1040px; width:100%; margin:0 auto; }
 .page-title { max-width: 760px; font-size: 24px; line-height: 1.2; }
 .back-link { margin-bottom: 2px; }
@@ -373,6 +375,13 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .buying-options-list { display:flex; flex-direction:column; gap:8px; }
 .buying-options-section-label { margin:10px 0 0; font-size:12px; font-weight:600; color:#92700a; }
 .buying-option-row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:11px 12px; border:1px solid var(--rule); border-radius:8px; }
+
+/* Standard HQ success toast */
+#recipeToast { position:fixed; right:28px; top:78px; z-index:1100; min-width:300px; display:flex; align-items:center; gap:14px; padding:15px 18px; border-radius:4px; border:1px solid #AFE7C2; background:var(--mint); box-shadow:0 16px 44px rgba(10,20,15,.16); color:var(--seaweed); opacity:0; transform:translateY(-8px); pointer-events:none; transition:opacity .2s ease, transform .2s ease; }
+#recipeToast.show { opacity:1; transform:translateY(0); }
+.recipe-toast-check { width:42px; height:42px; border-radius:50%; display:grid; place-items:center; background:var(--nomni-green); color:#fff; font-size:27px; line-height:1; flex:0 0 auto; }
+.recipe-toast-title { display:block; font-size:14px; font-weight:800; margin-bottom:2px; }
+.recipe-toast-copy { display:block; color:var(--seaweed); font-size:14px; }
 .buying-option-name { font-size:14px; font-weight:600; color:var(--ink); }
 .buying-option-meta { margin-top:2px; font-size:12px; color:var(--ink-mute); }
 .buying-option-price { color:var(--ink); font-size:13px; font-weight:600; white-space:nowrap; }
@@ -389,7 +398,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .recipe-settings-link:hover { background:#c6f2ce; }
 .recipe-settings-link .material-symbols-outlined { font-size:18px; }
 
-.form-section { position: relative; margin-top: 0; margin-bottom: 0; padding: 22px 26px; border: 0; border-radius: 16px; background: #f7f7f7; box-shadow: none; display: grid; grid-template-columns: 1fr 220px; gap: 18px 26px; align-items: start; }
+.form-section { position: relative; margin-top: 0; margin-bottom: 0; padding: 10px 0 10px; border: 0; border-radius: 16px; background: #fff; box-shadow: none; display: grid; grid-template-columns: 1fr 220px; gap: 18px 26px; align-items: start; }
 .name-portion-row { display: contents; }
 .name-group { grid-column: 1; grid-row: 1; }
 .portion-group { grid-column: 2; grid-row: 1; width: auto; background: #f7f7f7; border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; }
@@ -411,10 +420,11 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .var-item.active { background: #fff; border-color: #dfe7e2; box-shadow: 0 -3px 0 var(--nomni-green) inset; transform: translateY(1px); }
 .var-item-add { margin-left: 4px; margin-right: 0; color: var(--spinach); border-style: dashed; }
 
-.body-section { border: 0; border-radius: 16px; box-shadow: none; background: #f7f7f7; overflow: visible; }
-.body-section { padding-top: 15px; }
-.variation-title-row { display:flex; align-items:center; gap:10px; padding:0 25px 12px; }
-.variation-title-outside { margin-top: 22px; padding:10px 0 12px; }
+.body-section { border: 0; border-radius: 16px; box-shadow: 0 -8px 16px -10px color-mix(in srgb, var(--spinach) 32%, transparent); background: #f7f7f7; overflow: visible; }
+.body-section { position: relative; z-index: 2; margin-top: -18px; margin-bottom: 32px; padding-top: 23px; }
+.variation-title-row { display:flex; align-items:center; gap:10px; margin-top:24px; padding:20px 0 20px; border-top:1px solid var(--rule); }
+.variation-title-row.variation-title-outside { padding-bottom:20px; }
+.variation-title-outside { margin-top: 22px; padding:30px 0 20px; }
 .variation-editor-head { position:absolute; top:-58px; right:0; display:flex; align-items:center; gap:8px; padding:0; }
 .variation-editor-actions { margin-left:auto; display:flex; align-items:center; gap:8px; }
 .variation-title-actions { margin-left:auto; }
@@ -442,7 +452,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .variation-title-delete:hover { background:#FDD6DC; }
 .variation-title-input { font-family:"Hanken Grotesk", system-ui, sans-serif; font-size:22px; font-weight:800; letter-spacing:-.02em; color:var(--ink); border:1px solid #d8dbe0; border-radius:10px; padding:5px 9px; width:min(460px, 100%); outline:none; }
 .variation-title-input:focus { border-color:var(--nomni-green); box-shadow:0 0 0 3px rgba(42,200,100,.16); }
-.var-assignment-row { display:flex; align-items:center; gap:0; margin:0 0 16px; padding:10px 25px; border-radius:8px; background:var(--mint); color:var(--ink-mute); font-size:14px; }
+.var-assignment-row { display:flex; align-items:center; gap:0; margin:0; padding:14px 25px 32px; border-radius:16px; background:var(--mint); color:var(--ink-mute); font-size:14px; }
 .assignment-label { font-weight:600; color:var(--ink-2); }
 .assignment-chip-row { position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-width:0; }
 .assignment-summary-btn { border:0; background:transparent; color:var(--spinach); font:inherit; font-size: 14px; font-weight:700; cursor:pointer; padding:5px 6px; border-radius:5px; }
@@ -486,7 +496,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .sub-recipe-mode #sellingPriceItem, .sub-recipe-mode #foodCostItem { display: none; }
 #foodCostItem { background: #f3fff6; border-color: #b8efc8; }
 #foodCostItem .cost-bar-food { color: var(--seaweed); }
-.body-inner { padding: 0 26px 36px; }
+.body-inner { padding: 0 26px 30px; }
 .body-tabs { margin-top: 4px; padding-top: 12px; }
 .body-tab { font-size: 14px; }
 .var-context-bar { margin-top: 2px; border-radius: 10px; }
@@ -501,6 +511,10 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .qty-input, .uom-select { border: 0; background-color: transparent; }
 .qty-input:focus, .uom-select:focus { box-shadow: 0 0 0 2px rgba(42,200,100,.25); border-radius: 7px; }
 .add-ing-row { padding-top: 6px; }
+.ing-table tbody tr.empty-row td { padding:30px 16px; text-align:center; color:var(--ink-mute); }
+.empty-row .empty-icon { width:36px; height:36px; margin:0 auto 8px; border-radius:8px; background:#f0f0f2; display:inline-flex; align-items:center; justify-content:center; }
+.empty-row .empty-label { color:var(--ink); font-size:14px; font-weight:600; }
+.empty-row .empty-sub { margin-top:3px; font-size:13px; }
 .save-bar { box-shadow: 0 -10px 30px rgba(14,55,39,.08); }
 @media (max-width: 900px) {
   .form-section { grid-template-columns: 1fr; }
@@ -510,7 +524,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 /* HQ recipe costing context */
 .recipe-cost-context { display:flex; align-items:center; gap:9px; margin-left:auto; color:var(--ink-2); font-size:13px; font-weight:600; }
 .recipe-cost-context label { white-space:nowrap; }
-.recipe-cost-context select { min-width:214px; height:34px; padding:0 30px 0 10px; border:1px solid #B9F0C5; border-radius:6px; background:#fff; color:var(--ink); font:500 13px/1.2 inherit; cursor:pointer; outline:none; }
+.recipe-cost-context select { min-width:214px; height:40px; padding:0 30px 0 10px; border:1px solid #B9F0C5; border-radius:6px; background:#fff; color:var(--ink); font:500 14px/1.2 Inter,system-ui,sans-serif; cursor:pointer; outline:none; }
 .recipe-cost-context select:focus { border-color:var(--nomni-green); box-shadow:0 0 0 2px rgba(42,200,100,.16); }
 @media (max-width: 760px) { .var-assignment-row { align-items:flex-start; flex-wrap:wrap; gap:6px; } .recipe-cost-context { width:100%; margin-left:0; justify-content:space-between; } .recipe-cost-context select { min-width:0; flex:1; } }
 .cost-bar-item.cost-detail-item { padding:0; overflow:hidden; }
@@ -922,14 +936,14 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
         <div class="cost-bar-item cost-detail-item">
           <button type="button" class="cost-detail-button" onclick="openRecipeCostDetails()" aria-label="View cost by group and outlet">
             <span class="cost-bar-label">Cost <small id="costScopeLabel">per portion</small></span>
-            <span class="cost-bar-val" id="costRecipeVal">S$2.46–S$3.10</span>
+            <span class="cost-bar-val" id="costRecipeVal">$2.46–$3.10</span>
             <span class="cost-range-meta" id="costRangeMeta">Varies by group and outlet</span>
           </button>
         </div>
         <div class="cost-bar-item cost-detail-item" id="sellingPriceItem">
           <button class="pos-sync-summary" id="retailDisplayBtn" type="button" onclick="openPosSyncModal()" aria-label="Manage selling price sync">
             <span class="cost-bar-label">Selling price <small>per portion</small></span>
-            <span class="cost-bar-val" id="retailDisplayValue">S$15.90–S$17.90</span>
+            <span class="cost-bar-val" id="retailDisplayValue">$15.90–$17.90</span>
             <span class="pos-sync-source" id="posSyncSource"><span class="pos-badge">POS</span><span class="pos-sync-product">Chargrill chicken thigh (1086B)</span></span>
           </button>
           <input type="hidden" id="retailPrice" value="16.90" />
@@ -959,7 +973,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
             Viewing variation for <strong style="margin:0 2px">Family Dining Express</strong> — substituted ingredients are highlighted
           </div>
-          <div id="ingredientCostingNote" style="display:none;margin:4px 0 0;padding:10px 15px;border:0;border-radius:8px;background:var(--mint);color:var(--seaweed);font-size:13px;line-height:1.4"></div>
+          <div id="ingredientCostingNote" style="display:none;margin:4px 0 0;padding:10px 15px;border:1px solid var(--context-border);border-radius:8px;background:var(--context-bg);color:var(--context-ink);font-size:13px;line-height:1.4;text-align:center"></div>
           <table class="ing-table">
             <thead>
               <tr>
@@ -976,32 +990,32 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
                 <td><div class="row-ctrl"><span class="drag-handle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg></span><button class="del-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button><span class="row-num">1</span></div></td>
                 <td class="ing-name-cell-td"><div class="ing-name-main">Pork Baby Back Ribs</div><div class="ing-name-supplier">Fresh Meats Co.</div></td>
                 <td><div class="qty-uom"><input type="text" class="qty-input" value="500" /><select class="uom-select"><option>g</option><option>kg</option><option>ml</option><option>L</option><option>unit</option></select></div></td>
-                <td class="r"><span class="price-val">A$32.00/kg</span></td>
-                <td class="r"><span class="price-val">A$16.00</span></td>
+                <td class="r"><span class="price-val">$32.00/kg</span></td>
+                <td class="r"><span class="price-val">$16.00</span></td>
               </tr>
               <!-- Row 2: House BBQ Sauce (sub-recipe) — 1 portion @ $0.60 = $0.60 -->
               <tr>
                 <td><div class="row-ctrl"><span class="drag-handle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg></span><button class="del-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button><span class="row-num">2</span></div></td>
                 <td class="ing-name-cell-td"><div class="ing-name-main">House BBQ Sauce <span style="font-size:11px;font-weight:600;color:var(--spinach);background:var(--mint);padding:1px 6px;border-radius:3px;margin-left:4px">Sub-recipe</span></div><div class="ing-name-supplier">Smoked Tomato &amp; Molasses Base · 1 batch = 20 portions</div></td>
                 <td><div class="qty-uom"><input type="text" class="qty-input" value="1" /><select class="uom-select"><option selected>portion</option><option>ml</option><option>L</option></select></div></td>
-                <td class="r"><span class="price-val">A$0.60/ptn</span></td>
-                <td class="r"><span class="price-val">A$0.60</span></td>
+                <td class="r"><span class="price-val">$0.60/ptn</span></td>
+                <td class="r"><span class="price-val">$0.60</span></td>
               </tr>
               <!-- Row 3: Apple Cider Vinegar — 50ml @ $16/L = $0.80 -->
               <tr>
                 <td><div class="row-ctrl"><span class="drag-handle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg></span><button class="del-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button><span class="row-num">3</span></div></td>
                 <td class="ing-name-cell-td"><div class="ing-name-main">Apple Cider Vinegar</div><div class="ing-name-supplier">Horizons Supply</div></td>
                 <td><div class="qty-uom"><input type="text" class="qty-input" value="50" /><select class="uom-select"><option>ml</option><option>L</option><option>g</option><option>kg</option></select></div></td>
-                <td class="r"><span class="price-val">A$16.00/L</span></td>
-                <td class="r"><span class="price-val">A$0.80</span></td>
+                <td class="r"><span class="price-val">$16.00/L</span></td>
+                <td class="r"><span class="price-val">$0.80</span></td>
               </tr>
               <!-- Row 4: Brown Sugar — 30g @ $6/kg = $0.18 -->
               <tr>
                 <td><div class="row-ctrl"><span class="drag-handle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg></span><button class="del-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button><span class="row-num">4</span></div></td>
                 <td class="ing-name-cell-td"><div class="ing-name-main">Brown Sugar</div><div class="ing-name-supplier">PFD Food Services</div></td>
                 <td><div class="qty-uom"><input type="text" class="qty-input" value="30" /><select class="uom-select"><option>g</option><option>kg</option></select></div></td>
-                <td class="r"><span class="price-val">A$6.00/kg</span></td>
-                <td class="r"><span class="price-val">A$0.18</span></td>
+                <td class="r"><span class="price-val">$6.00/kg</span></td>
+                <td class="r"><span class="price-val">$0.18</span></td>
               </tr>
               <!-- Row 5: Smoked Paprika — 10g @ $25/kg = $0.25 — WARNING: Family Dining Express -->
               <tr>
@@ -1015,32 +1029,32 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
                   </div>
                 </td>
                 <td><div class="qty-uom"><input type="text" class="qty-input" value="10" /><select class="uom-select"><option>g</option><option>kg</option></select></div></td>
-                <td class="r"><span class="price-val">A$25.00/kg</span></td>
-                <td class="r"><span class="price-val">A$0.25</span></td>
+                <td class="r"><span class="price-val">$25.00/kg</span></td>
+                <td class="r"><span class="price-val">$0.25</span></td>
               </tr>
               <!-- Row 6: Garlic Powder — 8g @ $20/kg = $0.16 -->
               <tr>
                 <td><div class="row-ctrl"><span class="drag-handle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg></span><button class="del-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button><span class="row-num">6</span></div></td>
                 <td class="ing-name-cell-td"><div class="ing-name-main">Garlic Powder</div><div class="ing-name-supplier">Parisi Bakery</div></td>
                 <td><div class="qty-uom"><input type="text" class="qty-input" value="8" /><select class="uom-select"><option>g</option><option>kg</option></select></div></td>
-                <td class="r"><span class="price-val">A$20.00/kg</span></td>
-                <td class="r"><span class="price-val">A$0.16</span></td>
+                <td class="r"><span class="price-val">$20.00/kg</span></td>
+                <td class="r"><span class="price-val">$0.16</span></td>
               </tr>
               <!-- Row 7: Onion Powder — 5g @ $20/kg = $0.10 -->
               <tr>
                 <td><div class="row-ctrl"><span class="drag-handle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg></span><button class="del-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button><span class="row-num">7</span></div></td>
                 <td class="ing-name-cell-td"><div class="ing-name-main">Onion Powder</div><div class="ing-name-supplier">Parisi Bakery</div></td>
                 <td><div class="qty-uom"><input type="text" class="qty-input" value="5" /><select class="uom-select"><option>g</option><option>kg</option></select></div></td>
-                <td class="r"><span class="price-val">A$20.00/kg</span></td>
-                <td class="r"><span class="price-val">A$0.10</span></td>
+                <td class="r"><span class="price-val">$20.00/kg</span></td>
+                <td class="r"><span class="price-val">$0.10</span></td>
               </tr>
               <!-- Row 8: Black Pepper — 3g @ $36.67/kg = $0.11 -->
               <tr>
                 <td><div class="row-ctrl"><span class="drag-handle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg></span><button class="del-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button><span class="row-num">8</span></div></td>
                 <td class="ing-name-cell-td"><div class="ing-name-main">Black Pepper (cracked)</div><div class="ing-name-supplier">Parisi Bakery</div></td>
                 <td><div class="qty-uom"><input type="text" class="qty-input" value="3" /><select class="uom-select"><option>g</option><option>kg</option></select></div></td>
-                <td class="r"><span class="price-val">A$36.67/kg</span></td>
-                <td class="r"><span class="price-val">A$0.11</span></td>
+                <td class="r"><span class="price-val">$36.67/kg</span></td>
+                <td class="r"><span class="price-val">$0.11</span></td>
               </tr>
             </tbody>
           </table>
@@ -1224,7 +1238,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       <div class="pending-updates-list" id="pendingUpdatesList"></div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-tertiary" id="pendingUpdatesDoneBtn" type="button">Done</button>
+      <button class="btn btn-tertiary" id="pendingUpdatesDoneBtn" type="button">Keep pending</button>
     </div>
   </div>
 </div>
@@ -1485,11 +1499,11 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 <!-- POS price source -->
 <div class="modal-overlay centered" id="posSyncModal" onclick="if(event.target===this)closePosSyncModal()">
   <div class="modal-card" style="width:560px" role="dialog" aria-modal="true" aria-labelledby="posSyncTitle">
-    <div class="modal-header"><div class="restore-modal-head"><div><h2 class="modal-title" id="posSyncTitle">Sync price with mapped POS product</h2></div><button class="restore-modal-close" type="button" onclick="closePosSyncModal()" aria-label="Close price sync"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div></div>
+    <div class="modal-header"><div class="restore-modal-head"><div><h2 class="modal-title" id="posSyncTitle">Edit selling price</h2></div><button class="restore-modal-close" type="button" onclick="closePosSyncModal()" aria-label="Close selling price editor"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div></div>
     <div class="modal-body" style="gap:20px;padding-top:0">
-      <label class="sync-mode-row"><input type="checkbox" id="posSyncEnabled" checked onchange="togglePosSyncFields()" /><span><span class="sync-mode-title">Enable automatic syncing with POS</span><span class="sync-mode-copy">We&rsquo;ll keep the selling price synced with the selected POS product in each group or outlet.</span></span></label>
+      <label class="sync-mode-row" id="syncModeRow"><input type="checkbox" id="posSyncEnabled" checked onchange="togglePosSyncFields()" /><span><span class="sync-mode-title">Enable automatic syncing with POS</span><span class="sync-mode-copy">We&rsquo;ll keep the selling price synced with the selected POS product in each group or outlet.</span></span></label>
       <div class="sync-product-field" id="syncProductField"><label class="field-label" for="posProductSelect">POS product (3 available)</label><select class="pos-product-select" id="posProductSelect"><option value="1086B">Chargrill chicken thigh · 1086B</option><option value="A-01522">Chargrill chicken thigh · A-01522</option><option value="A-01531">Chargrill chicken thigh · A-01531</option></select></div>
-      <div class="sync-manual-field" id="syncManualField" hidden><label class="field-label" for="manualSellingPrice">Manual selling price</label><div class="manual-price-control"><span class="manual-price-prefix">S$</span><input class="field-input" id="manualSellingPrice" type="text" inputmode="decimal" value="16.90" /></div></div>
+      <div class="sync-manual-field" id="syncManualField" hidden><label class="field-label" for="manualSellingPrice">Manual selling price</label><div class="manual-price-control"><span class="manual-price-prefix">$</span><input class="field-input" id="manualSellingPrice" type="text" inputmode="decimal" value="16.90" /></div></div>
     </div>
     <div class="modal-foot"><button type="button" class="btn btn-tertiary" onclick="closePosSyncModal()">Cancel</button><button type="button" class="btn btn-primary" onclick="savePosSync()">Save</button></div>
   </div>
@@ -1543,37 +1557,61 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 <script>
   let rowCount = 8;
 
-  const ING_ITEMS = [
-    { name: 'Chicken Thigh Boneless', supplier: '2 buying options' },
-    { name: 'Dark Soy Sauce', supplier: '2 buying options' },
-    { name: 'Cooking Oil', supplier: '3 buying options' },
-    { name: 'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag', supplier: 'FairPrice Finest' },
-    { name: 'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub', supplier: 'Olam Food' },
-    { name: 'House BBQ Sauce', supplier: 'Sub-recipe' },
-    { name: 'Char Siu Marinade', supplier: 'Sub-recipe' },
-    { name: 'Chimichurri', supplier: 'Sub-recipe' },
-    { name: 'Satay Peanut Sauce', supplier: 'Sub-recipe' },
-    { name: 'Nam Jim Dipping Sauce', supplier: 'Sub-recipe' }
+  // Mirrors the current HQ Inventory list, including reusable stock items,
+  // recipes and sub-recipes. The picker deliberately excludes only disabled
+  // catalogue records.
+  const INGREDIENT_PICKER_ITEMS = [
+    { name:'Chicken Thigh Boneless', type:'Inventory item', meta:'2 buying options', uom:'kg', inventoryItem:'Chicken Thigh Boneless' },
+    { name:'Dark Soy Sauce', type:'Inventory item', meta:'2 buying options', uom:'L', inventoryItem:'Dark Soy Sauce' },
+    { name:'Cooking Oil', type:'Inventory item', meta:'3 buying options', uom:'L', inventoryItem:'Cooking Oil' },
+    { name:'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag', type:'Inventory item', meta:'FairPrice Finest · $4.20/kg', uom:'kg', inventoryItem:'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag' },
+    { name:'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub', type:'Inventory item', meta:'Olam Food · $19.60/kg', uom:'kg', inventoryItem:'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub' },
+    { name:'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg Vac Pk', type:'Inventory item', meta:'Kee Song Group · $6.80/kg', uom:'kg', cost:6.80 },
+    { name:'Kee Song Chilled Chicken Breast Fillet IQF 2kg Vac Pk', type:'Inventory item', meta:'Kee Song Group · $7.20/kg', uom:'kg', cost:7.20 },
+    { name:'Chilled Pork Belly Skin-On 1.5kg Vac Pk', type:'Inventory item', meta:'Meat Masters SG · $12.40/kg', uom:'kg', cost:12.40 },
+    { name:'Chilled Wagyu Striploin MS3 Grain-Fed BLK 4/5kg', type:'Inventory item', meta:'Premium Meats · $48.50/kg', uom:'kg', cost:48.50 },
+    { name:'Chilled Lamb Rack Frenched 8-Rib Cap-Off 1.2kg', type:'Inventory item', meta:'Premium Meats · $32.80/kg', uom:'kg', cost:32.80 },
+    { name:'Thai Hom Mali Jasmine Rice AA Grade 25kg PP Bag', type:'Inventory item', meta:'Rice & Grain Co · $1.20/kg', uom:'kg', cost:1.20 },
+    { name:'Sime Darby Canola Oil RBD 20L Jerry Can', type:'Inventory item', meta:'Sunny Gold F&B Supplies · $3.20/L', uom:'L', cost:3.20 },
+    { name:'Fresh Garlic Peeled 10kg Vac Bag', type:'Inventory item', meta:'Veggie Fresh · $4.80/kg', uom:'kg', cost:4.80 },
+    { name:'Fresh Lemongrass Trimmed 1kg Bunch', type:'Inventory item', meta:'Veggie Fresh · $8.20/kg', uom:'kg', cost:8.20 },
+    { name:'Kikkoman Naturally Brewed Soy Sauce 1.8L x 6', type:'Inventory item', meta:'Kikkoman · $12.40/btl · Disabled', uom:'btl', cost:12.40 },
+    { name:'Chaokoh UHT Coconut Milk 400ml x 24 Ctn', type:'Inventory item', meta:'Chaokoh F&B · $1.80/tin', uom:'tin', cost:1.80 },
+    { name:'Thai Palm Sugar Block 450g x 24 Ctn', type:'Inventory item', meta:'Asian Dry Goods · $3.60/pkt', uom:'pkt', cost:3.60 },
+    { name:"Fresh Bird's Eye Chilli 1kg Punnet", type:'Inventory item', meta:'Veggie Fresh · $9.40/kg', uom:'kg', cost:9.40 },
+    { name:'Fresh Rosemary Sprig 100g Bunch', type:'Inventory item', meta:'Veggie Fresh · $18.00/kg', uom:'kg', cost:18.00 },
+    { name:'Binchotan White Charcoal Premium 15kg Bag', type:'Inventory item', meta:'Grill Master SG · $14.20/kg', uom:'kg', cost:14.20 },
+    { name:'Anchor Unsalted Butter 25kg Bulk Block', type:'Inventory item', meta:'Fonterra Brands · $11.80/kg', uom:'kg', cost:11.80 },
+    { name:'Burger Bun', type:'Inventory item', meta:'No buying options · $0.00/pc', uom:'pc', cost:0 },
+    { name:'House BBQ Sauce', type:'Sub-recipe', meta:'$4.20/L', uom:'L', cost:4.20, available:['Chargrill Outlets'] },
+    { name:'Char Siu Marinade', type:'Sub-recipe', meta:'$3.60/L', uom:'L', cost:3.60, available:['Chargrill Outlets'] },
+    { name:'Chimichurri', type:'Sub-recipe', meta:'$1.80/ml', uom:'ml', cost:1.80, available:['Chargrill Outlets'] },
+    { name:'Satay Peanut Sauce', type:'Sub-recipe', meta:'$5.20/L', uom:'L', cost:5.20, available:['Chargrill Outlets','Family Dining Express','(WF 139) Chargrill @ 139 Tampines','(WF 290) Garden Express @ 290 Sengkang'] },
+    { name:'Nam Jim Dipping Sauce', type:'Sub-recipe', meta:'$1.40/ml', uom:'ml', cost:1.40, available:['Chargrill Outlets','Family Dining Express','(WF 139) Chargrill @ 139 Tampines','(WF 290) Garden Express @ 290 Sengkang'] },
+    { name:'Chargrill Half Chicken with Garlic Herb Butter', type:'Recipe', meta:'$8.40/ptn', uom:'ptn', cost:8.40, available:['Chargrill Outlets'] },
+    { name:'Wagyu Beef Striploin 200g', type:'Recipe', meta:'$18.50/ptn', uom:'ptn', cost:18.50, available:['Chargrill Outlets'] },
+    { name:'Pork Belly Burnt Ends', type:'Recipe', meta:'$10.20/ptn', uom:'ptn', cost:10.20, available:['Chargrill Outlets'] },
+    { name:'Chargrill Spring Onion Bunches with Soy & Sesame', type:'Recipe', meta:'$1.20/ptn', uom:'ptn', cost:1.20, available:['Chargrill Outlets'] }
   ];
   const INVENTORY_ITEM_SKUS = {
     'Chicken Thigh Boneless': [
-      { sku: 'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier: 'Kee Song Group', price: 'S$6.80/kg', groups: ['Chargrill Outlets'], outlets: [] },
-      { sku: 'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier: 'Poultry Masters SG', price: 'S$6.40/kg', groups: ['Family Dining Express'], outlets: [] }
+      { sku: 'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier: 'Kee Song Group', price: '$6.80/kg', groups: ['Chargrill Outlets'], outlets: ['(WF 139) Chargrill @ 139 Tampines'] },
+      { sku: 'Chilled Chicken Thigh Boneless IQF Jumbo 2.2kg', supplier: 'Poultry Masters SG', price: '$6.40/kg', groups: ['Family Dining Express'], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
     ],
     'Dark Soy Sauce': [
-      { sku: 'Kikkoman Dark Soy Sauce 2L', supplier: 'Kikkoman', price: 'S$8.80/L', groups: ['Chargrill Outlets'], outlets: [] },
-      { sku: 'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier: 'Asian Dry Goods', price: 'S$6.90/L', groups: [], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
+      { sku: 'Kikkoman Dark Soy Sauce 2L', supplier: 'Kikkoman', price: '$8.80/L', groups: ['Chargrill Outlets','Family Dining Express'], outlets: ['(WF 139) Chargrill @ 139 Tampines'] },
+      { sku: 'Pearl River Bridge Superior Dark Soy Sauce 2L', supplier: 'Asian Dry Goods', price: '$6.90/L', groups: [], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
     ],
     'Cooking Oil': [
-      { sku: 'Sime Darby Canola Oil RBD 20L', supplier: 'Sunny Gold F&B Supplies', price: 'S$3.20/L', groups: ['Family Dining Express'], outlets: [] },
-      { sku: 'Blended Vegetable Cooking Oil 20L', supplier: 'Sunny Gold F&B Supplies', price: 'S$2.80/L', groups: [], outlets: ['(WF 139) Chargrill @ 139 Tampines'] },
-      { sku: 'Golden Chef Rice Bran Oil 18L', supplier: 'Asian Dry Goods', price: 'S$3.60/L', groups: [], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
+      { sku: 'Sime Darby Canola Oil RBD 20L', supplier: 'Sunny Gold F&B Supplies', price: '$3.20/L', groups: ['Family Dining Express'], outlets: [] },
+      { sku: 'Blended Vegetable Cooking Oil 20L', supplier: 'Sunny Gold F&B Supplies', price: '$2.80/L', groups: [], outlets: ['(WF 139) Chargrill @ 139 Tampines'] },
+      { sku: 'Golden Chef Rice Bran Oil 18L', supplier: 'Asian Dry Goods', price: '$3.60/L', groups: [], outlets: ['(WF 290) Garden Express @ 290 Sengkang'] }
     ],
     'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag': [
-      { sku: 'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag', supplier: 'FairPrice Finest', price: 'S$4.20/kg', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'] }
+      { sku: 'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag', supplier: 'FairPrice Finest', price: '$4.20/kg', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'] }
     ],
     'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub': [
-      { sku: 'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub', supplier: 'Olam Food', price: 'S$19.60/kg', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'] }
+      { sku: 'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub', supplier: 'Olam Food', price: '$19.60/kg', groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: ['(WF 139) Chargrill @ 139 Tampines', '(WF 290) Garden Express @ 290 Sengkang'] }
     ]
   };
 
@@ -1812,45 +1850,123 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     const dd = document.createElement('div');
     dd.className = 'ing-dropdown';
 
+    function suggestionMeta(item) {
+      var meta = String(item.meta || '')
+        .replace(/\s*·\s*\$[0-9,.]+(?:\/[A-Za-z]+)?/g, '')
+        .replace(/^\$[0-9,.]+(?:\/[A-Za-z]+)?\s*·?\s*/g, '')
+        .trim();
+      return [item.type, meta].filter(Boolean).join(' · ');
+    }
+
     function renderDD(filter) {
       const q = (filter || '').toLowerCase();
-      const items = ING_ITEMS.filter(function(x) { return x.name.toLowerCase().includes(q); });
+      const items = INGREDIENT_PICKER_ITEMS.filter(function(x) {
+        return (x.name + ' ' + x.type + ' ' + x.meta).toLowerCase().includes(q);
+      });
       if (!items.length) {
         dd.innerHTML = '<div style="padding:10px 12px;font-size: 14px;color:var(--ink-mute)">No items found</div>';
       } else {
         dd.innerHTML = items.map(function(x) {
-          return '<div class="ing-dd-item" data-name="' + x.name + '" data-supplier="' + x.supplier + '">' +
+          var index = INGREDIENT_PICKER_ITEMS.indexOf(x);
+          return '<div class="ing-dd-item" data-index="' + index + '">' +
             '<div class="ing-dd-name">' + x.name + '</div>' +
-            '<div class="ing-dd-supplier">' + x.supplier + '</div>' +
+            '<div class="ing-dd-supplier">' + suggestionMeta(x) + '</div>' +
             '</div>';
         }).join('');
         dd.querySelectorAll('.ing-dd-item').forEach(function(item) {
           item.addEventListener('mousedown', function(e) {
             e.preventDefault();
             var previousName = input.dataset.pendingAddName || '';
-            input.value = this.dataset.name;
-            input.dataset.supplier = this.dataset.supplier;
-            input.dataset.pendingAddName = this.dataset.name;
-            dd.style.display = 'none';
+            var selected = INGREDIENT_PICKER_ITEMS[Number(this.dataset.index)];
+            if (!selected) return;
+            input.dataset.pendingAddName = selected.name;
+            closeDD();
             var row = input.closest('tr');
-            if (previousName && previousName !== input.value && typeof removePendingBulkUpdate === 'function') {
+            if (previousName && previousName !== selected.name && typeof removePendingBulkUpdate === 'function') {
               removePendingBulkUpdate('add', previousName, currentVar);
             }
-            if (row && row.parentElement && row.parentElement.id === 'ingBody' && typeof createPendingIngredientAdd === 'function') {
-              createPendingIngredientAdd(row, input.value);
+            if (row && row.parentElement && row.parentElement.id === 'ingBody') {
+              setIngredientRowFromPicker(row, selected);
+              if (typeof createPendingIngredientAdd === 'function') createPendingIngredientAdd(row, selected.name);
             }
           });
         });
       }
     }
 
-    input.addEventListener('focus', function() { renderDD(this.value); dd.style.display = 'block'; });
-    input.addEventListener('input', function() { renderDD(this.value); dd.style.display = 'block'; });
-    input.addEventListener('blur', function() { setTimeout(function() { dd.style.display = 'none'; }, 200); });
+    function positionDD() {
+      if (!dd.classList.contains('is-fixed') || dd.style.display !== 'block') return;
+      var inputRect = input.getBoundingClientRect();
+      var saveBar = document.querySelector('.save-bar');
+      var saveTop = saveBar ? saveBar.getBoundingClientRect().top : window.innerHeight;
+      var safeGap = 12;
+      var gap = 2;
+      var spaceBelow = Math.max(0, saveTop - safeGap - inputRect.bottom - gap);
+      var spaceAbove = Math.max(0, inputRect.top - safeGap - gap);
+      var minUsefulHeight = 120;
+      var openUp = spaceBelow < minUsefulHeight && spaceAbove > spaceBelow;
+      var available = openUp ? spaceAbove : spaceBelow;
+      var maxHeight = Math.max(96, Math.min(200, available));
+
+      dd.style.left = Math.round(inputRect.left) + 'px';
+      dd.style.width = Math.round(inputRect.width) + 'px';
+      dd.style.maxHeight = Math.round(maxHeight) + 'px';
+      dd.style.top = openUp ? 'auto' : Math.round(inputRect.bottom + gap) + 'px';
+      dd.style.bottom = openUp ? Math.round(window.innerHeight - inputRect.top + gap) + 'px' : 'auto';
+    }
+
+    function openDD() {
+      renderDD(input.value);
+      if (dd.parentNode !== document.body) document.body.appendChild(dd);
+      dd.classList.add('is-fixed');
+      dd.style.display = 'block';
+      positionDD();
+    }
+
+    function closeDD() {
+      dd.style.display = 'none';
+      dd.classList.remove('is-fixed');
+      dd.removeAttribute('style');
+      wrap.appendChild(dd);
+    }
+
+    input.addEventListener('focus', openDD);
+    input.addEventListener('input', openDD);
+    input.addEventListener('blur', function() { setTimeout(closeDD, 200); });
+    window.addEventListener('resize', positionDD);
+    window.addEventListener('scroll', positionDD, true);
 
     wrap.appendChild(input);
     wrap.appendChild(dd);
     return wrap;
+  }
+
+  function setIngredientRowFromPicker(row, item) {
+    var nameCell = row.querySelector('.ing-name-cell-td');
+    var uom = row.querySelector('.uom-select');
+    var prices = row.querySelectorAll('td.r .price-val');
+    var detail = item.type + ' · ' + item.meta;
+    nameCell.innerHTML = '<div class="ing-name-main">' + escapeHtml(item.name) + '</div><div class="ing-name-supplier ingredient-base-meta">' + escapeHtml(detail) + '</div>';
+    delete row.dataset.inventoryItem;
+    delete row.dataset.availableGroups;
+    delete row.dataset.fixedCost;
+    if (item.inventoryItem) row.dataset.inventoryItem = item.inventoryItem;
+    if (item.available) row.dataset.availableGroups = item.available.join('|');
+    if (Number.isFinite(item.cost)) row.dataset.fixedCost = String(item.cost);
+    if (uom && item.uom) uom.value = normaliseUom(item.uom);
+    if (prices.length >= 2) {
+      var unitPrice = Number(item.cost);
+      if (Number.isFinite(unitPrice)) {
+        prices[0].textContent = '$' + unitPrice.toFixed((item.uom === 'g' || item.uom === 'ml') ? 4 : 2) + '/' + (item.uom || 'unit');
+        prices[1].textContent = '$0.00';
+      } else {
+        prices[0].textContent = '—';
+        prices[1].textContent = '—';
+      }
+      prices[0].dataset.basePrice = prices[0].textContent;
+      prices[1].dataset.basePrice = prices[1].textContent;
+    }
+    updateRecipeCostContextUI();
   }
 
   // Chip toggles
@@ -1874,6 +1990,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
   function addIngredient() {
     const body = document.getElementById('ingBody');
+    const emptyRow = document.getElementById('emptyRow');
+    if (emptyRow) emptyRow.remove();
     rowCount++;
     const tr = document.createElement('tr');
     tr.innerHTML =
@@ -1886,8 +2004,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       '<td><div class="qty-uom"><input type="text" class="qty-input" placeholder="0" />' +
         '<select class="uom-select">' + uomOptionsHtml('g') + '</select>' +
       '</div></td>' +
-      '<td class="r"><span class="price-val">A$0.00</span></td>' +
-      '<td class="r"><span class="price-val">A$0.00</span></td>';
+      '<td class="r"><span class="price-val">$0.00</span></td>' +
+      '<td class="r"><span class="price-val">$0.00</span></td>';
 
     body.appendChild(tr);
     markVariationDirty(currentVar);
@@ -1954,16 +2072,15 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   }
 
   document.getElementById('saveBtn').addEventListener('click', function() {
-    if (pendingBulkQtyUpdates.length) {
-      openPendingUpdatesModal();
-      showToast('Review pending variation updates before saving.');
+    if (pendingBulkQtyUpdates.length && !window.allowSaveWithPendingUpdates) {
+      openPendingUpdatesModal(true);
       return;
     }
-
+    window.allowSaveWithPendingUpdates = false;
     if (document.getElementById('subRecipe').checked && !savedSubRecipe) {
       savedSubRecipe = true;
       updateSubRecipeMode();
-      completeRecipeSave('Saved as a sub-recipe. This cannot be changed back.');
+      completeRecipeSave(pendingBulkQtyUpdates.length ? 'Saved as a sub-recipe. Updates remain pending.' : 'Saved as a sub-recipe. This cannot be changed back.');
       return;
     }
 
@@ -1972,7 +2089,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     if (activeChips > 0 && warnings > 0) {
       document.getElementById('conflictModal').classList.add('open');
     } else {
-      completeRecipeSave('Recipe saved.');
+      completeRecipeSave(pendingBulkQtyUpdates.length ? 'Recipe saved. Updates remain pending.' : 'Recipe saved.');
     }
   });
 
@@ -1986,7 +2103,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       updateSubRecipeMode();
     }
     document.getElementById('conflictModal').classList.remove('open');
-    completeRecipeSave('Recipe saved.');
+    completeRecipeSave(pendingBulkQtyUpdates.length ? 'Recipe saved. Updates remain pending.' : 'Recipe saved.');
   });
 
   // Close modal on overlay click
@@ -1999,138 +2116,138 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   var VERSION_SNAPSHOT_A = {
     portion: '1',
     variations: [
-      { title: 'Base recipe', cost: 'A$18.20', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '500g', unit: 'A$0.032/g', total: 'A$16.00' },
-        { name: 'House BBQ Sauce', qty: '1 portion', unit: 'A$0.60/ptn', total: 'A$0.60' },
-        { name: 'Apple Cider Vinegar', qty: '50ml', unit: 'A$0.016/ml', total: 'A$0.80' },
-        { name: 'Brown Sugar', qty: '30g', unit: 'A$0.006/g', total: 'A$0.18' },
-        { name: 'Smoked Paprika', qty: '10g', unit: 'A$0.025/g', total: 'A$0.25' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.020/g', total: 'A$0.16' },
-        { name: 'Onion Powder', qty: '5g', unit: 'A$0.020/g', total: 'A$0.10' },
-        { name: 'Black Pepper (cracked)', qty: '3g', unit: 'A$0.037/g', total: 'A$0.11' },
+      { title: 'Base recipe', cost: '$18.20', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '500g', unit: '$0.032/g', total: '$16.00' },
+        { name: 'House BBQ Sauce', qty: '1 portion', unit: '$0.60/ptn', total: '$0.60' },
+        { name: 'Apple Cider Vinegar', qty: '50ml', unit: '$0.016/ml', total: '$0.80' },
+        { name: 'Brown Sugar', qty: '30g', unit: '$0.006/g', total: '$0.18' },
+        { name: 'Smoked Paprika', qty: '10g', unit: '$0.025/g', total: '$0.25' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.020/g', total: '$0.16' },
+        { name: 'Onion Powder', qty: '5g', unit: '$0.020/g', total: '$0.10' },
+        { name: 'Black Pepper (cracked)', qty: '3g', unit: '$0.037/g', total: '$0.11' },
       ]},
-      { title: 'Family Dining Express', cost: 'A$17.54', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '480g', unit: 'A$0.032/g', total: 'A$15.36' },
-        { name: 'House BBQ Sauce', qty: '1 portion', unit: 'A$0.60/ptn', total: 'A$0.60' },
-        { name: 'Apple Cider Vinegar', qty: '45ml', unit: 'A$0.016/ml', total: 'A$0.72' },
-        { name: 'Brown Sugar', qty: '28g', unit: 'A$0.006/g', total: 'A$0.17' },
-        { name: 'Smoked Paprika', qty: '10g', unit: 'A$0.025/g', total: 'A$0.25' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.020/g', total: 'A$0.16' },
-        { name: 'Onion Powder', qty: '5g', unit: 'A$0.020/g', total: 'A$0.10' },
-        { name: 'Black Pepper (cracked)', qty: '3g', unit: 'A$0.037/g', total: 'A$0.11' },
+      { title: 'Family Dining Express', cost: '$17.54', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '480g', unit: '$0.032/g', total: '$15.36' },
+        { name: 'House BBQ Sauce', qty: '1 portion', unit: '$0.60/ptn', total: '$0.60' },
+        { name: 'Apple Cider Vinegar', qty: '45ml', unit: '$0.016/ml', total: '$0.72' },
+        { name: 'Brown Sugar', qty: '28g', unit: '$0.006/g', total: '$0.17' },
+        { name: 'Smoked Paprika', qty: '10g', unit: '$0.025/g', total: '$0.25' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.020/g', total: '$0.16' },
+        { name: 'Onion Powder', qty: '5g', unit: '$0.020/g', total: '$0.10' },
+        { name: 'Black Pepper (cracked)', qty: '3g', unit: '$0.037/g', total: '$0.11' },
       ]},
-      { title: 'Airport Outlet', cost: 'A$19.10', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '500g', unit: 'A$0.034/g', total: 'A$17.00' },
-        { name: 'House BBQ Sauce', qty: '1.5 portions', unit: 'A$0.60/ptn', total: 'A$0.90' },
-        { name: 'Apple Cider Vinegar', qty: '50ml', unit: 'A$0.016/ml', total: 'A$0.80' },
-        { name: 'Brown Sugar', qty: '30g', unit: 'A$0.006/g', total: 'A$0.18' },
-        { name: 'Smoked Paprika', qty: '10g', unit: 'A$0.025/g', total: 'A$0.25' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.020/g', total: 'A$0.16' },
+      { title: 'Airport Outlet', cost: '$19.10', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '500g', unit: '$0.034/g', total: '$17.00' },
+        { name: 'House BBQ Sauce', qty: '1.5 portions', unit: '$0.60/ptn', total: '$0.90' },
+        { name: 'Apple Cider Vinegar', qty: '50ml', unit: '$0.016/ml', total: '$0.80' },
+        { name: 'Brown Sugar', qty: '30g', unit: '$0.006/g', total: '$0.18' },
+        { name: 'Smoked Paprika', qty: '10g', unit: '$0.025/g', total: '$0.25' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.020/g', total: '$0.16' },
       ]},
-      { title: 'CBD Stores', cost: 'A$18.70', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '500g', unit: 'A$0.032/g', total: 'A$16.00' },
-        { name: 'Premium BBQ Sauce', qty: '1 portion', unit: 'A$0.80/ptn', total: 'A$0.80' },
-        { name: 'Apple Cider Vinegar', qty: '50ml', unit: 'A$0.016/ml', total: 'A$0.80' },
-        { name: 'Brown Sugar', qty: '30g', unit: 'A$0.006/g', total: 'A$0.18' },
-        { name: 'Smoked Paprika', qty: '12g', unit: 'A$0.025/g', total: 'A$0.30' },
-        { name: 'Garlic Powder', qty: '10g', unit: 'A$0.020/g', total: 'A$0.20' },
-        { name: 'Onion Powder', qty: '5g', unit: 'A$0.020/g', total: 'A$0.10' },
-        { name: 'Black Pepper (cracked)', qty: '4g', unit: 'A$0.037/g', total: 'A$0.15' },
+      { title: 'CBD Stores', cost: '$18.70', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '500g', unit: '$0.032/g', total: '$16.00' },
+        { name: 'Premium BBQ Sauce', qty: '1 portion', unit: '$0.80/ptn', total: '$0.80' },
+        { name: 'Apple Cider Vinegar', qty: '50ml', unit: '$0.016/ml', total: '$0.80' },
+        { name: 'Brown Sugar', qty: '30g', unit: '$0.006/g', total: '$0.18' },
+        { name: 'Smoked Paprika', qty: '12g', unit: '$0.025/g', total: '$0.30' },
+        { name: 'Garlic Powder', qty: '10g', unit: '$0.020/g', total: '$0.20' },
+        { name: 'Onion Powder', qty: '5g', unit: '$0.020/g', total: '$0.10' },
+        { name: 'Black Pepper (cracked)', qty: '4g', unit: '$0.037/g', total: '$0.15' },
       ]},
-      { title: 'Catering Kitchen', cost: 'A$16.80', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '500g', unit: 'A$0.028/g', total: 'A$14.00' },
-        { name: 'House BBQ Sauce', qty: '1 portion', unit: 'A$0.55/ptn', total: 'A$0.55' },
-        { name: 'Apple Cider Vinegar', qty: '50ml', unit: 'A$0.014/ml', total: 'A$0.70' },
-        { name: 'Brown Sugar', qty: '30g', unit: 'A$0.005/g', total: 'A$0.15' },
-        { name: 'Smoked Paprika', qty: '10g', unit: 'A$0.022/g', total: 'A$0.22' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.018/g', total: 'A$0.14' },
-        { name: 'Onion Powder', qty: '5g', unit: 'A$0.018/g', total: 'A$0.09' },
-        { name: 'Black Pepper (cracked)', qty: '3g', unit: 'A$0.033/g', total: 'A$0.10' },
+      { title: 'Catering Kitchen', cost: '$16.80', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '500g', unit: '$0.028/g', total: '$14.00' },
+        { name: 'House BBQ Sauce', qty: '1 portion', unit: '$0.55/ptn', total: '$0.55' },
+        { name: 'Apple Cider Vinegar', qty: '50ml', unit: '$0.014/ml', total: '$0.70' },
+        { name: 'Brown Sugar', qty: '30g', unit: '$0.005/g', total: '$0.15' },
+        { name: 'Smoked Paprika', qty: '10g', unit: '$0.022/g', total: '$0.22' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.018/g', total: '$0.14' },
+        { name: 'Onion Powder', qty: '5g', unit: '$0.018/g', total: '$0.09' },
+        { name: 'Black Pepper (cracked)', qty: '3g', unit: '$0.033/g', total: '$0.10' },
       ]},
-      { title: 'Stadium & Events', cost: 'A$19.80', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '520g', unit: 'A$0.034/g', total: 'A$17.68' },
-        { name: 'House BBQ Sauce', qty: '1.5 portions', unit: 'A$0.60/ptn', total: 'A$0.90' },
-        { name: 'Apple Cider Vinegar', qty: '50ml', unit: 'A$0.016/ml', total: 'A$0.80' },
-        { name: 'Brown Sugar', qty: '30g', unit: 'A$0.006/g', total: 'A$0.18' },
-        { name: 'Smoked Paprika', qty: '12g', unit: 'A$0.025/g', total: 'A$0.30' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.020/g', total: 'A$0.16' },
+      { title: 'Stadium & Events', cost: '$19.80', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '520g', unit: '$0.034/g', total: '$17.68' },
+        { name: 'House BBQ Sauce', qty: '1.5 portions', unit: '$0.60/ptn', total: '$0.90' },
+        { name: 'Apple Cider Vinegar', qty: '50ml', unit: '$0.016/ml', total: '$0.80' },
+        { name: 'Brown Sugar', qty: '30g', unit: '$0.006/g', total: '$0.18' },
+        { name: 'Smoked Paprika', qty: '12g', unit: '$0.025/g', total: '$0.30' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.020/g', total: '$0.16' },
       ]},
     ]
   };
   var VERSION_SNAPSHOT_B = {
     portion: '2',
     variations: [
-      { title: 'Base recipe', cost: 'A$17.54', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '500g', unit: 'A$0.030/g', total: 'A$15.00' },
-        { name: 'House BBQ Sauce', qty: '1 portion', unit: 'A$0.60/ptn', total: 'A$0.60' },
-        { name: 'Apple Cider Vinegar', qty: '50ml', unit: 'A$0.015/ml', total: 'A$0.75' },
-        { name: 'Brown Sugar', qty: '30g', unit: 'A$0.006/g', total: 'A$0.18' },
-        { name: 'Smoked Paprika', qty: '10g', unit: 'A$0.024/g', total: 'A$0.24' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.019/g', total: 'A$0.15' },
-        { name: 'Onion Powder', qty: '5g', unit: 'A$0.018/g', total: 'A$0.09' },
-        { name: 'Black Pepper (cracked)', qty: '3g', unit: 'A$0.043/g', total: 'A$0.13' },
-        { name: 'Cayenne Pepper', qty: '2g', unit: 'A$0.020/g', total: 'A$0.04' },
-        { name: 'Mustard Powder', qty: '4g', unit: 'A$0.040/g', total: 'A$0.16' },
+      { title: 'Base recipe', cost: '$17.54', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '500g', unit: '$0.030/g', total: '$15.00' },
+        { name: 'House BBQ Sauce', qty: '1 portion', unit: '$0.60/ptn', total: '$0.60' },
+        { name: 'Apple Cider Vinegar', qty: '50ml', unit: '$0.015/ml', total: '$0.75' },
+        { name: 'Brown Sugar', qty: '30g', unit: '$0.006/g', total: '$0.18' },
+        { name: 'Smoked Paprika', qty: '10g', unit: '$0.024/g', total: '$0.24' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.019/g', total: '$0.15' },
+        { name: 'Onion Powder', qty: '5g', unit: '$0.018/g', total: '$0.09' },
+        { name: 'Black Pepper (cracked)', qty: '3g', unit: '$0.043/g', total: '$0.13' },
+        { name: 'Cayenne Pepper', qty: '2g', unit: '$0.020/g', total: '$0.04' },
+        { name: 'Mustard Powder', qty: '4g', unit: '$0.040/g', total: '$0.16' },
       ]},
-      { title: 'Family Dining Express', cost: 'A$16.90', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '480g', unit: 'A$0.030/g', total: 'A$14.40' },
-        { name: 'House BBQ Sauce', qty: '1 portion', unit: 'A$0.60/ptn', total: 'A$0.60' },
-        { name: 'Apple Cider Vinegar', qty: '45ml', unit: 'A$0.015/ml', total: 'A$0.68' },
-        { name: 'Brown Sugar', qty: '28g', unit: 'A$0.006/g', total: 'A$0.17' },
-        { name: 'Smoked Paprika', qty: '10g', unit: 'A$0.024/g', total: 'A$0.24' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.019/g', total: 'A$0.15' },
-        { name: 'Cayenne Pepper', qty: '2g', unit: 'A$0.020/g', total: 'A$0.04' },
+      { title: 'Family Dining Express', cost: '$16.90', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '480g', unit: '$0.030/g', total: '$14.40' },
+        { name: 'House BBQ Sauce', qty: '1 portion', unit: '$0.60/ptn', total: '$0.60' },
+        { name: 'Apple Cider Vinegar', qty: '45ml', unit: '$0.015/ml', total: '$0.68' },
+        { name: 'Brown Sugar', qty: '28g', unit: '$0.006/g', total: '$0.17' },
+        { name: 'Smoked Paprika', qty: '10g', unit: '$0.024/g', total: '$0.24' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.019/g', total: '$0.15' },
+        { name: 'Cayenne Pepper', qty: '2g', unit: '$0.020/g', total: '$0.04' },
       ]},
-      { title: 'Airport Outlet', cost: 'A$18.40', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '500g', unit: 'A$0.032/g', total: 'A$16.00' },
-        { name: 'House BBQ Sauce', qty: '1.5 portions', unit: 'A$0.60/ptn', total: 'A$0.90' },
-        { name: 'Apple Cider Vinegar', qty: '50ml', unit: 'A$0.015/ml', total: 'A$0.75' },
-        { name: 'Smoked Paprika', qty: '10g', unit: 'A$0.024/g', total: 'A$0.24' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.019/g', total: 'A$0.15' },
-        { name: 'Mustard Powder', qty: '4g', unit: 'A$0.040/g', total: 'A$0.16' },
+      { title: 'Airport Outlet', cost: '$18.40', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '500g', unit: '$0.032/g', total: '$16.00' },
+        { name: 'House BBQ Sauce', qty: '1.5 portions', unit: '$0.60/ptn', total: '$0.90' },
+        { name: 'Apple Cider Vinegar', qty: '50ml', unit: '$0.015/ml', total: '$0.75' },
+        { name: 'Smoked Paprika', qty: '10g', unit: '$0.024/g', total: '$0.24' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.019/g', total: '$0.15' },
+        { name: 'Mustard Powder', qty: '4g', unit: '$0.040/g', total: '$0.16' },
       ]},
-      { title: 'CBD Stores', cost: 'A$17.90', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '500g', unit: 'A$0.030/g', total: 'A$15.00' },
-        { name: 'Premium BBQ Sauce', qty: '1 portion', unit: 'A$0.75/ptn', total: 'A$0.75' },
-        { name: 'Apple Cider Vinegar', qty: '50ml', unit: 'A$0.015/ml', total: 'A$0.75' },
-        { name: 'Brown Sugar', qty: '30g', unit: 'A$0.006/g', total: 'A$0.18' },
-        { name: 'Smoked Paprika', qty: '12g', unit: 'A$0.024/g', total: 'A$0.29' },
-        { name: 'Garlic Powder', qty: '10g', unit: 'A$0.019/g', total: 'A$0.19' },
-        { name: 'Cayenne Pepper', qty: '2g', unit: 'A$0.020/g', total: 'A$0.04' },
+      { title: 'CBD Stores', cost: '$17.90', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '500g', unit: '$0.030/g', total: '$15.00' },
+        { name: 'Premium BBQ Sauce', qty: '1 portion', unit: '$0.75/ptn', total: '$0.75' },
+        { name: 'Apple Cider Vinegar', qty: '50ml', unit: '$0.015/ml', total: '$0.75' },
+        { name: 'Brown Sugar', qty: '30g', unit: '$0.006/g', total: '$0.18' },
+        { name: 'Smoked Paprika', qty: '12g', unit: '$0.024/g', total: '$0.29' },
+        { name: 'Garlic Powder', qty: '10g', unit: '$0.019/g', total: '$0.19' },
+        { name: 'Cayenne Pepper', qty: '2g', unit: '$0.020/g', total: '$0.04' },
       ]},
     ]
   };
   var VERSION_SNAPSHOT_C = {
     portion: '1',
     variations: [
-      { title: 'Base recipe', cost: 'A$16.88', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '480g', unit: 'A$0.030/g', total: 'A$14.40' },
-        { name: 'House BBQ Sauce', qty: '1 portion', unit: 'A$0.55/ptn', total: 'A$0.55' },
-        { name: 'Apple Cider Vinegar', qty: '40ml', unit: 'A$0.014/ml', total: 'A$0.56' },
-        { name: 'Brown Sugar', qty: '25g', unit: 'A$0.006/g', total: 'A$0.15' },
-        { name: 'Sweet Paprika', qty: '10g', unit: 'A$0.022/g', total: 'A$0.22' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.018/g', total: 'A$0.14' },
-        { name: 'Onion Powder', qty: '5g', unit: 'A$0.017/g', total: 'A$0.09' },
-        { name: 'Black Pepper (cracked)', qty: '3g', unit: 'A$0.040/g', total: 'A$0.12' },
-        { name: 'Sea Salt', qty: '5g', unit: 'A$0.005/g', total: 'A$0.03' },
-        { name: 'Cumin (ground)', qty: '3g', unit: 'A$0.040/g', total: 'A$0.12' },
+      { title: 'Base recipe', cost: '$16.88', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '480g', unit: '$0.030/g', total: '$14.40' },
+        { name: 'House BBQ Sauce', qty: '1 portion', unit: '$0.55/ptn', total: '$0.55' },
+        { name: 'Apple Cider Vinegar', qty: '40ml', unit: '$0.014/ml', total: '$0.56' },
+        { name: 'Brown Sugar', qty: '25g', unit: '$0.006/g', total: '$0.15' },
+        { name: 'Sweet Paprika', qty: '10g', unit: '$0.022/g', total: '$0.22' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.018/g', total: '$0.14' },
+        { name: 'Onion Powder', qty: '5g', unit: '$0.017/g', total: '$0.09' },
+        { name: 'Black Pepper (cracked)', qty: '3g', unit: '$0.040/g', total: '$0.12' },
+        { name: 'Sea Salt', qty: '5g', unit: '$0.005/g', total: '$0.03' },
+        { name: 'Cumin (ground)', qty: '3g', unit: '$0.040/g', total: '$0.12' },
       ]},
-      { title: 'Family Dining Express', cost: 'A$15.90', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '460g', unit: 'A$0.030/g', total: 'A$13.80' },
-        { name: 'House BBQ Sauce', qty: '1 portion', unit: 'A$0.55/ptn', total: 'A$0.55' },
-        { name: 'Apple Cider Vinegar', qty: '35ml', unit: 'A$0.014/ml', total: 'A$0.49' },
-        { name: 'Brown Sugar', qty: '22g', unit: 'A$0.006/g', total: 'A$0.13' },
-        { name: 'Sweet Paprika', qty: '10g', unit: 'A$0.022/g', total: 'A$0.22' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.018/g', total: 'A$0.14' },
-        { name: 'Sea Salt', qty: '5g', unit: 'A$0.005/g', total: 'A$0.03' },
+      { title: 'Family Dining Express', cost: '$15.90', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '460g', unit: '$0.030/g', total: '$13.80' },
+        { name: 'House BBQ Sauce', qty: '1 portion', unit: '$0.55/ptn', total: '$0.55' },
+        { name: 'Apple Cider Vinegar', qty: '35ml', unit: '$0.014/ml', total: '$0.49' },
+        { name: 'Brown Sugar', qty: '22g', unit: '$0.006/g', total: '$0.13' },
+        { name: 'Sweet Paprika', qty: '10g', unit: '$0.022/g', total: '$0.22' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.018/g', total: '$0.14' },
+        { name: 'Sea Salt', qty: '5g', unit: '$0.005/g', total: '$0.03' },
       ]},
-      { title: 'Airport Outlet', cost: 'A$17.60', ings: [
-        { name: 'Pork Baby Back Ribs', qty: '480g', unit: 'A$0.032/g', total: 'A$15.36' },
-        { name: 'House BBQ Sauce', qty: '1.5 portions', unit: 'A$0.55/ptn', total: 'A$0.83' },
-        { name: 'Apple Cider Vinegar', qty: '40ml', unit: 'A$0.014/ml', total: 'A$0.56' },
-        { name: 'Sweet Paprika', qty: '10g', unit: 'A$0.022/g', total: 'A$0.22' },
-        { name: 'Garlic Powder', qty: '8g', unit: 'A$0.018/g', total: 'A$0.14' },
-        { name: 'Cumin (ground)', qty: '3g', unit: 'A$0.040/g', total: 'A$0.12' },
+      { title: 'Airport Outlet', cost: '$17.60', ings: [
+        { name: 'Pork Baby Back Ribs', qty: '480g', unit: '$0.032/g', total: '$15.36' },
+        { name: 'House BBQ Sauce', qty: '1.5 portions', unit: '$0.55/ptn', total: '$0.83' },
+        { name: 'Apple Cider Vinegar', qty: '40ml', unit: '$0.014/ml', total: '$0.56' },
+        { name: 'Sweet Paprika', qty: '10g', unit: '$0.022/g', total: '$0.22' },
+        { name: 'Garlic Powder', qty: '8g', unit: '$0.018/g', total: '$0.14' },
+        { name: 'Cumin (ground)', qty: '3g', unit: '$0.040/g', total: '$0.12' },
       ]},
     ]
   };
@@ -2203,25 +2320,103 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     return (qty || '0') + (uom ? ' ' + uom : '');
   }
 
+  function updateIngredientAmount(row) {
+    var qtyInput = row.querySelector('.qty-input');
+    var priceCells = row.querySelectorAll('td.r .price-val');
+    if (!qtyInput || priceCells.length < 2) return;
+    var unit = priceCells[0];
+    var amount = priceCells[1];
+    var unitPrice = Number(unit.dataset.unitPrice);
+    if (!Number.isFinite(unitPrice)) {
+      var match = String(unit.textContent).match(/(S\$|A\$|\$)([0-9,.]+)/);
+      unitPrice = match ? Number(match[2].replace(/,/g, '')) : NaN;
+    }
+    var quantity = Number(String(qtyInput.value).replace(/[^0-9.]/g, ''));
+    if (!Number.isFinite(unitPrice) || !Number.isFinite(quantity) || /Varies|—/.test(unit.textContent)) return;
+    var currency = (String(unit.textContent).match(/(S\$|A\$|\$)/) || ['','$'])[1];
+    var previous = String(amount.textContent).match(/(?:S\$|A\$|\$)([0-9,.]+)/);
+    var previousAmount = previous ? Number(previous[1].replace(/,/g, '')) : NaN;
+    var nextAmount = unitPrice * quantity;
+    amount.textContent = currency + nextAmount.toFixed(2);
+
+    // A recipe amount contributes directly to the selected location's
+    // per-portion cost. In the all-locations view there is deliberately no
+    // single ingredient price to apply.
+    var target = activeRecipeTarget();
+    var change = nextAmount - previousAmount;
+    if (target && Number.isFinite(previousAmount) && Math.abs(change) > 0.000001) {
+      var key = recipeCostAdjustmentKey(target);
+      recipeCostAdjustments[key] = (recipeCostAdjustments[key] || 0) + change;
+      updateRecipeCostContextUI();
+    }
+  }
+
+  function ingredientTableForVariation(key) {
+    var html = key === currentVar ? serializeIngredientTable() : (ING_TABLE_HTML_BY_VAR[key] || ING_TABLE_HTML_BY_VAR.base || '');
+    var table = document.createElement('tbody');
+    table.innerHTML = html;
+    return table;
+  }
+
+  function ingredientRowForVariation(key, name) {
+    return Array.prototype.slice.call(ingredientTableForVariation(key).querySelectorAll('tr')).find(function(row) {
+      return rowIngredientName(row) === name;
+    }) || null;
+  }
+
   function variationUsageForIngredient(name, newQty) {
-    return VAR_KEY_ORDER.filter(function(key) { return VAR_META[key]; }).map(function(key, idx) {
-      var snapVar = VERSION_SNAPSHOT_A.variations[idx];
-      if (!snapVar) return null;
-      var ing = snapVar.ings.find(function(item) { return item.name === name; });
-      if (!ing) return null;
+    return VAR_KEY_ORDER.filter(function(key) { return VAR_META[key]; }).map(function(key) {
+      var row = ingredientRowForVariation(key, name);
+      if (!row) return null;
       return {
         key: key,
         title: VAR_META[key].title,
-        current: ing.qty,
+        current: rowQuantityLabel(row),
         next: newQty
       };
     }).filter(Boolean);
   }
 
   function variationHasIngredient(key, name) {
-    var idx = VAR_KEY_ORDER.indexOf(key);
-    var snapVar = VERSION_SNAPSHOT_A.variations[idx];
-    return !!(snapVar && snapVar.ings.some(function(item) { return item.name === name; }));
+    return !!ingredientRowForVariation(key, name);
+  }
+
+  function applyQuantityToVariation(key, ingredient, quantityLabel) {
+    var table = ingredientTableForVariation(key);
+    var row = Array.prototype.slice.call(table.querySelectorAll('tr')).find(function(candidate) {
+      return rowIngredientName(candidate) === ingredient;
+    });
+    if (!row) return false;
+    var match = String(quantityLabel).match(/^\s*([^\s]+)\s*(.*)$/);
+    var qtyInput = row.querySelector('.qty-input');
+    var uomSelect = row.querySelector('.uom-select');
+    if (qtyInput && match) qtyInput.value = match[1];
+    if (uomSelect && match && match[2]) uomSelect.value = match[2];
+    ING_TABLE_HTML_BY_VAR[key] = table.innerHTML;
+    markVariationDirty(key);
+    return true;
+  }
+
+  function applyIngredientChangeToVariation(update, key) {
+    var type = update.type || 'quantity';
+    if (type === 'quantity') return applyQuantityToVariation(key, update.ingredient, update.newQty);
+    var table = ingredientTableForVariation(key);
+    var existing = Array.prototype.slice.call(table.querySelectorAll('tr')).find(function(row) {
+      return rowIngredientName(row) === update.ingredient;
+    });
+    if (type === 'add' && !existing && update.rowHtml) {
+      table.insertAdjacentHTML('beforeend', update.rowHtml);
+      ING_TABLE_HTML_BY_VAR[key] = table.innerHTML;
+      markVariationDirty(key);
+      return true;
+    }
+    if (type === 'remove' && existing) {
+      existing.remove();
+      ING_TABLE_HTML_BY_VAR[key] = table.innerHTML;
+      markVariationDirty(key);
+      return true;
+    }
+    return false;
   }
 
   function allActiveVariationKeys() {
@@ -2366,25 +2561,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     clearBulkApplyPrompt();
     pendingBulkQty = { type: 'quantity', ingredient: name, newQty: newQty, usage: usage, sourceVar: currentVar };
     upsertPendingBulkUpdate(pendingBulkQty);
-    var otherCount = usage.length - 1;
-    var tr = document.createElement('tr');
-    tr.className = 'bulk-apply-row';
-    tr.innerHTML = '<td colspan="5">' +
-      '<div class="bulk-apply-card">' +
-        '<div class="bulk-apply-text"><strong>' + escapeHtml(name) + '</strong> appears in ' + otherCount + ' other variation' + (otherCount === 1 ? '' : 's') + '. Apply this quantity change elsewhere?</div>' +
-        '<div class="bulk-apply-actions">' +
-          '<button class="bulk-mini-btn" type="button" data-bulk-action="only">Only this variation</button>' +
-          '<button class="bulk-mini-btn primary" type="button" data-bulk-action="review">Review variations</button>' +
-        '</div>' +
-      '</div>' +
-    '</td>';
-    sourceRow.insertAdjacentElement('afterend', tr);
-    tr.querySelector('[data-bulk-action="only"]').addEventListener('click', function() {
-      removePendingBulkUpdate('quantity', name, currentVar);
-      clearBulkApplyPrompt();
-      showToast('Quantity updated for this variation only.');
-    });
-    tr.querySelector('[data-bulk-action="review"]').addEventListener('click', openBulkQtyModal);
+    // Surface the choice immediately instead of leaving it in an inline row
+    // that may sit outside the current viewport after a quantity edit.
+    openBulkQtyModal();
   }
 
   function createPendingIngredientAdd(row, name) {
@@ -2392,9 +2571,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     if (!name) return;
     markVariationDirty(currentVar);
     removeSourceFromPendingRemove(name, currentVar);
-    pendingBulkQty = { type: 'add', ingredient: name, usage: usageForAddedIngredient(name), sourceVar: currentVar };
+    pendingBulkQty = { type: 'add', ingredient: name, usage: usageForAddedIngredient(name), sourceVar: currentVar, rowHtml: row.outerHTML };
     upsertPendingBulkUpdate(pendingBulkQty);
-    showToast('Ingredient added here. Review pending updates to add it to other variations.');
   }
 
   function createPendingIngredientRemove(row, name) {
@@ -2402,7 +2580,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     if (!name) return;
     markVariationDirty(currentVar);
     if (removePendingBulkUpdate('add', name, currentVar)) {
-      showToast('New ingredient removed from this variation.');
+      showToast('Ingredient removed.');
       return;
     }
     var existingRemove = pendingBulkQtyUpdates.find(function(update) {
@@ -2410,9 +2588,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     });
     var sourceVars = existingRemove ? (existingRemove.sourceVars || [existingRemove.sourceVar]).slice() : [];
     if (sourceVars.indexOf(currentVar) === -1) sourceVars.push(currentVar);
-    pendingBulkQty = { type: 'remove', ingredient: name, usage: usageForRemovedIngredient(name, sourceVars), sourceVar: sourceVars[0], sourceVars: sourceVars };
+    pendingBulkQty = { type: 'remove', ingredient: name, usage: usageForRemovedIngredient(name, sourceVars), sourceVar: sourceVars[0], sourceVars: sourceVars, rowHtml: row.outerHTML };
     upsertPendingBulkUpdate(pendingBulkQty);
-    showToast('Ingredient removed here. Review pending updates to remove it from other variations.');
+    showToast('Ingredient removed. Review variations.');
   }
 
   function handleIngredientRemoval(btn) {
@@ -2422,17 +2600,42 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     row.remove();
     clearBulkApplyPrompt();
     createPendingIngredientRemove(row, name);
+    showIngredientEmptyStateIfNeeded();
     if (typeof renumberIngredients === 'function') renumberIngredients();
     else document.querySelectorAll('#ingBody .row-num').forEach(function(el, i) { el.textContent = i + 1; });
+  }
+
+  function showIngredientEmptyStateIfNeeded() {
+    var body = document.getElementById('ingBody');
+    if (!body || body.querySelector('tr:not(.bulk-apply-row)')) return;
+    body.innerHTML = '<tr class="empty-row" id="emptyRow"><td colspan="5">' +
+      '<div class="empty-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#adb0b8" stroke-width="1.8" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></div>' +
+      '<div class="empty-label">No ingredients yet</div><div class="empty-sub">Add ingredients to calculate cost and check availability</div>' +
+      '</td></tr>';
   }
 
   function bindQuantityBulkPrompts(scope) {
     (scope || document).querySelectorAll('.qty-input, .uom-select').forEach(function(input) {
       if (input.dataset.bulkBound) return;
       input.dataset.bulkBound = 'true';
+      var initialRow = input.closest('tr');
+      input.dataset.lastBulkQuantity = initialRow ? rowQuantityLabel(initialRow) : '';
+      if (input.classList.contains('qty-input')) {
+        input.addEventListener('input', function() {
+          var liveRow = input.closest('tr');
+          if (liveRow) updateIngredientAmount(liveRow);
+        });
+      }
       input.addEventListener('change', function() {
         var row = input.closest('tr');
-        if (row && row.parentElement && row.parentElement.id === 'ingBody') showBulkApplyPrompt(row);
+        if (row && row.parentElement && row.parentElement.id === 'ingBody') {
+          updateIngredientAmount(row);
+          var nextQuantity = rowQuantityLabel(row);
+          if (nextQuantity !== input.dataset.lastBulkQuantity) {
+            input.dataset.lastBulkQuantity = nextQuantity;
+            showBulkApplyPrompt(row);
+          }
+        }
       });
     });
   }
@@ -2500,14 +2703,18 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     updateBulkSelectAllLink();
   });
   document.getElementById('bulkQtyApplyBtn').addEventListener('click', function() {
-    var count = document.querySelectorAll('#bulkQtyList input[type="checkbox"]:checked').length;
+    var selectedKeys = Array.prototype.slice.call(document.querySelectorAll('#bulkQtyList input[type="checkbox"]:checked')).map(function(input) { return input.value; });
     closeBulkQtyModal();
     clearBulkApplyPrompt();
     if (pendingBulkQty) {
       var type = pendingBulkQty.type || 'quantity';
-      var message = 'Quantity applied to ' + count + ' variation' + (count === 1 ? '' : 's') + ' with ' + pendingBulkQty.ingredient + '.';
-      if (type === 'add') message = pendingBulkQty.ingredient + ' added to ' + count + ' variation' + (count === 1 ? '' : 's') + '.';
-      if (type === 'remove') message = pendingBulkQty.ingredient + ' removed from ' + count + ' variation' + (count === 1 ? '' : 's') + '.';
+      var sourceKeys = pendingBulkQty.sourceVars || [pendingBulkQty.sourceVar];
+      var applied = selectedKeys.filter(function(key) { return sourceKeys.indexOf(key) === -1; }).filter(function(key) {
+        return applyIngredientChangeToVariation(pendingBulkQty, key);
+      }).length;
+      var message = 'Updated ' + applied + ' variation' + (applied === 1 ? '' : 's') + '.';
+      if (type === 'add') message = 'Added to ' + applied + ' variation' + (applied === 1 ? '' : 's') + '.';
+      if (type === 'remove') message = 'Removed from ' + applied + ' variation' + (applied === 1 ? '' : 's') + '.';
       showToast(message);
     }
     if (pendingBulkQty) {
@@ -2521,8 +2728,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     if (e.target === this) closeBulkQtyModal();
   });
 
-  function openPendingUpdatesModal() {
+  function openPendingUpdatesModal(saveAfterClosing) {
     renderPendingUpdatesList();
+    window.pendingSaveAfterReview = !!saveAfterClosing;
+    document.getElementById('pendingUpdatesDoneBtn').textContent = saveAfterClosing ? 'Save recipe' : 'Keep pending';
     document.getElementById('pendingUpdatesModal').classList.add('open');
   }
 
@@ -2532,7 +2741,15 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
   document.getElementById('reviewPendingBtn').addEventListener('click', openPendingUpdatesModal);
   document.getElementById('pendingUpdatesCloseBtn').addEventListener('click', closePendingUpdatesModal);
-  document.getElementById('pendingUpdatesDoneBtn').addEventListener('click', closePendingUpdatesModal);
+  document.getElementById('pendingUpdatesDoneBtn').addEventListener('click', function() {
+    var shouldSave = !!window.pendingSaveAfterReview;
+    window.pendingSaveAfterReview = false;
+    closePendingUpdatesModal();
+    if (shouldSave) {
+      window.allowSaveWithPendingUpdates = true;
+      document.getElementById('saveBtn').click();
+    }
+  });
   document.getElementById('pendingUpdatesModal').addEventListener('click', function(e) {
     if (e.target === this) closePendingUpdatesModal();
   });
@@ -3028,23 +3245,20 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   // ── Toast ────────────────────────────────────────────────────────────────
 
   function showToast(msg) {
-    var t = document.getElementById('toastEl');
+    var t = document.getElementById('recipeToast');
     if (!t) {
       t = document.createElement('div');
-      t.id = 'toastEl';
-      t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(8px);' +
-        'background:#1a1f2b;color:#fff;font-size:14px;font-weight:500;padding:12px 20px;' +
-        'border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.22);z-index:9999;' +
-        'opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap';
+      t.id = 'recipeToast';
+      t.setAttribute('role', 'status');
+      t.setAttribute('aria-live', 'polite');
+      t.innerHTML = '<span class="recipe-toast-check" aria-hidden="true">✓</span><span><span class="recipe-toast-title">Success</span><span class="recipe-toast-copy"></span></span>';
       document.body.appendChild(t);
     }
-    t.textContent = msg;
-    t.style.opacity = '1';
-    t.style.transform = 'translateX(-50%) translateY(0)';
+    t.querySelector('.recipe-toast-copy').textContent = msg;
+    t.classList.add('show');
     clearTimeout(t._timer);
     t._timer = setTimeout(function() {
-      t.style.opacity = '0';
-      t.style.transform = 'translateX(-50%) translateY(8px)';
+      t.classList.remove('show');
     }, 2800);
   }
 
@@ -3056,13 +3270,13 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   var deletedVariationTitles = new Set();
 
   var VAR_META = {
-    base: { title: 'Base recipe', cost: 'A$18.20', costNum: 18.20, retail: '52.00' },
-    family: { title: 'Family Dining Express', cost: 'A$17.54', costNum: 17.54, retail: '52.00' },
-    airport: { title: 'Airport Outlet', cost: 'A$19.10', costNum: 19.10, retail: '56.00' },
-    cbd: { title: 'CBD Stores', cost: 'A$18.70', costNum: 18.70, retail: '54.00' },
-    catering: { title: 'Catering Kitchen', cost: 'A$16.80', costNum: 16.80, retail: '48.00' },
-    events:   { title: 'Stadium & Events', cost: 'A$19.80', costNum: 19.80, retail: '58.00' },
-    delivery: { title: 'Takeaway & Delivery', cost: 'A$17.40', costNum: 17.40, retail: '50.00' }
+    base: { title: 'Base recipe', cost: '$18.20', costNum: 18.20, retail: '52.00' },
+    family: { title: 'Family Dining Express', cost: '$17.54', costNum: 17.54, retail: '52.00' },
+    airport: { title: 'Airport Outlet', cost: '$19.10', costNum: 19.10, retail: '56.00' },
+    cbd: { title: 'CBD Stores', cost: '$18.70', costNum: 18.70, retail: '54.00' },
+    catering: { title: 'Catering Kitchen', cost: '$16.80', costNum: 16.80, retail: '48.00' },
+    events:   { title: 'Stadium & Events', cost: '$19.80', costNum: 19.80, retail: '58.00' },
+    delivery: { title: 'Takeaway & Delivery', cost: '$17.40', costNum: 17.40, retail: '50.00' }
   };
   var VAR_ASSIGNMENTS = {
     base: [],
@@ -3287,7 +3501,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   }
 
   function formatMoney(n) {
-    return isFinite(n) ? 'A$' + n.toFixed(2) : 'A$—';
+    return isFinite(n) ? '$' + n.toFixed(2) : '$—';
   }
 
   function getYieldQuantity() {
@@ -3309,13 +3523,13 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       var yieldQty = getYieldQuantity();
       var yieldUom = document.getElementById('yieldUom').value;
       if (costScopeLabel) costScopeLabel.textContent = 'per ' + yieldUom;
-      if (costEl) costEl.textContent = yieldQty ? formatMoney(cost / yieldQty) : 'A$—';
+      if (costEl) costEl.textContent = yieldQty ? formatMoney(cost / yieldQty) : '$—';
     } else {
       if (costScopeLabel) costScopeLabel.textContent = 'per portion';
       if (costEl) costEl.textContent = (VAR_META[currentVar] || VAR_META.base).cost;
     }
     var retail = parseFloat(String(retailEl.value || '').replace(/[^0-9.]/g, ''));
-    if (retailDisplayEl) retailDisplayEl.textContent = retail ? 'A$' + retail.toFixed(2) : 'A$—';
+    if (retailDisplayEl) retailDisplayEl.textContent = retail ? '$' + retail.toFixed(2) : '$—';
     if (!retail || retail <= 0) {
       foodEl.textContent = '—';
       itemEl.classList.remove('cost-alert');
@@ -3329,6 +3543,8 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   // HQ recipes can be used across locations. These values demonstrate how the
   // same recipe resolves against each target's ingredient and POS prices.
   var recipeCostingContext = 'all';
+  var recipeCostAdjustments = {};
+  var recipeHasMappedPosProducts = true;
   var posSyncConfig = { enabled: true, product: '1086B', manualPrice: 16.90 };
   var POS_PRODUCTS = {
     '1086B': { name: 'Chargrill chicken thigh', code: '1086B' },
@@ -3342,9 +3558,11 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     { id: 'outlet_290', name: '(WF 290) Garden Express @ 290 Sengkang', cost: 2.78, factor: .99, pos: { '1086B': 16.90, 'A-01522': 15.90, 'A-01531': 14.90 } }
   ];
 
-  function recipeMoney(value) { return 'S$' + Number(value).toFixed(2); }
+  function recipeMoney(value) { return '$' + Number(value).toFixed(2); }
   function recipePriceForTarget(target) { return posSyncConfig.enabled ? target.pos[posSyncConfig.product] : posSyncConfig.manualPrice; }
-  function recipeTargetFoodCost(target) { return target.cost / recipePriceForTarget(target) * 100; }
+  function recipeCostAdjustmentKey(target) { return currentVar + ':' + target.id; }
+  function recipeCostForTarget(target) { return target.cost + (recipeCostAdjustments[recipeCostAdjustmentKey(target)] || 0); }
+  function recipeTargetFoodCost(target) { return recipeCostForTarget(target) / recipePriceForTarget(target) * 100; }
   function recipeRange(values, formatter) {
     var min = Math.min.apply(null, values), max = Math.max.apply(null, values);
     return formatter(min) + (min === max ? '' : '–' + formatter(max));
@@ -3376,7 +3594,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     select.value = recipeCostingContext;
   }
   function replaceIngredientPrice(text, factor) {
-    return String(text).replace(/(?:From\s+)?(?:S\$|A\$)([0-9,.]+)(?:–[0-9,.]+)?/, function(match, value) {
+    return String(text).replace(/(?:From\s+)?(?:S\$|A\$|\$)([0-9,.]+)(?:–[0-9,.]+)?/, function(match, value) {
       return recipeMoney(Number(String(value).replace(/,/g, '')) * factor);
     });
   }
@@ -3391,16 +3609,38 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     return count + ' buying option' + (count === 1 ? '' : 's');
   }
   function recipeUnitPrice(option, recipeUom) {
+    var value = recipeUnitPriceNumber(option, recipeUom);
+    return recipeUnitPriceText(value, recipeUom);
+  }
+  function recipeUnitPriceText(value, recipeUom) {
+    var usesSmallUnit = recipeUom === 'g' || recipeUom === 'ml';
+    return '$' + value.toFixed(usesSmallUnit ? 4 : 2) + (recipeUom ? '/' + recipeUom : '');
+  }
+  function recipeUnitPriceNumber(option, recipeUom) {
     var sourceValue = parseFloat(String(option.price).replace(/[^0-9.]/g, ''));
     var sourceUom = /\/kg/.test(option.price) ? 'kg' : (/\/L/.test(option.price) ? 'L' : recipeUom);
     var factor = (sourceUom === 'kg' && recipeUom === 'g') || (sourceUom === 'L' && recipeUom === 'ml') ? 0.001 : 1;
-    return recipeMoney(sourceValue * factor) + (recipeUom ? '/' + recipeUom : '');
+    return sourceValue * factor;
   }
   function recipeAmount(option, recipeUom, qty) {
-    var sourceValue = parseFloat(String(option.price).replace(/[^0-9.]/g, ''));
-    var sourceUom = /\/kg/.test(option.price) ? 'kg' : (/\/L/.test(option.price) ? 'L' : recipeUom);
-    var factor = (sourceUom === 'kg' && recipeUom === 'g') || (sourceUom === 'L' && recipeUom === 'ml') ? 0.001 : 1;
-    return recipeMoney(sourceValue * factor * (Number(qty) || 0));
+    return recipeMoney(recipeUnitPriceNumber(option, recipeUom) * (Number(qty) || 0));
+  }
+  function recipeAverageUnitPrice(options, recipeUom) {
+    var values = options.map(function(option) { return recipeUnitPriceNumber(option, recipeUom); }).filter(function(value) { return Number.isFinite(value); });
+    if (!values.length) return NaN;
+    return values.reduce(function(total, value) { return total + value; }, 0) / values.length;
+  }
+  function recipeUnitPriceRange(values, recipeUom) {
+    if (!values.length) return '—';
+    var decimals = recipeUom === 'g' || recipeUom === 'ml' ? 4 : 2;
+    var min = Math.min.apply(null, values);
+    var max = Math.max.apply(null, values);
+    return '$' + min.toFixed(decimals) + (min === max ? '' : '–$' + max.toFixed(decimals)) + (recipeUom ? '/' + recipeUom : '');
+  }
+  function recipeItemPricesByTarget(itemName, recipeUom) {
+    return RECIPE_COST_TARGETS.map(function(target) {
+      return recipeAverageUnitPrice(optionsForRecipeScope(itemName, target), recipeUom);
+    }).filter(function(value) { return Number.isFinite(value); });
   }
   function availabilitySummary(unavailableTargets) {
     var groups = unavailableTargets.filter(function(target) { return target.id.indexOf('group_') === 0; }).length;
@@ -3483,22 +3723,45 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       var recipeUom = (row.querySelector('.uom-select') || {}).value || '';
       var qty = (row.querySelector('.qty-input') || {}).value || 0;
       var options = itemName ? optionsForRecipeScope(itemName, target) : [];
+      var fixedCost = Number(row.dataset.fixedCost);
+      var hasFixedCost = Number.isFinite(fixedCost);
       var subRecipeUnavailable = !itemName && target && row.dataset.availableGroups && row.dataset.availableGroups.split('|').indexOf(target.name) === -1;
       if (!target) {
-        unit.textContent = 'Varies';
-        amount.textContent = '—';
+        if (itemName) {
+          var allScopePrices = recipeItemPricesByTarget(itemName, recipeUom);
+          unit.textContent = recipeUnitPriceRange(allScopePrices, recipeUom);
+          amount.textContent = allScopePrices.length
+            ? recipeRange(allScopePrices.map(function(value) { return value * (Number(qty) || 0); }), recipeMoney)
+            : '—';
+        } else if (hasFixedCost) {
+          unit.textContent = recipeUnitPriceText(fixedCost, recipeUom);
+          amount.textContent = recipeMoney(fixedCost * (Number(qty) || 0));
+        } else {
+          unit.textContent = unit.dataset.basePrice;
+          amount.textContent = amount.dataset.basePrice;
+        }
+        delete unit.dataset.unitPrice;
       } else if (subRecipeUnavailable || (itemName && !options.length)) {
         unit.textContent = '—';
         amount.textContent = '—';
-      } else if (itemName && options.length === 1) {
-        unit.textContent = recipeUnitPrice(options[0], recipeUom);
-        amount.textContent = recipeAmount(options[0], recipeUom, qty);
+        delete unit.dataset.unitPrice;
+      } else if (hasFixedCost) {
+        unit.textContent = recipeUnitPriceText(fixedCost, recipeUom);
+        amount.textContent = recipeMoney(fixedCost * (Number(qty) || 0));
+        unit.dataset.unitPrice = String(fixedCost);
+      } else if (itemName && options.length) {
+        var scopedUnitPrice = recipeAverageUnitPrice(options, recipeUom);
+        unit.textContent = recipeUnitPriceText(scopedUnitPrice, recipeUom);
+        amount.textContent = recipeMoney(scopedUnitPrice * (Number(qty) || 0));
+        unit.dataset.unitPrice = String(scopedUnitPrice);
       } else if (!itemName && row.dataset.availableGroups) {
         unit.textContent = unit.dataset.basePrice;
         amount.textContent = amount.dataset.basePrice;
+        unit.dataset.unitPrice = String(parseFloat(String(unit.textContent).replace(/[^0-9.]/g, '')) || 0);
       } else {
         unit.textContent = replaceIngredientPrice(unit.dataset.basePrice, target.factor);
         amount.textContent = replaceIngredientPrice(amount.dataset.basePrice, target.factor);
+        delete unit.dataset.unitPrice;
       }
     });
     renderIngredientAvailability(target);
@@ -3506,10 +3769,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   function updateRecipeCostContextUI() {
     syncRecipeCostContextOptions();
     var target = activeRecipeTarget();
-    var costs = RECIPE_COST_TARGETS.map(function(item) { return item.cost; });
+    var costs = RECIPE_COST_TARGETS.map(recipeCostForTarget);
     var prices = RECIPE_COST_TARGETS.map(recipePriceForTarget);
     var foodCosts = RECIPE_COST_TARGETS.map(recipeTargetFoodCost);
-    var costValue = target ? recipeMoney(target.cost) : recipeRange(costs, recipeMoney);
+    var costValue = target ? recipeMoney(recipeCostForTarget(target)) : recipeRange(costs, recipeMoney);
     var priceValue = target ? recipeMoney(recipePriceForTarget(target)) : recipeRange(prices, recipeMoney);
     var foodValue = target ? recipeTargetFoodCost(target).toFixed(1) + '%' : recipeRange(foodCosts, function(value) { return value.toFixed(1) + '%'; });
     document.getElementById('costRecipeVal').textContent = costValue;
@@ -3534,19 +3797,19 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     updateRecipeCostContextUI();
   }
   function openRecipeCostDetails() {
-    var costs = RECIPE_COST_TARGETS.map(function(target) { return target.cost; });
+    var costs = RECIPE_COST_TARGETS.map(recipeCostForTarget);
     var foodCosts = RECIPE_COST_TARGETS.map(recipeTargetFoodCost);
     document.getElementById('recipeCostDetailsSummary').innerHTML =
       '<div class="recipe-cost-summary-item"><span class="recipe-cost-summary-label">Cost range</span><span class="recipe-cost-summary-value">' + recipeRange(costs, recipeMoney) + '</span></div>' +
       '<div class="recipe-cost-summary-item"><span class="recipe-cost-summary-label">Food cost range</span><span class="recipe-cost-summary-value">' + recipeRange(foodCosts, function(value) { return value.toFixed(1) + '%'; }) + '</span></div>';
     document.getElementById('recipeCostDetailsRows').innerHTML = RECIPE_COST_TARGETS.map(function(target) {
-      return '<tr><td><strong>' + target.name + '</strong><span class="recipe-cost-target-sub">' + (posSyncConfig.enabled ? 'POS · ' + POS_PRODUCTS[posSyncConfig.product].name + ' (' + POS_PRODUCTS[posSyncConfig.product].code + ')' : 'Manual selling price') + '</span></td><td class="num">' + recipeMoney(target.cost) + '</td><td class="num">' + recipeMoney(recipePriceForTarget(target)) + '</td><td class="num">' + recipeTargetFoodCost(target).toFixed(1) + '%</td></tr>';
+      return '<tr><td><strong>' + target.name + '</strong><span class="recipe-cost-target-sub">' + (posSyncConfig.enabled ? 'POS · ' + POS_PRODUCTS[posSyncConfig.product].name + ' (' + POS_PRODUCTS[posSyncConfig.product].code + ')' : 'Manual selling price') + '</span></td><td class="num">' + recipeMoney(recipeCostForTarget(target)) + '</td><td class="num">' + recipeMoney(recipePriceForTarget(target)) + '</td><td class="num">' + recipeTargetFoodCost(target).toFixed(1) + '%</td></tr>';
     }).join('');
     document.getElementById('recipeCostDetailsModal').classList.add('open');
   }
   function closeRecipeCostDetails() { document.getElementById('recipeCostDetailsModal').classList.remove('open'); }
   function openPosSyncModal() {
-    document.getElementById('posSyncEnabled').checked = posSyncConfig.enabled;
+    document.getElementById('posSyncEnabled').checked = recipeHasMappedPosProducts && posSyncConfig.enabled;
     document.getElementById('posProductSelect').value = posSyncConfig.product;
     document.getElementById('manualSellingPrice').value = posSyncConfig.manualPrice.toFixed(2);
     togglePosSyncFields();
@@ -3554,13 +3817,15 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   }
   function closePosSyncModal() { document.getElementById('posSyncModal').classList.remove('open'); }
   function togglePosSyncFields() {
-    var syncing = document.getElementById('posSyncEnabled').checked;
+    var hasMappedProducts = recipeHasMappedPosProducts;
+    var syncing = hasMappedProducts && document.getElementById('posSyncEnabled').checked;
+    document.getElementById('syncModeRow').hidden = !hasMappedProducts;
     document.getElementById('syncProductField').hidden = !syncing;
     document.getElementById('syncManualField').hidden = syncing;
   }
   function savePosSync() {
-    posSyncConfig.enabled = document.getElementById('posSyncEnabled').checked;
-    posSyncConfig.product = document.getElementById('posProductSelect').value;
+    posSyncConfig.enabled = recipeHasMappedPosProducts && document.getElementById('posSyncEnabled').checked;
+    if (recipeHasMappedPosProducts) posSyncConfig.product = document.getElementById('posProductSelect').value;
     var manual = Number(document.getElementById('manualSellingPrice').value);
     if (Number.isFinite(manual) && manual >= 0) posSyncConfig.manualPrice = manual;
     closePosSyncModal();
@@ -3634,7 +3899,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       var sourceValue = parseFloat(String(option.price).replace(/[^0-9.]/g, ''));
       var sourceUom = /\/kg/.test(option.price) ? 'kg' : (/\/L/.test(option.price) ? 'L' : recipeUom);
       var factor = (sourceUom === 'kg' && recipeUom === 'g') || (sourceUom === 'L' && recipeUom === 'ml') ? 0.001 : 1;
-      var converted = isFinite(sourceValue) ? 'S$' + (sourceValue * factor).toFixed(factor < 1 ? 4 : 2) : option.price;
+      var converted = isFinite(sourceValue) ? '$' + (sourceValue * factor).toFixed(factor < 1 ? 4 : 2) : option.price;
       var source = sourceUom && recipeUom && sourceUom !== recipeUom ? '<span class="buying-option-price-source">' + escapeHtml(option.price) + '</span>' : '';
       return '<div class="buying-option-price">' + converted + (recipeUom && sourceUom !== recipeUom ? '/' + recipeUom : '') + source + '</div>';
     }
@@ -4048,7 +4313,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     newVariationCount += 1;
     var key = 'new' + newVariationCount;
     var title = document.getElementById('createVariationName').value.trim() || ('New Variation ' + newVariationCount);
-    VAR_META[key] = { title: title, cost: 'A$18.20', costNum: 18.20, retail: '52.00' };
+    VAR_META[key] = { title: title, cost: '$18.20', costNum: 18.20, retail: '52.00' };
     VAR_ASSIGNMENTS[key] = [];
     applyAssignments(key, selectedAssignmentIds('createAssignmentList'));
     unsavedVariations.add(key);
@@ -4081,12 +4346,12 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   // sub-recipe. The chosen recipe view resolves its eligible buying options.
   function seedGardenCuisineRecipe() {
     var rows = [
-      { name:'Chicken Thigh Boneless', inventoryItem:'Chicken Thigh Boneless', qty:'250', uom:'g', price:'From S$6.40/kg', amount:'S$1.70' },
-      { name:'House BBQ Sauce', detail:'Sub-recipe', qty:'1', uom:'ptn', price:'S$0.60/ptn', amount:'S$0.60', availableGroups:['Chargrill Outlets'] },
-      { name:'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag', inventoryItem:'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag', qty:'20', uom:'g', price:'S$4.20/kg', amount:'S$0.08' },
-      { name:'Dark Soy Sauce', inventoryItem:'Dark Soy Sauce', qty:'10', uom:'ml', price:'From S$3.45/L', amount:'S$0.03' },
-      { name:'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub', inventoryItem:'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub', qty:'10', uom:'g', price:'S$19.60/kg', amount:'S$0.20' },
-      { name:'Cooking Oil', inventoryItem:'Cooking Oil', qty:'15', uom:'ml', price:'From S$2.50/L', amount:'S$0.04' }
+      { name:'Chicken Thigh Boneless', inventoryItem:'Chicken Thigh Boneless', qty:'250', uom:'g', price:'From $6.40/kg', amount:'$1.70' },
+      { name:'House BBQ Sauce', detail:'Sub-recipe', qty:'1', uom:'ptn', price:'$0.60/ptn', amount:'$0.60', availableGroups:['Chargrill Outlets'] },
+      { name:'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag', inventoryItem:'Fresh Peeled White Garlic Cloves Grade A 1kg Vacuum Sealed Bag', qty:'20', uom:'g', price:'$4.20/kg', amount:'$0.08' },
+      { name:'Dark Soy Sauce', inventoryItem:'Dark Soy Sauce', qty:'10', uom:'ml', price:'From $3.45/L', amount:'$0.03' },
+      { name:'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub', inventoryItem:'Smoked Sweet Paprika Powder Spanish Origin Premium Grade 500g Tub', qty:'10', uom:'g', price:'$19.60/kg', amount:'$0.20' },
+      { name:'Cooking Oil', inventoryItem:'Cooking Oil', qty:'15', uom:'ml', price:'From $2.50/L', amount:'$0.04' }
     ];
     function priceForRecipeUom(itemName, uom) {
       var options = INVENTORY_ITEM_SKUS[itemName] || [];
@@ -4099,7 +4364,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       var max = Math.max.apply(Math, values) * factor;
       var decimals = factor < 1 ? 4 : 2;
       var formatted = min.toFixed(decimals) + (max !== min ? '–' + max.toFixed(decimals) : '');
-      return 'From S$' + formatted;
+      return 'From $' + formatted;
     }
     function rowHtml(row, index) {
       var displayPrice = row.inventoryItem ? priceForRecipeUom(row.inventoryItem, row.uom) : String(row.price).replace(/\/[A-Za-z]+$/, '');
@@ -4126,7 +4391,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     document.getElementById('cookingTA').value = 'Marinate the chicken thigh with garlic, dark soy sauce and House BBQ Sauce for at least 30 minutes. Buying options resolve to those available at each group or outlet.\n\nSear in cooking oil over medium-high heat until caramelised and cooked through. Rest for 3 minutes, then serve one portion.';
     Object.keys(VAR_META).forEach(function(key) { if (key !== 'base') delete VAR_META[key]; });
     Object.keys(VAR_ASSIGNMENTS).forEach(function(key) { if (key !== 'base') delete VAR_ASSIGNMENTS[key]; });
-    VAR_META.base = { title:'Base recipe', cost:'S$2.46', costNum:2.46, retail:'16.90' };
+    VAR_META.base = { title:'Base recipe', cost:'$2.46', costNum:2.46, retail:'16.90' };
     VAR_KEY_ORDER.splice(0, VAR_KEY_ORDER.length, 'base');
     VERSIONS = [];
   }
@@ -4140,6 +4405,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       variationAssignments: VAR_ASSIGNMENTS,
       variationOrder: VAR_KEY_ORDER,
       variationTables: ING_TABLE_HTML_BY_VAR,
+      recipeCostAdjustments: recipeCostAdjustments,
       newVariationCount: newVariationCount,
       savedSubRecipe: savedSubRecipe
     };
@@ -4162,6 +4428,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     Object.keys(saved.variationAssignments || {}).forEach(function(key) { VAR_ASSIGNMENTS[key] = saved.variationAssignments[key] || []; });
     VAR_KEY_ORDER.splice.apply(VAR_KEY_ORDER, [0, VAR_KEY_ORDER.length].concat(saved.variationOrder.filter(function(key) { return VAR_META[key]; })));
     ING_TABLE_HTML_BY_VAR = saved.variationTables || ING_TABLE_HTML_BY_VAR;
+    recipeCostAdjustments = saved.recipeCostAdjustments || {};
     newVariationCount = Number(saved.newVariationCount) || 0;
     savedSubRecipe = !!saved.savedSubRecipe;
 
