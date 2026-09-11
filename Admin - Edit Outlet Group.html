@@ -1934,8 +1934,8 @@ function toggleIndividualSupplier(name) {
   renderIndividualOverviewItems();
 }
 
-// Inventory inherits every SKU that is available to this group or outlet. It
-// also contains the HQ inventory items, recipes and sub-recipes for the scope.
+// Every SKU creates an Inventory Item. SKUs remain buying options within those
+// items; recipes and stocktakes operate on the Inventory Item.
 const SCOPE_INVENTORY_ITEM_DEFINITIONS = [
   { name: 'Chicken Thigh Boneless', uom: 'kg', cost: 0, groups: ['Chargrill Outlets', 'Family Dining Express'], outlets: [], constituents: [
     { name: 'Kee Song Chilled Chicken Thigh Boneless Skinless 2kg', supplier: 'Kee Song Group', cost: 6.80, groups: ['Chargrill Outlets'], outlets: [] },
@@ -2000,35 +2000,49 @@ function scopeInventoryItemCost(definition, options) {
 }
 function scopeInventoryOptionIsAvailable(option) {
   const sourceIndex = ITEMS.findIndex(function(item) { return item.name === option.name; });
-  return sourceIndex < 0 ? true : !scopeInventorySkuIsUnavailable(ITEMS[sourceIndex], sourceIndex);
+  return sourceIndex < 0 ? true : !scopeSkuIsUnavailable(ITEMS[sourceIndex], sourceIndex);
 }
 function getScopeInventoryRecords() {
-  const skuRecords = ITEMS.map(function(item, index) {
-    if (inheritedHqItemLifecycle(item) === 'removed' || isExcludedByHq(item)) return null;
+  const inheritedItems = inheritedHqInventoryItems();
+  const mergedSkuNames = new Set(inheritedItems.filter(function(item) { return !item.autoIncluded && !item.mergedInto; }).reduce(function(names, item) {
+    return names.concat((item.constituents || []).map(function(option) { return option.name; }));
+  }, []));
+  const automaticInventoryItems = ITEMS.map(function(item, index) {
+    // A disabled or excluded SKU remains an Inventory Item: it may still have
+    // stock and be used in existing recipes.
+    if (inheritedHqItemLifecycle(item) === 'removed' || mergedSkuNames.has(item.name)) return null;
     const override = itemOverrides[index] || {};
     const uoms = Array.isArray(item.uom) ? item.uom : [item.uom];
     const price = override.price != null ? override.price : (Array.isArray(override.prices) && override.prices[0] != null ? override.prices[0] : item.price);
-    return { type: 'sku', name: override.customName || item.name, sourceName: item.name, supplier: supplierDisplayName(item.supplier), uom: uoms[0].replace(/^per\s+/i, ''), cost: '$' + Number(price).toFixed(2), unavailable: scopeInventorySkuIsUnavailable(item, index), sourceIndex: index };
+    if (!scopeUsesHqRecord({ groups:item.groupList || [], outlets:item.outletList || [] })) return null;
+    return {
+      type: 'item', name: override.customName || item.name, uom: uoms[0].replace(/^per\s+/i, ''),
+      cost: '$' + Number(price).toFixed(2), unavailable: scopeExcludedInventory.has(override.customName || item.name),
+      options: [{ name:item.name, supplier:item.supplier, cost:price, sourceIndex:index, groups:item.groupList || [], outlets:item.outletList || [] }]
+    };
   }).filter(Boolean);
-  const inventoryItems = inheritedHqInventoryItems().filter(scopeUsesHqRecord).map(function(definition) {
-    const options = (definition.constituents || []).filter(scopeUsesHqRecord).filter(scopeInventoryOptionIsAvailable);
-    return { type: 'item', name: definition.name, uom: definition.uom, cost: '$' + scopeInventoryItemCost(definition, options).toFixed(2), options: options, unavailable: scopeExcludedInventory.has(definition.name) };
-  });
+  const inventoryItems = inheritedItems.filter(scopeUsesHqRecord).map(function(definition) {
+    if (definition.autoIncluded) return null;
+    const options = (definition.constituents || []).filter(scopeUsesHqRecord);
+    const orderableOptions = options.filter(scopeInventoryOptionIsAvailable);
+    return { type: 'item', name: definition.name, uom: definition.uom, cost: '$' + scopeInventoryItemCost(definition, orderableOptions).toFixed(2), options: options, unavailable: scopeExcludedInventory.has(definition.name) };
+  }).filter(Boolean);
   const recipes = SCOPE_RECIPES.filter(scopeUsesHqRecord).map(function(recipe) {
     return { type: 'recipe', name: recipe.name, uom: recipe.uom, cost: '$' + Number(recipe.cost).toFixed(2), unavailable: scopeExcludedInventory.has(recipe.name) };
   });
   const subRecipes = SCOPE_SUB_RECIPES.filter(scopeUsesHqRecord).map(function(recipe) {
     return { type: 'sub-recipe', name: recipe.name, uom: recipe.uom, cost: '$' + Number(recipe.cost).toFixed(2), unavailable: scopeExcludedInventory.has(recipe.name) };
   });
-  return skuRecords.concat(inventoryItems, recipes, subRecipes);
+  return automaticInventoryItems.concat(inventoryItems, recipes, subRecipes);
 }
 function setScopeInventorySearch(value) { scopeInventorySearch = value || ''; scopeInventoryPage = 1; renderScopeInventory(); }
 function setScopeInventoryTypeFilter(value) { scopeInventoryTypeFilter = value || ''; scopeInventoryPage = 1; renderScopeInventory(); }
 function setInventoryStatusFilter(value) { inventoryStatusFilter = value || 'available'; scopeInventoryPage = 1; renderScopeInventory(); }
 function setScopeInventoryPage(page) { scopeInventoryPage = Math.max(1, page); renderScopeInventory(); }
 function toggleScopeInventoryExpand(name) { scopeInventoryExpanded.has(name) ? scopeInventoryExpanded.delete(name) : scopeInventoryExpanded.add(name); renderScopeInventory(); }
-function toggleInventoryExclusion(name) {
+function toggleInventoryExclusion(name, hasIncludedSku) {
   if (scopeExcludedInventory.has(name)) {
+    if (!hasIncludedSku) { openSkuAvailabilityInfo(); return; }
     scopeExcludedInventory.delete(name);
     showToast(window.isIndividualOutletPrototype ? 'Inventory item included in this outlet' : 'Inventory item included in this group');
     renderScopeInventory();
@@ -2089,18 +2103,17 @@ function renderScopeInventory() {
   const visibleRecords = records.slice((scopeInventoryPage - 1) * SCOPE_INVENTORY_PER_PAGE, scopeInventoryPage * SCOPE_INVENTORY_PER_PAGE);
   const availableCount = allRecords.filter(function(record) { return !record.unavailable; }).length;
   const rows = visibleRecords.map(function(record) {
-    const hasOptions = record.type === 'item' && record.options.length;
+    const optionCount = record.type === 'item' ? record.options.length : 0;
+    const hasOptions = record.type === 'item' && optionCount > 1;
     const isExpanded = hasOptions && scopeInventoryExpanded.has(record.name);
-    const metadata = record.type === 'sku' ? 'SKU · ' + record.supplier : record.type === 'item' ? 'Item · ' + (record.options.length ? record.options.length + ' option' + (record.options.length === 1 ? '' : 's') : 'No supplier options') : record.type === 'recipe' ? 'Recipe' : 'Sub-recipe';
+    const metadata = record.type === 'item'
+      ? (optionCount === 1 ? supplierDisplayName(record.options[0].supplier) : (optionCount ? optionCount + ' options' : 'No supplier options'))
+      : record.type === 'recipe' ? 'Recipe' : 'Sub-recipe';
     const metadataHtml = hasOptions
       ? '<button class="item-options-link" onclick="event.stopPropagation();toggleScopeInventoryExpand(\'' + record.name.replace(/'/g, "\\'") + '\')">' + metadata + ' <span class="item-options-chevron' + (isExpanded ? ' open' : '') + '"></span></button>'
       : '<div class="item-supplier-text item-options-static">' + metadata + '</div>';
-    const skuExcludedFromMarket = record.type === 'sku' && scopeSkuIsUnavailable(ITEMS[record.sourceIndex], record.sourceIndex);
-    const action = record.type === 'sku'
-      ? (record.unavailable && skuExcludedFromMarket
-        ? '<div class="row-action-item" onclick="event.stopPropagation();openSkuAvailabilityInfo()">Include in inventory</div>'
-        : '<div class="row-action-item' + (record.unavailable ? '' : ' danger') + '" onclick="event.stopPropagation();toggleInventorySkuExclusion(' + record.sourceIndex + ')">' + (record.unavailable ? 'Include in inventory' : 'Exclude from inventory') + '</div>')
-      : '<div class="row-action-item' + (record.unavailable ? '' : ' danger') + '" onclick="toggleInventoryExclusion(\'' + record.name.replace(/'/g, "\\'") + '\')">' + (record.unavailable ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div>';
+    const hasIncludedSku = record.type !== 'item' || record.options.some(function(option) { return option.sourceIndex == null || !scopeSkuIsUnavailable(ITEMS[option.sourceIndex], option.sourceIndex); });
+    const action = '<div class="row-action-item' + (record.unavailable ? '' : ' danger') + '" onclick="toggleInventoryExclusion(\'' + record.name.replace(/'/g, "\\'") + '\',' + hasIncludedSku + ')">' + (record.unavailable ? 'Include in ' + scopeLabel : 'Exclude from ' + scopeLabel) + '</div>';
     const parent = '<tr' + (record.unavailable ? ' class="ml-inactive"' : '') + '><td><div class="ml-item-name">' + record.name + '</div>' + metadataHtml + '</td><td>' + compactUom(record.uom) + '</td><td class="inventory-cost">' + record.cost + '</td><td><div class="row-actions-wrap"><button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button><div class="row-actions-menu">' + action + '</div></div></td></tr>';
     if (!isExpanded) return parent;
     const optionRows = record.options.map(function(option) {
@@ -2109,7 +2122,7 @@ function renderScopeInventory() {
     return parent + optionRows;
   }).join('');
   panel.innerHTML = '<div class="panel-label-row"><span class="panel-label-text">Inventory <span class="panel-label-count">' + availableCount + '</span></span></div>' +
-    '<div class="ml-filter-row"><div class="ml-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="ml-search-input" value="' + scopeInventorySearch.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" placeholder="Search inventory…" oninput="setScopeInventorySearch(this.value)" /></div><select class="ml-filter-select" onchange="setScopeInventoryTypeFilter(this.value)"><option value="">All types</option><option value="sku">SKU</option><option value="item">Item</option><option value="recipe">Recipe</option><option value="sub-recipe">Sub-recipe</option></select><select class="ml-filter-select" onchange="setInventoryStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
+    '<div class="ml-filter-row"><div class="ml-search-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="ml-search-input" value="' + scopeInventorySearch.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" placeholder="Search inventory…" oninput="setScopeInventorySearch(this.value)" /></div><select class="ml-filter-select" onchange="setScopeInventoryTypeFilter(this.value)"><option value="">All types</option><option value="item">Item</option><option value="recipe">Recipe</option><option value="sub-recipe">Sub-recipe</option></select><select class="ml-filter-select" onchange="setInventoryStatusFilter(this.value)"><option value="available">Available</option><option value="excluded">Excluded</option><option value="all">All statuses</option></select></div>' +
     '<table class="ml-table"><thead><tr><th>Item</th><th>UOM</th><th>Unit cost</th><th style="width:48px"></th></tr></thead><tbody>' + (rows || '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ink-mute)">No inventory records match these filters</td></tr>') + '</tbody></table>' + renderScopeInventoryPager(scopeInventoryPage, totalPages, records.length);
   const selects = panel.querySelectorAll('select');
   if (selects[0]) selects[0].value = scopeInventoryTypeFilter;
@@ -3212,11 +3225,18 @@ function closeItemEnableConfirm() {
   pendingItemIdx = null;
   document.getElementById('itemEnableConfirmOverlay').classList.remove('open');
 }
+function includeLinkedInventoryItem(rawIdx) {
+  var item = ITEMS[rawIdx];
+  if (!item) return;
+  var override = itemOverrides[rawIdx] || {};
+  scopeExcludedInventory.delete(override.customName || item.name);
+}
 function confirmItemEnable() {
   if (pendingItemIdx === null) return;
   scopeExcludedItems.delete(pendingItemIdx);
   individuallyDisabledItems.delete(pendingItemIdx);
   scopeExcludedInventorySkus.delete(pendingItemIdx);
+  includeLinkedInventoryItem(pendingItemIdx);
   closeItemEnableConfirm();
   showToast(window.isIndividualOutletPrototype ? 'SKU included in this outlet' : 'SKU included in this group');
   if (window.isIndividualOutletPrototype) renderIndividualOverviewItems(); else renderItems();
@@ -3235,7 +3255,7 @@ function itemSupBlockedEnableThisOnly() {
   ITEMS.forEach((item, i) => {
     if (item.supplier === supplierName && groupDisabledItems.has(i)) {
       groupDisabledItems.delete(i);
-      if (i === pendingItemIdx) scopeExcludedInventorySkus.delete(i);
+      if (i === pendingItemIdx) { scopeExcludedInventorySkus.delete(i); includeLinkedInventoryItem(i); }
       if (i !== pendingItemIdx) individuallyDisabledItems.add(i);
     }
   });
@@ -3250,7 +3270,7 @@ function itemSupBlockedEnableAll() {
   if (pendingItemIdx === null) return;
   const supplierName = ITEMS[pendingItemIdx].supplier;
   groupDisabledSuppliers.delete(supplierName);
-  ITEMS.forEach((item, i) => { if (item.supplier === supplierName) { groupDisabledItems.delete(i); scopeExcludedInventorySkus.delete(i); } });
+  ITEMS.forEach((item, i) => { if (item.supplier === supplierName) { groupDisabledItems.delete(i); scopeExcludedInventorySkus.delete(i); includeLinkedInventoryItem(i); } });
   const count = ITEMS.filter(item => item.supplier === supplierName).length;
   closeItemSupBlocked();
   renderSuppliers();

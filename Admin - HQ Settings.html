@@ -941,6 +941,15 @@ body.supplier-settings-open { overflow:hidden; }
 #groupSkuPickerOverlay > .modal-card > .modal-body > p:first-child { font-size:14px !important; }
 .inventory-inline-field { width:100%; height:38px; border:1px solid #dcdee3; border-radius:6px; padding:0 10px; background:#fff; color:var(--ink); font:inherit; font-size:14px; }
 .inventory-inline-field:focus { border-color:var(--nomni-green); outline:2px solid rgba(42,200,100,.18); }
+.merge-item-picker { position:relative; }
+.merge-item-picker .field-input { width:100%; }
+.merge-item-options { max-height:220px; margin-top:6px; overflow:auto; border:1px solid var(--rule); border-radius:6px; background:#fff; }
+.merge-item-option { width:100%; padding:10px 12px; border:0; border-bottom:1px solid var(--rule); background:#fff; color:var(--ink); font:inherit; font-size:14px; font-weight:500; text-align:left; cursor:pointer; }
+.merge-item-option:last-child { border-bottom:0; }
+.merge-item-option:hover, .merge-item-option.selected { background:var(--mint); color:var(--seaweed); }
+.merge-item-empty { padding:14px 12px; color:var(--ink-mute); font-size:13px; }
+#groupSkusChoiceOverlay .modal-header { border-bottom:0; padding-bottom:12px; }
+#groupSkusChoiceOverlay .modal-body { padding-top:0; }
 .inventory-conversion { display:flex; align-items:center; gap:7px; min-width:0; font-size:14px; }
 .inventory-conversion .inventory-inline-field { width:70px; flex:0 0 70px; }
 .inventory-flip { border:0; background:none; color:var(--spinach); font:inherit; font-size:12px; font-weight:600; padding:4px 0; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:5px; }
@@ -1976,7 +1985,6 @@ body.supplier-settings-open { overflow:hidden; }
         </div>
         <select class="ml-filter-select" id="invTypeFilter" onchange="setInvTypeFilter(this.value)">
           <option value="">All types</option>
-          <option value="sku">SKU</option>
           <option value="recipe">Recipe</option>
           <option value="sub-recipe">Sub-recipe</option>
           <option value="group">Item</option>
@@ -1989,7 +1997,7 @@ body.supplier-settings-open { overflow:hidden; }
           <option value="removed">Removed</option>
         </select>
       </div>
-      <div class="inventory-bulk-actions" id="inventoryBulkActions"><span class="inventory-bulk-count" id="inventoryBulkCount">0 selected</span><button type="button" class="inventory-bulk-btn" onclick="createInventoryItemFromSkus(Array.from(selectedInventoryIndices))">Create inventory item</button><button type="button" class="inventory-bulk-btn" onclick="openAddToExistingInventoryItem()">Add to existing item</button><button type="button" class="inventory-bulk-cancel" onclick="clearInventorySelection()">Cancel</button></div>
+      <div class="inventory-bulk-actions" id="inventoryBulkActions"><span class="inventory-bulk-count" id="inventoryBulkCount">0 selected</span><button type="button" class="inventory-bulk-btn" id="inventoryCombineBtn" onclick="createInventoryItemFromSkus(Array.from(selectedInventoryIndices))">Combine buying options</button><button type="button" class="inventory-bulk-cancel" onclick="clearInventorySelection()">Cancel</button></div>
       <div style="overflow:clip">
         <table class="ml-table">
           <thead>
@@ -2010,7 +2018,7 @@ body.supplier-settings-open { overflow:hidden; }
     <div class="tab-panel" id="panel-pos-mapping">
       <div class="panel-label-row">
         <span class="panel-label-text">POS mapping</span>
-        <a class="btn btn-primary" id="posHqCta" href="Admin - HQ - POS Mapping.html" onclick="if(!isPosConfigured()){event.preventDefault();openPosSettings();}else if(window.isNewHQ){event.preventDefault();window.location.href='Admin - HQ - POS Mapping.html?created-hq='+encodeURIComponent(document.querySelector('.page-title').textContent.trim());}" style="text-decoration:none">Open POS mapping</a>
+        <a class="btn btn-primary" id="posHqCta" href="Admin - HQ - POS Mapping.html" onclick="if(!isPosConfigured()){event.preventDefault();openPosSettings();}else if(window.isNewHQ){event.preventDefault();window.location.href='Admin - HQ - POS Mapping.html?created-hq='+encodeURIComponent(document.querySelector('.page-title').textContent.trim());}" style="text-decoration:none">Manage HQ mapping</a>
       </div>
       <div class="ml-filter-row" aria-label="Filter outlets for POS mapping">
         <div class="ml-search-wrap" style="min-width:260px">
@@ -2292,7 +2300,7 @@ function refreshNewHqEmptyStates() {
   }
 
   if (INV_ITEMS.length === 0) {
-    showNewHqEmptyState('panel-inventory', 'No SKUs or inventory items yet', 'SKUs added to the catalogue will appear here automatically.', {
+    showNewHqEmptyState('panel-inventory', 'No inventory items yet', 'SKUs added to the catalogue automatically create an inventory item.', {
       label: 'Create inventory item',
       onclick: 'openAddInvSkuModal()',
       disabled: ITEMS.length === 0,
@@ -5450,23 +5458,37 @@ function inventorySkuUom(item) {
 }
 
 function syncAutomaticInventorySkus() {
-  var nonSkuRecords = INV_ITEMS.filter(function(record) { return record.type !== 'sku'; });
-  var automaticSkuRecords = ITEMS.map(function(item, sourceItemIdx) {
+  // Every SKU owns an Inventory Item by default. When it is merged into another
+  // item, inventoryItemName points to the destination and prevents a duplicate.
+  var nonSkuRecords = INV_ITEMS.filter(function(record) { return record.type !== 'sku' && !record.mergedInto && !record.autoIncluded; });
+  var automaticItemRecords = ITEMS.map(function(item, sourceItemIdx) {
+    if (item.inventoryItemName) return null;
     ensureItemAccessState(sourceItemIdx);
     return {
-      type: 'sku',
+      type: 'group',
       autoIncluded: true,
       sourceItemIdx: sourceItemIdx,
       name: item.name,
-      detail: item.supplier,
+      detail: '1 option',
       uom: inventorySkuUom(item),
-      cost: item.price,
-      active: itemLifecycle(item) === 'active',
+      cost: null,
+      // Disabling a SKU affects its buying option, not the inventory item.
+      active: true,
       groups: (item.groupList || []).slice(),
-      outlets: (item.outletList || []).slice()
+      outlets: (item.outletList || []).slice(),
+      constituents: [{
+        name: item.name,
+        supplier: item.supplier,
+        cost: item.price,
+        uom: inventorySkuUom(item),
+        groups: (item.groupList || []).slice(),
+        outlets: (item.outletList || []).slice(),
+        sourceItemIdx: sourceItemIdx,
+        active: itemLifecycle(item) === 'active'
+      }]
     };
-  });
-  INV_ITEMS.splice.apply(INV_ITEMS, [0, INV_ITEMS.length].concat(automaticSkuRecords, nonSkuRecords));
+  }).filter(Boolean);
+  INV_ITEMS.splice.apply(INV_ITEMS, [0, INV_ITEMS.length].concat(automaticItemRecords, nonSkuRecords));
 }
 
 const HQ_INVENTORY_STATE_KEY = 'nomni-hq-inventory-state-v1';
@@ -5486,6 +5508,11 @@ function loadHqInventoryState() {
         if (!Array.isArray(upgraded.outlets) && baseConstituent && Array.isArray(baseConstituent.outlets)) upgraded.outlets = baseConstituent.outlets.slice();
         return upgraded;
       }) });
+      // Retain the one-SKU-to-one-Item mapping after a refresh. This is set
+      // when an automatically-created item is merged into another item.
+      if (!entry.autoIncluded) entry.constituents.forEach(function(option) {
+        if (Number.isInteger(option.sourceItemIdx) && ITEMS[option.sourceItemIdx]) ITEMS[option.sourceItemIdx].inventoryItemName = entry.name;
+      });
     }
     if (idx > -1) Object.assign(INV_ITEMS[idx], entry);
     else INV_ITEMS.push(entry);
@@ -5550,61 +5577,112 @@ function updateInventoryBulkActions() {
   if (!bar || !count) return;
   var n = selectedInventoryIndices.size;
   bar.classList.toggle('is-visible', n > 0);
+  var combineBtn = document.getElementById('inventoryCombineBtn');
+  if (combineBtn) { combineBtn.hidden = n < 2; combineBtn.disabled = n < 2; }
   var filter = document.querySelector('#panel-inventory .ml-filter-row');
   if (filter) filter.style.display = n ? 'none' : '';
   count.textContent = n + (n === 1 ? ' item selected' : ' items selected');
 }
 var pendingGroupSkuSourceIndices = [];
+var pendingCombinedSourceIndices = [];
+var mergeDestinationItems = [];
+var mergeDestinationIndex = -1;
+var mergeDestinationSearch = '';
 function groupSkuSources(indices) {
-  return (indices || []).map(function(idx) { return INV_ITEMS[idx]; }).filter(function(item) { return item && item.type === 'sku'; });
+  return (indices || []).map(function(idx) { return INV_ITEMS[idx]; }).filter(function(item) { return item && item.type === 'group'; });
 }
 function openAddToExistingInventoryItem(starterIndex) {
   var sourceIndices = Number.isInteger(starterIndex) ? [starterIndex] : Array.from(selectedInventoryIndices);
   var sources = groupSkuSources(sourceIndices);
   if (!sources.length) return;
   pendingGroupSkuSourceIndices = sourceIndices;
-  document.getElementById('groupSkusChoiceTitle').textContent = 'Add to existing inventory item';
+  document.getElementById('groupSkusChoiceTitle').textContent = 'Merge with another inventory item';
   document.getElementById('groupSkusChoiceCopy').textContent = sources.length === 1
-    ? 'Choose the inventory item that should include this SKU.'
-    : 'Choose the inventory item that should include these SKUs.';
-  var existing = INV_ITEMS.filter(function(item) { return item.type === 'group'; }).sort(function(a, b) { return a.name.localeCompare(b.name); });
-  document.getElementById('groupSkusExistingSelect').innerHTML = existing.map(function(item) {
-    return '<option value="' + INV_ITEMS.indexOf(item) + '">' + hqSettingsEscape(item.name) + '</option>';
-  }).join('');
+    ? 'Move this item’s buying options into an existing inventory item for the same product. This lets you track options from different suppliers against one stock balance.'
+    : 'Move these items’ buying options into an existing inventory item for the same product. This lets you track options from different suppliers against one stock balance.';
+  var sourceSet = new Set(sources);
+  mergeDestinationItems = INV_ITEMS.filter(function(item) { return item.type === 'group' && !sourceSet.has(item); }).sort(function(a, b) { return a.name.localeCompare(b.name); });
+  mergeDestinationIndex = -1;
+  mergeDestinationSearch = '';
+  var search = document.getElementById('groupSkusExistingSearch');
+  search.value = '';
+  renderMergeDestinationList();
+  document.getElementById('groupSkusChoiceConfirm').disabled = !mergeDestinationItems.length;
   document.getElementById('groupSkusChoiceOverlay').classList.add('open');
+  setTimeout(function() { search.focus(); }, 0);
 }
 function closeGroupSkusChoice() {
   document.getElementById('groupSkusChoiceOverlay').classList.remove('open');
   pendingGroupSkuSourceIndices = [];
+  mergeDestinationItems = [];
+  mergeDestinationIndex = -1;
+}
+function setMergeDestinationSearch(value) {
+  mergeDestinationSearch = value || '';
+  renderMergeDestinationList();
+}
+function chooseMergeDestination(index) {
+  mergeDestinationIndex = index;
+  var item = INV_ITEMS[index];
+  var search = document.getElementById('groupSkusExistingSearch');
+  if (item && search) search.value = item.name;
+  renderMergeDestinationList();
+  document.getElementById('groupSkusChoiceConfirm').disabled = false;
+}
+function renderMergeDestinationList() {
+  var list = document.getElementById('groupSkusExistingList');
+  if (!list) return;
+  var query = mergeDestinationSearch.trim().toLowerCase();
+  var matches = mergeDestinationItems.filter(function(item) { return !query || item.name.toLowerCase().indexOf(query) > -1; });
+  list.innerHTML = matches.length ? matches.map(function(item) {
+    var index = INV_ITEMS.indexOf(item);
+    return '<button type="button" class="merge-item-option' + (index === mergeDestinationIndex ? ' selected' : '') + '" onclick="chooseMergeDestination(' + index + ')">' + hqSettingsEscape(item.name) + '</button>';
+  }).join('') : '<div class="merge-item-empty">No inventory items match your search.</div>';
 }
 function createInventoryItemFromSkus(sourceIndices) {
   var selectedItems = groupSkuSources(sourceIndices);
-  if (!selectedItems.length) return;
+  if (selectedItems.length < 2) return;
   openGroupSkuModal();
-  groupSkuDraft.items = selectedItems.map(function(item) {
-    return { name: item.name, supplier: item.detail, cost: item.cost, uom: item.uom, groups: (item.groups || []).slice(), outlets: (item.outlets || []).slice(), active: item.active !== false, conversion: 1, conversionFlipped: false };
+  pendingCombinedSourceIndices = sourceIndices.slice();
+  var optionNames = new Set();
+  groupSkuDraft.items = selectedItems.reduce(function(options, item) {
+    return options.concat((item.constituents || []).map(function(option) {
+      return Object.assign({}, option, { conversion: option.conversion || 1, conversionFlipped: !!option.conversionFlipped });
+    }));
+  }, []).filter(function(option) {
+    if (optionNames.has(option.name)) return false;
+    optionNames.add(option.name);
+    return true;
   });
-  var selectedUoms = selectedItems.map(function(item) { return normaliseGroupSkuUom(item.uom); }).filter(function(value, index, values) { return values.indexOf(value) === index; });
+  var selectedUoms = groupSkuDraft.items.map(function(item) { return normaliseGroupSkuUom(item.uom); }).filter(function(value, index, values) { return values.indexOf(value) === index; });
   var uomField = document.getElementById('groupSkuUom');
   if (selectedUoms.length === 1) {
     var matchingOption = Array.from(uomField.options).find(function(option) { return normaliseGroupSkuUom(option.value) === selectedUoms[0]; });
-    uomField.value = matchingOption ? matchingOption.value : selectedItems[0].uom;
+    uomField.value = matchingOption ? matchingOption.value : groupSkuDraft.items[0].uom;
   } else {
     uomField.value = '';
   }
+  document.getElementById('groupSkuModalTitle').textContent = 'Combine buying options';
+  document.getElementById('groupSkuSaveBtn').textContent = 'Combine';
   renderGroupSkuContent();
   updateGroupSkuSaveState();
 }
 function addToExistingInventoryItem() {
-  var select = document.getElementById('groupSkusExistingSelect');
-  var targetIndex = Number(select.value);
-  var target = INV_ITEMS[targetIndex];
+  var target = INV_ITEMS[mergeDestinationIndex];
   var sources = groupSkuSources(pendingGroupSkuSourceIndices);
   if (!target || target.type !== 'group' || !sources.length) return;
   target.constituents = target.constituents || [];
+  // An automatically-created destination becomes a durable item once it has
+  // more than its original SKU option.
+  target.autoIncluded = false;
+  if (Number.isInteger(target.sourceItemIdx) && ITEMS[target.sourceItemIdx]) ITEMS[target.sourceItemIdx].inventoryItemName = target.name;
   sources.forEach(function(source) {
-    if (target.constituents.some(function(option) { return option.name === source.name; })) return;
-    target.constituents.push({ name: source.name, supplier: source.detail, cost: source.cost, uom: source.uom, groups: (source.groups || []).slice(), outlets: (source.outlets || []).slice(), active: source.active !== false, conversion: 1, conversionFlipped: false });
+    (source.constituents || []).forEach(function(option) {
+      if (target.constituents.some(function(candidate) { return candidate.name === option.name; })) return;
+      target.constituents.push(Object.assign({}, option, { conversion: option.conversion || 1, conversionFlipped: !!option.conversionFlipped }));
+      if (Number.isInteger(option.sourceItemIdx) && ITEMS[option.sourceItemIdx]) ITEMS[option.sourceItemIdx].inventoryItemName = target.name;
+    });
+    source.mergedInto = target.name;
   });
   target.detail = target.constituents.length + ' option' + (target.constituents.length === 1 ? '' : 's');
   target.groups = Array.from(new Set(target.constituents.reduce(function(all, option) { return all.concat(option.groups || []); }, [])));
@@ -5613,7 +5691,7 @@ function addToExistingInventoryItem() {
   selectedInventoryIndices.clear();
   saveHqInventoryState();
   renderInv();
-  showHqToast('SKUs grouped', 'Added to ' + target.name + '.');
+  showHqToast('Buying options combined', 'SKU options moved to ' + target.name + '.');
 }
 function toggleInvAddMenu(e) {
   e.stopPropagation();
@@ -6667,8 +6745,11 @@ function renderInv() {
       : (lifecycle === 'disabled' ? '<span style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:#F0F0F2;color:#555;margin-left:6px">Disabled</span>' : '');
 
 
+    var optionCount = r.type === 'group' ? (r.constituents || []).length : 0;
     var detail = r.type === 'group'
-      ? 'Item' + ((r.constituents || []).length ? ' · ' + (r.constituents || []).length + ' option' + ((r.constituents || []).length === 1 ? '' : 's') : ' · No supplier options')
+      ? (optionCount === 1
+        ? supplierDisplayName(r.constituents[0].supplier)
+        : (optionCount ? optionCount + ' option' + (optionCount === 1 ? '' : 's') : 'No supplier options'))
       : (r.type === 'sku'
         ? ('SKU' + (r.detail ? ' · ' + supplierDisplayName(r.detail) : ''))
         : (r.type === 'sub-recipe' ? 'Sub-recipe' : 'Recipe'));
@@ -6686,7 +6767,7 @@ function renderInv() {
       ? '<button class="ml-options-link' + (invUomExpanded.has(globalIdx) ? ' is-open' : '') + '" onclick="toggleInvUoms(' + globalIdx + ',event)">' + r.inventoryUoms.length + ' options<span class="ml-options-chevron"></span></button>'
       : compactUom(r.uom);
     var parentGrpHtml = hasUomVariations ? '' : grpHtml;
-    var selectHtml = r.type !== 'sku'
+    var selectHtml = r.type !== 'group'
       ? '<td class="inventory-select-cell"></td>'
       : '<td class="inventory-select-cell" onclick="event.stopPropagation()"><input type="checkbox" class="inventory-select-checkbox" aria-label="Select ' + escapeItemDisplayText(inventoryDisplayName(r)).replace(/"/g, '&quot;') + '"' + (selectedInventoryIndices.has(globalIdx) ? ' checked' : '') + ' onchange="toggleInventorySelection(' + globalIdx + ', this.checked)" /></td>';
 
@@ -6697,7 +6778,7 @@ function renderInv() {
           '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">' +
             '<span style="font-size:14px;font-weight:500;color:var(--ink)">' + escapeItemDisplayText(inventoryDisplayName(r)) + lifecycleBadge + '</span>' +
           '</div>' +
-          (detail ? (r.type === 'group' && (r.constituents || []).length
+          (detail ? (r.type === 'group' && optionCount > 1
             ? '<button onclick="event.stopPropagation();toggleInvExpand(' + globalIdx + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;font-weight:600;color:var(--spinach);cursor:pointer;display:inline-flex;align-items:center;gap:3px;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + detail + '<svg style="transition:transform .15s;transform:' + (invExpanded.has(globalIdx) ? 'rotate(180deg)' : '') + '" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>'
             : '<div style="font-size:12px;color:var(--ink-mute)">' + detail + '</div>') : '') +
         '</div></div>' +
@@ -6708,7 +6789,7 @@ function renderInv() {
         '<div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button>' +
           '<div class="row-actions-menu inventory-actions-menu">' +
           '<div class="row-action-item" onclick="event.stopPropagation();' + (r.type === 'group' ? 'openGroupSkuModal(' + globalIdx + ')' : 'openHqInventorySettings(' + globalIdx + ')') + '">Edit</div>' +
-          (r.type === 'sku' ? '<div class="row-action-item" onclick="event.stopPropagation();createInventoryItemFromSkus([' + globalIdx + '])">Create inventory item</div><div class="row-action-item" onclick="event.stopPropagation();openAddToExistingInventoryItem(' + globalIdx + ')">Add to existing item</div>' : '') +
+          (r.type === 'group' ? '<div class="row-action-item" onclick="event.stopPropagation();openAddToExistingInventoryItem(' + globalIdx + ')">Merge with another item&hellip;</div>' : '') +
           '<div class="row-action-item" onclick="event.stopPropagation();toggleInventoryLifecycle(' + globalIdx + ')">' + (lifecycle === 'removed' ? 'Restore' : (lifecycle === 'active' ? 'Disable' : 'Enable')) + '</div>' +
           '<div class="row-action-item danger" onclick="event.stopPropagation();' + (r.type === 'group' ? 'requestDeleteGroupSku(' + globalIdx + ')' : 'toggleInventoryLifecycle(' + globalIdx + ')') + '">' + (r.type === 'group' ? 'Delete' : 'Remove') + '</div>' +
         '</div></div>' +
@@ -6726,7 +6807,6 @@ function renderInv() {
             '<div style="font-size:12px;color:var(--ink-mute)">SKU · ' + supplierDisplayName(c.supplier) + '</div>' +
           '</td>' +
           '<td style="' + td + 'font-size: 14px;color:var(--ink-mute)">' + compactUom(r.uom) + '</td>' +
-          '<td style="' + td + 'font-size:14px;color:var(--ink)">S$' + Number(c.cost || 0).toFixed(2) + '</td>' +
           '<td style="' + td + '"><button onclick="event.stopPropagation();openGroupSkuConstituentAvailability(' + globalIdx + ',' + constituentIndex + ')" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + cLabel + '</button></td><td style="' + td + '"></td>' +
         '</tr>');
       });
@@ -6785,11 +6865,11 @@ function openGroupSkuModal(editIndex, starterIndex) {
     cost: existing && existing.cost != null ? existing.cost : '',
     par: existing && existing.par != null ? existing.par : '',
     items: existing && existing.constituents ? existing.constituents.map(function(c){
-      var source = INV_ITEMS.find(function(item) { return item.type === 'sku' && item.name === c.name; });
+      var source = Number.isInteger(c.sourceItemIdx) ? ITEMS[c.sourceItemIdx] : ITEMS.find(function(item) { return item.name === c.name; });
       return Object.assign({
         uom: existing.uom,
-        groups: source ? (source.groups || []).slice() : (c.groups || (existing.groups || [])).slice(),
-        outlets: source ? (source.outlets || []).slice() : (c.outlets || (existing.outlets || [])).slice()
+        groups: source ? (source.groupList || c.groups || []).slice() : (c.groups || (existing.groups || [])).slice(),
+        outlets: source ? (source.outletList || c.outlets || []).slice() : (c.outlets || (existing.outlets || [])).slice()
       }, c);
     }) : (starter && starter.type === 'sku' ? [{ name: starter.name, supplier: starter.detail, cost: starter.cost, uom: starter.uom, groups: (starter.groups || []).slice(), outlets: (starter.outlets || []).slice(), active: starter.active !== false }] : [])
   };
@@ -6806,6 +6886,7 @@ function openGroupSkuModal(editIndex, starterIndex) {
 function closeGroupSkuModal() {
   document.getElementById('groupSkuOverlay').classList.remove('open');
   groupSkuDraft = null;
+  pendingCombinedSourceIndices = [];
 }
 function groupSkuContentChecked() {
   return Array.from(document.querySelectorAll('#groupSkuContentBody [data-group-content-check]:checked')).map(function(el){ return el.dataset.groupContentCheck; });
@@ -6827,10 +6908,13 @@ function renderGroupSkuContent() {
     if (table) table.style.display = '';
     body.innerHTML = groupSkuDraft.items.map(function(item) {
       var needsConversion = !!targetUom && normaliseGroupSkuUom(item.uom) !== normaliseGroupSkuUom(targetUom);
+      var source = Number.isInteger(item.sourceItemIdx) ? ITEMS[item.sourceItemIdx] : ITEMS.find(function(candidate) { return candidate.name === item.name; });
+      var skuDisabled = item.active === false || (source && itemLifecycle(source) !== 'active');
+      var optionStatus = skuDisabled ? '<span style="display:inline-flex;align-items:center;margin-left:6px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 6px;background:#F0F0F2;color:#555">Disabled</span>' : '';
       var conversion = showConversion ? '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + (needsConversion ? '<div class="inventory-conversion"><span>1 ' + hqSettingsEscape(item.conversionFlipped ? item.uom : targetUom) + '</span><span>=</span><input class="inventory-inline-field" type="number" min="0.001" step="any" value="' + (item.conversion || 1) + '" onchange="updateGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\',this.value)" /><span>' + hqSettingsEscape(item.conversionFlipped ? targetUom : item.uom) + '</span><button class="inventory-flip" type="button" onclick="flipGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\')"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>Flip units</button></div>' : '<span class="inventory-not-required">Not required</span>') + '</td>' : '';
       return '<tr>' +
         '<td style="padding:12px 10px 12px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" data-group-content-check="' + hqSettingsEscape(item.name) + '" onchange="updateGroupSkuDeleteVisibility()" style="margin-top:3px" />' +
-          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</span></span></label></td>' +
+          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:flex;align-items:center;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + optionStatus + '</span></span></label></td>' +
         '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' + conversion +
       '</tr>';
     }).join('');
@@ -6896,14 +6980,14 @@ function closeGroupSkuPicker() {
 function renderGroupSkuPickerSupplierOptions() {
   var select = document.getElementById('groupSkuPickerSupplier');
   var used = groupSkuUsedNames();
-  var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'sku' && !used.has(i.name); }).map(function(i){ return i.detail; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
+  var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'group' && i.autoIncluded && !used.has(i.name); }).map(function(i){ return i.constituents && i.constituents[0] ? i.constituents[0].supplier : ''; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
   select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(s){ return '<option value="' + hqSettingsEscape(s) + '">' + supplierDisplayName(s) + '</option>'; }).join('');
 }
 function setGroupSkuPickerSearch(v) { groupSkuPickerSearch = v; renderGroupSkuPickerList(); }
 function setGroupSkuPickerSupplier(v) { groupSkuPickerSupplier = v; renderGroupSkuPickerList(); }
 function groupSkuUsedNames() {
   var used = new Set();
-  INV_ITEMS.forEach(function(item, idx) { if (item.type === 'group' && item.constituents && idx !== groupSkuDraft.editIndex) item.constituents.forEach(function(c){ used.add(c.name); }); });
+  INV_ITEMS.forEach(function(item, idx) { if (item.type === 'group' && !item.autoIncluded && item.constituents && idx !== groupSkuDraft.editIndex) item.constituents.forEach(function(c){ used.add(c.name); }); });
   (groupSkuDraft.items || []).forEach(function(item) { used.add(item.name); });
   return used;
 }
@@ -6933,9 +7017,11 @@ function renderGroupSkuPickerList() {
   var used = groupSkuUsedNames();
   var q = groupSkuPickerSearch.toLowerCase();
   var candidates = INV_ITEMS.filter(function(item) {
-    if (item.type !== 'sku') return false;
+    if (item.type !== 'group' || !item.autoIncluded) return false;
     if (used.has(item.name)) return false;
-    if (groupSkuPickerSupplier && item.detail !== groupSkuPickerSupplier) return false;
+    var option = item.constituents && item.constituents[0];
+    if (!option) return false;
+    if (groupSkuPickerSupplier && option.supplier !== groupSkuPickerSupplier) return false;
     if (q && item.name.toLowerCase().indexOf(q) === -1) return false;
     return true;
   });
@@ -6958,7 +7044,7 @@ function renderGroupSkuPickerList() {
       var checked = groupSkuPickerSelected.has(item.name);
       return '<tr>' +
         '<td style="padding:10px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleGroupSkuPickerItem(\'' + item.name.replace(/'/g,"\\'") + '\',this.checked)" style="margin-top:3px" />' +
-          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.detail) + '</span></span></label></td>' +
+          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.constituents[0].supplier) + '</span></span></label></td>' +
         '<td style="padding:10px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' +
       '</tr>';
     }).join('');
@@ -6975,12 +7061,13 @@ function toggleGroupSkuPickerItem(name, checked) {
   renderGroupSkuPickerList();
 }
 function confirmGroupSkuPicker() {
-  var chosen = INV_ITEMS.filter(function(item) { return groupSkuPickerSelected.has(item.name); });
+  var chosen = INV_ITEMS.filter(function(item) { return item.type === 'group' && item.autoIncluded && groupSkuPickerSelected.has(item.name); });
   if (!chosen.length) return;
   var targetUom = groupSkuPickerTargetUom() || chosen[0].uom;
   chosen.forEach(function(item) {
     var cfg = groupSkuPickerConversions[item.name] || { conversion: 1, flipped: false };
-    groupSkuDraft.items.push({ name: item.name, supplier: item.detail, cost: item.cost, uom: item.uom, inventoryUom: targetUom, conversion: cfg.conversion, conversionFlipped: cfg.flipped, groups: (item.groups || []).slice(), outlets: (item.outlets || []).slice(), active: item.active !== false });
+    var option = item.constituents[0];
+    groupSkuDraft.items.push(Object.assign({}, option, { inventoryUom: targetUom, conversion: cfg.conversion, conversionFlipped: cfg.flipped }));
   });
   if (!document.getElementById('groupSkuUom').value.trim() && chosen[0]) document.getElementById('groupSkuUom').value = targetUom;
   closeGroupSkuPicker();
@@ -7009,6 +7096,13 @@ function saveGroupSku() {
     outlets: outletAvailability,
     par: par, constituents: groupSkuDraft.items.slice()
   };
+  entry.constituents.forEach(function(option) {
+    if (Number.isInteger(option.sourceItemIdx) && ITEMS[option.sourceItemIdx]) ITEMS[option.sourceItemIdx].inventoryItemName = name;
+  });
+  if (pendingCombinedSourceIndices.length && groupSkuDraft.editIndex === -1) {
+    groupSkuSources(pendingCombinedSourceIndices).forEach(function(source) { source.mergedInto = name; });
+    pendingCombinedSourceIndices = [];
+  }
   if (groupSkuDraft.editIndex > -1) {
     INV_ITEMS[groupSkuDraft.editIndex] = entry;
     showHqToast('Inventory item updated', name + ' has been updated.');
@@ -8602,7 +8696,7 @@ var posMappingTargetType = 'inventory';
 var posSetupOutlet = null;
 function configuredPosOutlets(){ try{return JSON.parse(localStorage.getItem('nomniPosConfiguredOutlets')||'[]');}catch(e){return[];} }
 function isOutletPosConfigured(name){ return configuredPosOutlets().indexOf(name)>=0; }
-function refreshPosHqCta(){ var cta=document.getElementById('posHqCta'); if(cta) cta.textContent=isPosConfigured()?'Open POS mapping':'Set up POS for HQ'; }
+function refreshPosHqCta(){ var cta=document.getElementById('posHqCta'); if(cta) cta.textContent=isPosConfigured()?'Manage HQ mapping':'Set up POS for HQ'; }
 
 function posKey(productId, variantId) { return productId + ':' + (variantId || 'product'); }
 function isPosConfigured() { return !window.isNewHQ || !!(localStorage.getItem('nomniPosApiKey') && localStorage.getItem('nomniPosLocationId')); }
@@ -8640,8 +8734,10 @@ function openPosSettings(outletName) {
   posSetupOutlet = outletName || null;
   document.getElementById('posApiKey').value = localStorage.getItem('nomniPosApiKey') || '';
   document.getElementById('posLocationId').value = localStorage.getItem('nomniPosLocationId') || '';
+  document.getElementById('posApiKeyField').style.display = posSetupOutlet ? 'none' : '';
+  document.getElementById('posSettingsIntro').textContent = posSetupOutlet ? 'Connect this Nomni POS outlet to load its products and variants for mapping.' : 'Connect a Nomni POS location to load its products and variants for mapping.';
   document.getElementById('posSettingsOverlay').classList.add('open');
-  setTimeout(function(){ document.getElementById('posApiKey').focus(); }, 0);
+  setTimeout(function(){ document.getElementById(posSetupOutlet ? 'posLocationId' : 'posApiKey').focus(); }, 0);
 }
 if (new URLSearchParams(window.location.search).get('posSetup')) {
   setTimeout(function() { openPosSettings(new URLSearchParams(window.location.search).get('posSetup')); }, 0);
@@ -8652,13 +8748,15 @@ function savePosSettings() {
   var locationId = document.getElementById('posLocationId').value.trim();
   var error = document.getElementById('posApiKeyError');
   var locationError = document.getElementById('posLocationIdError');
-  if (!key || !locationId) { error.style.display = key ? 'none' : 'block'; locationError.style.display = locationId ? 'none' : 'block'; return; }
+  if ((!posSetupOutlet && !key) || !locationId) { error.style.display = (!posSetupOutlet && !key) ? 'block' : 'none'; locationError.style.display = locationId ? 'none' : 'block'; return; }
   error.style.display = 'none';
   locationError.style.display = 'none';
-  localStorage.setItem('nomniPosApiKey', key);
   localStorage.setItem('nomniPosLocationId', locationId);
-  localStorage.setItem('nomniHqPosApiKey', key);
-  if (!posSetupOutlet) localStorage.setItem('nomniPosHqConfigured', '1');
+  if (!posSetupOutlet) {
+    localStorage.setItem('nomniPosApiKey', key);
+    localStorage.setItem('nomniHqPosApiKey', key);
+    localStorage.setItem('nomniPosHqConfigured', '1');
+  }
   if (posSetupOutlet) { var configured = configuredPosOutlets(); if (configured.indexOf(posSetupOutlet)<0) configured.push(posSetupOutlet); localStorage.setItem('nomniPosConfiguredOutlets', JSON.stringify(configured)); }
   closePosSettings(); renderPosMappingState();
   refreshStaticPosOutletRows();
@@ -9098,8 +9196,8 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
   <div class="modal-card" style="width:500px">
     <div class="modal-header"><h2 class="modal-title">Nomni POS settings</h2><button class="modal-close" onclick="closePosSettings()" aria-label="Close">×</button></div>
     <div class="modal-body" style="gap:14px">
-      <div class="modal-warning modal-info" style="margin:0"><span class="material-symbols-rounded">info</span><span>Connect a Nomni POS location to load its products and variants for mapping.</span></div>
-      <div><label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">API key</label><input id="posApiKey" type="password" placeholder="Enter Nomni POS API key" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit" oninput="document.getElementById('posApiKeyError').style.display='none'" /><div id="posApiKeyError" style="display:none;color:#D0291E;font-size:12px;margin-top:6px">Enter an API key to continue.</div></div>
+      <div class="modal-warning modal-info" style="margin:0"><span class="material-symbols-rounded">info</span><span id="posSettingsIntro">Connect a Nomni POS location to load its products and variants for mapping.</span></div>
+      <div id="posApiKeyField"><label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">API key</label><input id="posApiKey" type="password" placeholder="Enter Nomni POS API key" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit" oninput="document.getElementById('posApiKeyError').style.display='none'" /><div id="posApiKeyError" style="display:none;color:#D0291E;font-size:12px;margin-top:6px">Enter an API key to continue.</div></div>
       <div><label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">Location ID</label><input id="posLocationId" type="text" placeholder="Enter Nomni POS Location ID" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #dcdee3;border-radius:6px;font:inherit" oninput="document.getElementById('posLocationIdError').style.display='none'" /><div id="posLocationIdError" style="display:none;color:#D0291E;font-size:12px;margin-top:6px">Enter a Location ID to continue.</div></div>
     </div>
     <div class="modal-foot"><button class="modal-cancel" onclick="closePosSettings()">Cancel</button><button class="btn btn-primary" onclick="savePosSettings()">Save &amp; connect</button></div>
@@ -9158,8 +9256,8 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
 <div class="modal-overlay" id="groupSkusChoiceOverlay" onclick="if(event.target===this)closeGroupSkusChoice()">
   <div class="modal-card" style="width:520px">
     <div class="modal-header"><h2 class="modal-title" id="groupSkusChoiceTitle">Add to existing inventory item</h2><button class="modal-close" onclick="closeGroupSkusChoice()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
-    <div class="modal-body" style="gap:18px"><p id="groupSkusChoiceCopy" style="margin:0;color:var(--ink-mute);font-size:14px">Choose the inventory item that should include these SKUs.</p><div><label class="field-label" for="groupSkusExistingSelect">Inventory item</label><select class="field-input" id="groupSkusExistingSelect"></select></div></div>
-    <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkusChoice()">Cancel</button><button type="button" class="btn btn-primary" onclick="addToExistingInventoryItem()">Add SKUs</button></div>
+    <div class="modal-body" style="gap:18px"><p id="groupSkusChoiceCopy" style="margin:0;color:var(--ink-mute);font-size:14px">Move this item&rsquo;s buying options into an existing inventory item for the same product. This lets you track options from different suppliers against one stock balance.</p><div><label class="field-label" for="groupSkusExistingSearch">Inventory item</label><div class="merge-item-picker"><input class="field-input" id="groupSkusExistingSearch" type="search" autocomplete="off" placeholder="Search inventory items" oninput="setMergeDestinationSearch(this.value)" /><div class="merge-item-options" id="groupSkusExistingList"></div></div></div></div>
+    <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkusChoice()">Cancel</button><button type="button" class="btn btn-primary" id="groupSkusChoiceConfirm" onclick="addToExistingInventoryItem()" disabled>Merge with item</button></div>
   </div>
 </div>
 <div class="confirm-overlay" id="groupSkuContentDeleteOverlay" onclick="if(event.target===this)closeGroupSkuContentDelete()">
