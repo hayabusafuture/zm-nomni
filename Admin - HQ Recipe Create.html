@@ -968,11 +968,6 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 
         <!-- Ingredients panel -->
         <div class="tab-panel active" id="panelIngredients">
-          <!-- Context bar shown when viewing a variation -->
-          <div class="var-context-bar" id="varContextBar">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
-            Viewing variation for <strong style="margin:0 2px">Family Dining Express</strong> — substituted ingredients are highlighted
-          </div>
           <div id="ingredientCostingNote" style="display:none;margin:4px 0 0;padding:10px 15px;border:1px solid var(--context-border);border-radius:8px;background:var(--context-bg);color:var(--context-ink);font-size:13px;line-height:1.4;text-align:center"></div>
           <table class="ing-table">
             <thead>
@@ -1449,17 +1444,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
         </div>
       </div>
       <!-- Snapshot content -->
-      <div style="display:flex;gap:10px;margin-bottom:16px">
-        <div style="flex:1;background:#f9fafb;border:1px solid var(--rule);border-radius:8px;padding:14px 16px">
-          <div id="previewMeasureLabel" style="font-size:11px;font-weight:600;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Portion</div>
-          <div id="previewPortion" style="font-size:15px;font-weight:600">—</div>
-        </div>
-        <div style="flex:1;background:#f9fafb;border:1px solid var(--rule);border-radius:8px;padding:14px 16px">
-          <div style="font-size:11px;font-weight:600;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Recipe cost</div>
-          <div id="previewCost" style="font-size:15px;font-weight:600">—</div>
-        </div>
-      </div>
-      <p style="margin:0 0 14px;font-size: 14px;color:var(--ink-mute)">Recipe cost is based on ingredient prices at the time this version was saved.</p>
+      <div style="margin:0 0 16px;font-size:14px;color:var(--ink-mute)"><span id="previewMeasureLabel">Portion</span>: <strong id="previewPortion" style="color:var(--ink)">—</strong></div>
       <div style="font-size:12px;font-weight:600;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Ingredients</div>
       <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:14px">
         <thead>
@@ -1467,8 +1452,6 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
             <th style="text-align:left;font-weight:600;font-size:12px;color:var(--ink-mute);padding:8px 12px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:#fff">#</th>
             <th style="text-align:left;font-weight:600;font-size:12px;color:var(--ink-mute);padding:8px 12px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:#fff">Item</th>
             <th style="text-align:left;font-weight:600;font-size:12px;color:var(--ink-mute);padding:8px 12px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:#fff">Qty</th>
-            <th style="text-align:right;font-weight:600;font-size:12px;color:var(--ink-mute);padding:8px 12px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:#fff">Unit cost</th>
-            <th style="text-align:right;font-weight:600;font-size:12px;color:var(--ink-mute);padding:8px 12px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:#fff">Total</th>
           </tr>
         </thead>
         <tbody id="previewIngBody"></tbody>
@@ -2758,19 +2741,32 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   var activeVarFilter = null;
 
   function buildCurrentSnapshot() {
-    var source = VERSION_SNAPSHOT_A;
     var isSub = document.getElementById('subRecipe').checked;
+    var variations = VAR_KEY_ORDER.filter(function(key) { return VAR_META[key]; }).map(function(key) {
+      var table = ingredientTableForVariation(key);
+      var ingredients = Array.prototype.slice.call(table.querySelectorAll('tr')).filter(function(row) {
+        return !row.classList.contains('bulk-apply-row') && rowIngredientName(row);
+      }).map(function(row) {
+        var prices = row.querySelectorAll('td.r .price-val');
+        return {
+          name: rowIngredientName(row),
+          qty: rowQuantityLabel(row),
+          unit: prices[0] ? prices[0].textContent.trim() : '—',
+          total: prices[1] ? prices[1].textContent.trim() : '—'
+        };
+      });
+      var meta = VAR_META[key] || {};
+      return {
+        title: meta.title,
+        cost: meta.cost || '$—',
+        ings: ingredients
+      };
+    });
     return {
       kind: isSub ? 'subRecipe' : 'recipe',
       portion: isSub ? undefined : currentMeasureLabel(),
       yield: isSub ? currentMeasureLabel() : undefined,
-      variations: source.variations.map(function(vr) {
-        return {
-          title: vr.title,
-          cost: (VAR_META[VAR_KEY_ORDER[source.variations.indexOf(vr)]] || {}).cost || vr.cost,
-          ings: vr.ings.slice()
-        };
-      })
+      variations: variations
     };
   }
 
@@ -2905,14 +2901,11 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   }
 
   function renderPreviewVariation(vr) {
-    document.getElementById('previewCost').textContent = vr.cost;
     document.getElementById('previewIngBody').innerHTML = vr.ings.map(function(ing, n) {
       return '<tr>' +
         '<td style="padding:10px 12px;border-bottom:1px solid var(--rule);color:var(--ink-mute);font-size:12px">' + (n + 1) + '</td>' +
         '<td style="padding:10px 12px;border-bottom:1px solid var(--rule);font-weight:500">' + ing.name + '</td>' +
         '<td style="padding:10px 12px;border-bottom:1px solid var(--rule)">' + ing.qty + '</td>' +
-        '<td style="padding:10px 12px;border-bottom:1px solid var(--rule);text-align:right;color:var(--ink-mute)">' + ing.unit + '</td>' +
-        '<td style="padding:10px 12px;border-bottom:1px solid var(--rule);text-align:right;font-weight:600">' + ing.total + '</td>' +
       '</tr>';
     }).join('');
   }
@@ -3198,6 +3191,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
 
   // History button
   document.getElementById('historyBtn').addEventListener('click', function() {
+    if (VERSIONS.length && VERSIONS[0].current) {
+      VERSIONS[0].varCount = VAR_KEY_ORDER.filter(function(key) { return VAR_META[key]; }).length;
+      VERSIONS[0].snapshot = buildCurrentSnapshot();
+    }
     activeVarFilter = currentVar || null;
     renderFilterChips();
     renderVersionList();
@@ -3993,7 +3990,6 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     }
     currentVar = v;
     setTabActive(v);
-    document.getElementById('varContextBar').classList.toggle('show', v === 'family');
     var meta = VAR_META[v] || VAR_META.base;
     document.getElementById('variationEditor').setAttribute('data-current-var-title', meta.title);
     var titleEl = document.getElementById('variationTitle');
@@ -4393,7 +4389,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     Object.keys(VAR_ASSIGNMENTS).forEach(function(key) { if (key !== 'base') delete VAR_ASSIGNMENTS[key]; });
     VAR_META.base = { title:'Base recipe', cost:'$2.46', costNum:2.46, retail:'16.90' };
     VAR_KEY_ORDER.splice(0, VAR_KEY_ORDER.length, 'base');
-    VERSIONS = [];
+    VERSIONS = [{ date:'Just now', user:'William Arya', name:'Current recipe', varCount:1, current:true, expired:false, snapshot:buildCurrentSnapshot() }];
   }
 
   const HQ_RECIPE_STATE_KEY = 'nomni-hq-recipe-create-state-v1';
