@@ -14,6 +14,7 @@
   --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
   --ink: #1a1f2b; --ink-2: #4a4f5a; --ink-mute: #8a8f98; --ink-soft: #c7c9cf;
   --rule: #e7e8ec; --row-hover: #f7f8fa; --primary: #2AC864;
+  --chip-rejected-ink: #D0291E;
   --context-bg: #EEF6FF; --context-ink: #24527A; --context-border: #B8D7F5;
 }
 * { box-sizing: border-box; }
@@ -192,6 +193,10 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .buying-options-link:hover { color:var(--seaweed); border-bottom-color:var(--seaweed); }
 .ing-warning { display: flex; align-items: flex-start; gap: 4px; font-size: 11px; color: #92700a; margin-top: 4px; line-height: 1.35; }
 .ing-warning svg { flex-shrink: 0; margin-top: 1px; }
+.restored-missing-warning { color: var(--chip-rejected-ink); font-weight: 500; }
+tr[data-restored-missing="true"] td { background: #fff7f7; }
+tr[data-restored-missing="true"].restored-missing-focus td { animation: restoredMissingFocus 1.8s ease-out; }
+@keyframes restoredMissingFocus { 0%, 45% { background: #ffe2e2; } 100% { background: #fff7f7; } }
 
 /* Ingredient name dropdown (for new rows) */
 .ing-select-wrap { position: relative; }
@@ -2869,7 +2874,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       var qty = quantity[1] || '0';
       var uom = normaliseUom(quantity[2] || (pickerItem && pickerItem.uom) || 'g');
       var detail = isMissing
-        ? '<div class="ing-warning restored-missing-warning">No longer available to this HQ — replace this ingredient</div>'
+        ? '<div class="ing-warning restored-missing-warning"><svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1l7 13H1L8 1zm0 2.5L2.5 13h11L8 3.5zM7.25 7h1.5v3.5h-1.5V7zm0 4.5h1.5v1.5h-1.5v-1.5z"/></svg>No longer available to this HQ — replace this ingredient</div>'
         : (inventoryItem
           ? '<button type="button" class="buying-options-link ingredient-base-meta" data-inventory-item="' + escapeHtml(inventoryItem) + '">' + buyingOptionCountLabel((INVENTORY_ITEM_SKUS[inventoryItem] || []).length) + '</button>'
           : '<div class="ing-name-supplier ingredient-base-meta">' + escapeHtml((pickerItem && pickerItem.meta) || 'Restored ingredient') + '</div>');
@@ -2877,7 +2882,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
         '<td><div class="row-ctrl"><span class="drag-handle">⠿</span><button class="del-btn" type="button" aria-label="Remove ingredient">×</button><span class="row-num">' + (index + 1) + '</span></div></td>' +
         '<td class="ing-name-cell-td"><div class="ing-name-main">' + escapeHtml(ing.name) + '</div>' + detail + '</td>' +
         '<td><div class="qty-uom"><input type="text" class="qty-input" value="' + escapeHtml(qty) + '" /><select class="uom-select">' + uomOptionsHtml(uom) + '</select></div></td>' +
-        '<td class="r"><span class="price-val">' + escapeHtml(ing.unit || '—') + '</span></td><td class="r"><span class="price-val">' + escapeHtml(ing.total || '—') + '</span></td></tr>';
+        '<td class="r"><span class="price-val">' + (isMissing ? '—' : escapeHtml(ing.unit || '—')) + '</span></td><td class="r"><span class="price-val">' + (isMissing ? '$0.00' : escapeHtml(ing.total || '—')) + '</span></td></tr>';
     }).join('');
   }
 
@@ -2900,8 +2905,22 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       applied.push(key);
     });
     if (applied.length) {
-      switchVariation(applied.indexOf(currentVar) !== -1 ? currentVar : applied[0]);
+      var variationToShow = applied.indexOf(currentVar) !== -1 ? currentVar : applied[0];
+      // switchVariation normally serialises the currently open table before
+      // changing tabs. When that same variation was just restored, doing so
+      // would overwrite the restored snapshot with the pre-restore DOM.
+      if (currentVar === variationToShow) currentVar = null;
+      switchVariation(variationToShow);
       persistRecipeState();
+      // Keep the unavailable restored row in view so it cannot be mistaken for
+      // a normal, successfully restored ingredient further down the recipe.
+      setTimeout(function() {
+        var missingRow = document.querySelector('#ingBody tr[data-restored-missing="true"]');
+        if (!missingRow) return;
+        missingRow.classList.add('restored-missing-focus');
+        missingRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(function() { missingRow.classList.remove('restored-missing-focus'); }, 1800);
+      }, 0);
     }
     return applied;
   }
@@ -3759,6 +3778,12 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       var priceCells = row.querySelectorAll('td.r .price-val');
       if (priceCells.length < 2) return;
       var unit = priceCells[0], amount = priceCells[1];
+      if (row.dataset.restoredMissing === 'true') {
+        unit.textContent = '—';
+        amount.textContent = '$0.00';
+        delete unit.dataset.unitPrice;
+        return;
+      }
       if (!unit.dataset.basePrice) unit.dataset.basePrice = unit.textContent;
       if (!amount.dataset.basePrice) amount.dataset.basePrice = amount.textContent;
       var itemName = row.dataset.inventoryItem;
