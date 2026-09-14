@@ -583,6 +583,11 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Welcome to Nomni: SendGrid/SendGrid - Welcome - Trimmed.html
+- Your Nomni Procure trial has been extended: SendGrid/SendGrid - Trial - Extended.html
+- Requested data ready for download: SendGrid/SendGrid - Requested Data Ready - With Outlet List.html
+- Requested data ready for download: SendGrid/SendGrid - Requested Data Ready - Trimmed.html
+- Requested data ready for download: SendGrid/SendGrid - Requested Data Ready - Outlet List Preview.html
 - Admin — POS settings: Admin - HQ - POS Settings.html
 - Admin — Recipe V3 · BBQ Baby Back Pork Ribs with House Sauce: Admin - HQ Recipe Create - V3.html
 - Admin — POS mapping: Admin - HQ - POS Mapping.html
@@ -590,16 +595,16 @@ Copy the full `:root` variable block, topbar, and sidebar verbatim from an exist
 - Admin — Create Buyer User (Access Cards Draft): Admin - Buyer User - Access Cards Draft.html
 - Admin — Create Buyer User (Access Reorg Draft): Admin - Buyer User - Access Reorg Draft.html
 - Admin — HQ Users: Admin - HQ Users.html
-- Your Nomni Procure setup is complete: SendGrid - Trial - Setup Complete.html
-- Your Nomni Procure setup is complete: SendGrid - Trial - Setup Complete - With Email Details.html
-- Your Nomni Procure trial ends in 3 days: SendGrid - Trial - Ending Soon - Setup Complete.html
-- Need more time with Nomni Procure?: SendGrid - Trial - Post Trial Follow Up.html
-- Welcome to Nomni: SendGrid - Welcome - Freemium.html
-- Continue setting up Nomni Procure: SendGrid - Trial - Setup Reminder.html
-- A personal welcome to Nomni Procure: SendGrid - Trial - Personal Welcome - Paran.html
-- I’ve extended your Nomni Procure trial: SendGrid - Trial - Extended - Personal.html
-- Your Nomni Procure trial ends in 3 days: SendGrid - Trial - Ending Soon.html
-- Your Nomni Procure trial has ended: SendGrid - Trial - Ended.html
+- Your Nomni Procure setup is complete: SendGrid/SendGrid - Trial - Setup Complete.html
+- Your Nomni Procure setup is complete: SendGrid/SendGrid - Trial - Setup Complete - With Email Details.html
+- Your Nomni Procure trial ends in 3 days: SendGrid/SendGrid - Trial - Ending Soon - Setup Complete.html
+- Need more time with Nomni Procure?: SendGrid/SendGrid - Trial - Post Trial Follow Up.html
+- Welcome to Nomni: SendGrid/SendGrid - Welcome - Freemium.html
+- Continue setting up Nomni Procure: SendGrid/SendGrid - Trial - Setup Reminder.html
+- A personal welcome to Nomni Procure: SendGrid/SendGrid - Trial - Personal Welcome - Paran.html
+- I’ve extended your Nomni Procure trial: SendGrid/SendGrid - Trial - Extended - Personal.html
+- Your Nomni Procure trial ends in 3 days: SendGrid/SendGrid - Trial - Ending Soon.html
+- Your Nomni Procure trial has ended: SendGrid/SendGrid - Trial - Ended.html
 - Nomni Procure — Outlet Suppliers: Procure - Outlets.html
 - Nomni Procure — Order by Supplier: Freemium/procure-trial-new-order-supplier.html
 - Nomni Procure — New Stock Count: Freemium/procure-trial-stock-count.html

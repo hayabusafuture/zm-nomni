@@ -48,15 +48,15 @@ The opening email screen presents two paths after the user enters an email:
    - The selected primary goal is stored as `primaryGoal` so the trial dashboard checklist can be personalised around the user's setup priority.
    - Prototype evaluation shortcut: open `Freemium/procure-get-started.html?step=3&prefill=1` to jump straight to Step 3 with harmless sample details. Add `&primaryGoal=Digitise%20invoices` or `&primaryGoal=Manage%20inventory` to preview a selected goal.
    - Finish shows a short `Creating your account` transition, then sends the user to the trial dashboard checklist with `setup=1`, so the onboarding view appears even if the user previously dismissed it.
-- Self-registered users receive the credential-free lifecycle welcome email in `SendGrid - Welcome - Freemium.html`. It confirms that the account is ready, links to desktop and mobile login options, and presents the four onboarding actions without repeating a username or generated password.
-- `SendGrid - Trial - Personal Welcome - Paran.html` is a separate human follow-up from Paranthaman Chinniah (Paran), Director of Customer Success. It introduces the Customer Success contact, points the user back to the setup checklist, and invites a direct reply to `paran@nomni.ai`; it does not replace the automated account-ready welcome email.
+- Self-registered users receive the credential-free lifecycle welcome email in `SendGrid/SendGrid - Welcome - Freemium.html`. It confirms that the account is ready, links to desktop and mobile login options, and presents the four onboarding actions without repeating a username or generated password.
+- `SendGrid/SendGrid - Trial - Personal Welcome - Paran.html` is a separate human follow-up from Paranthaman Chinniah (Paran), Director of Customer Success. It introduces the Customer Success contact, points the user back to the setup checklist, and invites a direct reply to `paran@nomni.ai`; it does not replace the automated account-ready welcome email.
 - Trial lifecycle email prototypes use the same credential-free SendGrid visual system:
-  - `SendGrid - Trial - Setup Reminder.html` is sent when setup remains incomplete and opens the Dashboard onboarding checklist.
-  - `SendGrid - Trial - Ending Soon.html` is sent three days before the account's current trial end date when setup remains incomplete, and offers setup continuation or a live demo.
-  - `SendGrid - Trial - Ending Soon - Setup Complete.html` is sent three days before the current trial end date when all onboarding tasks are complete. It acknowledges completion and offers a route to discuss continuing with Nomni Procure or reopen the product.
-  - `SendGrid - Trial - Ended.html` is sent after the current trial end date and offers a route to continue or request an extension.
-  - `SendGrid - Trial - Extended.html` is sent when an extension is granted, confirms the new end date, and returns the user to their existing setup progress.
-  - `SendGrid - Trial - Extended - Personal.html` is an alternative extension confirmation written as a direct note from the team member who granted the extension. It uses the recipient's first name and the sender's name and job title, and encourages a direct reply.
+  - `SendGrid/SendGrid - Trial - Setup Reminder.html` is sent when setup remains incomplete and opens the Dashboard onboarding checklist.
+  - `SendGrid/SendGrid - Trial - Ending Soon.html` is sent three days before the account's current trial end date when setup remains incomplete, and offers setup continuation or a live demo.
+  - `SendGrid/SendGrid - Trial - Ending Soon - Setup Complete.html` is sent three days before the current trial end date when all onboarding tasks are complete. It acknowledges completion and offers a route to discuss continuing with Nomni Procure or reopen the product.
+  - `SendGrid/SendGrid - Trial - Ended.html` is sent after the current trial end date and offers a route to continue or request an extension.
+  - `SendGrid/SendGrid - Trial - Extended.html` is sent when an extension is granted, confirms the new end date, and returns the user to their existing setup progress.
+  - `SendGrid/SendGrid - Trial - Extended - Personal.html` is an alternative extension confirmation written as a direct note from the team member who granted the extension. It uses the recipient's first name and the sender's name and job title, and encourages a direct reply.
 - Trial timing must use the account's current trial end date. If the trial is extended, any pending ending-soon or ended message based on the former date must be cancelled and rescheduled; the welcome and setup sequence must not restart.
 - All email CTAs that invite the user to continue or resume setup must open the Dashboard with the onboarding checklist visible. SendGrid supplies this destination as `dashboardChecklistUrl`; emails must not deep-link directly into an individual setup task or tour.
    - If no primary goal is selected, the dashboard defaults to the `Order faster` checklist.
@@ -74,7 +74,7 @@ Primary visual references are:
 ## Prototype Files
 
 - **Marketing:** `nomni.html` and `Zeemart.html`; `freemium.html` and `zeemart.html` are compatibility redirects.
-- **Entry and email:** `procure-get-started.html`, `procure-verification-email.html`, `procure-demo-email.html`, and `../SendGrid - Welcome - Freemium.html`.
+- **Entry and email:** `procure-get-started.html`, `procure-verification-email.html`, `procure-demo-email.html`, and `../SendGrid/SendGrid - Welcome - Freemium.html`.
 - **Trial:** `Procure Trial Dashboard.html` and the `procure-trial-*.html` pages. The compatibility `procure-trial-add-supplier.html` redirects to `procure-trial-outlet-suppliers.html`.
 - **Demo:** `procure-demo-dashboard.html`, which hands off to the corresponding `?demo=1` product pages.
 
