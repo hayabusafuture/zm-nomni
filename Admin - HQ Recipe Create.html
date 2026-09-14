@@ -2062,11 +2062,6 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   }
 
   document.getElementById('saveBtn').addEventListener('click', function() {
-    if (pendingBulkQtyUpdates.length && !window.allowSaveWithPendingUpdates) {
-      openPendingUpdatesModal(true);
-      return;
-    }
-    window.allowSaveWithPendingUpdates = false;
     if (document.getElementById('subRecipe').checked && !savedSubRecipe) {
       savedSubRecipe = true;
       updateSubRecipeMode();
@@ -2718,10 +2713,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     if (e.target === this) closeBulkQtyModal();
   });
 
-  function openPendingUpdatesModal(saveAfterClosing) {
+  function openPendingUpdatesModal() {
     renderPendingUpdatesList();
-    window.pendingSaveAfterReview = !!saveAfterClosing;
-    document.getElementById('pendingUpdatesDoneBtn').textContent = saveAfterClosing ? 'Save recipe' : 'Keep pending';
+    document.getElementById('pendingUpdatesDoneBtn').textContent = 'Keep pending';
     document.getElementById('pendingUpdatesModal').classList.add('open');
   }
 
@@ -2729,16 +2723,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     document.getElementById('pendingUpdatesModal').classList.remove('open');
   }
 
-  document.getElementById('reviewPendingBtn').addEventListener('click', openPendingUpdatesModal);
+  document.getElementById('reviewPendingBtn').addEventListener('click', function() { openPendingUpdatesModal(); });
   document.getElementById('pendingUpdatesCloseBtn').addEventListener('click', closePendingUpdatesModal);
   document.getElementById('pendingUpdatesDoneBtn').addEventListener('click', function() {
-    var shouldSave = !!window.pendingSaveAfterReview;
-    window.pendingSaveAfterReview = false;
     closePendingUpdatesModal();
-    if (shouldSave) {
-      window.allowSaveWithPendingUpdates = true;
-      document.getElementById('saveBtn').click();
-    }
   });
   document.getElementById('pendingUpdatesModal').addEventListener('click', function(e) {
     if (e.target === this) closePendingUpdatesModal();

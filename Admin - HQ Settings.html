@@ -822,6 +822,7 @@ body.supplier-settings-open { overflow:hidden; }
 /* ── Picker modals (Flow 1 & 2) ── */
 .picker-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: flex-start; justify-content: center; padding-top: 60px; }
 .picker-overlay.open { display: flex; }
+#groupSkuScopeOverlay { align-items: center; padding: 24px; }
 .picker-overlay.hq-new-uom-dialog { z-index: 960; }
 .modal-overlay.hq-new-uom-dialog { z-index: 960; }
 .picker-card { background: #fff; border-radius: 12px; width: 700px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); max-height: calc(100vh - 88px); display: flex; flex-direction: column; overflow: hidden; }
@@ -999,6 +1000,7 @@ body.supplier-settings-open { overflow:hidden; }
 .hq-invoice-step { display:flex; flex:1; min-height:0; flex-direction:column; }
 .hq-invoice-copy { margin:0; padding:18px 24px 10px; color:var(--ink-mute); font-size:14px; line-height:1.5; }
 .hq-invoice-scopes { display:flex; flex-direction:column; padding:0 24px 16px; overflow:auto; }
+#groupSkuScopeList { padding-top:16px; }
 .hq-invoice-list-actions { display:flex; align-items:center; min-height:44px; flex-shrink:0; position:sticky; top:0; z-index:2; background:#f5f6f7; border:1px solid var(--rule); border-bottom:0; border-radius:8px 8px 0 0; padding:0 14px; }
 .hq-invoice-list-actions label { display:inline-flex; align-items:center; gap:12px; color:var(--ink); font:inherit; font-size:14px; font-weight:600; cursor:pointer; row-gap:12px; column-gap:12px; }
 .hq-invoice-list-actions input { width:18px; height:18px; margin:0; accent-color:var(--spinach); cursor:pointer; }
@@ -5148,10 +5150,11 @@ function openRecGroupsDialog(btn) {
   const groups = btn.dataset.groups ? btn.dataset.groups.split('|').filter(Boolean) : [];
   const outlets = btn.dataset.outlets ? btn.dataset.outlets.split('|').filter(Boolean) : [];
   const overlay = document.getElementById('recGroupsOverlay');
+  document.getElementById('recGroupsNote').style.display = btn.dataset.avKind === 'group' ? 'block' : 'none';
   overlay.dataset.avKind = btn.dataset.avKind || '';
   overlay.dataset.avRef = btn.dataset.avRef || '';
   const supplier = overlay.dataset.avKind === 'supplier' ? SUPPLIERS.find(function(item) { return item.name === overlay.dataset.avRef; }) : null;
-  const canManageAvailability = !!overlay.dataset.avKind && !(supplier && supplier.type === 'active');
+  const canManageAvailability = !!overlay.dataset.avKind && overlay.dataset.avKind !== 'group' && !(supplier && supplier.type === 'active');
   const entries = groups.map(function(group) { return { name:group, meta:availabilityGroupCount(group) + ' outlets' }; }).concat(outlets.map(function(outlet) { return { name:outlet, meta:'' }; }));
   const html = entries.length ? entries.map(function(entry, index) {
     return '<div style="padding:12px 0;' + (index === entries.length - 1 ? '' : 'border-bottom:1px solid var(--rule);') + '"><div style="font-size:14px;font-weight:500;color:var(--ink)">' + escapeItemDisplayText(entry.name) + '</div>' + (entry.meta ? '<div style="margin-top:2px;font-size:12px;color:var(--ink-mute)">' + entry.meta + '</div>' : '') + '</div>';
@@ -5206,6 +5209,7 @@ function openGroupSkuAvailability(index) {
   document.getElementById('recGroupsTitle').textContent = 'Inventory item availability';
   document.getElementById('recGroupsCount').textContent = record.name;
   document.getElementById('recGroupsCount').style.fontSize = '14px';
+  document.getElementById('recGroupsNote').style.display = 'block';
   document.getElementById('recGroupsList').innerHTML = rows || '<div style="padding:14px 0;color:var(--ink-mute);font-size:14px">No constituent items.</div>';
   document.getElementById('recGroupsDialogHeader').style.borderBottom = '1px solid var(--rule)';
   document.getElementById('recGroupsFoot').style.display = 'flex';
@@ -5245,6 +5249,7 @@ function availabilityGroupCount(name) {
 }
 function openAvailabilityManager(config) {
   managedAvailability = config;
+  document.getElementById('recGroupsNote').style.display = 'none';
   const allScopes = config.groups.concat(config.outlets);
   const selected = new Set((config.record.groupList || config.record.groups || []).concat(config.record.outletList || config.record.outlets || []));
   config.initialSelected = selected;
@@ -6766,7 +6771,7 @@ function renderInv() {
     var availableGroups = groupScope ? groupScope.groups : (r.groups || []);
     var availableOutlets = groupScope ? groupScope.outlets : (r.outlets || []);
     var grpLabel = groupScope ? groupSkuScopeLabel(r) : availabilityLabel(availableGroups, availableOutlets, INV_GROUPS.length, REC_OUTLETS.length);
-    var availabilityKind = r.type === 'group' ? '' : 'inventory';
+    var availabilityKind = r.type === 'group' ? 'group' : 'inventory';
     var grpHtml = grpLabel === 'Not available'
       ? '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="" data-outlets="" data-av-kind="' + availabilityKind + '" data-av-ref="' + globalIdx + '" style="background:none;border:none;padding:0;font:inherit;font-size:12px;color:var(--ink-mute);cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">Not available</button>'
       : '<button onclick="event.stopPropagation();openRecGroupsDialog(this)" data-groups="' + availableGroups.join('|') + '" data-outlets="' + availableOutlets.join('|') + '" data-av-kind="' + availabilityKind + '" data-av-ref="' + globalIdx + '" style="background:none;border:none;padding:0;font:inherit;font-size: 14px;font-weight:600;color:var(--spinach);cursor:pointer;text-align:left;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dashed">' + grpLabel + '</button>';
@@ -6861,6 +6866,7 @@ var groupSkuPickerSelected = null;
 var groupSkuPickerSearch = '';
 var groupSkuPickerSupplier = '';
 var groupSkuPickerConversions = {};
+var groupSkuScopes = new Set();
 
 function openGroupSkuModal(editIndex, starterIndex) {
   var isEditing = typeof editIndex === 'number' && editIndex > -1;
@@ -6889,12 +6895,45 @@ function openGroupSkuModal(editIndex, starterIndex) {
   document.getElementById('groupSkuSaveBtn').textContent = isEditing ? 'Save' : 'Create';
   renderGroupSkuContent();
   updateGroupSkuSaveState();
-  document.getElementById('groupSkuOverlay').classList.add('open');
+  if (isEditing) document.getElementById('groupSkuOverlay').classList.add('open');
+  else openGroupSkuScopePicker();
 }
 function closeGroupSkuModal() {
   document.getElementById('groupSkuOverlay').classList.remove('open');
   groupSkuDraft = null;
+  groupSkuScopes = new Set();
   pendingCombinedSourceIndices = [];
+}
+
+function renderGroupSkuScopes() {
+  var list = document.getElementById('groupSkuScopeList');
+  var scopes = invoiceScopeEntries();
+  var allSelected = scopes.length > 0 && scopes.every(function(scope) { return groupSkuScopes.has(scope.name); });
+  list.innerHTML = '<div class="hq-invoice-list-actions"><label><input type="checkbox" ' + (allSelected ? 'checked' : '') + ' onchange="toggleAllGroupSkuScopes()"><span>Select all</span></label></div><div class="hq-invoice-scope-list">' + scopes.map(function(scope) {
+    var selected = groupSkuScopes.has(scope.name);
+    return '<label class="hq-invoice-scope' + (selected ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(scope.name) + '" ' + (selected ? 'checked' : '') + ' onchange="toggleGroupSkuScope(this.value,this.checked)"><span><span class="hq-invoice-scope-name">' + escapeOverviewText(scope.name) + '</span>' + (scope.meta ? '<span class="hq-invoice-scope-meta">' + escapeOverviewText(scope.meta) + '</span>' : '') + '</span></label>';
+  }).join('') + '</div>';
+  document.getElementById('groupSkuScopeCount').innerHTML = groupSkuScopes.size ? '<strong>' + groupSkuScopes.size + '</strong> selected' : 'No groups or outlets selected';
+  document.getElementById('groupSkuScopeCreateBtn').disabled = !groupSkuScopes.size;
+}
+function openGroupSkuScopePicker() {
+  groupSkuScopes = new Set();
+  renderGroupSkuScopes();
+  document.getElementById('groupSkuScopeOverlay').classList.add('open');
+}
+function closeGroupSkuScopePicker() { document.getElementById('groupSkuScopeOverlay').classList.remove('open'); }
+function cancelGroupSkuScopePicker() { closeGroupSkuScopePicker(); closeGroupSkuModal(); }
+function toggleGroupSkuScope(name, checked) { if (checked) groupSkuScopes.add(name); else groupSkuScopes.delete(name); renderGroupSkuScopes(); }
+function toggleAllGroupSkuScopes() {
+  var scopes = invoiceScopeEntries();
+  var allSelected = scopes.length > 0 && scopes.every(function(scope) { return groupSkuScopes.has(scope.name); });
+  groupSkuScopes = allSelected ? new Set() : new Set(scopes.map(function(scope) { return scope.name; }));
+  renderGroupSkuScopes();
+}
+function confirmGroupSkuScopes() {
+  if (!groupSkuScopes.size) return;
+  closeGroupSkuScopePicker();
+  document.getElementById('groupSkuOverlay').classList.add('open');
 }
 function groupSkuContentChecked() {
   return Array.from(document.querySelectorAll('#groupSkuContentBody [data-group-content-check]:checked')).map(function(el){ return el.dataset.groupContentCheck; });
@@ -6988,7 +7027,7 @@ function closeGroupSkuPicker() {
 function renderGroupSkuPickerSupplierOptions() {
   var select = document.getElementById('groupSkuPickerSupplier');
   var used = groupSkuUsedNames();
-  var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'group' && i.autoIncluded && !used.has(i.name); }).map(function(i){ return i.constituents && i.constituents[0] ? i.constituents[0].supplier : ''; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
+  var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'group' && i.autoIncluded && !used.has(i.name) && groupSkuAvailableInSelectedScope(i); }).map(function(i){ return i.constituents && i.constituents[0] ? i.constituents[0].supplier : ''; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
   select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(s){ return '<option value="' + hqSettingsEscape(s) + '">' + supplierDisplayName(s) + '</option>'; }).join('');
 }
 function setGroupSkuPickerSearch(v) { groupSkuPickerSearch = v; renderGroupSkuPickerList(); }
@@ -7012,6 +7051,12 @@ function groupSkuPickerNeedsConversion(item) {
   var target = groupSkuPickerTargetUom();
   return !!target && normaliseGroupSkuUom(item.uom) !== normaliseGroupSkuUom(target);
 }
+function groupSkuAvailableInSelectedScope(item) {
+  if (!groupSkuScopes.size) return true;
+  var option = item && item.constituents && item.constituents[0];
+  var availableScopes = new Set([].concat((item && item.groups) || [], (item && item.outlets) || [], (option && option.groups) || [], (option && option.outlets) || []));
+  return Array.from(groupSkuScopes).some(function(scope) { return availableScopes.has(scope); });
+}
 function updateGroupSkuPickerConversion(name, value) {
   groupSkuPickerConversions[name] = groupSkuPickerConversions[name] || { conversion: 1, flipped: false };
   groupSkuPickerConversions[name].conversion = Math.max(0.001, Number(value) || 1);
@@ -7027,6 +7072,7 @@ function renderGroupSkuPickerList() {
   var candidates = INV_ITEMS.filter(function(item) {
     if (item.type !== 'group' || !item.autoIncluded) return false;
     if (used.has(item.name)) return false;
+    if (!groupSkuAvailableInSelectedScope(item)) return false;
     var option = item.constituents && item.constituents[0];
     if (!option) return false;
     if (groupSkuPickerSupplier && option.supplier !== groupSkuPickerSupplier) return false;
@@ -7091,10 +7137,14 @@ function saveGroupSku() {
   if (!name || !uom) return;
   var duplicate = INV_ITEMS.some(function(item, idx) { return idx !== groupSkuDraft.editIndex && item.name.toLowerCase() === name.toLowerCase(); });
   if (duplicate) { var nameField = document.getElementById('groupSkuName'); nameField.focus(); return; }
-  var groupAvailability = groupSkuDraft.items.length
+  var groupAvailability = groupSkuDraft.editIndex === -1
+    ? Array.from(groupSkuScopes).filter(function(scope) { return ML_GROUPS.includes(scope); })
+    : groupSkuDraft.items.length
     ? Array.from(new Set(groupSkuDraft.items.reduce(function(all, item) { return all.concat(item.groups || []); }, [])))
     : INV_GROUPS.slice();
-  var outletAvailability = groupSkuDraft.items.length
+  var outletAvailability = groupSkuDraft.editIndex === -1
+    ? Array.from(groupSkuScopes).filter(function(scope) { return ML_UNGROUPED_OUTLETS.includes(scope); })
+    : groupSkuDraft.items.length
     ? Array.from(new Set(groupSkuDraft.items.reduce(function(all, item) { return all.concat(item.outlets || []); }, [])))
     : [];
   var entry = {
@@ -8857,6 +8907,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
+    <div id="recGroupsNote" style="display:none;padding:12px 24px;font-size:12px;line-height:1.45;color:var(--seaweed);background:var(--mint)">Manage availability by updating this item’s buying options.</div>
     <div style="padding:0 24px 20px" id="recGroupsList"></div>
     <div id="recGroupsFoot" style="display:none;padding:16px 24px 20px;border-top:1px solid var(--rule);justify-content:flex-end;gap:8px">
       <button class="btn btn-tertiary" id="recGroupsCancel" onclick="closeRecGroupsDialog()">Cancel</button>
@@ -9357,6 +9408,22 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
       </div>
     </div>
     <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkuModal()">Cancel</button><button class="btn btn-primary" id="groupSkuSaveBtn" disabled onclick="saveGroupSku()">Create</button></div>
+  </div>
+</div>
+
+<!-- ── Inventory item scope (same selection pattern as Add from invoice) ── -->
+<div class="picker-overlay" id="groupSkuScopeOverlay" onclick="if(event.target===this)cancelGroupSkuScopePicker()">
+  <div class="picker-card">
+    <div class="picker-head">
+      <div class="picker-head-row" style="margin-bottom:0">
+        <div class="picker-title">Add item to...</div>
+        <button class="picker-close-btn" type="button" onclick="cancelGroupSkuScopePicker()" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+    </div>
+    <section class="hq-invoice-step" style="display:flex">
+      <div class="hq-invoice-scopes" id="groupSkuScopeList"></div>
+      <div class="picker-foot"><span class="picker-sel-label" id="groupSkuScopeCount">No groups or outlets selected</span><div style="display:flex;gap:8px"><button class="btn btn-tertiary" type="button" onclick="cancelGroupSkuScopePicker()">Cancel</button><button class="btn btn-primary" type="button" id="groupSkuScopeCreateBtn" onclick="confirmGroupSkuScopes()" disabled>Continue</button></div></div>
+    </section>
   </div>
 </div>
 
