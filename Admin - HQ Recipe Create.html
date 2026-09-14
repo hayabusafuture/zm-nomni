@@ -315,7 +315,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .restore-modal-actions.has-restore-options { display: grid; grid-template-columns: 1fr 1fr; }
 .restore-modal-actions .btn { justify-content: center; min-height: 44px; padding: 12px 16px; }
 .restore-modal-actions.has-restore-options .btn { width: 100%; }
-.restore-choice { flex-direction: column; align-items: center; gap: 3px; line-height: 1.15; white-space: normal; text-align: center; }
+.restore-choice { flex-direction: column; align-items: center; gap: 4px; line-height: 1.15; white-space: normal; text-align: center; }
+#restoreCompleteOnlyBtn { gap: 5px; }
 .restore-choice-title { font-size: 14px; font-weight: 700; }
 .restore-choice-note { font-size: 11px; font-weight: 600; opacity: .72; }
 
@@ -447,6 +448,7 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .variation-title-outside > .variation-title-edit { width:20px; height:20px; padding:0; border:0; border-radius:4px; background:transparent !important; box-shadow:none; color:var(--spinach); }
 .variation-title-outside > .variation-title-edit:hover { background:transparent !important; color:var(--seaweed); }
 .variation-title-outside > .variation-title-edit .material-symbols-outlined { font-size:18px; }
+.variation-title-outside > .variation-picker { margin-left:2px; }
 #variationEditor .variation-editor-head { top:-54px; right:0; }
 .variation-title-delete { border:0; background:#fff1f1; border-radius:8px; padding:6px; display:none; align-items:center; justify-content:center; cursor:pointer; color:#D0291E; }
 .variation-title-delete:hover { background:#FDD6DC; }
@@ -902,8 +904,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
     <div class="variation-title-row variation-title-outside">
       <h2 class="variation-title" id="variationTitle">Base recipe</h2>
       <button class="variation-title-edit" id="renameVariationBtn" type="button" title="Rename variation"><span class="material-symbols-outlined" aria-hidden="true">edit</span></button>
+      <button class="variation-picker" id="variationPickerBtn" type="button" aria-label="Choose recipe variation"><span id="variationPickerCount">0 variations</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button>
       <div class="variation-editor-actions variation-title-actions">
-        <button class="variation-picker" id="variationPickerBtn" type="button" aria-label="Choose recipe variation"><span id="variationPickerCount">0 variations</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button>
         <div class="var-item-add" id="createVariationBtn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Add variation</div>
         <button class="btn btn-tertiary" id="historyBtn" type="button" style="font-size:14px;padding:7px 12px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>History</button>
       </div>
@@ -1510,7 +1512,7 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       <div id="restoreMissingWrap" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:14px 16px">
         <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D0291E" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16.5" r="1" fill="#D0291E" stroke="none"/></svg>
-          <p style="margin:0;font-size:14px;font-weight:600;color:#D0291E">Some ingredients are no longer in your catalogue</p>
+          <p style="margin:0;font-size:14px;font-weight:600;color:#D0291E">Some ingredients are no longer available to this HQ</p>
         </div>
         <div id="restoreMissingList" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto"></div>
       </div>
@@ -2839,14 +2841,11 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   var pendingRestoreScope = null; // 'variation' | 'all'
   var pendingRestoreVariationTitle = null;
 
-  // Ingredients present in the current catalogue — excludes discontinued items
-  var CURRENT_CATALOG = new Set([
-    'Pork Baby Back Ribs', 'House BBQ Sauce', 'Apple Cider Vinegar',
-    'Brown Sugar', 'Smoked Paprika', 'Garlic Powder', 'Onion Powder',
-    'Black Pepper (cracked)', 'Sweet Paprika', 'Sea Salt', 'Cumin (ground)',
-    'Cayenne Pepper'
-    // 'Premium BBQ Sauce' and 'Mustard Powder' are discontinued
-  ]);
+  // The restore check uses the same enabled catalogue as the ingredient picker.
+  // A snapshot item is missing only when it can no longer be selected today.
+  var CURRENT_CATALOG = new Set(INGREDIENT_PICKER_ITEMS
+    .filter(function(item) { return !/\bDisabled\b/i.test(item.meta || ''); })
+    .map(function(item) { return item.name; }));
 
   function checkMissingItems(v, scope, activeVariationTitle) {
     var vars = v.snapshot.variations.slice(0, v.varCount);
@@ -2859,6 +2858,52 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       if (missing.length) results.push({ title: vr.title, missing: missing });
     });
     return results;
+  }
+
+  function snapshotIngredientTableHtml(ingredients) {
+    return (ingredients || []).map(function(ing, index) {
+      var pickerItem = INGREDIENT_PICKER_ITEMS.find(function(item) { return item.name === ing.name; });
+      var isMissing = !CURRENT_CATALOG.has(ing.name);
+      var inventoryItem = pickerItem && pickerItem.inventoryItem;
+      var quantity = String(ing.qty || '').match(/^\s*([^\s]+)\s*(.*)$/) || ['', '', ''];
+      var qty = quantity[1] || '0';
+      var uom = normaliseUom(quantity[2] || (pickerItem && pickerItem.uom) || 'g');
+      var detail = isMissing
+        ? '<div class="ing-warning restored-missing-warning">No longer available to this HQ — replace this ingredient</div>'
+        : (inventoryItem
+          ? '<button type="button" class="buying-options-link ingredient-base-meta" data-inventory-item="' + escapeHtml(inventoryItem) + '">' + buyingOptionCountLabel((INVENTORY_ITEM_SKUS[inventoryItem] || []).length) + '</button>'
+          : '<div class="ing-name-supplier ingredient-base-meta">' + escapeHtml((pickerItem && pickerItem.meta) || 'Restored ingredient') + '</div>');
+      return '<tr' + (inventoryItem ? ' data-inventory-item="' + escapeHtml(inventoryItem) + '"' : '') + (isMissing ? ' data-restored-missing="true"' : '') + '>' +
+        '<td><div class="row-ctrl"><span class="drag-handle">⠿</span><button class="del-btn" type="button" aria-label="Remove ingredient">×</button><span class="row-num">' + (index + 1) + '</span></div></td>' +
+        '<td class="ing-name-cell-td"><div class="ing-name-main">' + escapeHtml(ing.name) + '</div>' + detail + '</td>' +
+        '<td><div class="qty-uom"><input type="text" class="qty-input" value="' + escapeHtml(qty) + '" /><select class="uom-select">' + uomOptionsHtml(uom) + '</select></div></td>' +
+        '<td class="r"><span class="price-val">' + escapeHtml(ing.unit || '—') + '</span></td><td class="r"><span class="price-val">' + escapeHtml(ing.total || '—') + '</span></td></tr>';
+    }).join('');
+  }
+
+  function applySnapshotRestore(version, scope, activeVariationTitle, completeOnly) {
+    var snapshotVariations = (version.snapshot.variations || []).filter(function(variation) {
+      return scope !== 'variation' || variation.title === activeVariationTitle;
+    });
+    var applied = [];
+    if (currentVar) ING_TABLE_HTML_BY_VAR[currentVar] = serializeIngredientTable();
+    snapshotVariations.forEach(function(snapshotVariation) {
+      var hasMissing = snapshotVariation.ings.some(function(ing) { return !CURRENT_CATALOG.has(ing.name); });
+      if (completeOnly && hasMissing) return;
+      var key = VAR_KEY_ORDER.find(function(candidate) { return VAR_META[candidate] && VAR_META[candidate].title === snapshotVariation.title; });
+      if (!key && snapshotVariation.title === 'Base recipe') key = 'base';
+      if (!key) key = recreateVariationFromSnapshot(version, snapshotVariation.title);
+      if (!key) return;
+      VAR_META[key].cost = snapshotVariation.cost || '$—';
+      VAR_META[key].costNum = parseFloat(String(snapshotVariation.cost || '').replace(/[^0-9.]/g, '')) || 0;
+      ING_TABLE_HTML_BY_VAR[key] = snapshotIngredientTableHtml(snapshotVariation.ings);
+      applied.push(key);
+    });
+    if (applied.length) {
+      switchVariation(applied.indexOf(currentVar) !== -1 ? currentVar : applied[0]);
+      persistRecipeState();
+    }
+    return applied;
   }
 
   function getSnapshotMeasure(snapshot) {
@@ -3051,7 +3096,11 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     var label = v.name ? v.date + ' — ' + v.name : v.date;
     var activeTab = document.querySelector('#previewVarTabs .preview-var-tab.active');
     pendingRestoreScope = scope;
-    pendingRestoreVariationTitle = activeTab ? activeTab.textContent.trim() : '';
+    // A one-variation snapshot has no visible preview tab, so fall back to
+    // its only variation instead of passing an empty title into the restore.
+    pendingRestoreVariationTitle = activeTab
+      ? activeTab.textContent.trim()
+      : (((v.snapshot.variations || [])[0] || {}).title || 'Base recipe');
 
     function setRestoreButtonCopy(title, note) {
       confirmOkBtn.innerHTML = '<span class="restore-choice-title">' + title + '</span>' + (note ? '<span class="restore-choice-note">' + note + '</span>' : '');
@@ -3146,19 +3195,12 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     document.getElementById('restoreConfirmModal').classList.remove('open');
     var v = VERSIONS[pendingRestoreIndex];
     var label = v.name || v.date;
-    var recreatedKey = null;
-    if (pendingRestoreScope === 'variation' && !variationExistsByTitle(pendingRestoreVariationTitle)) {
-      recreatedKey = recreateVariationFromSnapshot(v, pendingRestoreVariationTitle);
-    }
+    var applied = applySnapshotRestore(v, pendingRestoreScope, pendingRestoreVariationTitle, false);
     var toastMsg = pendingRestoreScope === 'variation'
       ? '"' + pendingRestoreVariationTitle + '" restored to: ' + label
       : 'All variations restored to: ' + label;
-    if (recreatedKey) {
-      switchVariation(recreatedKey);
-      layoutVariationRail();
-      renderFilterChips();
-      toastMsg = '"' + pendingRestoreVariationTitle + '" recreated unassigned from: ' + label;
-    }
+    if (!applied.length) toastMsg = 'No variations could be restored from: ' + label;
+    else if (pendingRestoreScope === 'variation' && applied[0] !== currentVar) toastMsg = '"' + pendingRestoreVariationTitle + '" restored unassigned from: ' + label;
     pendingRestoreIndex = null;
     pendingRestoreScope = null;
     pendingRestoreVariationTitle = null;
@@ -3171,7 +3213,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     var label = v.name || v.date;
     var missing = checkMissingItems(v, 'all', '');
     var skipped = missing.map(function(m) { return m.title; });
-    var toastMsg = skipped.length
+    var applied = applySnapshotRestore(v, 'all', '', true);
+    var toastMsg = !applied.length
+      ? 'No complete variations were restored from: ' + label
+      : skipped.length
       ? 'Complete variations restored to: ' + label + '. Skipped: ' + skipped.join(', ')
       : 'All variations restored to: ' + label;
     pendingRestoreIndex = null;
@@ -4389,7 +4434,13 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     Object.keys(VAR_ASSIGNMENTS).forEach(function(key) { if (key !== 'base') delete VAR_ASSIGNMENTS[key]; });
     VAR_META.base = { title:'Base recipe', cost:'$2.46', costNum:2.46, retail:'16.90' };
     VAR_KEY_ORDER.splice(0, VAR_KEY_ORDER.length, 'base');
-    VERSIONS = [{ date:'Just now', user:'William Arya', name:'Current recipe', varCount:1, current:true, expired:false, snapshot:buildCurrentSnapshot() }];
+    var currentSnapshot = buildCurrentSnapshot();
+    var olderSnapshot = JSON.parse(JSON.stringify(currentSnapshot));
+    olderSnapshot.variations[0].ings.push({ name:'Herb Marinade Concentrate', qty:'15 ml', unit:'$0.0180/ml', total:'$0.27' });
+    VERSIONS = [
+      { date:'Just now', user:'William Arya', name:'Current recipe', varCount:1, current:true, expired:false, snapshot:currentSnapshot },
+      { date:'18 Jun 2026, 11:20 am', user:'William Arya', name:'Before ingredient retired', varCount:1, current:false, expired:false, snapshot:olderSnapshot }
+    ];
   }
 
   const HQ_RECIPE_STATE_KEY = 'nomni-hq-recipe-create-state-v1';
