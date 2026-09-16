@@ -218,6 +218,12 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .modal-info { background:var(--mint); border-color:var(--notice-info-border); color:var(--seaweed); }
 .modal-info .material-symbols-rounded { color:var(--nomni-green); }
 .notice-symbol { align-self:center; flex-shrink:0; color:#D97706; font-size:24px; line-height:24px; }
+#supplierSettingsBanner { position:relative; display:block; padding-right:180px !important; }
+#supplierSettingsBanner #supplierSettingsFilterButton { position:absolute; top:50%; right:16px; transform:translateY(-50%); }
+@media (max-width:700px) {
+  #supplierSettingsBanner { padding-right:16px !important; padding-bottom:60px !important; }
+  #supplierSettingsBanner #supplierSettingsFilterButton { top:auto; right:16px; bottom:12px; transform:none; }
+}
 .health-check-panel { transition:filter .16s ease; }
 .health-check-panel:hover { filter:brightness(.97); }
 .group-radio-list { display: flex; flex-direction: column; gap: 8px; }
@@ -1824,7 +1830,7 @@ body.supplier-settings-open { overflow:hidden; }
             <div id="addItemMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:230px;overflow:hidden">
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openHqInvoiceModal()">Add from invoice</div>
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openAddCatalogueModal()">Add from supplier catalogue</div>
-              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';window.location.href='Admin - HQ Create Item.html'+window.location.search">Create SKU</div>
+              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';cacheCreateItemInventoryContext();window.location.href='Admin - HQ Create Item.html'+window.location.search">Create SKU</div>
             </div>
           </div>
         </div>
@@ -1925,8 +1931,8 @@ body.supplier-settings-open { overflow:hidden; }
 
     <!-- ── Suppliers ── -->
     <div class="tab-panel" id="panel-suppliers">
-      <div id="supplierSettingsBanner" hidden style="display:none;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px">
-        <div style="display:flex;align-items:flex-start;gap:10px"><span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span><div><div id="supplierSettingsBannerCount" style="font-size:14px;font-weight:700;color:var(--notice-warning-ink)"></div><div style="font-size:14px;color:var(--notice-warning-ink);margin-top:2px">Affected outlets cannot order from their supplier until the relevant settings are added.</div></div></div><button type="button" class="btn btn-tertiary" id="supplierSettingsFilterButton" onclick="toggleSupplierSettingsFilter()" style="flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap">View suppliers</button>
+      <div id="supplierSettingsBanner" hidden style="display:none;grid-template-columns:minmax(0,1fr) auto;background:var(--notice-warning-bg);border:1px solid var(--notice-warning-border);border-radius:8px;padding:13px 16px;align-items:center;gap:16px;margin-bottom:20px">
+        <div style="display:flex;align-items:flex-start;gap:10px;min-width:0"><span class="material-symbols-rounded notice-symbol" aria-hidden="true">warning</span><div><div id="supplierSettingsBannerCount" style="font-size:14px;font-weight:700;color:var(--notice-warning-ink)"></div><div style="font-size:14px;color:var(--notice-warning-ink);margin-top:2px">Affected outlets cannot order from their supplier until the relevant settings are added.</div></div></div><button type="button" class="btn btn-tertiary" id="supplierSettingsFilterButton" onclick="toggleSupplierSettingsFilter()" style="justify-self:end;flex-shrink:0;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;font-size:14px;padding:7px 14px;white-space:nowrap">View suppliers</button>
       </div>
       <div class="panel-label-row">
         <span class="panel-label-text">Suppliers <span class="panel-label-count" id="supCount"></span></span>
@@ -2111,7 +2117,7 @@ body.supplier-settings-open { overflow:hidden; }
 </div>
 
 <aside class="prototype-hints" id="prototypeHints" aria-label="Prototype search hints"></aside>
-<button class="prototype-reset-btn" onclick="resetHqPrototypeData()" title="Reset prototype data">Reset prototype</button>
+<button class="prototype-reset-btn" onclick="resetAdminHqPrototypeData()" title="Reset Admin HQ prototype data">Reset Admin</button>
 
 <!-- Edit HQ -->
 <div class="modal-overlay" id="editHqDialog" onclick="if(event.target===this)closeEditHqDialog()">
@@ -2345,30 +2351,17 @@ function refreshNewHqSupplierEmptyState() {
   if (!window.isNewHQ) return;
   var panel = document.getElementById('panel-suppliers');
   if (!panel) return;
-  var state = panel.querySelector('.new-hq-supplier-empty');
-
   if (SUPPLIERS.length > 0) {
-    Array.from(panel.children).forEach(function(child) {
-      child.style.display = child.classList.contains('new-hq-supplier-empty') ? 'none' : '';
-    });
+    clearNewHqEmptyState('panel-suppliers');
     return;
   }
-
-  Array.from(panel.children).forEach(function(child) { child.style.display = 'none'; });
-  if (!state) {
-    state = document.createElement('div');
-    state.className = 'new-hq-empty new-hq-supplier-empty';
-    state.innerHTML = '<div class="new-hq-empty-inner">' +
-      '<h2 class="new-hq-empty-title">No suppliers linked</h2>' +
-      '<p class="new-hq-empty-copy">Link a supplier to make it available to this HQ.</p>' +
-      '<button class="btn-primary" id="emptyLinkSupplierBtn">' +
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add supplier' +
-      '</button>' +
-    '</div>';
-    panel.appendChild(state);
-    document.getElementById('emptyLinkSupplierBtn').addEventListener('click', openLinkSupModal);
-  }
-  state.style.display = 'flex';
+  var hasOutletOrGroup = document.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length > 0;
+  showNewHqEmptyState('panel-suppliers', 'No suppliers linked', 'Link a supplier to make it available to this HQ.', {
+    label: 'Add supplier',
+    onclick: 'openLinkSupModal()',
+    disabled: !hasOutletOrGroup,
+    reason: hasOutletOrGroup ? '' : 'Add an outlet or group first'
+  });
 }
 
 
@@ -4614,8 +4607,8 @@ window.addEventListener(HQ_CHANGE_EVENT, function() {
   renderRecentActivity();
 });
 
-function resetHqPrototypeData() {
-  if (!window.confirm('Clear all locally saved data for this HQ prototype?')) return;
+function resetAdminHqPrototypeData() {
+  if (!window.confirm('Clear all locally saved data for this Admin HQ prototype?')) return;
   var params = new URLSearchParams(window.location.search);
   var hqName = params.get('created-hq') || params.get('hq');
   var keys = ['nomniNewHQ','nomniNewHQToastPending','nomniCreatedHQs','nomniHqDetails','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState','nomniHqManagedOutlets','nomni-hq-created-items-v1','nomni-hq-item-lifecycle-v1','nomni-hq-item-exclusions-v1','nomni-hq-supplier-state-v1','nomni-hq-recipe-state-v1','nomni-hq-recipe-food-cost-threshold-v1','nomni-hq-recipe-draft-v3','nomni-hq-inventory-state-v1','nomni-hq-price-review-v1','nomni-hq-price-review-v2','nomni-hq-activity-log-v1','nomniPosApiKey','nomniPosLocationId','nomniPosConfiguredOutlets','nomniHqPosApiKey'];
@@ -5065,7 +5058,7 @@ function renderSupplierSettingsAttention() {
   var banner = document.getElementById('supplierSettingsBanner');
   if (banner) {
     banner.hidden = !hasMissingSettings;
-    banner.style.display = hasMissingSettings ? 'flex' : 'none';
+    banner.style.display = hasMissingSettings ? 'block' : 'none';
   }
   var count = document.getElementById('supplierSettingsBannerCount');
   if (count) count.textContent = hasMissingSettings ? missingSettings + ' supplier setting' + (missingSettings === 1 ? ' needs' : 's need') + ' attention' : '';
@@ -5526,6 +5519,17 @@ function loadHqInventoryState() {
 function saveHqInventoryState() {
   if (window.isNewHQ) { savePrototypeState(); return; }
   localStorage.setItem(HQ_INVENTORY_STATE_KEY, JSON.stringify(INV_ITEMS));
+}
+function cacheCreateItemInventoryContext() {
+  var title = document.querySelector('.page-title');
+  var context = {
+    hq: title ? title.textContent.trim() : 'Garden Cuisine HQ',
+    itemCount: ITEMS.length,
+    newHq: !!window.isNewHQ,
+    items: INV_ITEMS.filter(function(item) { return item && item.type === 'group' && !item.mergedInto && item.active !== false; })
+      .map(function(item) { return JSON.parse(JSON.stringify(item)); })
+  };
+  localStorage.setItem('nomni-hq-create-item-inventory-context-v1', JSON.stringify(context));
 }
 syncAutomaticInventorySkus();
 loadHqInventoryState();
@@ -6196,8 +6200,12 @@ function updateSupplierScopePresentation() {
 var supplierOutletFilter = 'all';
 var supplierScopeView = 'outlets';
 function setSupplierScopeView(view) {
+  var hasHqGroups = document.querySelectorAll('#ogTable tbody > tr[data-group-name]').length > 0;
+  if (!hasHqGroups) view = 'outlets';
   supplierScopeView = view;
   var groups = document.getElementById('supplierScopeNavGroups'), outlets = document.getElementById('supplierScopeNavPolicies');
+  var segmented = document.querySelector('#supplierSettingsOverlay .supplier-scope-segmented');
+  if (segmented) segmented.style.display = hasHqGroups ? '' : 'none';
   var addDefault = document.querySelector('.supplier-scope-nav-add');
   var addGroup = document.getElementById('supplierGroupSettingsButton');
   var defaultHelper = document.querySelector('.supplier-default-helper');
@@ -6501,6 +6509,7 @@ function openSupplierSettings(supplier, isNew, isEditing, showSettingsRequired, 
   document.getElementById('supplierSettingsOverlay').classList.add('open');
   document.querySelectorAll('.row-actions-menu.open').forEach(function(menu) { menu.classList.remove('open'); menu.removeAttribute('style'); });
   closeLinkSupModal(); closeNewSupplierModal();
+  setSupplierScopeView(supplierScopeView);
   document.getElementById('supplierSettingsPageTitle').textContent = "Supplier's settings: " + supplierDisplayName(supplier.name);
   document.getElementById('supplierSettingsForm').reset();
   document.getElementById('supplierSmsField').hidden = true;
@@ -8439,6 +8448,7 @@ function saveManagedOutletList() {
     ungrouped: UNGROUPED.slice()
   }));
   syncNewHqPosOutlets();
+  refreshNewHqSupplierEmptyState();
 }
 
 function getManagedOutletStateKey() {
@@ -9432,7 +9442,6 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
   <div class="modal-card" style="width:620px">
     <div class="modal-header"><h2 class="modal-title">Add SKUs</h2><button class="modal-close" onclick="closeGroupSkuPicker()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
     <div class="modal-body" style="gap:14px">
-      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--ink)">Select SKUs that are not already assigned to an inventory item.</p>
       <div style="display:flex;gap:10px">
         <div class="ml-search-wrap" style="flex:1">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -9770,6 +9779,7 @@ var panel = document.getElementById('panel-outlet-groups');
 }
 
 initialiseNewHQView();
+cacheCreateItemInventoryContext();
 document.addEventListener('click', function(event){var link=event.target.closest('a[href*="Admin - HQ - POS Mapping.html"]');if(window.isNewHQ&&link&&!link.getAttribute('href').includes('outlet=')&&!(link.id==='posHqCta'&&!isPosConfigured())){event.preventDefault();window.location.href='Admin - HQ - POS Mapping.html?created-hq='+encodeURIComponent(document.querySelector('.page-title').textContent.trim());}});
 
 // The Create item route hands the user back here after saving. Surface the
