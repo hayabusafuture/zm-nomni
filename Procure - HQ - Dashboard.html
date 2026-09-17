@@ -1350,19 +1350,6 @@ body.supplier-settings-open { overflow:hidden; }
 }
 .new-hq-empty-title { margin:0 0 6px; font-size:21px; font-weight:700; letter-spacing:-.02em; color:var(--ink); }
 .new-hq-empty-copy { margin:0 0 20px; font-size:14px; line-height:1.5; color:var(--ink-mute); }
-.new-hq-get-started { padding:20px; border:0; border-radius:10px; background:var(--mint); }
-.new-hq-get-started-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
-.new-hq-get-started-title { margin:0; color:var(--seaweed); font-size:21px; font-weight:700; letter-spacing:-.02em; }
-.new-hq-get-started-dismiss { appearance:none; padding:5px 6px; border:0; border-radius:5px; background:transparent; color:var(--spinach); font:600 12px/1 Inter,sans-serif; cursor:pointer; }
-.new-hq-get-started-dismiss:hover { background:rgba(255,255,255,.68); color:var(--seaweed); }
-.new-hq-get-started-dismiss:focus-visible,
-.new-hq-get-started-item:focus-visible { outline:2px solid var(--spinach); outline-offset:2px; }
-.new-hq-get-started-list { display:flex; flex-direction:column; gap:8px; }
-.new-hq-get-started-item { width:100%; min-height:44px; display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid rgba(26,128,64,.22); border-radius:7px; background:rgba(255,255,255,.68); color:var(--seaweed); font:600 14px/1.35 Inter,sans-serif; text-align:left; cursor:pointer; transition:background-color .18s ease,border-color .18s ease,color .18s ease; }
-.new-hq-get-started-item:hover { background:#fff; border-color:var(--spinach); }
-.new-hq-get-started-item .material-symbols-outlined { color:var(--spinach); font-size:18px; flex:0 0 auto; }
-.new-hq-get-started-item-label { flex:1; min-width:0; }
-.new-hq-get-started-item .new-hq-get-started-arrow { color:var(--seaweed); font-size:17px; }
 
 
 /* Prerequisite empty states */
@@ -2817,7 +2804,7 @@ function renderHealthCheck() {
     { icon: 'home',        value: totalOutlets, label: '<span>Outlets</span> in this HQ',      accent: true, iconColor: '#1A8040', accentColor: '#2AC864' },
     { icon: 'layout-grid', value: 100, label: '<span>SKUs</span> in catalogue', accent: true, iconColor: '#185FA5', accentColor: '#3B82F6' },
     { icon: 'star',        value: 48,  label: '<span>Recipes</span> in library',      accent: true, iconColor: '#854F0B', accentColor: '#F59E0B' },
-    { icon: 'briefcase',   value: 14,  label: '<span>Suppliers</span> group-wide',    accent: true, iconColor: '#6D28D9', accentColor: '#8B5CF6' },
+    { icon: 'briefcase',   value: 14,  label: '<span>Suppliers</span> in this HQ',    accent: true, iconColor: '#6D28D9', accentColor: '#8B5CF6' },
   ];
   strip.innerHTML = stats.map(s =>
     '<div class="hq-summary-cell' + (s.accent ? ' accent' : '') + '"' + (s.accentColor ? ' style="--accent-bar:' + s.accentColor + '"' : '') + '>' +
@@ -4747,9 +4734,6 @@ function resetProcureHqPrototypeData() {
   var keys = ['nomniNewHQ','nomniNewHQToastPending','nomniCreatedHQs','nomniHqDetails','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState','nomniHqPrototypeState:demo-new','nomniHqManagedOutlets','nomni-hq-created-items-v1','nomni-hq-item-lifecycle-v1','nomni-hq-item-exclusions-v1','nomni-hq-supplier-state-v1','nomni-hq-recipe-state-v1','nomni-hq-recipe-food-cost-threshold-v1','nomni-hq-recipe-draft-v3','nomni-hq-inventory-state-v1','nomni-hq-price-review-v1','nomni-hq-price-review-v2','nomni-hq-activity-log-v1','nomniPosApiKey','nomniPosLocationId','nomniPosConfiguredOutlets','nomniHqPosApiKey'];
   if (hqName) keys.push('nomniHqManagedOutlets:new:' + hqName, 'nomniHqDetails:new:' + hqName);
   keys.forEach(function(key) { localStorage.removeItem(key); });
-  Object.keys(localStorage).forEach(function(key) {
-    if (key.indexOf('nomni-hq-get-started-dismissed:') === 0) localStorage.removeItem(key);
-  });
   window.location.href = 'Procure - HQ - Dashboard.html#outlet-groups';
 }
 
@@ -9831,18 +9815,6 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
 
 
 <script>
-function newHqGetStartedStorageKey(hqName) {
-  return 'nomni-hq-get-started-dismissed:' + String(hqName || 'new-hq').trim();
-}
-
-function dismissNewHqGetStarted() {
-  var checklist = document.getElementById('newHqGetStarted');
-  if (!checklist) return;
-  localStorage.setItem(newHqGetStartedStorageKey(checklist.dataset.hqName), '1');
-  checklist.hidden = true;
-  showHqToast('Checklist dismissed', 'You can continue setting up this HQ from the sidebar.');
-}
-
 function initialiseNewHQView() {
   var params = new URLSearchParams(window.location.search);
   var createdHqName = params.get('created-hq');
@@ -9903,21 +9875,11 @@ var panel = document.getElementById('panel-outlet-groups');
       '</div></div>' +
     '</div>' +
     '<div id="newHqOverviewRail" style="display:flex;flex-direction:column;gap:20px;position:sticky;top:72px">' +
-      '<section class="new-hq-get-started" id="newHqGetStarted" data-hq-name="' + escapeOverviewText(saved.name) + '"><div class="new-hq-get-started-head"><h2 class="new-hq-get-started-title">Get started</h2><button type="button" class="new-hq-get-started-dismiss" onclick="dismissNewHqGetStarted()">Dismiss</button></div>' +
-        '<div class="new-hq-get-started-list">' +
-          '<button type="button" class="new-hq-get-started-item" onclick="navigateToTab(\'suppliers\')"><span class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</span><span class="new-hq-get-started-item-label">Link suppliers</span><span class="material-symbols-outlined new-hq-get-started-arrow" aria-hidden="true">arrow_forward</span></button>' +
-          '<button type="button" class="new-hq-get-started-item" onclick="navigateToTab(\'market-list\')"><span class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</span><span class="new-hq-get-started-item-label">Add SKUs</span><span class="material-symbols-outlined new-hq-get-started-arrow" aria-hidden="true">arrow_forward</span></button>' +
-          '<button type="button" class="new-hq-get-started-item" onclick="navigateToTab(\'pos-mapping\')"><span class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</span><span class="new-hq-get-started-item-label">Set up POS mapping</span><span class="material-symbols-outlined new-hq-get-started-arrow" aria-hidden="true">arrow_forward</span></button>' +
-        '</div>' +
-      '</section>' +
       '<div><div class="panel-label-row" style="margin-bottom:12px"><span class="panel-label-text">Recent activity</span><button onclick="navigateToTab(\'activity\')" style="font-size:14px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View all →</button></div>' +
         '<div class="activity-feed"><div class="activity-item"><div class="activity-dot" style="background:#8a8f98"></div><div class="activity-body"><div class="activity-text"><strong>HQ created</strong></div><div class="activity-time">Today · Nomni Admin</div></div></div></div>' +
       '</div>' +
     '</div>' +
   '</div>';
-
-  var newHqGetStarted = document.getElementById('newHqGetStarted');
-  if (newHqGetStarted && localStorage.getItem(newHqGetStartedStorageKey(saved.name)) === '1') newHqGetStarted.hidden = true;
 
   var managedState;
   try { managedState = JSON.parse(localStorage.getItem(getManagedOutletStateKey()) || 'null'); } catch (e) { managedState = null; }
@@ -10083,7 +10045,7 @@ function renderNewHqSummary(group) {
     { icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', value:outletCount, label:'<span>Outlets</span> in this HQ', color:'#1A8040', accent:'#2AC864' },
     { icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>', value:ITEMS.length, label:'<span>Items</span> in market list', color:'#185FA5', accent:'#3B82F6' },
     { icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>', value:RECIPES.length, label:'<span>Recipes</span> in library', color:'#854F0B', accent:'#F59E0B' },
-    { icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>', value:SUPPLIERS.length, label:'<span>Suppliers</span> group-wide', color:'#6D28D9', accent:'#8B5CF6' }
+    { icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>', value:SUPPLIERS.length, label:'<span>Suppliers</span> in this HQ', color:'#6D28D9', accent:'#8B5CF6' }
   ];
   strip.className = 'hq-summary-strip';
   strip.innerHTML = stats.map(function(stat) {
