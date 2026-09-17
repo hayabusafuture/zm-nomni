@@ -2005,7 +2005,7 @@ body.supplier-settings-open { overflow:hidden; }
           <option value="removed">Removed</option>
         </select>
       </div>
-      <div class="inventory-bulk-actions" id="inventoryBulkActions"><span class="inventory-bulk-count" id="inventoryBulkCount">0 selected</span><button type="button" class="inventory-bulk-btn" id="inventoryCombineBtn" onclick="createInventoryItemFromSkus(Array.from(selectedInventoryIndices))">Combine buying options</button><button type="button" class="inventory-bulk-cancel" onclick="clearInventorySelection()">Cancel</button></div>
+      <div class="inventory-bulk-actions" id="inventoryBulkActions"><span class="inventory-bulk-count" id="inventoryBulkCount">0 selected</span><button type="button" class="inventory-bulk-btn" id="inventoryCombineBtn" onclick="createInventoryItemFromSkus(Array.from(selectedInventoryIndices))">Combine buying options</button><button type="button" class="inventory-bulk-btn" id="inventoryMergeBtn" onclick="openAddToExistingInventoryItem()">Merge with another item</button><button type="button" class="inventory-bulk-cancel" onclick="clearInventorySelection()">Cancel</button></div>
       <div style="overflow:clip">
         <table class="ml-table">
           <thead>
@@ -5534,6 +5534,7 @@ function cacheCreateItemInventoryContext() {
 syncAutomaticInventorySkus();
 loadHqInventoryState();
 syncAutomaticInventorySkus();
+INV_ITEMS.forEach(function(item) { if (item.par == null) item.par = 10; });
 window.nomniInventoryItems = INV_ITEMS;
 renderHealthCheck();
 
@@ -5588,12 +5589,15 @@ function updateInventoryBulkActions() {
   bar.classList.toggle('is-visible', n > 0);
   var combineBtn = document.getElementById('inventoryCombineBtn');
   if (combineBtn) { combineBtn.hidden = n < 2; combineBtn.disabled = n < 2; }
+  var mergeBtn = document.getElementById('inventoryMergeBtn');
+  if (mergeBtn) { mergeBtn.hidden = n < 1; mergeBtn.disabled = n < 1; }
   var filter = document.querySelector('#panel-inventory .ml-filter-row');
   if (filter) filter.style.display = n ? 'none' : '';
   count.textContent = n + (n === 1 ? ' item selected' : ' items selected');
 }
 var pendingGroupSkuSourceIndices = [];
 var pendingCombinedSourceIndices = [];
+var pendingMergeSourceIndices = [];
 var mergeDestinationItems = [];
 var mergeDestinationIndex = -1;
 var mergeDestinationSearch = '';
@@ -5616,7 +5620,6 @@ function openAddToExistingInventoryItem(starterIndex) {
   var search = document.getElementById('groupSkusExistingSearch');
   search.value = '';
   renderMergeDestinationList();
-  document.getElementById('groupSkusChoiceConfirm').disabled = !mergeDestinationItems.length;
   document.getElementById('groupSkusChoiceOverlay').classList.add('open');
   setTimeout(function() { search.focus(); }, 0);
 }
@@ -5635,8 +5638,7 @@ function chooseMergeDestination(index) {
   var item = INV_ITEMS[index];
   var search = document.getElementById('groupSkusExistingSearch');
   if (item && search) search.value = item.name;
-  renderMergeDestinationList();
-  document.getElementById('groupSkusChoiceConfirm').disabled = false;
+  if (item) openMergeDestinationEditor();
 }
 function renderMergeDestinationList() {
   var list = document.getElementById('groupSkusExistingList');
@@ -5648,10 +5650,52 @@ function renderMergeDestinationList() {
     return '<button type="button" class="merge-item-option' + (index === mergeDestinationIndex ? ' selected' : '') + '" onclick="chooseMergeDestination(' + index + ')">' + hqSettingsEscape(item.name) + '</button>';
   }).join('') : '<div class="merge-item-empty">No inventory items match your search.</div>';
 }
+function openMergeDestinationEditor() {
+  var targetIndex = mergeDestinationIndex;
+  var target = INV_ITEMS[targetIndex];
+  var sourceIndices = pendingGroupSkuSourceIndices.slice();
+  var sources = groupSkuSources(sourceIndices);
+  if (!target || target.type !== 'group' || !sources.length) return;
+  pendingMergeSourceIndices = sourceIndices;
+  closeGroupSkusChoice();
+  openGroupSkuModal(targetIndex);
+  var destinationUom = String(target.uom || '').trim();
+  var destinationUomField = document.getElementById('groupSkuUom');
+  if (destinationUom && destinationUomField) {
+    var matchingUom = Array.from(destinationUomField.options).find(function(option) {
+      return normaliseGroupSkuUom(option.value) === normaliseGroupSkuUom(destinationUom);
+    });
+    destinationUomField.value = matchingUom ? matchingUom.value : destinationUom;
+    groupSkuDraft.uom = destinationUomField.value;
+  }
+  var existingNames = new Set(groupSkuDraft.items.map(function(item) { return item.name; }));
+  sources.forEach(function(source) {
+    (source.constituents || []).forEach(function(option) {
+      if (existingNames.has(option.name)) return;
+      existingNames.add(option.name);
+      groupSkuDraft.items.push(Object.assign({}, option, {
+        conversion: option.conversion || 1,
+        conversionFlipped: !!option.conversionFlipped
+      }));
+    });
+  });
+  document.getElementById('groupSkuModalTitle').textContent = 'Merge with another inventory item';
+  document.getElementById('groupSkuSaveBtn').textContent = 'Merge';
+  renderGroupSkuContent();
+  updateGroupSkuSaveState();
+}
 function createInventoryItemFromSkus(sourceIndices) {
   var selectedItems = groupSkuSources(sourceIndices);
   if (selectedItems.length < 2) return;
-  openGroupSkuModal();
+  // Bulk combines inherit the selected items' availability, so there is no
+  // need to interrupt the flow with the manual "Add items to..." picker.
+  groupSkuScopes = new Set(selectedItems.reduce(function(scopes, item) {
+    scopes = scopes.concat(item.groups || [], item.outlets || []);
+    return scopes.concat((item.constituents || []).reduce(function(optionScopes, option) {
+      return optionScopes.concat(option.groups || [], option.outlets || []);
+    }, []));
+  }, []));
+  openGroupSkuModal(-1, undefined, true);
   pendingCombinedSourceIndices = sourceIndices.slice();
   var optionNames = new Set();
   groupSkuDraft.items = selectedItems.reduce(function(options, item) {
@@ -6877,7 +6921,7 @@ var groupSkuPickerSupplier = '';
 var groupSkuPickerConversions = {};
 var groupSkuScopes = new Set();
 
-function openGroupSkuModal(editIndex, starterIndex) {
+function openGroupSkuModal(editIndex, starterIndex, skipScopePicker) {
   var isEditing = typeof editIndex === 'number' && editIndex > -1;
   var existing = isEditing ? INV_ITEMS[editIndex] : null;
   var starter = Number.isInteger(starterIndex) ? INV_ITEMS[starterIndex] : null;
@@ -6904,7 +6948,7 @@ function openGroupSkuModal(editIndex, starterIndex) {
   document.getElementById('groupSkuSaveBtn').textContent = isEditing ? 'Save' : 'Create';
   renderGroupSkuContent();
   updateGroupSkuSaveState();
-  if (isEditing) document.getElementById('groupSkuOverlay').classList.add('open');
+  if (isEditing || skipScopePicker) document.getElementById('groupSkuOverlay').classList.add('open');
   else openGroupSkuScopePicker();
 }
 function closeGroupSkuModal() {
@@ -6912,6 +6956,7 @@ function closeGroupSkuModal() {
   groupSkuDraft = null;
   groupSkuScopes = new Set();
   pendingCombinedSourceIndices = [];
+  pendingMergeSourceIndices = [];
 }
 
 function renderGroupSkuScopes() {
@@ -7172,6 +7217,10 @@ function saveGroupSku() {
   }
   if (groupSkuDraft.editIndex > -1) {
     INV_ITEMS[groupSkuDraft.editIndex] = entry;
+    if (pendingMergeSourceIndices.length) {
+      groupSkuSources(pendingMergeSourceIndices).forEach(function(source) { source.mergedInto = name; });
+      pendingMergeSourceIndices = [];
+    }
     showHqToast('Inventory item updated', name + ' has been updated.');
     addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(name) + '</strong> inventory item updated', 'inventory', 'Master');
   } else {
@@ -9348,7 +9397,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
   <div class="modal-card" style="width:520px">
     <div class="modal-header"><h2 class="modal-title" id="groupSkusChoiceTitle">Add to existing inventory item</h2><button class="modal-close" onclick="closeGroupSkusChoice()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
     <div class="modal-body" style="gap:18px"><p id="groupSkusChoiceCopy" style="margin:0;color:var(--ink-mute);font-size:14px">Move this item&rsquo;s buying options into an existing inventory item for the same product. This lets you track options from different suppliers against one stock balance.</p><div><label class="field-label" for="groupSkusExistingSearch">Inventory item</label><div class="merge-item-picker"><input class="field-input" id="groupSkusExistingSearch" type="search" autocomplete="off" placeholder="Search inventory items" oninput="setMergeDestinationSearch(this.value)" /><div class="merge-item-options" id="groupSkusExistingList"></div></div></div></div>
-    <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkusChoice()">Cancel</button><button type="button" class="btn btn-primary" id="groupSkusChoiceConfirm" onclick="addToExistingInventoryItem()" disabled>Merge with item</button></div>
+    <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkusChoice()">Cancel</button></div>
   </div>
 </div>
 <div class="confirm-overlay" id="groupSkuContentDeleteOverlay" onclick="if(event.target===this)closeGroupSkuContentDelete()">

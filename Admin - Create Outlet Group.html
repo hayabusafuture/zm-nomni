@@ -144,6 +144,8 @@
   .picker-empty-title { font-size: 14px; font-weight: 600; color: var(--ink-mute); }
   .picker-empty-hint { font-size: 12px; color: var(--ink-soft); line-height: 1.5; }
   .outlet-selection-card { border:1px solid var(--rule); border-radius:8px; overflow:hidden; background:#fff; margin-bottom:24px; }
+  .procure-group-warning { display:none; align-items:flex-start; gap:10px; margin:0 0 12px; padding:12px 14px; border:1px solid #F5D87A; border-radius:8px; background:#FFF3CD; color:#7A5F00; line-height:1.45; }
+  .procure-group-warning .material-symbols-outlined { flex:0 0 auto; color:#D97706; font-size:20px; }
   .outlet-selection-head { min-height:56px; padding:0 16px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
   .outlet-selection-title { font-size:14px; font-weight:600; color:var(--ink); }
   .outlet-selection-count { margin-left:6px; color:var(--ink-mute); font-weight:400; }
@@ -330,6 +332,41 @@
 }
 
 </style>
+<style>
+  body.procure-context .app { grid-template-columns: 232px 1fr; }
+  body.procure-context .topbar { background: #1F2226; color: #fff; border-bottom: 1px solid #000; }
+  body.procure-context .brand-sub { color: var(--nomni-green); font-size: 23px; font-weight: 400; }
+  body.procure-context .topbar .user { color: #fff; }
+  body.procure-context .topbar-avt { background: #7F6AD0; color: #fff; }
+  body.procure-context .help-btn { color: rgba(255,255,255,.7); }
+  body.procure-context .sidebar { background: #F5F5F5; color: var(--ink); }
+  body.procure-context .sidebar-mode-wrap { display: block; padding: 10px 10px 0; }
+  body.procure-context .sidebar-mode-pill { display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: rgba(0,0,0,.07); }
+  body.procure-context .sidebar-mode-opt { flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 6px 8px; border: 0; border-radius: 6px; background: transparent; color: var(--ink-mute); font: 500 14px/1 Inter,sans-serif; }
+  body.procure-context .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  body.procure-context .sidebar-hq-select { position: relative; margin: 8px 0 2px; }
+  body.procure-context .sidebar-hq-btn { width: 100%; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--ink); font: 500 14px/1.2 Inter,sans-serif; text-align: left; }
+  body.procure-context .sidebar-hq-btn-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.procure-context .sidebar .nav { margin-top: 12px; padding: 6px 10px; }
+  body.procure-context .sidebar .nav a { gap: 12px; padding: 10px 12px; min-height: 40px; color: var(--ink); border: 0; border-radius: 6px; font-weight: 400; }
+  body.procure-context .sidebar .nav a:hover { color: var(--ink); background: rgba(0,0,0,.05); }
+  body.procure-context .sidebar .nav a.active { color: var(--seaweed); background: rgba(42,200,100,.14); font-weight: 600; }
+  body.procure-context .sidebar .nav .ms-icon { width: 18px; color: #888; font-size: 18px; line-height: 1; }
+  body.procure-context .sidebar .nav a.active .ms-icon { color: var(--spinach); }
+  body.procure-context .sidebar .nav a img { width: 18px; height: 18px; flex: 0 0 18px; }
+  body.procure-context .sidebar .nav a .icon-green { display: none; }
+  body.procure-context .sidebar .nav a.active .icon-grey { display: none; }
+  body.procure-context .sidebar .nav a.active .icon-green { display: block; }
+  body.procure-context .main { min-width: 0; padding-top: 32px; }
+  body.procure-context #hqSelect:disabled { background-color: #F3F4F6; color: var(--ink-mute); border-color: #DCDEE3; opacity: 1; cursor: not-allowed; }
+  @media (max-width: 1280px) {
+    body.procure-context .app { grid-template-columns: 64px 1fr; }
+    body.procure-context .sidebar { width: 64px; }
+    body.procure-context .sidebar:hover { width: 232px; }
+    body.procure-context .sidebar-mode-wrap, body.procure-context .sidebar-hq-select { display: none; }
+    body.procure-context .sidebar:hover .sidebar-mode-wrap, body.procure-context .sidebar:hover .sidebar-hq-select { display: block; }
+  }
+</style>
 </head>
 <body>
 <div class="app">
@@ -475,6 +512,7 @@
       <div class="section-heading">Outlets</div>
       <div class="section-note">Select the outlets that belong to this group. Outlets can come from any company or cluster.</div>
 
+      <div class="procure-group-warning" id="procureGroupWarning"><span class="material-symbols-outlined" aria-hidden="true">warning</span><span>Adding outlets to this group will <strong>replace their existing data</strong> — market list, recipes, and supplier settings — with the group's data. This cannot be undone.</span></div>
       <div class="outlet-selection-card">
         <div class="outlet-selection-head">
           <div class="outlet-selection-title">Selected outlets <span class="outlet-selection-count" id="pageOutletCount">0</span></div>
@@ -482,7 +520,6 @@
         </div>
         <div id="pageSelectedOutlets"></div>
       </div>
-
     </div>
 
   </main>
@@ -717,6 +754,14 @@ function handleCreate() {
   localStorage.setItem('nomniNewOutletGroup', JSON.stringify(group));
   localStorage.setItem('nomniNewOutletGroupToastPending', '1');
   var params = new URLSearchParams(window.location.search);
+  if (params.get('procure') === '1') {
+    var dashboardParams = new URLSearchParams();
+    if (hqName === 'New HQ') dashboardParams.set('demo-hq', 'new');
+    else if (hqName && hqName !== 'Garden Cuisine HQ') dashboardParams.set('created-hq', hqName);
+    dashboardParams.set('groupCreated', '1');
+    window.location.href = 'Procure - HQ - Dashboard.html' + (dashboardParams.toString() ? '?' + dashboardParams.toString() : '') + '#outlet-groups';
+    return;
+  }
   var returnUrl = 'Admin - HQ Settings.html?groupCreated=1&hq=' + encodeURIComponent(hqName);
   if (params.get('returnNew') === '1') {
     returnUrl += '&new=1';
@@ -776,6 +821,57 @@ document.getElementById('clearAllBtn').style.visibility = 'hidden';
   renderPageSelected();
   renderSelected();
   checkReady();
+})();
+</script>
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('procure') !== '1') return;
+  document.body.classList.add('procure-context');
+  var procureWarning = document.getElementById('procureGroupWarning');
+  if (procureWarning) procureWarning.style.display = 'flex';
+  var hqName = params.get('hq') || (params.get('demo-hq') === 'new' ? 'New HQ' : 'Garden Cuisine HQ');
+  var safeHq = String(hqName).replace(/[&<>"']/g, function(char) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]; });
+  if (hqName === 'New HQ') {
+    var linkedNewHqOutlets = new Set(['Amber Restaurant', 'Sky Bar & Lounge', 'Garden Terrace Cafe']);
+    getVisible = function() {
+      var q = document.getElementById('searchInput').value.trim().toLowerCase();
+      var co = document.getElementById('companyFilter').value;
+      var cl = document.getElementById('clusterFilter').value;
+      return OUTLETS.filter(function(outlet) {
+        if (!linkedNewHqOutlets.has(outlet.name)) return false;
+        if (co && outlet.company !== co) return false;
+        if (cl && outlet.cluster !== cl) return false;
+        return !q || outlet.name.toLowerCase().includes(q) || outlet.company.toLowerCase().includes(q) || outlet.cluster.toLowerCase().includes(q);
+      });
+    };
+  }
+  var hqSelect = document.getElementById('hqSelect');
+  if (hqSelect) {
+    hqSelect.innerHTML = '';
+    hqSelect.add(new Option(hqName, hqName, true, true));
+    hqSelect.disabled = true;
+    hqSelect.setAttribute('aria-label', 'Current HQ');
+  }
+  var dashboardParams = new URLSearchParams();
+  if (hqName === 'New HQ') dashboardParams.set('demo-hq', 'new');
+  else if (hqName && hqName !== 'Garden Cuisine HQ') dashboardParams.set('created-hq', hqName);
+  var dashboardUrl = 'Procure - HQ - Dashboard.html' + (dashboardParams.toString() ? '?' + dashboardParams.toString() : '');
+  document.title = 'Procure — Create outlet group';
+  var logo = document.querySelector('.brand-logo-img');
+  if (logo) logo.src = '_assets/nomni-logo-light.svg';
+  var brandSub = document.querySelector('.brand-sub');
+  if (brandSub) brandSub.textContent = 'Procure';
+  var back = document.querySelector('.back-link');
+  if (back) {
+    back.href = dashboardUrl + '#outlet-groups';
+    back.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg><span>' + safeHq + '</span>';
+  }
+  var sidebar = document.querySelector('.sidebar');
+  if (sidebar) sidebar.innerHTML = '<div class="sidebar-mode-wrap"><div class="sidebar-mode-pill"><button class="sidebar-mode-opt" type="button"><span>Outlet</span></button><button class="sidebar-mode-opt active" type="button"><span>HQ</span></button></div><div class="sidebar-hq-select"><button class="sidebar-hq-btn" type="button"><span class="material-symbols-outlined" style="font-size:16px;color:var(--ink-mute)">domain</span><span class="sidebar-hq-btn-name">' + safeHq + '</span><span class="material-symbols-outlined" style="font-size:16px;color:var(--ink-mute)">expand_more</span></button></div></div>' +
+    '<nav class="nav" aria-label="HQ navigation"><a href="' + dashboardUrl + '#outlet-groups"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Dashboard - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Dashboard - green.png" alt=""></span><span>Dashboard</span></a><a href="' + dashboardUrl + '#market-list"><span class="ms-icon material-symbols-outlined">list_alt</span><span>SKUs</span></a><a href="' + dashboardUrl + '#inventory"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Inventory - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Inventory - green.png" alt=""></span><span>Inventory</span></a><a href="' + dashboardUrl + '#recipes"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Recipes - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Recipes - green.png" alt=""></span><span>Recipes</span></a><a href="' + dashboardUrl + '#pos-mapping"><span class="ms-icon material-symbols-outlined">account_tree</span><span>POS mapping</span></a><a href="' + dashboardUrl + '#suppliers"><span class="ms-icon material-symbols-outlined">local_shipping</span><span>Suppliers</span></a><a href="' + dashboardUrl + '#users"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Users - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Users - green.png" alt=""></span><span>HQ users</span></a><a href="' + dashboardUrl + '#activity"><span class="ms-icon material-symbols-outlined">history</span><span>Activity</span></a></nav>';
+  var hqLabel = document.getElementById('backHqName');
+  if (hqLabel) hqLabel.textContent = hqName;
 })();
 </script>
 </body>

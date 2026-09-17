@@ -290,6 +290,44 @@
   .font-inspector-btn { border-color: rgba(14,55,39,.28); color: rgba(14,55,39,.68); }
   .font-inspector-btn:hover { background: rgba(14,55,39,.10); color: var(--seaweed); }
 
+  /* Procure-themed Create SKU context, entered from the Procure HQ SKUs page. */
+  body.procure-context .app { grid-template-columns: 232px 1fr; }
+  body.procure-context .topbar { background: #1F2226; color: #fff; border-bottom: 1px solid #000; box-shadow: none; }
+  body.procure-context .brand-logo-img { height: 26px; }
+  body.procure-context .brand-sub { color: var(--nomni-green); font-size: 23px; font-weight: 400; }
+  body.procure-context .topbar .user { color: #fff; }
+  body.procure-context .topbar-avt { background: #7F6AD0; color: #fff; }
+  body.procure-context .help-btn { color: rgba(255,255,255,.7); }
+  body.procure-context .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  body.procure-context .sidebar { background: #F5F5F5; color: var(--ink); }
+  body.procure-context .sidebar-mode-wrap { display: block; padding: 10px 10px 0; flex-shrink: 0; }
+  body.procure-context .sidebar-mode-pill { display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: rgba(0,0,0,.07); }
+  body.procure-context .sidebar-mode-opt { flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 6px 8px; border: 0; border-radius: 6px; background: transparent; color: var(--ink-mute); font: 500 14px/1 Inter,sans-serif; }
+  body.procure-context .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  body.procure-context .sidebar-hq-select { position: relative; margin: 8px 0 2px; }
+  body.procure-context .sidebar-hq-btn { width: 100%; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--ink); font: 500 14px/1.2 Inter,sans-serif; text-align: left; }
+  body.procure-context .sidebar-hq-btn-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.procure-context .sidebar .nav { margin-top: 12px; padding: 6px 10px; }
+  body.procure-context .sidebar .nav a { gap: 12px; padding: 10px 12px; min-height: 40px; color: var(--ink); border: 0; border-radius: 6px; font-weight: 400; }
+  body.procure-context .sidebar .nav a:hover { color: var(--ink); background: rgba(0,0,0,.05); }
+  body.procure-context .sidebar .nav a.active { color: var(--seaweed); background: rgba(42,200,100,.14); font-weight: 600; }
+  body.procure-context .sidebar .nav .ms-icon { width: 18px; color: #888; font-size: 18px; line-height: 1; }
+  body.procure-context .sidebar .nav a.active .ms-icon { color: var(--spinach); }
+  body.procure-context .sidebar .nav a img { width: 18px; height: 18px; flex: 0 0 18px; }
+  body.procure-context .sidebar .nav a .icon-green { display: none; }
+  body.procure-context .sidebar .nav a.active .icon-grey { display: none; }
+  body.procure-context .sidebar .nav a.active .icon-green { display: block; }
+  body.procure-context .main { padding-top: 32px; }
+  body.procure-context .sticky-footer { left: 232px; }
+  @media (max-width: 1280px) {
+    body.procure-context .app { grid-template-columns: 64px 1fr; }
+    body.procure-context .sidebar { width: 64px; }
+    body.procure-context .sidebar:hover { width: 232px; }
+    body.procure-context .sidebar-mode-wrap, body.procure-context .sidebar-hq-select { display: none; }
+    body.procure-context .sidebar:hover .sidebar-mode-wrap, body.procure-context .sidebar:hover .sidebar-hq-select { display: block; }
+    body.procure-context .sticky-footer { left: 64px; }
+  }
+
 /* Freemium-aligned action buttons */
 .btn-primary {
   min-height: 40px;
@@ -701,15 +739,23 @@ function createItemEscape(value) {
 }
 function isNewHqCreateItem() {
   var params = new URLSearchParams(window.location.search);
-  return params.get('new') === '1' || params.has('created-hq');
+  return params.get('new') === '1' || params.has('created-hq') || params.get('demo-hq') === 'new';
 }
 function getNewHqCreateItemScopes() {
   var params = new URLSearchParams(window.location.search);
   var hqName = params.get('created-hq') || params.get('hq');
-  if (!hqName) return [];
+  var managedOutletsKey = params.get('demo-hq') === 'new'
+    ? 'nomniHqManagedOutlets:preview:new'
+    : (hqName ? 'nomniHqManagedOutlets:new:' + hqName : 'nomniHqManagedOutlets');
   var stored;
-  try { stored = JSON.parse(localStorage.getItem('nomniHqManagedOutlets:new:' + hqName) || 'null'); } catch (e) { stored = null; }
-  if (!stored || !stored.tableHtml) return [];
+  try { stored = JSON.parse(localStorage.getItem(managedOutletsKey) || 'null'); } catch (e) { stored = null; }
+  if (!stored || !stored.tableHtml) {
+    return params.get('demo-hq') === 'new' ? [
+      {name:'Amber Restaurant', type:'outlet', meta:''},
+      {name:'Sky Bar & Lounge', type:'outlet', meta:''},
+      {name:'Garden Terrace Cafe', type:'outlet', meta:''}
+    ] : [];
+  }
   var template = document.createElement('template'); template.innerHTML = stored.tableHtml;
   var groups = Array.from(template.content.querySelectorAll('tr[data-group-name]')).map(function(row) {
     var name = row.querySelector('.og-name'); var count = row.querySelector('.og-outlet-count');
@@ -737,7 +783,8 @@ function hydrateNewHqCreateItem() {
   }
   var select = document.getElementById('supplierSelect');
   if (select) {
-    var state; try { state = JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}'); } catch (e) { state = {}; }
+    var supplierStateKey = new URLSearchParams(window.location.search).get('demo-hq') === 'new' ? 'nomniHqPrototypeState:demo-new' : 'nomniHqPrototypeState';
+    var state; try { state = JSON.parse(localStorage.getItem(supplierStateKey) || '{}'); } catch (e) { state = {}; }
     var suppliers = Array.isArray(state.suppliers) ? state.suppliers.map(function(supplier) { return supplier && (supplier.name || supplier.supplier || supplier.label); }).filter(Boolean) : [];
     select.innerHTML = '<option value="">' + (suppliers.length ? 'Select supplier' : 'Link a supplier first') + '</option>' + suppliers.map(function(name) { return '<option value="' + createItemEscape(name) + '">' + createItemEscape(createItemSupplierDisplayName(name)) + '</option>'; }).join('');
     select.disabled = !suppliers.length;
@@ -860,6 +907,43 @@ function updateRemoveButtons() {
 function updateCharCount(inp) {
   const hint = document.getElementById('skuNameHint');
   hint.textContent = inp.value.length + '/100 characters · Use the name as it appears on supplier invoices';
+}
+
+function applyProcureCreateItemContext() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('procure') !== '1') return false;
+  document.body.classList.add('procure-context');
+  document.title = 'Procure — Create SKU';
+  var hqName = params.get('created-hq') || (params.get('demo-hq') === 'new' ? 'New HQ' : 'Garden Cuisine HQ');
+  var dashboardParams = new URLSearchParams(window.location.search);
+  dashboardParams.delete('procure');
+  var dashboardUrl = 'Procure - HQ - Dashboard.html' + (dashboardParams.toString() ? '?' + dashboardParams.toString() : '');
+  var logo = document.querySelector('.brand-logo-img');
+  var brandSub = document.querySelector('.brand-sub');
+  if (logo) { logo.src = '_assets/nomni-logo-light.svg'; logo.alt = 'nomni'; }
+  if (brandSub) brandSub.textContent = 'Procure';
+  var back = document.querySelector('.back-link');
+  if (back) {
+    back.href = dashboardUrl + '#market-list';
+    back.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg><span>' + createItemEscape(hqName) + '</span>';
+  }
+  var sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    sidebar.innerHTML = '<div class="sidebar-mode-wrap"><div class="sidebar-mode-pill"><button class="sidebar-mode-opt" type="button"><span>Outlet</span></button><button class="sidebar-mode-opt active" type="button"><span>HQ</span></button></div><div class="sidebar-hq-select"><button class="sidebar-hq-btn" type="button"><span class="material-symbols-outlined" style="font-size:16px;color:var(--ink-mute)">domain</span><span class="sidebar-hq-btn-name">' + createItemEscape(hqName) + '</span><span class="material-symbols-outlined" style="font-size:16px;color:var(--ink-mute)">expand_more</span></button></div></div>' +
+      '<nav class="nav">' +
+      '<a href="' + dashboardUrl + '#outlet-groups"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span>Dashboard</span></a>' +
+      '<a class="active" href="' + dashboardUrl + '#market-list"><span class="ms-icon material-symbols-outlined">list_alt</span><span>SKUs</span></a>' +
+      '<a href="' + dashboardUrl + '#inventory"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span>Inventory</span></a>' +
+      '<a href="' + dashboardUrl + '#recipes"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span>Recipes</span></a>' +
+      '<a href="' + dashboardUrl + '#pos-mapping"><span class="ms-icon material-symbols-outlined">account_tree</span><span>POS mapping</span></a>' +
+      '<a href="' + dashboardUrl + '#suppliers"><span class="ms-icon material-symbols-outlined">local_shipping</span><span>Suppliers</span></a>' +
+      '<a href="' + dashboardUrl + '#users"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span>HQ users</span></a>' +
+      '<a href="' + dashboardUrl + '#activity"><span class="ms-icon material-symbols-outlined">history</span><span>Activity</span></a>' +
+      '</nav>';
+  }
+  var submit = document.querySelector('.save-btn');
+  if (submit) submit.textContent = 'Create SKU';
+  return true;
 }
 
 function onTaxRadioChange(radio) {
@@ -1100,20 +1184,26 @@ function saveNewHqItem() {
   try {
     const newHq = JSON.parse(localStorage.getItem('nomniNewHQ') || 'null');
     if (newHq) {
-      const state = JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}');
+      const stateKey = new URLSearchParams(window.location.search).get('demo-hq') === 'new' ? 'nomniHqPrototypeState:demo-new' : 'nomniHqPrototypeState';
+      const state = JSON.parse(localStorage.getItem(stateKey) || '{}');
       state.items = Array.isArray(state.items) ? state.items : [];
       if (state.items.some(function(existing) { return existing && existing.name && existing.name.toLowerCase() === name.toLowerCase(); })) {
         alert('An item with this name has already been created.'); return;
       }
       if (inventoryTarget) persistInventoryItemAssociation(item, inventoryTarget);
       state.items.push(item);
-      localStorage.setItem('nomniHqPrototypeState', JSON.stringify(state));
+      localStorage.setItem(stateKey, JSON.stringify(state));
     }
   } catch (e) {}
 
   localStorage.setItem('nomniHqCreatedItemToastPending', name);
   const params = new URLSearchParams(window.location.search);
-  window.location.href = 'Admin - HQ Settings.html' + (isNewHqCreateItem() && params.toString() ? '?' + params.toString() : '') + '#market-list';
+  if (params.get('procure') === '1') {
+    params.delete('procure');
+    window.location.href = 'Procure - HQ - Dashboard.html' + (params.toString() ? '?' + params.toString() : '') + '#market-list';
+  } else {
+    window.location.href = 'Admin - HQ Settings.html' + (isNewHqCreateItem() && params.toString() ? '?' + params.toString() : '') + '#market-list';
+  }
 }
 
 // UOM chip toggle
@@ -1127,6 +1217,7 @@ document.addEventListener('click', function(e) {
   if (inp) inp.checked = chip.classList.contains('on');
 });
 
+var procureCreateItemContext = applyProcureCreateItemContext();
 hydrateNewHqCreateItem();
 hydrateCreateItemInventoryOptions();
 // Seed one default pricing row

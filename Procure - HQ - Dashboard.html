@@ -1607,7 +1607,7 @@ body.supplier-settings-open { overflow:hidden; }
             <span class="panel-label-text">Groups &amp; outlets <span class="panel-label-count">4</span></span>
             <div style="display:flex;align-items:center;gap:8px">
               <button class="btn-secondary" onclick="openLinkOutletPicker()">Add outlets</button>
-              <button class="btn-primary" onclick="window.location.href='Procure - HQ - Create Outlet Group.html?hq=Garden+Cuisine+HQ'">
+              <button class="btn-primary" onclick="openNewHqCreateGroup()">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
                 New group
               </button>
@@ -1840,7 +1840,7 @@ body.supplier-settings-open { overflow:hidden; }
             <div id="addItemMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:230px;overflow:hidden">
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openHqInvoiceModal()">Add from invoice</div>
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openAddCatalogueModal()">Add from supplier catalogue</div>
-              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';window.location.href='Admin - HQ Create Item.html'+window.location.search">Create SKU</div>
+              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';var p=new URLSearchParams(window.location.search);p.set('procure','1');window.location.href='Admin - HQ Create Item.html?'+p.toString()">Create SKU</div>
             </div>
           </div>
         </div>
@@ -2032,7 +2032,7 @@ body.supplier-settings-open { overflow:hidden; }
           <option value="removed">Removed</option>
         </select>
       </div>
-      <div class="inventory-bulk-actions" id="inventoryBulkActions"><span class="inventory-bulk-count" id="inventoryBulkCount">0 selected</span><button type="button" class="inventory-bulk-btn" id="inventoryCombineBtn" onclick="createInventoryItemFromSkus(Array.from(selectedInventoryIndices))">Combine buying options</button><button type="button" class="inventory-bulk-cancel" onclick="clearInventorySelection()">Cancel</button></div>
+      <div class="inventory-bulk-actions" id="inventoryBulkActions"><span class="inventory-bulk-count" id="inventoryBulkCount">0 selected</span><button type="button" class="inventory-bulk-btn" id="inventoryCombineBtn" onclick="createInventoryItemFromSkus(Array.from(selectedInventoryIndices))">Combine buying options</button><button type="button" class="inventory-bulk-btn" id="inventoryMergeBtn" onclick="openAddToExistingInventoryItem()">Merge with another item</button><button type="button" class="inventory-bulk-cancel" onclick="clearInventorySelection()">Cancel</button></div>
       <div style="overflow:clip">
         <table class="ml-table">
           <thead>
@@ -2054,7 +2054,7 @@ body.supplier-settings-open { overflow:hidden; }
       <div class="inner-page-header">
       <div class="panel-label-row">
         <span class="panel-label-text">POS mapping</span>
-        <a class="btn btn-primary" id="posHqCta" href="Admin - HQ - POS Mapping.html" onclick="if(!isPosConfigured()){event.preventDefault();openPosSettings();}else if(window.isNewHQ){event.preventDefault();window.location.href='Admin - HQ - POS Mapping.html?created-hq='+encodeURIComponent(document.querySelector('.page-title').textContent.trim());}" style="text-decoration:none">Manage HQ mapping</a>
+        <a class="btn btn-primary" id="posHqCta" href="Admin - HQ - POS Mapping.html?procure=1" onclick="if(!isPosConfigured()){event.preventDefault();openPosSettings();}else if(window.isNewHQ){event.preventDefault();var p=new URLSearchParams(window.location.search);p.set('procure','1');p.set('created-hq',document.querySelector('.page-title').textContent.trim());window.location.href='Admin - HQ - POS Mapping.html?'+p.toString();}" style="text-decoration:none">Manage HQ mapping</a>
       </div>
       </div>
       <div class="ml-filter-row" aria-label="Filter outlets for POS mapping">
@@ -2076,18 +2076,18 @@ body.supplier-settings-open { overflow:hidden; }
         </select>
       </div>
       <table class="ml-table"><thead><tr><th>Outlet</th><th style="width:150px">POS connection</th><th style="width:150px">Products</th><th style="width:150px">Variants</th><th style="width:130px">Last mapped</th><th style="width:130px"></th></tr></thead><tbody id="posOutletTableBody">
-        <tr data-mapping-status="mapped"><td><div style="font-weight:500">(WF 301) Chargrill @ 301 Punggol</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:100%"></span></div><strong class="pos-mapping-count">8 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:100%"></span></div><strong class="pos-mapping-count">14 / 14</strong></div></td><td style="color:var(--ink-mute)">10 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20301%20Punggol" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 107) Chargrill @ 107 Serangoon</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:58%"></span></div><strong class="pos-mapping-count">7 / 12</strong></div></td><td style="color:var(--ink-mute)">09 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20107%20Serangoon" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 139) Chargrill @ 139 Tampines</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:88%"></span></div><strong class="pos-mapping-count">7 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:64%"></span></div><strong class="pos-mapping-count">9 / 14</strong></div></td><td style="color:var(--ink-mute)">4 Sep 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=%28WF%20139%29%20Chargrill%20%40%20139%20Tampines" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="mapped"><td><div style="font-weight:500">(WF 301) Chargrill @ 301 Punggol</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:100%"></span></div><strong class="pos-mapping-count">8 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:100%"></span></div><strong class="pos-mapping-count">14 / 14</strong></div></td><td style="color:var(--ink-mute)">10 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20301%20Punggol&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 107) Chargrill @ 107 Serangoon</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:58%"></span></div><strong class="pos-mapping-count">7 / 12</strong></div></td><td style="color:var(--ink-mute)">09 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Chargrill%20%40%20107%20Serangoon&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 139) Chargrill @ 139 Tampines</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:88%"></span></div><strong class="pos-mapping-count">7 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:64%"></span></div><strong class="pos-mapping-count">9 / 14</strong></div></td><td style="color:var(--ink-mute)">4 Sep 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=%28WF%20139%29%20Chargrill%20%40%20139%20Tampines&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
         <tr data-mapping-status="unmapped"><td><div style="font-weight:600">(WF 259) Chargrill @ 259 Bukit Panjang</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 259) Chargrill @ 259 Bukit Panjang')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
         <tr data-mapping-status="unmapped"><td><div style="font-weight:600">(WF 280) Chargrill @ 280 Bishan</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Chargrill Outlets</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 280) Chargrill @ 280 Bishan')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
-        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 055) Garden Express @ 055 Jurong East</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:75%"></span></div><strong class="pos-mapping-count">6 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">10 / 16</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20055%20Jurong%20East" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 088) Garden Express @ 088 Clementi</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:50%"></span></div><strong class="pos-mapping-count">8 / 16</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20088%20Clementi" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 112) Garden Bistro @ 112 Novena</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:50%"></span></div><strong class="pos-mapping-count">4 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:38%"></span></div><strong class="pos-mapping-count">6 / 16</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20112%20Novena" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 167) Garden Bistro @ 167 Ang Mo Kio</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:88%"></span></div><strong class="pos-mapping-count">7 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:69%"></span></div><strong class="pos-mapping-count">11 / 16</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20167%20Ang%20Mo%20Kio" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 055) Garden Express @ 055 Jurong East</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:75%"></span></div><strong class="pos-mapping-count">6 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">10 / 16</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20055%20Jurong%20East&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 088) Garden Express @ 088 Clementi</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:50%"></span></div><strong class="pos-mapping-count">8 / 16</strong></div></td><td style="color:var(--ink-mute)">08 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Express%20%40%20088%20Clementi&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 112) Garden Bistro @ 112 Novena</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:50%"></span></div><strong class="pos-mapping-count">4 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:38%"></span></div><strong class="pos-mapping-count">6 / 16</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20112%20Novena&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 167) Garden Bistro @ 167 Ang Mo Kio</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:88%"></span></div><strong class="pos-mapping-count">7 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:69%"></span></div><strong class="pos-mapping-count">11 / 16</strong></div></td><td style="color:var(--ink-mute)">07 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Bistro%20%40%20167%20Ang%20Mo%20Kio&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
         <tr data-mapping-status="unmapped"><td><div style="font-weight:600">(WF 203) Garden Café @ 203 Bedok</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip off">Not connected</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td><button type="button" onclick="openPosSettings('(WF 203) Garden Café @ 203 Bedok')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button></td></tr>
-        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 244) Garden Café @ 244 Woodlands</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:75%"></span></div><strong class="pos-mapping-count">6 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:56%"></span></div><strong class="pos-mapping-count">9 / 16</strong></div></td><td style="color:var(--ink-mute)">06 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Caf%C3%A9%20%40%20244%20Woodlands" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
-        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 290) Garden Express @ 290 Sengkang</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:64%"></span></div><strong class="pos-mapping-count">9 / 14</strong></div></td><td style="color:var(--ink-mute)">4 Sep 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=%28WF%20290%29%20Garden%20Express%20%40%20290%20Sengkang" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 244) Garden Café @ 244 Woodlands</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">Family Dining Express</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:75%"></span></div><strong class="pos-mapping-count">6 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:56%"></span></div><strong class="pos-mapping-count">9 / 16</strong></div></td><td style="color:var(--ink-mute)">06 Jun 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=Garden%20Caf%C3%A9%20%40%20244%20Woodlands&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
+        <tr data-mapping-status="partially-mapped"><td><div style="font-weight:600">(WF 290) Garden Express @ 290 Sengkang</div></td><td><span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:63%"></span></div><strong class="pos-mapping-count">5 / 8</strong></div></td><td><div class="pos-mapping-status"><div class="pos-mapping-progress"><span style="width:64%"></span></div><strong class="pos-mapping-count">9 / 14</strong></div></td><td style="color:var(--ink-mute)">4 Sep 2026</td><td><a href="Admin - HQ - POS Mapping.html?outlet=%28WF%20290%29%20Garden%20Express%20%40%20290%20Sengkang&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a></td></tr>
         <tr id="posOutletEmpty" hidden><td colspan="6" style="padding:32px;text-align:center;color:var(--ink-mute)">No outlets match these filters.</td></tr>
       </tbody></table>
     </div>
@@ -4683,12 +4683,14 @@ function saveActivityLog() {
 }
 
 function getPrototypeState() {
-  try { return JSON.parse(localStorage.getItem('nomniHqPrototypeState') || '{}'); } catch (e) { return {}; }
+  var key = new URLSearchParams(window.location.search).get('demo-hq') === 'new'
+    ? 'nomniHqPrototypeState:demo-new'
+    : 'nomniHqPrototypeState';
+  try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { return {}; }
 }
 function savePrototypeState() {
   saveActivityLog();
   if (!window.isNewHQ) return;
-  if (new URLSearchParams(window.location.search).get('demo-hq') === 'new') return;
   var state = getPrototypeState();
   state.suppliers = SUPPLIERS.map(function(supplier) { return Object.assign({}, supplier); });
   state.items = ITEMS.map(function(item) { return Object.assign({}, item); });
@@ -4697,7 +4699,10 @@ function savePrototypeState() {
     groups: Array.isArray(item.groups) ? item.groups.slice() : []
   }); });
   state.activity = ACTIVITY_LOG.slice();
-  localStorage.setItem('nomniHqPrototypeState', JSON.stringify(state));
+  var key = new URLSearchParams(window.location.search).get('demo-hq') === 'new'
+    ? 'nomniHqPrototypeState:demo-new'
+    : 'nomniHqPrototypeState';
+  localStorage.setItem(key, JSON.stringify(state));
 }
 function addPrototypeActivity(module, text, tab, scope, user) {
   var now = new Date();
@@ -4739,7 +4744,7 @@ function resetProcureHqPrototypeData() {
   if (!window.confirm('Clear all locally saved data for this Procure HQ prototype?')) return;
   var params = new URLSearchParams(window.location.search);
   var hqName = params.get('created-hq') || params.get('hq');
-  var keys = ['nomniNewHQ','nomniNewHQToastPending','nomniCreatedHQs','nomniHqDetails','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState','nomniHqManagedOutlets','nomni-hq-created-items-v1','nomni-hq-item-lifecycle-v1','nomni-hq-item-exclusions-v1','nomni-hq-supplier-state-v1','nomni-hq-recipe-state-v1','nomni-hq-recipe-food-cost-threshold-v1','nomni-hq-recipe-draft-v3','nomni-hq-inventory-state-v1','nomni-hq-price-review-v1','nomni-hq-price-review-v2','nomni-hq-activity-log-v1','nomniPosApiKey','nomniPosLocationId','nomniPosConfiguredOutlets','nomniHqPosApiKey'];
+  var keys = ['nomniNewHQ','nomniNewHQToastPending','nomniCreatedHQs','nomniHqDetails','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState','nomniHqPrototypeState:demo-new','nomniHqManagedOutlets','nomni-hq-created-items-v1','nomni-hq-item-lifecycle-v1','nomni-hq-item-exclusions-v1','nomni-hq-supplier-state-v1','nomni-hq-recipe-state-v1','nomni-hq-recipe-food-cost-threshold-v1','nomni-hq-recipe-draft-v3','nomni-hq-inventory-state-v1','nomni-hq-price-review-v1','nomni-hq-price-review-v2','nomni-hq-activity-log-v1','nomniPosApiKey','nomniPosLocationId','nomniPosConfiguredOutlets','nomniHqPosApiKey'];
   if (hqName) keys.push('nomniHqManagedOutlets:new:' + hqName, 'nomniHqDetails:new:' + hqName);
   keys.forEach(function(key) { localStorage.removeItem(key); });
   Object.keys(localStorage).forEach(function(key) {
@@ -5650,6 +5655,7 @@ function saveHqInventoryState() {
 syncAutomaticInventorySkus();
 loadHqInventoryState();
 syncAutomaticInventorySkus();
+INV_ITEMS.forEach(function(item) { if (item.par == null) item.par = 10; });
 window.nomniInventoryItems = INV_ITEMS;
 renderHealthCheck();
 
@@ -5704,12 +5710,15 @@ function updateInventoryBulkActions() {
   bar.classList.toggle('is-visible', n > 0);
   var combineBtn = document.getElementById('inventoryCombineBtn');
   if (combineBtn) { combineBtn.hidden = n < 2; combineBtn.disabled = n < 2; }
+  var mergeBtn = document.getElementById('inventoryMergeBtn');
+  if (mergeBtn) { mergeBtn.hidden = n < 1; mergeBtn.disabled = n < 1; }
   var filter = document.querySelector('#panel-inventory .ml-filter-row');
   if (filter) filter.style.display = n ? 'none' : '';
   count.textContent = n + (n === 1 ? ' item selected' : ' items selected');
 }
 var pendingGroupSkuSourceIndices = [];
 var pendingCombinedSourceIndices = [];
+var pendingMergeSourceIndices = [];
 var mergeDestinationItems = [];
 var mergeDestinationIndex = -1;
 var mergeDestinationSearch = '';
@@ -5732,7 +5741,6 @@ function openAddToExistingInventoryItem(starterIndex) {
   var search = document.getElementById('groupSkusExistingSearch');
   search.value = '';
   renderMergeDestinationList();
-  document.getElementById('groupSkusChoiceConfirm').disabled = !mergeDestinationItems.length;
   document.getElementById('groupSkusChoiceOverlay').classList.add('open');
   setTimeout(function() { search.focus(); }, 0);
 }
@@ -5751,8 +5759,7 @@ function chooseMergeDestination(index) {
   var item = INV_ITEMS[index];
   var search = document.getElementById('groupSkusExistingSearch');
   if (item && search) search.value = item.name;
-  renderMergeDestinationList();
-  document.getElementById('groupSkusChoiceConfirm').disabled = false;
+  if (item) openMergeDestinationEditor();
 }
 function renderMergeDestinationList() {
   var list = document.getElementById('groupSkusExistingList');
@@ -5764,10 +5771,52 @@ function renderMergeDestinationList() {
     return '<button type="button" class="merge-item-option' + (index === mergeDestinationIndex ? ' selected' : '') + '" onclick="chooseMergeDestination(' + index + ')">' + hqSettingsEscape(item.name) + '</button>';
   }).join('') : '<div class="merge-item-empty">No inventory items match your search.</div>';
 }
+function openMergeDestinationEditor() {
+  var targetIndex = mergeDestinationIndex;
+  var target = INV_ITEMS[targetIndex];
+  var sourceIndices = pendingGroupSkuSourceIndices.slice();
+  var sources = groupSkuSources(sourceIndices);
+  if (!target || target.type !== 'group' || !sources.length) return;
+  pendingMergeSourceIndices = sourceIndices;
+  closeGroupSkusChoice();
+  openGroupSkuModal(targetIndex);
+  var destinationUom = String(target.uom || '').trim();
+  var destinationUomField = document.getElementById('groupSkuUom');
+  if (destinationUom && destinationUomField) {
+    var matchingUom = Array.from(destinationUomField.options).find(function(option) {
+      return normaliseGroupSkuUom(option.value) === normaliseGroupSkuUom(destinationUom);
+    });
+    destinationUomField.value = matchingUom ? matchingUom.value : destinationUom;
+    groupSkuDraft.uom = destinationUomField.value;
+  }
+  var existingNames = new Set(groupSkuDraft.items.map(function(item) { return item.name; }));
+  sources.forEach(function(source) {
+    (source.constituents || []).forEach(function(option) {
+      if (existingNames.has(option.name)) return;
+      existingNames.add(option.name);
+      groupSkuDraft.items.push(Object.assign({}, option, {
+        conversion: option.conversion || 1,
+        conversionFlipped: !!option.conversionFlipped
+      }));
+    });
+  });
+  document.getElementById('groupSkuModalTitle').textContent = 'Merge with another inventory item';
+  document.getElementById('groupSkuSaveBtn').textContent = 'Merge';
+  renderGroupSkuContent();
+  updateGroupSkuSaveState();
+}
 function createInventoryItemFromSkus(sourceIndices) {
   var selectedItems = groupSkuSources(sourceIndices);
   if (selectedItems.length < 2) return;
-  openGroupSkuModal();
+  // Bulk combines inherit the selected items' availability, so there is no
+  // need to interrupt the flow with the manual "Add items to..." picker.
+  groupSkuScopes = new Set(selectedItems.reduce(function(scopes, item) {
+    scopes = scopes.concat(item.groups || [], item.outlets || []);
+    return scopes.concat((item.constituents || []).reduce(function(optionScopes, option) {
+      return optionScopes.concat(option.groups || [], option.outlets || []);
+    }, []));
+  }, []));
+  openGroupSkuModal(-1, undefined, true);
   pendingCombinedSourceIndices = sourceIndices.slice();
   var optionNames = new Set();
   groupSkuDraft.items = selectedItems.reduce(function(options, item) {
@@ -6858,6 +6907,9 @@ function inventoryDisplayName(record) {
 
 function renderInv() {
   syncAutomaticInventorySkus();
+  // New HQ pages replace empty panels with a prerequisite state. Reconcile
+  // that wrapper before rendering so a newly-created item can appear here.
+  if (typeof refreshNewHqEmptyStates === 'function') refreshNewHqEmptyStates();
   applyHqInventorySettingsOverrides();
   var items = INV_ITEMS.slice();
   if (invSearch) { var q = invSearch.toLowerCase(); items = items.filter(function(r){ return inventoryDisplayName(r).toLowerCase().includes(q) || r.name.toLowerCase().includes(q) || (r.detail||'').toLowerCase().includes(q); }); }
@@ -6996,7 +7048,7 @@ var groupSkuPickerSupplier = '';
 var groupSkuPickerConversions = {};
 var groupSkuScopes = new Set();
 
-function openGroupSkuModal(editIndex, starterIndex) {
+function openGroupSkuModal(editIndex, starterIndex, skipScopePicker) {
   var isEditing = typeof editIndex === 'number' && editIndex > -1;
   var existing = isEditing ? INV_ITEMS[editIndex] : null;
   var starter = Number.isInteger(starterIndex) ? INV_ITEMS[starterIndex] : null;
@@ -7023,7 +7075,7 @@ function openGroupSkuModal(editIndex, starterIndex) {
   document.getElementById('groupSkuSaveBtn').textContent = isEditing ? 'Save' : 'Create';
   renderGroupSkuContent();
   updateGroupSkuSaveState();
-  if (isEditing) document.getElementById('groupSkuOverlay').classList.add('open');
+  if (isEditing || skipScopePicker) document.getElementById('groupSkuOverlay').classList.add('open');
   else openGroupSkuScopePicker();
 }
 function closeGroupSkuModal() {
@@ -7031,6 +7083,7 @@ function closeGroupSkuModal() {
   groupSkuDraft = null;
   groupSkuScopes = new Set();
   pendingCombinedSourceIndices = [];
+  pendingMergeSourceIndices = [];
 }
 
 function renderGroupSkuScopes() {
@@ -7291,6 +7344,10 @@ function saveGroupSku() {
   }
   if (groupSkuDraft.editIndex > -1) {
     INV_ITEMS[groupSkuDraft.editIndex] = entry;
+    if (pendingMergeSourceIndices.length) {
+      groupSkuSources(pendingMergeSourceIndices).forEach(function(source) { source.mergedInto = name; });
+      pendingMergeSourceIndices = [];
+    }
     showHqToast('Inventory item updated', name + ' has been updated.');
     addPrototypeActivity('inventory', '<strong>' + escapeOverviewText(name) + '</strong> inventory item updated', 'inventory', 'Master');
   } else {
@@ -8033,6 +8090,9 @@ function confirmAddItems() {
     applyCatalogueTargetPricing(ITEMS.length - 1, pricing, groupList.concat(outletList));
   });
   renderMl();
+  // Every SKU is also represented in Inventory automatically. Refresh that
+  // view here so the new buying option appears without another navigation.
+  if (typeof renderInv === 'function') renderInv();
   if (window.isNewHQ) {
     refreshNewHqEmptyStates();
     renderNewHqSummary(getSavedOutletGroup());
@@ -8698,7 +8758,8 @@ function createGroupFromSelectedOutlets() {
     var createdHq = new URLSearchParams(window.location.search).get('created-hq');
     if (createdHq) params.set('created-hq', createdHq);
   }
-  window.location.href = 'Procure - HQ - Create Outlet Group.html?' + params.toString();
+  params.set('procure', '1');
+  window.location.href = 'Admin - Create Outlet Group.html?' + params.toString();
 }
 function openAddToGroupModal(outletName) {
   _addToGroupOutlets = [{ row: null, name: outletName }];
@@ -8975,7 +9036,7 @@ function refreshStaticPosOutletRows() {
     if (!outletLabel || configuredPosOutlets().indexOf(outletLabel.textContent.trim()) === -1) return;
     var connectedOutletName = outletLabel.textContent.trim();
     status.innerHTML = '<span class="pos-chip" style="background:var(--mint);color:var(--spinach)">Connected</span>';
-    action.innerHTML = '<a href="Admin - HQ - POS Mapping.html?outlet=' + encodeURIComponent(connectedOutletName) + '" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a>';
+    action.innerHTML = '<a href="Admin - HQ - POS Mapping.html?outlet=' + encodeURIComponent(connectedOutletName) + '&procure=1" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a>';
   });
 }
 function openPosMappingDialog(productId, variantId) {
@@ -9468,7 +9529,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
   <div class="modal-card" style="width:520px">
     <div class="modal-header"><h2 class="modal-title" id="groupSkusChoiceTitle">Add to existing inventory item</h2><button class="modal-close" onclick="closeGroupSkusChoice()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
     <div class="modal-body" style="gap:18px"><p id="groupSkusChoiceCopy" style="margin:0;color:var(--ink-mute);font-size:14px">Move this item&rsquo;s buying options into an existing inventory item for the same product. This lets you track options from different suppliers against one stock balance.</p><div><label class="field-label" for="groupSkusExistingSearch">Inventory item</label><div class="merge-item-picker"><input class="field-input" id="groupSkusExistingSearch" type="search" autocomplete="off" placeholder="Search inventory items" oninput="setMergeDestinationSearch(this.value)" /><div class="merge-item-options" id="groupSkusExistingList"></div></div></div></div>
-    <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkusChoice()">Cancel</button><button type="button" class="btn btn-primary" id="groupSkusChoiceConfirm" onclick="addToExistingInventoryItem()" disabled>Merge with item</button></div>
+    <div class="modal-foot"><button class="modal-cancel" onclick="closeGroupSkusChoice()">Cancel</button></div>
   </div>
 </div>
 <div class="confirm-overlay" id="groupSkuContentDeleteOverlay" onclick="if(event.target===this)closeGroupSkuContentDelete()">
@@ -9872,7 +9933,7 @@ var panel = document.getElementById('panel-outlet-groups');
   ITEMS.splice(0, ITEMS.length);
   INV_ITEMS.splice(0, INV_ITEMS.length);
   RECIPES.splice(0, RECIPES.length);
-  var prototypeState = demoNewHq ? {} : getPrototypeState();
+  var prototypeState = getPrototypeState();
   if (Array.isArray(prototypeState.suppliers)) {
     prototypeState.suppliers.forEach(function(supplier) { SUPPLIERS.push(supplier); });
   }
@@ -9922,7 +9983,7 @@ var panel = document.getElementById('panel-outlet-groups');
 }
 
 initialiseNewHQView();
-document.addEventListener('click', function(event){var link=event.target.closest('a[href*="Admin - HQ - POS Mapping.html"]');if(window.isNewHQ&&link&&!link.getAttribute('href').includes('outlet=')&&!(link.id==='posHqCta'&&!isPosConfigured())){event.preventDefault();window.location.href='Admin - HQ - POS Mapping.html?created-hq='+encodeURIComponent(document.querySelector('.page-title').textContent.trim());}});
+document.addEventListener('click', function(event){var link=event.target.closest('a[href*="Admin - HQ - POS Mapping.html"]');if(window.isNewHQ&&link&&!link.getAttribute('href').includes('outlet=')&&!(link.id==='posHqCta'&&!isPosConfigured())){event.preventDefault();var p=new URLSearchParams(window.location.search);p.set('procure','1');p.set('created-hq',document.querySelector('.page-title').textContent.trim());window.location.href='Admin - HQ - POS Mapping.html?'+p.toString();}});
 
 // The Create item route hands the user back here after saving. Surface the
 // result once, then let the Items tab remain the source of truth for the list.
@@ -9955,7 +10016,11 @@ function renderNewHqGroupsTableShell(container, hqName) {
 
 function openNewHqCreateGroup() {
   var hqName = document.querySelector('.page-title').textContent.trim();
-  window.location.href = 'Procure - HQ - Create Outlet Group.html?hq=' + encodeURIComponent(hqName) + '&returnNew=1';
+  var params = new URLSearchParams(window.location.search);
+  params.set('hq', hqName);
+  params.set('returnNew', '1');
+  params.set('procure', '1');
+  window.location.href = 'Admin - Create Outlet Group.html?' + params.toString();
 }
 
 function renderNewHqUngroupedOutletRow(outlet) {
@@ -10024,7 +10089,38 @@ function renderNewHqSummary(group) {
   strip.innerHTML = stats.map(function(stat) {
     return '<div class="hq-summary-cell accent" style="--accent-bar:' + stat.accent + '"><div class="hq-summary-icon" style="color:' + stat.color + '">' + stat.icon + '</div><div class="hq-summary-value">' + stat.value + '</div><div class="hq-summary-label">' + stat.label + '</div></div>';
   }).join('');
+
+  // Keep the Groups & outlets roll-up counts aligned with the live HQ data.
+  // Group rows inherit records assigned to their group; ungrouped rows use
+  // the record's direct outlet assignment.
+  if (!window.isNewHQ) return;
+  var countForScope = function(records, groupName, outletName) {
+    return records.filter(function(record) {
+      var groups = Array.isArray(record.groupList) ? record.groupList : (Array.isArray(record.groups) ? record.groups : []);
+      var outlets = Array.isArray(record.outletList) ? record.outletList : (Array.isArray(record.outlets) ? record.outlets : []);
+      return groupName
+        ? groups.some(function(value) { return String(value).toLowerCase() === String(groupName).toLowerCase(); })
+        : outlets.some(function(value) { return String(value).toLowerCase() === String(outletName).toLowerCase(); });
+    }).length;
+  };
+  document.querySelectorAll('#ogTable tbody > tr[data-group-name]').forEach(function(row) {
+    var groupName = row.dataset.groupName || '';
+    var counts = row.querySelectorAll('.og-count');
+    if (counts[0]) counts[0].textContent = countForScope(ITEMS, groupName, '');
+    if (counts[1]) counts[1].textContent = countForScope(RECIPES, groupName, '');
+    if (counts[2]) counts[2].textContent = countForScope(SUPPLIERS, groupName, '');
+  });
+  document.querySelectorAll('#ogTable tbody > tr[data-ungrouped-name]').forEach(function(row) {
+    var outletName = row.dataset.ungroupedName || '';
+    var counts = row.querySelectorAll('.og-count');
+    if (counts[0]) counts[0].textContent = countForScope(ITEMS, '', outletName);
+    if (counts[1]) counts[1].textContent = countForScope(RECIPES, '', outletName);
+    if (counts[2]) counts[2].textContent = countForScope(SUPPLIERS, '', outletName);
+  });
 }
+window.addEventListener(HQ_CHANGE_EVENT, function() {
+  if (window.isNewHQ) renderNewHqSummary(getSavedOutletGroup());
+});
 
 function escapeOverviewText(value) {
   return String(value || '').replace(/[&<>"']/g, function(character) {
@@ -10193,6 +10289,12 @@ function renderCreatedOutletGroup() {
 
   tbody.insertBefore(outletRow, tbody.firstChild);
   tbody.insertBefore(groupRow, tbody.firstChild);
+  // Outlets assigned to the newly created group should no longer remain in
+  // the ungrouped section as standalone rows.
+  var createdOutletNames = new Set(outletNames.map(function(name) { return String(name).toLowerCase(); }));
+  Array.from(tbody.querySelectorAll('tr[data-ungrouped-name]')).forEach(function(row) {
+    if (createdOutletNames.has(String(row.dataset.ungroupedName || '').toLowerCase())) row.remove();
+  });
   var count = panel.querySelector('.panel-label-count');
   if (count) count.textContent = panel.querySelectorAll('#ogTable tbody > tr:not(.og-outlet-sub-row)').length;
 
@@ -10259,7 +10361,7 @@ function syncNewHqPosOutlets() {
   } else {
     body.innerHTML = outlets.map(function(outlet) {
       var configured = isOutletPosConfigured(outlet.name);
-      return '<tr><td><div style="font-weight:600">' + escapeOverviewText(outlet.name) + '</div>' + (outlet.group !== 'Ungrouped' ? '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(outlet.group) + '</div>' : '') + '</td><td><span class="pos-chip ' + (configured ? '' : 'off') + '"' + (configured ? ' style="background:var(--mint);color:var(--spinach)"' : '') + '>' + (configured ? 'Connected' : 'Not connected') + '</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td>' + (configured ? '<a href="Admin - HQ - POS Mapping.html?outlet=' + encodeURIComponent(outlet.name) + '" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a>' : '<button type="button" onclick="openPosSettings(\'' + escapeOverviewText(outlet.name).replace(/&#39;/g,"\\'") + '\')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button>') + '</td></tr>';
+      return '<tr><td><div style="font-weight:600">' + escapeOverviewText(outlet.name) + '</div>' + (outlet.group !== 'Ungrouped' ? '<div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + escapeOverviewText(outlet.group) + '</div>' : '') + '</td><td><span class="pos-chip ' + (configured ? '' : 'off') + '"' + (configured ? ' style="background:var(--mint);color:var(--spinach)"' : '') + '>' + (configured ? 'Connected' : 'Not connected') + '</span></td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td style="color:var(--ink-mute)">—</td><td>' + (configured ? '<a href="Admin - HQ - POS Mapping.html?' + (function(){var p=new URLSearchParams(window.location.search);p.set('outlet',outlet.name);p.set('procure','1');return p.toString();})() + '" style="color:var(--spinach);font-weight:600;text-decoration:none">View outlet</a>' : '<button type="button" onclick="openPosSettings(\'' + escapeOverviewText(outlet.name).replace(/&#39;/g,"\\'") + '\')" style="border:0;background:none;padding:0;color:var(--spinach);font:600 14px Inter,sans-serif;cursor:pointer">Set up</button>') + '</td></tr>';
     }).join('') + '<tr id="posOutletEmpty" hidden><td colspan="6" style="padding:32px;text-align:center;color:var(--ink-mute)">No outlets match these filters.</td></tr>';
   }
   filterPosOutlets();
@@ -10618,6 +10720,9 @@ function filterPosOutlets() {
     if (savingOutletDraft && supplier && supplier.scopeSettings && supplier.scopeSettings[supplierSettingsScope]) showHqToast('Outlet settings saved');
     return result;
   };
+  // Re-render once after the inherited-settings resolver is installed. The
+  // initial page render runs earlier and otherwise leaves a stale banner.
+  if (typeof renderSuppliers === 'function') renderSuppliers();
 })();
 </script>
 <script>
@@ -10767,10 +10872,12 @@ function filterPosOutlets() {
     document.getElementById('addUserSearch').value = '';
     renderAddUserResults();
     document.getElementById('addUserOverlay').classList.add('open');
+    showPrototypeHints('user');
     setTimeout(function() { document.getElementById('addUserSearch').focus(); }, 80);
   }
   function closeAddUserModal() {
     document.getElementById('addUserOverlay').classList.remove('open');
+    hidePrototypeHints();
   }
   function linkedEmailsForCurrentHq() {
     var hqName = currentHqName();
@@ -10786,7 +10893,7 @@ function filterPosOutlets() {
     if (q.length < 2) {
       results.innerHTML = '<div class="search-prompt">' +
         '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>' +
-        '<p>Search an existing Procure user by name or email</p></div>';
+        '<p>Search by name or email to find an existing Procure user.</p></div>';
       return;
     }
     var matches = PLATFORM_USERS.filter(function(u) {
