@@ -2559,6 +2559,7 @@ function closeDeleteGroupModal() {
 function confirmDeleteGroup() {
   if (!pendingDeleteGroupRow) { closeDeleteGroupModal(); return; }
   const tbody = pendingDeleteGroupRow.closest('tbody');
+  const deletedGroupName = pendingDeleteGroupRow.querySelector('.og-name') ? pendingDeleteGroupRow.querySelector('.og-name').textContent.trim() : '';
 
   // Capture group-level counts to inherit
   const counts = pendingDeleteGroupRow.querySelectorAll('.og-count');
@@ -2577,7 +2578,7 @@ function confirmDeleteGroup() {
       const newRow = document.createElement('tr');
       newRow.dataset.ungroupedName = name.toLowerCase();
       newRow.innerHTML =
-        '<td><div class="og-name-cell"><div style="width:18px;flex-shrink:0"></div>' +
+        '<td><div class="og-name-cell"><input class="ungrouped-select" type="checkbox" aria-label="Select ' + name.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" onchange="updateUngroupedSelection()" />' +
         '<div class="og-name-cell-inner"><span class="og-name">' + name + '</span>' +
         '<span class="og-outlet-count" style="display:flex;align-items:center;gap:5px">' + posHtml + '</span>' +
         '</div></div></td>' +
@@ -2608,6 +2609,22 @@ function confirmDeleteGroup() {
   ungroupedRows.forEach(function(row) { tbody.appendChild(row); });
 
   closeDeleteGroupModal();
+
+  // Keep the create-group picker in sync: outlets released by a deleted
+  // group are standalone again and must become selectable.
+  var hqName = (document.querySelector('.page-title') || {}).textContent;
+  hqName = (hqName || '').trim();
+  try {
+    var groupsByHq = JSON.parse(localStorage.getItem('nomniOutletGroupsByHq') || '{}');
+    if (Array.isArray(groupsByHq[hqName])) {
+      groupsByHq[hqName] = groupsByHq[hqName].filter(function(group) { return !group || group.name !== deletedGroupName; });
+      localStorage.setItem('nomniOutletGroupsByHq', JSON.stringify(groupsByHq));
+    }
+    var latestGroup = JSON.parse(localStorage.getItem('nomniNewOutletGroup') || 'null');
+    if (latestGroup && latestGroup.name === deletedGroupName && latestGroup.hq === hqName) localStorage.removeItem('nomniNewOutletGroup');
+  } catch (e) {}
+  ensureUngroupedRowsHaveCheckboxes();
+  saveManagedOutletList();
 }
 
 function toggleRowActions(btn) {
@@ -8643,6 +8660,7 @@ function restoreManagedOutletList() {
   var tbody = document.querySelector('#ogTable tbody');
   if (!tbody) return;
   tbody.innerHTML = stored.tableHtml;
+  ensureUngroupedRowsHaveCheckboxes();
   if (Array.isArray(stored.ungrouped)) {
     UNGROUPED.splice(0, UNGROUPED.length);
     stored.ungrouped.forEach(function(name) { UNGROUPED.push(name); });
@@ -10005,6 +10023,20 @@ function renderNewHqUngroupedOutletRow(outlet) {
     '<td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td><td style="color:var(--ink-mute)">Today</td>' +
     '<td><div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu"><div class="row-action-item" onclick="openAddToGroupModal(this.closest(\'tr\').dataset.ungroupedName)">Add to group</div><div class="row-action-item danger" onclick="openRemoveFromHQModal(this.closest(\'tr\').dataset.ungroupedName)">Remove from HQ</div></div></div></td>';
   return row;
+}
+
+function ensureUngroupedRowsHaveCheckboxes() {
+  document.querySelectorAll('#ogTable tbody tr[data-ungrouped-name]').forEach(function(row) {
+    var nameNode = row.querySelector('.og-name');
+    var cell = row.querySelector('.og-name-cell');
+    if (!nameNode || !cell || cell.querySelector('.ungrouped-select')) return;
+    var input = document.createElement('input');
+    input.className = 'ungrouped-select';
+    input.type = 'checkbox';
+    input.setAttribute('aria-label', 'Select ' + nameNode.textContent.trim());
+    input.addEventListener('change', updateUngroupedSelection);
+    cell.insertBefore(input, cell.firstChild);
+  });
 }
 
 function seedDemoNewHqOutlets() {
