@@ -279,6 +279,14 @@
   .help-btn:hover { background: rgba(14,55,39,.10); color: var(--seaweed); }
   .font-inspector-btn { border-color: rgba(14,55,39,.28); color: rgba(14,55,39,.68); }
   .font-inspector-btn:hover { background: rgba(14,55,39,.10); color: var(--seaweed); }
+  body.procure-context .topbar { background:#1F2226; color:#fff; border-bottom:1px solid #000; box-shadow:none; }
+  body.procure-context .brand-sub { color:var(--nomni-green); font-size:23px; font-weight:400; }
+  body.procure-context .topbar .user { color:#fff; }
+  body.procure-context .topbar-avt { background:#7F6AD0; color:#fff; }
+  body.procure-context .help-btn { color:rgba(255,255,255,.7); }
+  body.procure-context .font-inspector-btn { border-color:rgba(255,255,255,.25); color:rgba(255,255,255,.6); }
+  body.procure-context .procure-outlet-locked { opacity:.48; pointer-events:none; }
+  body.procure-context .procure-outlet-locked .access-type-desc::after { content:'Available when “Manage user accounts” is enabled'; display:block; margin-top:3px; color:var(--ink-mute); font-size:12px; }
 </style>
 </head>
 <body>
@@ -984,6 +992,51 @@
       setAccessType('outlet', false);
     }
   })();
+</script>
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('procure') !== '1') return;
+  document.body.classList.add('procure-context');
+
+  var hqName = params.get('hq') || (params.get('demo-hq') === 'new' ? 'New HQ' : 'Garden Cuisine HQ');
+  var safeHq = String(hqName).replace(/[&<>"']/g, function(char) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char];
+  });
+  var dashboardParams = new URLSearchParams();
+  if (hqName === 'New HQ') dashboardParams.set('demo-hq', 'new');
+  else if (hqName && hqName !== 'Garden Cuisine HQ') dashboardParams.set('created-hq', hqName);
+  var dashboardUrl = 'Procure - HQ - Dashboard.html' + (dashboardParams.toString() ? '?' + dashboardParams.toString() : '');
+
+  document.title = 'Procure — Add user';
+  var logo = document.querySelector('.brand-logo-img');
+  if (logo) logo.src = '_assets/nomni-logo-light.svg';
+  var brandSub = document.querySelector('.brand-sub');
+  if (brandSub) brandSub.textContent = 'Procure';
+
+  var backLink = document.getElementById('backLink');
+  if (backLink) {
+    backLink.href = dashboardUrl + '#users';
+    document.getElementById('backLinkLabel').textContent = hqName + ' users';
+  }
+
+  var sidebar = document.querySelector('.sidebar');
+  if (sidebar) sidebar.innerHTML =
+    '<div class="sidebar-mode-wrap" style="display:block;padding:10px 10px 0"><div style="display:flex;gap:2px;padding:3px;border-radius:8px;background:rgba(0,0,0,.07)"><button style="flex:1;padding:6px 8px;border:0;border-radius:6px;background:transparent;color:var(--ink-mute);font:500 14px/1 Inter,sans-serif">Outlet</button><button style="flex:1;padding:6px 8px;border:0;border-radius:6px;background:#fff;color:var(--seaweed);font:600 14px/1 Inter,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,.1)">HQ</button></div><div style="margin:8px 0 2px"><button style="width:100%;display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--rule);border-radius:6px;background:#fff;color:var(--ink);font:500 14px/1.2 Inter,sans-serif;text-align:left"><span class="material-symbols-outlined" style="font-size:16px;color:var(--ink-mute)">domain</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + safeHq + '</span><span class="material-symbols-outlined" style="font-size:16px;color:var(--ink-mute)">expand_more</span></button></div></div>' +
+    '<nav class="nav" aria-label="HQ navigation"><a href="' + dashboardUrl + '#outlet-groups"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Dashboard - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Dashboard - green.png" alt=""></span><span>Dashboard</span></a><a href="' + dashboardUrl + '#market-list"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Items - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Items - green.png" alt=""></span><span>SKUs</span></a><a href="' + dashboardUrl + '#inventory"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Inventory - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Inventory - green.png" alt=""></span><span>Inventory</span></a><a href="' + dashboardUrl + '#recipes"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Recipes - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Recipes - green.png" alt=""></span><span>Recipes</span></a><a href="' + dashboardUrl + '#pos-mapping"><span class="material-symbols-outlined ms-icon">account_tree</span><span>POS mapping</span></a><a href="' + dashboardUrl + '#suppliers"><span class="material-symbols-outlined ms-icon">local_shipping</span><span>Suppliers</span></a><a class="active" href="' + dashboardUrl + '#users"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Users - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Users - green.png" alt=""></span><span>HQ users</span></a><a href="' + dashboardUrl + '#activity"><span class="material-symbols-outlined ms-icon">history</span><span>Activity</span></a></nav>';
+
+  var permission = document.querySelector('#hqPermGroup input[data-hq-permission]');
+  var outletSection = document.getElementById('outletAccessSection');
+  function syncProcureUserScope() {
+    if (!permission || !outletSection) return;
+    var canManageUsers = permission.checked || document.getElementById('hqOwnerToggle').classList.contains('on');
+    outletSection.classList.toggle('procure-outlet-locked', !canManageUsers);
+    if (!canManageUsers && outletSection.classList.contains('on')) disableAccessType('outlet');
+  }
+  if (permission) permission.addEventListener('change', syncProcureUserScope);
+  document.getElementById('hqOwnerToggle').addEventListener('click', function() { setTimeout(syncProcureUserScope, 0); });
+  syncProcureUserScope();
+})();
 </script>
 </body>
 </html>
