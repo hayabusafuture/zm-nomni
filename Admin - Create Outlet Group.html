@@ -347,6 +347,11 @@
   body.procure-context .sidebar-hq-select { position: relative; margin: 8px 0 2px; }
   body.procure-context .sidebar-hq-btn { width: 100%; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--ink); font: 500 14px/1.2 Inter,sans-serif; text-align: left; }
   body.procure-context .sidebar-hq-btn-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.procure-context .sidebar-hq-dropdown { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 40; overflow: hidden; border: 1px solid var(--rule); border-radius: 8px; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+  body.procure-context .sidebar-hq-dropdown.open { display: block; }
+  body.procure-context .sidebar-hq-option { display: block; width: 100%; padding: 10px 12px; border: 0; background: #fff; color: var(--ink); text-align: left; font: 500 14px/1.2 Inter,sans-serif; cursor: pointer; }
+  body.procure-context .sidebar-hq-option:hover { background: var(--mint); }
+  body.procure-context .sidebar-hq-option.active { background: #f5fbf6; color: var(--seaweed); font-weight: 600; }
   body.procure-context .sidebar .nav { margin-top: 12px; padding: 6px 10px; }
   body.procure-context .sidebar .nav a { gap: 12px; padding: 10px 12px; min-height: 40px; color: var(--ink); border: 0; border-radius: 6px; font-weight: 400; }
   body.procure-context .sidebar .nav a:hover { color: var(--ink); background: rgba(0,0,0,.05); }
@@ -595,6 +600,87 @@ const OUTLETS = [
 const selected = new Set();
 let pickerInitialSelection = new Set();
 
+const HQ_STANDALONE_SEEDS = {
+  'New HQ': [
+    { name: 'Amber Restaurant', company: 'The Grand Hospitality Group', cluster: 'CBD Cluster' },
+    { name: 'Sky Bar & Lounge', company: 'The Grand Hospitality Group', cluster: 'CBD Cluster' },
+    { name: 'Garden Terrace Cafe', company: 'The Grand Hospitality Group', cluster: 'CBD Cluster' }
+  ],
+  'Garden Cuisine HQ': [
+    { name: '(WF 139) Chargrill @ 139 Tampines', company: 'Garden Cuisine HQ', cluster: 'Ungrouped' },
+    { name: '(WF 290) Garden Express @ 290 Sengkang', company: 'Garden Cuisine HQ', cluster: 'Ungrouped' }
+  ]
+};
+
+function currentHqName() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('hq') || (params.get('demo-hq') === 'new' ? 'New HQ' : 'Garden Cuisine HQ');
+}
+
+function readJsonStorage(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || '');
+    return value == null ? fallback : value;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function ensureHqOutletRecords(hqName) {
+  (HQ_STANDALONE_SEEDS[hqName] || []).forEach(function(seed, index) {
+    if (OUTLETS.some(function(outlet) { return outlet.name.toLowerCase() === seed.name.toLowerCase(); })) return;
+    OUTLETS.push({ id: 1000 + index, name: seed.name, company: seed.company, cluster: seed.cluster });
+  });
+}
+
+function getStoredUngroupedNames(hqName) {
+  if (hqName !== 'New HQ') return null;
+  const managed = readJsonStorage('nomniHqManagedOutlets:preview:new', null);
+  if (!managed || !managed.tableHtml) return null;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString('<table><tbody>' + managed.tableHtml + '</tbody></table>', 'text/html');
+  return Array.from(doc.querySelectorAll('tr[data-ungrouped-name] .og-name')).map(function(node) { return node.textContent.trim(); });
+}
+
+function getPreviouslyGroupedNames(hqName) {
+  const grouped = [];
+  const byHq = readJsonStorage('nomniOutletGroupsByHq', {});
+  (Array.isArray(byHq[hqName]) ? byHq[hqName] : []).forEach(function(group) {
+    (Array.isArray(group.outlets) ? group.outlets : []).forEach(function(name) { grouped.push(String(name).toLowerCase()); });
+  });
+  const latest = readJsonStorage('nomniNewOutletGroup', null);
+  if (latest && latest.hq === hqName && Array.isArray(latest.outlets)) {
+    latest.outlets.forEach(function(name) { grouped.push(String(name).toLowerCase()); });
+  }
+  return new Set(grouped);
+}
+
+function getHqAvailableOutlets() {
+  const hqName = currentHqName();
+  ensureHqOutletRecords(hqName);
+  const storedUngrouped = getStoredUngroupedNames(hqName);
+  const seedNames = (HQ_STANDALONE_SEEDS[hqName] || []).map(function(seed) { return seed.name; });
+  const names = storedUngrouped || seedNames;
+  const grouped = getPreviouslyGroupedNames(hqName);
+  return OUTLETS.filter(function(outlet) {
+    return names.some(function(name) { return String(name).toLowerCase() === outlet.name.toLowerCase(); }) && !grouped.has(outlet.name.toLowerCase());
+  });
+}
+
+function refreshPickerFilters() {
+  var available = getHqAvailableOutlets();
+  [['companyFilter', 'All companies', 'company'], ['clusterFilter', 'All clusters', 'cluster']].forEach(function(config) {
+    var select = document.getElementById(config[0]);
+    if (!select) return;
+    var current = select.value;
+    var values = Array.from(new Set(available.map(function(outlet) { return outlet[config[2]]; })));
+    select.innerHTML = '<option value="">' + config[1] + '</option>' + values.map(function(value) {
+      return '<option>' + value + '</option>';
+    }).join('');
+    select.value = values.indexOf(current) !== -1 ? current : '';
+  });
+}
+
 function getVisible() {
   const q  = document.getElementById('searchInput').value.trim().toLowerCase();
   const co = document.getElementById('companyFilter').value;
@@ -717,6 +803,7 @@ function removePageOutlet(id) {
 function openOutletPicker() {
   pickerInitialSelection = new Set(selected);
   document.getElementById('searchInput').value = '';
+  if (document.body.classList.contains('procure-context')) refreshPickerFilters();
   document.getElementById('companyFilter').value = '';
   document.getElementById('clusterFilter').value = '';
   renderList(); renderSelected();
@@ -740,6 +827,13 @@ function checkReady() {
     && selected.size > 0;
   document.getElementById('saveBtn').disabled = !ok;
 }
+function rememberCreatedOutletGroup(group) {
+  var byHq = readJsonStorage('nomniOutletGroupsByHq', {});
+  if (!Array.isArray(byHq[group.hq])) byHq[group.hq] = [];
+  byHq[group.hq] = byHq[group.hq].filter(function(existing) { return existing && existing.name !== group.name; });
+  byHq[group.hq].push({ name: group.name, outlets: (group.outlets || []).slice() });
+  localStorage.setItem('nomniOutletGroupsByHq', JSON.stringify(byHq));
+}
 function handleCreate() {
   var hqName = document.getElementById('hqSelect').value;
   var group = {
@@ -752,6 +846,7 @@ function handleCreate() {
     })
   };
   localStorage.setItem('nomniNewOutletGroup', JSON.stringify(group));
+  if (new URLSearchParams(window.location.search).get('procure') === '1') rememberCreatedOutletGroup(group);
   localStorage.setItem('nomniNewOutletGroupToastPending', '1');
   var params = new URLSearchParams(window.location.search);
   if (params.get('procure') === '1') {
@@ -832,20 +927,18 @@ document.getElementById('clearAllBtn').style.visibility = 'hidden';
   if (procureWarning) procureWarning.style.display = 'flex';
   var hqName = params.get('hq') || (params.get('demo-hq') === 'new' ? 'New HQ' : 'Garden Cuisine HQ');
   var safeHq = String(hqName).replace(/[&<>"']/g, function(char) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]; });
-  if (hqName === 'New HQ') {
-    var linkedNewHqOutlets = new Set(['Amber Restaurant', 'Sky Bar & Lounge', 'Garden Terrace Cafe']);
-    getVisible = function() {
-      var q = document.getElementById('searchInput').value.trim().toLowerCase();
-      var co = document.getElementById('companyFilter').value;
-      var cl = document.getElementById('clusterFilter').value;
-      return OUTLETS.filter(function(outlet) {
-        if (!linkedNewHqOutlets.has(outlet.name)) return false;
-        if (co && outlet.company !== co) return false;
-        if (cl && outlet.cluster !== cl) return false;
-        return !q || outlet.name.toLowerCase().includes(q) || outlet.company.toLowerCase().includes(q) || outlet.cluster.toLowerCase().includes(q);
-      });
-    };
-  }
+  // The picker is limited to outlets that belong to this HQ and are still
+  // standalone. Grouped outlets are removed from the candidate list.
+  getVisible = function() {
+    var q = document.getElementById('searchInput').value.trim().toLowerCase();
+    var co = document.getElementById('companyFilter').value;
+    var cl = document.getElementById('clusterFilter').value;
+    return getHqAvailableOutlets().filter(function(outlet) {
+      if (co && outlet.company !== co) return false;
+      if (cl && outlet.cluster !== cl) return false;
+      return !q || outlet.name.toLowerCase().includes(q) || outlet.company.toLowerCase().includes(q) || outlet.cluster.toLowerCase().includes(q);
+    });
+  };
   var hqSelect = document.getElementById('hqSelect');
   if (hqSelect) {
     hqSelect.innerHTML = '';
@@ -870,6 +963,35 @@ document.getElementById('clearAllBtn').style.visibility = 'hidden';
   var sidebar = document.querySelector('.sidebar');
   if (sidebar) sidebar.innerHTML = '<div class="sidebar-mode-wrap"><div class="sidebar-mode-pill"><button class="sidebar-mode-opt" type="button"><span>Outlet</span></button><button class="sidebar-mode-opt active" type="button"><span>HQ</span></button></div><div class="sidebar-hq-select"><button class="sidebar-hq-btn" type="button"><span class="material-symbols-outlined" style="font-size:16px;color:var(--ink-mute)">domain</span><span class="sidebar-hq-btn-name">' + safeHq + '</span><span class="material-symbols-outlined" style="font-size:16px;color:var(--ink-mute)">expand_more</span></button></div></div>' +
     '<nav class="nav" aria-label="HQ navigation"><a href="' + dashboardUrl + '#outlet-groups"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Dashboard - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Dashboard - green.png" alt=""></span><span>Dashboard</span></a><a href="' + dashboardUrl + '#market-list"><span class="ms-icon material-symbols-outlined">list_alt</span><span>SKUs</span></a><a href="' + dashboardUrl + '#inventory"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Inventory - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Inventory - green.png" alt=""></span><span>Inventory</span></a><a href="' + dashboardUrl + '#recipes"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Recipes - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Recipes - green.png" alt=""></span><span>Recipes</span></a><a href="' + dashboardUrl + '#pos-mapping"><span class="ms-icon material-symbols-outlined">account_tree</span><span>POS mapping</span></a><a href="' + dashboardUrl + '#suppliers"><span class="ms-icon material-symbols-outlined">local_shipping</span><span>Suppliers</span></a><a href="' + dashboardUrl + '#users"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Users - grey.png" alt=""><img class="icon icon-green" src="_assets/sidenav icons/Users - green.png" alt=""></span><span>HQ users</span></a><a href="' + dashboardUrl + '#activity"><span class="ms-icon material-symbols-outlined">history</span><span>Activity</span></a></nav>';
+  var hqSelectWrap = sidebar && sidebar.querySelector('.sidebar-hq-select');
+  if (hqSelectWrap) {
+    var dropdown = document.createElement('div');
+    dropdown.className = 'sidebar-hq-dropdown';
+    ['New HQ', 'Garden Cuisine HQ'].forEach(function(optionName) {
+      var option = document.createElement('button');
+      option.type = 'button';
+      option.className = 'sidebar-hq-option' + (optionName === hqName ? ' active' : '');
+      option.textContent = optionName;
+      option.addEventListener('click', function(event) {
+        event.stopPropagation();
+        var nextParams = new URLSearchParams(window.location.search);
+        nextParams.set('hq', optionName);
+        nextParams.set('procure', '1');
+        nextParams.set('returnNew', '1');
+        if (optionName === 'New HQ') nextParams.set('demo-hq', 'new');
+        else nextParams.delete('demo-hq');
+        window.location.href = 'Admin - Create Outlet Group.html?' + nextParams.toString();
+      });
+      dropdown.appendChild(option);
+    });
+    hqSelectWrap.appendChild(dropdown);
+    var hqButton = hqSelectWrap.querySelector('.sidebar-hq-btn');
+    if (hqButton) hqButton.addEventListener('click', function(event) {
+      event.stopPropagation();
+      dropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', function() { dropdown.classList.remove('open'); });
+  }
   var hqLabel = document.getElementById('backHqName');
   if (hqLabel) hqLabel.textContent = hqName;
 })();

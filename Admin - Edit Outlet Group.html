@@ -1242,9 +1242,23 @@ const pendingAdd   = new Set();
 let   pendingRemoveId = null;
 
 (function initialiseCreatedGroupDetails() {
-  if (new URLSearchParams(window.location.search).get('newGroup') !== '1') return;
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('newGroup') !== '1') return;
   var group;
   try { group = JSON.parse(localStorage.getItem('nomniNewOutletGroup') || 'null'); } catch (e) { group = null; }
+  var requestedName = params.get('group');
+  if (requestedName && group && group.name !== requestedName) group = null;
+  if (requestedName && !group) {
+    var groupsByHq;
+    try { groupsByHq = JSON.parse(localStorage.getItem('nomniOutletGroupsByHq') || '{}'); } catch (e) { groupsByHq = {}; }
+    var hqName = params.get('hq') || params.get('created-hq') || '';
+    var matches = Array.isArray(groupsByHq[hqName]) ? groupsByHq[hqName] : [];
+    group = matches.find(function(candidate) { return candidate && candidate.name === requestedName; }) || null;
+    if (!group) {
+      var queryOutlets = (params.get('outlets') || '').split('|').filter(Boolean);
+      group = { name: requestedName, hq: hqName, outlets: queryOutlets, outletDetails: queryOutlets.map(function(name) { return { name:name, company:'Procure outlet' }; }) };
+    }
+  }
   if (!group) return;
   window.isCreatedGroupPrototype = true;
   var details = Array.isArray(group.outletDetails) && group.outletDetails.length
@@ -3483,6 +3497,7 @@ function showToast(msg) {
   var storedGroup;
   try { storedGroup = JSON.parse(localStorage.getItem('nomniNewOutletGroup') || 'null'); } catch (e) { storedGroup = null; }
   var hqName = params.get('hq') || params.get('created-hq') || (storedGroup && storedGroup.hq) || 'Garden Cuisine HQ';
+  var requestedGroupName = params.get('group');
   var safeHq = String(hqName).replace(/[&<>"']/g, function(char) {
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char];
   });
@@ -3492,6 +3507,11 @@ function showToast(msg) {
   var dashboardUrl = 'Procure - HQ - Dashboard.html' + (dashboardParams.toString() ? '?' + dashboardParams.toString() : '');
 
   document.title = 'Procure — Edit outlet group';
+  if (requestedGroupName) {
+    var requestedTitle = document.getElementById('groupPageTitle');
+    if (requestedTitle) requestedTitle.textContent = requestedGroupName;
+    document.title = requestedGroupName + ' — Procure';
+  }
   var logo = document.querySelector('.brand-logo-img');
   if (logo) logo.src = '_assets/nomni-logo-light.svg';
   var brandSub = document.querySelector('.brand-sub');
