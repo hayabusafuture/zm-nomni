@@ -58,6 +58,8 @@
   .main { grid-column: 2; grid-row: 2; padding: 36px 40px 80px; min-width: 0; background: #fff; }
 
   /* ── Back link ── */
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 14px; font-weight: 500; text-decoration: none; transition: color .13s; margin-bottom: 14px; }
+  .back-link:hover { color: var(--seaweed); }
 
   /* ── Page head ── */
   .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
@@ -284,6 +286,11 @@
   <!-- Main -->
   <main class="main">
 
+    <a href="#" class="back-link" id="backLink">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      <span id="backLinkLabel">Garden Cuisine HQ</span>
+    </a>
+
     <div class="page-head">
       <div>
         <h1 class="page-title">HQ users</h1>
@@ -384,6 +391,13 @@
     // knows how to relabel itself for a plain ?hq= name, so fall back to that instead of losing it.
     return 'Admin - HQ Settings.html?hq=' + encodeURIComponent(currentHqName());
   }
+
+  (function initialiseBackLink() {
+    var link = document.getElementById('backLink');
+    if (!link) return;
+    link.href = backUrl();
+    link.querySelector('#backLinkLabel').textContent = currentHqName();
+  })();
 
   function escapeHtml(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });

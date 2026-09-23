@@ -1624,7 +1624,7 @@ body.supplier-settings-open { overflow:hidden; }
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
                 <div class="og-name-cell-inner">
-                  <a href="Admin - Edit Outlet Group.html?from=hq" class="og-name">Chargrill Outlets</a>
+                  <a href="Admin - Edit Outlet Group.html?from=hq&amp;admin=1&amp;hq=Garden+Cuisine+HQ&amp;group=Chargrill+Outlets" class="og-name">Chargrill Outlets</a>
                   <span class="og-outlet-count">4 outlets</span>
                 </div>
               </div>
@@ -1846,7 +1846,8 @@ body.supplier-settings-open { overflow:hidden; }
         </select>
         <select class="ml-filter-select" id="mlStatusFilter" onchange="setMlStatusFilter(this.value)">
           <option value="">All SKUs</option>
-          <option value="removed">Removed</option>
+          <option value="active">Active</option>
+          <option value="disabled">Disabled</option>
         </select>
       </div>
       <div style="overflow:clip">
@@ -3083,7 +3084,8 @@ let mlSearch = '', mlCatFilter = '', mlSupplierFilter = '', mlStatusFilter = '',
 const mlExpandedUoms = new Set();
 
 // Master lifecycle is shared with group and ungrouped-outlet prototype views.
-// Removed items are deliberately retained here so they can be restored.
+// Removed items are retained in state for existing records, but are no longer
+// shown in the SKU list and cannot be restored from this screen.
 const HQ_ITEM_STATE_KEY = 'nomni-hq-item-lifecycle-v1';
 function getHqItemState() {
   try { return JSON.parse(localStorage.getItem(HQ_ITEM_STATE_KEY) || '{}'); } catch (e) { return {}; }
@@ -3189,8 +3191,13 @@ function getMlItems() {
   let items = ITEMS.slice();
   if (mlCatFilter) items = items.filter(i => i.cat === mlCatFilter);
   if (mlSupplierFilter) items = items.filter(i => i.supplier === mlSupplierFilter);
-  if (mlStatusFilter === 'removed') items = items.filter(i => itemLifecycle(i) === 'removed');
-  else items = items.filter(i => itemLifecycle(i) !== 'removed');
+  // Removing an SKU takes it out of the list entirely. Active and disabled
+  // SKUs remain available through the lifecycle filter.
+  items = items.filter(i => {
+    const lifecycle = itemLifecycle(i);
+    if (lifecycle === 'removed') return false;
+    return !mlStatusFilter || lifecycle === mlStatusFilter;
+  });
   if (mlSearch) {
     const q = mlSearch.toLowerCase();
     items = items.filter(i => itemDisplayName(i).toLowerCase().includes(q) || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q));
@@ -4026,15 +4033,13 @@ function renderMl() {
     }
 
     const lifecycle = itemLifecycle(item);
-    const stateBadge = lifecycle === 'removed' ? '<span class="item-exc-badge" style="margin-left:7px;color:var(--chip-rejected-ink)">Removed</span>' : '';
+    const stateBadge = '';
     const actionsTd = '<td><div class="row-actions-wrap">' +
       '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
       '<div class="row-actions-menu">' +
         '<div class="row-action-item" onclick="event.stopPropagation();openHqItemModal(' + rawIdx + ')">Edit</div>' +
-        (lifecycle === 'removed'
-          ? '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'active\')">Restore</div>'
-          : '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'' + (lifecycle === 'disabled' ? 'active' : 'disabled') + '\')">' + (lifecycle === 'disabled' ? 'Enable' : 'Disable') + '</div>' +
-            '<div class="row-action-item danger" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'removed\')">Remove</div>') +
+        '<div class="row-action-item" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'' + (lifecycle === 'disabled' ? 'active' : 'disabled') + '\')">' + (lifecycle === 'disabled' ? 'Enable' : 'Disable') + '</div>' +
+        '<div class="row-action-item danger" onclick="event.stopPropagation();setMasterItemLifecycle(' + rawIdx + ',\'removed\')">Remove</div>' +
       '</div></div></td>';
 
     if (!isMultiUom) {
@@ -6855,7 +6860,6 @@ function renderInv() {
           '<div class="row-action-item" onclick="event.stopPropagation();' + (r.type === 'group' ? 'openGroupSkuModal(' + globalIdx + ')' : 'openHqInventorySettings(' + globalIdx + ')') + '">Edit</div>' +
           (r.type === 'group' ? '<div class="row-action-item" onclick="event.stopPropagation();openAddToExistingInventoryItem(' + globalIdx + ')">Merge with another item&hellip;</div>' : '') +
           '<div class="row-action-item" onclick="event.stopPropagation();toggleInventoryLifecycle(' + globalIdx + ')">' + (lifecycle === 'removed' ? 'Restore' : (lifecycle === 'active' ? 'Disable' : 'Enable')) + '</div>' +
-          '<div class="row-action-item danger" onclick="event.stopPropagation();' + (r.type === 'group' ? 'requestDeleteGroupSku(' + globalIdx + ')' : 'toggleInventoryLifecycle(' + globalIdx + ')') + '">' + (r.type === 'group' ? 'Delete' : 'Remove') + '</div>' +
         '</div></div>' +
       '</td>' +
     '</tr>');
@@ -9633,7 +9637,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
 <div class="confirm-overlay" id="removeMasterItemOverlay" onclick="if(event.target===this)closeRemoveMasterItemModal()">
   <div class="danger-confirm-card">
     <div class="danger-confirm-title">Remove from HQ?</div>
-    <div class="danger-confirm-body"><strong id="removeMasterItemName"></strong> will no longer be available to any outlet group or ungrouped outlet in this HQ. Existing Inventory and Recipe records will be kept, but the item cannot be newly added or ordered. You can restore it later from the <strong>Removed</strong> filter.</div>
+    <div class="danger-confirm-body"><strong id="removeMasterItemName"></strong> will no longer be available to any outlet group or ungrouped outlet in this HQ. Existing Inventory and Recipe records will be kept, but the item cannot be newly added or ordered.</div>
     <div class="danger-confirm-actions">
       <button class="btn-cancel-plain" onclick="closeRemoveMasterItemModal()">Cancel</button>
       <button class="btn-danger-confirm" onclick="confirmRemoveMasterItem()">Remove from HQ</button>
@@ -10040,7 +10044,7 @@ function renderCreatedOutletGroup() {
   groupRow.dataset.groupOutlets = outletNames.join('|').toLowerCase();
   groupRow.innerHTML =
     '<td><div class="og-name-cell"><button class="og-expand-btn" onclick="toggleOgExpand(this,\'' + rowId + '\')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>' +
-      '<div class="og-name-cell-inner"><a href="Admin - Edit Outlet Group.html?from=hq&amp;newGroup=1&amp;created-hq=' + encodeURIComponent(group.hq || '') + '" class="og-name">' + safeName + '</a><span class="og-outlet-count">' + outletNames.length + ' outlet' + (outletNames.length === 1 ? '' : 's') + '</span></div></div></td>' +
+      '<div class="og-name-cell-inner"><a href="Admin - Edit Outlet Group.html?from=hq&amp;admin=1&amp;newGroup=1&amp;hq=' + encodeURIComponent(group.hq || '') + '&amp;created-hq=' + encodeURIComponent(group.hq || '') + '&amp;group=' + encodeURIComponent(group.name || '') + '&amp;outlets=' + encodeURIComponent(outletNames.join('|')) + '" class="og-name">' + safeName + '</a><span class="og-outlet-count">' + outletNames.length + ' outlet' + (outletNames.length === 1 ? '' : 's') + '</span></div></div></td>' +
     '<td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td><td style="text-align:center"><span class="og-count">0</span></td>' +
     '<td style="color:var(--ink-mute)">Today</td><td><div class="row-actions-wrap"><button class="btn-row-actions" data-actions-btn onclick="toggleRowActions(this)">•••</button><div class="row-actions-menu">' +
       '<div class="row-action-item" data-group-name="' + safeName + '" onclick="openGroupOutletPicker(this.dataset.groupName,this)">Add outlets</div>' +
