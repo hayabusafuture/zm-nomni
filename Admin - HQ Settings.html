@@ -5662,24 +5662,19 @@ function openMergeDestinationEditor() {
   pendingMergeSourceIndices = sourceIndices;
   closeGroupSkusChoice();
   openGroupSkuModal(targetIndex);
-  var destinationUom = String(target.uom || '').trim();
-  var destinationUomField = document.getElementById('groupSkuUom');
-  if (destinationUom && destinationUomField) {
-    var matchingUom = Array.from(destinationUomField.options).find(function(option) {
-      return normaliseGroupSkuUom(option.value) === normaliseGroupSkuUom(destinationUom);
-    });
-    destinationUomField.value = matchingUom ? matchingUom.value : destinationUom;
-    groupSkuDraft.uom = destinationUomField.value;
-  }
+  var destinationUom = setGroupSkuInventoryUom(target.uom);
   var existingNames = new Set(groupSkuDraft.items.map(function(item) { return item.name; }));
   sources.forEach(function(source) {
     (source.constituents || []).forEach(function(option) {
       if (existingNames.has(option.name)) return;
       existingNames.add(option.name);
-      groupSkuDraft.items.push(Object.assign({}, option, {
+      var mergedOption = Object.assign({}, option, {
+        uom: option.uom || source.uom,
         conversion: option.conversion || 1,
         conversionFlipped: !!option.conversionFlipped
-      }));
+      });
+      if (groupSkuNeedsConversion(mergedOption, destinationUom)) requireGroupSkuConversion(mergedOption, destinationUom);
+      groupSkuDraft.items.push(mergedOption);
     });
   });
   document.getElementById('groupSkuModalTitle').textContent = 'Merge with another inventory item';
@@ -6944,7 +6939,7 @@ function openGroupSkuModal(editIndex, starterIndex, skipScopePicker) {
   };
   document.getElementById('groupSkuModalTitle').textContent = isEditing ? 'Edit inventory item' : 'Create inventory item';
   document.getElementById('groupSkuName').value = groupSkuDraft.name;
-  document.getElementById('groupSkuUom').value = existing ? existing.uom : (starter ? starter.uom : '');
+  setGroupSkuInventoryUom(existing ? existing.uom : (starter ? starter.uom : ''));
   document.getElementById('groupSkuCost').value = groupSkuDraft.cost;
   document.getElementById('groupSkuPar').value = groupSkuDraft.par;
   document.getElementById('groupSkuSaveBtn').textContent = isEditing ? 'Save' : 'Create';
@@ -7010,11 +7005,13 @@ function renderGroupSkuContent() {
   } else {
     if (table) table.style.display = '';
     body.innerHTML = groupSkuDraft.items.map(function(item) {
-      var needsConversion = !!targetUom && normaliseGroupSkuUom(item.uom) !== normaliseGroupSkuUom(targetUom);
+      var needsConversion = groupSkuNeedsConversion(item, targetUom);
       var source = Number.isInteger(item.sourceItemIdx) ? ITEMS[item.sourceItemIdx] : ITEMS.find(function(candidate) { return candidate.name === item.name; });
       var skuDisabled = item.active === false || (source && itemLifecycle(source) !== 'active');
       var optionStatus = skuDisabled ? '<span style="display:inline-flex;align-items:center;margin-left:6px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:2px 6px;background:#F0F0F2;color:#555">Disabled</span>' : '';
-      var conversion = showConversion ? '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + (needsConversion ? '<div class="inventory-conversion"><span>1 ' + hqSettingsEscape(item.conversionFlipped ? item.uom : targetUom) + '</span><span>=</span><input class="inventory-inline-field" type="number" min="0.001" step="any" value="' + (item.conversion || 1) + '" onchange="updateGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\',this.value)" /><span>' + hqSettingsEscape(item.conversionFlipped ? targetUom : item.uom) + '</span><button class="inventory-flip" type="button" onclick="flipGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\')"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>Flip units</button></div>' : '<span class="inventory-not-required">Not required</span>') + '</td>' : '';
+      var conversionValue = item.conversionRequired && !item.conversionConfirmed ? '' : (item.conversion != null ? item.conversion : '');
+      var conversionRequired = item.conversionRequired && !item.conversionConfirmed;
+      var conversion = showConversion ? '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + (needsConversion ? '<div class="inventory-conversion"><span>1 ' + hqSettingsEscape(item.conversionFlipped ? item.uom : targetUom) + '</span><span>=</span><input class="inventory-inline-field" type="number" min="0.001" step="any" value="' + conversionValue + '" placeholder="Enter rate" aria-label="Conversion rate for ' + hqSettingsEscape(item.name) + '"' + (conversionRequired ? ' aria-invalid="true"' : '') + ' oninput="updateGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\',this.value,this)" /><span>' + hqSettingsEscape(item.conversionFlipped ? targetUom : item.uom) + '</span><button class="inventory-flip" type="button" onclick="flipGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\')"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>Flip units</button></div>' : '<span class="inventory-not-required">Not required</span>') + '</td>' : '';
       return '<tr>' +
         '<td style="padding:12px 10px 12px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" data-group-content-check="' + hqSettingsEscape(item.name) + '" onchange="updateGroupSkuDeleteVisibility()" style="margin-top:3px" />' +
           '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:flex;align-items:center;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + optionStatus + '</span></span></label></td>' +
@@ -7025,9 +7022,16 @@ function renderGroupSkuContent() {
   deleteBtn.hidden = true;
   updateGroupSkuSaveState();
 }
-function updateGroupSkuContentConversion(name, value) {
+function updateGroupSkuContentConversion(name, value, field) {
   var item = (groupSkuDraft.items || []).find(function(candidate) { return candidate.name === name; });
-  if (item) item.conversion = Math.max(0.001, Number(value) || 1);
+  if (!item) return;
+  var rate = Number(value);
+  item.conversion = Number.isFinite(rate) && rate > 0 ? rate : null;
+  item.conversionConfirmed = item.conversion !== null;
+  if (field) {
+    field.toggleAttribute('aria-invalid', item.conversion === null);
+  }
+  updateGroupSkuSaveState();
 }
 function flipGroupSkuContentConversion(name) {
   var item = (groupSkuDraft.items || []).find(function(candidate) { return candidate.name === name; });
@@ -7063,7 +7067,7 @@ function updateGroupSkuSaveState() {
   var uom = document.getElementById('groupSkuUom').value.trim();
   var uomLabel = document.getElementById('groupSkuParUom');
   uomLabel.textContent = uom;
-  var ready = !!name && !!uom && par !== '' && Number(par) >= 0;
+  var ready = !!name && !!uom && par !== '' && Number(par) >= 0 && groupSkuConversionsAreComplete(uom);
   document.getElementById('groupSkuSaveBtn').disabled = !ready;
 }
 function openGroupSkuPicker() {
@@ -7098,6 +7102,58 @@ function normaliseGroupSkuUom(value) {
   var uom = String(value || '').replace(/^per\s+/i, '').trim().toLowerCase();
   var aliases = { btl:'bottle', bottles:'bottle', pc:'piece', pcs:'piece', pieces:'piece', l:'litre', litres:'litre', ml:'millilitre', mls:'millilitre', ctn:'carton', bch:'bunch', pk:'pack' };
   return aliases[uom] || uom;
+}
+function ensureGroupSkuUomOption(value) {
+  var field = document.getElementById('groupSkuUom');
+  var requested = String(value || '').trim();
+  if (!field || !requested) return '';
+  var matchingOption = Array.from(field.options).find(function(option) {
+    return normaliseGroupSkuUom(option.value) === normaliseGroupSkuUom(requested);
+  });
+  if (matchingOption) return matchingOption.value;
+  var option = document.createElement('option');
+  option.value = requested;
+  option.textContent = requested;
+  field.appendChild(option);
+  return requested;
+}
+function setGroupSkuInventoryUom(value) {
+  var field = document.getElementById('groupSkuUom');
+  if (!field) return '';
+  var selectedUom = ensureGroupSkuUomOption(value);
+  field.value = selectedUom;
+  if (groupSkuDraft) groupSkuDraft.uom = selectedUom;
+  return selectedUom;
+}
+function groupSkuNeedsConversion(item, targetUom) {
+  return !!targetUom && normaliseGroupSkuUom(item && item.uom) !== normaliseGroupSkuUom(targetUom);
+}
+function requireGroupSkuConversion(item, targetUom) {
+  item.conversion = null;
+  item.conversionRequired = true;
+  item.conversionConfirmed = false;
+  item.conversionTargetUom = targetUom;
+  item.conversionFlipped = false;
+}
+function groupSkuConversionsAreComplete(targetUom) {
+  return (groupSkuDraft.items || []).every(function(item) {
+    if (!groupSkuNeedsConversion(item, targetUom)) return true;
+    var rate = Number(item.conversion);
+    return Number.isFinite(rate) && rate > 0 && (!item.conversionRequired || item.conversionConfirmed);
+  });
+}
+function handleGroupSkuUomChange(value) {
+  var targetUom = String(value || '').trim();
+  if (!groupSkuDraft) return;
+  var previousUom = groupSkuDraft.uom;
+  groupSkuDraft.uom = targetUom;
+  if (normaliseGroupSkuUom(previousUom) !== normaliseGroupSkuUom(targetUom)) {
+    groupSkuDraft.items.forEach(function(item) {
+      if (groupSkuNeedsConversion(item, targetUom)) requireGroupSkuConversion(item, targetUom);
+    });
+  }
+  renderGroupSkuContent();
+  updateGroupSkuSaveState();
 }
 function groupSkuPickerTargetUom() {
   var field = document.getElementById('groupSkuUom');
@@ -7191,6 +7247,11 @@ function saveGroupSku() {
   var cost = Number(costField.value.replace(/[$,\s]/g, '') || 0);
   if (!Number.isFinite(cost) || cost < 0) { costField.focus(); return; }
   if (!name || !uom) return;
+  if (!groupSkuConversionsAreComplete(uom)) {
+    var incompleteConversion = document.querySelector('#groupSkuContentBody input[aria-invalid="true"]');
+    if (incompleteConversion) incompleteConversion.focus();
+    return;
+  }
   var duplicate = INV_ITEMS.some(function(item, idx) { return idx !== groupSkuDraft.editIndex && item.name.toLowerCase() === name.toLowerCase(); });
   if (duplicate) { var nameField = document.getElementById('groupSkuName'); nameField.focus(); return; }
   var groupAvailability = groupSkuDraft.editIndex === -1
@@ -9437,7 +9498,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
       </div>
       <div style="max-width:220px">
         <label class="field-label">Inventory UOM:</label>
-        <select class="field-input" id="groupSkuUom" onchange="updateGroupSkuSaveState(); if (groupSkuDraft) renderGroupSkuContent()">
+        <select class="field-input" id="groupSkuUom" onchange="handleGroupSkuUomChange(this.value)">
           <option value="">Select UOM</option>
           <option value="kg">kg</option><option value="g">g</option><option value="L">L</option><option value="mL">mL</option>
           <option value="piece">piece</option><option value="portion">portion</option><option value="bottle">bottle</option><option value="can">can</option>
