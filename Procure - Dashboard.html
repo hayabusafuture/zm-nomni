@@ -87,6 +87,17 @@
   .ai-summary.key-takeaway { display: block; margin: 0 0 16px; padding: 20px 28px; border-radius: 16px; box-shadow: 0 1px 2px rgba(26,31,43,.08), 0 8px 20px rgba(26,31,43,.06); }
   .key-takeaway[hidden] { display: none; }
   .key-takeaway-title { margin: 0 0 4px; color: var(--spinach); font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .04em; line-height: 1.4; text-transform: uppercase; }
+  .key-takeaway-title { display: flex; align-items: center; gap: 7px; }
+  /* Nomni mark beside the heading. When new text is revealed it swipes up (clipped from the bottom) while nudging up
+     into place, and "At a glance" slides in just behind it. Both stay hidden while the shimmer runs. */
+  .key-takeaway-logo { flex: 0 0 auto; width: auto; height: 18px; color: var(--nomni-green); overflow: visible; }
+  .key-takeaway[aria-busy="true"] .key-takeaway-logo, .key-takeaway[aria-busy="true"] .key-takeaway-label { visibility: hidden; }
+  .key-takeaway-label { display: inline-block; }
+  .key-takeaway.is-announcing .key-takeaway-logo { animation: takeaway-logo-in .65s cubic-bezier(.33, 1, .68, 1) both; }
+  @keyframes takeaway-logo-in { 0% { clip-path: inset(100% 0 0 0); transform: translateY(8px); } 65% { clip-path: inset(0); transform: translateY(-2px); } 100% { clip-path: inset(0); transform: translateY(0); } }
+  .key-takeaway.is-announcing .key-takeaway-label { animation: takeaway-label-in .45s cubic-bezier(.33, 1, .68, 1) .15s both; }
+  @keyframes takeaway-label-in { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .key-takeaway.is-announcing .key-takeaway-logo, .key-takeaway.is-announcing .key-takeaway-label { animation: none; } }
   .key-takeaway-text { margin: 0; }
   .key-takeaway-text.is-clamped { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .key-takeaway-toggle { margin-top: 4px; padding: 0; border: 0; background: transparent; color: var(--spinach); font: 600 13px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; }
@@ -732,7 +743,7 @@
     <div class="dashboard-tabs" role="tablist" aria-label="Dashboard insights"><button class="dashboard-tab active" type="button" role="tab" aria-selected="true" aria-controls="panel-sales" id="tab-sales"><span class="material-symbols-outlined" aria-hidden="true">point_of_sale</span>Sales</button><button class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-spend" id="tab-spend"><span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span>Spend &amp; procurement</button><button class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-margins" id="tab-margins"><span class="material-symbols-outlined" aria-hidden="true">percent</span>Margins</button><button class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-trends" id="tab-trends"><span class="material-symbols-outlined" aria-hidden="true">trending_up</span>Trends</button></div>
     <div class="tab-panels">
       <section class="tab-panel active" id="panel-sales" role="tabpanel" aria-labelledby="tab-sales">
-        <div class="ai-summary key-takeaway" id="keyTakeaway" hidden><h3 class="key-takeaway-title" id="keyTakeawayTitle">At a glance</h3><span class="ai-summary-skeleton" id="keyTakeawaySkeleton" aria-hidden="true" hidden><span></span><span></span></span><p class="key-takeaway-text is-clamped" id="keyTakeawayText" aria-labelledby="keyTakeawayTitle"></p><button class="key-takeaway-toggle" id="keyTakeawayToggle" type="button" aria-expanded="false" aria-controls="keyTakeawayText" hidden>View all</button></div>
+        <div class="ai-summary key-takeaway" id="keyTakeaway" hidden><h3 class="key-takeaway-title" id="keyTakeawayTitle"><svg class="key-takeaway-logo" viewBox="0 0 514.202 584.713" aria-hidden="true" focusable="false"><path fill="currentColor" d="M 77.918 113.681 C 78.718 109.922 82.408 107.521 86.167 108.321 L 429.699 181.338 C 433.459 182.138 435.861 185.827 435.06 189.586 L 429.247 217.011 C 427.158 226.755 424.339 236.152 420.858 245.166 L 491.59 230.131 C 495.35 229.331 499.039 231.732 499.84 235.491 L 508.577 276.593 C 538.965 419.459 443.101 559.923 296.311 581.988 C 160.938 602.313 35.242 506.605 6.837 373.032 L 0.154 341.674 C -0.647 337.916 1.755 334.227 5.515 333.426 L 123.309 308.403 C 79.971 264.238 59.887 198.391 73.532 134.145 L 77.883 113.716 L 77.918 113.681 Z M 342.572 0.154 C 346.331 -0.647 350.021 1.755 350.822 5.514 L 352.806 14.771 C 363.005 62.729 330.841 109.887 281.551 117.3 C 236.125 124.122 193.902 91.999 184.364 47.138 L 183.076 41.152 C 182.276 37.393 184.677 33.704 188.437 32.903 L 342.572 0.154 Z"/></svg><span class="key-takeaway-label">At a glance</span></h3><span class="ai-summary-skeleton" id="keyTakeawaySkeleton" aria-hidden="true" hidden><span></span><span></span></span><p class="key-takeaway-text is-clamped" id="keyTakeawayText" aria-labelledby="keyTakeawayTitle"></p><button class="key-takeaway-toggle" id="keyTakeawayToggle" type="button" aria-expanded="false" aria-controls="keyTakeawayText" hidden>View all</button></div>
         <div class="tab-placeholder sales-no-pos" id="salesNoPos"><span class="material-symbols-outlined" aria-hidden="true">point_of_sale</span><p class="sales-no-pos-title">No sales data for this outlet</p><p class="sales-no-pos-body" id="salesNoPosBody"></p></div>
         <div class="insight-card">
           <div class="insight-card-head heatmap-card-head">
@@ -2152,6 +2163,8 @@
     keyTakeawayLoadTimer = window.setTimeout(() => {
       keyTakeawayLoadTimer = null;
       keyTakeawaySkeleton.hidden = true; keyTakeawayText.hidden = false; keyTakeaway.removeAttribute('aria-busy');
+      // Restart the logo swipe-up and label slide-in for each new briefing.
+      keyTakeaway.classList.remove('is-announcing'); void keyTakeaway.offsetWidth; keyTakeaway.classList.add('is-announcing');
       updateKeyTakeawayOverflow();
     }, 650);
   }
