@@ -67,10 +67,18 @@
      so the panel spans the whole content column instead of stopping at the workspace's centred 1120px. */
   .sticky-header { margin: 0 calc(-1 * var(--main-pad-x)); padding: 0 var(--main-pad-x); background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 2px 5px rgba(26,31,43,.06); opacity: 0; transform: translateY(-8px); transition: opacity .18s ease, transform .18s ease; }
   .sticky-header.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-  .sticky-header-summary { display: flex; align-items: baseline; gap: 12px; max-width: 1120px; margin: 0 auto; padding: 16px 0; }
-  .sticky-header-scope { color: var(--ink); font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
-  .sticky-header-period { color: var(--ink-mute); font-size: 14px; font-weight: 700; }
+  .sticky-header-summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; max-width: 1120px; margin: 0 auto; padding: 16px 0; }
+  .sticky-header-scope { color: var(--ink); font-size: 21px; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
+  .sticky-header-range { position: relative; display: inline-flex; align-items: baseline; padding-left: 18px; white-space: nowrap; }
+  .sticky-header-separator { position: absolute; top: 50%; left: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--ink-mute); transform: translateY(-50%); }
+  .sticky-header-period { color: var(--ink-mute); font-size: 21px; font-weight: 400; letter-spacing: -.02em; white-space: nowrap; }
   .sticky-header-comparison { margin-left: auto; color: var(--spinach); font-size: 14px; font-weight: 500; white-space: nowrap; }
+  @media (max-width: 720px) {
+    .sticky-header-summary { gap: 6px 10px; padding: 12px 0; }
+    .sticky-header-scope, .sticky-header-period { font-size: 17px; }
+    .sticky-header-range { padding-left: 14px; }
+    .sticky-header-comparison { flex-basis: 100%; margin-left: 0; font-size: 12px; }
+  }
   .page-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 0; padding-bottom: 24px; border-bottom: 0; } .page-actions { display: flex; align-items: center; gap: 16px; flex-shrink: 0; } .quick-action { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 13px; border: 1px solid var(--nomni-green); border-radius: 6px; background: var(--nomni-green); color: var(--seaweed); font: 600 14px/1 "Inter", system-ui, sans-serif; box-shadow: 0 1px 2px rgba(14,55,39,.09); cursor: pointer; } .quick-action:hover { background: var(--primary-hover); border-color: var(--primary-hover); } .quick-action .material-symbols-outlined { font-size: 18px; } .new-action { position: relative; } .new-menu { top: calc(100% + 8px); right: 0; left: auto; min-width: 208px; } .new-menu a { display: flex; align-items: center; gap: 9px; padding: 10px; border-radius: 6px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; } .new-menu a:hover { background: var(--mint); color: var(--seaweed); } .new-menu .material-symbols-outlined { color: var(--spinach); font-size: 18px; }
   .welcome { margin: 0; color: var(--ink); font: 700 42px/1.05 "Hanken Grotesk", system-ui, sans-serif; letter-spacing: -.045em; }
   .welcome-date { margin: 0 0 8px; color: var(--ink-mute); font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; } .overview-title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px; margin: 0 0 16px; padding-top: 20px; color: var(--ink); font-size: 21px; font-weight: 600; } .period-comparison { margin-left: auto; color: var(--ink-mute); font-size: 12px; font-weight: 500; letter-spacing: 0; white-space: nowrap; }
@@ -201,6 +209,10 @@
   .outlet-table tr.outlet-row-selected td { background: var(--mint); }
   .outlet-table tr.outlet-row-selected td:first-child { border-radius: 6px 0 0 6px; }
   .outlet-table tr.outlet-row-selected td:last-child { border-radius: 0 6px 6px 0; }
+  /* Pad only the highlighted row so the name sits inside the mint fill; the indent against other rows is intended. */
+  .outlet-table tr.outlet-row-selected td:first-child { padding-left: 10px; }
+  .outlet-table tr.outlet-row-selected td:last-child  { padding-right: 10px; }
+  .outlet-card .outlet-sort[hidden] { display: none; }
   .outlet-table tr.outlet-row-selected .outlet-name { color: var(--seaweed); font-weight: 700; }
   .outlet-name { display: block; min-width: 140px; overflow: hidden; color: var(--ink); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
   .outlet-sparkline { display: block; width: 60px; height: 18px; color: var(--viz-line-neutral); }
@@ -246,6 +258,9 @@
   .top-items-picker-option { display: block; width: 100%; padding: 9px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--ink); text-align: left; font: 500 14px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; }
   .top-items-picker-option:hover, .top-items-picker-option.active { background: var(--mint); color: var(--seaweed); font-weight: 600; }
   .spend-per-head-card { width: 100%; margin-top: 24px; }
+  /* 1-outlet data set: the card is one .insight-row-2col column wide and its only chart fills it. */
+  .spend-per-head-card.is-compact { width: calc(50% - 8px); }
+  .spend-per-head-card.is-compact .spend-outlet-chart { flex: 1 1 100%; }
   .spend-per-head-card .mini-chart-row { flex-wrap: wrap; margin-top: 18px; }
   .spend-per-head-card .mini-chart-row[hidden] { display: none; }
   .spend-outlet-chart { flex: 0 1 calc(25% - 15px); min-width: 0; }
@@ -292,7 +307,6 @@
   .mini-chart-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-bottom: 2px; }
   .mini-chart-name { color: var(--ink); font-size: 13px; font-weight: 500; margin-right: auto; }
   .mini-chart-value { color: var(--ink); font: 700 21px/1 "Hanken Grotesk", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
-  .mini-chart-caption { color: var(--ink-mute-strong); font-size: 12px; }
   .mini-chart-sub { margin: 0 0 10px; color: var(--ink-mute-strong); font-size: 11px; }
   /* Taller viewBox (400×200, was 400×70) so the chart fills the card instead of leaving a blank band below it.
      The x-axis labels are drawn as SVG text at each point's own x — same coordinate, guaranteed aligned. */
@@ -318,7 +332,7 @@
   .mini-chart-crosshair.show { opacity: 1; }
 
   @media (max-width: 1050px) { .insight-row-2col { grid-template-columns: 1fr; } .mini-chart-row { flex-direction: column; gap: 18px; } .spend-per-head-card .mini-chart-row { flex-direction: row; } .spend-outlet-chart { flex: 0 1 calc(50% - 10px); } }
-  @media (max-width: 1180px) { .insight-row-2col { grid-template-columns: 1fr; } }
+  @media (max-width: 1180px) { .insight-row-2col { grid-template-columns: 1fr; } .spend-per-head-card.is-compact { width: 100%; } }
   @media (max-width: 640px) { .spend-outlet-chart, .spend-outlet-chart.is-single { flex: 0 1 100%; } }
   @media (max-width: 640px) { .top-item-name { max-width: 130px; } }
 
@@ -426,6 +440,7 @@
     position: sticky;
     top: 56px;
     height: calc(100vh - 56px);
+    z-index: 1;
   }
   .nav {
     margin-top: 12px;
@@ -690,7 +705,7 @@
       </div>
     </div>
   </aside>
-  <main class="main"><div class="sticky-header-shell"><div class="sticky-header" id="stickyContext" aria-label="Selected data scope and period"><div class="sticky-header-summary"><span class="sticky-header-scope" id="stickyScope">All outlets</span><span class="sticky-header-period" id="stickyPeriod">1–21 September 2026</span><span class="sticky-header-comparison" id="stickyComparison">Compared with 1–21 August 2026</span></div></div></div><div class="workspace">
+<main class="main"><div class="sticky-header-shell"><div class="sticky-header" id="stickyContext" aria-label="Selected data scope and period"><div class="sticky-header-summary"><span class="sticky-header-scope" id="stickyScope">All outlets</span><span class="sticky-header-range"><span class="sticky-header-separator" aria-hidden="true"></span><span class="sticky-header-period" id="stickyPeriod">1–21 September 2026</span></span><span class="sticky-header-comparison" id="stickyComparison">Compared with 1–21 August 2026</span></div></div></div><div class="workspace">
     <div class="page-head"><div><p class="welcome-date" id="welcomeDate"></p><h1 class="welcome" id="welcomeGreeting">Good morning, William</h1></div><div class="page-actions"><div class="new-action"><button class="quick-action" id="newActionButton" type="button" aria-expanded="false" aria-controls="newActionMenu"><span class="material-symbols-outlined">add</span>New</button><div class="picker-menu new-menu" id="newActionMenu"><a href="Procure%20-%20New%20Order%20-%20Item.html"><span class="material-symbols-outlined">format_list_bulleted</span>Order by item</a><a href="Procure%20-%20New%20Order%20-%20Supplier.html"><span class="material-symbols-outlined">local_shipping</span>Order by supplier</a><a href="Freemium/procure-trial-invoices.html"><span class="material-symbols-outlined">upload</span>Upload invoice</a></div></div></div></div>
     <div class="overview-title" id="overviewTitle" role="heading" aria-level="2"><span>Here’s the performance of</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="scope"><span data-picker-label="scope">all outlets</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="scope"><button class="picker-option selected">All outlets</button><button class="picker-option">Roll'd Chatswood</button><button class="picker-option">Roll'd Newtown</button><button class="picker-option">Roll'd Bondi</button><button class="picker-option">Roll'd Parramatta</button><button class="picker-option">Roll'd Wynyard</button><button class="picker-option">Roll'd World Square</button></div></div></div><span>for</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="period"><span data-picker-label="period">this month</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="period"><button class="picker-option selected">This month</button><button class="picker-option">Last 30 days</button><button class="picker-option">Last month</button><button class="picker-option">Last 3 months</button><button class="picker-option">This year</button></div></div></div><span class="period-comparison">Compared with 1–21 August 2026</span></div>
     <section class="overview" aria-label="Operations and performance overview">
@@ -783,7 +798,7 @@
         </div>
         <div class="insight-card spend-per-head-card">
           <div class="insight-card-head spend-per-head-head">
-            <div class="insight-card-heading"><h3>Spend per head by outlet</h3><p class="insight-card-sub" id="spendPerHeadSubtitle"></p></div>
+            <div class="insight-card-heading"><h3 id="spendPerHeadTitle">Spend per head by outlet</h3><p class="insight-card-sub" id="spendPerHeadSubtitle"></p></div>
             <div class="spend-per-head-controls"><div class="outlet-sort"><button class="outlet-sort-button" id="spendSortButton" type="button" aria-expanded="false" aria-controls="spendSortMenu"><span id="spendSortLabel">By % change</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="outlet-sort-menu" id="spendSortMenu" role="listbox" aria-label="Sort spend per head outlets"><button class="outlet-sort-option active" type="button" role="option" aria-selected="true" data-spend-sort="change">By % change</button><button class="outlet-sort-option" type="button" role="option" aria-selected="false" data-spend-sort="value">By value</button></div></div></div>
           </div>
           <div class="mini-chart-row" id="spendPerHeadBody"></div>
@@ -1566,7 +1581,12 @@
     const ranked = visible.filter(outlet => !outlet.belowFloor).sort((a, b) => Math.abs(outletSort === 'pct' ? b.changePct : b.changeAbs) - Math.abs(outletSort === 'pct' ? a.changePct : a.changeAbs));
     const belowFloor = visible.filter(outlet => outlet.belowFloor);
     const rows = [...ranked, ...belowFloor];
-    const selected = visible.find(outlet => outlet.name === currentScope);
+    // With a single outlet there is nothing to rank or distinguish it from: no highlight, chips or sort.
+    const multiOutlet = outlets.length > 1;
+    const selected = multiOutlet ? visible.find(outlet => outlet.name === currentScope) : null;
+    const outletSortControl = document.querySelector('.outlet-card .outlet-sort');
+    outletSortControl.hidden = !multiOutlet;
+    if(!multiOutlet){ document.getElementById('outletSortMenu').classList.remove('open'); document.getElementById('outletSortButton').setAttribute('aria-expanded', 'false'); }
     const controls = document.createElement('div'); controls.className = 'outlet-controls';
     controls.innerHTML = `<div class="outlet-filter-chips" role="group" aria-label="Filter outlets by this-period change"><button class="outlet-filter-chip" type="button" data-outlet-filter="all" aria-pressed="${outletFilter === 'all'}">All ${counts.all}</button><button class="outlet-filter-chip" type="button" data-outlet-filter="up" aria-pressed="${outletFilter === 'up'}">Up this period ${counts.up}</button><button class="outlet-filter-chip" type="button" data-outlet-filter="down" aria-pressed="${outletFilter === 'down'}">Down this period ${counts.down}</button></div>`;
     controls.querySelectorAll('[data-outlet-filter]').forEach(button => button.addEventListener('click', () => { outletFilter = button.dataset.outletFilter; renderOutlets(); }));
@@ -1582,7 +1602,7 @@
     let selectedRow = null;
     rows.forEach(outlet => { const row = document.createElement('tr'); if(outlet.belowFloor) row.className = 'outlet-low-volume'; if(outlet === selected){ row.classList.add('outlet-row-selected'); row.setAttribute('aria-current', 'true'); selectedRow = row; } row.innerHTML = `<td><span class="outlet-name" title="${outlet.name}">${middleEllipsis(outlet.name)}</span></td><td class="num">${outletChangeHtml(outlet)}</td><td class="num outlet-revenue">S$${outlet.revenue.toLocaleString('en-SG')}</td><td>${sparklineSvg(trendFor(outlet), outletSparklineTitle(outlet))}</td>`; tbody.appendChild(row); });
     table.appendChild(tbody); wrap.appendChild(table); scrollFrame.appendChild(wrap);
-    const children = [controls, scrollFrame];
+    const children = multiOutlet ? [controls, scrollFrame] : [scrollFrame];
     const comparisonNote = document.createElement('p'); comparisonNote.className = 'outlet-comparison-note'; comparisonNote.textContent = `% and S$ change compare this period with the previous one. The line shows the last ${trendWindow.points} complete ${trendWindow.unit === 'month' ? 'months' : 'weeks'}, so the two can differ.`;
     children.push(comparisonNote);
     body.replaceChildren(...children);
@@ -1748,7 +1768,6 @@
     const valueEl = document.createElement('span'); valueEl.className = 'mini-chart-value'; valueEl.textContent = format(headline ? headline.value : current);
     const pillEl = document.createElement('span'); pillEl.innerHTML = deltaPillHtml(seriesChangePct);
     head.append(valueEl, pillEl);
-    if(headline?.caption){ const captionEl = document.createElement('span'); captionEl.className = 'mini-chart-caption'; captionEl.textContent = headline.caption; head.appendChild(captionEl); }
     // note: { text, tone } sits directly under the value and pill. It's always rendered when passed (even with
     // empty text) so its reserved line keeps every chart in a row starting at the same height.
     if(note !== null){ const noteEl = document.createElement('span'); noteEl.className = `spend-per-head-note${note.tone ? ` is-${note.tone}` : ''}`; noteEl.textContent = note.text; if(note.title) noteEl.title = note.title; wrap.appendChild(noteEl); }
@@ -1895,7 +1914,7 @@
     const cs = data.covers[period.granularity][period.key];
     const total = cs.covers.reduce((sum, value) => sum + value, 0);
     body.innerHTML = '';
-    buildMiniLineChart(body, { name: '', periods: cs.labels, values: cs.covers, xLabelEvery: period.xLabelEvery, showYAxis: true, showXAxisLine: true, headline: { value: total, previousValue: cs.previousTotal, caption: 'total covers vs previous period' } });
+    buildMiniLineChart(body, { name: '', periods: cs.labels, values: cs.covers, xLabelEvery: period.xLabelEvery, showYAxis: true, showXAxisLine: true, headline: { value: total, previousValue: cs.previousTotal } });
   }
   function renderSpendOutletTable(container, rows){
     const frame = document.createElement('div'); frame.className = 'outlet-scroll-frame';
@@ -1928,6 +1947,8 @@
     body.hidden = false;
     const singleOutlet = currentScope !== 'All outlets';
     const hasGroup = hasOutletGroup();
+    document.querySelector('.spend-per-head-card').classList.toggle('is-compact', !hasGroup);
+    document.getElementById('spendPerHeadTitle').textContent = hasGroup ? 'Spend per head by outlet' : 'Spend per head';
     // Rank across the whole set, never just the visible cards — otherwise a lone outlet would trivially be
     // its own "steepest decline". Computed independently of the display sort, so labels survive "By value".
     const rows = data.outlets.map(outlet => {
@@ -1941,7 +1962,7 @@
     });
     const fewOutlets = rows.length <= 3; // nothing to hide: show them all and drop the button
     const expanded = !singleOutlet && (spendShowAll || fewOutlets);
-    document.getElementById('spendPerHeadSubtitle').textContent = singleOutlet ? period.subtitle : expanded ? `All ${rows.length} outlets · ${period.subtitle}` : 'The 3 biggest changes this period';
+    document.getElementById('spendPerHeadSubtitle').textContent = singleOutlet ? period.subtitle : expanded ? `All ${rows.length} outlets · ${period.subtitle}` : '';
     // Sorting is only a control for the expanded list. The compact cards always explain themselves by rank.
     const sortControls = document.querySelector('.spend-per-head-controls');
     sortControls.hidden = !expanded || rows.length <= 1;
