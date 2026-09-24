@@ -991,21 +991,14 @@
   .tour-branch-link:hover { color: var(--seaweed); }
 
   @media (max-width: 1100px) {
-    .app { grid-template-columns: 64px 1fr; }
-    .sidebar { width: 64px; overflow: hidden; }
-    .nav a { justify-content: center; padding: 10px; }
-    .nav-label, .badge { display: none; }
     .sidebar-setup { display: none; }
     .content, .page-header, .tabs { padding-left: 24px; padding-right: 24px; }
     .toolbar { align-items: stretch; flex-direction: column; }
     .toolbar-left, .toolbar-right { width: 100%; flex-wrap: wrap; }
   }
   @media (max-width: 760px) {
-    .app { display: block; }
-    .topbar { position: static; }
     .trial-status,
     .topbar-setup-link { display: none; }
-    .sidebar { display: none; }
     .page-header { flex-direction: column; }
     .search-wrap, .outlet-picker select { width: 100%; min-width: 0; }
     .outlet-picker { width: 100%; align-items: stretch; flex-direction: column; }
@@ -1359,6 +1352,142 @@
   }
 
 </style>
+<style>
+  /* Sidenav styles copied from Procure - Orders.html. */
+  .sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+  .nav {
+    margin-top: 12px;
+    padding: 6px 10px;
+    display: flex; flex-direction: column; gap: 2px;
+    flex: 1;
+  }
+  .nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .nav a .icon-wrap {
+    flex: 0 0 18px;
+    width: 18px; height: 18px;
+    position: relative;
+    display: block;
+  }
+  .nav a .icon {
+    position: absolute;
+    top: 0; left: 0;
+    width: 18px; height: 18px;
+    color: #888888;
+    transition: color .15s ease;
+  }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav a:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--ink);
+  }
+  .nav a:hover .icon { color: #888; }
+  .nav a.active {
+    background: var(--sidebar-item-active);
+    color: var(--seaweed);
+    font-weight: 600;
+  }
+  .nav a.active .icon { color: var(--spinach); }
+
+  .nav .badge {
+    margin-left: auto;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    display: inline-flex; align-items: center; justify-content: center; align-self: center;
+  }
+
+  .nav .warn-icon {
+    margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0;
+    height: 18px; align-self: center;
+  }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+  .sidebar-foot {
+    padding: 16px;
+  }
+  .help-fab {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #6c4df2;
+    display: grid; place-items: center;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(108,77,242,.4);
+  }
+
+  .nav-label { line-height: 1; }
+
+  /* ---------- Sidenav collapse at 1280px ---------- */
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      width: 64px;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+      transition: width 0.2s ease;
+      z-index: 4;
+    }
+    .sidebar:hover {
+      width: 232px;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
+    }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label,
+    .sidebar .nav .badge,
+    .sidebar .nav .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .nav .badge { display: inline-grid; }
+    .sidebar:hover .nav .warn-icon { display: inline-flex; }
+    /* Collapsed mode switcher */
+    .sidebar .mode-label { display: none; }
+    .sidebar .mode-icon { display: block; }
+    .sidebar:not(:hover) .sidebar-mode-wrap { padding: 10px 0 0; display: flex; align-items: flex-start; justify-content: center; height: 46px; flex-shrink: 0; }
+    .sidebar:not(:hover) .sidebar-mode-pill { background: transparent; padding: 0; justify-content: center; }
+    .sidebar:not(:hover) .sidebar-mode-opt:not(.active) { display: none; }
+    .sidebar:not(:hover) .sidebar-mode-opt.active { flex: 0 0 auto; width: 36px; height: 36px; padding: 0; background: rgba(0,0,0,.08); box-shadow: none; border-radius: 8px; color: var(--seaweed); }
+    .sidebar:hover .sidebar-mode-wrap { padding: 10px 10px 0; height: auto; display: block; }
+    .sidebar:hover .sidebar-mode-opt { display: inline-flex; padding: 6px 8px; width: auto; height: auto; }
+    .sidebar:hover .mode-label { display: inline; }
+    .sidebar:hover .mode-icon { display: none; }
+
+  }
+
+  /* ── Sidebar mode switcher ── */
+  .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
+  .sidebar-mode-pill { display: flex; background: rgba(0,0,0,.07); border-radius: 8px; padding: 3px; gap: 2px; }
+  .sidebar-mode-opt { flex: 1; background: transparent; border: none; color: var(--ink-mute); font-family: inherit; font-size: 13px; font-weight: 500; line-height: normal; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  .sidebar-mode-opt:not(.active):hover { color: var(--ink); }
+  .mode-icon { display: none; flex-shrink: 0; }
+  .mode-label { display: inline; }
+</style>
 </head>
 <body>
 <div class="handoff-inspector" aria-label="Handoff inspectors">
@@ -1402,29 +1531,42 @@
     </div>
   </header>
 
-  <aside class="sidebar">
-    <nav class="nav" aria-label="Trial navigation">
-      <a data-dashboard-link href="Freemium/Procure%20Trial%20Dashboard.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
-      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
-      <a data-nav-orders href="Freemium/procure-trial-orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
-      <a data-nav-invoices href="Freemium/procure-trial-invoices.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
-      <a class="active" data-nav-items href="Freemium/procure-trial-items.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
-      <a data-nav-inventory href="Freemium/procure-trial-inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
-      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
-      <a data-nav-outlets href="Freemium/procure-trial-outlet-suppliers.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span></a>
-      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
-      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
-    </nav>
-    <div class="sidebar-setup">
-      <div class="sidebar-setup-card" data-sidebar-setup-card>
-        <a class="sidebar-setup-main" data-setup-home-link href="Freemium/Procure%20Trial%20Dashboard.html?setup=1">
-          <span class="sidebar-setup-row"><span class="sidebar-setup-title"><span class="sidebar-setup-tick" data-sidebar-setup-tick hidden aria-hidden="true">✓</span>Get started</span><span class="sidebar-setup-copy">20% done</span></span>
-          <span class="sidebar-setup-progress" aria-hidden="true"><span></span></span>
-        </a>
-        <span class="sidebar-setup-next"><strong data-sidebar-next-label>Next</strong> <a class="sidebar-setup-next-link" data-sidebar-next-action href="Freemium/procure-trial-outlet-suppliers.html?tour=2"><span>Add supplier</span></a></span>
+<aside class="sidebar">
+    <div class="sidebar-mode-wrap">
+      <div class="sidebar-mode-pill">
+        <button class="sidebar-mode-opt active" id="outletModeBtn">
+          <svg class="mode-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="mode-label">Outlet</span>
+        </button>
+        <button class="sidebar-mode-opt" id="hqModeBtn">
+          <svg class="mode-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 21V7M8 21V7M2 12h20"/><path d="M9 3h6l2 4H7z"/></svg>
+          <span class="mode-label">HQ</span>
+        </button>
       </div>
     </div>
-    <button class="intercom-launcher" type="button" aria-label="Open chat support"></button>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="Procure - Dashboard.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+      <a href="Procure - Orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Payments - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Payments - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Payments</span></a>
+      <a href="Procure - Items.html" class="active"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+      <a href="Procure - Inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+      <a href="Procure - Recipes.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span><span class="warn-icon"><img src="_assets/error_24dp_1F1F1F 1.png" width="20" height="20" alt=""></span></a>
+      <a href="Procure - Users.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
+      <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/>
+          <path d="M12 8v5l3 2"/>
+        </svg>
+      </div>
+    </div>
   </aside>
 
   <main class="main">
@@ -2736,6 +2878,7 @@ html.demo-boot:not(.demo-ready) .main,html.demo-boot:not(.demo-ready) .nav{visib
 body:not(.demo-mode) .trial-conversion,body:not(.demo-mode) .sidebar-setup{display:none!important}
 body.demo-mode .trial-conversion,body.demo-mode .sidebar-setup,body.demo-mode .handoff-inspector,body.demo-mode .tour-overlay{display:none!important}
 body.demo-mode .nav{margin-top:12px}
+html.demo-boot .sidebar-mode-wrap,body.demo-mode .sidebar-mode-wrap{display:none!important}
 body.demo-mode .page-header{padding-top:32px}
 body.demo-mode .page-title{font:800 26px/1 "Hanken Grotesk",system-ui,sans-serif;letter-spacing:-.03em}
 body.demo-mode .demo-brand-pill{--demo-amber:#F5B731;height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:4px;background:var(--demo-amber);color:var(--seaweed);font-size:10px;font-weight:800;letter-spacing:.06em}
@@ -2761,5 +2904,6 @@ body.demo-mode .demo-top-btn.primary{border-color:var(--nomni-green);background:
 <script>
 (function(){if(new URLSearchParams(location.search).get('demo')==='1')return;document.querySelectorAll('[data-user-name]').forEach(function(node){node.textContent='William Arya'});document.querySelectorAll('[data-avatar]').forEach(function(node){node.textContent='WA'});document.querySelectorAll('[data-venue-option]').forEach(function(node){node.textContent='Test Outlet ZM'})})();
 </script>
+<script>document.getElementById('hqModeBtn').addEventListener('click',function(){window.location.href='Procure - HQ - Dashboard.html'});</script>
 </body>
 </html>

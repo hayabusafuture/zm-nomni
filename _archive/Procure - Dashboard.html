@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href="../_assets/favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Procure — Dashboard</title>
+<script>if(new URLSearchParams(location.search).get('demo')==='1')document.documentElement.classList.add('demo-boot')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+<style>
+  :root {
+    --seaweed: #0E3727;
+    --nomni-green: #2AC864;
+    --spinach: #1A8040;
+    --cream: #FAF7E9;
+    --mint: #E2FFE6;
+
+    --sidebar-bg: #F5F5F5;
+    --sidebar-item-active: rgba(42, 200, 100, 0.14);
+    --sidebar-text: #1a1f2b;
+
+    --ink: #1a1f2b;
+    --ink-2: #1a1f2b;
+    --ink-mute: #8a8f98;
+    --ink-soft: #c7c9cf;
+    --rule: #e7e8ec;
+
+    --primary: #2AC864;
+    --primary-ink: #0E3727;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 232px 1fr;
+    grid-template-rows: 56px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ── Topbar ── */
+  .topbar {
+    grid-column: 1 / -1; grid-row: 1;
+    background: #1f2226; color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px 0 22px;
+    border-bottom: 1px solid #000;
+    position: sticky; top: 0; z-index: 5;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 4px; }
+
+  /* ── Sidebar mode switcher ── */
+  .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
+  .sidebar-mode-pill { display: flex; background: rgba(0,0,0,.07); border-radius: 8px; padding: 3px; gap: 2px; }
+  .sidebar-mode-opt { flex: 1; background: transparent; border: none; color: var(--ink-mute); font-family: inherit; font-size: 13px; font-weight: 500; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  .sidebar-mode-opt:not(.active):hover { color: var(--ink); }
+  .mode-icon { display: none; flex-shrink: 0; }
+  .mode-label { display: inline; }
+
+  /* HQ selector in sidebar */
+  .sidebar-hq-select { margin: 8px 0 2px; position: relative; }
+  .sidebar-hq-btn { width: 100%; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); cursor: pointer; transition: border-color .13s; text-align: left; }
+  .sidebar-hq-btn:hover { border-color: #b0b4bc; }
+  .sidebar-hq-btn.open { border-color: var(--nomni-green); }
+  .sidebar-hq-btn-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-hq-btn svg { flex-shrink: 0; }
+  .sidebar-hq-dropdown { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 50; overflow: hidden; display: none; animation: switcherIn .12s ease-out; }
+  .sidebar-hq-dropdown.open { display: block; }
+  .sidebar-hq-option { padding: 9px 12px; font-size: 13px; color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; transition: background .1s; }
+  .sidebar-hq-option:hover { background: var(--mint); }
+  .sidebar-hq-option.active { font-weight: 600; color: var(--seaweed); }
+  .sidebar-hq-option.active::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--nomni-green); display: block; flex-shrink: 0; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .help-btn {
+    background: transparent; border: none;
+    color: rgba(255,255,255,.7); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 10px; border-radius: 6px;
+    transition: background .15s, color .15s;
+    text-decoration: none; font-size: 14px;
+  }
+  .help-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .help-btn .material-symbols-outlined { font-size: 18px; line-height: 1; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo-img { height: 26px; width: auto; display: block; }
+  .brand-sub {
+    color: var(--nomni-green); font-weight: 400; font-size: 23px;
+    font-family: "Hanken Grotesk", system-ui, sans-serif; line-height: 1;
+  }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: #7F6AD0;
+    color: #fff; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+  }
+  .user { display: flex; align-items: center; gap: 10px; font-weight: 400; color: #fff; }
+  .chev {
+    width: 10px; height: 10px; display: inline-block;
+    border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translate(-1px,-1px);
+  }
+
+  /* app switcher */
+  .app-switcher { position: relative; }
+  .app-switcher-btn {
+    background: transparent; border: 0; color: #fff;
+    width: 40px; height: 40px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background-color .15s ease;
+  }
+  .app-switcher-btn:hover { background: rgba(255,255,255,.08); }
+  .app-switcher-btn.open { background: rgba(255,255,255,.12); }
+  .app-switcher-btn svg { width: 20px; height: 20px; }
+  .app-switcher-panel {
+    position: absolute; top: calc(100% + 8px); left: 0;
+    width: 360px; background: #fff; color: var(--ink);
+    border-radius: 10px;
+    box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08);
+    padding: 18px 18px 14px; display: none; z-index: 40;
+    animation: switcherIn .14s ease-out;
+  }
+  .app-switcher-panel.open { display: block; }
+  @keyframes switcherIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .app-switcher-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-mute); margin: 0 0 12px 2px;
+  }
+  .app-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
+  .app-item {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 12px 6px; border-radius: 8px; text-decoration: none; color: var(--ink);
+    cursor: pointer; transition: background-color .12s ease; gap: 8px;
+  }
+  .app-item:hover { background: #f3f4f6; }
+  .app-tile {
+    width: 52px; height: 52px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 21px; letter-spacing: -0.02em;
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+  }
+  .app-item.current .app-tile { outline: 2px solid var(--seaweed); outline-offset: 2px; }
+  .app-label { font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+  .app-switcher-foot {
+    border-top: 1px solid var(--rule); margin-top: 12px; padding-top: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--ink-mute);
+  }
+  .app-switcher-foot a { color: var(--primary-ink); text-decoration: none; font-weight: 600; }
+  .app-switcher-foot a:hover { color: #1A8040; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    grid-column: 1; grid-row: 2;
+    background: var(--sidebar-bg); color: var(--sidebar-text);
+    display: flex; flex-direction: column;
+    position: sticky; top: 56px; height: calc(100vh - 56px);
+  }
+  .nav {
+    margin-top: 12px; padding: 6px 10px;
+    display: flex; flex-direction: column; gap: 2px; flex: 1;
+  }
+  .nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; color: var(--sidebar-text);
+    text-decoration: none; border-radius: 6px;
+    font-size: 14px; font-weight: 400;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .nav a .icon-wrap {
+    flex: 0 0 18px;
+    width: 18px; height: 18px;
+    position: relative;
+    display: block;
+  }
+  .nav a .icon {
+    position: absolute;
+    top: 0; left: 0;
+    width: 18px; height: 18px;
+    color: #888888;
+    transition: color .15s ease;
+  }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav a:hover { background: rgba(0,0,0,.05); color: var(--ink); }
+  .nav a:hover .icon { color: #888; }
+  .nav a.active { background: var(--sidebar-item-active); color: var(--seaweed); font-weight: 600; }
+  .nav a.active .icon { color: var(--spinach); }
+  .nav .badge {
+    margin-left: auto; background: var(--nomni-green); color: var(--seaweed);
+    font-size: 10px; font-weight: 700; min-width: 18px; height: 18px;
+    padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; align-self: center;
+  }
+  .nav .warn-icon {
+    margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0;
+    height: 18px; align-self: center;
+  }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+  .sidebar-foot { padding: 16px; }
+  .help-fab {
+    width: 44px; height: 44px; border-radius: 50%; background: #6c4df2;
+    display: grid; place-items: center; color: #fff;
+    box-shadow: 0 6px 18px rgba(108,77,242,.4);
+  }
+
+  /* ── Main ── */
+  .main {
+    grid-column: 2; grid-row: 2;
+    padding: 32px 40px 56px;
+    min-width: 0; background: #fff;
+    position: relative;
+  }
+
+  /* Loading overlay */
+  .main-loader { position: absolute; inset: 0; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 20; opacity: 1; transition: opacity .25s ease; }
+  .main-loader.fade-out { opacity: 0; pointer-events: none; }
+  .spinner { width: 34px; height: 34px; border: 3px solid var(--rule); border-top-color: var(--nomni-green); border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-label { font-size: 13px; color: var(--ink-mute); font-weight: 500; }
+
+  /* HQ placeholder */
+  .hq-placeholder { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; gap: 10px; }
+  .hq-placeholder.visible { display: flex; }
+  .hq-placeholder-title { font-size: 21px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 0; }
+  .hq-placeholder-sub { font-size: 14px; color: var(--ink-mute); margin: 0; }
+
+  /* ── Buttons ── */
+  .btn {
+    font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 6px;
+    padding: 10px 16px; border: 1px solid transparent; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; line-height: 1;
+    white-space: nowrap; transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .btn-primary { background: var(--nomni-green); color: var(--seaweed); border-color: var(--nomni-green); }
+  .btn-primary:hover { background: var(--seaweed); color: var(--nomni-green); border-color: var(--seaweed); }
+  .btn-secondary { background: var(--mint); color: var(--seaweed); border-color: var(--mint); }
+  .btn-secondary:hover { background: #c6f2ce; color: var(--seaweed); border-color: #c6f2ce; }
+  .btn-tertiary { background: #f3f4f6; color: var(--ink-2); border-color: transparent; }
+  .btn-tertiary:hover { background: #e6e8ec; color: var(--ink); border-color: transparent; }
+
+  /* ── Welcome header ── */
+  .dash-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 28px; gap: 16px;
+  }
+  .dash-welcome { font-size: 26px; font-weight: 800; color: var(--ink); margin: 0 0 6px; letter-spacing: -0.03em; line-height: 1;; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .dash-subtitle { font-size: 14px; color: var(--ink-2); margin: 0; }
+  .dash-subtitle b { color: var(--ink); font-weight: 700; }
+  .dash-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+  /* ── Metric cards ── */
+  .metrics-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-bottom: 32px;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .metrics-group {
+    padding: 0;
+  }
+  .metrics-group:first-child {
+    border-right: 1px solid var(--rule);
+  }
+  .metrics-group-label {
+    font-size: 14px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--ink-mute); padding: 14px 20px 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .metrics-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+  }
+  .metric-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px 20px;
+    background: #fff;
+  }
+  .metrics-row .metric-card:first-child {
+    border-right: 1px solid var(--rule);
+  }
+  .metric-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex: 0 0 48px;
+  }
+  .metric-icon svg { width: 22px; height: 22px; }
+  .metric-period {
+    font-size: 14px; color: var(--ink-mute); margin-bottom: 6px; font-weight: 400;
+  }
+  .metric-amount {
+    font-size: 24px; font-weight: 700; color: var(--ink);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.03em; line-height: 1;
+  }
+
+  /* ── Charts area (grey bg) ── */
+  .charts-area {
+    margin: 0 -40px -56px;
+    padding: 40px 40px 56px;
+    background: #f9f9f9;
+  }
+
+  /* ── Section wrapper ── */
+  .dash-section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 28px 32px 32px;
+    margin-bottom: 24px;
+  }
+  .dash-section:last-child { margin-bottom: 0; }
+  .dash-section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; gap: 16px;
+  }
+  .dash-section-left { display: flex; align-items: center; gap: 12px; }
+  .dash-section-title { font-size: 21px; font-weight: 600; color: var(--ink); margin: 0; letter-spacing: -0.02em; }
+
+  /* outlet select */
+  .outlet-select {
+    font-family: inherit; font-size: 14px; color: var(--ink-2);
+    background: #fff; border: 1px solid #d0d2d8; border-radius: 6px;
+    padding: 5px 28px 5px 10px; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+
+  /* period toggle */
+  .period-toggle {
+    display: flex; border: 1px solid #d0d2d8; border-radius: 6px; overflow: hidden;
+  }
+  .period-btn {
+    font-family: inherit; font-size: 14px; font-weight: 600; color: var(--ink-mute);
+    background: #fff; border: none; border-left: 1px solid #d0d2d8;
+    padding: 6px 14px; cursor: pointer; line-height: 1;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .period-btn:first-child { border-left: none; }
+  .period-btn:hover { background: #f3f4f6; color: var(--ink); }
+  .period-btn.active { background: var(--seaweed); color: #fff; }
+
+  /* view link */
+  .view-link {
+    font-size: 14px; font-weight: 600; color: var(--primary-ink);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+    margin-left: auto;
+  }
+  .view-link:hover { color: #1A8040; }
+  .view-link .chev { border-color: currentColor; }
+  .chev.right { transform: rotate(-45deg) translate(1px,1px); }
+
+  /* ── Spending overview ── */
+  .spend-meta {
+    display: flex; gap: 32px; margin-bottom: 20px;
+  }
+  .spend-meta-item .spend-meta-label { font-size: 14px; color: var(--ink-mute); margin-bottom: 3px; }
+  .spend-meta-item .spend-meta-val { font-size: 21px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+  /* bar chart */
+  .chart-wrap {
+    position: relative;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+    padding: 20px 0 0;
+  }
+  .chart-yaxis {
+    position: absolute; left: 0; top: 20px; bottom: 36px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 0 12px 0 16px;
+    font-size: 11px; color: var(--ink-mute); text-align: right;
+    width: 90px;
+    pointer-events: none;
+  }
+  .chart-plot {
+    margin-left: 90px;
+    padding: 0 16px;
+    height: 200px;
+    display: flex; align-items: flex-end; gap: 6px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+  /* horizontal grid lines */
+  .chart-plot::before,
+  .chart-plot::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    border-top: 1px solid var(--rule);
+    pointer-events: none;
+  }
+  .chart-plot::before { top: 33.3%; }
+  .chart-plot::after  { top: 66.6%; }
+  .chart-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+  .chart-bar {
+    width: 100%; max-width: 40px;
+    border-radius: 3px 3px 0 0;
+    background: #E8B94F;
+  }
+  .chart-xaxis {
+    margin-left: 90px;
+    padding: 8px 16px 12px;
+    display: flex; gap: 6px;
+  }
+  .chart-xaxis-label { flex: 1; text-align: center; font-size: 10px; color: var(--ink-mute); }
+
+  /* ── Top expenditures ── */
+  .top-exp-body {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    overflow: hidden;
+    min-height: 200px;
+  }
+  .top-exp-sidebar {
+    border-right: 1px solid var(--rule);
+    background: #fff;
+  }
+  .top-exp-tab {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px;
+    font-size: 14px; font-weight: 400; color: var(--ink-2);
+    cursor: pointer; border-bottom: 1px solid var(--rule);
+    transition: background-color .12s ease;
+  }
+  .top-exp-tab:last-child { border-bottom: none; }
+  .top-exp-tab:hover { background: #f7f8fa; color: var(--ink); }
+  .top-exp-tab.active { background: #f0f1f3; color: var(--ink); font-weight: 600; }
+  .top-exp-tab svg { width: 16px; height: 16px; color: var(--ink-mute); flex: 0 0 auto; }
+  .top-exp-content {
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 24px; background: #fff;
+  }
+  .empty-state {
+    text-align: center; color: var(--ink-mute); font-size: 14px;
+  }
+  .empty-state svg { display: block; margin: 0 auto 12px; color: #c7c9cf; }
+  /* Font inspector */
+  .font-inspector-btn {
+    background: transparent; border: 1px solid rgba(255,255,255,.25);
+    color: rgba(255,255,255,.6); cursor: pointer;
+    display: inline-flex; align-items: center;
+    padding: 3px 8px; border-radius: 6px;
+    transition: background .15s, color .15s, border-color .15s;
+    font-size: 11px; font-weight: 700; font-family: monospace; letter-spacing: .03em;
+  }
+  .font-inspector-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .font-inspector-btn.active { background: rgba(255,255,255,.18); color: #fff; border-color: rgba(255,255,255,.5); }
+  #font-inspector-tip {
+    position: fixed; background: #1a1f2b; color: #fff;
+    font-size: 11px; font-weight: 600; font-family: monospace;
+    padding: 3px 8px; border-radius: 4px; pointer-events: none;
+    z-index: 99999; display: none; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3); letter-spacing: .02em;
+  }
+
+  /* User menu dropdown */
+  .user-wrap { position: relative; }
+  .user { cursor: pointer; user-select: none; }
+  .user-menu {
+    position: absolute; top: calc(100% + 8px); right: 0;
+    width: 248px; background: #fff; color: var(--ink);
+    border-radius: 10px;
+    box-shadow: 0 14px 40px rgba(10,20,15,.22), 0 2px 8px rgba(10,20,15,.08);
+    display: none; z-index: 200;
+    animation: switcherIn .14s ease-out;
+    overflow: hidden;
+  }
+  .user-menu.open { display: block; }
+  .user-menu-header { padding: 14px 16px 12px; }
+  .user-menu-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .user-menu-email { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .user-menu-divider { height: 1px; background: var(--rule); margin: 0; }
+  .user-menu-section { padding: 6px 0; }
+  .user-menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px; font-size: 14px; color: var(--ink);
+    text-decoration: none; cursor: pointer;
+    transition: background-color .1s; white-space: nowrap;
+  }
+  .user-menu-item:hover { background: #f3f4f6; }
+  .user-menu-item .material-symbols-outlined {
+    width: 18px; font-size: 18px; line-height: 1; flex-shrink: 0;
+    color: var(--ink-mute); text-align: center;
+  }
+  .user-menu-item.supplier-hub { color: #1a6fcc; font-weight: 500; }
+  .user-menu-item.supplier-hub .material-symbols-outlined { color: #1a6fcc; }
+  .user-menu-item.logout { color: #e53535; }
+  .user-menu-item.logout .material-symbols-outlined { color: #e53535; }
+
+  .nav-label { line-height: 1; }
+
+  /* ---------- Sidenav collapse at 1280px ---------- */
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      width: 64px;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+      transition: width 0.2s ease;
+      z-index: 4;
+    }
+    .sidebar:hover {
+      width: 232px;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
+    }
+    .main { min-width: 1140px; }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label,
+    .sidebar .nav .badge,
+    .sidebar .nav .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .nav .badge { display: inline-grid; }
+    .sidebar:hover .nav .warn-icon { display: inline-flex; }
+
+    /* Collapsed mode switcher — framed active icon, fixed height to prevent nav jump */
+    .sidebar .mode-label { display: none; }
+    .sidebar .mode-icon { display: block; }
+    .sidebar:not(:hover) .sidebar-mode-wrap { padding: 10px 0 0; display: flex; align-items: flex-start; justify-content: center; height: 46px; flex-shrink: 0; }
+    .sidebar:not(:hover) .sidebar-mode-pill { background: transparent; padding: 0; justify-content: center; }
+    .sidebar:not(:hover) .sidebar-mode-opt:not(.active) { display: none; }
+    .sidebar:not(:hover) .sidebar-mode-opt.active { flex: 0 0 auto; width: 36px; height: 36px; padding: 0; background: rgba(0,0,0,.08); box-shadow: none; border-radius: 8px; color: var(--seaweed); }
+    /* Hide HQ name selector when collapsed */
+    .sidebar:not(:hover) .sidebar-hq-select { display: none !important; }
+
+    /* Expanded (hovered) — restore full pill */
+    .sidebar:hover .sidebar-mode-wrap { padding: 10px 10px 0; height: auto; display: block; }
+    .sidebar:hover .sidebar-mode-opt { display: inline-flex; padding: 6px 8px; width: auto; height: auto; }
+    .sidebar:hover .mode-label { display: inline; }
+    .sidebar:hover .mode-icon { display: none; }
+  }
+
+  
+  /* HQ nav MS icons — match PNG icon colour treatment */
+  .nav a .ms-icon {
+    font-size: 18px; line-height: 1; flex: 0 0 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    color: #888888; transition: color .15s;
+  }
+  .nav a:hover .ms-icon { color: #888; }
+  .nav a.active .ms-icon { color: var(--spinach); }
+</style>
+</head>
+<body>
+<div class="app" data-screen-label="Dashboard">
+
+  <!-- ── Topbar ── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <!--
+<div class="app-switcher">
+        <button class="app-switcher-btn" id="appSwitcherBtn" aria-label="Switch app" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="5" cy="5" r="1.8"/><circle cx="12" cy="5" r="1.8"/><circle cx="19" cy="5" r="1.8"/>
+            <circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/>
+            <circle cx="5" cy="19" r="1.8"/><circle cx="12" cy="19" r="1.8"/><circle cx="19" cy="19" r="1.8"/>
+          </svg>
+        </button>
+        <div class="app-switcher-panel" id="appSwitcherPanel" role="menu">
+          <div class="app-grid">
+            <a class="app-item current" href="../Procure - Dashboard.html"><div class="app-tile" style="background:#B05EC0">Pc</div><div class="app-label">Procure</div></a>
+            <a class="app-item" href="../POS - Dashboard.html"><div class="app-tile" style="background:#3F8AFB">Po</div><div class="app-label">POS</div></a>
+          </div>
+          <div class="app-switcher-foot">
+            <span>william@zeemart.co</span>
+            <a href="#">View all →</a>
+          </div>
+        </div>
+      </div>
+-->
+      <div class="brand">
+        <img class="brand-logo-img" src="../_assets/nomni-logo-light.svg" alt="nomni" />
+        <div class="brand-sub">Procure</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="font-inspector-btn" id="fontInspectorBtn" title="Font size inspector">Aa</button>
+      <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+        Help
+      </a>
+      <div class="user-wrap">
+        <div class="user" id="userMenuBtn" role="button" aria-haspopup="true" aria-expanded="false">
+          <div class="avatar" aria-hidden="true">WA</div>
+          <span>William Arya</span>
+          <span class="chev" aria-hidden="true"></span>
+        </div>
+        <div class="user-menu" id="userMenu" role="menu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">William Arya (Zeemart)</div>
+            <div class="user-menu-email">william@zeemart.co</div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="../Supply - Dashboard.html" class="user-menu-item supplier-hub">
+              <span class="material-symbols-outlined" aria-hidden="true">open_in_new</span>
+              Use Nomni Supply
+            </a>
+            <a href="#" class="user-menu-item">
+              <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+              Settings
+            </a>
+            <a href="#" class="user-menu-item">
+              <span class="material-symbols-outlined" aria-hidden="true">lock</span>
+              Change password
+            </a>
+            <a href="#" class="user-menu-item">
+              <span class="material-symbols-outlined" aria-hidden="true">domain</span>
+              Companies
+            </a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="#" class="user-menu-item">
+              <span class="material-symbols-outlined" aria-hidden="true">language</span>
+              English
+            </a>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-section">
+            <a href="https://www.nomni.ai/terms" class="user-menu-item" target="_blank">
+              <span class="material-symbols-outlined" aria-hidden="true">description</span>
+              Terms of use
+            </a>
+            <a href="https://www.nomni.ai/privacy" class="user-menu-item" target="_blank">
+              <span class="material-symbols-outlined" aria-hidden="true">privacy_tip</span>
+              Privacy Policy
+            </a>
+            <a href="../Procure - Login.html" class="user-menu-item logout">
+              <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+
+    <!-- Mode switcher -->
+    <div class="sidebar-mode-wrap">
+      <div class="sidebar-mode-pill">
+        <button class="sidebar-mode-opt active" id="outletModeBtn">
+          <svg class="mode-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="mode-label">Outlet</span>
+        </button>
+        <button class="sidebar-mode-opt" id="hqModeBtn">
+          <svg class="mode-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="1"/><path d="M16 21V7M8 21V7M2 12h20"/><path d="M9 3h6l2 4H7z"/></svg>
+          <span class="mode-label">HQ</span>
+        </button>
+      </div>
+      <div class="sidebar-hq-select" id="sidebarHqSelect" style="display:none">
+        <button class="sidebar-hq-btn" id="sidebarHqBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-mute)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="sidebar-hq-btn-name" id="sidebarHqName">Roll'd Australia HQ</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="color:var(--ink-mute)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="sidebar-hq-dropdown" id="sidebarHqDropdown">
+          <div class="sidebar-hq-option active">Roll'd Australia HQ</div>
+          <div class="sidebar-hq-option">Liven Group HQ</div>
+          <div class="sidebar-hq-option">Shake Shack SG HQ</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      <div id="outletNavItems">
+        <a href="../Procure - Dashboard.html" class="active"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Dashboard - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Dashboard - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Dashboard</span></a>
+        <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Reports - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Reports - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Reports</span></a>
+        <a href="../Procure - Orders.html"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Orders - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Orders - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Orders</span></a>
+        <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Invoice - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Invoice - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Invoices</span></a>
+        <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Payments - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Payments - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Payments</span></a>
+        <a href="../Procure - Items.html"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Items - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Items - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Items</span></a>
+        <a href="../Procure - Inventory.html"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Inventory - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Inventory - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Inventory</span></a>
+        <a href="../Procure - Recipes.html"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Recipes - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Recipes - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Recipes</span></a>
+        <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Outlets - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Outlets - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Outlets</span><span class="warn-icon"><img src="../_assets/error_24dp_1F1F1F 1.png" width="20" height="20" alt=""></span></a>
+        <a href="../Procure - Users.html"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
+        <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="../_assets/sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="../_assets/sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="help-fab" title="Help">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 12a8 8 0 1 1-3-6.2L21 5v5h-5"/>
+          <path d="M12 8v5l3 2"/>
+        </svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+
+    <!-- Welcome header -->
+    <div class="dash-header">
+      <div>
+        <h1 class="dash-welcome">Welcome back, William!</h1>
+        <p class="dash-subtitle">Your outlets have today placed <b>S$16.35</b> worth of orders and are expecting <b>6 deliveries</b>.</p>
+      </div>
+      <div class="dash-actions">
+        <button class="btn btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+          New order
+        </button>
+        <button class="btn btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          Upload invoice
+        </button>
+      </div>
+    </div>
+
+    <!-- Metric cards -->
+    <div class="metrics-section">
+      <!-- Weekly -->
+      <div class="metrics-group">
+        <div class="metrics-group-label">Weekly orders</div>
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-icon" style="background:#EBF3FF">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#3F8AFB" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <div>
+              <div class="metric-period">This week (5 orders)</div>
+              <div class="metric-amount">S$2,110.34</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" style="background:#E0F7F6">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#17B3A3" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <div>
+              <div class="metric-period">Last week (18 orders)</div>
+              <div class="metric-amount">S$2,387.35</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Monthly -->
+      <div class="metrics-group">
+        <div class="metrics-group-label">Monthly orders</div>
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-icon" style="background:#E8F5E9">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <div>
+              <div class="metric-period">This month (65 orders)</div>
+              <div class="metric-amount">S$10,237.21</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon" style="background:#FFF3E0">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#F17E36" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <div>
+              <div class="metric-period">Last month (52 orders)</div>
+              <div class="metric-amount">S$9,100.91</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-area">
+    <!-- Spending overview -->
+    <div class="dash-section">
+      <div class="dash-section-head">
+        <div class="dash-section-left">
+          <h2 class="dash-section-title">Spending overview</h2>
+          <select class="outlet-select" aria-label="Outlet">
+            <option>All outlets</option>
+          </select>
+        </div>
+        <a href="#" class="view-link">View spending report <span class="chev right"></span></a>
+        <div class="period-toggle" style="margin-left:0">
+          <button class="period-btn">YTD</button>
+          <button class="period-btn">Last year</button>
+          <button class="period-btn active">Past 12 weeks</button>
+        </div>
+      </div>
+
+      <div class="spend-meta">
+        <div class="spend-meta-item">
+          <div class="spend-meta-label">This week</div>
+          <div class="spend-meta-val">S$0.00</div>
+        </div>
+        <div class="spend-meta-item">
+          <div class="spend-meta-label">Last week</div>
+          <div class="spend-meta-val">S$0.00</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-yaxis">
+          <span>S$30,000.00</span>
+          <span>S$20,000.00</span>
+          <span>S$10,000.00</span>
+          <span>S$0.00</span>
+        </div>
+        <div class="chart-plot" id="chartPlot"></div>
+        <div class="chart-xaxis" id="chartXAxis"></div>
+      </div>
+    </div>
+
+    <!-- Top expenditures -->
+    <div class="dash-section">
+      <div class="dash-section-head">
+        <div class="dash-section-left">
+          <h2 class="dash-section-title">Top expenditures</h2>
+          <select class="outlet-select" aria-label="Outlet">
+            <option>All outlets</option>
+          </select>
+        </div>
+        <div class="period-toggle">
+          <button class="period-btn">This month</button>
+          <button class="period-btn">Last month</button>
+          <button class="period-btn active">This week</button>
+          <button class="period-btn">Last week</button>
+        </div>
+      </div>
+
+      <div class="top-exp-body">
+        <div class="top-exp-sidebar">
+          <div class="top-exp-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+            Supplier
+          </div>
+          <div class="top-exp-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            SKU
+          </div>
+          <div class="top-exp-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+            Category
+          </div>
+        </div>
+        <div class="top-exp-content">
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M15 9l-6 6M9 9l6 6"/>
+            </svg>
+            There is no data for the chosen period. Please select another period.
+          </div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /charts-area -->
+
+  </main>
+</div>
+
+<script>
+  // App switcher
+  /*
+(function(){
+    var btn = document.getElementById('appSwitcherBtn');
+    var panel = document.getElementById('appSwitcherPanel');
+    if (!btn || !panel) return;
+    function close(){ panel.classList.remove('open'); btn.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+    function toggle(e){
+      e.stopPropagation();
+      var isOpen = panel.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+    btn.addEventListener('click', toggle);
+    document.addEventListener('click', function(e){ if (!panel.contains(e.target) && e.target !== btn) close(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
+  })();
+*/
+
+  // Period toggles
+  document.querySelectorAll('.period-toggle').forEach(function(group) {
+    group.querySelectorAll('.period-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        group.querySelectorAll('.period-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+      });
+    });
+  });
+
+  // Top expenditures sidebar tabs
+  document.querySelectorAll('.top-exp-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.top-exp-tab').forEach(function(t){ t.classList.remove('active'); });
+      tab.classList.add('active');
+    });
+  });
+
+  // Bar chart
+  (function() {
+    var weeks = ['2 Feb','9 Feb','16 Feb','23 Feb','2 Mar','9 Mar','16 Mar','30 Mar','6 Apr','13 Apr'];
+    // Heights as % of chart (max = S$30,000). 2 Feb had ~S$28,000
+    var values = [28000, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    var maxVal = 30000;
+    var chartH = 200;
+
+    var plot = document.getElementById('chartPlot');
+    var xaxis = document.getElementById('chartXAxis');
+
+    weeks.forEach(function(label, i) {
+      var col = document.createElement('div');
+      col.className = 'chart-bar-col';
+      var pct = values[i] / maxVal;
+      var h = Math.round(pct * chartH);
+      if (h > 0) {
+        var bar = document.createElement('div');
+        bar.className = 'chart-bar';
+        bar.style.height = h + 'px';
+        col.appendChild(bar);
+      }
+      plot.appendChild(col);
+
+      var xl = document.createElement('div');
+      xl.className = 'chart-xaxis-label';
+      xl.textContent = label;
+      xaxis.appendChild(xl);
+    });
+  })();
+</script>
+<div id="font-inspector-tip"></div>
+<script>
+(function(){
+  var btn = document.getElementById('fontInspectorBtn');
+  var tip = document.getElementById('font-inspector-tip');
+  var on = false;
+  var tokenMap = {
+    '10px': '--text-badge', '11px': '--text-xs', '12px': '--text-sm',
+    '14px': '--text-base',  '21px': '--text-heading', '24px': '--text-display'
+  };
+  var colorMap = {
+    'rgb(26, 31, 43)':   '--ink',
+    'rgb(138, 143, 152)':'--ink-mute',
+    'rgb(199, 201, 207)':'--ink-soft',
+    'rgb(26, 128, 64)':  '--spinach',
+    'rgb(42, 200, 100)': '--nomni-green',
+    'rgb(14, 55, 39)':   '--seaweed',
+    'rgb(17, 17, 17)':   '--sidebar-text',
+    'rgb(255, 255, 255)':'white'
+  };
+  btn.addEventListener('click', function(){
+    on = !on;
+    btn.classList.toggle('active', on);
+    document.body.style.cursor = on ? 'crosshair' : '';
+    tip.style.display = 'none';
+  });
+  document.addEventListener('mousemove', function(e){
+    if (!on) return;
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+  });
+  document.addEventListener('mouseover', function(e){
+    if (!on) return;
+    var s = window.getComputedStyle(e.target);
+    var fs = s.fontSize;
+    var fw = s.fontWeight;
+    var col = s.color;
+    var fsLabel = tokenMap[fs] ? fs + ' · ' + tokenMap[fs] : fs;
+    var colLabel = colorMap[col] || col;
+    tip.textContent = fsLabel + ' · ' + fw + ' · ' + colLabel;
+    tip.style.display = 'block';
+  });
+  document.addEventListener('mouseleave', function(){ tip.style.display = 'none'; });
+})();
+</script>
+<script>
+(function(){
+  var btn = document.getElementById('userMenuBtn');
+  var menu = document.getElementById('userMenu');
+  if (!btn || !menu) return;
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    var open = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', function(){
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  });
+  menu.addEventListener('click', function(e){ e.stopPropagation(); });
+})();
+</script>
+
+<script>
+  document.getElementById('hqModeBtn').addEventListener('click', function() {
+    window.location.href = 'Procure - HQ - Dashboard.html';
+  });
+</script>
+<style>
+  html.demo-boot:not(.demo-ready) .main, html.demo-boot:not(.demo-ready) .nav { visibility: hidden; }
+  html.demo-boot .sidebar-mode-wrap { display: none !important; }
+  body.demo-mode .main { padding-top: 32px; }
+  body.demo-mode .dash-welcome { font: 800 26px/1 "Hanken Grotesk", system-ui, sans-serif; letter-spacing: -.03em; }
+  body.demo-mode .approved-demo-dialog { position:fixed; inset:0; z-index:900; border:0; width:100%; height:100%; background:transparent; }
+  body.demo-mode .demo-only-banner { min-height: 44px; margin: 0 -40px 24px; padding: 0 40px; background: var(--mint); border-bottom: 1px solid #B9F0C5; color: var(--seaweed); font-size: 13px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  body.demo-mode .demo-only-banner strong { font-weight: 700; }
+  body.demo-mode .demo-only-banner a { color: var(--spinach); font-weight: 700; }
+  body.demo-mode .demo-top-status { height: 32px; display: inline-flex; align-items: center; padding: 0 11px; border: 1px solid rgba(42,200,100,.35); border-radius: 6px; background: rgba(42,200,100,.1); color: #BFF6CF; font-size: 12px; font-weight: 600; }
+  body.demo-mode .demo-brand-pill {--demo-amber:#F5B731; height: 22px; display:inline-flex; align-items:center; padding:0 8px; border-radius:4px; background:var(--demo-amber); color:var(--seaweed); font-size:10px; font-weight:800; letter-spacing:.06em; }
+  body.demo-mode .demo-top-actions { display:flex; align-items:center; gap:8px; margin-right:4px; }
+  body.demo-mode .demo-top-btn { height:34px; display:inline-flex; align-items:center; justify-content:center; padding:0 12px; border:1px solid rgba(255,255,255,.25); border-radius:6px; background:transparent; color:#fff; font:600 12px "Inter",sans-serif; cursor:pointer; white-space:nowrap; }
+  body.demo-mode .demo-top-btn:hover { background:rgba(255,255,255,.1); }
+  body.demo-mode .demo-top-btn.primary { border-color:var(--nomni-green); background:var(--nomni-green); color:var(--seaweed); }
+  body.demo-mode .demo-top-btn.primary:hover { border-color:var(--seaweed); background:var(--seaweed); color:var(--nomni-green); }
+  body.demo-mode .demo-request-overlay { position:fixed; inset:0; z-index:900; display:none; align-items:flex-start; justify-content:center; padding-top:72px; background:rgba(10,20,15,.46); }
+  body.demo-mode .demo-request-overlay.open { display:flex; }
+  body.demo-mode .demo-request-card { width:560px; max-width:calc(100vw - 32px); overflow:hidden; border-radius:12px; background:#fff; box-shadow:0 24px 64px rgba(0,0,0,.22); }
+  body.demo-mode .demo-request-head { display:flex; justify-content:space-between; gap:16px; padding:20px 24px 16px; border-bottom:1px solid var(--rule); }
+  body.demo-mode .demo-request-head h2 { margin:0; font-size:18px; letter-spacing:-.02em; }
+  body.demo-mode .demo-request-head p { margin:4px 0 0; color:var(--ink-mute); font-size:12px; }
+  body.demo-mode .demo-request-close { width:36px; height:36px; border:0; border-radius:6px; background:transparent; color:var(--ink-mute); font-size:22px; cursor:pointer; }
+  body.demo-mode .demo-request-close:hover { background:#F3F4F6; color:var(--ink); }
+  body.demo-mode .demo-request-body { display:grid; gap:15px; padding:20px 24px 24px; }
+  body.demo-mode .demo-request-field { display:grid; gap:6px; }
+  body.demo-mode .demo-request-field label { font-size:13px; font-weight:600; }
+  body.demo-mode .demo-request-field input, body.demo-mode .demo-request-field select, body.demo-mode .demo-request-field textarea { width:100%; padding:9px 12px; border:1px solid #DCDEE3; border-radius:6px; background:#fff; color:var(--ink); outline:none; resize:vertical; }
+  body.demo-mode .demo-request-field input:focus, body.demo-mode .demo-request-field select:focus, body.demo-mode .demo-request-field textarea:focus { border-color:var(--nomni-green); }
+  body.demo-mode .demo-request-options { display:flex; flex-wrap:wrap; gap:8px; }
+  body.demo-mode .demo-request-option { display:flex; align-items:center; gap:7px; padding:8px 10px; border:1px solid var(--rule); border-radius:6px; }
+  body.demo-mode .demo-request-foot { display:flex; justify-content:flex-end; gap:10px; padding:14px 24px 18px; border-top:1px solid var(--rule); }
+  body.demo-mode .sidebar-mode-wrap { display: none; }
+  body.demo-mode .nav { margin-top: 12px; }
+  body.demo-mode .top-exp-content { display: block; padding: 18px 24px 20px; }
+  body.demo-mode .demo-exp-list { display: grid; gap: 13px; }
+  body.demo-mode .demo-exp-row { display: grid; grid-template-columns: minmax(130px, 190px) 1fr 88px; align-items: center; gap: 14px; }
+  body.demo-mode .demo-exp-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; }
+  body.demo-mode .demo-exp-track { height: 8px; overflow: hidden; border-radius: 4px; background: #F0F1F3; }
+  body.demo-mode .demo-exp-bar { height: 100%; border-radius: 4px; background: #E8B94F; }
+  body.demo-mode .demo-exp-value { text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+</style>
+<script>
+(function(){
+  var demoParams = new URLSearchParams(location.search);
+  if (demoParams.get('demo') !== '1') return;
+  document.body.classList.add('demo-mode');
+  var demoEmail = demoParams.get('email') || '';
+  function demoUrl(path) { return path + '?demo=1' + (demoEmail ? '&email=' + encodeURIComponent(demoEmail) : ''); }
+  var allowed = {
+    Dashboard: demoUrl('Procure%20-%20Dashboard.html'),
+    Orders: demoUrl('Procure%20-%20Orders.html'),
+    Invoices: demoUrl('Freemium/procure-trial-invoices.html'),
+    Items: demoUrl('Procure%20-%20Items.html'),
+    Inventory: demoUrl('Procure%20-%20Inventory.html'),
+    Recipes: demoUrl('Procure%20-%20Recipes.html'),
+    Outlets: demoUrl('Procure%20-%20Outlets.html'),
+    Users: demoUrl('Procure%20-%20Users.html')
+  };
+  document.querySelectorAll('.nav a').forEach(function(link){
+    var label = link.querySelector('.nav-label');
+    var name = label ? label.textContent.trim() : '';
+    if (!allowed[name]) { link.remove(); return; }
+    link.href = allowed[name];
+    link.classList.toggle('active', name === 'Dashboard');
+  });
+  var right = document.querySelector('.topbar-right');
+  var brand=document.querySelector('.brand');if(brand){var pill=document.createElement('span');pill.className='demo-brand-pill';pill.textContent='DEMO';brand.appendChild(pill);var status=document.createElement('span');status.className='demo-top-status';status.textContent='Expires in 14 days';brand.appendChild(status)}
+  function buildDemoRequest(){
+    var overlay=document.createElement('div');overlay.className='demo-request-overlay';overlay.innerHTML='<section class="demo-request-card" role="dialog" aria-modal="true" aria-labelledby="demo-request-title"><div class="demo-request-head"><div><h2 id="demo-request-title">Book a live demo</h2><p>Tell us how you would like to connect, and we’ll tailor the conversation to your business.</p></div><button class="demo-request-close" type="button" aria-label="Close">×</button></div><form><div class="demo-request-body" data-demo-step="1"><div class="demo-request-field"><label>Preferred contact method</label><select required><option value="">Select</option><option>Email</option><option>Phone</option><option>WhatsApp</option></select></div><div class="demo-request-field"><label>Contact details</label><input required value="'+demoEmail+'" placeholder="Email address or phone number"></div><div class="demo-request-field"><label>Best time to reach you</label><select required><option>Weekday mornings</option><option>Weekday afternoons</option><option>Any time</option></select></div></div><div class="demo-request-body" data-demo-step="2" hidden><div class="demo-request-field"><label>Number of locations</label><select required><option>1 location</option><option>2–5 locations</option><option>6–20 locations</option><option>More than 20</option></select></div><div class="demo-request-field"><label>How do you order today?</label><div class="demo-request-options"><label class="demo-request-option"><input type="checkbox"> WhatsApp</label><label class="demo-request-option"><input type="checkbox"> Email</label><label class="demo-request-option"><input type="checkbox"> Supplier portals</label><label class="demo-request-option"><input type="checkbox"> Other</label></div></div><div class="demo-request-field"><label>Questions for our team (optional)</label><textarea rows="3"></textarea></div></div><div class="demo-request-foot"><button class="btn btn-tertiary" type="button" data-demo-back hidden>Back</button><button class="btn btn-primary" type="button" data-demo-next>Continue</button><button class="btn btn-primary" type="submit" data-demo-submit hidden>Send request</button></div></form></section>';document.body.appendChild(overlay);
+    var one=overlay.querySelector('[data-demo-step="1"]'),two=overlay.querySelector('[data-demo-step="2"]'),back=overlay.querySelector('[data-demo-back]'),next=overlay.querySelector('[data-demo-next]'),submit=overlay.querySelector('[data-demo-submit]');
+    function close(){overlay.classList.remove('open')}overlay.querySelector('.demo-request-close').onclick=close;overlay.addEventListener('click',function(e){if(e.target===overlay)close()});next.onclick=function(){one.hidden=true;two.hidden=false;back.hidden=false;next.hidden=true;submit.hidden=false};back.onclick=function(){one.hidden=false;two.hidden=true;back.hidden=true;next.hidden=false;submit.hidden=true};overlay.querySelector('form').onsubmit=function(e){e.preventDefault();overlay.querySelector('.demo-request-card').innerHTML='<div class="demo-request-body" style="padding:32px"><h2 style="margin:0 0 8px">Request received</h2><p style="margin:0;color:var(--ink-mute)">Our team will get in touch using your preferred contact method.</p><div style="margin-top:20px"><button class="btn btn-primary" type="button" data-success-close>Done</button></div></div>';overlay.querySelector('[data-success-close]').onclick=close};return overlay;
+  }
+  function openApprovedDemoDialog(){var frame=document.createElement('iframe');frame.className='approved-demo-dialog';frame.title='Book a live demo';frame.src='Freemium/procure-trial-invoices.html?dialogOnly=1'+(demoEmail?'&email='+encodeURIComponent(demoEmail):'');document.body.appendChild(frame);function close(event){if(event.source===frame.contentWindow&&event.data==='close-demo-request'){frame.remove();window.removeEventListener('message',close)}}window.addEventListener('message',close)}
+  var topActions=document.createElement('div');topActions.className='demo-top-actions';topActions.innerHTML='<button class="demo-top-btn" type="button">Book a live demo</button><a class="demo-top-btn primary" href="../Freemium/procure-get-started.html?source=demo'+(demoEmail?'&email='+encodeURIComponent(demoEmail):'')+'">Start my FREE trial</a>';topActions.querySelector('button').onclick=openApprovedDemoDialog;if(right)right.insertBefore(topActions,right.firstChild);
+  document.querySelectorAll('.dash-welcome').forEach(function(el){ el.textContent = 'Welcome to your Nomni Procure demo'; });
+  document.querySelectorAll('.dash-subtitle').forEach(function(el){ el.innerHTML = 'Today’s sample outlets have placed <b>S$4,890.40</b> worth of orders and are expecting <b>12 deliveries</b>.'; });
+  var spendValues = document.querySelectorAll('.spend-meta-val');
+  if (spendValues[0]) spendValues[0].textContent = 'S$12,486.70';
+  if (spendValues[1]) spendValues[1].textContent = 'S$11,523.40';
+  var demoWeeks = ['11 May','18 May','25 May','1 Jun','8 Jun','15 Jun','22 Jun','29 Jun','6 Jul','13 Jul','20 Jul','This week'];
+  var demoSpend = [8640,9720,7480,11280,10460,12490,9180,13640,10820,11760,11523,12487];
+  var chartPlot = document.getElementById('chartPlot');
+  var chartXAxis = document.getElementById('chartXAxis');
+  var yAxisLabels = document.querySelectorAll('.chart-yaxis span');
+  ['S$15,000.00','S$10,000.00','S$5,000.00','S$0.00'].forEach(function(label,index){ if(yAxisLabels[index]) yAxisLabels[index].textContent=label; });
+  if (chartPlot && chartXAxis) {
+    chartPlot.innerHTML = '';
+    chartXAxis.innerHTML = '';
+    demoWeeks.forEach(function(label,index){
+      var col=document.createElement('div');col.className='chart-bar-col';
+      var bar=document.createElement('div');bar.className='chart-bar';bar.style.height=Math.round(demoSpend[index]/15000*200)+'px';bar.title=label+': S$'+demoSpend[index].toLocaleString('en-SG',{minimumFractionDigits:2});
+      col.appendChild(bar);chartPlot.appendChild(col);
+      var axis=document.createElement('div');axis.className='chart-xaxis-label';axis.textContent=label;chartXAxis.appendChild(axis);
+    });
+  }
+  var expenditureData = {
+    Supplier: [
+      ['Fresh Harvest Pte Ltd',3486.20,100],['Ocean Catch Seafood',2814.60,81],['Golden Grain Foods',2248.40,65],['Morning Roast Co.',1682.50,48],['Evergreen Meats',1240.80,36]
+    ],
+    SKU: [
+      ['Atlantic Salmon Fillet',1264.80,100],['Free Range Eggs',984.60,78],['Japanese Short Grain Rice',846.20,67],['Chicken Thigh Boneless',728.40,58],['Arabica Coffee Beans',612.80,48]
+    ],
+    Category: [
+      ['Fresh produce',3184.70,100],['Seafood',2814.60,88],['Meat & poultry',2468.20,78],['Dry goods',2186.40,69],['Dairy & eggs',1832.80,58]
+    ]
+  };
+  var expenditureContent = document.querySelector('.top-exp-content');
+  function renderExpenditures(kind){
+    if(!expenditureContent)return;
+    expenditureContent.innerHTML='<div class="demo-exp-list">'+expenditureData[kind].map(function(row){return '<div class="demo-exp-row"><span class="demo-exp-name">'+row[0]+'</span><span class="demo-exp-track"><span class="demo-exp-bar" style="display:block;width:'+row[2]+'%"></span></span><span class="demo-exp-value">S$'+row[1].toLocaleString('en-SG',{minimumFractionDigits:2})+'</span></div>'}).join('')+'</div>';
+  }
+  renderExpenditures('Supplier');
+  document.querySelectorAll('.top-exp-tab').forEach(function(tab){
+    tab.addEventListener('click',function(){renderExpenditures(tab.textContent.trim())});
+  });
+  document.title = 'Nomni Procure — Demo Dashboard';
+  document.documentElement.classList.add('demo-ready');
+})();
+</script>
+</body>
+</html>

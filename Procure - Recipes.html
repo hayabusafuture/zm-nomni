@@ -221,7 +221,143 @@
   /* ── Sidebar mode switcher ── */
   .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
   .sidebar-mode-pill { display: flex; background: rgba(0,0,0,.07); border-radius: 8px; padding: 3px; gap: 2px; }
-  .sidebar-mode-opt { flex: 1; background: transparent; border: none; color: var(--ink-mute); font-family: inherit; font-size: 13px; font-weight: 500; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .sidebar-mode-opt { flex: 1; background: transparent; border: none; color: var(--ink-mute); font-family: inherit; font-size: 13px; font-weight: 500; line-height: normal; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+  .sidebar-mode-opt:not(.active):hover { color: var(--ink); }
+  .mode-icon { display: none; flex-shrink: 0; }
+  .mode-label { display: inline; }
+</style>
+<style>
+  /* Sidenav styles copied from Procure - Orders.html. */
+  .sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+  .nav {
+    margin-top: 12px;
+    padding: 6px 10px;
+    display: flex; flex-direction: column; gap: 2px;
+    flex: 1;
+  }
+  .nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .nav a .icon-wrap {
+    flex: 0 0 18px;
+    width: 18px; height: 18px;
+    position: relative;
+    display: block;
+  }
+  .nav a .icon {
+    position: absolute;
+    top: 0; left: 0;
+    width: 18px; height: 18px;
+    color: #888888;
+    transition: color .15s ease;
+  }
+  .nav a .icon-green { display: none; }
+  .nav a.active .icon-grey { display: none; }
+  .nav a.active .icon-green { display: block; }
+  .nav a:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--ink);
+  }
+  .nav a:hover .icon { color: #888; }
+  .nav a.active {
+    background: var(--sidebar-item-active);
+    color: var(--seaweed);
+    font-weight: 600;
+  }
+  .nav a.active .icon { color: var(--spinach); }
+
+  .nav .badge {
+    margin-left: auto;
+    background: var(--nomni-green);
+    color: var(--seaweed);
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    display: inline-flex; align-items: center; justify-content: center; align-self: center;
+  }
+
+  .nav .warn-icon {
+    margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0;
+    height: 18px; align-self: center;
+  }
+  .nav .warn-icon img { height: 18px; width: 18px; }
+  .sidebar-foot {
+    padding: 16px;
+  }
+  .help-fab {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #6c4df2;
+    display: grid; place-items: center;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(108,77,242,.4);
+  }
+
+  .nav-label { line-height: 1; }
+
+  /* ---------- Sidenav collapse at 1280px ---------- */
+  @media (max-width: 1280px) {
+    .app { grid-template-columns: 64px 1fr; }
+    .sidebar {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      width: 64px;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+      transition: width 0.2s ease;
+      z-index: 4;
+    }
+    .sidebar:hover {
+      width: 232px;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
+    }
+    .nav a { white-space: nowrap; }
+    .sidebar .nav-label,
+    .sidebar .nav .badge,
+    .sidebar .nav .warn-icon { display: none; }
+    .sidebar:hover .nav-label { display: inline; }
+    .sidebar:hover .nav .badge { display: inline-grid; }
+    .sidebar:hover .nav .warn-icon { display: inline-flex; }
+    /* Collapsed mode switcher */
+    .sidebar .mode-label { display: none; }
+    .sidebar .mode-icon { display: block; }
+    .sidebar:not(:hover) .sidebar-mode-wrap { padding: 10px 0 0; display: flex; align-items: flex-start; justify-content: center; height: 46px; flex-shrink: 0; }
+    .sidebar:not(:hover) .sidebar-mode-pill { background: transparent; padding: 0; justify-content: center; }
+    .sidebar:not(:hover) .sidebar-mode-opt:not(.active) { display: none; }
+    .sidebar:not(:hover) .sidebar-mode-opt.active { flex: 0 0 auto; width: 36px; height: 36px; padding: 0; background: rgba(0,0,0,.08); box-shadow: none; border-radius: 8px; color: var(--seaweed); }
+    .sidebar:hover .sidebar-mode-wrap { padding: 10px 10px 0; height: auto; display: block; }
+    .sidebar:hover .sidebar-mode-opt { display: inline-flex; padding: 6px 8px; width: auto; height: auto; }
+    .sidebar:hover .mode-label { display: inline; }
+    .sidebar:hover .mode-icon { display: none; }
+
+  }
+
+  /* ── Sidebar mode switcher ── */
+  .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
+  .sidebar-mode-pill { display: flex; background: rgba(0,0,0,.07); border-radius: 8px; padding: 3px; gap: 2px; }
+  .sidebar-mode-opt { flex: 1; background: transparent; border: none; color: var(--ink-mute); font-family: inherit; font-size: 13px; font-weight: 500; line-height: normal; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
   .sidebar-mode-opt.active { background: #fff; color: var(--seaweed); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
   .sidebar-mode-opt:not(.active):hover { color: var(--ink); }
   .mode-icon { display: none; flex-shrink: 0; }
@@ -288,7 +424,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar">
+<aside class="sidebar">
     <div class="sidebar-mode-wrap">
       <div class="sidebar-mode-pill">
         <button class="sidebar-mode-opt active" id="outletModeBtn">
@@ -315,6 +451,7 @@
       <a href="Procure - Users.html"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/Users - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/Users - green.png" alt="" aria-hidden="true"></span><span class="nav-label">Users</span></a>
       <a href="#"><span class="icon-wrap"><img class="icon icon-grey" src="_assets/sidenav icons/News - grey.png" alt="" aria-hidden="true"><img class="icon icon-green" src="_assets/sidenav icons/News - green.png" alt="" aria-hidden="true"></span><span class="nav-label">News</span><span class="badge">9</span></a>
     </nav>
+
     <div class="sidebar-foot">
       <div class="help-fab" title="Help">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -447,6 +584,7 @@
 </script>
 <style>
 html.demo-boot:not(.demo-ready) .main,html.demo-boot:not(.demo-ready) .nav{visibility:hidden}
+html.demo-boot .sidebar-mode-wrap{display:none!important}
 body.demo-mode .sidebar-mode-wrap,body.demo-mode .font-inspector-btn{display:none!important}
 body.demo-mode .nav{margin-top:12px}
 body.demo-mode .main{padding-top:32px}
