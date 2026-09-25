@@ -14,6 +14,7 @@
   --nomni-green: #2AC864; --seaweed: #0E3727; --spinach: #1A8040; --mint: #E2FFE6;
   --ink: #1a1f2b; --ink-2: #4a4f5a; --ink-mute: #8a8f98; --ink-soft: #c7c9cf;
   --rule: #e7e8ec; --row-hover: #f7f8fa; --primary: #2AC864;
+  --sidebar-bg: #F5F5F5; --sidebar-bg-2: #EBEBEB; --sidebar-text-dim: #666666;
   --chip-rejected-ink: #D0291E;
   --context-bg: #EEF6FF; --context-ink: #24527A; --context-border: #B8D7F5;
 }
@@ -618,6 +619,52 @@ tr[data-restored-missing="true"].restored-missing-focus td { animation: restored
 .add-ing-row .btn { border-radius:6px !important; padding:9px 16px !important; font-size:14px !important; }
 .add-ing-row .btn-pill { border-radius:6px !important; }
 .save-bar { left:220px !important; box-shadow:0 -10px 30px rgba(14,55,39,.08); }
+/* Outlet-group recipe view: use the HQ editor's layout without its editing chrome. */
+body.scope-readonly #variationRail,
+body.scope-readonly #renameVariationBtn,
+body.scope-readonly #variationPickerBtn,
+body.scope-readonly .variation-title-actions,
+body.scope-readonly #createVariationBtn,
+body.scope-readonly #historyBtn,
+body.scope-readonly .add-ing-row,
+body.scope-readonly .row-ctrl .drag-handle,
+body.scope-readonly .row-ctrl .del-btn,
+body.scope-readonly .tag-picker-actions,
+body.scope-readonly .tag-chip-remove,
+body.scope-readonly .checkbox-row,
+body.scope-readonly .sub-recipe-status { display:none !important; }
+body.scope-readonly .main { padding-bottom:96px; }
+body.scope-readonly .var-assignment-row { display:none !important; }
+body.scope-readonly .variation-title-row.variation-title-outside { padding-bottom:32px; }
+body.scope-readonly .body-section { margin-top:0; box-shadow:none; }
+body.scope-readonly .save-bar { display:flex !important; justify-content:flex-end !important; }
+body.scope-readonly .save-status,
+body.scope-readonly #saveTimestamp,
+body.scope-readonly #saveVersionBtn,
+body.scope-readonly #saveBtn { display:none !important; }
+body.scope-readonly .save-actions .btn-primary { text-decoration:none !important; }
+body.scope-readonly #costRangeMeta,
+body.scope-readonly #foodCostRangeMeta { display:none !important; }
+body.scope-readonly .cost-detail-button { cursor:default; }
+body.scope-readonly .cost-detail-button:hover { background:var(--row-hover); }
+body.scope-readonly .form-section input:disabled,
+body.scope-readonly .body-section input:disabled,
+body.scope-readonly .form-section select:disabled,
+body.scope-readonly .body-section select:disabled,
+body.scope-readonly textarea:disabled { opacity:1; color:var(--ink); -webkit-text-fill-color:var(--ink); cursor:default; }
+body.scope-readonly .form-section input:disabled,
+body.scope-readonly .form-section select:disabled { background:var(--sidebar-bg-2); border-color:var(--rule); color:var(--sidebar-text-dim); -webkit-text-fill-color:var(--sidebar-text-dim); cursor:not-allowed; }
+body.scope-readonly .form-section .form-label { color:var(--sidebar-text-dim); }
+body.scope-readonly .form-section .portion-group { background:var(--row-hover); }
+body.scope-readonly .tag-input-shell,
+body.scope-readonly .tag-picker.open .tag-input-shell { background:var(--sidebar-bg-2); border-color:var(--rule); box-shadow:none; }
+body.scope-readonly .tag-chip { background:var(--sidebar-bg); border-color:var(--rule); color:var(--sidebar-text-dim); }
+body.scope-readonly #tagInput { display:none; }
+body.scope-readonly #retailDisplayBtn { cursor:default; }
+body.scope-readonly #ingredientCostingNote { display:none !important; }
+body.scope-readonly .row-ctrl { justify-content:center; }
+body.scope-readonly .tag-picker { pointer-events:none; }
+body.summary-only-recipe #historyBtn { display:none !important; }
 .sidebar { z-index:10; }
 .save-context-sub { display:none !important; }
 .save-context-title { display:block; font-size: 14px; font-weight:600; color:var(--ink); max-width:420px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -3611,7 +3658,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   function recipePriceForTarget(target) { return posSyncConfig.enabled ? target.pos[posSyncConfig.product] : posSyncConfig.manualPrice; }
   function recipeCostAdjustmentKey(target) { return currentVar + ':' + target.id; }
   function recipeCostForTarget(target) { return target.cost + (recipeCostAdjustments[recipeCostAdjustmentKey(target)] || 0); }
-  function recipeTargetFoodCost(target) { return recipeCostForTarget(target) / recipePriceForTarget(target) * 100; }
+  function recipeTargetFoodCost(target) {
+    var price = Number(recipePriceForTarget(target));
+    return Number.isFinite(price) && price > 0 ? recipeCostForTarget(target) / price * 100 : 0;
+  }
   function recipeRange(values, formatter) {
     var min = Math.min.apply(null, values), max = Math.max.apply(null, values);
     return formatter(min) + (min === max ? '' : '–' + formatter(max));
@@ -4456,7 +4506,10 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     ];
   }
 
-  const HQ_RECIPE_STATE_KEY = 'nomni-hq-recipe-create-state-v1';
+  const recipePageParams = new URLSearchParams(window.location.search);
+  const requestedRecipeName = recipePageParams.get('recipe') || 'Chargrill Chicken Thigh with Herb & Garlic Marinade';
+  const isGardenChickenRecipe = requestedRecipeName === 'Chargrill Chicken Thigh with Herb & Garlic Marinade';
+  const HQ_RECIPE_STATE_KEY = 'nomni-hq-recipe-create-state-v1' + (isGardenChickenRecipe ? '' : ':' + requestedRecipeName);
 
   function persistRecipeState() {
     if (currentVar) ING_TABLE_HTML_BY_VAR[currentVar] = serializeIngredientTable();
@@ -4520,6 +4573,31 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   }
 
   seedGardenCuisineRecipe();
+  if (!isGardenChickenRecipe) {
+    // The list prototype has summaries for other recipes, but no ingredient-level
+    // records. Never present the chicken's ingredients as another recipe's data.
+    document.body.classList.add('summary-only-recipe');
+    VERSIONS = [];
+    document.getElementById('recipeName').value = requestedRecipeName;
+    document.querySelector('.page-title').textContent = requestedRecipeName;
+    document.title = 'Admin — Recipe · ' + requestedRecipeName;
+    document.getElementById('ingBody').innerHTML = '';
+    showIngredientEmptyStateIfNeeded();
+    document.querySelector('#emptyRow .empty-label').textContent = 'Ingredient details unavailable';
+    document.querySelector('#emptyRow .empty-sub').textContent = 'This recipe has a list entry, but no ingredient-level data in the prototype.';
+    ING_TABLE_HTML_BY_VAR = { base: document.getElementById('ingBody').innerHTML };
+    document.getElementById('cookingTA').value = '';
+    selectedTags.clear();
+    if (recipePageParams.get('recipeTag')) selectedTags.add(recipePageParams.get('recipeTag'));
+    renderTags();
+    RECIPE_COST_TARGETS.forEach(function(target) {
+      target.cost = 0;
+      Object.keys(target.pos).forEach(function(product) { target.pos[product] = 0; });
+    });
+    posSyncConfig.enabled = false;
+    posSyncConfig.manualPrice = 0;
+    recipeHasMappedPosProducts = false;
+  }
   restoreSavedRecipeState();
   updateSubRecipeMode();
   function updateSaveContext() {
@@ -4617,6 +4695,69 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
   document.getElementById('recipeCostingContext').addEventListener('change', function() {
     setRecipeCostingContext(this.value);
   });
+
+  function initialiseScopedRecipeView() {
+    if (recipePageParams.get('view') !== 'scope') return;
+    var scopeId = recipePageParams.get('scope') || '';
+    var scopeName = recipePageParams.get('scopeName') || '';
+    var target = RECIPE_COST_TARGETS.find(function(item) { return item.id === scopeId; });
+    var hasKnownScope = !!target;
+    if (!target && scopeName) {
+      // Keep an unrecognised group's identity visible without borrowing another
+      // group's prices or assignments.
+      scopeId = (recipePageParams.get('scopeType') === 'outlet' ? 'outlet_' : 'group_') + 'preview';
+      target = { id: scopeId, name: scopeName, cost: 0, factor: 1, pos: {} };
+      RECIPE_COST_TARGETS.push(target);
+      ASSIGNMENT_OPTIONS.push({ id: scopeId, type: recipePageParams.get('scopeType') === 'outlet' ? 'Outlet' : 'Outlet group', label: scopeName, outletCount: 0 });
+    }
+    var effectiveVariation = target ? (assignmentOwner(target.id) || 'base') : 'base';
+    recipeCostingContext = target ? target.id : 'all';
+    switchVariation(effectiveVariation);
+    if (target) setRecipeCostingContext(target.id);
+    document.body.classList.add('scope-readonly');
+    document.title = requestedRecipeName + ' — View recipe';
+    var returnTo = recipePageParams.get('returnTo');
+    if (returnTo) {
+      try {
+        var returnUrl = new URL(returnTo, window.location.href);
+        if (returnUrl.protocol === 'file:' && returnUrl.pathname.endsWith('Admin%20-%20Edit%20Outlet%20Group.html')) {
+          var back = document.querySelector('.back-link');
+          back.href = returnUrl.href;
+          back.lastChild.textContent = ' ' + (scopeName || 'Outlet group');
+        }
+      } catch (error) {}
+    }
+    var hqUrl = new URL('Admin - HQ Recipe Create.html', window.location.href);
+    if (!isGardenChickenRecipe) hqUrl.searchParams.set('recipe', requestedRecipeName);
+    var hqButton = document.createElement('a');
+    hqButton.className = 'btn btn-primary';
+    hqButton.href = hqUrl.href;
+    hqButton.target = '_blank';
+    hqButton.rel = 'noopener';
+    hqButton.textContent = 'Open at HQ to edit ↗';
+    document.querySelector('.save-actions').appendChild(hqButton);
+    document.querySelectorAll('.cost-detail-button').forEach(function(button) {
+      var panel = document.createElement('div');
+      panel.className = button.className;
+      while (button.firstChild) panel.appendChild(button.firstChild);
+      button.replaceWith(panel);
+    });
+    document.querySelectorAll('main input, main select, main textarea').forEach(function(field) { field.disabled = true; });
+    document.querySelectorAll('main button').forEach(function(button) {
+      if (button.id === 'tabIngredients' || button.id === 'tabCooking' || button.classList.contains('buying-options-link')) return;
+      button.disabled = true;
+    });
+    document.querySelectorAll('#ingBody tr').forEach(function(row) { row.draggable = false; });
+    if (!isGardenChickenRecipe || !hasKnownScope) {
+      document.getElementById('costRecipeVal').textContent = '—';
+      document.getElementById('retailDisplayValue').textContent = '—';
+      document.getElementById('foodCostPct').textContent = '—';
+      document.getElementById('costRangeMeta').textContent = 'Ingredient details not available in this prototype';
+      document.getElementById('foodCostRangeMeta').textContent = 'No cost calculation available';
+      document.getElementById('posSyncSource').textContent = 'No price data available';
+    }
+  }
+  initialiseScopedRecipeView();
 
   // User menu
   document.getElementById('userMenuBtn').addEventListener('click', function(e) {

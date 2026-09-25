@@ -451,6 +451,8 @@
   .ml-table thead th { text-align: left; font-weight: 600; font-size: 12px; color: var(--ink-mute); padding: 12px 14px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fff; white-space: nowrap; }
   .ml-table tbody td { padding: 14px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
   .ml-table tbody tr:hover td { background: var(--row-hover); }
+  #ogRecBody .og-recipe-row { cursor: pointer; }
+  #ogRecBody .og-recipe-row:focus-visible { outline: 2px solid var(--spinach); outline-offset: -2px; }
   .supplier-status-chip { display:inline-flex; align-items:center; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; border-radius:4px; padding:3px 10px; }
   .supplier-status-chip.active { background:#D9F5E4; color:#1A8040; }
   .supplier-status-chip.excluded { background:#FDD6DC; color:#D0291E; }
@@ -3017,6 +3019,20 @@ OG_RECIPES.forEach((r, i) => {
   r.price = Math.round(r.cost / fc * 2) / 2;
   r.foodCostPct = r.cost / r.price * 100;
 });
+// Keep the chicken example in this scoped list aligned with the HQ recipe's
+// "View recipe for" values; the other list rows remain summary-only examples.
+const OG_CHICKEN_SCOPE_PRICES = {
+  'Chargrill Outlets': [2.46, 15.90],
+  'Family Dining Express': [2.68, 16.50],
+  '(WF 139) Chargrill @ 139 Tampines': [3.10, 17.90],
+  '(WF 290) Garden Express @ 290 Sengkang': [2.78, 16.90]
+};
+const ogChickenScope = OG_CHICKEN_SCOPE_PRICES[document.getElementById('groupPageTitle').textContent.trim()];
+if (ogChickenScope) {
+  OG_RECIPES[0].cost = ogChickenScope[0];
+  OG_RECIPES[0].price = ogChickenScope[1];
+  OG_RECIPES[0].foodCostPct = ogChickenScope[0] / ogChickenScope[1] * 100;
+}
 
 let ogRecPage = 1, ogRecSearch = '', ogRecCatFilter = '', ogRecFoodCostFilter = '', ogRecSortKey = 'default', ogRecStatusFilter = 'available';
 const ogRecipeExclusions = new Set();
@@ -3059,6 +3075,24 @@ function renderOgRecipeMetaLine(recipe) {
   const tagHtml = tags.map(function(tag, index) { return (index ? '<span class="ml-recipe-separator">•</span>' : '') + '<span class="ml-cat-tag">' + tag + '</span>'; }).join('');
   return '<div class="ml-recipe-meta"><span class="ml-recipe-type">' + (recipe.type === 'sub-recipe' ? 'Sub-recipe' : 'Recipe') + '</span>' + (tags.length ? '<span class="ml-recipe-separator">•</span>' + tagHtml : '') + '</div>';
 }
+function openOgRecipeView() {
+  const scopeName = document.getElementById('groupPageTitle').textContent.trim();
+  const scopeIds = {
+    'Chargrill Outlets': 'group_chargrill',
+    'Family Dining Express': 'group_family',
+    '(WF 139) Chargrill @ 139 Tampines': 'outlet_139',
+    '(WF 290) Garden Express @ 290 Sengkang': 'outlet_290'
+  };
+  const url = new URL('Admin - HQ Recipe Create.html', window.location.href);
+  url.searchParams.set('view', 'scope');
+  url.searchParams.set('recipe', 'Chargrill Chicken Thigh with Herb & Garlic Marinade');
+  url.searchParams.set('scope', scopeIds[scopeName] || '');
+  url.searchParams.set('scopeName', scopeName);
+  url.searchParams.set('scopeType', window.isIndividualOutletPrototype ? 'outlet' : 'group');
+  url.searchParams.set('recipeTag', 'Mains');
+  url.searchParams.set('returnTo', window.location.href.split('#')[0] + '#recipes');
+  window.location.href = url.href;
+}
 function renderOgRec() {
   const items = getOgRecItems();
   const total = items.length;
@@ -3066,7 +3100,7 @@ function renderOgRec() {
   const page = items.slice(start, start + OG_REC_PER_PAGE);
   document.getElementById('ogRecCount').textContent = total;
   document.getElementById('ogRecBody').innerHTML = page.map(r => {
-    return '<tr' + (r.active ? '' : ' class="ml-inactive"') + '>' +
+    return '<tr class="og-recipe-row' + (r.active ? '' : ' ml-inactive') + '" tabindex="0" role="link" aria-label="Open view-only recipe example">' +
       '<td><div class="ml-item-name">' + r.name + '</div>' + renderOgRecipeMetaLine(r) + '</td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.cost.toFixed(2) + '</span></td>' +
       '<td><span style="font-size: 14px;font-weight:600;color:var(--ink)">$' + r.price.toFixed(2) + '</span></td>' +
@@ -3075,7 +3109,6 @@ function renderOgRec() {
       '<td><div class="row-actions-wrap">' +
         '<button class="btn-row-actions" onclick="event.stopPropagation();toggleRowMenu(this)" title="Actions">•••</button>' +
         '<div class="row-actions-menu">' +
-          '<div class="row-action-item">Edit recipe</div>' +
           (r.active ? '<div class="row-action-item' + (ogRecipeExclusions.has(r.name) ? '' : ' danger') + '" onclick="event.stopPropagation();toggleOgRecipeExclusion(\'' + r.name.replace(/'/g, "\\'") + '\')">' + (ogRecipeExclusions.has(r.name) ? (window.isIndividualOutletPrototype ? 'Include in this outlet' : 'Include in this group') : (window.isIndividualOutletPrototype ? 'Exclude from this outlet' : 'Exclude from this group')) + '</div>' : '<div class="row-action-note">Disabled at HQ</div>') +
         '</div></div></td>' +
     '</tr>';
@@ -3089,6 +3122,16 @@ function renderOgRec() {
   btns += '<button class="pager-btn" ' + (ogRecPage===totalPages?'disabled':'') + ' onclick="setOgRecPage(' + (ogRecPage+1) + ')">›</button>';
   pager.innerHTML = '<span>Showing ' + from + '–' + to + ' of ' + total + ' recipes</span><div style="display:flex;align-items:center;gap:3px">' + btns + '</div>';
 }
+document.getElementById('ogRecBody').addEventListener('click', function(event) {
+  if (event.target.closest('.row-actions-wrap')) return;
+  if (event.target.closest('.og-recipe-row')) openOgRecipeView();
+});
+document.getElementById('ogRecBody').addEventListener('keydown', function(event) {
+  if (!event.target.classList.contains('og-recipe-row')) return;
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  openOgRecipeView();
+});
 function toggleOgRecipeExclusion(name) {
   if (ogRecipeExclusions.has(name)) {
     ogRecipeExclusions.delete(name);
@@ -3104,6 +3147,7 @@ function toggleOgRecipeExclusion(name) {
 }
 function setOgRecPage(p) { ogRecPage = p; renderOgRec(); window.scrollTo(0,0); }
 renderOgRec();
+if (window.location.hash === '#recipes') switchToTab('recipes');
 
 document.getElementById('modalClearBtn').style.visibility = 'hidden';
 if (!window.isIndividualOutletPrototype) renderOutlets();
