@@ -558,14 +558,13 @@
   .supplier-reliability-card { display: flex; flex-direction: column; min-height: 0; }
   .supplier-reliability-card #supplierReliabilityBody { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
   .supplier-reliability-card #supplierReliabilityBody .outlet-scroll-frame { display: flex; flex: 1 1 auto; min-height: 0; }
-  .supplier-reliability-card #supplierReliabilityBody .procure-table-wrap { flex: 1 1 auto; min-height: 0; max-height: none; }
+  .supplier-reliability-card #supplierReliabilityBody .procure-table-wrap { flex: 1 1 auto; min-height: 0; max-height: 335px; }
   .supplier-reliability-card .outlet-table th:last-child { text-align: right; }
-  /* The equal-height Spend row gives this card more room than the default six-row viewport. Let the
-     outlet list use that available height instead of leaving a large empty band below the scrollbar. */
+  /* Keep the two half-width cards compact; their lists scroll while the comparison and accuracy footers stay visible. */
   .spend-outlet-card { display: flex; flex-direction: column; min-height: 0; }
   .spend-outlet-card #spendOutletBody { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
   .spend-outlet-card .outlet-scroll-frame { display: flex; flex: 1 1 auto; min-height: 0; }
-  .spend-outlet-card .procure-table-wrap { flex: 1 1 auto; min-height: 0; max-height: none; }
+  .spend-outlet-card .procure-table-wrap { flex: 1 1 auto; min-height: 0; max-height: 410px; }
   .spend-outlet-card .outlet-comparison-note { flex: 0 0 auto; }
   .spend-outlet-card .outlet-sort[hidden] { display: none; }
   .spend-outlet-card .outlet-name { min-width: 0; overflow: visible; text-overflow: clip; white-space: normal; }
@@ -588,7 +587,7 @@
   .supplier-bar-link { color: var(--ink); text-decoration: none; }
   .supplier-bar-link:hover { color: var(--spinach); text-decoration: underline; }
   .supplier-bar-share { color: var(--ink-mute-strong); font-size: 13px; font-variant-numeric: tabular-nums; }
-  .spend-supplier-card .procure-table-wrap { max-height: calc(27px + 10 * 40px); box-sizing: border-box; padding-right: 12px; }
+  .spend-supplier-card .procure-table-wrap { max-height: calc(27px + 7.5 * 40px); box-sizing: border-box; padding-right: 12px; }
 
   /* Price movement: the invoice description stays on one line (full text in its title), so every row is the same height. */
   .procure-sku { display: block; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 600; letter-spacing: .01em; text-overflow: ellipsis; white-space: nowrap; }
@@ -2981,6 +2980,7 @@
         bySupplier: Object.entries(data.current.suppliers).map(([name, row]) => ({ id: name, name, over: row.over, notReceived: row.notReceived })),
       },
       reliability: supplierReliabilityRows(data).map(row => ({ id: row.name, name: row.name, fill: row.fill, accuracy: row.accuracy })),
+      outletCount: data.names.length,
     };
     if(data.names.length > 1){
       input.outlets = data.perOutlet.map(outlet => ({ id: outlet.name, name: outlet.name,

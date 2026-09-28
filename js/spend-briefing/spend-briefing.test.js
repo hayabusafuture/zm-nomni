@@ -66,18 +66,15 @@ test('same data with its own memory returns the cached text', () => {
   assert.strictEqual(b.text, a.text);
 });
 
-test('spend change leads when it moved, split by supplier', () => {
+test('spend change is always included, split by supplier', () => {
   const r = summariseSpendTab(base());
-  assert.strictEqual(r.findings[0].key, 'spend');
-  assert.match(r.text, /^Spend (is down|fell) 2%/);
-  assert.match(r.text, /Sunrise Poultry Distributors \(−S\$555\)/);
+  assert.ok(r.findings.some(f => f.key === 'spend'));
+  assert.match(r.text, /Sunrise Poultry Distributors \(−S\$555\)|S\$555 of the 2% drop/);
 });
 
-test('spend change is pinned and leads, even when another finding scores higher', () => {
-  const d = base(); d.priceMoves[0].change = 40;
-  const r = summariseSpendTab(d);
-  assert.strictEqual(r.findings[0].key, 'spend');
-  assert.ok(r.findings.some(f => f.key === 'price'));
+test('a big spend change leads; a small one can become context', () => {
+  const d = base(); d.spend = { current: 30000, previous: 37401 }; d.suppliers[4].spend = 11324;
+  assert.match(summariseSpendTab(d).text, /^(Spend|Most of the 20% drop|Everyone else accounts)/);
 });
 
 test('steady spend with nothing else to say reads as a steady period', () => {
@@ -93,7 +90,7 @@ test('steady spend is not pinned: stronger findings can replace it', () => {
 });
 
 test('two suppliers share the change when neither holds 60%', () => {
-  const d = base();
+  const d = base(); d.discrepancies.over.value = 0; d.reliability = []; d.priceMoves = []; d.outlets = [];
   d.suppliers = [
     { id: 'a', name: 'Alpha', spend: 1000, previousSpend: 1500 },
     { id: 'b', name: 'Beta', spend: 1000, previousSpend: 1400 },
@@ -104,21 +101,34 @@ test('two suppliers share the change when neither holds 60%', () => {
 });
 
 test('a supplier offsetting 30%+ of the change is named as going the other way', () => {
-  const d = base();
+  const d = base(); d.discrepancies.over.value = 0; d.reliability = []; d.priceMoves = []; d.outlets = [];
   d.suppliers = [{ id: 'a', name: 'Alpha', spend: 1000, previousSpend: 2000 }, { id: 'b', name: 'Beta', spend: 1400, previousSpend: 1000 }];
   d.spend = { current: 2400, previous: 3000 };
   assert.match(summariseSpendTab(d).text, /Beta went the other way \(\+S\$400\)/);
 });
 
-test('a reliability finding about the supplier just named also follows on', () => {
-  const d = base(); d.outlets = []; d.priceMoves = []; d.discrepancies.over.value = 0;
-  assert.match(summariseSpendTab(d).text, /\(−S\$555\)\. The same supplier billed at the ordered price on 65% of invoice lines\./);
+test('facts about one supplier are told as one story, without repeating its name', () => {
+  const d = base(); d.outlets = []; d.priceMoves = [];
+  for (let g = 1; g <= 12; g++) {
+    const t = summariseSpendTab(d, { generation: g }).text;
+    const mentions = t.split('Sunrise Poultry Distributors').length - 1;
+    assert.ok(mentions === 1, 'named ' + mentions + ' times: ' + t);
+    assert.match(t, /65% of its invoice lines at the ordered price|65% of invoice lines|S\$490 of the S\$690/);
+  }
 });
 
-test('a finding about the supplier just named follows on as "The same supplier"', () => {
-  const d = base(); d.reliability = []; d.outlets = []; d.priceMoves = [];
-  const r = summariseSpendTab(d);
-  assert.match(r.text, /mostly from Sunrise Poultry Distributors \(−S\$555\)\. The same supplier accounts for S\$490 of the S\$690/);
+test('the story never says "billed" twice in one sentence', () => {
+  const d = base(); d.outlets = []; d.priceMoves = [];
+  for (let g = 1; g <= 12; g++) {
+    const t = summariseSpendTab(d, { generation: g }).text;
+    t.split(/(?<=\.)\s/).forEach(sentence => assert.ok((sentence.match(/\bbilled\b/g) || []).length <= 1, sentence));
+  }
+});
+
+test('openings vary across data: not every briefing starts with "Spend"', () => {
+  const starts = new Set();
+  for (let seed = 1; seed <= 60; seed++) starts.add(summariseSpendTab(randomScenario(seed)).text.split(' ').slice(0, 2).join(' '));
+  assert.ok(starts.size >= 6, 'only ' + starts.size + ' different openings: ' + [...starts].join(' | '));
 });
 
 test('discrepancies name a supplier only with half or more', () => {
@@ -129,10 +139,11 @@ test('discrepancies name a supplier only with half or more', () => {
   assert.match(r.text, /S\$690 was invoiced above the ordered price\.|Invoices came in S\$690 above/);
 });
 
-test('not received is added only when it is above S$0', () => {
-  const d = base(); d.reliability = []; d.outlets = []; d.priceMoves = []; assert.doesNotMatch(summariseSpendTab(d).text, /not received/);
+test('not received is mentioned only when it is above S$0', () => {
+  const d = base(); d.reliability = []; d.outlets = []; d.priceMoves = [];
+  assert.doesNotMatch(summariseSpendTab(d).text, /not received/);
   d.discrepancies.notReceived = { value: 120, count: 2 };
-  assert.match(summariseSpendTab(d).text, /plus S\$120 invoiced but not received/);
+  assert.match(summariseSpendTab(d).text, /S\$120 (was )?invoiced but not received/);
 });
 
 test('small discrepancies are not mentioned', () => {
@@ -140,13 +151,13 @@ test('small discrepancies are not mentioned', () => {
   assert.ok(!summariseSpendTab(d).findings.some(f => f.key === 'discrepancy'));
 });
 
-test('a price rise says where: one outlet by name, several by count and "up to"', () => {
+test('a price rise says where: one outlet by name, several by count, all as "all"', () => {
   const d = base(); d.discrepancies.over.value = 0; d.reliability = []; d.outlets = [];
-  assert.match(summariseSpendTab(d).text, /rose 12\.7% at 6 outlets/);
+  assert.match(summariseSpendTab(d).text, /12\.7% at 6 outlets/);
+  d.outletCount = 6;
+  assert.match(summariseSpendTab(d).text, /12\.7% at all 6 outlets/);
   d.priceMoves[0].outlets = ["Roll'd Bondi"];
-  assert.match(summariseSpendTab(d).text, /rose 12\.7% at Roll'd Bondi/);
-  d.priceMoves[0].outlets = [];
-  assert.match(summariseSpendTab(d).text, /which rose 12\.7%\.|rose 12\.7%, the largest/);
+  assert.match(summariseSpendTab(d).text, /12\.7% at Roll'd Bondi/);
 });
 
 test('rows for the same item at different outlets group into one item, reporting the largest rise', () => {
@@ -157,7 +168,7 @@ test('rows for the same item at different outlets group into one item, reporting
     { id: 'm:a', item: 'Milk', supplier: 'Eastview', change: 6, outlets: ['Glebe'] }
   ];
   const t = summariseSpendTab(d).text;
-  assert.match(t, /Chicken thigh from Sunrise,? (which )?rose by up to 14\.3% across 3 outlets/);
+  assert.match(t, /(by )?up to 14\.3% at 3 outlets/);
   assert.match(t, /two items/i);
 });
 
@@ -188,10 +199,11 @@ test('an outlet moving against the group appears only in a group view', () => {
   assert.doesNotMatch(summariseSpendTab(d).text, /Roll'd Wynyard/);
 });
 
-test('three findings about one supplier chain without repeating "The same supplier"', () => {
-  const d = base(); d.outlets = []; d.priceMoves = [];
+test('a supplier story can include a price rise from the same supplier', () => {
+  const d = base(); d.outlets = []; d.discrepancies.over.value = 0;
+  d.priceMoves = [{ id: 'c', item: 'Chicken thigh', supplier: 'Sunrise Poultry Distributors', change: 13.9, outlets: ['A', 'B'] }];
   const t = summariseSpendTab(d).text;
-  assert.match(t, /The same supplier accounts for S\$490 of the S\$690 invoiced above the ordered price\. It billed at the ordered price on 65% of invoice lines\./);
+  assert.match(t, /raised the price of Chicken thigh by 13\.9% at 2 outlets/);
 });
 
 test('supporting findings rotate when the data changes', () => {
