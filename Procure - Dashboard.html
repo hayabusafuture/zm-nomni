@@ -25,6 +25,19 @@
     --viz-seq-5-4: #22A452; --viz-seq-4-3: #54CE82; --viz-seq-3-2: #A9E4C0; --viz-seq-2-1: #E4F8EB;
     /* diverging — down is amber, up is green; darkness carries magnitude */
     --viz-div-neg2: #C9911B; --viz-div-neg1: #F7DFA3; --viz-div-mid: #F4F4F2; --viz-div-pos1: #A8E8C0; --viz-div-pos2: #1A8040;
+    /* The Sales heatmap uses a quieter low end and smaller tonal jumps than the shared five-step chart scale. */
+    --heatmap-quiet: #F3F6F4;
+    --heatmap-1: var(--heatmap-quiet);
+    --heatmap-2: color-mix(in srgb, var(--nomni-green) 9%, var(--heatmap-quiet));
+    --heatmap-3: color-mix(in srgb, var(--nomni-green) 19%, var(--heatmap-quiet));
+    --heatmap-4: color-mix(in srgb, var(--nomni-green) 31%, var(--heatmap-quiet));
+    --heatmap-5: color-mix(in srgb, var(--nomni-green) 43%, var(--heatmap-quiet));
+    --heatmap-6: color-mix(in srgb, var(--nomni-green) 70%, var(--heatmap-quiet));
+    --heatmap-7: var(--nomni-green);
+    --heatmap-8: color-mix(in srgb, var(--nomni-green) 50%, var(--seaweed));
+    --heatmap-9: color-mix(in srgb, var(--heatmap-8) 67%, var(--seaweed));
+    --heatmap-10: color-mix(in srgb, var(--heatmap-8) 33%, var(--seaweed));
+    --heatmap-11: var(--seaweed);
     /* neutral sparkline/line stroke — trend lines don't colour by direction; the delta pill beside them already does */
     --viz-line-neutral: var(--ink-mute-strong);
     /* .main's own horizontal padding, exposed so the sticky header can bleed exactly to its edges regardless of breakpoint */
@@ -110,6 +123,7 @@
   .key-takeaway-footer[hidden] { display: none; }
   .key-takeaway.has-footer-only { padding: 14px 28px; }
   .key-takeaway.has-footer-only .key-takeaway-footer { margin-top: 0; padding-top: 0; border-top: 0; }
+  .key-takeaway.has-footer-only .key-takeaway-title, .key-takeaway.has-footer-only .key-takeaway-text, .key-takeaway.has-footer-only .key-takeaway-toggle { display: none; }
   .key-takeaway-footer-icon { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--viz-div-neg2); color: #fff; font-size: 11px; font-weight: 700; font-style: normal; line-height: 1; }
   .key-takeaway-footer-text { flex: 1 1 auto; min-width: 0; margin: 0; color: var(--ink); font-size: 13px; line-height: 1.4; }
   .key-takeaway-footer-details { position: relative; flex: 0 0 auto; padding: 0; border: 0; background: transparent; color: var(--spinach); font: 600 13px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
@@ -173,6 +187,7 @@
   .sales-tab-head { display: flex; align-items: center; justify-content: flex-end; margin: -6px 0 12px; }
   .insight-card { min-width: 0; margin-bottom: 16px; padding: 25px 28px 28px 28px; border: 0; border-radius: 16px; background: var(--panel); box-shadow: 0 1px 2px rgba(26,31,43,.08), 0 8px 20px rgba(26,31,43,.06); }
   .insight-row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; min-width: 0; }
+  #panel-spend .insight-row-2col { align-items: stretch; }
   .insight-row-2col + .insight-row-2col { margin-top: 16px; }
   .insight-row-2col .insight-card { margin-bottom: 0; height: 100%; }
   .insight-row-full { min-width: 0; }
@@ -202,13 +217,15 @@
   .pill-toggle-btn.active { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(14,55,39,.14); }
 
   /* Heatmap — fixed 24px row height (no aspect-ratio) keeps the card to roughly a single screenful */
-  .heatmap-grid { display: grid; grid-template-columns: 44px repeat(var(--heatmap-cols, 12), 1fr); gap: 2px; margin-top: 10px; }
+  .heatmap-grid { display: grid; grid-template-columns: 44px repeat(var(--heatmap-cols, 12), 1fr); gap: clamp(2px, .25vw, 3px); margin-top: 10px; }
   .heatmap-summary { margin: 0 0 10px; color: var(--ink-mute-strong); font-size: 14px; line-height: 1.4; }
   .heatmap-hour-label { align-self: end; padding-bottom: 3px; color: var(--ink-mute-strong); font-size: 10px; font-weight: 600; text-align: center; }
   .heatmap-day-label { display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; color: var(--ink-mute-strong); font-size: 11px; font-weight: 600; }
-  .heatmap-cell { position: relative; height: 24px; padding: 0; border: 0; border-radius: 2px; background: var(--viz-seq-1); }
-  .heat-step-1 { background: var(--viz-seq-1); } .heat-step-2 { background: var(--viz-seq-2); } .heat-step-3 { background: var(--viz-seq-3); }
-  .heat-step-4 { background: var(--viz-seq-4); } .heat-step-5 { background: var(--viz-seq-5); }
+  .heatmap-cell { position: relative; height: 24px; padding: 0; border: 0; border-radius: 4px; background: var(--heatmap-1); }
+  .heat-step-1 { background: var(--heatmap-1); } .heat-step-2 { background: var(--heatmap-2); } .heat-step-3 { background: var(--heatmap-3); }
+  .heat-step-4 { background: var(--heatmap-4); } .heat-step-5 { background: var(--heatmap-5); } .heat-step-6 { background: var(--heatmap-6); }
+  .heat-step-7 { background: var(--heatmap-7); } .heat-step-8 { background: var(--heatmap-8); } .heat-step-9 { background: var(--heatmap-9); }
+  .heat-step-10 { background: var(--heatmap-10); } .heat-step-11 { background: var(--heatmap-11); }
   .heat-div-neg2 { background: var(--viz-div-neg2); } .heat-div-neg1 { background: var(--viz-div-neg1); } .heat-div-mid { background: var(--viz-div-mid); }
   .heat-div-pos1 { background: var(--viz-div-pos1); } .heat-div-pos2 { background: var(--viz-div-pos2); }
   .heatmap-cell:hover, .heatmap-cell:focus-visible { outline: 2px solid var(--seaweed); outline-offset: -2px; }
@@ -216,7 +233,7 @@
   .heatmap-legend-scale { display: inline-flex; align-items: center; gap: 3px; }
   .heatmap-legend[data-mode="thisPeriod"] .heatmap-legend-diverging { display: none; }
   .heatmap-legend[data-mode="vsLastMonth"] .heatmap-legend-sequential { display: none; }
-  .heatmap-legend-swatch { width: 14px; height: 10px; border-radius: 2px; }
+  .heatmap-legend-swatch { width: 14px; height: 10px; border-radius: 3px; }
   /* Shared floating tooltip for the heatmap, category mix segments and the two mini line charts */
   .chart-tip { position: fixed; z-index: 80; display: none; max-width: 270px; padding: 8px 10px; border-radius: 7px; background: var(--ink); color: var(--panel); font: 500 12px/1.4 "Inter", system-ui, sans-serif; white-space: pre-line; pointer-events: none; box-shadow: 0 8px 22px rgba(14,55,39,.22); }
   .chart-tip.show { display: block; }
@@ -538,9 +555,18 @@
   .supplier-reliability-card .procure-table-wrap { box-sizing: border-box; padding-right: 12px; }
   .procure-compact-table td { height: 44px; }
   /* Long lists scroll under the fade; their headers remain visible. */
-  .supplier-reliability-card .procure-table-wrap { max-height: calc(27px + 6 * 44px); }
+  .supplier-reliability-card { display: flex; flex-direction: column; min-height: 0; }
+  .supplier-reliability-card #supplierReliabilityBody { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+  .supplier-reliability-card #supplierReliabilityBody .outlet-scroll-frame { display: flex; flex: 1 1 auto; min-height: 0; }
+  .supplier-reliability-card #supplierReliabilityBody .procure-table-wrap { flex: 1 1 auto; min-height: 0; max-height: none; }
   .supplier-reliability-card .outlet-table th:last-child { text-align: right; }
-  .spend-outlet-card .procure-table-wrap { max-height: calc(27px + 6 * 56px); }
+  /* The equal-height Spend row gives this card more room than the default six-row viewport. Let the
+     outlet list use that available height instead of leaving a large empty band below the scrollbar. */
+  .spend-outlet-card { display: flex; flex-direction: column; min-height: 0; }
+  .spend-outlet-card #spendOutletBody { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+  .spend-outlet-card .outlet-scroll-frame { display: flex; flex: 1 1 auto; min-height: 0; }
+  .spend-outlet-card .procure-table-wrap { flex: 1 1 auto; min-height: 0; max-height: none; }
+  .spend-outlet-card .outlet-comparison-note { flex: 0 0 auto; }
   .spend-outlet-card .outlet-sort[hidden] { display: none; }
   .spend-outlet-card .outlet-name { min-width: 0; overflow: visible; text-overflow: clip; white-space: normal; }
   /* The breakdown's fixed bar, amount and change columns fit the card; only its rows scroll. */
@@ -552,18 +578,17 @@
   .procure-price-unit { color: var(--ink-mute-strong); font-size: 10px; font-weight: 500; }
   .procure-price-previous { display: block; margin-top: 2px; color: var(--ink-mute-strong); font-size: 11px; text-decoration: line-through; text-decoration-color: var(--ink-mute); white-space: nowrap; }
 
-  /* Treemap: size, not status — the nine-step sequential scale, darkest for the largest. */
-  .spend-supplier-card { display: flex; flex-direction: column; }
-  #spendSupplierBody { display: flex; flex: 1; flex-direction: column; min-height: 0; }
-  .spend-treemap { position: relative; flex: 1; min-height: 300px; margin-top: 12px; overflow: hidden; border-radius: 10px; }
-  /* Labels sit top-left with the same padding in every tile, so names line up across a row. */
-  .spend-tile { position: absolute; display: flex; flex-direction: column; justify-content: flex-start; gap: 2px; padding: 10px 12px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--panel); color: #1A1A18; text-decoration: none; }
-  .spend-tile.is-dark { color: #fff; }
-  .spend-tile:hover { filter: brightness(1.04); }
-  .spend-tile:focus-visible { outline: 2px solid var(--seaweed); outline-offset: -3px; }
-  .spend-tile-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .spend-tile-name { display: -webkit-box; overflow: hidden; font-size: 13px; font-weight: 600; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-  .spend-tile-value { font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  /* Supplier bars: size, not status — brand greens stepping down by rank. Change is shown by the pill. */
+  .supplier-bar-table col.supplier-bar-name-col { width: 240px; }
+  .supplier-bar-table col.supplier-bar-share-col { width: 64px; }
+  .supplier-bar-table th.num { text-align: right; }
+  .supplier-bar-table td { height: 40px; }
+  .supplier-bar { height: 14px; border-radius: 4px; }
+  .supplier-bar > span { display: block; height: 100%; min-width: 4px; border-radius: 4px; }
+  .supplier-bar-link { color: var(--ink); text-decoration: none; }
+  .supplier-bar-link:hover { color: var(--spinach); text-decoration: underline; }
+  .supplier-bar-share { color: var(--ink-mute-strong); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .spend-supplier-card .procure-table-wrap { max-height: calc(27px + 10 * 40px); box-sizing: border-box; padding-right: 12px; }
 
   /* Price movement: the invoice description stays on one line (full text in its title), so every row is the same height. */
   .procure-sku { display: block; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 600; letter-spacing: .01em; text-overflow: ellipsis; white-space: nowrap; }
@@ -571,13 +596,18 @@
 
   /* Compact order exposure sits above the supplier list in one half-width card. */
   .procure-headline { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-  .procure-headline-value { font-size: 28px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .procure-headline-value { font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .procure-headline-sub { margin: 2px 0 8px; color: var(--ink-mute-strong); font-size: 13px; }
-  .procure-accuracy-breakdown { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--ink-mute-strong); font-size: 12px; }
-  .procure-accuracy-breakdown strong { color: var(--ink); font-weight: 600; }
-  .procure-section-title { margin: 20px 0 0; font-size: 14px; font-weight: 700; }
-  .procure-reliability-note { margin: 2px 0 0; color: var(--ink-mute-strong); font-size: 11px; }
-  .order-reliability-card .outlet-scroll-frame { margin-top: 8px; }
+  .procure-not-received { margin: 8px 0 0; color: var(--ink-mute-strong); font-size: 13px; }
+  .procure-not-received strong { color: var(--ink); font-weight: 600; }
+  .order-reliability-card .outlet-scroll-frame { margin-top: 20px; }
+  .reliability-table col.reliability-rate-col { width: 88px; }
+  .reliability-table col.reliability-accuracy-col { width: 124px; }
+  .reliability-table col.reliability-stake-col { width: 84px; }
+  .col-info-head { display: inline-flex; align-items: center; gap: 4px; }
+  .col-info { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; padding: 0; border: 0; border-radius: 50%; background: var(--ink-soft); color: var(--panel); font: 700 9px/1 "Inter", system-ui, sans-serif; cursor: help; }
+  .col-info:hover, .col-info:focus-visible { background: var(--ink-mute-strong); }
+  .col-info-tip { position: absolute; z-index: 90; max-width: 240px; padding: 8px 10px; border-radius: 7px; background: var(--ink); color: var(--panel); box-shadow: 0 8px 22px rgba(14,55,39,.22); font: 500 12px/1.45 "Inter", system-ui, sans-serif; text-transform: none; letter-spacing: 0; white-space: normal; pointer-events: none; }
   .procure-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--rule); color: var(--ink-mute-strong); font-size: 12px; }
 
   /* Supplier reliability: rates under 90% in amber text. */
@@ -891,7 +921,7 @@
           <div id="heatmapBody">
             <div class="heatmap-grid" id="heatmapGrid" role="presentation"></div>
             <div class="heatmap-legend" id="heatmapLegend" data-mode="thisPeriod">
-              <div class="heatmap-legend-scale heatmap-legend-sequential"><span>Quiet</span><span class="heatmap-legend-swatch heat-step-1"></span><span class="heatmap-legend-swatch heat-step-2"></span><span class="heatmap-legend-swatch heat-step-3"></span><span class="heatmap-legend-swatch heat-step-4"></span><span class="heatmap-legend-swatch heat-step-5"></span><span>Busy</span></div>
+              <div class="heatmap-legend-scale heatmap-legend-sequential"><span>Quiet</span><span class="heatmap-legend-swatch heat-step-1"></span><span class="heatmap-legend-swatch heat-step-3"></span><span class="heatmap-legend-swatch heat-step-5"></span><span class="heatmap-legend-swatch heat-step-8"></span><span class="heatmap-legend-swatch heat-step-11"></span><span>Busy</span></div>
               <div class="heatmap-legend-scale heatmap-legend-diverging"><span>Down</span><span class="heatmap-legend-swatch heat-div-neg2"></span><span class="heatmap-legend-swatch heat-div-neg1"></span><span class="heatmap-legend-swatch heat-div-mid"></span><span class="heatmap-legend-swatch heat-div-pos1"></span><span class="heatmap-legend-swatch heat-div-pos2"></span><span>Up</span></div>
             </div>
           </div>
@@ -960,7 +990,7 @@
         </div>
       </section>
       <section class="tab-panel" id="panel-spend" role="tabpanel" aria-labelledby="tab-spend">
-        <div class="ai-summary key-takeaway has-footer-only" id="spendStatus" hidden><div class="key-takeaway-footer" id="spendStatusFooter"><span class="key-takeaway-footer-icon" aria-hidden="true">i</span><p class="key-takeaway-footer-text" id="spendStatusText"></p><button class="key-takeaway-footer-details" id="spendStatusDetails" type="button" aria-haspopup="dialog" aria-controls="statusModal">Details</button></div></div>
+        <div class="ai-summary key-takeaway" id="spendTakeaway" hidden><h3 class="key-takeaway-title" id="spendTakeawayTitle"><svg class="key-takeaway-logo" viewBox="0 0 514.202 584.713" aria-hidden="true" focusable="false"><path fill="currentColor" d="M 77.918 113.681 C 78.718 109.922 82.408 107.521 86.167 108.321 L 429.699 181.338 C 433.459 182.138 435.861 185.827 435.06 189.586 L 429.247 217.011 C 427.158 226.755 424.339 236.152 420.858 245.166 L 491.59 230.131 C 495.35 229.331 499.039 231.732 499.84 235.491 L 508.577 276.593 C 538.965 419.459 443.101 559.923 296.311 581.988 C 160.938 602.313 35.242 506.605 6.837 373.032 L 0.154 341.674 C -0.647 337.916 1.755 334.227 5.515 333.426 L 123.309 308.403 C 79.971 264.238 59.887 198.391 73.532 134.145 L 77.883 113.716 L 77.918 113.681 Z M 342.572 0.154 C 346.331 -0.647 350.021 1.755 350.822 5.514 L 352.806 14.771 C 363.005 62.729 330.841 109.887 281.551 117.3 C 236.125 124.122 193.902 91.999 184.364 47.138 L 183.076 41.152 C 182.276 37.393 184.677 33.704 188.437 32.903 L 342.572 0.154 Z"/></svg><span class="key-takeaway-label">At a glance</span></h3><span class="ai-summary-skeleton" id="spendTakeawaySkeleton" aria-hidden="true" hidden><span></span><span></span></span><p class="key-takeaway-text is-clamped" id="spendTakeawayText" aria-labelledby="spendTakeawayTitle"></p><button class="key-takeaway-toggle" id="spendTakeawayToggle" type="button" aria-expanded="false" aria-controls="spendTakeawayText" hidden>View all</button><div class="key-takeaway-footer" id="spendStatusFooter" hidden><span class="key-takeaway-footer-icon" aria-hidden="true">i</span><p class="key-takeaway-footer-text" id="spendStatusText"></p><button class="key-takeaway-footer-details" id="spendStatusDetails" type="button" aria-haspopup="dialog" aria-controls="statusModal">Details</button></div></div>
         <div class="insight-row-full">
           <div class="insight-card spend-supplier-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Spend by supplier</h3></div></div><div id="spendSupplierBody"></div></div>
         </div>
@@ -975,7 +1005,7 @@
             </div>
             <div id="spendCategoryBody" role="tabpanel" aria-labelledby="spendCategoryTab"></div>
           </div>
-          <div class="insight-card price-movement-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Price movement</h3></div></div><div id="priceMovementBody"></div></div>
+          <div class="insight-card price-movement-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Price movement</h3></div><div class="top-items-picker price-movement-picker"><button class="top-items-picker-button" id="priceMovementFilterButton" type="button" aria-expanded="false" aria-controls="priceMovementFilterMenu"><span id="priceMovementFilterLabel">All</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="top-items-picker-menu" id="priceMovementFilterMenu" role="listbox" aria-label="Price movement filter"><button class="top-items-picker-option active" type="button" role="option" aria-selected="true" data-price-filter="all">All</button><button class="top-items-picker-option" type="button" role="option" aria-selected="false" data-price-filter="increases">Price increases</button><button class="top-items-picker-option" type="button" role="option" aria-selected="false" data-price-filter="decreases">Price decreases</button></div></div></div><div id="priceMovementBody"></div></div>
         </div>
         <div class="insight-row-2col">
           <div class="insight-card spend-outlet-card">
@@ -994,8 +1024,6 @@
           <div class="insight-card supplier-reliability-card order-reliability-card">
             <div class="insight-card-head"><div class="insight-card-heading"><h3>Order accuracy &amp; supplier reliability</h3></div></div>
             <div id="orderAccuracyBody"></div>
-            <h4 class="procure-section-title">Supplier reliability</h4>
-            <p class="procure-reliability-note" id="supplierReliabilityQualifier"></p>
             <div id="supplierReliabilityBody"></div>
             <div class="procure-footer" id="orderAccuracyFooter"></div>
           </div>
@@ -1017,6 +1045,7 @@
 <div class="chart-tip" id="chartTip"></div>
 <script src="js/heatmap-summary/heatmap-summary.js"></script>
 <script src="js/sales-briefing/sales-briefing.js"></script>
+<script src="js/spend-briefing/spend-briefing.js"></script>
 <script>
   const welcomeGreeting = document.getElementById('welcomeGreeting');
   const welcomeDate = document.getElementById('welcomeDate');
@@ -1089,13 +1118,13 @@
   // Prices per base unit, named as they appear on the invoice. weekly: base units bought per outlet per week.
   const PROCURE_SKUS = [
     { description: 'CHIC THIGH FIL S/LESS B/LESS 5KG FRZ AUS', supplier: 'Sunrise Poultry Distributors', unit: 'kg', weekly: 34, price: 12.95, previous: 11.80 },
-    { description: 'Baby spinach, washed – 1.5 kg carton', supplier: 'Green Valley Produce', unit: 'kg', weekly: 9, price: 16.10, previous: 14.20 },
+    { description: 'Baby spinach, washed – 1.5 kg carton', supplier: 'Green Valley Produce', unit: 'kg', weekly: 9, price: 16.10, previous: 14.20, groupPrice: true },
     { description: 'Beef Mince 80/20 – 2 kg Vac Pack', supplier: 'Northside Meats', unit: 'kg', weekly: 16, price: 13.10, previous: 13.40 },
     { description: 'Boneless Lamb Shoulder – 3 kg, Australia', supplier: 'Northside Meats', unit: 'kg', weekly: 7, price: 19.60, previous: 18.90 },
     { description: 'Extra virgin olive oil, 4 L tin', supplier: 'Pantry Wholesale', unit: 'L', weekly: 8, price: 10.40, previous: 11.50 },
     { description: 'RAW GREEN PRAWNS 16/20 – 1 KG FROZEN', supplier: 'Harbour Seafood Supply', unit: 'kg', weekly: 5, price: 25.30, previous: 24.50 },
     { description: 'Full Cream Milk 2L Bottle', supplier: 'Eastview Dairy', unit: 'L', weekly: 36, price: 1.66, previous: 1.62 },
-    { description: 'Thai jasmine rice (premium), 10 kg bag', supplier: 'Asia Pacific Foods', unit: 'kg', weekly: 30, price: 2.20, previous: 2.35 },
+    { description: 'Thai jasmine rice (premium), 10 kg bag', supplier: 'Asia Pacific Foods', unit: 'kg', weekly: 30, price: 2.20, previous: 2.35, groupPrice: true },
   ];
   // Days in each period and in the one it is compared with.
   const PROCURE_PERIOD_DAYS = { 'This month': [21, 21], 'Last 30 days': [30, 30], 'Last month': [31, 31], 'Last 3 months': [83, 92], 'This year': [264, 264] };
@@ -1137,7 +1166,9 @@
           accuracy: Math.min(1, jitter(supplier.accuracy, .05)),
           linesPerOrder: 4 + Math.floor(rand() * 5),
         })).filter(supplier => supplier.value > 0),
-        skus: PROCURE_SKUS.map(sku => ({ ...sku, weekly: sku.weekly * (.7 + rand() * .6), priceFactor: jitter(1, .05), previousFactor: jitter(1, .05) })),
+        // Prices are per outlet, as Procure tracks them. A groupPrice item is on one supplier list price, so every
+        // outlet pays the same and moves together. Draw both jitters for every item to preserve the seeded dataset.
+        skus: PROCURE_SKUS.map(sku => { const weekly = sku.weekly * (.7 + rand() * .6), priceFactor = jitter(1, .05), previousFactor = jitter(1, .05); return { ...sku, weekly, priceFactor: sku.groupPrice ? 1 : priceFactor, previousFactor: sku.groupPrice ? 1 : previousFactor }; }),
       }];
     }));
     const sideFor = (name, period, previous, missing, processing) => {
@@ -1166,9 +1197,11 @@
         const notReceived = ordered * supplier.notReceived * better;
         const lines = orderSplit[index] * supplier.linesPerOrder;
         const qtyOrdered = ordered / 9.5;
+        // Handoff limit: a substitute can still read as short fill on the original item until order and invoice
+        // lines can be paired across substitutions. This prototype uses aggregate supplier ratios, not line records.
         // Only invoices linked to an order can be matched, so only they produce discrepancies.
         const link = profile.linkRate;
-        const row = { spend: received + over + notReceived, orders: orderSplit[index], qtyOrdered, qtyReceived: qtyOrdered * fill, lines, linesAtPrice: lines * accuracy, over: over * link, notReceived: notReceived * link, category: supplier.category };
+        const row = { spend: received + over + notReceived, orders: orderSplit[index], qtyOrdered, qtyInvoiced: qtyOrdered * fill, lines, linesAtPrice: lines * accuracy, over: over * link, notReceived: notReceived * link, category: supplier.category };
         suppliers[supplier.name] = row;
         invoiced += row.spend;
         discrepancies.over.value += row.over; discrepancies.notReceived.value += row.notReceived;
@@ -1797,6 +1830,14 @@
     table.innerHTML = html + '</tbody>';
   }
 
+  function heatmapSequentialStep(revenue, cap){
+    const ratio = Math.min(revenue / cap, 1);
+    // Keep the first eight bands unchanged; divide the former Seaweed band into three finer dark shades.
+    return ratio <= 8 / 9
+      ? Math.max(1, Math.ceil(ratio * 9))
+      : 8 + Math.min(3, Math.ceil((ratio - 8 / 9) * 27));
+  }
+
   function renderHeatmap(mode){
     const grid = document.getElementById('heatmapGrid');
     const legend = document.getElementById('heatmapLegend');
@@ -1820,10 +1861,11 @@
     const ranges = PERIOD_DATE_RANGES[currentPeriod];
     const currentGrid = thisPeriod.map(row => row.map(cell => cell.revenue));
     const previousGrid = previousPeriod;
+    const currentDayCounts = HeatmapSummary.weekdayCounts(ranges.current.start, ranges.current.end);
     const result = HeatmapSummary.summariseHeatmap({
       mode: mode === 'vsLastMonth' ? 'compare' : 'period',
       hours,
-      current: { grid: currentGrid, dayCounts: HeatmapSummary.weekdayCounts(ranges.current.start, ranges.current.end) },
+      current: { grid: currentGrid, dayCounts: currentDayCounts },
       previous: { grid: previousGrid, dayCounts: HeatmapSummary.weekdayCounts(ranges.previous.start, ranges.previous.end) },
     });
     summary.textContent = result.text;
@@ -1843,19 +1885,20 @@
         const btn = document.createElement('button');
         btn.type = 'button'; btn.className = 'heatmap-cell';
         if(mode === 'thisPeriod'){
-          const clamped = Math.min(cell.revenue, cap);
-          const step = Math.max(1, Math.min(5, Math.ceil((clamped / cap) * 5)));
-          btn.classList.add(`heat-step-${step}`);
+          btn.classList.add(`heat-step-${heatmapSequentialStep(cell.revenue, cap)}`);
         } else {
           const clamped = Math.sign(deltaCell.delta) * Math.min(Math.abs(deltaCell.delta), maxAbsDelta);
           btn.classList.add(`heat-div-${bucketForRatio(clamped / maxAbsDelta)}`);
         }
         const timeLabel = `${day} ${formatHour(hr)}–${formatHour(hr + 1)}`;
-        const base = `${timeLabel}: S$${cell.revenue.toLocaleString('en-SG')} revenue, ${cell.covers} covers, S$${cell.avgSpend.toFixed(2)} average spend`;
+        const weekdayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][di];
+        const averageRevenue = `S$${Math.round(cell.revenue / currentDayCounts[di]).toLocaleString('en-SG')}`;
+        const base = `${timeLabel}: S$${cell.revenue.toLocaleString('en-SG')} revenue this period, ${averageRevenue} per ${weekdayName}, ${cell.covers} covers this period, S$${cell.avgSpend.toFixed(2)} spend per cover`;
         const label = mode === 'thisPeriod' ? base : `${deltaCell.delta > 0 ? '+' : ''}${deltaCell.delta}% vs last month · ${base}`;
+        const tooltipDetails = `Period revenue: S$${cell.revenue.toLocaleString('en-SG')}\nAverage revenue per ${weekdayName}: ${averageRevenue}\nCovers this period: ${cell.covers}\nAverage spend per cover: S$${cell.avgSpend.toFixed(2)}`;
         const tooltip = mode === 'thisPeriod'
-          ? `${timeLabel}\nRevenue: S$${cell.revenue.toLocaleString('en-SG')}\nCovers: ${cell.covers}\nAverage spend: S$${cell.avgSpend.toFixed(2)}`
-          : `${timeLabel}\n${deltaCell.delta > 0 ? '+' : ''}${deltaCell.delta}% vs last month\nRevenue: S$${cell.revenue.toLocaleString('en-SG')}\nCovers: ${cell.covers}\nAverage spend: S$${cell.avgSpend.toFixed(2)}`;
+          ? `${timeLabel}\n${tooltipDetails}`
+          : `${timeLabel}\n${deltaCell.delta > 0 ? '+' : ''}${deltaCell.delta}% vs last month\n${tooltipDetails}`;
         btn.setAttribute('aria-label', label);
         btn.addEventListener('mouseenter', () => showChartTip(btn, tooltip));
         btn.addEventListener('focus', () => showChartTip(btn, tooltip));
@@ -2082,6 +2125,10 @@
       outletSortMenu.classList.remove('open');
       outletSortButton.setAttribute('aria-expanded', 'false');
     }
+    if(!event.target.closest('.price-movement-picker') && priceMovementFilterMenu?.classList.contains('open')){
+      priceMovementFilterMenu.classList.remove('open');
+      priceMovementFilterButton.setAttribute('aria-expanded', 'false');
+    }
   });
 
   /* --- Block 4: sales by channel — channel share is composition, so bars stay neutral. --- */
@@ -2273,7 +2320,7 @@
 
   const MIN_SPEND_COVERS_FLOOR = 200;
   const MAX_SPEND_CHARTS = 12;
-  let spendSort = 'change', spendShowAll = false, spendTableFadeCleanup = null;
+  let spendSort = 'change', spendShowAll = false, spendTableFadeCleanup = null, priceMovementFilter = 'all';
   // Covers / Spend per head describes the selected period itself, not the trailing context window used by table sparklines.
   const COVERS_SPEND_PERIOD = {
     'This month':    { granularity: 'daily', key: 'thisMonth', subtitle: '1–21 September 2026', xLabelEvery: 5 },
@@ -2579,134 +2626,42 @@
     procureScrollFrames.add(frame);
     return frame;
   }
-  function refreshProcureFades(){ procureScrollFrames.forEach(frame => { if(!frame.isConnected) procureScrollFrames.delete(frame); else updateProcureFade(frame); }); document.querySelectorAll('.spend-treemap').forEach(layoutSpendTreemap); }
+  function refreshProcureFades(){ procureScrollFrames.forEach(frame => { if(!frame.isConnected) procureScrollFrames.delete(frame); else updateProcureFade(frame); }); }
   window.addEventListener('resize', refreshProcureFades);
 
-  // Squarified treemap (Bruls, Huizing & van Wijk): tiles are laid in rows along the shorter side, and a row only
-  // grows while that keeps its worst aspect ratio from getting worse. Largest first, from the top-left.
-  function squarify(items, width, height){
-    const total = items.reduce((sum, item) => sum + item.value, 0);
-    const scale = width * height / total;
-    const queue = items.map(item => ({ ...item, area: item.value * scale }));
-    const rect = { x: 0, y: 0, w: width, h: height }, out = [];
-    const worst = (row, side) => {
-      const sum = row.reduce((acc, item) => acc + item.area, 0), max = Math.max(...row.map(item => item.area)), min = Math.min(...row.map(item => item.area));
-      return Math.max(side * side * max / (sum * sum), (sum * sum) / (side * side * min));
-    };
-    const place = row => {
-      const sum = row.reduce((acc, item) => acc + item.area, 0);
-      if(rect.w >= rect.h){ const w = sum / rect.h; let y = rect.y; row.forEach(item => { const h = item.area / w; out.push({ ...item, x: rect.x, y, w, h }); y += h; }); rect.x += w; rect.w -= w; }
-      else { const h = sum / rect.w; let x = rect.x; row.forEach(item => { const w = item.area / h; out.push({ ...item, x, y: rect.y, w, h }); x += w; }); rect.y += h; rect.h -= h; }
-    };
-    let row = [];
-    while(queue.length){
-      const side = Math.min(rect.w, rect.h), next = queue[0];
-      if(!row.length || worst([...row, next], side) <= worst(row, side)){ row.push(queue.shift()); }
-      else { place(row); row = []; }
-    }
-    if(row.length) place(row);
-    return out;
+  // Supplier bars: ranked by spend, every supplier listed (no "+ N others" bucket), scrolling past 10 rows.
+  // Bar length carries the value; the shade steps down by rank through the brand greens, darkest for the largest.
+  const SUPPLIER_BAR_ANCHORS = ['#0E3727', '#1A8040', '#22A452', '#2AC864', '#54CE82', '#7ED4A0', '#A9E4C0'];
+  function mixHex(a, b, t){
+    const pa = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), pb = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16));
+    return '#' + pa.map((v, i) => Math.round(v + (pb[i] - v) * t).toString(16).padStart(2, '0')).join('');
   }
-  // Supplier spend rank uses the five existing sequential colours with one interpolated shade between each pair.
-  // Every step has at least 4.5:1 contrast with its assigned text colour. "+ N others" remains neutral.
-  const TREEMAP_STEPS = [
-    { fill: 'var(--viz-seq-5)', dark: false },
-    { fill: 'var(--viz-seq-5-4)', dark: true },
-    { fill: 'var(--viz-seq-4)', dark: true },
-    { fill: 'var(--viz-seq-4-3)', dark: true },
-    { fill: 'var(--viz-seq-3)', dark: true },
-    { fill: 'var(--viz-seq-3-2)', dark: true },
-    { fill: 'var(--viz-seq-2)', dark: true },
-    { fill: 'var(--viz-seq-2-1)', dark: true },
-    { fill: 'var(--viz-seq-1)', dark: true },
-  ];
-  const TREEMAP_OTHERS = { fill: '#E4E4E0', dark: true };
-  const TREEMAP_MAX_TILES = 9, TREEMAP_REMAINDER_SHARE = .1;
-  function sharePointsText(points){ const rounded = Math.round(points); return rounded === 0 ? 'no change' : `${rounded > 0 ? 'up' : 'down'} ${plural(Math.abs(rounded), 'pt')}`; }
+  function supplierBarShade(rank, count){
+    const steps = SUPPLIER_BAR_ANCHORS.length - 1;
+    const position = count > 1 ? rank / (count - 1) * steps : 0;
+    const index = Math.min(Math.floor(position), steps - 1);
+    return mixHex(SUPPLIER_BAR_ANCHORS[index], SUPPLIER_BAR_ANCHORS[index + 1], position - index);
+  }
   function renderSpendBySupplier(data){
     const body = document.getElementById('spendSupplierBody');
-    const previousTotal = Object.values(data.previous.suppliers).reduce((sum, row) => sum + row.spend, 0);
     const suppliers = Object.entries(data.current.suppliers).map(([name, row]) => ({ name, value: row.spend, previous: data.previous.suppliers[name]?.spend || 0 })).filter(row => row.value > 0).sort((a, b) => b.value - a.value);
     if(!suppliers.length){ renderEmptyState(body, 'No supplier invoices in this period.'); return; }
-    const total = suppliers.reduce((sum, row) => sum + row.value, 0);
-    // Name suppliers in order of spend until what's left is under 10% of spend, up to 9; the rest become "+ N others".
-    const named = [];
-    let remaining = total;
-    for(const supplier of suppliers){ if(remaining < total * TREEMAP_REMAINDER_SHARE || named.length === TREEMAP_MAX_TILES) break; named.push(supplier); remaining -= supplier.value; }
-    const rest = suppliers.slice(named.length);
-    const tiles = rest.length === 1 && named.length < TREEMAP_MAX_TILES
-      ? [...named, rest[0]]
-      : rest.length
-        ? [...named, { name: `+ ${plural(rest.length, 'other')}`, value: remaining, previous: rest.reduce((sum, row) => sum + row.previous, 0), others: rest }]
-        : named;
-    // "+ N others" can hold more value than several named suppliers (it's a bucket, not a small remainder), so
-    // always appending it last violates squarify's descending-value precondition and produces a degenerate sliver
-    // next to it. Sorting it into its true size position fixes that at the root, rather than papering over it in
-    // the rendered layout.
-    tiles.sort((a, b) => b.value - a.value);
-    const map = document.createElement('div'); map.className = 'spend-treemap'; map.setAttribute('aria-label', 'Invoice spend by supplier');
-    let namedRank = 0;
-    map.dataset.tiles = JSON.stringify(tiles.map(tile => {
-      const rank = tile.others ? -1 : namedRank++;
-      const points = (tile.value / total - (previousTotal ? tile.previous / previousTotal : 0)) * 100;
-      const title = `${tile.name} · ${money(tile.value)} · ${percent(tile.value / total)} of spend · ${sharePointsText(points)}`;
-      return { name: tile.name, value: tile.value, share: percent(tile.value / total), others: Boolean(tile.others), rank, title: tile.others ? `${title}\n${tile.others.map(row => `${row.name} · ${money(row.value)}`).join('\n')}` : title };
-    }));
-    body.replaceChildren(map);
-    layoutSpendTreemap(map);
-    spendTreemapObserver.observe(map);
+    const total = suppliers.reduce((sum, row) => sum + row.value, 0), max = suppliers[0].value;
+    const table = document.createElement('table'); table.className = 'outlet-table procure-table supplier-bar-table';
+    table.innerHTML = '<colgroup><col class="supplier-bar-name-col"><col><col class="procure-money-col"><col class="supplier-bar-share-col"><col class="procure-pill-col"></colgroup><thead><tr><th scope="col">Supplier</th><th scope="colgroup" colspan="2">Spend</th><th scope="col" class="num">Share</th><th scope="col" class="num">Change</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    suppliers.forEach((row, rank) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><a class="procure-name supplier-bar-link" href="#supplier-invoices" data-stub title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</a></td>`
+        + `<td><div class="supplier-bar"><span style="width:${row.value / max * 100}%;background:${supplierBarShade(rank, suppliers.length)}"></span></div></td>`
+        + `<td class="num"><span class="procure-money">${money(row.value)}</span></td>`
+        + `<td class="num"><span class="supplier-bar-share">${percent(row.value / total)}</span></td>`
+        + `<td class="num">${costPillHtml(pctChange(row.value, row.previous))}</td>`;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    body.replaceChildren(procureScrollTable(table, 'Spend by supplier list'));
   }
-  // Measures the actual rendered width of a label using the real class it's drawn with — a hidden DOM element,
-  // not a canvas font guess. A canvas measurement missed the "font-variant-numeric: tabular-nums" on the value
-  // text, which widens digits slightly; that under-count let "S$6,347" get chosen for a tile just too narrow for
-  // it, clipping to "S$6,...". Whichever tier's text truly fits, styled as it will really be shown, is the one used.
-  let spendTileMeasureEl = null;
-  function measureTileText(text, className){
-    if(!spendTileMeasureEl){
-      spendTileMeasureEl = document.createElement('span');
-      spendTileMeasureEl.style.cssText = 'position:absolute; visibility:hidden; left:-9999px; top:-9999px; white-space:nowrap;';
-      document.body.appendChild(spendTileMeasureEl);
-    }
-    spendTileMeasureEl.className = className;
-    spendTileMeasureEl.textContent = text;
-    return spendTileMeasureEl.getBoundingClientRect().width;
-  }
-  // Laid out in pixels against the treemap's real size, so tiles stay square at any width. A hidden tab measures
-  // 0 × 0; the observer lays it out once it's shown, and again whenever it resizes.
-  function layoutSpendTreemap(map){
-    const width = map.clientWidth, height = map.clientHeight;
-    if(!width || !height || (map.dataset.laidOut === `${width}x${height}`)) return;
-    map.dataset.laidOut = `${width}x${height}`;
-    const tiles = squarify(JSON.parse(map.dataset.tiles), width, height);
-    map.replaceChildren(...tiles.map(tile => {
-      const step = tile.others ? TREEMAP_OTHERS : TREEMAP_STEPS[Math.min(tile.rank, TREEMAP_STEPS.length - 1)];
-      const link = document.createElement('a');
-      link.className = `spend-tile${step.dark ? '' : ' is-dark'}`;
-      link.href = tile.others ? '#suppliers' : '#supplier-invoices';
-      link.dataset.stub = '';
-      link.title = tile.title;
-      link.setAttribute('aria-label', tile.title.replace(/\n/g, '; '));
-      link.style.cssText = `left:${tile.x / width * 100}%;top:${tile.y / height * 100}%;width:${tile.w / width * 100}%;height:${tile.h / height * 100}%;background:${step.fill}`;
-      // A tile never renders with no text, and never with clipped text: name + value + share when both the name's
-      // line and the value line actually fit, then name + value, then value alone, then share. The full detail
-      // is always in the title.
-      const availW = Math.max(0, tile.w - 24) - 1; // 12px padding each side, minus a 1px rounding allowance
-      const valueShareText = `${money(tile.value)} · ${tile.share}`, valueText = money(tile.value);
-      const nameFits = tile.h >= 48 && measureTileText(tile.name, 'spend-tile-name') <= availW * 2.2;
-      const fitsFull = nameFits && measureTileText(valueShareText, 'spend-tile-value') <= availW;
-      const fitsNameValue = nameFits && measureTileText(valueText, 'spend-tile-value') <= availW;
-      const fitsValue = tile.h >= 26 && measureTileText(valueText, 'spend-tile-value') <= availW;
-      link.innerHTML = fitsFull
-        ? `<span class="spend-tile-name">${escapeHtml(tile.name)}</span><span class="spend-tile-value">${valueShareText}</span>`
-        : fitsNameValue
-          ? `<span class="spend-tile-name">${escapeHtml(tile.name)}</span><span class="spend-tile-value">${valueText}</span>`
-          : fitsValue
-            ? `<span class="spend-tile-value">${valueText}</span>`
-            : `<span class="spend-tile-value">${tile.share}</span>`;
-      return link;
-    }));
-  }
-  const spendTreemapObserver = new ResizeObserver(entries => entries.forEach(entry => layoutSpendTreemap(entry.target)));
   function spendBreakdownTable(rows, label){
     const isItem = label === 'Item';
     const max = Math.max(...rows.map(row => row.spend), 1);
@@ -2798,21 +2753,40 @@
       refreshProcureFades();
     });
   });
+  // Compare each outlet's own current and previous unit price; only identical price pairs share a row.
+  function priceMovementRows(data){
+    const rows = [];
+    PROCURE_SKUS.forEach(sku => {
+      const groups = new Map();
+      data.perOutlet.forEach(outlet => {
+        const current = outlet.current.skus[sku.description], previous = outlet.previous.skus[sku.description];
+        if(!current?.qty || !previous?.qty) return;
+        const price = current.value / current.qty, was = previous.value / previous.qty;
+        const key = `${Math.round(price * 100)}|${Math.round(was * 100)}`;
+        if(!groups.has(key)) groups.set(key, { ...sku, price, was, change: pctChange(price, was), outlets: [] });
+        groups.get(key).outlets.push(outlet.name);
+      });
+      groups.forEach(row => rows.push({ ...row, id: `${sku.description}|${row.outlets.join(',')}` }));
+    });
+    return rows.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
+  }
+  function priceRowWhere(row, data){
+    if(data.names.length === 1) return '';
+    return row.outlets.length === 1 ? row.outlets[0] : plural(row.outlets.length, 'outlet');
+  }
   function renderPriceMovement(data){
     const body = document.getElementById('priceMovementBody');
-    const rows = PROCURE_SKUS.map(sku => {
-      const current = data.current.skus[sku.description], previous = data.previous.skus[sku.description];
-      if(!current?.qty || !previous?.qty) return null;
-      const price = current.value / current.qty, was = previous.value / previous.qty;
-      return { ...sku, price, was, change: pctChange(price, was) };
-    }).filter(Boolean).sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
-    if(!rows.length){ renderEmptyState(body, 'No repeat SKU purchases to compare in this period.'); return; }
+    const rows = priceMovementRows(data);
+    const visibleRows = rows.filter(row => priceMovementFilter === 'increases' ? row.change > 0 : priceMovementFilter === 'decreases' ? row.change < 0 : true);
+    if(!visibleRows.length){ renderEmptyState(body, 'No price movements match this filter.'); return; }
     const table = document.createElement('table'); table.className = 'outlet-table procure-table procure-price-table';
     table.innerHTML = '<colgroup><col><col class="procure-rate-col"><col class="procure-price-col"></colgroup><thead><tr><th scope="col">Item</th><th scope="col" class="num">Change</th><th scope="col" class="num">Price</th></tr></thead>';
     const tbody = document.createElement('tbody');
-    rows.forEach(row => {
+    visibleRows.forEach(row => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td><span class="procure-sku" title="${escapeHtml(row.description)}">${escapeHtml(row.description)}</span><span class="procure-sub">${escapeHtml(row.supplier)}</span></td>`
+      const where = priceRowWhere(row, data);
+      const whereTitle = row.outlets.length > 1 ? ` title="${escapeHtml(row.outlets.join(', '))}"` : '';
+      tr.innerHTML = `<td><span class="procure-sku" title="${escapeHtml(row.description)}">${escapeHtml(row.description)}</span><span class="procure-sub"${whereTitle}>${escapeHtml(row.supplier)}${where ? ` · ${escapeHtml(where)}` : ''}</span></td>`
         + `<td class="num">${changePillHtml(row.change, { decimals: 1 })}</td>`
         + `<td class="num"><span class="procure-money procure-price-current">${unitPrice(row.price)}<span class="procure-price-unit">/${escapeHtml(row.unit)}</span></span><del class="procure-price-previous" aria-label="Previous price ${unitPrice(row.was)} per ${escapeHtml(row.unit)}">${unitPrice(row.was)}</del></td>`;
       tbody.appendChild(tr);
@@ -2820,41 +2794,102 @@
     table.appendChild(tbody);
     body.replaceChildren(procureScrollTable(table, 'Price movement list'));
   }
-  const DISCREPANCY_LABELS = { over: 'Invoiced above the ordered price', notReceived: 'Invoiced but not received' };
-  function discrepancyTotal(side){ return Object.values(side.discrepancies).reduce((sum, entry) => sum + entry.value, 0); }
+  const priceMovementFilterButton = document.getElementById('priceMovementFilterButton');
+  const priceMovementFilterMenu = document.getElementById('priceMovementFilterMenu');
+  const priceMovementFilterLabel = document.getElementById('priceMovementFilterLabel');
+  priceMovementFilterButton?.addEventListener('click', () => {
+    const willOpen = !priceMovementFilterMenu.classList.contains('open');
+    document.querySelectorAll('.picker-menu, .top-items-picker-menu').forEach(menu => { if(menu !== priceMovementFilterMenu) menu.classList.remove('open'); });
+    priceMovementFilterMenu.classList.toggle('open', willOpen);
+    priceMovementFilterButton.setAttribute('aria-expanded', String(willOpen));
+  });
+  priceMovementFilterMenu?.querySelectorAll('[data-price-filter]').forEach(option => option.addEventListener('click', () => {
+    priceMovementFilter = option.dataset.priceFilter;
+    priceMovementFilterLabel.textContent = option.textContent.trim();
+    priceMovementFilterMenu.querySelectorAll('[data-price-filter]').forEach(item => { const active = item === option; item.classList.toggle('active', active); item.setAttribute('aria-selected', String(active)); });
+    priceMovementFilterMenu.classList.remove('open');
+    priceMovementFilterButton.setAttribute('aria-expanded', 'false');
+    const data = getProcureData();
+    if(data) renderPriceMovement(data);
+  }));
   function renderOrderAccuracy(data){
     const body = document.getElementById('orderAccuracyBody');
-    const total = discrepancyTotal(data.current), previousTotal = discrepancyTotal(data.previous);
-    const delta = Math.round(total / 10) * 10 - Math.round(previousTotal / 10) * 10;
+    // Headline is price discrepancies only: invoice lines matched to a PO line, billed above the ordered price.
+    const over = data.current.discrepancies.over, previousOver = data.previous.discrepancies.over;
+    const delta = Math.round(over.value / 10) * 10 - Math.round(previousOver.value / 10) * 10;
     const pill = delta === 0 ? '<span class="delta-pill flat">no change</span>'
-      : `<span class="delta-pill ${delta > 0 ? 'neg' : 'pos'}"><span class="material-symbols-outlined" aria-hidden="true">${delta > 0 ? 'arrow_upward' : 'arrow_downward'}</span>${money(Math.abs(delta))}</span>`;
-    const invoices = Math.round(data.current.discrepancyInvoices);
-    const types = Object.keys(DISCREPANCY_LABELS).map(type => ({ type, value: data.current.discrepancies[type].value }));
+      : `<span class="delta-pill ${delta > 0 ? 'neg' : 'pos'}"><span class="material-symbols-outlined" aria-hidden="true">${delta > 0 ? 'trending_up' : 'trending_down'}</span>${money(Math.abs(delta))}</span>`;
+    // "Not received" is shown only when there is some: invoiced qty above GRN qty, on lines with a GRN line for the item.
+    const notReceived = data.current.discrepancies.notReceived;
     const linkedShare = data.current.invoices ? data.current.linkedInvoices / data.current.invoices : 0;
-    body.innerHTML = `<div class="procure-headline"><span class="procure-headline-value">${money(total, 10)}</span>${pill}</div>`
-      + `<p class="procure-headline-sub">in discrepancies across ${plural(invoices, 'invoice')} ${PROCURE_PERIOD_PHRASE[currentPeriod]}</p>`
-      + `<div class="procure-accuracy-breakdown">${types.map(row => `<span>${DISCREPANCY_LABELS[row.type]} <strong>${money(row.value, 10)}</strong></span>`).join('')}</div>`;
-    document.getElementById('orderAccuracyFooter').innerHTML = `<span>Based on ${percent(linkedShare)} of invoices linked to an order</span><a class="procure-link" href="#" data-stub>Open 3-way match report →</a>`;
+    body.innerHTML = `<div class="procure-headline"><span class="procure-headline-value">${money(over.value, 10)}</span>${pill}</div>`
+      + `<p class="procure-headline-sub">invoiced above the ordered price, across ${plural(over.count, 'invoice')} ${PROCURE_PERIOD_PHRASE[currentPeriod]}</p>`
+      + (notReceived.value > 0 ? `<p class="procure-not-received">Plus <strong>${money(notReceived.value, 10)}</strong> invoiced but not received, across ${plural(notReceived.count, 'invoice')}</p>` : '');
+    document.getElementById('orderAccuracyFooter').innerHTML = `<span id="procureFooterNote">Based on ${percent(linkedShare)} of invoices linked to an order</span><a class="procure-link" href="#" data-stub>Open 3-way match report →</a>`;
+  }
+  // Share the panel's qualification rule and figures with the Spend briefing.
+  function supplierReliabilityRows(data){
+    const minimumOrders = data.names.length > 1 ? 5 : 2;
+    return Object.entries(data.current.suppliers).filter(([, row]) => row.orders >= minimumOrders).map(([name, row]) => ({
+      name, fill: row.qtyOrdered ? row.qtyInvoiced / row.qtyOrdered : 1, accuracy: row.lines ? row.linesAtPrice / row.lines : 1, atStake: row.over + row.notReceived,
+    })).sort((a, b) => b.atStake - a.atStake);
   }
   function renderSupplierReliability(data){
+    hideColInfo();
     const body = document.getElementById('supplierReliabilityBody');
     // Enough orders to judge a supplier: 5 across a group, 2 for a single outlet.
     const minimumOrders = data.names.length > 1 ? 5 : 2;
-    const hasExcluded = Object.values(data.current.suppliers).some(row => row.orders < minimumOrders);
-    document.getElementById('supplierReliabilityQualifier').textContent = `Suppliers with ${minimumOrders}+ orders${hasExcluded ? '; smaller suppliers not shown' : ''}.`;
-    const rows = Object.entries(data.current.suppliers).filter(([, row]) => row.orders >= minimumOrders).map(([name, row]) => ({
-      name, fill: row.qtyOrdered ? row.qtyReceived / row.qtyOrdered : 1, accuracy: row.lines ? row.linesAtPrice / row.lines : 1, atStake: row.over + row.notReceived,
-    })).sort((a, b) => b.atStake - a.atStake);
+    const note = document.getElementById('procureFooterNote');
+    if(note) note.textContent = `Suppliers with ${minimumOrders}+ orders · ${note.textContent}`;
+    const rows = supplierReliabilityRows(data);
     if(!rows.length){ renderEmptyState(body, `No supplier had ${minimumOrders} or more orders in this period.`); return; }
     // Judged on the figure shown, so a rate displayed as 90% is never amber.
     const rate = value => `<span class="${Math.round(value * 100) < 90 ? 'procure-below' : ''}">${percent(value)}</span>`;
-    const table = document.createElement('table'); table.className = 'outlet-table procure-table procure-compact-table';
-    table.innerHTML = '<colgroup><col><col class="procure-rate-col"><col class="procure-wide-col"><col class="procure-money-col"></colgroup><thead><tr><th scope="col">Supplier</th><th scope="col" class="num">Fill rate</th><th scope="col" class="num">Price accuracy</th><th scope="col" class="num">At stake</th></tr></thead>';
+    const header = (label, key) => `<th scope="col" class="num"><span class="col-info-head">${label}<button class="col-info" type="button" data-col-info="${key}" aria-label="How ${label.toLowerCase()} is calculated">i</button></span></th>`;
+    const table = document.createElement('table'); table.className = 'outlet-table procure-table procure-compact-table reliability-table';
+    table.innerHTML = '<colgroup><col><col class="reliability-rate-col"><col class="reliability-accuracy-col"><col class="reliability-stake-col"></colgroup>'
+      + `<thead><tr><th scope="col">Supplier</th>${header('Fill rate', 'fill')}${header('Price accuracy', 'accuracy')}${header('At stake', 'atStake')}</tr></thead>`;
     const tbody = document.createElement('tbody');
     rows.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = `<td><span class="procure-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span></td><td class="num">${rate(row.fill)}</td><td class="num">${rate(row.accuracy)}</td><td class="num"><span class="procure-money">${money(row.atStake, 10)}</span></td>`; tbody.appendChild(tr); });
     table.appendChild(tbody);
     body.replaceChildren(procureScrollTable(table, 'Supplier reliability list'));
   }
+  // One shared tooltip on <body> avoids clipping inside the scrolling supplier table.
+  const COL_INFO = {
+    fill: 'Quantity invoiced ÷ quantity ordered, across this supplier’s orders that have an invoice. Under 90% shows in amber.',
+    accuracy: 'Share of this supplier’s invoice lines billed at the ordered price. Under 90% shows in amber.',
+    atStake: 'Amount invoiced above the ordered price for this supplier, plus anything invoiced but not received. Adds up to the totals above.',
+  };
+  const colInfoTip = document.createElement('div');
+  colInfoTip.className = 'col-info-tip';
+  colInfoTip.id = 'colInfoTip';
+  colInfoTip.setAttribute('role', 'tooltip');
+  colInfoTip.hidden = true;
+  document.body.appendChild(colInfoTip);
+  let colInfoOwner = null;
+  function showColInfo(button){
+    if(!button.isConnected){ hideColInfo(); return; }
+    if(colInfoOwner && colInfoOwner !== button) colInfoOwner.removeAttribute('aria-describedby');
+    colInfoOwner = button;
+    colInfoTip.textContent = COL_INFO[button.dataset.colInfo];
+    colInfoTip.hidden = false;
+    button.setAttribute('aria-describedby', 'colInfoTip');
+    const rect = button.getBoundingClientRect(), width = colInfoTip.offsetWidth;
+    colInfoTip.style.left = `${Math.max(8, Math.min(window.innerWidth - width - 8, rect.left + rect.width / 2 - width / 2))}px`;
+    colInfoTip.style.top = `${rect.bottom + 8 + window.scrollY}px`;
+  }
+  function hideColInfo(){
+    if(colInfoOwner) colInfoOwner.removeAttribute('aria-describedby');
+    colInfoOwner = null;
+    colInfoTip.hidden = true;
+  }
+  document.addEventListener('mouseover', event => { const button = event.target.closest('.col-info'); if(button) showColInfo(button); });
+  document.addEventListener('mouseout', event => { const button = event.target.closest('.col-info'); if(button && document.activeElement !== button) hideColInfo(); });
+  document.addEventListener('focusin', event => { const button = event.target.closest('.col-info'); if(button) showColInfo(button); });
+  document.addEventListener('focusout', event => { if(event.target.closest('.col-info')) hideColInfo(); });
+  document.addEventListener('click', event => { const button = event.target.closest('.col-info'); if(button) showColInfo(button); else hideColInfo(); });
+  document.addEventListener('keydown', event => { if(event.key === 'Escape') hideColInfo(); });
+  document.addEventListener('scroll', () => { if(colInfoOwner && !colInfoTip.hidden) showColInfo(colInfoOwner); }, true);
   let spendOutletSort = 'pct';
   let lastSpendOutletScope = null;
   let pendingSpendOutletCentre = false;
@@ -2931,19 +2966,99 @@
   document.addEventListener('click', event => {
     if(!event.target.closest('#spendOutletSortControl')){ spendOutletSortMenu.classList.remove('open'); spendOutletSortButton.setAttribute('aria-expanded', 'false'); }
   });
+  /* --- Spend At a glance: use the same figures as the panels below it. --- */
+  function buildSpendBriefingInput(data){
+    const sum = (values, key) => values.reduce((total, value) => total + (value[key] || 0), 0);
+    const supplierNames = [...new Set([...Object.keys(data.current.suppliers), ...Object.keys(data.previous.suppliers)])];
+    const suppliers = supplierNames.map(name => ({ id: name, name, spend: data.current.suppliers[name]?.spend || 0, previousSpend: data.previous.suppliers[name]?.spend || 0 }));
+    const input = {
+      ...BRIEFING_PERIOD_LABELS[currentPeriod] || BRIEFING_PERIOD_LABELS['This month'],
+      spend: { current: sum(suppliers, 'spend'), previous: sum(suppliers, 'previousSpend') },
+      suppliers,
+      priceMoves: priceMovementRows(data).map(row => ({ id: row.id, item: row.description, supplier: row.supplier, change: row.change, outlets: data.names.length > 1 ? row.outlets : [] })),
+      discrepancies: {
+        over: data.current.discrepancies.over, notReceived: data.current.discrepancies.notReceived,
+        bySupplier: Object.entries(data.current.suppliers).map(([name, row]) => ({ id: name, name, over: row.over, notReceived: row.notReceived })),
+      },
+      reliability: supplierReliabilityRows(data).map(row => ({ id: row.name, name: row.name, fill: row.fill, accuracy: row.accuracy })),
+    };
+    if(data.names.length > 1){
+      input.outlets = data.perOutlet.map(outlet => ({ id: outlet.name, name: outlet.name,
+        spend: Object.values(outlet.current.suppliers).reduce((total, row) => total + row.spend, 0),
+        previousSpend: Object.values(outlet.previous.suppliers).reduce((total, row) => total + row.spend, 0) }));
+    }
+    return input;
+  }
+  const SPEND_BRIEFING_MEMORY_KEY = 'nomni.spendBriefing.memory';
+  function readSpendBriefingMemory(){ try { return JSON.parse(localStorage.getItem(SPEND_BRIEFING_MEMORY_KEY)) || undefined; } catch { return undefined; } }
+  function writeSpendBriefingMemory(memory){ try { localStorage.setItem(SPEND_BRIEFING_MEMORY_KEY, JSON.stringify(memory)); } catch { /* Storage unavailable: briefing still works without rotation. */ } }
+  const spendTakeaway = document.getElementById('spendTakeaway'), spendTakeawayText = document.getElementById('spendTakeawayText');
+  const spendTakeawayToggle = document.getElementById('spendTakeawayToggle'), spendTakeawaySkeleton = document.getElementById('spendTakeawaySkeleton');
+  let spendTakeawayExpanded = false, spendTakeawayLoadTimer = null;
+  function setSpendTakeawayExpanded(expanded){
+    spendTakeawayExpanded = expanded;
+    spendTakeawayText.classList.toggle('is-clamped', !expanded);
+    spendTakeawayToggle.setAttribute('aria-expanded', String(expanded));
+    spendTakeawayToggle.textContent = expanded ? 'Show less' : 'View all';
+  }
+  function updateSpendTakeawayOverflow(){
+    if(spendTakeawayLoadTimer) return;
+    spendTakeawayText.classList.add('is-clamped');
+    const overflows = spendTakeawayText.scrollHeight > spendTakeawayText.clientHeight + 1;
+    spendTakeawayText.classList.toggle('is-clamped', !spendTakeawayExpanded);
+    spendTakeawayToggle.hidden = !overflows;
+    if(!overflows && spendTakeawayExpanded) setSpendTakeawayExpanded(false);
+  }
+  function renderSpendBriefing(data){
+    let result = null;
+    if(data && window.SpendBriefing){
+      try { result = SpendBriefing.summariseSpendTab(buildSpendBriefingInput(data), readSpendBriefingMemory()); }
+      catch(error){ console.warn('Spend At a glance unavailable:', error); }
+    }
+    const hasText = Boolean(result?.text), hasFooter = !spendStatusFooter.hidden;
+    spendTakeaway.hidden = !hasText && !hasFooter;
+    spendTakeaway.classList.toggle('has-footer-only', !hasText && hasFooter);
+    if(!hasText){
+      window.clearTimeout(spendTakeawayLoadTimer);
+      spendTakeawayLoadTimer = null;
+      spendTakeawaySkeleton.hidden = true;
+      spendTakeawayText.hidden = false;
+      spendTakeawayText.textContent = '';
+      spendTakeawayToggle.hidden = true;
+      spendTakeaway.removeAttribute('aria-busy');
+      return;
+    }
+    writeSpendBriefingMemory(result.memory);
+    if(spendTakeawayText.textContent === result.text){ if(!spendTakeawayLoadTimer) updateSpendTakeawayOverflow(); return; }
+    spendTakeawayText.textContent = result.text; setSpendTakeawayExpanded(false);
+    window.clearTimeout(spendTakeawayLoadTimer);
+    spendTakeawayText.hidden = true; spendTakeawayToggle.hidden = true; spendTakeawaySkeleton.hidden = false; spendTakeaway.setAttribute('aria-busy', 'true');
+    spendTakeawayLoadTimer = window.setTimeout(() => {
+      spendTakeawayLoadTimer = null;
+      spendTakeawaySkeleton.hidden = true; spendTakeawayText.hidden = false; spendTakeaway.removeAttribute('aria-busy');
+      spendTakeaway.classList.remove('is-announcing'); void spendTakeaway.offsetWidth; spendTakeaway.classList.add('is-announcing');
+      updateSpendTakeawayOverflow();
+    }, 650);
+  }
+  spendTakeawayToggle.addEventListener('click', () => setSpendTakeawayExpanded(!spendTakeawayExpanded));
+  let spendTakeawayWidth = 0;
+  function recheckSpendTakeawayWidth(){ const width = Math.round(spendTakeaway.getBoundingClientRect().width); if(width === spendTakeawayWidth) return; spendTakeawayWidth = width; updateSpendTakeawayOverflow(); }
+  window.addEventListener('resize', recheckSpendTakeawayWidth);
+  new ResizeObserver(recheckSpendTakeawayWidth).observe(spendTakeaway);
+
   function renderSpendTab(){
     const data = getProcureData();
     const ids = ['spendSupplierBody', 'spendCategoryBody', 'priceMovementBody', 'orderAccuracyBody', 'supplierReliabilityBody', 'spendOutletBody'];
-    if(!data){ ids.forEach(id => renderEmptyState(document.getElementById(id), 'No procurement data for this selection.')); document.getElementById('orderAccuracyFooter').replaceChildren(); document.getElementById('supplierReliabilityQualifier').textContent = ''; spendStatus.hidden = true; return; }
+    if(!data){ hideColInfo(); ids.forEach(id => renderEmptyState(document.getElementById(id), 'No procurement data for this selection.')); document.getElementById('orderAccuracyFooter').replaceChildren(); spendStatusFooter.hidden = true; renderSpendBriefing(null); return; }
     renderSpendBySupplier(data); renderSpendCategoryOrItem(data); renderPriceMovement(data); renderOrderAccuracy(data); renderSupplierReliability(data); renderSpendByOutlet();
     updateSpendStatusFooter();
+    renderSpendBriefing(data);
     refreshProcureFades();
   }
   // Stub links: they stand in for pages that don't exist in this prototype.
   document.addEventListener('click', event => { if(event.target.closest('[data-stub]')) event.preventDefault(); });
 
-  /* --- Data status: a footer row inside the "At a glance" box (Sales) and, until Spend has its own summary,
-     inside a footer-only box in the same position (Spend). Shown only when there is a gap. --- */
+  /* --- Data status: a footer row inside each tab's "At a glance" box. Shown only when there is a gap. --- */
   function statusPopoverRow(label, value, detail, link){ return `<div class="data-status-item"><div class="data-status-row"><span>${label}</span><span class="data-status-value">${value}</span></div><div class="data-status-detail"><span>${detail}</span>${link ? `<a class="procure-link" href="#" data-stub>${link}</a>` : ''}</div></div>`; }
   // One popover wiring per footer: open on the Details button, close on Escape, an outside click, or the button again.
   // A single shared dialog: the trigger only needs to hand it a title and body, and remember who opened it so
@@ -2994,12 +3109,12 @@
   }
   salesStatusDetails.addEventListener('click', event => openStatusModal('Data status', salesStatusModalBody, event.currentTarget));
 
-  const spendStatus = document.getElementById('spendStatus'), spendStatusText = document.getElementById('spendStatusText'), spendStatusDetails = document.getElementById('spendStatusDetails');
+  const spendStatusFooter = document.getElementById('spendStatusFooter'), spendStatusText = document.getElementById('spendStatusText'), spendStatusDetails = document.getElementById('spendStatusDetails');
   let spendStatusModalBody = '';
   function updateSpendStatusFooter(){
     const data = getProcureData();
     const show = INVOICES_MISSING && data?.current.missing > 0;
-    spendStatus.hidden = !show;
+    spendStatusFooter.hidden = !show;
     if(!show) return;
     const side = data.current;
     const deliveryWord = plural(side.missing, 'delivery', 'deliveries'), verb = side.missing === 1 ? 'has' : 'have';
