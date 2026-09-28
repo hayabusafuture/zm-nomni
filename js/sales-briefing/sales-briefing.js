@@ -8,12 +8,11 @@
  *
  * HOW IT AVOIDS SOUNDING THE SAME EVERY DAY
  *
- *   1. It ranks findings from ALL panels together and leads with the
- *      strongest. Different days lead with different panels because the
- *      data differs — an outlet diverging one day, a channel shift another.
- *   2. The lead is always the strongest finding, but supporting findings
- *      ROTATE: when several qualify, it prefers ones it hasn't shown you
- *      recently. Everything said is still true and above threshold.
+ *   1. It ranks findings from ALL panels together, then groups related
+ *      outlet facts into a story. Revenue is pinned but is not a fixed opener.
+ *   2. Related outlet facts may lead together; otherwise the strongest
+ *      eligible subject leads. Supporting findings ROTATE when several
+ *      qualify, favouring ones it hasn't shown you recently.
  *   3. Each finding has several phrasings.
  *
  *   Identical data always returns the identical text (cached against a hash
@@ -27,7 +26,8 @@
  *     - revenue split into dine-in covers × spend per head and off-premise
  *       orders × average order value (an exact identity)
  *     - a group change split by outlet (a decomposition)
- *   Nothing else is joined. No "because", no "which usually means".
+ *   Other facts about one subject may share a sentence, without claiming
+ *   that one caused the other. No "because", no "which usually means".
  *
  * ------------------------------------------------------------------------
  * INPUT — the Sales tab's own data, already normalised. It does not parse
@@ -203,7 +203,8 @@
     return [{
       key: 'revenue', subject: 'revenue', pinned: true,
       score: 0.3 + clamp(Math.abs(chg) / 15) * 0.7,
-      render: function (pick) {
+      changePct: chg,
+      render: function (pick, ctx) {
         // The page header already states the comparison period, so most
         // variants don't repeat it.
         var headline = pick(up ? [
@@ -217,7 +218,7 @@
           'Revenue fell ' + abs(chg),
           'Revenue has slipped ' + abs(chg)
         ]);
-        if (!top) return headline + '.';
+        if (!top) return ctx && ctx.detailOnly ? '' : headline + '.';
 
         var s;
         if (topShare >= 0.6 || !second) {
@@ -231,6 +232,11 @@
             headline + ', split between ' + top.label + ' and ' + second.label + '.',
             headline + '. It came from both ' + top.label + ' and ' + second.label + '.'
           ]);
+        }
+        if (ctx && ctx.detailOnly) {
+          s = topShare >= 0.6 || !second
+            ? 'Across the group, the largest component was ' + top.label + ' (' + top.detail + ').'
+            : 'Across the group, the change split between ' + top.label + ' and ' + second.label + '.';
         }
         if (offset) s += ' ' + cap(offset.label) + ' pulled the other way (' + offset.detail + ').';
         return s;
@@ -307,6 +313,7 @@
       if (s1 >= CONFIG.concentrationShare) {
         var A = same[0].o.name;
         out.push({ key: 'concentration', subject: 'outlet:' + same[0].o.id,
+          outletId: same[0].o.id, outletIds: [same[0].o.id], storyName: A, share: s1, direction: dir,
           score: clamp((s1 - 0.35) * 1.4) * (outlets.length >= 4 ? 1 : 0.7),
           render: function (pick) { return pick([
             A + ' accounts for ' + shareWord(s1) + ' of the revenue ' + dir + '.',
@@ -315,6 +322,8 @@
       } else if (s2 >= CONFIG.concentrationShare && same[1]) {
         var B1 = same[0].o.name, B2 = same[1].o.name;
         out.push({ key: 'concentration', subject: 'outlets:' + same[0].o.id + ',' + same[1].o.id,
+          outletIds: [same[0].o.id, same[1].o.id],
+          storyName: B1 + ' and ' + B2, share: s2, direction: dir,
           score: clamp((s2 - 0.35) * 1.3) * (outlets.length >= 4 ? 1 : 0.7),
           render: function (pick) { return pick([
             B1 + ' and ' + B2 + ' account for ' + shareWord(s2) + ' of the revenue ' + dir + '.',
@@ -334,6 +343,8 @@
         var others = outlets.length - 1;
         var weight = o.previousRevenue / R0;
         out.push({ key: 'divergence', subject: 'outlet:' + o.id, outletId: o.id,
+          storyName: o.name,
+          storyFact: 'revenue is ' + dirWord(against.chg) + ' while the rest of the group is ' + dirWord(restChg),
           score: 0.25 + clamp(Math.abs(against.chg) / 12) * 0.6 + clamp(weight * 2) * 0.2,
           render: function (pick) {
             var mine = dirWord(against.chg), theirs = dirWord(restChg);
@@ -351,6 +362,8 @@
         .sort(function (a, b) { return Math.abs(b.chg) - Math.abs(a.chg); })[0];
       if (mover) {
         out.push({ key: 'divergence', subject: 'outlet:' + mover.o.id, outletId: mover.o.id,
+          storyName: mover.o.name,
+          storyFact: 'revenue moved most of any outlet, ' + dirWord(mover.chg),
           score: 0.2 + clamp(Math.abs(mover.chg) / 20) * 0.6,
           render: function (pick) { return pick([
             mover.o.name + ' saw the biggest move of any outlet, ' + dirWord(mover.chg) + '.',
@@ -455,6 +468,8 @@
     var fell = m.chg < 0;
     var tail = fell ? 'the steepest drop of any outlet' : 'the biggest rise of any outlet';
     return [{ key: 'sph', subject: 'sph', outletId: m.o.id,
+      storyName: m.o.name,
+      storyFact: 'dine-in spend per head ' + (fell ? 'fell ' : 'rose ') + abs(m.chg) + ', ' + tail,
       score: clamp(Math.abs(m.chg) / 15) * 0.7,
       render: function (pick, ctx) {
         var verb = (fell ? 'fell ' : 'rose ') + abs(m.chg);
@@ -524,50 +539,34 @@
     var ranked = findings.filter(function (f) { return f.score >= CONFIG.minScore || f.pinned; })
       .sort(function (a, b) { return b.score - a.score; });
     if (!ranked.length) return [];
-    var lead = ranked[0];
+    var revenue = ranked.filter(function (f) { return f.key === 'revenue'; })[0];
+    var concentration = ranked.filter(function (f) { return f.key === 'concentration'; })[0];
+    var divergence = ranked.filter(function (f) { return f.key === 'divergence'; })[0];
+    var sph = ranked.filter(function (f) { return f.key === 'sph'; })[0];
+    var pair = divergence && sph && divergence.outletId === sph.outletId &&
+      (!concentration || divergence.score + sph.score > concentration.score + 0.3);
 
-    // The revenue breakdown is pinned when revenue moved: it's the one thing
-    // the summary cards above can't show, so it never rotates out.
-    var pinned = ranked.filter(function (f) { return f.pinned && f !== lead; });
+    // Related facts can make a stronger outlet story than either panel fact
+    // alone. The revenue decomposition still occupies one of three places.
+    if (pair) return [divergence, sph].concat(revenue || []);
 
-    // Other supporting findings are ordered so ones NOT shown recently come
-    // first; within each group the stronger still comes first. That is the
-    // only source of rotation.
-    var rest = ranked.slice(1).filter(function (f) {
-      return !f.pinned && f.key !== lead.key && f.subject !== lead.subject;
+    var picked = concentration && revenue && revenue.pinned ? [revenue, concentration] : [ranked[0]];
+    if (revenue && revenue.pinned && picked.indexOf(revenue) < 0) picked.push(revenue);
+    var rest = ranked.filter(function (f) {
+      return picked.indexOf(f) < 0 && !f.pinned &&
+        !(concentration && f.outletId && concentration.outletIds.indexOf(f.outletId) >= 0) &&
+        !picked.some(function (p) { return p.key === f.key || p.subject === f.subject; });
     });
     rest.sort(function (a, b) {
       var ra = recent.indexOf(fid(a)) >= 0 ? 1 : 0, rb = recent.indexOf(fid(b)) >= 0 ? 1 : 0;
       return ra - rb || b.score - a.score;
     });
 
-    var picked = [lead].concat(pinned);
     for (var i = 0; i < rest.length && picked.length <= CONFIG.maxSupporting; i++) {
       var f = rest[i];
       if (picked.some(function (p) { return p.key === f.key || p.subject === f.subject; })) continue;
       picked.push(f);
     }
-
-    // Ordering: a concentration finding reads best straight after the revenue
-    // figure it breaks down; a spend-per-head finding about the diverging
-    // outlet reads best straight after it, as "Its…".
-    function moveAfter(item, anchor) {
-      if (!item || !anchor || picked.indexOf(item) < 0 || picked.indexOf(anchor) < 0) return;
-      picked.splice(picked.indexOf(item), 1);
-      picked.splice(picked.indexOf(anchor) + 1, 0, item);
-    }
-    var byKey = function (k) { return picked.filter(function (p) { return p.key === k; })[0]; };
-    var rev = byKey('revenue'), conc = byKey('concentration');
-    if (rev && conc && !rev.steady) {
-      if (picked.indexOf(conc) < picked.indexOf(rev)) {
-        // Concentration outranked revenue; put revenue first so "the increase" has context.
-        picked.splice(picked.indexOf(rev), 1);
-        picked.splice(picked.indexOf(conc), 0, rev);
-      }
-      moveAfter(conc, rev);
-    }
-    var div = byKey('divergence'), sph = byKey('sph');
-    if (div && sph && div.outletId === sph.outletId) moveAfter(sph, div);
     return picked;
   }
 
@@ -580,21 +579,57 @@
       ]), coverage].filter(Boolean).join(' ');
     }
 
-    var sentences = chosen.map(function (f, i) {
-      var prev = chosen[i - 1];
-      var ctx = {
-        alone: chosen.length === 1,
-        followsOutlet: prev && prev.key === 'divergence' ? prev.outletId : null
-      };
-      return f.render(pick, ctx);
+    var revenue = chosen.filter(function (f) { return f.key === 'revenue'; })[0];
+    var concentration = chosen.filter(function (f) { return f.key === 'concentration'; })[0];
+    var divergence = chosen.filter(function (f) { return f.key === 'divergence'; })[0];
+    var sph = chosen.filter(function (f) { return f.key === 'sph'; })[0];
+    var units = [];
+    var used = [];
+    function add(fs, sentence, pinned) {
+      units.push({ findings: fs, text: sentence, pinned: pinned });
+      fs.forEach(function (f) { used.push(f); });
+    }
+
+    if (revenue && revenue.pinned && concentration) {
+      var name = concentration.storyName;
+      var verb = concentration.outletId ? 'accounts' : 'account';
+      var opening = 'Revenue is ' + dirWord(revenue.changePct) + ', and ' + name + ' ' + verb +
+        ' for ' + shareWord(concentration.share) + ' of the ' + concentration.direction + '.';
+      add([revenue, concentration], opening + ' ' + revenue.render(pick, { detailOnly: true }), true);
+    } else {
+      var others = chosen.filter(function (f) { return f !== revenue; });
+      if (divergence && sph && divergence.outletId === sph.outletId) {
+        var combined = pick([
+          'Two things stand out for ' + divergence.storyName + ': ' + divergence.storyFact + ', and its ' + sph.storyFact + '.',
+          divergence.storyName + ' stands apart: ' + divergence.storyFact + '; its ' + sph.storyFact + '.'
+        ]);
+        add([divergence, sph], combined, false);
+        others = others.filter(function (f) { return f !== divergence && f !== sph; });
+      }
+      // An outlet, item, channel or daily pattern leads. The pinned revenue
+      // breakdown follows as context unless it is the only finding.
+      if (others.length) {
+        add([others[0]], others[0].render(pick, { alone: false }), false);
+        others.shift();
+      }
+      if (revenue) add([revenue], revenue.render(pick, { alone: units.length === 0 }), !!revenue.pinned);
+      others.forEach(function (f) { add([f], f.render(pick, { alone: false }), false); });
+    }
+    chosen.forEach(function (f) {
+      if (used.indexOf(f) < 0) add([f], f.render(pick, { alone: false }), false);
     });
 
-    // Enforce the word budget: drop supporting sentences from the end,
-    // never the lead, never the coverage clause.
-    while (sentences.length > 1 && !chosen[sentences.length - 1].pinned && wordCount(sentences.concat(coverage || []).join(' ')) > CONFIG.maxWords) {
-      sentences.pop(); chosen.pop();
+    // Drop only optional trailing stories to make room for the coverage note.
+    while (units.length > 1 && wordCount(units.map(function (u) { return u.text; }).concat(coverage || []).join(' ')) > CONFIG.maxWords) {
+      var drop = units.length - 1;
+      while (drop > 0 && units[drop].pinned) drop--;
+      if (drop === 0) break;
+      units.splice(drop, 1);
     }
-    return sentences.concat(coverage || []).join(' ');
+    var said = [];
+    units.forEach(function (u) { u.findings.forEach(function (f) { said.push(f); }); });
+    chosen.splice.apply(chosen, [0, chosen.length].concat(said));
+    return units.map(function (u) { return u.text; }).concat(coverage || []).join(' ');
   }
 
   function coverageClause(c) {

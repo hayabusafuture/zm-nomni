@@ -147,6 +147,41 @@ test('a single-outlet data set never compares outlets', () => {
   assert.ok(!findings.some(f => f.key === 'divergence' || f.key === 'concentration' || f.key === 'sph'), text);
 });
 
+console.log('\nstory composition');
+test('related outlet facts become one two-fact story with the outlet named once', () => {
+  const name = "Roll'd Parramatta";
+  const { text, findings } = summariseSalesTab(scenario({ dineSph: 5, dineCovers: 2,
+    outletShift: { [name]: -45 }, outletSph: { [name]: -12 } }));
+  assert.deepStrictEqual(findings.slice(0, 2).map(f => f.key), ['divergence', 'sph'], text);
+  assert.strictEqual(text.split(name).length - 1, 1, text);
+  assert.match(text, /revenue is down .*dine-in spend per head fell/, text);
+  assert.match(text, /higher dine-in spend per head/, 'pinned group decomposition missing: ' + text);
+});
+test('concentrated revenue opens with the outlet and retains the group decomposition', () => {
+  const { text, findings } = summariseSalesTab(scenario({ dineSph: 6, dineCovers: 2,
+    outletShift: { "Roll'd Wynyard": 30, "Roll'd Chatswood": 28 } }));
+  assert.match(text, /^Revenue is up .*accounts? for .* of the increase\./, text);
+  assert.ok(findings.some(f => f.key === 'revenue') && findings.some(f => f.key === 'concentration'), text);
+  assert.match(text, /Across the group, the largest component was higher dine-in spend per head/, text);
+});
+test('an item or channel can open while the revenue breakdown stays in context', () => {
+  const { text, findings } = summariseSalesTab(scenario({ offOrders: 28, deliveryShift: 9 }));
+  assert.strictEqual(findings[0].key, 'channel', text);
+  assert.match(text, /^Delivery|^The channel mix/, text);
+  assert.match(text, /more takeaway and delivery orders/, text);
+});
+test('story openings vary across changed sales scenarios', () => {
+  const openings = new Set();
+  const r = rng(731);
+  for (let k = 0; k < 60; k++) {
+    const v = () => (r() - 0.5) * 35;
+    const { text } = summariseSalesTab(scenario({ seed: k + 1, dineSph: v(), dineCovers: v(),
+      offOrders: v(), offAov: v(), deliveryShift: (r() - 0.5) * 15 }));
+    openings.add(text.split(/\s+/).slice(0, 3).join(' '));
+  }
+  assert.ok(openings.size >= 6, 'only ' + openings.size + ' openings');
+});
+
 console.log('\ncoverage');
 test('names missing outlets when there are three or fewer', () => {
   const { text } = summariseSalesTab(scenario({ dineSph: 6,
@@ -195,7 +230,7 @@ test('identical data gives identical text, with or without memory', () => {
   const again = summariseSalesTab(d, first.memory);
   assert.strictEqual(again.text, first.text);
 });
-test('the lead stays the strongest finding while supporting facts rotate', () => {
+test('the story lead stays stable while supporting facts rotate', () => {
   // Same shape of data every "day", nudged slightly so the hash changes.
   let memory, leads = new Set(), supports = new Set();
   for (let day = 0; day < 7; day++) {

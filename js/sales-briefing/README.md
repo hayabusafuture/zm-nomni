@@ -3,7 +3,7 @@
 A short briefing for the **Sales** tab — under 100 words, built only from the data the tab already shows. Local and deterministic: no network, no model.
 
 ```
-node sales-briefing.test.js     # 19 tests, no dependencies
+node sales-briefing.test.js     # 23 tests, no dependencies
 ```
 
 If `js/heatmap-summary/heatmap-summary.js` is present, the briefing also draws on the heatmap's findings. It is optional.
@@ -24,24 +24,24 @@ The input is the same data the Sales panels render. The full shape is documented
 
 ## What it says, and what it won't
 
-It leads with the strongest finding from **any** panel — revenue, outlets, channels, items, dine-in spend per head, yesterday's covers, or the heatmap — then adds up to two supporting findings and a coverage note.
+It ranks findings from **every** Sales panel, then tells a short story about the strongest subject — an outlet, item or channel — with up to two related facts. An outlet's revenue divergence and dine-in spend per head can share one sentence with its name said once. A concentrated group movement can instead open with revenue and the one or two outlets accounting for most of the change. The coverage note remains separate.
 
 It never states a cause. The only links it draws between facts are arithmetic:
 
 - **Revenue split** into dine-in (covers × spend per head) and off-premise (orders × average order value). This is an exact identity, so "most of that came from higher dine-in spend per head" is a calculation, not an interpretation.
 - **A group change split by outlet**: "Wynyard and Chatswood account for 59% of the increase."
 
-Nothing else is joined. The test suite checks 300 random scenarios for words like *because*, *usually*, *likely*, *suggests* and *driven by*.
+Other facts about the same subject can be joined without implying that one caused the other. The test suite checks 300 random scenarios for words like *because*, *usually*, *likely*, *suggests* and *driven by*.
 
 ## Why it doesn't read the same every day
 
-- **The data decides what leads.** Different periods surface different panels.
-- **Supporting findings rotate.** The lead is always the strongest finding, but when several supporting findings qualify, it prefers ones this user hasn't seen recently. That's what `memory` is for — persist it per user. Without it the output is still correct; it just won't rotate.
+- **The data decides what leads.** Revenue opens when the change is concentrated in one or two outlets. Otherwise a qualifying outlet, item or channel story can lead, with the revenue breakdown following as context.
+- **Supporting findings rotate.** When several qualify, the briefing prefers ones this user hasn't seen recently. That's what `memory` is for — persist it per user. Without it the output is still correct; it just won't rotate.
 - **Each finding has several phrasings.**
 
 Identical data always returns identical text, so re-rendering or switching tabs never makes it flicker. Rotation only happens when the data changes.
 
-The revenue breakdown is **pinned**: whenever revenue moved, it's always included. It's the one thing the summary cards above can't show.
+The revenue breakdown is **pinned** whenever revenue moved, whether or not it opens. It is the one thing the summary cards above cannot show. The coverage, heatmap and yesterday rules and all thresholds are unchanged.
 
 ## Before shipping, confirm upstream
 
