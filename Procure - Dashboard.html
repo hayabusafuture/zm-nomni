@@ -708,7 +708,7 @@
   .margins-category-scroll { overflow-x: auto; padding-bottom: 3px; }
   .margins-category-layout { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 100%; }
   .margins-category-plot { position: relative; display: flex; height: 190px; border-bottom: 1px solid var(--rule); background: linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 50%, var(--rule) 50% calc(50% + 1px), transparent calc(50% + 1px)); }
-  .margins-category-reference { position: absolute; z-index: 2; left: 0; right: 0; top: var(--reference-top); border-top: 1.5px dashed var(--ink-mute); pointer-events: none; }
+  .margins-category-reference { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
   .margins-category-column { position: relative; display: flex; flex: 1 1 0; flex-direction: column; align-items: center; min-width: 0; }
   .margins-category-bar { width: min(72px, 68%); height: var(--bar-height); margin-top: auto; border-radius: 4px 4px 0 0; background: var(--spinach); }
   .margins-category-bar.heat-step-5 { background: var(--heatmap-5); }
@@ -3117,7 +3117,7 @@
     purchases: 'Total invoiced supplier spend for the selected outlets and period. Deliveries without an invoice are excluded, so this figure may be understated.',
     unexplainedVariance: 'Actual food cost minus theoretical recipe cost and wastage.',
     gpPercent: 'Gross profit is 100% minus COGS %.',
-    priceImpact: 'Extra cost from supplier price changes in this period: for each change, (new price − old price) × quantity bought since it took effect. The % is that extra cost as a share of what the same purchases cost at the old prices.',
+    priceImpact: 'Extra cost from supplier price changes: each change’s price difference × quantity bought since. Counts items with an invoiced price in both periods. The % is against the old prices.',
     fill: 'Quantity invoiced ÷ quantity ordered, across this supplier’s orders that have an invoice. Under 90% shows in amber.',
     accuracy: 'Share of this supplier’s invoice lines billed at the ordered price. Under 90% shows in amber.',
     atStake: 'Amount invoiced above the ordered price for this supplier, plus anything invoiced but not received. Adds up to the totals above.',
@@ -3797,6 +3797,11 @@
   }
   function renderMarginsCategories(){
     const body = document.getElementById('marginsCategoryBody');
+    if(!getMarginsData()){
+      marginsCategoryFilter.hidden = true;
+      renderEmptyState(body, 'Margins are unavailable without POS data.');
+      return;
+    }
     const names = SALES_OUTLET_ROWS.map(outlet => outlet.name);
     if(marginsCategoryScope !== 'All outlets' && !names.includes(marginsCategoryScope)) marginsCategoryScope = 'All outlets';
     marginsCategoryFilter.hidden = names.length <= 1;
@@ -3815,7 +3820,7 @@
     const maxCogs = Math.max(...data.rows.map(row => row.cogsPct));
     const referenceTop = (1 - data.overallCogsPct / scaleMax) * 100;
     body.innerHTML = `<div class="margins-category-scroll" role="region" aria-label="COGS by sales category chart, scrollable" tabindex="0"><div class="margins-category-layout${data.rows.length <= 3 ? ' is-few-categories' : ''}" style="min-width:${Math.max(320, data.rows.length * 112)}px">`
-      + `<div class="margins-category-plot" style="--reference-top:${referenceTop.toFixed(2)}%"><span class="margins-category-reference" aria-hidden="true"></span>`
+      + `<div class="margins-category-plot"><svg class="margins-category-reference" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="${referenceTop.toFixed(2)}" x2="100" y2="${referenceTop.toFixed(2)}" stroke="var(--ink-mute)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"></line></svg>`
       + data.rows.map(row => {
         const height = Math.max(0, Math.min(100, row.cogsPct / scaleMax * 100));
         const heatStep = maxCogs === minCogs ? 7 : 5 + Math.round((row.cogsPct - minCogs) / (maxCogs - minCogs) * 4);
@@ -4009,6 +4014,12 @@
       priceImpact: price ? { value: price.impact, changePct: price.changePct } : null,
     };
     if(data.scope === 'All outlets') input.outlets = data.outlets.map(outlet => ({ name: outlet.name, gp: 100 - outlet.actual, target: 100 - outlet.target }));
+    // Gross profit at each point of the GP% tile, against the same target line.
+    const sample = marginsSampleCogsSeries(data), unit = { daily: 'day', weekly: 'week', monthly: 'month' }[COVERS_SPEND_PERIOD[data.period]?.granularity] || 'day';
+    input.trend = { unit, target: 100 - data.targetPct, points: sample.labels.map((label, index) => ({ label, gp: 100 - sample.scopeValues[index] })) };
+    // COGS by sales category for the selected outlets (the panel's own outlet filter doesn't change this).
+    const categories = getMarginsCategoryRows(data.scope, data.period);
+    if(categories.rows.length) input.categories = { overall: categories.overallCogsPct, rows: categories.rows.map(row => ({ name: row.name, cogsPct: row.cogsPct, salesShare: row.salesShare })) };
     return input;
   }
   function renderMarginsBriefing(data){
