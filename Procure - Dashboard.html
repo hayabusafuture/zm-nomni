@@ -101,6 +101,10 @@
   /* At a glance: the old AI briefing box, without the chip or sparkle, under the Sales tab bar. */
   .ai-summary.key-takeaway { display: block; margin: 0 0 16px; padding: 20px 28px; border-radius: 16px; box-shadow: 0 1px 2px rgba(26,31,43,.08), 0 8px 20px rgba(26,31,43,.06); }
   .key-takeaway[hidden] { display: none; }
+  /* Margins: At a glance (cream) and the key numbers (white) are one panel. It owns the corners and shadow; the two halves keep their own fill. */
+  .margins-overview { overflow: hidden; border-radius: 16px; box-shadow: 0 1px 2px rgba(26,31,43,.08), 0 8px 20px rgba(26,31,43,.06); }
+  .margins-overview .ai-summary.key-takeaway { margin: 0; border-radius: 0; box-shadow: none; }
+  .margins-overview .insight-card.margins-key-overview { margin-bottom: 0; border-radius: 0; box-shadow: none; }
   .key-takeaway-title { margin: 0 0 4px; color: var(--spinach); font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .04em; line-height: 1.4; text-transform: uppercase; }
   .key-takeaway-title { display: flex; align-items: center; gap: 7px; }
   /* Nomni mark beside the heading. When new text is revealed it swipes up (clipped from the bottom) while nudging up
@@ -504,6 +508,10 @@
   .spend-category-tab { padding: 6px 12px; border: 0; border-radius: 6px; background: transparent; color: var(--ink-mute-strong); font: 600 13px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; }
   .spend-category-tab.active { background: var(--panel); color: var(--seaweed); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .spend-category-tab:focus-visible { outline: 2px solid var(--spinach); outline-offset: 2px; }
+  .margins-compare-tabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--row-hover); }
+  .margins-compare-tab { padding: 6px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--ink-mute-strong); font: 600 12px/1.4 "Inter", system-ui, sans-serif; white-space: nowrap; cursor: pointer; }
+  .margins-compare-tab.active { background: var(--panel); color: var(--seaweed); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .margins-compare-tab:focus-visible { outline: 2px solid var(--spinach); outline-offset: 2px; }
   .procure-link { color: var(--spinach); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
   .procure-link:hover { color: var(--seaweed); text-decoration: underline; }
   .procure-card-footer { margin-top: 14px; }
@@ -573,6 +581,9 @@
   .price-movement-card .procure-table-wrap { max-height: calc(27px + 6 * 56px); }
   .procure-price-table td { height: 56px; }
   .procure-price-table col.procure-price-col { width: 100px; }
+  .procure-price-impact { display: block; margin: 2px 0 0 auto; padding: 0; border: 0; background: transparent; color: var(--ink-mute-strong); font: 500 11px/1.4 "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap; cursor: help; }
+  .procure-price-impact:hover, .procure-price-impact:focus-visible { color: var(--ink); text-decoration: underline; }
+  .procure-price-impact:focus-visible { outline: 2px solid var(--spinach); outline-offset: 2px; border-radius: 2px; }
   .procure-price-current { display: block; white-space: nowrap; }
   .procure-price-unit { color: var(--ink-mute-strong); font-size: 10px; font-weight: 500; }
   .procure-price-previous { display: block; margin-top: 2px; color: var(--ink-mute-strong); font-size: 11px; text-decoration: line-through; text-decoration-color: var(--ink-mute); white-space: nowrap; }
@@ -593,7 +604,7 @@
   .spend-supplier-card .procure-table-wrap { max-height: calc(27px + 7.5 * 40px); box-sizing: border-box; padding-right: 12px; }
 
   /* Price movement: the invoice description stays on one line (full text in its title), so every row is the same height. */
-  .procure-sku { display: block; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 600; letter-spacing: .01em; text-overflow: ellipsis; white-space: nowrap; }
+  .procure-sku { display: block; overflow: hidden; color: var(--ink); font-size: 13px; font-weight: 600; letter-spacing: .01em; text-overflow: ellipsis; white-space: nowrap; }
   /* A row carries colour once, on its change pill; values stay dark. */
 
   /* Compact order exposure sits above the supplier list in one half-width card. */
@@ -626,6 +637,140 @@
 
   /* Supplier reliability: rates under 90% in amber text. */
   .procure-below { color: var(--viz-div-neg2); font-weight: 700; }
+
+  /* Margins: reuse the dashboard's cards, rules, semantic colours and scroll treatments. */
+  #panel-margins .insight-row-2col { align-items: stretch; }
+  #panel-margins .margins-outlet-card .insight-card-head, #panel-margins .margins-menu-card .insight-card-head, #panel-margins .margins-trend-card .insight-card-head { align-items: center; }
+  #panel-margins .margins-menu-sort { align-self: center; }
+  #panel-margins .margins-trend-card { order: 1; }
+  #panel-margins .margins-outlet-card { order: 2; }
+  #panel-margins .insight-card-sub { margin: 0; }
+  .margins-callout[hidden] { display: none; }
+  .margins-key-overview .mini-chart-row { flex-wrap: wrap; margin-top: 0; }
+  .margins-key-overview .spend-outlet-chart { flex: 0 1 calc(25% - 15px); }
+  .margins-key-overview .mini-chart-head { min-height: 48px; align-content: flex-start; }
+  .margins-key-overview .mini-chart svg { width: calc(100% - 16px); height: 112px; margin-inline: 8px; aspect-ratio: auto; }
+  .margins-key-overview .mini-chart-axis { margin-top: 6px; padding-inline: 8px; }
+  .margins-key-overview .mini-chart-name { display: inline-flex; align-items: center; gap: 5px; }
+  .margins-key-overview .mini-chart-name .col-info { flex: 0 0 14px; margin-left: 0; vertical-align: initial; }
+  /* GP% tile: inset the plot like the other charts in this strip. */
+  .margins-gp-plot { position: relative; height: 112px; margin-inline: 8px; }
+  .margins-key-overview .mini-chart .margins-gp-plot svg { width: 100%; height: 100%; margin-inline: 0; aspect-ratio: auto; }
+  .margins-gp-target-key { display: inline-flex; align-items: center; gap: 5px; }
+  .margins-gp-target-key i { display: inline-block; width: 12px; border-top: 1px dashed var(--ink-mute); }
+  .insight-card-note { color: var(--ink-mute-strong); font-size: 11px; }
+  .margins-bullet-controls { margin: 12px 0 15px; }
+  .margins-bullet-head, .margins-bullet-row { display: grid; grid-template-columns: minmax(110px, 1.1fr) minmax(145px, 1.7fr) 86px; align-items: center; gap: 8px; }
+  .margins-bullet-head { padding: 0 12px 7px 0; border-bottom: 1px solid var(--rule); color: var(--ink-mute-strong); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+  .margins-bullet-head > :last-child { text-align: right; }
+  .margins-bullet-list { max-height: 300px; overflow-y: auto; padding-right: 12px; scrollbar-width: thin; scrollbar-color: var(--row-mute) transparent; }
+  .margins-bullet-row { min-height: 48px; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+  .margins-bullet-row:last-child { border-bottom: 0; }
+  .margins-bullet-row.is-selected { padding-left: 10px; background: var(--mint); border-radius: 6px; }
+  .margins-bullet-name { overflow: hidden; color: var(--ink); font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+  .margins-bullet-measure { display: flex; align-items: center; gap: 7px; min-width: 0; cursor: help; }
+  .margins-bullet-measure:focus-visible { outline: 2px solid var(--spinach); outline-offset: 3px; border-radius: 3px; }
+  .margins-bullet-measure strong, .margins-bullet-gap strong { color: var(--ink); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .margins-bullet-track { position: relative; height: 10px; flex: 1 1 auto; min-width: 40px; border-radius: 3px; background: var(--sidebar-bg); }
+  .margins-bullet-actual { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
+  .margins-bullet-reference { position: absolute; top: -4px; width: 2px; height: 18px; border-radius: 1px; background: var(--seaweed); transform: translateX(-50%); pointer-events: none; }
+  .margins-bullet-gap { display: flex; flex-direction: column; align-items: flex-end; color: var(--ink-mute-strong); font-size: 10px; line-height: 1.25; text-align: right; white-space: nowrap; }
+  .margins-bullet-gap.is-over strong { color: var(--viz-div-neg2); }
+  .margins-bullet-mobile-label { display: none; }
+  .margins-bullet-empty { margin: 18px 0; color: var(--ink-mute-strong); font-size: 12px; }
+  .margins-trend-card { display: flex; flex-direction: column; }
+  .margins-trend-scope { flex: 0 1 auto; margin-left: auto; color: var(--ink-mute-strong); font-size: 11px; line-height: 1.3; text-align: right; }
+  @media (min-width: 1181px) { #panel-margins .insight-row-2col:nth-of-type(2) > .insight-card { height: 470px; } }
+  #marginsTrendBody { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 320px; }
+  .margins-trend-current { display: flex; align-items: baseline; gap: 8px; margin: 0 0 12px; color: var(--seaweed); font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 21px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .margins-trend-current-scope { color: var(--ink-mute-strong); font: 500 11px/1.3 "Inter", system-ui, sans-serif; font-variant-numeric: normal; }
+  .margins-trend-chart { display: grid; flex: 1 1 auto; grid-template-columns: 38px minmax(0, 1fr); grid-template-rows: minmax(230px, 1fr) 22px; min-height: 0; }
+  .margins-trend-y-axis { position: relative; grid-column: 1; grid-row: 1; color: var(--ink-mute-strong); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .margins-trend-y-axis span { position: absolute; right: 7px; transform: translateY(-50%); }
+  .margins-trend-plot { position: relative; grid-column: 2; grid-row: 1; min-height: 0; }
+  .margins-trend-plot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .margins-trend-endpoint { position: absolute; top: var(--endpoint-y); right: -5px; width: 10px; height: 10px; border-radius: 50%; background: var(--trend-color, var(--seaweed)); transform: translateY(-50%); pointer-events: none; }
+  .margins-trend-hit { cursor: crosshair; }
+  .margins-trend-hit:focus-visible { outline: 2px solid var(--spinach); outline-offset: -2px; }
+  .margins-trend-crosshair { opacity: 0; }
+  .margins-trend-active { position: absolute; z-index: 1; top: 0; left: 0; width: 14px; height: 14px; box-sizing: border-box; border: 3px solid var(--trend-color, var(--seaweed)); border-radius: 50%; background: var(--panel); opacity: 0; transform: translate(-50%, -50%); pointer-events: none; }
+  .margins-trend-x-axis { display: flex; justify-content: space-between; grid-column: 2; grid-row: 2; padding-top: 7px; color: var(--ink-mute-strong); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .margins-trend-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 13px; color: var(--ink-mute-strong); font-size: 11px; }
+  .margins-trend-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .margins-trend-legend i { display: inline-block; width: 14px; height: 0; border-top: 2px solid var(--seaweed); }
+  .margins-trend-legend strong { color: var(--ink); font-weight: 600; }
+  .margins-trend-legend .target-key { border-top: 1px dashed var(--ink-mute); }
+  .margins-trend-legend .band-key { height: 10px; border: 0; background: var(--sidebar-bg-2); }
+  .margins-category-filter { display: inline-flex; }
+  .margins-category-filter[hidden] { display: none; }
+  .margins-category-filter .top-items-picker-menu { min-width: 194px; max-height: min(420px, 60vh); overflow-y: auto; }
+  #marginsCategoryBody { margin-top: 12px; }
+  .margins-category-scroll { overflow-x: auto; padding-bottom: 3px; }
+  .margins-category-layout { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 100%; }
+  .margins-category-plot { position: relative; display: flex; height: 190px; border-bottom: 1px solid var(--rule); background: linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 50%, var(--rule) 50% calc(50% + 1px), transparent calc(50% + 1px)); }
+  .margins-category-reference { position: absolute; z-index: 2; left: 0; right: 0; top: var(--reference-top); border-top: 1.5px dashed var(--ink-mute); pointer-events: none; }
+  .margins-category-column { position: relative; display: flex; flex: 1 1 0; flex-direction: column; align-items: center; min-width: 0; }
+  .margins-category-bar { width: min(72px, 68%); height: var(--bar-height); margin-top: auto; border-radius: 4px 4px 0 0; background: var(--spinach); }
+  .margins-category-bar.heat-step-5 { background: var(--heatmap-5); }
+  .margins-category-bar.heat-step-6 { background: var(--heatmap-6); }
+  .margins-category-bar.heat-step-7 { background: var(--heatmap-7); }
+  .margins-category-bar.heat-step-8 { background: var(--heatmap-8); }
+  .margins-category-bar.heat-step-9 { background: var(--heatmap-9); }
+  .margins-category-layout.is-few-categories .margins-category-bar { width: min(112px, 74%); }
+  .margins-category-bar:focus-visible { outline: 2px solid var(--seaweed); outline-offset: 3px; }
+  .margins-category-value { position: absolute; z-index: 3; bottom: calc(var(--bar-height) + 6px); padding: 0 2px; border-radius: 2px; background: var(--panel); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .margins-category-labels { display: flex; grid-column: 1; gap: 0; padding-top: 9px; }
+  .margins-category-label { flex: 1 1 0; min-width: 0; padding: 0 4px; text-align: center; font-size: 12px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+  @media (max-width: 600px) {
+    .margins-bullet-head { display: none; }
+    .margins-bullet-row { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+    .margins-bullet-name { grid-column: 1; grid-row: 1; }
+    .margins-bullet-measure { grid-column: 1 / -1; grid-row: 2; }
+    .margins-bullet-gap { grid-column: 2; grid-row: 1; }
+    .margins-bullet-mobile-label { display: block; }
+  }
+  @media (max-width: 640px) {
+    .margins-category-card .insight-card-head { align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+  }
+  .margins-menu-table col.margins-menu-name-col { width: calc(100% - 222px); }
+  .margins-menu-table col:nth-child(2) { width: 140px; }
+  .margins-menu-table col.margins-menu-volume-col { width: 82px; }
+  .margins-menu-table { width: 100%; min-width: 0; }
+  #marginsMenuBody .procure-table-wrap { max-height: 360px; }
+  #marginsDriftBody .procure-table-wrap { max-height: 360px; }
+  .margins-menu-margin-cell { display: flex; flex-direction: column; gap: 3px; width: 140px; max-width: 100%; min-width: 0; }
+  .margins-menu-margin-value { color: var(--ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .margins-menu-margin-cell .procure-bar { width: 100%; height: 5px; }
+  .margins-menu-margin-cell .procure-bar > span { background: var(--spinach); }
+  .margins-menu-margin-cell .procure-bar { cursor: help; }
+  .margins-drift-table { min-width: 0; }
+  .margins-drift-table col.margins-drift-name-col { width: calc(100% - 154px); }
+  .margins-drift-table col.margins-drift-cost-col { width: 130px; }
+  .margins-drift-table col.margins-drift-detail-col { width: 24px; }
+  .margins-drift-cost-cell { display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; column-gap: 8px; white-space: nowrap; }
+  .margins-drift-value { color: var(--ink); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .margins-drift-outlet { display: block; overflow: hidden; margin-top: 2px; color: var(--ink-mute-strong); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+  .margins-drift-disclosure { display: flex; align-items: center; justify-content: center; width: 20px; height: 24px; padding: 0; border: 0; background: transparent; color: var(--spinach); cursor: pointer; }
+  .margins-drift-disclosure:hover { color: var(--seaweed); }
+  .margins-drift-disclosure:focus-visible { outline: 2px solid var(--spinach); outline-offset: 2px; border-radius: 3px; }
+  .margins-drift-disclosure .material-symbols-outlined { font-size: 16px; transition: transform 150ms ease; }
+  .margins-drift-disclosure[aria-expanded="true"] .material-symbols-outlined { transform: rotate(180deg); }
+  .margins-drift-detail-row[hidden] { display: none; }
+  .margins-drift-detail-row td { height: auto; padding: 0; border-bottom: 1px solid var(--rule); }
+  .margins-drift-detail { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 9px; padding: 8px 10px; border-radius: 6px; background: var(--row-hover); color: var(--ink-mute-strong); font-size: 11px; line-height: 1.3; }
+  .margins-drift-detail strong { color: var(--ink); font-weight: 600; }
+  .margins-drift-detail > :first-child { margin-right: auto; }
+  .margins-drift-detail .margins-drift-current-price { color: var(--ink); font-weight: 700; }
+  .margins-drift-previous-price { color: var(--ink-mute-strong); text-decoration: line-through; text-decoration-thickness: 1px; }
+  @media (max-width: 1050px) { .margins-key-overview .mini-chart-row { flex-direction: row; } .margins-key-overview .spend-outlet-chart { flex-basis: calc(50% - 10px); } }
+  @media (max-width: 720px) {
+    .margins-key-overview .spend-outlet-chart { flex-basis: 100%; }
+    .margins-bullet-gap { width: 72px; }
+    .margins-menu-table col.margins-menu-name-col { width: calc(100% - 222px); }
+    #marginsMenuBody .procure-table-wrap, #marginsDriftBody .procure-table-wrap { overflow-x: auto; }
+    .margins-menu-table { min-width: 430px; }
+    .margins-drift-table { min-width: 500px; }
+  }
 
 </style>
 <style>
@@ -928,7 +1073,7 @@
             </div>
             <div class="pill-toggle" role="group" aria-label="Heatmap comparison mode">
               <button class="pill-toggle-btn active" type="button" data-heatmap-mode="thisPeriod">This period</button>
-              <button class="pill-toggle-btn" type="button" data-heatmap-mode="vsLastMonth">vs last month</button>
+              <button class="pill-toggle-btn" type="button" data-heatmap-mode="vsLastMonth">vs last period</button>
             </div>
           </div>
           <p class="heatmap-summary" id="heatmapSummary" aria-live="polite"></p>
@@ -966,10 +1111,6 @@
               <div class="top-items-picker">
                 <button class="top-items-picker-button" id="topItemsCategoryButton" type="button" aria-expanded="false" aria-controls="topItemsCategoryMenu"><span id="topItemsCategoryLabel">All</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button>
                 <div class="top-items-picker-menu" id="topItemsCategoryMenu" role="listbox" aria-label="Top items category">
-                  <button class="top-items-picker-option active" type="button" role="option" aria-selected="true" data-top-items-category="all">All</button>
-                  <button class="top-items-picker-option" type="button" role="option" aria-selected="false" data-top-items-category="Mains">Mains</button>
-                  <button class="top-items-picker-option" type="button" role="option" aria-selected="false" data-top-items-category="Beverages">Beverages</button>
-                  <button class="top-items-picker-option" type="button" role="option" aria-selected="false" data-top-items-category="Sides &amp; other">Sides &amp; other</button>
                 </div>
               </div>
             </div>
@@ -1043,7 +1184,21 @@
           </div>
         </div>
       </section>
-      <section class="tab-panel" id="panel-margins" role="tabpanel" aria-labelledby="tab-margins"><p class="tab-placeholder">Margins — coming soon.</p></section>
+      <section class="tab-panel" id="panel-margins" role="tabpanel" aria-labelledby="tab-margins">
+        <div class="insight-row-full"><div class="margins-overview">
+          <div class="ai-summary key-takeaway" id="marginsTakeaway" hidden><h3 class="key-takeaway-title" id="marginsTakeawayTitle"><svg class="key-takeaway-logo" viewBox="0 0 514.202 584.713" aria-hidden="true" focusable="false"><path fill="currentColor" d="M 77.918 113.681 C 78.718 109.922 82.408 107.521 86.167 108.321 L 429.699 181.338 C 433.459 182.138 435.861 185.827 435.06 189.586 L 429.247 217.011 C 427.158 226.755 424.339 236.152 420.858 245.166 L 491.59 230.131 C 495.35 229.331 499.039 231.732 499.84 235.491 L 508.577 276.593 C 538.965 419.459 443.101 559.923 296.311 581.988 C 160.938 602.313 35.242 506.605 6.837 373.032 L 0.154 341.674 C -0.647 337.916 1.755 334.227 5.515 333.426 L 123.309 308.403 C 79.971 264.238 59.887 198.391 73.532 134.145 L 77.883 113.716 L 77.918 113.681 Z M 342.572 0.154 C 346.331 -0.647 350.021 1.755 350.822 5.514 L 352.806 14.771 C 363.005 62.729 330.841 109.887 281.551 117.3 C 236.125 124.122 193.902 91.999 184.364 47.138 L 183.076 41.152 C 182.276 37.393 184.677 33.704 188.437 32.903 L 342.572 0.154 Z"/></svg><span class="key-takeaway-label">At a glance</span></h3><span class="ai-summary-skeleton" id="marginsTakeawaySkeleton" aria-hidden="true" hidden><span></span><span></span></span><p class="key-takeaway-text is-clamped" id="marginsTakeawayText" aria-labelledby="marginsTakeawayTitle"></p><button class="key-takeaway-toggle" id="marginsTakeawayToggle" type="button" aria-expanded="false" aria-controls="marginsTakeawayText" hidden>View all</button><div class="key-takeaway-footer" id="marginsStatusFooter" hidden><span class="key-takeaway-footer-icon" aria-hidden="true">i</span><p class="key-takeaway-footer-text" id="marginsStatusText"></p><button class="key-takeaway-footer-details" id="marginsStatusDetails" type="button" aria-haspopup="dialog" aria-controls="statusModal">Details</button></div></div>
+          <div class="insight-card margins-key-overview" role="region" aria-label="Margins key numbers"><div class="mini-chart-row" id="marginsKeyBody"></div></div>
+        </div></div>
+        <div class="insight-row-2col">
+          <div class="insight-card margins-outlet-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>COGS by outlet</h3></div><div class="margins-compare-tabs" role="tablist" aria-label="COGS comparison"><button class="margins-compare-tab active" id="marginsTargetTab" type="button" role="tab" aria-selected="true" aria-controls="marginsBulletsBody" data-margins-compare="target">vs target</button><button class="margins-compare-tab" id="marginsTheoreticalTab" type="button" role="tab" aria-selected="false" aria-controls="marginsBulletsBody" tabindex="-1" data-margins-compare="theoretical">vs theoretical</button></div></div><div id="marginsBulletsBody" role="tabpanel" aria-labelledby="marginsTargetTab"></div></div>
+          <div class="insight-card margins-trend-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>COGS</h3></div><span class="margins-trend-scope" id="marginsTrendScopeNote"></span></div><div id="marginsTrendBody"></div></div>
+        </div>
+        <div class="insight-row-full"><div class="insight-card margins-category-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>COGS by sales category</h3></div><div class="top-items-picker margins-category-filter" id="marginsCategoryFilter" hidden><button class="top-items-picker-button" id="marginsCategoryOutletButton" type="button" aria-expanded="false" aria-controls="marginsCategoryOutletMenu" aria-label="Filter COGS by outlet"><span id="marginsCategoryOutletLabel">All outlets</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="top-items-picker-menu" id="marginsCategoryOutletMenu" role="listbox" aria-label="Filter COGS by outlet"></div></div></div><div id="marginsCategoryBody"></div></div></div>
+        <div class="insight-row-2col">
+          <div class="insight-card margins-menu-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Menu item margin</h3></div><div class="outlet-sort margins-menu-sort"><button class="outlet-sort-button" id="marginsMenuSortButton" type="button" aria-expanded="false" aria-controls="marginsMenuSortMenu"><span id="marginsMenuSortLabel">Margin %</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="outlet-sort-menu" id="marginsMenuSortMenu" role="listbox" aria-label="Sort menu items"><button class="outlet-sort-option active" type="button" role="option" aria-selected="true" data-margins-menu-sort="margin">Margin %</button><button class="outlet-sort-option" type="button" role="option" aria-selected="false" data-margins-menu-sort="volume">Times sold</button></div></div></div><div id="marginsMenuBody"></div></div>
+          <div class="insight-card margins-drift-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Recipe cost drift</h3></div></div><div id="marginsDriftBody"></div></div>
+        </div>
+      </section>
       <section class="tab-panel" id="panel-trends" role="tabpanel" aria-labelledby="tab-trends"><p class="tab-placeholder">Trends — coming soon.</p></section>
     </div>
   </div></main>
@@ -1060,6 +1215,7 @@
 <script src="js/heatmap-summary/heatmap-summary.js"></script>
 <script src="js/sales-briefing/sales-briefing.js"></script>
 <script src="js/spend-briefing/spend-briefing.js"></script>
+<script src="js/margins-briefing/margins-briefing.js"></script>
 <script>
   const welcomeGreeting = document.getElementById('welcomeGreeting');
   const welcomeDate = document.getElementById('welcomeDate');
@@ -1283,7 +1439,7 @@
     const previous = perOutlet.reduce((total, outlet) => sumProcure(total, outlet.previous), {});
     // weeks is per outlet, not additive.
     current.weeks = perOutlet[0].current.weeks; previous.weeks = perOutlet[0].previous.weeks;
-    return { names, perOutlet, current, previous };
+    return { names, perOutlet, current, previous, period };
   }
   // Rebound by loadPrototypeDataSet — every reader looks these up at render time.
   let DASHBOARD_OUTLETS = [], OUTLETS_WITHOUT_POS = [], PROCUREMENT_ONLY_OUTLETS = {}, outletBases = {};
@@ -1363,7 +1519,7 @@
   let currentScope = 'All outlets';
   let currentPeriod = 'This month';
   loadPrototypeDataSet(initialPrototypeOutletCount());
-  function updateDashboard(){ const scope = currentScope, period = currentPeriod, cards = getDashboardData(scope, period), lacksPos = OUTLETS_WITHOUT_POS.includes(scope); ['purchases', 'invoiceValue', 'revenue', 'cogs'].forEach(metric => renderMetricCard(metric, cards?.[metric])); ['revenue', 'cogs'].forEach(metric => { document.querySelector(`[data-metric-card="${metric}"] .metric-content`).hidden = lacksPos; document.querySelector(`[data-unavailable="${metric}"]`).hidden = !lacksPos; }); updateMetricCoverage(scope); const salesPanel = document.getElementById('panel-sales'); salesPanel.classList.toggle('no-pos', lacksPos); if(lacksPos) document.getElementById('salesNoPosBody').textContent = `${scope} isn’t connected to a POS, so there’s no sales, covers or item data to show. Purchases and other procurement data above are still available.`; if(window.salesTabReady && !lacksPos) { renderHeatmap(document.querySelector('[data-heatmap-mode].active')?.dataset.heatmapMode || 'thisPeriod'); renderOutlets(); renderTopItems(); renderSalesChannels(); renderCovers(); renderSpendPerHead(); renderSalesBriefing(); updateSalesStatusFooter(); } if(window.salesTabReady) { renderSpendTab(); } }
+  function updateDashboard(){ const scope = currentScope, period = currentPeriod, cards = getDashboardData(scope, period), lacksPos = OUTLETS_WITHOUT_POS.includes(scope); ['purchases', 'invoiceValue', 'revenue', 'cogs'].forEach(metric => renderMetricCard(metric, cards?.[metric])); ['revenue', 'cogs'].forEach(metric => { document.querySelector(`[data-metric-card="${metric}"] .metric-content`).hidden = lacksPos; document.querySelector(`[data-unavailable="${metric}"]`).hidden = !lacksPos; }); updateMetricCoverage(scope); const salesPanel = document.getElementById('panel-sales'); salesPanel.classList.toggle('no-pos', lacksPos); if(lacksPos) document.getElementById('salesNoPosBody').textContent = `${scope} isn’t connected to a POS, so there’s no sales, covers or item data to show. Purchases and other procurement data above are still available.`; if(window.salesTabReady && !lacksPos) { renderHeatmap(document.querySelector('[data-heatmap-mode].active')?.dataset.heatmapMode || 'thisPeriod'); renderOutlets(); renderTopItems(); renderSalesChannels(); renderCovers(); renderSpendPerHead(); renderSalesBriefing(); updateSalesStatusFooter(); } if(window.salesTabReady) { renderSpendTab(); renderMarginsTab(); } }
   const overviewTitle = document.getElementById('overviewTitle');
   const stickyContext = document.getElementById('stickyContext');
   function updateStickyContextVisibility(){
@@ -1395,6 +1551,11 @@
     menu.classList.toggle('open', willOpen);
     button.setAttribute('aria-expanded', String(willOpen));
   }));
+  document.addEventListener('click', event => {
+    if(event.target.closest('.picker')) return;
+    document.querySelectorAll('.picker-menu.open').forEach(menu => menu.classList.remove('open'));
+    pickerButtons.forEach(button => button.setAttribute('aria-expanded', 'false'));
+  });
   document.querySelectorAll('.picker-menu[data-menu="scope"], .picker-menu[data-menu="period"]').forEach(pickerMenu => pickerMenu.addEventListener('click', event => {
     const option = event.target.closest('.picker-option'); if(!option) return;
     const menu = option.closest('.picker-menu'); const key = menu.dataset.menu;
@@ -1574,14 +1735,27 @@
               ],
             },
             {
-              name: 'Sides & other',
+              name: 'Starters',
               items: [
                 { name: 'Fresh Spring Rolls', revenue: 3820, timesSold: 1890, revenueSeries: revenueSeries([3400, 3500, 3590, 3660, 3750, 3780]) },
                 { name: 'Crispy Spring Onion Pancake', revenue: 2140, timesSold: 1520, revenueSeries: revenueSeries([2400, 2320, 2290, 2220, 2180, 2160]) },
                 { name: 'Pork Summer Rolls', revenue: 3290, timesSold: 1390, revenueSeries: revenueSeries([2900, 3030, 2980, 3170, 3100, 3260]) },
+              ],
+            },
+            {
+              name: 'Sides',
+              items: [
                 { name: 'Crispy Chicken Wings', revenue: 2870, timesSold: 1120, revenueSeries: revenueSeries([2700, 2780, 2720, 2830, 2790, 2890]) },
                 { name: 'Edamame', revenue: 1640, timesSold: 1090, revenueSeries: revenueSeries([1800, 1760, 1710, 1680, 1660, 1620]) },
+                { name: 'Pickled Vegetables', revenue: 1190, timesSold: 980, revenueSeries: revenueSeries([1060, 1120, 1090, 1150, 1130, 1180]) },
+              ],
+            },
+            {
+              name: 'Desserts',
+              items: [
                 { name: 'Mango Pudding', revenue: 1320, timesSold: 760, revenueSeries: revenueSeries([1150, 1200, 1180, 1270, 1240, 1300]) },
+                { name: 'Coconut Sago', revenue: 1540, timesSold: 810, revenueSeries: revenueSeries([1320, 1380, 1350, 1450, 1480, 1520]) },
+                { name: 'Pandan Chiffon Cake', revenue: 970, timesSold: 540, revenueSeries: revenueSeries([890, 920, 900, 950, 930, 980]) },
               ],
             },
           ],
@@ -1637,10 +1811,10 @@
           },
           monthly: {
             thisYear: {
-              labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],
-              covers: [6010, 5840, 6180, 6290, 6380, 6460, 6720, 6957],
-              groupSpendPerHead: [10.85, 10.92, 10.88, 11.03, 11.08, 11.15, 11.12, 11.26],
-              previousTotal: 47100, // same months of 2025
+              labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'],
+              covers: [6010, 5840, 6180, 6290, 6380, 6460, 6720, 6957, 4850],
+              groupSpendPerHead: [10.85, 10.92, 10.88, 11.03, 11.08, 11.15, 11.12, 11.26, 11.60],
+              previousTotal: 51792, // 1 January–21 September 2025
             },
           },
         },
@@ -1810,7 +1984,7 @@
     return `<span class="delta-pill ${isPos ? 'pos' : 'neg'}"><span class="material-symbols-outlined" aria-hidden="true">${icon}</span>${Math.abs(rounded)}%</span>`;
   }
   let sparklineGradientId = 0;
-  function sparklineSvg(trend, titleText = null){
+  function sparklineSvg(trend, titleText = null, costSide = false){
     if(!trend || trend.length < 3) return '<svg class="outlet-sparkline outlet-sparkline-empty" viewBox="0 0 64 20" role="img" aria-label="Not enough history yet"><line x1="2" y1="10" x2="62" y2="10" /></svg>';
     const min = Math.min(...trend), max = Math.max(...trend), span = (max - min) || 1;
     const chartTop = 3, chartBottom = 15;
@@ -1820,7 +1994,8 @@
     // (neutral / gradFlat). It is never derived from the delta pill, whose period-vs-previous-period
     // comparison can legitimately disagree with this complete-history trend.
     const trendChangePct = ((trend[trend.length - 1] - trend[0]) / trend[0]) * 100;
-    const direction = Math.abs(trendChangePct) < SPARKLINE_FLAT_THRESHOLD_PCT ? 'trend-flat' : trendChangePct > 0 ? 'trend-up' : 'trend-down';
+    let direction = Math.abs(trendChangePct) < SPARKLINE_FLAT_THRESHOLD_PCT ? 'trend-flat' : trendChangePct > 0 ? 'trend-up' : 'trend-down';
+    if(costSide && direction !== 'trend-flat') direction = direction === 'trend-up' ? 'trend-down' : 'trend-up';
     const gradientId = `sparkline-area-gradient-${sparklineGradientId++}`;
     const accessibleTitle = titleText || `Trend: ${trend.map(v => Math.round(v)).join(' → ')}`;
     return `<svg class="outlet-sparkline ${direction}" viewBox="0 0 64 20" role="img" aria-label="${accessibleTitle}" title="${accessibleTitle}"><defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="20" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="currentColor" stop-opacity=".2" /><stop offset="1" stop-color="currentColor" stop-opacity="0" /></linearGradient></defs><polygon style="fill:url(#${gradientId})" points="${points} 62,19 2,19" /><polyline points="${points}" /></svg>`;
@@ -1828,7 +2003,14 @@
 
   /* Shared floating tooltip for the heatmap, category mix segments and the two mini line charts */
   const chartTip = document.getElementById('chartTip');
-  function showChartTip(target, text){ const rect = target.getBoundingClientRect(); chartTip.textContent = text; chartTip.style.left = `${Math.min(rect.left, window.innerWidth - 286)}px`; chartTip.style.top = `${rect.bottom + 8}px`; chartTip.classList.add('show'); }
+  function showChartTip(target, text){
+    const rect = target.getBoundingClientRect();
+    chartTip.textContent = text;
+    chartTip.classList.add('show');
+    chartTip.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - chartTip.offsetWidth - 8))}px`;
+    const below = rect.bottom + 8;
+    chartTip.style.top = `${below + chartTip.offsetHeight <= window.innerHeight - 8 ? below : Math.max(8, rect.top - chartTip.offsetHeight - 8)}px`;
+  }
   function hideChartTip(){ chartTip.classList.remove('show'); }
 
   /* --- Block 1: sales by day & hour heatmap --- */
@@ -1911,11 +2093,11 @@
         const weekdayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][di];
         const averageRevenue = `S$${Math.round(cell.revenue / currentDayCounts[di]).toLocaleString('en-SG')}`;
         const base = `${timeLabel}: S$${cell.revenue.toLocaleString('en-SG')} revenue this period, ${averageRevenue} per ${weekdayName}, ${cell.covers} covers this period, S$${cell.avgSpend.toFixed(2)} spend per cover`;
-        const label = mode === 'thisPeriod' ? base : `${deltaCell.delta > 0 ? '+' : ''}${deltaCell.delta}% vs last month · ${base}`;
+        const label = mode === 'thisPeriod' ? base : `${deltaCell.delta > 0 ? '+' : ''}${deltaCell.delta}% vs last period · ${base}`;
         const tooltipDetails = `Period revenue: S$${cell.revenue.toLocaleString('en-SG')}\nAverage revenue per ${weekdayName}: ${averageRevenue}\nCovers this period: ${cell.covers}\nAverage spend per cover: S$${cell.avgSpend.toFixed(2)}`;
         const tooltip = mode === 'thisPeriod'
           ? `${timeLabel}\n${tooltipDetails}`
-          : `${timeLabel}\n${deltaCell.delta > 0 ? '+' : ''}${deltaCell.delta}% vs last month\n${tooltipDetails}`;
+          : `${timeLabel}\n${deltaCell.delta > 0 ? '+' : ''}${deltaCell.delta}% vs last period\n${tooltipDetails}`;
         btn.setAttribute('aria-label', label);
         btn.addEventListener('mouseenter', () => showChartTip(btn, tooltip));
         btn.addEventListener('focus', () => showChartTip(btn, tooltip));
@@ -2058,16 +2240,30 @@
 
   /* --- Block 3: top items — show every mock item in the selected POS category --- */
   let topItemsCategory = 'all';
-  function renderTopItems(categoryFilter = topItemsCategory){
+  function syncTopItemsCategories(){
+    const categories = getSalesData()?.topItems?.categories || [];
+    if(topItemsCategory !== 'all' && !categories.some(category => category.name === topItemsCategory)) topItemsCategory = 'all';
+    const menu = document.getElementById('topItemsCategoryMenu');
+    menu.replaceChildren(...[{ name: 'All', value: 'all' }, ...categories.map(category => ({ name: category.name, value: category.name }))].map(category => {
+      const option = document.createElement('button');
+      option.type = 'button'; option.className = `top-items-picker-option${category.value === topItemsCategory ? ' active' : ''}`;
+      option.setAttribute('role', 'option'); option.setAttribute('aria-selected', String(category.value === topItemsCategory));
+      option.dataset.topItemsCategory = category.value; option.textContent = category.name;
+      return option;
+    }));
+    document.getElementById('topItemsCategoryLabel').textContent = topItemsCategory === 'all' ? 'All' : topItemsCategory;
+  }
+  function renderTopItems(){
     const body = document.getElementById('topItemsBody');
     const previousScrollTop = body.querySelector('.top-items-scroll-wrap')?.scrollTop || 0;
     const data = getSalesData();
     if(!data){ renderEmptyState(body, 'Top items are unavailable without POS data.'); return; }
+    syncTopItemsCategories();
     const { categories } = data.topItems;
     const allItems = categories.flatMap(category => category.items);
-    const displayCategories = categoryFilter === 'all'
+    const displayCategories = topItemsCategory === 'all'
       ? [{ name: '', items: allItems }]
-      : categories.filter(category => category.name === categoryFilter);
+      : categories.filter(category => category.name === topItemsCategory);
     const displayedItems = displayCategories.flatMap(category => category.items);
     if(displayedItems.length < 2){ renderEmptyState(body, 'Not enough item sales data yet.'); return; }
 
@@ -2104,17 +2300,20 @@
   topItemsCategoryButton?.addEventListener('click', () => {
     const willOpen = !topItemsCategoryMenu.classList.contains('open');
     document.querySelectorAll('.picker-menu, .top-items-picker-menu').forEach(menu => { if(menu !== topItemsCategoryMenu) menu.classList.remove('open'); });
+    marginsCategoryOutletButton?.setAttribute('aria-expanded', 'false');
     topItemsCategoryMenu.classList.toggle('open', willOpen);
     topItemsCategoryButton.setAttribute('aria-expanded', String(willOpen));
   });
-  topItemsCategoryMenu?.querySelectorAll('[data-top-items-category]').forEach(option => option.addEventListener('click', () => {
+  topItemsCategoryMenu?.addEventListener('click', event => {
+    const option = event.target.closest('[data-top-items-category]');
+    if(!option) return;
     topItemsCategoryMenu.querySelectorAll('[data-top-items-category]').forEach(item => { const selected = item === option; item.classList.toggle('active', selected); item.setAttribute('aria-selected', String(selected)); });
     topItemsCategoryLabel.textContent = option.textContent.trim();
     topItemsCategoryMenu.classList.remove('open');
     topItemsCategoryButton.setAttribute('aria-expanded', 'false');
     topItemsCategory = option.dataset.topItemsCategory;
     renderTopItems();
-  }));
+  });
   const outletSortButton = document.getElementById('outletSortButton');
   const outletSortLabel = document.getElementById('outletSortLabel');
   const outletSortMenu = document.getElementById('outletSortMenu');
@@ -2138,9 +2337,17 @@
       topItemsCategoryMenu.classList.remove('open');
       topItemsCategoryButton.setAttribute('aria-expanded', 'false');
     }
+    if(!event.target.closest('#marginsCategoryFilter') && marginsCategoryOutletMenu?.classList.contains('open')){
+      marginsCategoryOutletMenu.classList.remove('open');
+      marginsCategoryOutletButton.setAttribute('aria-expanded', 'false');
+    }
     if(!event.target.closest('.outlet-sort') && outletSortMenu?.classList.contains('open')){
       outletSortMenu.classList.remove('open');
       outletSortButton.setAttribute('aria-expanded', 'false');
+    }
+    if(!event.target.closest('.margins-menu-sort') && marginsMenuSortMenu?.classList.contains('open')){
+      marginsMenuSortMenu.classList.remove('open');
+      marginsMenuSortButton.setAttribute('aria-expanded', 'false');
     }
     if(!event.target.closest('.price-movement-picker') && priceMovementFilterMenu?.classList.contains('open')){
       priceMovementFilterMenu.classList.remove('open');
@@ -2185,8 +2392,8 @@
   }
   // headline: optional { value, previousValue, caption } for charts whose headline isn't the last point
   // (e.g. Covers shows the period total vs the previous period's total, not the last day vs the first).
-  function buildMiniLineChart(container, { name, nameTitle = name, periods, values, unitPrefix = '', unitSuffix = '', decimals = 0, xLabelEvery = 1, note = null, neutral = false, showYAxis = false, showXAxisLine = false, headline = null }){
-    const wrap = document.createElement('div'); wrap.className = 'mini-chart';
+  function buildMiniLineChart(container, { name, nameTitle = name, pointLabel = null, periods, values, unitPrefix = '', unitSuffix = '', decimals = 0, xLabelEvery = 1, note = null, neutral = false, showYAxis = false, showXAxisLine = false, zeroBaseline = false, stretch = false, headline = null, directionChange = null, costSide = false, deltaHtml = null, chartClass = '' }){
+    const wrap = document.createElement('div'); wrap.className = `mini-chart${chartClass ? ` ${chartClass}` : ''}`;
     const head = document.createElement('div'); head.className = 'mini-chart-head';
     if(name){
       const nameEl = document.createElement('span'); nameEl.className = 'mini-chart-name'; nameEl.title = nameTitle; nameEl.textContent = name;
@@ -2201,13 +2408,13 @@
     const format = v => `${unitPrefix}${v.toLocaleString('en-SG', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${unitSuffix}`;
     const current = values[values.length - 1];
     // The line colour follows the same change as the pill, so the two can never disagree.
-    const seriesChangePct = headline ? pctChange(headline.value, headline.previousValue) : pctChange(current, values[0]);
+    const seriesChangePct = directionChange ?? (headline ? pctChange(headline.value, headline.previousValue) : pctChange(current, values[0]));
     // neutral: a reference series (the group) keeps a grey line and stipple; only its pill carries direction.
-    const seriesDirection = neutral || Math.abs(seriesChangePct) < SPARKLINE_FLAT_THRESHOLD_PCT ? 'trend-flat' : seriesChangePct > 0 ? 'trend-up' : 'trend-down';
+    const seriesDirection = neutral || Math.abs(seriesChangePct) < (directionChange === null ? SPARKLINE_FLAT_THRESHOLD_PCT : .05) ? 'trend-flat' : (seriesChangePct > 0) !== costSide ? 'trend-up' : 'trend-down';
     wrap.classList.add(seriesDirection);
     const patternId = seriesDirection === 'trend-up' ? 'mcDotsUp' : seriesDirection === 'trend-down' ? 'mcDotsDown' : 'mcDotsFlat';
     const valueEl = document.createElement('span'); valueEl.className = 'mini-chart-value'; valueEl.textContent = format(headline ? headline.value : current);
-    const pillEl = document.createElement('span'); pillEl.innerHTML = deltaPillHtml(seriesChangePct);
+    const pillEl = document.createElement('span'); pillEl.innerHTML = deltaHtml ?? deltaPillHtml(seriesChangePct);
     head.append(valueEl, pillEl);
     // note: { text, tone } sits directly under the value and pill. It's always rendered when passed (even with
     // empty text) so its reserved line keeps every chart in a row starting at the same height.
@@ -2216,15 +2423,16 @@
     // band below it. X-axis labels are SVG text drawn at each point's own x(i) — same function as the
     // points themselves, so a label can never drift out of alignment with its point.
     const w = 400, h = 200, padX = showYAxis ? 34 : 0, padRight = 0, padTop = 18, padBottom = showYAxis ? 12 : 34;
-    const { baseline, top } = computeChartAxisRange(values);
+    const axisRange = computeChartAxisRange(values), baseline = zeroBaseline ? 0 : axisRange.baseline, top = axisRange.top;
     const x = i => padX + (i / (periods.length - 1)) * (w - padX - padRight);
     const y = v => h - padBottom - ((v - baseline) / (top - baseline)) * (h - padTop - padBottom);
     const points = values.map((v, i) => [x(i), y(v)]);
 
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    if(stretch) svg.setAttribute('preserveAspectRatio', 'none');
     svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', `${name || 'Trend'}: ${periods.map((p, i) => `${p} ${format(values[i])}`).join(', ')}`);
+    svg.setAttribute('aria-label', `${pointLabel || name || 'Trend'}: ${periods.map((p, i) => `${p} ${format(values[i])}`).join(', ')}`);
     const baselineY = h - padBottom;
     const area = document.createElementNS(SVG_NS, 'path');
     const linePath = points.map(([px, py], index) => `${index ? 'L' : 'M'} ${px.toFixed(1)},${py.toFixed(1)}`).join(' ');
@@ -2261,7 +2469,7 @@
     svg.appendChild(line);
     const pointElements = [];
     let activeIndex = -1;
-    const pointText = index => `${periods[index]}: ${format(values[index])}`;
+    const pointText = index => `${periods[index]}: ${pointLabel ? `${pointLabel} ` : ''}${format(values[index])}`;
     const activatePoint = index => {
       if(index < 0 || index >= points.length || index === activeIndex) return;
       activeIndex = index;
@@ -2344,7 +2552,7 @@
     'Last month':    { granularity: 'daily', key: 'lastMonth', subtitle: '1–31 August 2026', xLabelEvery: 5 },
     'Last 30 days':  { granularity: 'daily', key: 'last30', subtitle: '23 August–21 September 2026', xLabelEvery: 5 },
     'Last 3 months': { granularity: 'weekly', key: 'last3Months', subtitle: '1 July–21 September 2026', xLabelEvery: 2 },
-    'This year':     { granularity: 'monthly', key: 'thisYear', subtitle: '1 January–31 August 2026', xLabelEvery: 1 },
+    'This year':     { granularity: 'monthly', key: 'thisYear', subtitle: '1 January–21 September 2026', xLabelEvery: 1 },
   };
   function resolvedCoversSpendPeriod(){ return COVERS_SPEND_PERIOD[currentPeriod] || COVERS_SPEND_PERIOD['This month']; }
   function renderCovers(){
@@ -2555,9 +2763,8 @@
       input.daily = { dates: coverSource.labels.map(isoFromDayLabel), dineInCovers: coverSource.covers.map(value => Math.round(value * dineInShare)), lastClosedIndex: coverSource.labels.length - 1, today: '2026-09-22' };
     }
 
-    // The same input the heatmap card summarises, in its "this period" mode.
-    const heatmap = data.heatmap[currentPeriod], ranges = PERIOD_DATE_RANGES[currentPeriod];
-    if(heatmap && ranges) input.heatmap = { mode: 'period', hours: heatmap.hours, current: { grid: heatmap.thisPeriod.map(row => row.map(cell => cell.revenue)), dayCounts: HeatmapSummary.weekdayCounts(ranges.current.start, ranges.current.end) }, previous: { grid: heatmap.previousPeriod, dayCounts: HeatmapSummary.weekdayCounts(ranges.previous.start, ranges.previous.end) } };
+    // Keep the sales briefing focused on revenue, channels and outlets. The day/hour narrative
+    // belongs to the heatmap card below, so it does not repeat the same finding here.
     return input;
   }
   const SALES_BRIEFING_MEMORY_KEY = 'nomni.salesBriefing.memory';
@@ -2778,22 +2985,49 @@
       refreshProcureFades();
     });
   });
-  // Compare each outlet's own current and previous unit price; only identical price pairs share a row.
-  function priceMovementRows(data){
-    const rows = [];
+  // Price history. The prototype holds one price per period, so each item's move from last period's price to this
+  // period's is split into one or two dated steps (seeded; a list-price item moves on the same days at every outlet).
+  // A real feed would use the actual price changes from invoices. Each step is worth (new − old) × quantity bought
+  // from that day to the end of the period.
+  const priceDateFormat = { format: time => { const date = new Date(time); return `${date.getUTCDate()} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][date.getUTCMonth()]}`; } };
+  function priceSteps(outletName, sku, period, current, previous){
+    if(!current?.qty || !previous?.qty) return [];
+    const price = current.value / current.qty, was = previous.value / previous.qty;
+    const range = PERIOD_DATE_RANGES[period].current, start = Date.parse(range.start);
+    const days = Math.round((Date.parse(range.end) - start) / 864e5) + 1;
+    const rand = seededRandom(`${sku.groupPrice ? 'list' : outletName}:${sku.description}:${period}:price-steps`);
+    const twice = Math.abs(price - was) / was > .03 && rand() < .3;
+    const first = 1 + Math.floor(rand() * (twice ? days * .5 : days - 2));
+    const moves = twice
+      ? [{ from: was, to: was + (price - was) * (.4 + rand() * .3), offset: first }, { offset: first + 3 + Math.floor(rand() * (days - first - 4)) }]
+      : [{ from: was, to: price, offset: first }];
+    if(twice){ moves[1].from = moves[0].to; moves[1].to = price; }
+    return moves.map(move => ({ ...move, date: priceDateFormat.format(start + move.offset * 864e5), qty: current.qty * (days - move.offset) / days }));
+  }
+  // One row per price change: identical changes (same prices, same day) share a row across outlets.
+  // overall: one change per outlet and item, from last period's price to today's (used where dates don't matter).
+  function priceMovementRows(data, { overall = false } = {}){
+    const rows = [], cents = value => Math.round(value * 100);
     PROCURE_SKUS.forEach(sku => {
       const groups = new Map();
       data.perOutlet.forEach(outlet => {
-        const current = outlet.current.skus[sku.description], previous = outlet.previous.skus[sku.description];
-        if(!current?.qty || !previous?.qty) return;
-        const price = current.value / current.qty, was = previous.value / previous.qty;
-        const key = `${Math.round(price * 100)}|${Math.round(was * 100)}`;
-        if(!groups.has(key)) groups.set(key, { ...sku, price, was, change: pctChange(price, was), outlets: [] });
-        groups.get(key).outlets.push(outlet.name);
+        let steps = priceSteps(outlet.name, sku, data.period || currentPeriod, outlet.current.skus[sku.description], outlet.previous.skus[sku.description]);
+        if(overall && steps.length) steps = [{ ...steps[steps.length - 1], from: steps[0].from, offset: 0 }];
+        steps.forEach(step => {
+          const key = `${cents(step.to)}|${cents(step.from)}|${step.offset}`;
+          if(!groups.has(key)) groups.set(key, { ...sku, price: step.to, was: step.from, change: pctChange(step.to, step.from), date: step.date, outlets: [], qty: 0, impact: 0 });
+          const group = groups.get(key);
+          group.outlets.push(outlet.name); group.qty += step.qty; group.impact += (step.to - step.from) * step.qty;
+        });
       });
-      groups.forEach(row => rows.push({ ...row, id: `${sku.description}|${row.outlets.join(',')}` }));
+      groups.forEach(row => rows.push({ ...row, id: `${sku.description}|${row.date}|${row.outlets.join(',')}` }));
     });
     return rows.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
+  }
+  function priceImpactHtml(row){
+    const impact = Math.round(row.impact), qty = Math.round(row.qty), diff = Math.abs(row.price - row.was), up = row.price > row.was;
+    const text = `${qty.toLocaleString('en-SG')} ${row.unit} bought since ${row.date} × ${unitPrice(diff)} ${up ? 'more' : 'less'} per ${row.unit} = ${money(Math.abs(impact))} ${up ? 'extra cost' : 'saved'}.`;
+    return `<button class="procure-price-impact" type="button" data-col-info="rowImpact" data-col-info-text="${escapeHtml(text)}">${impact > 0 ? '+' : impact < 0 ? '−' : ''}${money(Math.abs(impact))}</button>`;
   }
   function priceRowWhere(row, data){
     if(data.names.length === 1) return '';
@@ -2811,8 +3045,8 @@
       const tr = document.createElement('tr');
       const where = priceRowWhere(row, data);
       const whereTitle = row.outlets.length > 1 ? ` title="${escapeHtml(row.outlets.join(', '))}"` : '';
-      tr.innerHTML = `<td><span class="procure-sku" title="${escapeHtml(row.description)}">${escapeHtml(row.description)}</span><span class="procure-sub"${whereTitle}>${escapeHtml(row.supplier)}${where ? ` · ${escapeHtml(where)}` : ''}</span></td>`
-        + `<td class="num">${changePillHtml(row.change, { decimals: 1 })}</td>`
+      tr.innerHTML = `<td><span class="procure-sku" title="${escapeHtml(row.description)}">${escapeHtml(row.description)}</span><span class="procure-sub"${whereTitle}>${escapeHtml(row.supplier)}${where ? ` · ${escapeHtml(where)}` : ''} · ${escapeHtml(row.date)}</span></td>`
+        + `<td class="num">${changePillHtml(row.change, { decimals: 1 })}${priceImpactHtml(row)}</td>`
         + `<td class="num"><span class="procure-money procure-price-current">${unitPrice(row.price)}<span class="procure-price-unit">/${escapeHtml(row.unit)}</span></span><del class="procure-price-previous" aria-label="Previous price ${unitPrice(row.was)} per ${escapeHtml(row.unit)}">${unitPrice(row.was)}</del></td>`;
       tbody.appendChild(tr);
     });
@@ -2881,6 +3115,9 @@
   // One shared tooltip on <body> avoids clipping inside the scrolling supplier table.
   const COL_INFO = {
     purchases: 'Total invoiced supplier spend for the selected outlets and period. Deliveries without an invoice are excluded, so this figure may be understated.',
+    unexplainedVariance: 'Actual food cost minus theoretical recipe cost and wastage.',
+    gpPercent: 'Gross profit is 100% minus COGS %.',
+    priceImpact: 'Extra cost from supplier price changes in this period: for each change, (new price − old price) × quantity bought since it took effect. The % is that extra cost as a share of what the same purchases cost at the old prices.',
     fill: 'Quantity invoiced ÷ quantity ordered, across this supplier’s orders that have an invoice. Under 90% shows in amber.',
     accuracy: 'Share of this supplier’s invoice lines billed at the ordered price. Under 90% shows in amber.',
     atStake: 'Amount invoiced above the ordered price for this supplier, plus anything invoiced but not received. Adds up to the totals above.',
@@ -3081,6 +3318,752 @@
     renderSpendBriefing(data);
     refreshProcureFades();
   }
+
+  /* Margins combines the existing Sales and Spend figures with explicitly illustrative recipe economics. */
+  // Prototype-only outlet targets create a realistic mix of above- and below-target results.
+  const MARGINS_TARGET_COGS = {
+    "Roll'd Chatswood": 32.5, "Roll'd Newtown": 30.5, "Roll'd Bondi": 31.8,
+    "Roll'd Parramatta": 31.5, "Roll'd Wynyard": 31.5, "Roll'd Circular Quay": 32
+  };
+  function marginsTargetFor(name){ return MARGINS_TARGET_COGS[name] ?? +(29 + seededRandom(`${name}:cogs-target`)() * 5).toFixed(1); }
+  // Allocate the existing sample wastage and variance totals across outlets, then use the remainder as each
+  // outlet's sample theoretical cost. One allocation serves group and outlet scopes, so the rows reconcile.
+  function marginsTheoreticalAllocations(allPairs, period, cogsOffset){
+    const allocationScope = allPairs.length === 1 ? allPairs[0].name : 'All outlets';
+    const groupRand = seededRandom(`${allocationScope}:${period}:margins`);
+    groupRand(); // Keep the first draw reserved for the existing recipe-mapping estimate.
+    const wastageShare = .036 + groupRand() * .01;
+    const varianceShare = .05 + groupRand() * .016;
+    const candidates = allPairs.map(pair => {
+      const actual = pair.base.cogs + cogsOffset;
+      const cogsValue = pair.revenue * actual / 100;
+      return {
+        name: pair.name, revenue: pair.revenue, actual, cogsValue,
+        wastageWeight: cogsValue * (.75 + seededRandom(`${pair.name}:${period}:wastage-weight`)() * .5),
+        varianceWeight: cogsValue * (.75 + seededRandom(`${pair.name}:${period}:variance-weight`)() * .5)
+      };
+    });
+    const groupCogs = candidates.reduce((sum, row) => sum + row.cogsValue, 0);
+    const totalWastageWeight = candidates.reduce((sum, row) => sum + row.wastageWeight, 0);
+    const totalVarianceWeight = candidates.reduce((sum, row) => sum + row.varianceWeight, 0);
+    return candidates.map(row => {
+      const wastageValue = groupCogs * wastageShare * row.wastageWeight / totalWastageWeight;
+      const varianceValue = groupCogs * varianceShare * row.varianceWeight / totalVarianceWeight;
+      const theoreticalValue = row.cogsValue - wastageValue - varianceValue;
+      return { ...row, wastageValue, varianceValue, theoreticalValue,
+        theoreticalPct: theoreticalValue / row.revenue * 100 };
+    });
+  }
+  function getMarginsData(scope = currentScope, period = currentPeriod){
+    const context = PERIOD_CARD_CONTEXT[period];
+    const allPairs = SALES_OUTLET_ROWS.map(row => ({ ...periodRevenuePair(row, period), name: row.name, base: outletBases[row.name] })).filter(pair => pair.base);
+    const pairs = scope === 'All outlets' ? allPairs : allPairs.filter(pair => pair.name === scope);
+    if(!pairs.length) return null;
+    const revenue = pairs.reduce((sum, pair) => sum + pair.revenue, 0);
+    if(revenue <= 0) return null;
+    // Same revenue weighting and period offset as the COGS summary card.
+    const cogsPct = pairs.reduce((sum, pair) => sum + pair.base.cogs * pair.revenue, 0) / revenue + context.cogsOffset;
+    const cogsValue = revenue * cogsPct / 100;
+    const targetPct = pairs.reduce((sum, pair) => sum + marginsTargetFor(pair.name) * pair.revenue, 0) / revenue;
+    const allocations = marginsTheoreticalAllocations(allPairs, period, context.cogsOffset);
+    // Keep the whole POS comparison list visible at outlet scope, like Revenue by outlet on Sales.
+    const outlets = allocations.map(row => ({ name: row.name, revenue: row.revenue, trendActual: row.actual, actual: +row.actual.toFixed(1), target: marginsTargetFor(row.name),
+      gapValue: row.revenue * (row.actual - marginsTargetFor(row.name)) / 100,
+      theoreticalPct: row.theoreticalPct, theoreticalGapValue: row.cogsValue - row.theoreticalValue }));
+    const selectedNames = new Set(pairs.map(pair => pair.name));
+    const selectedAllocations = allocations.filter(row => selectedNames.has(row.name));
+    const rand = seededRandom(`${scope}:${period}:margins`);
+    const assumedMappedPct = 78 + Math.round(rand() * 10);
+    const wastageValue = selectedAllocations.reduce((sum, row) => sum + row.wastageValue, 0);
+    const varianceValue = selectedAllocations.reduce((sum, row) => sum + row.varianceValue, 0);
+    const theoreticalValue = selectedAllocations.reduce((sum, row) => sum + row.theoreticalValue, 0);
+    return { scope, period, names: pairs.map(pair => pair.name), revenue, cogsPct, cogsValue, gpPct: 100 - cogsPct,
+      targetPct, outlets, assumedMappedPct, wastageValue, varianceValue, theoreticalValue,
+      wastageSharePct: wastageValue / cogsValue * 100, varianceSharePct: varianceValue / cogsValue * 100,
+      wastagePts: wastageValue / revenue * 100, variancePts: varianceValue / revenue * 100 };
+  }
+  // Deterministic sample history at the same daily, weekly or monthly grain as the covers chart.
+  // Each outlet's revenue-weighted COGS rate reconciles to its selected-period figure; GP is its exact inverse.
+  function marginsSampleCogsSeries(data){
+    const period = COVERS_SPEND_PERIOD[data.period] || COVERS_SPEND_PERIOD['This month'];
+    const coversFor = scope => SALES_DATA[scope]?.covers?.[period.granularity]?.[period.key];
+    const source = coversFor(data.scope) || coversFor(data.outlets[0]?.name);
+    const labels = source.labels;
+    const sharedRand = seededRandom(`${data.period}:cogs-common-samples`);
+    let commonDrift = 0;
+    const common = labels.map(() => {
+      commonDrift = commonDrift * .28 + (sharedRand() - .5) * 1.5;
+      return commonDrift;
+    });
+    const volatility = period.granularity === 'daily' ? 1 : period.granularity === 'weekly' ? .75 : .55;
+    const outlets = data.outlets.filter(outlet => outlet.revenue > 0).map(outlet => {
+      const covers = coversFor(outlet.name)?.covers || labels.map(() => 1);
+      const coverTotal = covers.reduce((sum, value) => sum + value, 0);
+      const revenues = covers.map(value => value / coverTotal * outlet.revenue);
+      const rand = seededRandom(`${outlet.name}:${data.period}:cogs-samples`);
+      let localDrift = 0;
+      const raw = labels.map((_, index) => {
+        localDrift = localDrift * .2 + (rand() - .5) * 2.6;
+        return (common[index] + localDrift) * volatility;
+      });
+      const offset = raw.reduce((sum, value, index) => sum + value * revenues[index], 0) / outlet.revenue;
+      return { name: outlet.name, average: outlet.trendActual, revenue: outlet.revenue, target: outlet.target,
+        revenues, values: raw.map(value => outlet.trendActual + value - offset) };
+    });
+    const totalRevenue = outlets.reduce((sum, outlet) => sum + outlet.revenue, 0);
+    const groupValues = labels.map((_, index) => {
+      const revenue = outlets.reduce((sum, outlet) => sum + outlet.revenues[index], 0);
+      return outlets.reduce((sum, outlet) => sum + outlet.values[index] * outlet.revenues[index], 0) / revenue;
+    });
+    const groupAverage = outlets.reduce((sum, outlet) => sum + outlet.average * outlet.revenue, 0) / totalRevenue;
+    const target = outlets.reduce((sum, outlet) => sum + outlet.target * outlet.revenue, 0) / totalRevenue;
+    const selectedOutlet = outlets.find(outlet => outlet.name === data.scope);
+    return { labels, outlets, groupValues, groupAverage, target, selectedOutlet,
+      scopeValues: selectedOutlet?.values || groupValues, scopeCovers: source.covers };
+  }
+  // Allocate the period total to recorded intervals, with quiet and busy intervals rather than a smooth slope.
+  function marginsSampleAmountSeries(seed, total, covers, sparse){
+    const rand = seededRandom(seed);
+    const weights = covers.map(value => value * (sparse && rand() < .22 ? 0 : .35 + rand() * 1.5) * (rand() < .12 ? 2.2 : 1));
+    if(!weights.some(value => value > 0)) weights.fill(1);
+    const weightTotal = weights.reduce((sum, value) => sum + value, 0);
+    const scaled = weights.map(value => total * value / weightTotal);
+    const amounts = scaled.map(Math.floor);
+    const remainder = total - amounts.reduce((sum, value) => sum + value, 0);
+    const largestFractions = scaled.map((value, index) => ({ index, fraction: value - amounts[index] })).sort((a, b) => b.fraction - a.fraction);
+    for(let index = 0; index < remainder; index++) amounts[largestFractions[index].index]++;
+    return amounts;
+  }
+  // Supplier price impact: every price change in the period is worth (new price − old price) × quantity bought since it
+  // took effect; the total adds those up. It covers the items Procure tracks (the ones in Price movement on Spend). The %
+  // is that extra cost over what the same purchases cost at the old prices. Limited to the outlets the rest of this tab
+  // covers (those with POS).
+  function marginsPriceImpact(data){
+    let impact = 0, base = 0;
+    data.names.forEach(name => {
+      const sides = PROCURE_DATA.outlets[name]?.[data.period];
+      if(!sides) return;
+      PROCURE_SKUS.forEach(sku => priceSteps(name, sku, data.period, sides.current.skus[sku.description], sides.previous.skus[sku.description]).forEach(step => {
+        impact += (step.to - step.from) * step.qty;
+        base += step.from * step.qty;
+      }));
+    });
+    return base ? { impact, changePct: impact / base * 100 } : null;
+  }
+  // GP% tile. A ratio that lives in a ~3-point band can't be read as zero-based bars (every bar comes out the same
+  // height), so this is a line on a zoomed axis, drawn against the target like the COGS chart below (inverted, because
+  // GP is 100 − COGS). Deliberately plain: one point per interval on the same axis as the tiles beside it, and each
+  // point is that interval's own GP, so the points average (weighted by revenue) to the headline number.
+  // Anatomy is the stat-tile contract shared by the strip: label, value, delta pill, sparkline, two axis labels.
+  // Everything else (cadence, standing against target, how many outlets miss) lives in the "i" tooltip, as it does for
+  // Unexplained variance. The target is one dashed hairline, labelled once on the axis row instead of in a legend.
+  function renderMarginsGpTile(container, data, sample, gpChange){
+    const granularity = (COVERS_SPEND_PERIOD[data.period] || COVERS_SPEND_PERIOD['This month']).granularity;
+    const grain = { daily: 'day', weekly: 'week', monthly: 'month' }[granularity];
+    // Worked out from the figures as displayed (one decimal), the way COGS by outlet does, so the sentence adds up.
+    const gp = +data.gpPct.toFixed(1), target = +(100 - data.targetPct).toFixed(1);
+    const difference = +(gp - target).toFixed(1);
+    // Line, wash and end-dot follow the pill (change on the previous period) exactly as the tiles beside this one do.
+    // Where GP stands against target is read from the dashed line, so a second colour never contradicts the pill.
+    const direction = Math.abs(Math.round(gpChange * 10) / 10) < .05 ? 'trend-flat' : gpChange > 0 ? 'trend-up' : 'trend-down';
+    const patternId = { 'trend-up': 'mcDotsUp', 'trend-down': 'mcDotsDown', 'trend-flat': 'mcDotsFlat' }[direction];
+    const deltaHtml = deltaPillHtml(gpChange).replace('%', ' pts');
+    const labels = sample.labels, values = sample.scopeValues.map(value => 100 - value);
+    const wrap = document.createElement('div');
+    wrap.className = `mini-chart spend-outlet-chart margins-gp-tile ${direction}`;
+    const head = `<div class="mini-chart-head"><span class="mini-chart-name">GP%</span><span class="mini-chart-value">${gp.toFixed(1)}%</span><span>${deltaHtml}</span></div>`;
+    if(values.length < 2){
+      wrap.innerHTML = head;
+      renderEmptyState(wrap, 'Not enough history yet.');
+      container.appendChild(wrap);
+      return;
+    }
+    // At least a 2-point window, centred on the data and the target: a small wobble stays small, a real miss is obvious.
+    // (One point of GP is worth about 1% of revenue, so a full point should be clearly visible.)
+    const lo = Math.min(target, ...values), hi = Math.max(target, ...values);
+    const mid = (lo + hi) / 2, half = Math.max((hi - lo) / 2 * 1.35, 1);
+    const domainMax = mid + half, span = half * 2;
+    const W = 400, H = 200;
+    const x = index => index / (values.length - 1) * W;
+    const y = value => (domainMax - value) / span * H;
+    const linePath = values.map((value, index) => `${index ? 'L' : 'M'} ${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(' ');
+    const label = `GP% by ${grain}, target ${target.toFixed(1)}%: ${values.map((value, index) => `${labels[index]} ${value.toFixed(1)}%`).join(', ')}`;
+    wrap.innerHTML = head
+      + `<div class="margins-gp-plot">`
+      + `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" tabindex="0" aria-label="${escapeHtml(label)}">`
+      + `<path class="mini-chart-area" d="${linePath} L ${W},${H} L 0,${H} Z" fill="url(#${patternId})" mask="url(#mcFade)"></path>`
+      + `<line x1="0" y1="${y(target).toFixed(1)}" x2="${W}" y2="${y(target).toFixed(1)}" stroke="var(--ink-mute)" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"></line>`
+      + `<polyline class="mini-chart-line" points="${values.map((value, index) => `${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(' ')}"></polyline>`
+      + `<line class="mini-chart-crosshair" x1="0" y1="0" x2="0" y2="${H}"></line>`
+      + values.map((value, index) => `<circle class="mini-chart-point" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="4"></circle>`).join('')
+      + `<rect class="mini-chart-hit-area" x="0" y="0" width="${W}" height="${H}" fill="transparent"></rect></svg>`
+      + `</div>`
+      + `<div class="mini-chart-axis"><span>${escapeHtml(labels[0])}</span><span class="margins-gp-target-key"><i aria-hidden="true"></i>Target ${target.toFixed(1)}%</span><span>${escapeHtml(labels.at(-1))}</span></div>`;
+    // How the number is worked out, in plain words. Nothing else is derived for this tile.
+    const isGroup = data.scope === 'All outlets' && data.outlets.length > 1;
+    const standing = difference === 0 ? 'on target' : `${Math.abs(difference).toFixed(1)} pts ${difference > 0 ? 'above' : 'below'} target`;
+    const info = document.createElement('button');
+    info.className = 'col-info'; info.type = 'button'; info.dataset.colInfo = 'gpPercent';
+    info.dataset.colInfoText = `GP% = (revenue − COGS) ÷ revenue${isGroup ? ', worked out across all outlets together' : ''}. One point per ${grain}. Target: ${isGroup ? 'each outlet’s own target, weighted by revenue' : 'set for this outlet'}. Currently ${standing}.`;
+    info.setAttribute('aria-label', 'About GP%'); info.textContent = 'i';
+    wrap.querySelector('.mini-chart-name').appendChild(info);
+    container.appendChild(wrap);
+    const svg = wrap.querySelector('svg'), crosshair = svg.querySelector('.mini-chart-crosshair'), points = [...svg.querySelectorAll('.mini-chart-point')];
+    let active = -1;
+    const activate = index => {
+      if(index === active) return;
+      active = index;
+      crosshair.setAttribute('x1', x(index)); crosshair.setAttribute('x2', x(index)); crosshair.classList.add('show');
+      points.forEach((point, pointIndex) => {
+        const isActive = pointIndex === index;
+        point.classList.toggle('is-active', isActive);
+        point.setAttribute('r', isActive ? '5.5' : '4');
+      });
+      showChartTip(points[index], `${labels[index]}\nGP: ${values[index].toFixed(1)}%\nTarget: ${target.toFixed(1)}%`);
+    };
+    const deactivate = () => {
+      if(active < 0) return;
+      active = -1;
+      crosshair.classList.remove('show');
+      points.forEach(point => { point.classList.remove('is-active'); point.setAttribute('r', '4'); });
+      hideChartTip();
+    };
+    const hit = svg.querySelector('.mini-chart-hit-area');
+    hit.addEventListener('pointermove', event => {
+      const bounds = svg.getBoundingClientRect();
+      if(bounds.width) activate(Math.max(0, Math.min(values.length - 1, Math.round((event.clientX - bounds.left) / bounds.width * (values.length - 1)))));
+    });
+    hit.addEventListener('pointerleave', deactivate);
+    svg.addEventListener('keydown', event => {
+      if(event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      const step = event.key === 'ArrowRight' ? 1 : -1;
+      activate(active < 0 ? (step > 0 ? 0 : values.length - 1) : Math.max(0, Math.min(values.length - 1, active + step)));
+    });
+    svg.addEventListener('focusout', deactivate);
+  }
+  function renderMarginsKeyNumbers(data){
+    const body = document.getElementById('marginsKeyBody');
+    const rand = seededRandom(`${data.scope}:${data.period}:margins-deltas`);
+    const sample = marginsSampleCogsSeries(data);
+    const periods = sample.labels;
+    const wastageChange = Math.round((rand() - .55) * 26);
+    const varianceChange = Math.round((rand() - .35) * 30);
+    // Gross profit is 100% minus COGS, so it moves by the COGS card's change, sign flipped: the two always agree.
+    const gpChange = -PERIOD_CARD_CONTEXT[data.period].cogsChangePts;
+    const wastageTotal = Math.round(data.wastageValue / 10) * 10;
+    const varianceTotal = Math.round(data.varianceValue / 10) * 10;
+    const price = marginsPriceImpact(data);
+    const priceTotal = price ? Math.round(Math.abs(price.impact) / 10) * 10 : null;
+    const grain = COVERS_SPEND_PERIOD[data.period]?.granularity === 'daily' ? 'day'
+      : COVERS_SPEND_PERIOD[data.period]?.granularity === 'weekly' ? 'week' : 'month';
+    const cards = [
+      { label: 'Recorded wastage', value: wastageTotal, prefix: 'S$', decimals: 0,
+        delta: changePillHtml(wastageChange), change: wastageChange, costSide: true,
+        trend: marginsSampleAmountSeries(`${data.scope}:${data.period}:wastage-samples`, wastageTotal, sample.scopeCovers, false) },
+      { label: 'Unexplained variance', value: varianceTotal, prefix: 'S$', decimals: 0, infoKey: 'unexplainedVariance',
+        delta: changePillHtml(varianceChange), change: varianceChange, costSide: true,
+        trend: marginsSampleAmountSeries(`${data.scope}:${data.period}:variance-samples`, varianceTotal, sample.scopeCovers, true) },
+      { label: 'Supplier price impact', value: priceTotal, prefix: 'S$', decimals: 0, infoKey: 'priceImpact',
+        signed: price && priceTotal ? (price.impact < 0 ? -1 : 1) : 0, pointLabel: price?.impact < 0 ? 'Saving' : 'Extra cost',
+        delta: price ? changePillHtml(price.changePct, { decimals: 1 }) : '', change: price?.changePct ?? 0, costSide: true,
+        trend: price ? marginsSampleAmountSeries(`${data.scope}:${data.period}:price-impact-samples`, priceTotal, sample.scopeCovers, false) : [] },
+    ];
+    body.replaceChildren();
+    renderMarginsGpTile(body, data, sample, gpChange);
+    cards.forEach(card => {
+      if(card.value == null){
+        const empty = document.createElement('div'); empty.className = 'mini-chart spend-outlet-chart';
+        empty.innerHTML = `<div class="mini-chart-head"><span class="mini-chart-name">${card.label}</span><span class="mini-chart-value">—</span></div>`;
+        renderEmptyState(empty, 'No price data for this period.'); body.appendChild(empty);
+        return;
+      }
+      buildMiniLineChart(body, { name: card.label, pointLabel: card.pointLabel || `${card.label} this ${grain}`, periods, values: card.trend,
+        unitPrefix: card.prefix || '', unitSuffix: card.suffix || '', decimals: card.decimals,
+        headline: { value: card.value }, directionChange: card.change, costSide: card.costSide, deltaHtml: card.delta,
+        zeroBaseline: true, stretch: true, chartClass: 'spend-outlet-chart' });
+      // The chart plots the size of the effect; the headline says which way it went (extra cost or a saving).
+      if(card.signed) body.lastElementChild.querySelector('.mini-chart-value').textContent = `${card.signed < 0 ? '−' : '+'}S$${card.value.toLocaleString('en-SG')}`;
+      if(card.infoKey){
+        const icon = document.createElement('button');
+        icon.className = 'col-info'; icon.type = 'button'; icon.dataset.colInfo = card.infoKey;
+        icon.setAttribute('aria-label', `About ${card.label.toLowerCase()}`); icon.textContent = 'i';
+        body.lastElementChild.querySelector('.mini-chart-name').appendChild(icon);
+      }
+    });
+  }
+  let marginsComparison = 'target';
+  let marginsOutletFilter = 'all';
+  let lastMarginsOutletScope = null;
+  function marginsReference(outlet){ return marginsComparison === 'target' ? outlet.target : outlet.theoreticalPct; }
+  function marginsDifference(outlet){ return +(outlet.actual - marginsReference(outlet)).toFixed(1); }
+  function marginsOutletPosition(outlet){
+    const difference = marginsDifference(outlet);
+    return difference > 0 ? 'over' : difference < 0 ? 'under' : 'at';
+  }
+  function renderMarginsBullets(data){
+    const body = document.getElementById('marginsBulletsBody');
+    const previousScrollTop = body.querySelector('.margins-bullet-list')?.scrollTop || 0;
+    const multiOutlet = data.outlets.length > 1;
+    if(!multiOutlet) marginsOutletFilter = 'all';
+    const referenceLabel = marginsComparison === 'target' ? 'target' : 'theoretical';
+    const counts = { all: data.outlets.length, over: 0, under: 0, at: 0 };
+    data.outlets.forEach(outlet => counts[marginsOutletPosition(outlet)]++);
+    const visible = data.outlets.filter(outlet => marginsOutletFilter === 'all' || marginsOutletPosition(outlet) === marginsOutletFilter);
+    const scaleMax = Math.max(40, ...data.outlets.map(outlet => Math.ceil(Math.max(outlet.actual, marginsReference(outlet)) / 5) * 5));
+    const controls = document.createElement('div'); controls.className = 'margins-bullet-controls';
+    controls.innerHTML = `<div class="outlet-filter-chips" role="group" aria-label="Filter outlets by COGS difference from ${referenceLabel}"><button class="outlet-filter-chip" type="button" data-margins-outlet-filter="all" aria-pressed="${marginsOutletFilter === 'all'}">All ${counts.all}</button><button class="outlet-filter-chip" type="button" data-margins-outlet-filter="over" aria-pressed="${marginsOutletFilter === 'over'}">Over ${counts.over}</button><button class="outlet-filter-chip" type="button" data-margins-outlet-filter="under" aria-pressed="${marginsOutletFilter === 'under'}">Under ${counts.under}</button></div>`;
+    controls.querySelectorAll('[data-margins-outlet-filter]').forEach(button => button.addEventListener('click', () => { marginsOutletFilter = button.dataset.marginsOutletFilter; renderMarginsBullets(data); }));
+    const head = document.createElement('div'); head.className = 'margins-bullet-head';
+    head.innerHTML = `<span>Outlet</span><span>Actual COGS</span><span>vs ${referenceLabel}</span>`;
+    const list = document.createElement('div'); list.className = 'margins-bullet-list'; list.tabIndex = 0; list.setAttribute('role', 'region'); list.setAttribute('aria-label', 'COGS by outlet list, scrollable');
+    let selectedRow = null;
+    [...visible].sort((a, b) => marginsDifference(b) - marginsDifference(a) || a.name.localeCompare(b.name)).forEach(outlet => {
+      const reference = marginsReference(outlet);
+      const difference = marginsDifference(outlet);
+      const gapValue = marginsComparison === 'target' ? outlet.gapValue : outlet.theoreticalGapValue;
+      const over = difference > 0, under = difference < 0;
+      const status = over ? `${money(Math.abs(gapValue), 10)} over` : under ? `${money(Math.abs(gapValue), 10)} under` : `At ${referenceLabel}`;
+      const row = document.createElement('div'); row.className = 'margins-bullet-row';
+      if(multiOutlet && outlet.name === data.scope){ row.classList.add('is-selected'); row.setAttribute('aria-current', 'true'); selectedRow = row; }
+      row.innerHTML = `<span class="margins-bullet-name" title="${escapeHtml(outlet.name)}">${escapeHtml(outlet.name)}</span>`
+        + `<span class="margins-bullet-measure" tabindex="0" role="img" aria-label="${escapeHtml(outlet.name)}: actual COGS ${outlet.actual.toFixed(1)}%; ${referenceLabel} ${reference.toFixed(1)}%; difference ${difference > 0 ? '+' : ''}${difference.toFixed(1)} percentage points"><span class="margins-bullet-track">`
+        + `<span class="margins-bullet-actual" style="left:0;width:${(outlet.actual / scaleMax * 100).toFixed(1)}%;background:${over ? 'var(--viz-div-neg2)' : under ? 'var(--spinach)' : 'var(--ink-mute)'}"></span>`
+        + `<span class="margins-bullet-reference" style="left:${(reference / scaleMax * 100).toFixed(1)}%" aria-hidden="true"></span>`
+        + `</span><strong>${outlet.actual.toFixed(1)}%</strong></span>`
+        + `<span class="margins-bullet-gap${over ? ' is-over' : ''}"><span class="margins-bullet-mobile-label">vs ${referenceLabel}</span><strong>${difference > 0 ? '+' : ''}${difference.toFixed(1)} pts</strong><span>${status}</span></span>`;
+      const measure = row.querySelector('.margins-bullet-measure');
+      const tip = `${outlet.name}\n${marginsComparison === 'target' ? 'Target' : 'Theoretical'} COGS: ${reference.toFixed(1)}%\nActual COGS: ${outlet.actual.toFixed(1)}%`;
+      measure.addEventListener('mouseenter', () => showChartTip(measure, tip));
+      measure.addEventListener('focus', () => showChartTip(measure, tip));
+      measure.addEventListener('mouseleave', hideChartTip);
+      measure.addEventListener('blur', hideChartTip);
+      list.appendChild(row);
+    });
+    if(!visible.length){ const empty = document.createElement('p'); empty.className = 'margins-bullet-empty'; empty.textContent = 'No outlets in this group.'; list.appendChild(empty); }
+    const children = multiOutlet ? [controls, head, list] : [head, list];
+    body.replaceChildren(...children);
+    list.scrollTop = previousScrollTop;
+    if(selectedRow && data.scope !== lastMarginsOutletScope){
+      const rowRect = selectedRow.getBoundingClientRect(), listRect = list.getBoundingClientRect();
+      list.scrollTop += rowRect.top - listRect.top - (list.clientHeight - rowRect.height) / 2;
+    }
+    lastMarginsOutletScope = data.scope;
+  }
+  const marginsCompareTabs = [...document.querySelectorAll('[data-margins-compare]')];
+  function selectMarginsComparison(button){
+    if(marginsComparison === button.dataset.marginsCompare) return;
+    marginsComparison = button.dataset.marginsCompare;
+    marginsOutletFilter = 'all';
+    lastMarginsOutletScope = null;
+    const oldList = document.querySelector('#marginsBulletsBody .margins-bullet-list');
+    if(oldList) oldList.scrollTop = 0;
+    marginsCompareTabs.forEach(tab => {
+      const active = tab === button;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', String(active));
+      tab.tabIndex = active ? 0 : -1;
+    });
+    document.getElementById('marginsBulletsBody').setAttribute('aria-labelledby', button.id);
+    hideChartTip();
+    const data = getMarginsData();
+    if(data) renderMarginsBullets(data);
+  }
+  marginsCompareTabs.forEach((button, index) => {
+    button.addEventListener('click', () => selectMarginsComparison(button));
+    button.addEventListener('keydown', event => {
+      if(!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? marginsCompareTabs.length - 1
+        : (index + (event.key === 'ArrowRight' ? 1 : -1) + marginsCompareTabs.length) % marginsCompareTabs.length;
+      const next = marginsCompareTabs[nextIndex];
+      selectMarginsComparison(next);
+      next.focus();
+    });
+  });
+  function renderMarginsTrend(data){
+    const body = document.getElementById('marginsTrendBody');
+    const sample = marginsSampleCogsSeries(data);
+    const { labels, outlets: allOutlets, groupValues, groupAverage, target } = sample;
+    const ranked = [...allOutlets].sort((a, b) => b.average - a.average || a.name.localeCompare(b.name));
+    const selectedOutlet = ranked.find(outlet => outlet.name === data.scope);
+    const singleOutletAccount = SALES_OUTLET_ROWS.length === 1;
+    // A single-outlet scope compares only that outlet with the unchanged group benchmark.
+    let visibleOutlets = selectedOutlet ? [selectedOutlet] : allOutlets.length > 1 ? ranked.slice(0, 3) : [];
+    const outletColors = ['var(--spinach)', 'var(--viz-div-neg2)', 'var(--ink-mute-strong)'];
+    visibleOutlets = visibleOutlets.map((outlet, index) => ({ ...outlet, color: outletColors[index] }));
+    const plottedLines = singleOutletAccount ? visibleOutlets : [{ name: 'All outlets', values: groupValues, color: 'var(--seaweed)' }, ...visibleOutlets];
+    const focalLine = selectedOutlet || singleOutletAccount ? visibleOutlets[0] : plottedLines[0];
+    const scopeNote = document.getElementById('marginsTrendScopeNote');
+    scopeNote.textContent = singleOutletAccount ? '' : selectedOutlet ? 'Chart shows group & selected outlet' : `Chart shows group & ${visibleOutlets.length} highest outlets`;
+    scopeNote.hidden = singleOutletAccount;
+    const groupStrokeWidth = selectedOutlet ? 1.5 : 3;
+    const outletStrokeWidth = selectedOutlet || singleOutletAccount ? 3 : 1.5;
+    const drawLines = singleOutletAccount ? visibleOutlets : selectedOutlet ? [plottedLines[0], ...visibleOutlets] : [...visibleOutlets, plottedLines[0]];
+    const low = Math.min(target - 1, ...plottedLines.flatMap(line => line.values)), high = Math.max(target + 1, ...plottedLines.flatMap(line => line.values));
+    const domainMin = Math.floor(low) - .5, domainMax = Math.ceil(high) + .5, domainSpan = domainMax - domainMin;
+    const plotWidth = 1000, plotHeight = 300;
+    const x = index => index / (groupValues.length - 1) * plotWidth;
+    const y = value => (domainMax - value) / domainSpan * plotHeight;
+    const ticks = [];
+    const tickStep = domainSpan > 7 ? 2 : 1;
+    for(let value = Math.ceil(domainMin / tickStep) * tickStep; value < domainMax; value += tickStep) ticks.push(value);
+    const points = values => values.map((value, index) => `${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(' ');
+    const bandTop = y(target + 1), bandHeight = y(target - 1) - bandTop;
+    const dateTickIndexes = [...new Set([0, 1, 2, 3, 4].map(step => Math.round(step * (labels.length - 1) / 4)))];
+    const hitWidth = plotWidth / (labels.length - 1);
+    const targetLegendLabel = singleOutletAccount ? 'Target' : 'Group target';
+    const toleranceLegendLabel = singleOutletAccount ? '±1 pt tolerance' : 'Group ±1 pt';
+    const currentScopeLabel = selectedOutlet ? selectedOutlet.name : singleOutletAccount ? allOutlets[0]?.name || 'Outlet' : 'All outlets';
+    const trendScopeLabel = singleOutletAccount
+      ? escapeHtml(visibleOutlets[0]?.name || allOutlets[0].name)
+      : selectedOutlet
+        ? `all outlets and ${escapeHtml(selectedOutlet.name)}`
+        : `all outlets and ${visibleOutlets.length} highest-COGS outlet${visibleOutlets.length === 1 ? '' : 's'}`;
+    body.innerHTML = `<p class="margins-trend-current"><span>${(selectedOutlet?.average ?? groupAverage).toFixed(1)}%</span><span class="margins-trend-current-scope">${escapeHtml(currentScopeLabel)}</span></p>`
+      + `<div class="margins-trend-chart">`
+      + `<div class="margins-trend-y-axis" aria-hidden="true">${ticks.map(value => `<span style="top:${(y(value) / plotHeight * 100).toFixed(2)}%">${value}%</span>`).join('')}</div>`
+      + `<div class="margins-trend-plot" style="--endpoint-y:${(y(focalLine.values.at(-1)) / plotHeight * 100).toFixed(2)}%;--trend-color:${focalLine.color}"><svg viewBox="0 0 ${plotWidth} ${plotHeight}" preserveAspectRatio="none" aria-label="COGS percentage trends for ${trendScopeLabel} from ${escapeHtml(labels[0])} to ${escapeHtml(labels.at(-1))}; ${targetLegendLabel.toLowerCase()} ${target.toFixed(1)}% with a one-point tolerance band">`
+      + `<rect x="0" y="${bandTop.toFixed(1)}" width="${plotWidth}" height="${bandHeight.toFixed(1)}" fill="var(--sidebar-bg-2)"></rect>`
+      + ticks.map(value => `<line x1="0" y1="${y(value).toFixed(1)}" x2="${plotWidth}" y2="${y(value).toFixed(1)}" stroke="var(--rule)" stroke-width="1" vector-effect="non-scaling-stroke"></line>`).join('')
+      + `<line x1="0" y1="${y(target).toFixed(1)}" x2="${plotWidth}" y2="${y(target).toFixed(1)}" stroke="var(--ink-mute)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"></line>`
+      + drawLines.map(line => `<polyline points="${points(line.values)}" fill="none" stroke="${line.color}" stroke-width="${line.name === 'All outlets' ? groupStrokeWidth : outletStrokeWidth}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></polyline>`).join('')
+      + `<line class="margins-trend-crosshair" x1="0" y1="0" x2="0" y2="${plotHeight}" stroke="var(--ink-mute-strong)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>`
+      + groupValues.map((value, index) => `<rect class="margins-trend-hit" data-trend-index="${index}" x="${(index === 0 ? 0 : x(index) - hitWidth / 2).toFixed(1)}" y="0" width="${index === 0 || index === labels.length - 1 ? hitWidth / 2 : hitWidth}" height="${plotHeight}" fill="transparent" tabindex="0" role="img" aria-label="${escapeHtml(`${labels[index]}: ${plottedLines.map(line => `${line.name} ${line.values[index].toFixed(1)}%`).join('; ')}; ${targetLegendLabel.toLowerCase()} ${target.toFixed(1)}%`)}"></rect>`).join('')
+      + `</svg><span class="margins-trend-endpoint" aria-hidden="true"></span>${plottedLines.map(line => `<span class="margins-trend-active" style="--trend-color:${line.color}" aria-hidden="true"></span>`).join('')}</div><div class="margins-trend-x-axis" aria-hidden="true">${dateTickIndexes.map(index => `<span>${escapeHtml(labels[index])}</span>`).join('')}</div></div>`
+      + `<div class="margins-trend-legend">${singleOutletAccount ? '' : `<span><i style="border-top-width:${groupStrokeWidth}px" aria-hidden="true"></i>${selectedOutlet ? `All outlets avg ${groupAverage.toFixed(1)}%` : `<strong>All outlets avg ${groupAverage.toFixed(1)}%</strong>`}</span>`}${visibleOutlets.map(outlet => `<span><i style="border-top-color:${outlet.color};border-top-width:${outletStrokeWidth}px" aria-hidden="true"></i>${selectedOutlet || singleOutletAccount ? `<strong>${escapeHtml(outlet.name)} avg ${outlet.average.toFixed(1)}%</strong>` : `${escapeHtml(outlet.name)} avg ${outlet.average.toFixed(1)}%`}</span>`).join('')}<span><i class="target-key" aria-hidden="true"></i>${targetLegendLabel} ${target.toFixed(1)}%</span><span><i class="band-key" aria-hidden="true"></i>${toleranceLegendLabel}</span></div>`;
+    const svg = body.querySelector('svg'), plot = body.querySelector('.margins-trend-plot'), crosshair = svg.querySelector('.margins-trend-crosshair'), markers = [...plot.querySelectorAll('.margins-trend-active')];
+    const activate = index => {
+      crosshair.setAttribute('x1', x(index)); crosshair.setAttribute('x2', x(index)); crosshair.style.opacity = '1';
+      markers.forEach((marker, lineIndex) => { marker.style.left = `${x(index) / plotWidth * 100}%`; marker.style.top = `${y(plottedLines[lineIndex].values[index]) / plotHeight * 100}%`; marker.style.opacity = '1'; });
+      showChartTip(markers[0], `${labels[index]}\n${plottedLines.map(line => `${line.name}: ${line.values[index].toFixed(1)}%`).join('\n')}\n${targetLegendLabel}: ${target.toFixed(1)}%`);
+    };
+    const deactivate = () => { crosshair.style.opacity = '0'; markers.forEach(marker => { marker.style.opacity = '0'; }); hideChartTip(); };
+    svg.querySelectorAll('.margins-trend-hit').forEach(hit => {
+      const index = Number(hit.dataset.trendIndex);
+      hit.addEventListener('mouseenter', () => activate(index));
+      hit.addEventListener('focus', () => activate(index));
+      hit.addEventListener('mouseleave', deactivate);
+      hit.addEventListener('blur', deactivate);
+    });
+  }
+  // POS item categories provide the selected period's sales mix. Sample category costs are centred on each
+  // outlet's existing COGS rate before aggregation, so every outlet and group result reconciles to the cards.
+  const MARGINS_CATEGORY_COGS_OFFSETS = { Mains: 4.5, Beverages: -11.5, Starters: -2, Sides: .5, Desserts: -9 };
+  let marginsCategoryScope = 'All outlets';
+  const marginsCategoryFilter = document.getElementById('marginsCategoryFilter');
+  const marginsCategoryOutletButton = document.getElementById('marginsCategoryOutletButton');
+  const marginsCategoryOutletLabel = document.getElementById('marginsCategoryOutletLabel');
+  const marginsCategoryOutletMenu = document.getElementById('marginsCategoryOutletMenu');
+  function getMarginsCategoryRows(scope, period){
+    const outlets = SALES_OUTLET_ROWS.filter(outlet => scope === 'All outlets' || outlet.name === scope);
+    const categoryTotals = new Map();
+    let totalRevenue = 0, totalCost = 0;
+    outlets.forEach(outlet => {
+      const allCategories = SALES_DATA[outlet.name]?.topItems?.categories || [];
+      let categories = allCategories;
+      if(scope !== 'All outlets' && allCategories.length > 3){
+        // The prototype POS sample simulates outlet assortment differences without changing Sales tab top items.
+        const outletIndex = SALES_OUTLET_ROWS.findIndex(row => row.name === outlet.name);
+        const categoryCount = Math.min(allCategories.length, 3 + (Math.max(0, outletIndex) % 3));
+        const rankCategory = seededRandom(`${outlet.name}:${period}:category-availability`);
+        const available = new Set(allCategories.map(category => ({ name: category.name, rank: rankCategory() }))
+          .sort((a, b) => a.rank - b.rank).slice(0, categoryCount).map(category => category.name));
+        categories = allCategories.filter(category => available.has(category.name));
+      }
+      const weights = categories.map(category => category.items.reduce((sum, item) => sum + Math.max(0, periodRevenuePair(item, period).revenue), 0));
+      const weightTotal = weights.reduce((sum, weight) => sum + weight, 0);
+      const revenue = periodRevenuePair(outlet, period).revenue;
+      if(!weightTotal || !revenue) return;
+      const shares = weights.map(weight => weight / weightTotal);
+      const outletCogs = outletBases[outlet.name].cogs + PERIOD_CARD_CONTEXT[period].cogsOffset;
+      const rand = seededRandom(`${outlet.name}:${period}:sales-category-cogs`);
+      const rawRates = categories.map(category => outletCogs + (MARGINS_CATEGORY_COGS_OFFSETS[category.name] || 0) + (rand() - .5) * 1.6);
+      const rawAverage = rawRates.reduce((sum, rate, index) => sum + rate * shares[index], 0);
+      categories.forEach((category, index) => {
+        const categoryRevenue = revenue * shares[index];
+        const categoryCost = categoryRevenue * (rawRates[index] + outletCogs - rawAverage) / 100;
+        const total = categoryTotals.get(category.name) || { name: category.name, revenue: 0, cost: 0 };
+        total.revenue += categoryRevenue;
+        total.cost += categoryCost;
+        categoryTotals.set(category.name, total);
+        totalCost += categoryCost;
+      });
+      totalRevenue += revenue;
+    });
+    return { rows: [...categoryTotals.values()].map(row => ({ ...row, cogsPct: row.cost / row.revenue * 100, salesShare: row.revenue / totalRevenue * 100 }))
+        .sort((a, b) => b.cogsPct - a.cogsPct || a.name.localeCompare(b.name)),
+      overallCogsPct: totalRevenue ? totalCost / totalRevenue * 100 : null, outletCount: outlets.length };
+  }
+  function renderMarginsCategories(){
+    const body = document.getElementById('marginsCategoryBody');
+    const names = SALES_OUTLET_ROWS.map(outlet => outlet.name);
+    if(marginsCategoryScope !== 'All outlets' && !names.includes(marginsCategoryScope)) marginsCategoryScope = 'All outlets';
+    marginsCategoryFilter.hidden = names.length <= 1;
+    marginsCategoryOutletLabel.textContent = marginsCategoryScope;
+    marginsCategoryOutletMenu.replaceChildren(...['All outlets', ...names].map(name => {
+      const option = document.createElement('button');
+      option.type = 'button'; option.className = `top-items-picker-option${name === marginsCategoryScope ? ' active' : ''}`;
+      option.setAttribute('role', 'option'); option.setAttribute('aria-selected', String(name === marginsCategoryScope));
+      option.dataset.marginsCategoryOutlet = name; option.textContent = name;
+      return option;
+    }));
+    const data = getMarginsCategoryRows(marginsCategoryScope, currentPeriod);
+    if(!data.rows.length){ renderEmptyState(body, 'No POS sales categories for this selection.'); return; }
+    const scaleMax = Math.max(50, Math.ceil(Math.max(...data.rows.map(row => row.cogsPct)) / 10) * 10);
+    const minCogs = Math.min(...data.rows.map(row => row.cogsPct));
+    const maxCogs = Math.max(...data.rows.map(row => row.cogsPct));
+    const referenceTop = (1 - data.overallCogsPct / scaleMax) * 100;
+    body.innerHTML = `<div class="margins-category-scroll" role="region" aria-label="COGS by sales category chart, scrollable" tabindex="0"><div class="margins-category-layout${data.rows.length <= 3 ? ' is-few-categories' : ''}" style="min-width:${Math.max(320, data.rows.length * 112)}px">`
+      + `<div class="margins-category-plot" style="--reference-top:${referenceTop.toFixed(2)}%"><span class="margins-category-reference" aria-hidden="true"></span>`
+      + data.rows.map(row => {
+        const height = Math.max(0, Math.min(100, row.cogsPct / scaleMax * 100));
+        const heatStep = maxCogs === minCogs ? 7 : 5 + Math.round((row.cogsPct - minCogs) / (maxCogs - minCogs) * 4);
+        return `<div class="margins-category-column" style="--bar-height:${height.toFixed(2)}%"><strong class="margins-category-value">${row.cogsPct.toFixed(1)}%</strong><div class="margins-category-bar heat-step-${heatStep}" role="img" tabindex="0" aria-label="${escapeHtml(row.name)}: COGS ${row.cogsPct.toFixed(1)}% of sales; ${row.salesShare.toFixed(0)}% of sales"></div></div>`;
+      }).join('')
+      + `</div><div class="margins-category-labels">`
+      + data.rows.map(row => `<div class="margins-category-label">${escapeHtml(row.name)}</div>`).join('')
+      + `</div></div></div>`;
+    body.querySelectorAll('.margins-category-bar').forEach((bar, index) => {
+      const row = data.rows[index];
+      const tooltip = `${row.name}\nCOGS: ${row.cogsPct.toFixed(1)}%\nSales share: ${row.salesShare.toFixed(0)}%\nOverall COGS: ${data.overallCogsPct.toFixed(1)}%`;
+      bar.addEventListener('mouseenter', () => showChartTip(bar, tooltip));
+      bar.addEventListener('mouseleave', hideChartTip);
+      bar.addEventListener('focus', () => showChartTip(bar, tooltip));
+      bar.addEventListener('blur', hideChartTip);
+    });
+  }
+  marginsCategoryOutletButton.addEventListener('click', () => {
+    const willOpen = !marginsCategoryOutletMenu.classList.contains('open');
+    document.querySelectorAll('.picker-menu, .top-items-picker-menu').forEach(menu => { if(menu !== marginsCategoryOutletMenu) menu.classList.remove('open'); });
+    topItemsCategoryButton?.setAttribute('aria-expanded', 'false');
+    marginsCategoryOutletMenu.classList.toggle('open', willOpen);
+    marginsCategoryOutletButton.setAttribute('aria-expanded', String(willOpen));
+  });
+  marginsCategoryOutletMenu.addEventListener('click', event => {
+    const option = event.target.closest('[data-margins-category-outlet]');
+    if(!option) return;
+    marginsCategoryScope = option.dataset.marginsCategoryOutlet;
+    marginsCategoryOutletMenu.classList.remove('open');
+    marginsCategoryOutletButton.setAttribute('aria-expanded', 'false');
+    renderMarginsCategories();
+  });
+
+  // Menu item sales prices come from the current Sales selection; illustrative ingredient costs vary by outlet.
+  let marginsMenuSort = 'margin';
+  function getMarginsMenuRows(data){
+    const sales = getSalesData();
+    if(!sales) return [];
+    const items = sales.topItems.categories.flatMap(category => category.items).filter(item => item.timesSold > 0).sort((a, b) => b.revenue - a.revenue).slice(0, 7);
+    const rows = [];
+    const rowFor = (name, price, cost, outlet, timesSold) => {
+      const margin = (price - cost) / price * 100;
+      return { name, price: unitPrice(price), cost: unitPrice(cost), margin: `${margin.toFixed(1)}%`, marginValue: margin,
+        outlet, timesSold, barWidth: `${Math.max(0, Math.min(100, margin)).toFixed(1)}%` };
+    };
+    items.forEach(item => {
+      const price = item.revenue / item.timesSold;
+      const totalSales = Math.round(item.timesSold);
+      const weights = data.names.map(outlet => .7 + seededRandom(`${item.name}:${outlet}:menu-volume`)() * .6);
+      const weightTotal = weights.reduce((sum, weight) => sum + weight, 0);
+      const allocations = weights.map(weight => Math.floor(totalSales * weight / weightTotal));
+      const remainder = totalSales - allocations.reduce((sum, count) => sum + count, 0);
+      weights.map((weight, index) => ({ index, fraction: totalSales * weight / weightTotal - allocations[index] }))
+        .sort((a, b) => b.fraction - a.fraction).slice(0, remainder).forEach(({ index }) => allocations[index]++);
+      data.names.forEach((outlet, outletIndex) => {
+        const rand = seededRandom(`${item.name}:${outlet}:margin-cost`);
+        const cost = price * .38 * (.9 + rand() * .2);
+        rows.push(rowFor(item.name, price, cost, outlet, allocations[outletIndex]));
+      });
+    });
+    return rows.sort((a, b) => marginsMenuSort === 'margin'
+      ? b.marginValue - a.marginValue || b.timesSold - a.timesSold || a.name.localeCompare(b.name) || a.outlet.localeCompare(b.outlet)
+      : b.timesSold - a.timesSold || b.marginValue - a.marginValue || a.name.localeCompare(b.name) || a.outlet.localeCompare(b.outlet));
+  }
+  function renderMarginsMenu(data){
+    const body = document.getElementById('marginsMenuBody'), rows = getMarginsMenuRows(data);
+    if(!rows.length){ renderEmptyState(body, 'No menu item data for this selection.'); return; }
+    const table = document.createElement('table'); table.className = 'outlet-table procure-table margins-menu-table';
+    table.innerHTML = '<colgroup><col class="margins-menu-name-col"><col><col class="margins-menu-volume-col"></colgroup><thead><tr><th scope="col">Menu item</th><th scope="col">Gross margin</th><th scope="col" class="num">Times sold</th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><span class="procure-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span><span class="procure-sub">${escapeHtml(row.outlet)}</span></td>`
+        + `<td><div class="margins-menu-margin-cell"><strong class="margins-menu-margin-value">${row.margin}</strong><span class="procure-bar" role="img" aria-label="${escapeHtml(row.name)}: gross margin ${row.margin}; price ${row.price}; ingredient cost ${row.cost}" tabindex="0"><span style="width:${row.barWidth}"></span></span></div></td>`
+        + `<td class="num">${row.timesSold.toLocaleString('en-SG')}</td>`;
+      tbody.appendChild(tr);
+      const marginBar = tr.querySelector('.margins-menu-margin-cell .procure-bar');
+      const marginTip = `Gross margin: ${row.margin}\nPrice: ${row.price}\nIngredient cost: ${row.cost}`;
+      marginBar.addEventListener('mouseenter', () => showChartTip(marginBar, marginTip));
+      marginBar.addEventListener('focus', () => showChartTip(marginBar, marginTip));
+      marginBar.addEventListener('mouseleave', hideChartTip);
+      marginBar.addEventListener('blur', hideChartTip);
+    });
+    table.appendChild(tbody);
+    body.replaceChildren(procureScrollTable(table, 'Menu item margin list'));
+  }
+  const marginsMenuSortButton = document.getElementById('marginsMenuSortButton');
+  const marginsMenuSortLabel = document.getElementById('marginsMenuSortLabel');
+  const marginsMenuSortMenu = document.getElementById('marginsMenuSortMenu');
+  marginsMenuSortButton?.addEventListener('click', () => {
+    const willOpen = !marginsMenuSortMenu.classList.contains('open');
+    marginsMenuSortMenu.classList.toggle('open', willOpen);
+    marginsMenuSortButton.setAttribute('aria-expanded', String(willOpen));
+  });
+  marginsMenuSortMenu?.querySelectorAll('[data-margins-menu-sort]').forEach(button => button.addEventListener('click', () => {
+    marginsMenuSort = button.dataset.marginsMenuSort;
+    marginsMenuSortMenu.querySelectorAll('[data-margins-menu-sort]').forEach(option => {
+      const selected = option === button;
+      option.classList.toggle('active', selected);
+      option.setAttribute('aria-selected', String(selected));
+    });
+    marginsMenuSortLabel.textContent = button.textContent.trim();
+    marginsMenuSortMenu.classList.remove('open');
+    marginsMenuSortButton.setAttribute('aria-expanded', 'false');
+    renderMarginsMenu(getMarginsData());
+  }));
+
+  // Recipe links and quantity per serve are illustrative; invoice price movements are from Spend.
+  const MARGINS_RECIPE_SKU_LINKS = [
+    { sku: 'CHIC THIGH FIL S/LESS B/LESS 5KG FRZ AUS', ingredient: 'Chicken thigh fillet', recipe: 'Chargrilled Chicken Rice', perServeKg: .15 },
+    { sku: 'CHIC THIGH FIL S/LESS B/LESS 5KG FRZ AUS', ingredient: 'Chicken thigh fillet', recipe: 'Lemongrass Chicken Banh Mi', perServeKg: .10 },
+    { sku: 'Baby spinach, washed – 1.5 kg carton', ingredient: 'Baby spinach', recipe: 'Tofu Noodle Salad', perServeKg: .04 },
+    { sku: 'Baby spinach, washed – 1.5 kg carton', ingredient: 'Baby spinach', recipe: 'Fresh Spring Rolls', perServeKg: .02 },
+  ];
+  function getMarginsDriftRows(procureData){
+    if(!procureData) return [];
+    const movesBySku = new Map();
+    priceMovementRows(procureData, { overall: true }).forEach(move => {
+      if(!movesBySku.has(move.description)) movesBySku.set(move.description, []);
+      movesBySku.get(move.description).push(move);
+    });
+    const rows = [];
+    MARGINS_RECIPE_SKU_LINKS.forEach(link => {
+      (movesBySku.get(link.sku) || []).forEach(move => move.outlets.forEach(outlet => {
+        rows.push({
+          name: link.recipe, outlet, changeValue: (move.price - move.was) * link.perServeKg,
+          ingredient: link.ingredient, invoiceChange: move.change, price: move.price, previousPrice: move.was,
+          unit: move.unit, sourceSku: link.sku,
+        });
+      }));
+    });
+    return rows.sort((a, b) => Math.abs(b.invoiceChange) - Math.abs(a.invoiceChange) || b.invoiceChange - a.invoiceChange || a.name.localeCompare(b.name) || a.outlet.localeCompare(b.outlet));
+  }
+  function renderMarginsDrift(procureData){
+    const body = document.getElementById('marginsDriftBody'), rows = getMarginsDriftRows(procureData);
+    if(!rows.length){ renderEmptyState(body, 'No recipe-linked price changes in this selection.'); return; }
+    const table = document.createElement('table'); table.className = 'outlet-table procure-table margins-drift-table';
+    table.innerHTML = '<colgroup><col class="margins-drift-name-col"><col class="margins-drift-cost-col"><col class="margins-drift-detail-col"></colgroup><thead><tr><th scope="col">Recipe</th><th scope="col" class="num">Cost change / serve</th><th scope="col"><span class="sr-only">Ingredient price change</span></th></tr></thead>';
+    const tbody = document.createElement('tbody');
+    rows.forEach((row, index) => {
+      const detailId = `margins-drift-detail-${index}`;
+      const tr = document.createElement('tr');
+      const signedCostChange = row.changeValue < 0 ? `−${unitPrice(Math.abs(row.changeValue))}` : `+${unitPrice(row.changeValue)}`;
+      tr.innerHTML = `<td><span class="procure-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span><span class="margins-drift-outlet">${escapeHtml(row.outlet)}</span></td>`
+        + `<td class="num"><div class="margins-drift-cost-cell"><strong class="margins-drift-value">${signedCostChange}</strong>${changePillHtml(row.invoiceChange, {decimals:1})}</div></td>`
+        + `<td><button class="margins-drift-disclosure" type="button" aria-expanded="false" aria-controls="${detailId}" aria-label="Show ingredient price change for ${escapeHtml(row.name)} at ${escapeHtml(row.outlet)}"><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>`;
+      tbody.appendChild(tr);
+      const detailRow = document.createElement('tr'); detailRow.className = 'margins-drift-detail-row'; detailRow.hidden = true;
+      const priceDelta = row.price - row.previousPrice;
+      const priceDeltaPill = priceDelta === 0 ? '<span class="delta-pill flat">flat</span>'
+        : `<span class="delta-pill ${priceDelta > 0 ? 'neg' : 'pos'}">${priceDelta > 0 ? '+' : '−'}${unitPrice(Math.abs(priceDelta))}</span>`;
+      detailRow.innerHTML = `<td colspan="3"><div class="margins-drift-detail" id="${detailId}"><strong title="${escapeHtml(row.sourceSku)}">${escapeHtml(row.ingredient)}</strong><strong class="margins-drift-current-price">${unitPrice(row.price)}/${escapeHtml(row.unit)}</strong><s class="margins-drift-previous-price">${unitPrice(row.previousPrice)}</s>${priceDeltaPill}</div></td>`;
+      tbody.appendChild(detailRow);
+      const disclosure = tr.querySelector('.margins-drift-disclosure');
+      disclosure.addEventListener('click', () => {
+        const expanded = disclosure.getAttribute('aria-expanded') !== 'true';
+        disclosure.setAttribute('aria-expanded', String(expanded));
+        disclosure.setAttribute('aria-label', `${expanded ? 'Hide' : 'Show'} ingredient price change for ${row.name} at ${row.outlet}`);
+        disclosure.querySelector('.material-symbols-outlined').textContent = expanded ? 'expand_less' : 'expand_more';
+        detailRow.hidden = !expanded;
+      });
+    });
+    table.appendChild(tbody); body.replaceChildren(procureScrollTable(table, 'Recipe cost drift list'));
+  }
+  // Margins "At a glance": local and deterministic, from the figures in the key-numbers strip (see js/margins-briefing).
+  const marginsTakeaway = document.getElementById('marginsTakeaway'), marginsTakeawayText = document.getElementById('marginsTakeawayText');
+  const marginsTakeawayToggle = document.getElementById('marginsTakeawayToggle'), marginsTakeawaySkeleton = document.getElementById('marginsTakeawaySkeleton');
+  let marginsTakeawayExpanded = false, marginsTakeawayLoadTimer = null;
+  function setMarginsTakeawayExpanded(expanded){
+    marginsTakeawayExpanded = expanded;
+    marginsTakeawayText.classList.toggle('is-clamped', !expanded);
+    marginsTakeawayToggle.setAttribute('aria-expanded', String(expanded));
+    marginsTakeawayToggle.textContent = expanded ? 'Show less' : 'View all';
+  }
+  function updateMarginsTakeawayOverflow(){
+    if(marginsTakeawayLoadTimer) return;
+    marginsTakeawayText.classList.add('is-clamped');
+    const overflows = marginsTakeawayText.scrollHeight > marginsTakeawayText.clientHeight + 1;
+    marginsTakeawayText.classList.toggle('is-clamped', !marginsTakeawayExpanded);
+    marginsTakeawayToggle.hidden = !overflows;
+    if(!overflows && marginsTakeawayExpanded) setMarginsTakeawayExpanded(false);
+  }
+  // The same figures the strip shows: gross profit and its change come from the COGS card's context, the cost lines
+  // and price impact from the tiles, and (group view) each outlet's GP against its own target.
+  function buildMarginsBriefingInput(data){
+    const context = PERIOD_CARD_CONTEXT[data.period], price = marginsPriceImpact(data);
+    const input = {
+      comparison: context.comparison,
+      gp: { value: data.gpPct, target: 100 - data.targetPct, change: -context.cogsChangePts },
+      costs: { revenue: data.revenue, wastage: data.wastageValue, variance: data.varianceValue },
+      priceImpact: price ? { value: price.impact, changePct: price.changePct } : null,
+    };
+    if(data.scope === 'All outlets') input.outlets = data.outlets.map(outlet => ({ name: outlet.name, gp: 100 - outlet.actual, target: 100 - outlet.target }));
+    return input;
+  }
+  function renderMarginsBriefing(data){
+    let result = null;
+    if(data && window.MarginsBriefing){
+      try { result = MarginsBriefing.summariseMarginsTab(buildMarginsBriefingInput(data)); }
+      catch(error){ console.warn('Margins At a glance unavailable:', error); }
+    }
+    const hasText = Boolean(result?.text), hasFooter = !marginsStatusFooter.hidden;
+    marginsTakeaway.hidden = !hasText && !hasFooter;
+    marginsTakeaway.classList.toggle('has-footer-only', !hasText && hasFooter);
+    if(!hasText){
+      window.clearTimeout(marginsTakeawayLoadTimer);
+      marginsTakeawayLoadTimer = null;
+      marginsTakeawaySkeleton.hidden = true;
+      marginsTakeawayText.hidden = false;
+      marginsTakeawayText.textContent = '';
+      marginsTakeawayToggle.hidden = true;
+      marginsTakeaway.removeAttribute('aria-busy');
+      return;
+    }
+    if(marginsTakeawayText.textContent === result.text){ if(!marginsTakeawayLoadTimer) updateMarginsTakeawayOverflow(); return; }
+    marginsTakeawayText.textContent = result.text; setMarginsTakeawayExpanded(false);
+    window.clearTimeout(marginsTakeawayLoadTimer);
+    marginsTakeawayText.hidden = true; marginsTakeawayToggle.hidden = true; marginsTakeawaySkeleton.hidden = false; marginsTakeaway.setAttribute('aria-busy', 'true');
+    marginsTakeawayLoadTimer = window.setTimeout(() => {
+      marginsTakeawayLoadTimer = null;
+      marginsTakeawaySkeleton.hidden = true; marginsTakeawayText.hidden = false; marginsTakeaway.removeAttribute('aria-busy');
+      marginsTakeaway.classList.remove('is-announcing'); void marginsTakeaway.offsetWidth; marginsTakeaway.classList.add('is-announcing');
+      updateMarginsTakeawayOverflow();
+    }, 650);
+  }
+  marginsTakeawayToggle.addEventListener('click', () => setMarginsTakeawayExpanded(!marginsTakeawayExpanded));
+  let marginsTakeawayWidth = 0;
+  function recheckMarginsTakeawayWidth(){ const width = Math.round(marginsTakeaway.getBoundingClientRect().width); if(width === marginsTakeawayWidth) return; marginsTakeawayWidth = width; updateMarginsTakeawayOverflow(); }
+  window.addEventListener('resize', recheckMarginsTakeawayWidth);
+  new ResizeObserver(recheckMarginsTakeawayWidth).observe(marginsTakeaway);
+  function renderMarginsTab(){
+    const data = getMarginsData();
+    const ids = ['marginsKeyBody', 'marginsBulletsBody', 'marginsTrendBody', 'marginsCategoryBody', 'marginsMenuBody', 'marginsDriftBody'];
+    if(!data){
+      ids.forEach(id => renderEmptyState(document.getElementById(id), 'Margins are unavailable without POS data.'));
+      renderMarginsCategories();
+      updateMarginsStatusFooter(); renderMarginsBriefing(null);
+      return;
+    }
+    renderMarginsKeyNumbers(data);
+    updateMarginsStatusFooter(); renderMarginsBriefing(data);
+    renderMarginsBullets(data);
+    renderMarginsTrend(data);
+    renderMarginsCategories();
+    renderMarginsMenu(data);
+    renderMarginsDrift(getProcureData());
+    refreshProcureFades();
+  }
   // Stub links: they stand in for pages that don't exist in this prototype.
   document.addEventListener('click', event => { if(event.target.closest('[data-stub]')) event.preventDefault(); });
 
@@ -3129,10 +4112,28 @@
     salesStatusText.textContent = missing.length === 1
       ? `Sales cover ${connected} of ${total} outlets — ${missing[0]} isn’t connected to POS.`
       : `Sales cover ${connected} of ${total} outlets — ${missing.length} aren’t connected to POS.`;
-    // The dialog has room to spare, so every outlet is listed up front rather than truncated behind "View all".
-    const listed = missing.map(name => `<li><span class="data-status-name">${escapeHtml(name)}</span><a class="procure-link" href="#outlets" data-stub>Connect →</a></li>`).join('');
-    salesStatusModalBody = `<div class="data-status-row"><span>Not connected to POS</span><span class="data-status-value">${plural(missing.length, 'outlet')}</span></div><ul class="data-status-list">${listed}</ul>`;
+    salesStatusModalBody = missingPosModalBody(missing);
   }
+  // The dialog has room to spare, so every outlet is listed up front rather than truncated behind "View all".
+  function missingPosModalBody(missing){
+    const listed = missing.map(name => `<li><span class="data-status-name">${escapeHtml(name)}</span><a class="procure-link" href="#outlets" data-stub>Connect →</a></li>`).join('');
+    return `<div class="data-status-row"><span>Not connected to POS</span><span class="data-status-value">${plural(missing.length, 'outlet')}</span></div><ul class="data-status-list">${listed}</ul>`;
+  }
+  // Margins needs sales as well as costs, so it has the same gap as Sales: outlets without POS aren't in these figures.
+  const marginsStatusFooter = document.getElementById('marginsStatusFooter'), marginsStatusText = document.getElementById('marginsStatusText'), marginsStatusDetails = document.getElementById('marginsStatusDetails');
+  let marginsStatusModalBody = '';
+  function updateMarginsStatusFooter(){
+    const missing = OUTLETS_WITHOUT_POS;
+    const show = currentScope === 'All outlets' && missing.length > 0;
+    marginsStatusFooter.hidden = !show;
+    if(!show) return;
+    const total = DASHBOARD_OUTLETS.length, connected = total - missing.length;
+    marginsStatusText.textContent = missing.length === 1
+      ? `Margins cover ${connected} of ${total} outlets — ${missing[0]} isn’t connected to POS.`
+      : `Margins cover ${connected} of ${total} outlets — ${missing.length} aren’t connected to POS.`;
+    marginsStatusModalBody = missingPosModalBody(missing);
+  }
+  marginsStatusDetails.addEventListener('click', event => openStatusModal('Data status', marginsStatusModalBody, event.currentTarget));
   salesStatusDetails.addEventListener('click', event => openStatusModal('Data status', salesStatusModalBody, event.currentTarget));
 
   const spendStatusFooter = document.getElementById('spendStatusFooter'), spendStatusText = document.getElementById('spendStatusText'), spendStatusDetails = document.getElementById('spendStatusDetails');
