@@ -42,6 +42,7 @@
     --viz-line-neutral: var(--ink-mute-strong);
     /* .main's own horizontal padding, exposed so the sticky header can bleed exactly to its edges regardless of breakpoint */
     --main-pad-x: 44px;
+    --chrome-top: 56px;   /* height of the topbar; 0 in full screen mode */
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-width: 320px; background: color-mix(in srgb, var(--cream) 20%, var(--panel)); }
@@ -77,19 +78,20 @@
   .workspace { max-width: 1120px; margin: 0 auto; }
   /* The sticky header is a literal duplicate of #overviewTitle (same markup, same .overview-title styling,
      same live picker controls) — not a simplified mirror — sitting flush under the topbar. */
-  .sticky-header-shell { position: sticky; top: 56px; z-index: 15; height: 0; overflow: visible; pointer-events: none; }
+  .sticky-header-shell { position: sticky; top: var(--chrome-top); z-index: 15; height: 0; overflow: visible; pointer-events: none; }
   /* Frosted glass, bled to .main's full edges via --main-pad-x (negative margin out, matching padding back in)
      so the panel spans the whole content column instead of stopping at the workspace's centred 1120px. */
-  .sticky-header { margin: 0 calc(-1 * var(--main-pad-x)); padding: 0 var(--main-pad-x); background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 2px 5px rgba(26,31,43,.06); opacity: 0; transform: translateY(-8px); transition: opacity .18s ease, transform .18s ease; }
-  .sticky-header.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-  .sticky-header-summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; max-width: 1120px; margin: 0 auto; padding: 16px 0; }
+  .sticky-header { margin: 0 calc(-1 * var(--main-pad-x)); padding: 0 var(--main-pad-x); background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 2px 5px rgba(26,31,43,.06); opacity: 0; transform: translateY(-8px); }
+  /* Fades in on arrival only. Leaving is instant, so the header and the tab rail (which share one surface while docked) never show separately. */
+  .sticky-header.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; transition: opacity .18s ease, transform .18s ease; }
+  .sticky-header-summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; max-width: 1120px; margin: 0 auto; padding: 14px 0 8px; }
   .sticky-header-scope { color: var(--ink); font-size: 21px; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
   .sticky-header-range { position: relative; display: inline-flex; align-items: baseline; padding-left: 18px; white-space: nowrap; }
   .sticky-header-separator { position: absolute; top: 50%; left: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--ink-mute); transform: translateY(-50%); }
   .sticky-header-period { color: var(--ink-mute); font-size: 21px; font-weight: 400; letter-spacing: -.02em; white-space: nowrap; }
   .sticky-header-comparison { margin-left: auto; color: var(--spinach); font-size: 14px; font-weight: 500; white-space: nowrap; }
   @media (max-width: 720px) {
-    .sticky-header-summary { gap: 6px 10px; padding: 12px 0; }
+    .sticky-header-summary { gap: 6px 10px; padding: 10px 0 6px; }
     .sticky-header-scope, .sticky-header-period { font-size: 17px; }
     .sticky-header-range { padding-left: 14px; }
     .sticky-header-comparison { flex-basis: 100%; margin-left: 0; font-size: 12px; }
@@ -501,7 +503,30 @@
   }
   /* ── Tab bar ── */
   .dashboard-tabs-bar { display: flex; align-items: center; gap: 16px; margin: 28px 0 18px; border-bottom: 1px solid var(--rule); }
-  .dashboard-tabs-bar .dashboard-tabs { flex: 1 1 auto; min-width: 0; margin: 0; border-bottom: 0; }
+  /* The tab rail docks under the sticky scope/period header. Its offset is that header's height (measured in JS, since
+     it wraps on narrow screens). Once docked it takes the header's frosted surface, bled to the same edges, and the
+     header hands its shadow over, so the two read as one bar. */
+  .dashboard-tabs-bar { position: sticky; top: calc(var(--chrome-top) + var(--sticky-context-h, 0px)); z-index: 14; isolation: isolate; }
+  .dashboard-tabs-bar::before { content: ""; position: absolute; z-index: -1; top: 0; bottom: -1px; left: calc(-1 * var(--tabs-bleed-left, 0px)); right: calc(-1 * var(--tabs-bleed-right, 0px)); background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--rule); box-shadow: 0 2px 5px rgba(26,31,43,.06); opacity: 0; pointer-events: none; }
+  .dashboard-tabs-bar.is-docked { border-bottom-color: transparent; }
+  .dashboard-tabs-bar.is-docked::before { opacity: 1; transition: opacity .18s ease; }
+  .sticky-header.tabs-docked { box-shadow: none; }
+  /* Full screen mode: the topbar and side nav go, and the page takes the whole window. */
+  body.is-fullscreen { --chrome-top: 0px; }
+  body.is-fullscreen .topbar, body.is-fullscreen .sidebar { display: none !important; }
+  body.is-fullscreen .app { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: 1fr !important; }
+  body.is-fullscreen .main { grid-column: 1 !important; grid-row: 1 !important; }
+  .fullscreen-toggle { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 13px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--ink); font: 600 14px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .fullscreen-toggle:hover { background: var(--row-hover); }
+  .fullscreen-toggle .material-symbols-outlined { color: var(--spinach); font-size: 18px; }
+  .fullscreen-exit { position: fixed; left: 16px; bottom: 16px; z-index: 60; display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); color: var(--ink); box-shadow: 0 2px 8px rgba(26,31,43,.12); font: 600 13px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .fullscreen-exit[hidden] { display: none; }
+  .fullscreen-exit:hover { background: var(--row-hover); }
+  .fullscreen-exit .material-symbols-outlined { color: var(--spinach); font-size: 18px; }
+  .fullscreen-exit kbd { padding: 2px 5px; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink-mute-strong); font: 500 11px/1 "Inter", system-ui, sans-serif; }
+  @media (max-width: 720px) { .fullscreen-toggle .fullscreen-label { display: none; } .fullscreen-toggle { padding: 0 10px; } }
+  .dashboard-tabs-bar .dashboard-tabs { flex: 1 1 auto; min-width: 0; margin: 0; padding-top: 0; border-bottom: 0; }
+  .dashboard-tabs-bar .dashboard-tab { padding-top: 6px; }
 
   /* ── Spend & procurement tab ── */
   .spend-category-tabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--row-hover); }
@@ -710,15 +735,25 @@
   .margins-category-plot { position: relative; display: flex; height: 190px; border-bottom: 1px solid var(--rule); background: linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 50%, var(--rule) 50% calc(50% + 1px), transparent calc(50% + 1px)); }
   .margins-category-reference { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
   .margins-category-column { position: relative; display: flex; flex: 1 1 0; flex-direction: column; align-items: center; min-width: 0; }
-  .margins-category-bar { width: min(72px, 68%); height: var(--bar-height); margin-top: auto; border-radius: 4px 4px 0 0; background: var(--spinach); }
-  .margins-category-bar.heat-step-5 { background: var(--heatmap-5); }
-  .margins-category-bar.heat-step-6 { background: var(--heatmap-6); }
-  .margins-category-bar.heat-step-7 { background: var(--heatmap-7); }
-  .margins-category-bar.heat-step-8 { background: var(--heatmap-8); }
-  .margins-category-bar.heat-step-9 { background: var(--heatmap-9); }
-  .margins-category-layout.is-few-categories .margins-category-bar { width: min(112px, 74%); }
+  /* One colour for this period, one for the previous period; the value on top of each bar, in text colour. */
+  .margins-category-pair { display: flex; flex: 1 1 auto; align-items: flex-end; justify-content: center; gap: 6px; width: 100%; min-height: 0; }
+  .margins-category-slot { position: relative; display: flex; flex: 0 1 44px; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
+  .margins-category-bar { width: 100%; height: var(--bar-height); margin-top: auto; border-radius: 4px 4px 0 0; background: var(--spinach); }
+  .margins-category-slot.is-previous .margins-category-bar { background: var(--row-mute); }
+  .margins-category-slot.is-empty .margins-category-bar { height: 0; border-top: 2px dashed var(--row-mute); border-radius: 0; background: none; }
+  .margins-category-layout.is-few-categories .margins-category-slot { flex-basis: 56px; }
+  .margins-category-layout.is-single .margins-category-slot { flex-basis: min(72px, 68%); }
+  .margins-category-layout.is-single.is-few-categories .margins-category-slot { flex-basis: min(112px, 74%); }
   .margins-category-bar:focus-visible { outline: 2px solid var(--seaweed); outline-offset: 3px; }
-  .margins-category-value { position: absolute; z-index: 3; bottom: calc(var(--bar-height) + 6px); padding: 0 2px; border-radius: 2px; background: var(--panel); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .margins-category-value { position: absolute; z-index: 3; bottom: calc(var(--bar-height, 0%) + 6px); padding: 0 2px; border-radius: 2px; background: var(--panel); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .margins-category-slot.is-previous .margins-category-value { color: var(--ink-mute-strong); font-size: 12px; font-weight: 500; }
+  .margins-category-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin: 0 0 14px; color: var(--ink-mute-strong); font-size: 12px; }
+  .margins-category-legend[hidden] { display: none; }
+  .margins-category-key { display: inline-flex; align-items: center; gap: 6px; }
+  .margins-category-key i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--spinach); }
+  .margins-category-key i.is-previous { background: var(--row-mute); }
+  .margins-category-key i.is-overall { width: 14px; height: 0; border-top: 1.5px dashed var(--ink-mute); border-radius: 0; background: none; }
+  .margins-category-key-note { margin-left: auto; color: var(--ink-mute); }
   .margins-category-labels { display: flex; grid-column: 1; gap: 0; padding-top: 9px; }
   .margins-category-label { flex: 1 1 0; min-width: 0; padding: 0 4px; text-align: center; font-size: 12px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
   @media (max-width: 600px) {
@@ -1051,7 +1086,7 @@
     </div>
   </aside>
 <main class="main"><div class="sticky-header-shell"><div class="sticky-header" id="stickyContext" aria-label="Selected data scope and period"><div class="sticky-header-summary"><span class="sticky-header-scope" id="stickyScope">All outlets</span><span class="sticky-header-range"><span class="sticky-header-separator" aria-hidden="true"></span><span class="sticky-header-period" id="stickyPeriod">1–21 September 2026</span></span><span class="sticky-header-comparison" id="stickyComparison">Compared with 1–21 August 2026</span></div></div></div><div class="workspace">
-    <div class="page-head"><div><p class="welcome-date" id="welcomeDate"></p><h1 class="welcome" id="welcomeGreeting">Good morning, William</h1></div><div class="page-actions"><div class="new-action"><button class="quick-action" id="newActionButton" type="button" aria-expanded="false" aria-controls="newActionMenu"><span class="material-symbols-outlined">add</span>New</button><div class="picker-menu new-menu" id="newActionMenu"><a href="Procure%20-%20New%20Order%20-%20Item.html"><span class="material-symbols-outlined">format_list_bulleted</span>Order by item</a><a href="Procure%20-%20New%20Order%20-%20Supplier.html"><span class="material-symbols-outlined">local_shipping</span>Order by supplier</a><a href="Freemium/procure-trial-invoices.html"><span class="material-symbols-outlined">upload</span>Upload invoice</a></div></div></div></div>
+    <div class="page-head"><div><p class="welcome-date" id="welcomeDate"></p><h1 class="welcome" id="welcomeGreeting">Good morning, William</h1></div><div class="page-actions"><button class="fullscreen-toggle" id="fullscreenToggle" type="button" aria-pressed="false" title="Hide the top bar and side menu"><span class="material-symbols-outlined" aria-hidden="true">fullscreen</span><span class="fullscreen-label">Full screen</span></button><div class="new-action"><button class="quick-action" id="newActionButton" type="button" aria-expanded="false" aria-controls="newActionMenu"><span class="material-symbols-outlined">add</span>New</button><div class="picker-menu new-menu" id="newActionMenu"><a href="Procure%20-%20New%20Order%20-%20Item.html"><span class="material-symbols-outlined">format_list_bulleted</span>Order by item</a><a href="Procure%20-%20New%20Order%20-%20Supplier.html"><span class="material-symbols-outlined">local_shipping</span>Order by supplier</a><a href="Freemium/procure-trial-invoices.html"><span class="material-symbols-outlined">upload</span>Upload invoice</a></div></div></div></div>
     <div class="overview-title" id="overviewTitle" role="heading" aria-level="2"><span>Here’s the performance of</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="scope"><span data-picker-label="scope">all outlets</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="scope"></div></div></div><span>for</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="period"><span data-picker-label="period">this month</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="period"><button class="picker-option selected">This month</button><button class="picker-option">Last 30 days</button><button class="picker-option">Last month</button><button class="picker-option">Last 3 months</button><button class="picker-option">This year</button></div></div></div><span class="period-comparison">Compared with 1–21 August 2026</span></div>
     <section class="overview" aria-label="Operations and performance overview">
       <div class="metric-grid">
@@ -1193,7 +1228,7 @@
           <div class="insight-card margins-outlet-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>COGS by outlet</h3></div><div class="margins-compare-tabs" role="tablist" aria-label="COGS comparison"><button class="margins-compare-tab active" id="marginsTargetTab" type="button" role="tab" aria-selected="true" aria-controls="marginsBulletsBody" data-margins-compare="target">vs target</button><button class="margins-compare-tab" id="marginsTheoreticalTab" type="button" role="tab" aria-selected="false" aria-controls="marginsBulletsBody" tabindex="-1" data-margins-compare="theoretical">vs theoretical</button></div></div><div id="marginsBulletsBody" role="tabpanel" aria-labelledby="marginsTargetTab"></div></div>
           <div class="insight-card margins-trend-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>COGS</h3></div><span class="margins-trend-scope" id="marginsTrendScopeNote"></span></div><div id="marginsTrendBody"></div></div>
         </div>
-        <div class="insight-row-full"><div class="insight-card margins-category-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>COGS by sales category</h3></div><div class="top-items-picker margins-category-filter" id="marginsCategoryFilter" hidden><button class="top-items-picker-button" id="marginsCategoryOutletButton" type="button" aria-expanded="false" aria-controls="marginsCategoryOutletMenu" aria-label="Filter COGS by outlet"><span id="marginsCategoryOutletLabel">All outlets</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="top-items-picker-menu" id="marginsCategoryOutletMenu" role="listbox" aria-label="Filter COGS by outlet"></div></div></div><div id="marginsCategoryBody"></div></div></div>
+        <div class="insight-row-full"><div class="insight-card margins-category-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>COGS by sales category</h3></div><div class="top-items-picker margins-category-filter" id="marginsCategoryFilter" hidden><button class="top-items-picker-button" id="marginsCategoryOutletButton" type="button" aria-expanded="false" aria-controls="marginsCategoryOutletMenu" aria-label="Filter COGS by outlet"><span id="marginsCategoryOutletLabel">All outlets</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="top-items-picker-menu" id="marginsCategoryOutletMenu" role="listbox" aria-label="Filter COGS by outlet"></div></div></div><div class="margins-category-legend" id="marginsCategoryLegend" hidden></div><div id="marginsCategoryBody"></div></div></div>
         <div class="insight-row-2col">
           <div class="insight-card margins-menu-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Menu item margin</h3></div><div class="outlet-sort margins-menu-sort"><button class="outlet-sort-button" id="marginsMenuSortButton" type="button" aria-expanded="false" aria-controls="marginsMenuSortMenu"><span id="marginsMenuSortLabel">Margin %</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="outlet-sort-menu" id="marginsMenuSortMenu" role="listbox" aria-label="Sort menu items"><button class="outlet-sort-option active" type="button" role="option" aria-selected="true" data-margins-menu-sort="margin">Margin %</button><button class="outlet-sort-option" type="button" role="option" aria-selected="false" data-margins-menu-sort="volume">Times sold</button></div></div></div><div id="marginsMenuBody"></div></div>
           <div class="insight-card margins-drift-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Recipe cost drift</h3></div></div><div id="marginsDriftBody"></div></div>
@@ -1209,6 +1244,7 @@
     <div class="modal-body" id="statusModalBody"></div>
   </div>
 </div>
+<button class="fullscreen-exit" id="fullscreenExit" type="button" hidden><span class="material-symbols-outlined" aria-hidden="true">fullscreen_exit</span>Exit full screen<kbd>Esc</kbd></button>
 <div class="proto-data-toggle" id="protoDataToggle" role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-data-label">Prototype data</span><button type="button" data-proto-outlets="1">1 outlet</button><button type="button" data-proto-outlets="10">10 outlets</button><button type="button" data-proto-outlets="30">30 outlets</button></div>
 <div class="inspect-tip" id="inspectTip"></div>
 <div class="chart-tip" id="chartTip"></div>
@@ -1522,16 +1558,58 @@
   function updateDashboard(){ const scope = currentScope, period = currentPeriod, cards = getDashboardData(scope, period), lacksPos = OUTLETS_WITHOUT_POS.includes(scope); ['purchases', 'invoiceValue', 'revenue', 'cogs'].forEach(metric => renderMetricCard(metric, cards?.[metric])); ['revenue', 'cogs'].forEach(metric => { document.querySelector(`[data-metric-card="${metric}"] .metric-content`).hidden = lacksPos; document.querySelector(`[data-unavailable="${metric}"]`).hidden = !lacksPos; }); updateMetricCoverage(scope); const salesPanel = document.getElementById('panel-sales'); salesPanel.classList.toggle('no-pos', lacksPos); if(lacksPos) document.getElementById('salesNoPosBody').textContent = `${scope} isn’t connected to a POS, so there’s no sales, covers or item data to show. Purchases and other procurement data above are still available.`; if(window.salesTabReady && !lacksPos) { renderHeatmap(document.querySelector('[data-heatmap-mode].active')?.dataset.heatmapMode || 'thisPeriod'); renderOutlets(); renderTopItems(); renderSalesChannels(); renderCovers(); renderSpendPerHead(); renderSalesBriefing(); updateSalesStatusFooter(); } if(window.salesTabReady) { renderSpendTab(); renderMarginsTab(); } }
   const overviewTitle = document.getElementById('overviewTitle');
   const stickyContext = document.getElementById('stickyContext');
+  const dashboardTabsBar = document.querySelector('.dashboard-tabs-bar');
   function updateStickyContextVisibility(){
     if(!stickyContext || !overviewTitle) return;
-    // Once the real headline has scrolled up under the topbar, its sticky duplicate takes over.
-    stickyContext.classList.toggle('is-visible', overviewTitle.getBoundingClientRect().bottom <= 56);
+    // The scope/period header and the tab rail arrive together: both appear at the moment the rail reaches the
+    // bottom of where the header sits (the header's height is measured even while it is hidden).
+    const chromeTop = document.body.classList.contains('is-fullscreen') ? 0 : 56;
+    const docked = dashboardTabsBar.getBoundingClientRect().top <= chromeTop + stickyContext.offsetHeight + 0.5;
+    stickyContext.classList.toggle('is-visible', docked);
+    dashboardTabsBar.classList.toggle('is-docked', docked);
+    stickyContext.classList.toggle('tabs-docked', docked);
+  }
+  // The header's height sets where the rail docks; the rail's surface bleeds out to the header's edges.
+  function measureStickyTabs(){
+    const root = document.documentElement.style, workspace = dashboardTabsBar.parentElement.getBoundingClientRect(), main = document.querySelector('.main').getBoundingClientRect();
+    root.setProperty('--sticky-context-h', `${stickyContext.offsetHeight}px`);
+    root.setProperty('--tabs-bleed-left', `${Math.max(0, workspace.left - main.left)}px`);
+    root.setProperty('--tabs-bleed-right', `${Math.max(0, main.right - workspace.right)}px`);
+    updateStickyContextVisibility();
   }
   window.addEventListener('scroll', updateStickyContextVisibility, { passive: true });
-  window.addEventListener('resize', updateStickyContextVisibility);
+  window.addEventListener('resize', measureStickyTabs);
+  new ResizeObserver(measureStickyTabs).observe(stickyContext);
+  measureStickyTabs();
+  // Full screen: hides the topbar and side menu, and asks the browser for full screen too (if it refuses, the page
+  // still goes full screen inside the window). Esc or the floating button leaves it.
+  const fullscreenToggle = document.getElementById('fullscreenToggle'), fullscreenExit = document.getElementById('fullscreenExit');
+  function setFullscreenMode(on, { native = true } = {}){
+    document.body.classList.toggle('is-fullscreen', on);
+    fullscreenToggle.setAttribute('aria-pressed', String(on));
+    fullscreenExit.hidden = !on;
+    if(native){
+      try {
+        if(on && !document.fullscreenElement) document.documentElement.requestFullscreen?.()?.catch(() => {});
+        else if(!on && document.fullscreenElement) document.exitFullscreen?.()?.catch(() => {});
+      } catch { /* no browser full screen: the in-page mode still applies */ }
+    }
+    measureStickyTabs();
+    (on ? fullscreenExit : fullscreenToggle).focus({ preventScroll: true });
+  }
+  fullscreenToggle.addEventListener('click', () => setFullscreenMode(true));
+  fullscreenExit.addEventListener('click', () => setFullscreenMode(false));
+  document.addEventListener('keydown', event => {
+    if(event.key !== 'Escape' || !document.body.classList.contains('is-fullscreen')) return;
+    if(document.querySelector('.picker-menu.open, .top-items-picker-menu.open, #statusModal.open')) return;   // Esc closes those first
+    setFullscreenMode(false);
+  });
+  document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement && document.body.classList.contains('is-fullscreen')) setFullscreenMode(false, { native: false }); });
   const dashboardTabs = Array.from(document.querySelectorAll('.dashboard-tab'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
-  dashboardTabs.forEach((tab, tabIndex) => tab.addEventListener('click', () => { dashboardTabs.forEach(item => { const isSelected = item === tab; item.classList.toggle('active', isSelected); item.setAttribute('aria-selected', String(isSelected)); }); tabPanels.forEach((panel, panelIndex) => panel.classList.toggle('active', panelIndex === tabIndex)); if(window.salesTabReady) { recheckKeyTakeawayWidth(); refreshProcureFades(); if(tab.id === 'tab-spend') centreSelectedSpendOutlet(); } }));
+  dashboardTabs.forEach((tab, tabIndex) => tab.addEventListener('click', () => { const wasDocked = dashboardTabsBar.classList.contains('is-docked'); dashboardTabs.forEach(item => { const isSelected = item === tab; item.classList.toggle('active', isSelected); item.setAttribute('aria-selected', String(isSelected)); }); tabPanels.forEach((panel, panelIndex) => panel.classList.toggle('active', panelIndex === tabIndex)); if(window.salesTabReady) { recheckKeyTakeawayWidth(); refreshProcureFades(); if(tab.id === 'tab-spend') centreSelectedSpendOutlet(); }
+    // Scrolled past the tab rail: start the new tab from the top of its contents, just under the docked rail.
+    if(wasDocked){ const panel = tabPanels[tabIndex], dockedBottom = dashboardTabsBar.getBoundingClientRect().bottom; window.scrollTo({ top: Math.max(0, window.scrollY + panel.getBoundingClientRect().top - dockedBottom - 16), behavior: 'instant' }); updateStickyContextVisibility(); } }));
   const newActionButton = document.getElementById('newActionButton'); const newActionMenu = document.getElementById('newActionMenu');
   newActionButton.addEventListener('click', () => { const willOpen = !newActionMenu.classList.contains('open'); document.querySelectorAll('.picker-menu').forEach(menu => { if(menu !== newActionMenu) menu.classList.remove('open'); }); newActionMenu.classList.toggle('open', willOpen); newActionButton.setAttribute('aria-expanded', String(willOpen)); });
   document.addEventListener('click', event => { if(!event.target.closest('.new-action') && newActionMenu.classList.contains('open')) { newActionMenu.classList.remove('open'); newActionButton.setAttribute('aria-expanded', 'false'); } });
@@ -3751,14 +3829,14 @@
   // outlet's existing COGS rate before aggregation, so every outlet and group result reconciles to the cards.
   const MARGINS_CATEGORY_COGS_OFFSETS = { Mains: 4.5, Beverages: -11.5, Starters: -2, Sides: .5, Desserts: -9 };
   let marginsCategoryScope = 'All outlets';
-  const marginsCategoryFilter = document.getElementById('marginsCategoryFilter');
+  const marginsCategoryFilter = document.getElementById('marginsCategoryFilter'), marginsCategoryLegend = document.getElementById('marginsCategoryLegend');
   const marginsCategoryOutletButton = document.getElementById('marginsCategoryOutletButton');
   const marginsCategoryOutletLabel = document.getElementById('marginsCategoryOutletLabel');
   const marginsCategoryOutletMenu = document.getElementById('marginsCategoryOutletMenu');
   function getMarginsCategoryRows(scope, period){
     const outlets = SALES_OUTLET_ROWS.filter(outlet => scope === 'All outlets' || outlet.name === scope);
     const categoryTotals = new Map();
-    let totalRevenue = 0, totalCost = 0;
+    let totalRevenue = 0, totalCost = 0, previousRevenueTotal = 0, previousCostTotal = 0, previousOutletCount = 0;
     outlets.forEach(outlet => {
       const allCategories = SALES_DATA[outlet.name]?.topItems?.categories || [];
       let categories = allCategories;
@@ -3780,25 +3858,45 @@
       const rand = seededRandom(`${outlet.name}:${period}:sales-category-cogs`);
       const rawRates = categories.map(category => outletCogs + (MARGINS_CATEGORY_COGS_OFFSETS[category.name] || 0) + (rand() - .5) * 1.6);
       const rawAverage = rawRates.reduce((sum, rate, index) => sum + rate * shares[index], 0);
+      // The previous period is built the same way from last period's sales mix and the group's COGS change. An outlet
+      // or a category with no previous sales simply has no previous figure: nothing is filled in for it.
+      const previousRevenue = periodRevenuePair(outlet, period).previousRevenue;
+      const previousWeights = categories.map(category => category.items.reduce((sum, item) => sum + Math.max(0, periodRevenuePair(item, period).previousRevenue || 0), 0));
+      const previousWeightTotal = previousWeights.reduce((sum, weight) => sum + weight, 0);
+      const hasPrevious = previousWeightTotal > 0 && previousRevenue > 0;
+      const previousShares = previousWeights.map(weight => hasPrevious ? weight / previousWeightTotal : 0);
+      const previousOutletCogs = outletCogs - PERIOD_CARD_CONTEXT[period].cogsChangePts;
+      const previousRand = seededRandom(`${outlet.name}:${period}:sales-category-cogs-previous`);
+      const previousRates = categories.map(category => previousOutletCogs + (MARGINS_CATEGORY_COGS_OFFSETS[category.name] || 0) + (previousRand() - .5) * 1.6);
+      const previousAverage = previousRates.reduce((sum, rate, index) => sum + rate * previousShares[index], 0);
+      if(hasPrevious){ previousOutletCount++; previousRevenueTotal += previousRevenue; }
       categories.forEach((category, index) => {
         const categoryRevenue = revenue * shares[index];
         const categoryCost = categoryRevenue * (rawRates[index] + outletCogs - rawAverage) / 100;
-        const total = categoryTotals.get(category.name) || { name: category.name, revenue: 0, cost: 0 };
+        const total = categoryTotals.get(category.name) || { name: category.name, revenue: 0, cost: 0, previousRevenue: 0, previousCost: 0 };
         total.revenue += categoryRevenue;
         total.cost += categoryCost;
+        if(previousShares[index] > 0){
+          const previousCategoryRevenue = previousRevenue * previousShares[index];
+          const previousCategoryCost = previousCategoryRevenue * (previousRates[index] + previousOutletCogs - previousAverage) / 100;
+          total.previousRevenue += previousCategoryRevenue;
+          total.previousCost += previousCategoryCost;
+          previousCostTotal += previousCategoryCost;
+        }
         categoryTotals.set(category.name, total);
         totalCost += categoryCost;
       });
       totalRevenue += revenue;
     });
-    return { rows: [...categoryTotals.values()].map(row => ({ ...row, cogsPct: row.cost / row.revenue * 100, salesShare: row.revenue / totalRevenue * 100 }))
+    return { rows: [...categoryTotals.values()].map(row => ({ ...row, cogsPct: row.cost / row.revenue * 100, salesShare: row.revenue / totalRevenue * 100,
+        previousCogsPct: row.previousRevenue > 0 ? row.previousCost / row.previousRevenue * 100 : null }))
         .sort((a, b) => b.cogsPct - a.cogsPct || a.name.localeCompare(b.name)),
-      overallCogsPct: totalRevenue ? totalCost / totalRevenue * 100 : null, outletCount: outlets.length };
+      overallCogsPct: totalRevenue ? totalCost / totalRevenue * 100 : null, outletCount: outlets.length, previousOutletCount };
   }
   function renderMarginsCategories(){
     const body = document.getElementById('marginsCategoryBody');
     if(!getMarginsData()){
-      marginsCategoryFilter.hidden = true;
+      marginsCategoryFilter.hidden = true; marginsCategoryLegend.hidden = true;
       renderEmptyState(body, 'Margins are unavailable without POS data.');
       return;
     }
@@ -3814,28 +3912,45 @@
       return option;
     }));
     const data = getMarginsCategoryRows(marginsCategoryScope, currentPeriod);
-    if(!data.rows.length){ renderEmptyState(body, 'No POS sales categories for this selection.'); return; }
-    const scaleMax = Math.max(50, Math.ceil(Math.max(...data.rows.map(row => row.cogsPct)) / 10) * 10);
-    const minCogs = Math.min(...data.rows.map(row => row.cogsPct));
-    const maxCogs = Math.max(...data.rows.map(row => row.cogsPct));
-    const referenceTop = (1 - data.overallCogsPct / scaleMax) * 100;
-    body.innerHTML = `<div class="margins-category-scroll" role="region" aria-label="COGS by sales category chart, scrollable" tabindex="0"><div class="margins-category-layout${data.rows.length <= 3 ? ' is-few-categories' : ''}" style="min-width:${Math.max(320, data.rows.length * 112)}px">`
+    if(!data.rows.length){ marginsCategoryLegend.hidden = true; renderEmptyState(body, 'No POS sales categories for this selection.'); return; }
+    const hasPrevious = data.rows.some(row => row.previousCogsPct != null);
+    const scaleMax = Math.max(50, Math.ceil(Math.max(...data.rows.map(row => Math.max(row.cogsPct, row.previousCogsPct ?? 0))) / 10) * 10);
+    const referenceTop = (1 - data.overallCogsPct / scaleMax * 1) * 100;
+    const ranges = PERIOD_DATE_RANGES[currentPeriod];
+    const heightOf = value => `${Math.max(0, Math.min(100, value / scaleMax * 100)).toFixed(2)}%`;
+    const slotHtml = (row, previous) => {
+      const value = previous ? row.previousCogsPct : row.cogsPct, period = previous ? 'previous period' : 'this period';
+      if(value == null) return `<div class="margins-category-slot is-previous is-empty"><strong class="margins-category-value">n/a</strong><div class="margins-category-bar" role="img" tabindex="0" data-slot="previous" aria-label="${escapeHtml(row.name)}: no data for the previous period"></div></div>`;
+      return `<div class="margins-category-slot${previous ? ' is-previous' : ''}" style="--bar-height:${heightOf(value)}"><strong class="margins-category-value">${value.toFixed(1)}%</strong><div class="margins-category-bar" role="img" tabindex="0" data-slot="${previous ? 'previous' : 'current'}" aria-label="${escapeHtml(row.name)}: COGS ${value.toFixed(1)}% of sales, ${period}"></div></div>`;
+    };
+    // Two series, so a legend; the dashed line is the overall COGS for this period.
+    const partial = hasPrevious && data.previousOutletCount < data.outletCount;
+    marginsCategoryLegend.hidden = false;
+    marginsCategoryLegend.innerHTML = hasPrevious
+      ? `<span class="margins-category-key"><i class="is-current" aria-hidden="true"></i>This period</span><span class="margins-category-key"><i class="is-previous" aria-hidden="true"></i>Previous period</span><span class="margins-category-key"><i class="is-overall" aria-hidden="true"></i>Overall this period ${data.overallCogsPct.toFixed(1)}%</span>${partial ? `<span class="margins-category-key-note">Previous period covers ${data.previousOutletCount} of ${data.outletCount} outlets</span>` : ''}`
+      : `<span class="margins-category-key"><i class="is-overall" aria-hidden="true"></i>Overall ${data.overallCogsPct.toFixed(1)}%</span><span class="margins-category-key-note">No data for the previous period</span>`;
+    body.innerHTML = `<div class="margins-category-scroll" role="region" aria-label="COGS by sales category chart, scrollable" tabindex="0"><div class="margins-category-layout${data.rows.length <= 3 ? ' is-few-categories' : ''}${hasPrevious ? '' : ' is-single'}" style="min-width:${Math.max(320, data.rows.length * (hasPrevious ? 128 : 112))}px">`
       + `<div class="margins-category-plot"><svg class="margins-category-reference" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="${referenceTop.toFixed(2)}" x2="100" y2="${referenceTop.toFixed(2)}" stroke="var(--ink-mute)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"></line></svg>`
-      + data.rows.map(row => {
-        const height = Math.max(0, Math.min(100, row.cogsPct / scaleMax * 100));
-        const heatStep = maxCogs === minCogs ? 7 : 5 + Math.round((row.cogsPct - minCogs) / (maxCogs - minCogs) * 4);
-        return `<div class="margins-category-column" style="--bar-height:${height.toFixed(2)}%"><strong class="margins-category-value">${row.cogsPct.toFixed(1)}%</strong><div class="margins-category-bar heat-step-${heatStep}" role="img" tabindex="0" aria-label="${escapeHtml(row.name)}: COGS ${row.cogsPct.toFixed(1)}% of sales; ${row.salesShare.toFixed(0)}% of sales"></div></div>`;
-      }).join('')
+      + data.rows.map(row => `<div class="margins-category-column"><div class="margins-category-pair">${slotHtml(row, false)}${hasPrevious ? slotHtml(row, true) : ''}</div></div>`).join('')
       + `</div><div class="margins-category-labels">`
       + data.rows.map(row => `<div class="margins-category-label">${escapeHtml(row.name)}</div>`).join('')
       + `</div></div></div>`;
-    body.querySelectorAll('.margins-category-bar').forEach((bar, index) => {
+    const pts = value => `${value < 0 ? '−' : '+'}${Math.abs(value).toFixed(1)} pts`;
+    body.querySelectorAll('.margins-category-column').forEach((column, index) => {
       const row = data.rows[index];
-      const tooltip = `${row.name}\nCOGS: ${row.cogsPct.toFixed(1)}%\nSales share: ${row.salesShare.toFixed(0)}%\nOverall COGS: ${data.overallCogsPct.toFixed(1)}%`;
-      bar.addEventListener('mouseenter', () => showChartTip(bar, tooltip));
-      bar.addEventListener('mouseleave', hideChartTip);
-      bar.addEventListener('focus', () => showChartTip(bar, tooltip));
-      bar.addEventListener('blur', hideChartTip);
+      const lines = [row.name, `This period: ${row.cogsPct.toFixed(1)}%`];
+      if(hasPrevious){
+        lines.push(row.previousCogsPct == null ? 'Previous period: no data' : `Previous period: ${row.previousCogsPct.toFixed(1)}%`);
+        if(row.previousCogsPct != null) lines.push(`Change: ${pts(row.cogsPct - row.previousCogsPct)}`);
+      }
+      lines.push(`Sales share: ${row.salesShare.toFixed(0)}%`);
+      const tooltip = lines.join('\n');
+      column.querySelectorAll('.margins-category-bar').forEach(bar => {
+        bar.addEventListener('mouseenter', () => showChartTip(bar, tooltip));
+        bar.addEventListener('mouseleave', hideChartTip);
+        bar.addEventListener('focus', () => showChartTip(bar, tooltip));
+        bar.addEventListener('blur', hideChartTip);
+      });
     });
   }
   marginsCategoryOutletButton.addEventListener('click', () => {
