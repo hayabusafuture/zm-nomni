@@ -646,6 +646,11 @@
   .spend-outlet-card .outlet-scroll-frame { display: flex; flex: 1 1 auto; min-height: 0; }
   .spend-outlet-card .procure-table-wrap { flex: 1 1 auto; min-height: 0; max-height: 410px; }
   .spend-outlet-card .outlet-comparison-note { flex: 0 0 auto; }
+  /* Side by side with Order accuracy, the card is as tall as that one: the list takes the height it's given (and scrolls past it) rather than stopping at a fixed height with a gap above the note. */
+  @media (min-width: 1181px) {
+    .spend-outlet-card .outlet-scroll-frame { flex: 1 1 0; min-height: 330px; }
+    .spend-outlet-card .procure-table-wrap { max-height: none; }
+  }
   .spend-outlet-card .outlet-sort[hidden] { display: none; }
   .spend-outlet-card .outlet-name { min-width: 0; overflow: visible; text-overflow: clip; white-space: normal; }
   /* The breakdown's fixed bar, amount and change columns fit the card; only its rows scroll. */
@@ -682,12 +687,19 @@
   /* Compact order exposure sits above the supplier list in one half-width card. */
   .procure-headline { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
   .procure-headline-value { font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-  .procure-headline-sub { margin: 2px 0 8px; color: var(--ink-mute-strong); font-size: 13px; }
-  .procure-not-received { margin: 8px 0 0; color: var(--ink-mute-strong); font-size: 13px; }
-  .procure-not-received strong { color: var(--ink); font-weight: 600; }
+  .procure-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 6px; }
+  .procure-stat { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .procure-stat + .procure-stat { padding-left: 20px; border-left: 1px solid var(--rule); }
+  .procure-stat-label { color: var(--ink-mute-strong); font-size: 12px; font-weight: 500; }
+  .procure-stats .procure-headline { flex-wrap: wrap; margin-top: 2px; gap: 4px 8px; }
+  .procure-stats .procure-headline-value { font-size: 24px; line-height: 1.2; }
+  .procure-stats .procure-headline-value.is-none { color: var(--ink-mute); }
+  .procure-stat-sub { color: var(--ink-mute-strong); font-size: 12px; }
+  .procure-stats { margin-bottom: 14px; }
+  .procure-stats .delta-pill[data-col-info] { cursor: help; }
+  @media (max-width: 560px) { .procure-stats { grid-template-columns: minmax(0, 1fr); gap: 14px; } .procure-stat + .procure-stat { padding: 14px 0 0; border-top: 1px solid var(--rule); border-left: 0; } }
   .order-reliability-card .outlet-scroll-frame { margin-top: 20px; }
   .order-reliability-card .insight-card-sub { margin: 0; font-size: 14px; }
-  .order-reliability-card .procure-footer { justify-content: flex-end; }
   .reliability-table col.reliability-invoices-col { width: 60px; }
   .reliability-table col.reliability-rate-col { width: 62px; }
   .reliability-table col.reliability-accuracy-col { width: 76px; }
@@ -709,6 +721,9 @@
 
   /* Supplier reliability: rates under 90% in amber text. */
   .procure-below { color: var(--viz-div-neg2); font-weight: 700; }
+  .procure-below[data-col-info] { cursor: help; }
+  .procure-below[data-col-info]:hover, .procure-below[data-col-info]:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+  .procure-below[data-col-info]:focus-visible, .delta-pill[data-col-info]:focus-visible { outline: 2px solid var(--spinach); outline-offset: 2px; border-radius: 4px; }
 
   /* Margins: reuse the dashboard's cards, rules, semantic colours and scroll treatments. */
   #panel-margins .insight-row-2col { align-items: stretch; }
@@ -1632,17 +1647,27 @@
   const dashboardTabsBar = document.querySelector('.dashboard-tabs-bar');
   // The scope/period header appears once the tab rail has scrolled up to where the header sits. From then on the rail
   // is only shown while the user scrolls up: scrolling down tucks it away under the header, scrolling up brings it back.
-  let lastScrollY = window.scrollY, tabsTucked = true;
+  let lastScrollY = window.scrollY, tabsTucked = true, tabsHovered = false, tabsHoverTimer = null;
   function updateStickyContextVisibility(){
     if(!stickyContext || !overviewTitle) return;
     // Docked = the rail has reached the bottom of the header. Nothing ever transforms the bar itself, so its position is always true.
     const docked = dashboardTabsBar.getBoundingClientRect().top <= 56 + stickyContext.offsetHeight + 0.5;
-    const tucked = docked && tabsTucked;
+    const tucked = docked && tabsTucked && !tabsHovered;   // hovering the header (or the rail) brings the tabs back
     stickyContext.classList.toggle('is-visible', docked);
     dashboardTabsBar.classList.toggle('is-docked', docked);
     dashboardTabsBar.classList.toggle('is-tucked', tucked);
     stickyContext.classList.toggle('tabs-docked', docked && !tucked);   // one shared surface only while the rail is showing
   }
+  // Pointing at the sticky header shows the tab rail; it stays while the pointer is on the header or the rail, and tucks away a moment after.
+  function setTabsHovered(hovered){
+    window.clearTimeout(tabsHoverTimer);
+    if(hovered){ tabsHovered = true; updateStickyContextVisibility(); return; }
+    tabsHoverTimer = window.setTimeout(() => { tabsHovered = false; updateStickyContextVisibility(); }, 150);
+  }
+  [stickyContext, dashboardTabsBar].forEach(element => {
+    element.addEventListener('mouseenter', () => { if(element === dashboardTabsBar && !dashboardTabsBar.classList.contains('is-docked')) return; setTabsHovered(true); });
+    element.addEventListener('mouseleave', () => setTabsHovered(false));
+  });
   function onScrollDirection(){
     const y = window.scrollY, delta = y - lastScrollY;
     if(Math.abs(delta) >= 6){ tabsTucked = delta > 0; lastScrollY = y; }   // ignore jitter
@@ -3303,19 +3328,28 @@
   }));
   function renderOrderAccuracy(data){
     const body = document.getElementById('orderAccuracyBody');
-    // Headline is price discrepancies only: invoice lines matched to a PO line, billed above the ordered price.
-    const over = data.current.discrepancies.over, previousOver = data.previous.discrepancies.over;
-    const delta = Math.round(over.value / 10) * 10 - Math.round(previousOver.value / 10) * 10;
-    const pill = delta === 0 ? '<span class="delta-pill flat">no change</span>'
-      : `<span class="delta-pill ${delta > 0 ? 'neg' : 'pos'}"><span class="material-symbols-outlined" aria-hidden="true">${delta > 0 ? 'trending_up' : 'trending_down'}</span>${money(Math.abs(delta))}</span>`;
-    // "Not received" is shown only when there is some: invoiced qty above GRN qty, on lines with a GRN line for the item.
-    const notReceived = data.current.discrepancies.notReceived;
-    const linkedShare = data.current.invoices ? data.current.linkedInvoices / data.current.invoices : 0;
-    body.innerHTML = `<div class="procure-headline"><span class="procure-headline-value">${money(over.value, 10)}</span>${pill}</div>`
-      + `<p class="procure-headline-sub">invoiced above the ordered price, across ${plural(over.count, 'invoice')} ${PROCURE_PERIOD_PHRASE[currentPeriod]}</p>`
-      + (notReceived.value > 0 ? `<p class="procure-not-received">Plus <strong>${money(notReceived.value, 10)}</strong> invoiced but not received, across ${plural(notReceived.count, 'invoice')}</p>` : '');
-    document.getElementById('procureCoverageNote').textContent = `Based on ${percent(linkedShare)} of invoices linked to an order`;
-    document.getElementById('orderAccuracyFooter').innerHTML = '<a class="procure-link" href="#" data-stub>Open 3-way match report →</a>';
+    // Two money figures that add up to the table's "At stake" column: invoice lines billed above the ordered price (matched to a
+    // PO line), and quantity invoiced but not received (on lines with a GRN line for the item). Each has its own change and count.
+    const { over, notReceived } = data.current.discrepancies, previous = data.previous.discrepancies;
+    // Whole dollars, not tens: the two figures, their total and the At stake column below all have to add up exactly.
+    const whole = value => Math.round(value);
+    const changePill = (now, before) => {
+      const delta = whole(now) - whole(before);
+      const baseline = PERIOD_CARD_CONTEXT[currentPeriod].comparison;
+      return delta === 0 ? `<span class="delta-pill flat" data-col-info="change" data-col-info-text="No change ${baseline}" tabindex="0">no change</span>`
+        : `<span class="delta-pill ${delta > 0 ? 'neg' : 'pos'}" data-col-info="change" data-col-info-text="${delta > 0 ? 'Up' : 'Down'} ${money(Math.abs(delta))} ${baseline}" tabindex="0"><span class="material-symbols-outlined" aria-hidden="true">${delta > 0 ? 'trending_up' : 'trending_down'}</span>${money(Math.abs(delta))}</span>`;
+    };
+    const linked = Math.round(data.current.linkedInvoices), linkedShare = data.current.invoices ? data.current.linkedInvoices / data.current.invoices : 0;
+    const notReceivedStat = notReceived.value > 0
+      ? `<div class="procure-headline"><span class="procure-headline-value">${money(notReceived.value)}</span>${changePill(notReceived.value, previous.notReceived.value)}</div><span class="procure-stat-sub">across ${plural(notReceived.count, 'invoice')}</span>`
+      : `<div class="procure-headline"><span class="procure-headline-value is-none">None</span>${previous.notReceived.value > 0 ? changePill(0, previous.notReceived.value) : ''}</div><span class="procure-stat-sub">Everything billed was received</span>`;
+    body.innerHTML = `<div class="procure-stats">`
+      + `<div class="procure-stat"><span class="procure-stat-label">Billed above ordered price</span><div class="procure-headline"><span class="procure-headline-value">${money(over.value)}</span>${changePill(over.value, previous.over.value)}</div><span class="procure-stat-sub">${over.count.toLocaleString('en-SG')} of ${linked.toLocaleString('en-SG')} invoice${linked === 1 ? '' : 's'}</span></div>`
+      + `<div class="procure-stat"><span class="procure-stat-label">Invoiced, not received</span>${notReceivedStat}</div>`
+      + `</div>`;
+    const coverageNote = document.getElementById('procureCoverageNote');
+    coverageNote.textContent = ''; coverageNote.hidden = true;   // the note now sits under the figures it qualifies
+    document.getElementById('orderAccuracyFooter').innerHTML = `<span>Based on ${percent(linkedShare)} of invoices linked to an order.</span><a class="procure-link" href="Procure%20-%203-way%20Match.html" target="_blank" rel="noopener">Open 3-way match report →</a>`;
   }
   // Show every supplier with an invoice; the briefing applies its own volume filter below.
   function supplierReliabilityRows(data, includeUninvoiced = false){
@@ -3328,8 +3362,18 @@
     const body = document.getElementById('supplierReliabilityBody');
     const rows = supplierReliabilityRows(data);
     if(!rows.length){ renderEmptyState(body, 'No supplier invoices in this period.'); return; }
-    // Judged on the figure shown, so a rate displayed as 90% is never amber.
-    const rate = value => `<span class="${Math.round(value * 100) < 90 ? 'procure-below' : ''}">${percent(value)}</span>`;
+    // Whole dollars, shared out by largest remainder so the column adds up to the total in the headline above.
+    const { over, notReceived } = data.current.discrepancies;
+    const stakeShown = distributeWhole(Math.round(over.value) + Math.round(notReceived.value), rows.map(row => row.atStake));
+    rows.forEach((row, index) => { row.atStakeShown = stakeShown[index]; });
+    // Judged on the figure shown, so a rate displayed as 90% is never amber. An amber rate says why when pointed at.
+    const RELIABILITY_FLOOR = 90;
+    const rate = (value, kind) => {
+      if(Math.round(value * 100) >= RELIABILITY_FLOOR) return `<span>${percent(value)}</span>`;
+      const why = kind === 'fill' ? `${percent(value)} of the quantity ordered was invoiced, under the ${RELIABILITY_FLOOR}% mark.`
+        : `${percent(value)} of this supplier’s invoice lines were billed at the ordered price, under the ${RELIABILITY_FLOOR}% mark.`;
+      return `<span class="procure-below" data-col-info="rate" data-col-info-text="${escapeHtml(why)}" tabindex="0">${percent(value)}</span>`;
+    };
     const header = (label, key) => {
       const [first, second] = label.split(' ');
       return `<th scope="col" class="num" data-col-info="${key}" tabindex="0"><span class="col-info-head"><span class="reliability-head-first">${first}</span><span class="reliability-head-second">${second}</span></span></th>`;
@@ -3338,7 +3382,7 @@
     table.innerHTML = '<colgroup><col><col class="reliability-invoices-col"><col class="reliability-rate-col"><col class="reliability-accuracy-col"><col class="reliability-stake-col"></colgroup>'
       + `<thead><tr><th scope="col">Supplier</th><th scope="col" class="num">Invoices</th>${header('Fill rate', 'fill')}${header('Price accuracy', 'accuracy')}${header('At stake', 'atStake')}</tr></thead>`;
     const tbody = document.createElement('tbody');
-    rows.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = `<td><span class="procure-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span></td><td class="num">${row.invoices.toLocaleString('en-SG')}</td><td class="num">${rate(row.fill)}</td><td class="num">${rate(row.accuracy)}</td><td class="num"><span class="procure-money">${money(row.atStake, 10)}</span></td>`; tbody.appendChild(tr); });
+    rows.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = `<td><span class="procure-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span></td><td class="num">${row.invoices.toLocaleString('en-SG')}</td><td class="num">${rate(row.fill, 'fill')}</td><td class="num">${rate(row.accuracy, 'accuracy')}</td><td class="num"><span class="procure-money">${money(row.atStakeShown)}</span></td>`; tbody.appendChild(tr); });
     table.appendChild(tbody);
     body.replaceChildren(procureScrollTable(table, 'Supplier reliability list'));
   }
@@ -3350,7 +3394,7 @@
     priceImpact: 'Extra cost from supplier price changes: each change’s price difference × quantity bought since. Counts items with an invoiced price in both periods. The % is against the old prices.',
     fill: 'Quantity invoiced ÷ quantity ordered, across this supplier’s orders that have an invoice. Under 90% shows in amber.',
     accuracy: 'Share of this supplier’s invoice lines billed at the ordered price. Under 90% shows in amber.',
-    atStake: 'Amount invoiced above the ordered price for this supplier, plus anything invoiced but not received. Adds up to the totals above.',
+    atStake: 'Amount invoiced above the ordered price for this supplier, plus anything invoiced but not received. Adds up to the two figures above.',
   };
   const colInfoTip = document.createElement('div');
   colInfoTip.className = 'col-info-tip';
