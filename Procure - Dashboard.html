@@ -123,7 +123,7 @@
   .key-takeaway-text { margin: 0; }
   .key-takeaway-text.is-clamped { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .key-takeaway-toggle { margin-top: 4px; padding: 0; border: 0; background: transparent; color: var(--spinach); font: 600 13px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; }
-  .key-takeaway-toggle:hover { color: var(--seaweed); text-decoration: underline; }
+  .key-takeaway-toggle:hover { color: var(--seaweed); }
   .key-takeaway-toggle[hidden], .key-takeaway-text[hidden] { display: none; }
   /* Footer: outside the two-line clamp, so it is always visible collapsed or expanded. */
   .key-takeaway-footer { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 14px; border-top: 1px solid rgba(26,26,24,.10); }
@@ -134,21 +134,67 @@
   .key-takeaway-footer-icon { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--viz-div-neg2); color: #fff; font-size: 11px; font-weight: 700; font-style: normal; line-height: 1; }
   .key-takeaway-footer-text { flex: 1 1 auto; min-width: 0; margin: 0; color: var(--ink); font-size: 13px; font-weight: 400; line-height: 1.4; }
   .key-takeaway-footer-details { position: relative; flex: 0 0 auto; padding: 0; border: 0; background: transparent; color: var(--spinach); font: 600 13px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
-  .key-takeaway-footer-details:hover { color: var(--seaweed); text-decoration: underline; }
+  .key-takeaway-footer-details:hover { color: var(--seaweed); }
   /* Data status dialog: a real modal shared by both footers, following this file's own modal convention. */
   .modal-overlay { position: fixed; inset: 0; z-index: 900; display: none; align-items: center; justify-content: center; padding: 24px; background: rgba(10,20,15,.46); }
   .modal-overlay.open { display: flex; }
-  .modal-card { display: flex; flex-direction: column; width: 420px; max-width: 100%; max-height: calc(100vh - 48px); overflow: hidden; border-radius: 12px; background: var(--panel); box-shadow: 0 24px 64px rgba(0,0,0,.22); }
-  .modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 24px 0; }
-  .modal-title { margin: 0; color: var(--ink); font-size: 21px; font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
-  .modal-close { display: flex; align-items: center; padding: 4px; border: 0; border-radius: 4px; background: transparent; color: var(--ink-mute); cursor: pointer; }
+  .modal-card { display: flex; flex-direction: column; width: 480px; max-width: 100%; max-height: calc(100vh - 48px); overflow: hidden; border-radius: 12px; background: var(--panel); box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+  .modal-header { position: relative; display: flex; align-items: center; padding: 24px 64px 0 24px; }
+  .modal-title { margin: 0; color: var(--ink); font-size: 21px; font-weight: 700; line-height: 1.4; letter-spacing: -.02em; }
+  .modal-close { position: absolute; top: 16px; right: 16px; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--ink-mute); cursor: pointer; }
   .modal-close:hover { color: var(--ink); }
-  .modal-body { flex: 1; overflow-y: auto; padding: 16px 24px 22px; color: var(--ink); font-size: 13px; }
-  .data-status-summary { margin: 0 0 10px; color: var(--ink-mute-strong); font-size: 12px; }
-  .data-status-item { padding: 9px 0; border-top: 1px solid var(--rule); }
+  .modal-close:focus-visible { outline: 2px solid var(--spinach); outline-offset: -2px; }
+  .modal-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 24px 24px; color: var(--ink); font-size: 13px; }
+  .data-status-context { margin: -3px 0 20px; color: var(--ink-mute-strong); font-size: 14px; line-height: 1.4; text-wrap: pretty; }
+  #statusModal .procure-link { position: relative; display: inline-flex; align-items: center; min-height: 0; padding: 0; font: 600 14px/20px "Inter", system-ui, sans-serif; white-space: normal; }
+  #statusModal .data-status-list li { align-items: center; }
+  #statusModal .data-status-list .procure-link { min-height: 24px; }
+  .link-chevron { margin-right: -4px; font-size: 18px; line-height: 1; }
+  #orderAccuracyFooter .procure-link { display: inline-flex; align-items: center; }
+  #statusModal .procure-link:focus-visible { outline: 2px solid var(--spinach); outline-offset: 4px; border-radius: 2px; }
+  /* Invoice coverage: the gaps as stat blocks (label, figure, impact, link). */
+  .coverage-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .coverage-stats.is-single { grid-template-columns: minmax(0, 1fr); }
+  .coverage-stat { display: flex; flex-direction: column; min-width: 0; padding: 18px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+  .coverage-stat.is-tinted { border-color: transparent; background: color-mix(in srgb, var(--viz-div-neg1) 26%, var(--panel)); }
+  .coverage-stat-label { color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.35; }
+  .coverage-stat-value { margin-top: 6px; color: var(--ink); font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .coverage-stat-detail { margin: 8px 0 22px; color: var(--ink-mute-strong); font-size: 13px; line-height: 1.45; text-wrap: pretty; }
+  .coverage-stat-detail strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .coverage-stat .procure-link { margin-top: auto; }
+  .coverage-stat .procure-link::after { content: ''; position: absolute; inset: 0 0 -10px; }
+  @media (max-width: 460px) { .coverage-stats { grid-template-columns: minmax(0, 1fr); } }
+  /* Data status on Sales and Margins: POS connection and mapping, per outlet. */
+  .coverage-stat.no-link .coverage-stat-detail { margin-bottom: 0; }
+  .coverage-stats.is-single { grid-template-columns: 1fr; }
+  .modal-body > .coverage-stats:first-child { margin-top: 8px; }
+  .coverage-stat.is-tab { align-items: flex-start; font: inherit; text-align: left; cursor: pointer; transition: border-color .15s; }
+  .coverage-stat.is-tab:hover { border-color: var(--row-mute); }
+  .coverage-stat.is-tab.is-active { border-color: var(--nomni-green); box-shadow: inset 0 0 0 1px var(--nomni-green); }
+  .coverage-stat.is-tab:focus-visible { outline: 2px solid var(--seaweed); outline-offset: 2px; }
+  .coverage-stat.no-link .coverage-stat-value, .coverage-stat.no-link .coverage-stat-detail { display: block; }
+  .pos-status-section { margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--rule); }
+  .pos-status-section + .pos-status-section { margin-top: 20px; }
+  .pos-status-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; color: var(--ink); font-size: 14px; font-weight: 600; }
+  .pos-status-head small { color: var(--ink-mute); font-size: 12px; font-weight: 400; }
+  .pos-status-section .data-status-list { margin: 0; }
+  .pos-status-section .data-status-list li { padding: 9px 0; font-size: 14px; }
+  .pos-map-list { max-height: 228px; margin: 0; padding: 0; overflow-y: auto; list-style: none; scrollbar-width: thin; scrollbar-color: var(--row-mute) transparent; }
+  .pos-map-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--rule); }
+  .pos-map-list li:first-child { border-top: 0; }
+  .pos-map-name { display: block; color: var(--ink); font-size: 14px; font-weight: 600; }
+  .pos-map-sub { display: block; margin-top: 1px; color: var(--ink-mute-strong); font-size: 12px; }
+  .pos-map-pct { flex: 0 0 auto; color: var(--ink); font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pos-status-section > .procure-link { margin-top: 12px; }
+  .data-status-item { padding: 16px 0; border-top: 1px solid var(--rule); }
+  .data-status-note { margin: 0; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--ink-mute-strong); font-size: 13px; line-height: 1.5; text-wrap: pretty; }
+  .data-status-item:last-child { padding-bottom: 0; }
   .data-status-row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; font-weight: 600; }
   .data-status-value { font-size: 14px; font-variant-numeric: tabular-nums; }
-  .data-status-detail { display: flex; justify-content: space-between; gap: 12px; margin-top: 2px; color: var(--ink-mute-strong); font-size: 12px; }
+  .data-status-detail { margin-top: 4px; color: var(--ink-mute-strong); font-size: 13px; line-height: 1.5; }
+  .data-status-detail > span { display: block; }
+  .data-status-detail:empty { display: none; }
+  .data-status-detail .procure-link { margin-top: 12px; }
   .data-status-list { margin: 8px 0 0; padding: 0; list-style: none; }
   .data-status-list li { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 12px; border-top: 1px solid var(--rule); }
   .data-status-list li:first-child { border-top: 0; }
@@ -561,6 +607,49 @@
   .upload-dropzone .material-symbols-outlined { font-size: 30px; }
   .upload-help { margin: 10px 0 0; color: var(--ink-mute); font-size: 12px; text-align: center; }
   @media (max-width: 640px) { .outlet-modal-card { padding: 24px 20px 26px; } .outlet-modal-grid { grid-template-columns: minmax(0, 1fr); } .upload-dialog-card { padding: 22px 20px 24px; } }
+  /* Target COGS %: set per outlet in a dialog opened from the COGS by outlet card or the target on the GP% tile. */
+  .margins-outlet-card .margins-compare-tabs { margin-left: auto; }
+  .margins-set-target { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; padding: 0; border: 0; background: none; color: var(--spinach); font: 600 13px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
+  .margins-set-target:hover { color: var(--seaweed); }
+  .margins-set-target:focus-visible { outline: 2px solid var(--spinach); outline-offset: 3px; border-radius: 3px; }
+  .margins-set-target .material-symbols-outlined { font-size: 17px; }
+  .margins-target-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+  .margins-target-link:hover, .margins-target-link:focus-visible { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  .margins-target-link:focus-visible { outline: 2px solid var(--spinach); outline-offset: 3px; border-radius: 3px; }
+  .target-modal { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; padding: 24px; background: rgba(10,20,15,.46); }
+  .target-modal.open { display: flex; }
+  .target-modal-card { display: flex; flex-direction: column; width: 560px; max-width: 100%; max-height: calc(100vh - 48px); padding: 24px 28px 22px; border-radius: 12px; background: var(--panel); box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+  .target-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex: 0 0 auto; }
+  .target-modal-head h2 { margin: 0; color: var(--ink); font-size: 21px; font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
+  .target-modal-close { display: flex; align-items: center; padding: 4px; border: 0; border-radius: 4px; background: transparent; color: var(--ink-mute); cursor: pointer; }
+  .target-modal-close:hover { color: var(--ink); }
+  .target-modal-help { flex: 0 0 auto; margin: 8px 0 16px; color: var(--ink-mute-strong); font-size: 13px; line-height: 1.5; }
+  .target-bulk { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 12px 14px; border-radius: 8px; background: #FAFAFB; }
+  .target-bulk label { flex: 1 1 auto; color: var(--ink); font-size: 13px; font-weight: 600; }
+  .target-form { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+  .target-list { flex: 1 1 auto; min-height: 120px; margin-top: 8px; overflow-y: auto; }
+  .target-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 14px; padding: 9px 2px; border-bottom: 1px solid var(--rule); }
+  .target-row-name { min-width: 0; color: var(--ink); font-size: 14px; font-weight: 600; }
+  .target-row-name small { display: block; margin-top: 1px; color: var(--ink-mute); font-size: 12px; font-weight: 400; }
+  .target-row.is-selected .target-row-name::after { content: "Selected"; margin-left: 8px; padding: 1px 6px; border-radius: 4px; background: var(--mint); color: #0a8a3a; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+  .target-input { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-mute-strong); font-size: 14px; }
+  .target-input input { width: 84px; height: 38px; padding: 0 10px; border: 1px solid #dcdee3; border-radius: 6px; background: #fff; color: var(--ink); font: 500 14px/1 "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums; text-align: right; }
+  .target-input input:focus { border-color: var(--nomni-green); outline: 0; }
+  .target-input input::placeholder { color: var(--ink-soft); font-weight: 400; }
+  .target-input input.invalid { border-color: #d0291e; background: #fdf2f1; }
+  .target-error { grid-column: 1 / -1; justify-self: end; color: #d0291e; font-size: 12px; }
+  .target-error[hidden] { display: none; }
+  .target-summary { flex: 0 0 auto; margin: 12px 0 0; color: var(--ink-mute-strong); font-size: 13px; }
+  .target-summary strong { color: var(--ink); font-weight: 600; }
+  .target-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
+  .target-actions .target-link { margin-right: auto; padding: 0; border: 0; background: none; color: var(--spinach); font: 600 13px/1.4 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .target-actions .target-link:hover { color: var(--seaweed); }
+  .target-secondary, .target-primary { min-height: 38px; padding: 0 16px; border-radius: 6px; font: 600 14px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .target-secondary { border: 1px solid var(--rule); background: var(--panel); color: var(--ink); }
+  .target-secondary:hover { background: var(--row-hover); }
+  .target-primary { border: 1px solid var(--nomni-green); background: var(--nomni-green); color: var(--seaweed); }
+  .target-primary:hover { border-color: var(--primary-hover); background: var(--primary-hover); }
+  @media (max-width: 560px) { .target-modal-card { padding: 20px 18px 18px; } .target-row { grid-template-columns: minmax(0, 1fr); } .target-input { justify-self: start; } .target-error { justify-self: start; } }
   /* The scope and period menus open over the tab rail (z-index 14), not under it. */
   .overview-title { position: relative; z-index: 16; }
   .page-actions { position: relative; z-index: 17; }   /* the New menu opens over the title row, not under it */
@@ -585,7 +674,7 @@
   .margins-compare-tab.active { background: var(--panel); color: var(--seaweed); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .margins-compare-tab:focus-visible { outline: 2px solid var(--spinach); outline-offset: 2px; }
   .procure-link { color: var(--spinach); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
-  .procure-link:hover { color: var(--seaweed); text-decoration: underline; }
+  .procure-link:hover { color: var(--seaweed); }
   .procure-card-footer { margin-top: 14px; }
   .procure-table { min-width: 0; }
   .procure-table td { height: 48px; }
@@ -746,7 +835,7 @@
   .margins-gp-target-key { display: inline-flex; align-items: center; gap: 5px; }
   .margins-gp-target-key i { display: inline-block; width: 12px; border-top: 1px dashed var(--ink-mute); }
   .insight-card-note { color: var(--ink-mute-strong); font-size: 11px; }
-  .margins-bullet-controls { margin: 12px 0 15px; }
+  .margins-bullet-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0 15px; }
   .margins-bullet-head, .margins-bullet-row { display: grid; grid-template-columns: minmax(110px, 1.1fr) minmax(145px, 1.7fr) 86px; align-items: center; gap: 8px; }
   .margins-bullet-head { padding: 0 12px 7px 0; border-bottom: 1px solid var(--rule); color: var(--ink-mute-strong); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
   .margins-bullet-head > :last-child { text-align: right; }
@@ -1329,6 +1418,18 @@
     <div class="upload-dialog-head"><h2 id="uploadDialogTitle">Upload for <span id="uploadDialogOutlet"></span></h2><button class="upload-dialog-close" id="uploadDialogClose" type="button" aria-label="Close upload dialog"><span class="material-symbols-outlined">close</span></button></div>
     <div class="upload-dropzone"><span><span class="material-symbols-outlined" aria-hidden="true">cloud_upload</span><br />Drag and drop files here or <strong>click to upload</strong></span></div>
     <p class="upload-help">JPG, PNG, PDF files only — max 2MB each</p>
+  </div>
+</div>
+<div class="target-modal" id="targetModal" role="dialog" aria-modal="true" aria-labelledby="targetModalTitle" aria-hidden="true">
+  <div class="target-modal-card">
+    <div class="target-modal-head"><h2 id="targetModalTitle">Set target COGS %</h2><button class="target-modal-close" id="targetModalClose" type="button" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
+    <p class="target-modal-help">Every outlet starts at 30%. Each outlet has one target, used for every period, past ones included. Leave an outlet blank for no target. The group target is the outlets’ targets averaged by revenue.</p>
+    <div class="target-bulk"><label for="targetBulkInput">Same target for every outlet</label><span class="target-input"><input id="targetBulkInput" inputmode="decimal" autocomplete="off" placeholder="e.g. 31.5" aria-label="Target COGS % for every outlet" /><span aria-hidden="true">%</span></span><button class="target-secondary" id="targetBulkApply" type="button">Apply to all</button></div>
+    <form class="target-form" id="targetForm" novalidate>
+      <div class="target-list" id="targetList"></div>
+      <p class="target-summary" id="targetSummary"></p>
+      <div class="target-actions"><button class="target-link" id="targetClear" type="button">Clear all</button><button class="target-secondary" id="targetCancel" type="button">Cancel</button><button class="target-primary" type="submit">Save targets</button></div>
+    </form>
   </div>
 </div>
 <div class="proto-data-toggle" id="protoDataToggle" role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-data-label">Prototype data</span><button type="button" data-proto-outlets="1">1 outlet</button><button type="button" data-proto-outlets="10">10 outlets</button><button type="button" data-proto-outlets="30">30 outlets</button></div>
@@ -3349,7 +3450,7 @@
       + `</div>`;
     const coverageNote = document.getElementById('procureCoverageNote');
     coverageNote.textContent = ''; coverageNote.hidden = true;   // the note now sits under the figures it qualifies
-    document.getElementById('orderAccuracyFooter').innerHTML = `<span>Based on ${percent(linkedShare)} of invoices linked to an order.</span><a class="procure-link" href="Procure%20-%203-way%20Match.html" target="_blank" rel="noopener">Open 3-way match report →</a>`;
+    document.getElementById('orderAccuracyFooter').innerHTML = `<span>Based on ${percent(linkedShare)} of invoices linked to an order.</span><a class="procure-link" href="Procure%20-%203-way%20Match.html" target="_blank" rel="noopener">Open 3-way match report<span class="material-symbols-outlined link-chevron" aria-hidden="true">chevron_right</span></a>`;
   }
   // Show every supplier with an invoice; the briefing applies its own volume filter below.
   function supplierReliabilityRows(data, includeUninvoiced = false){
@@ -3595,11 +3696,79 @@
 
   /* Margins combines the existing Sales and Spend figures with explicitly illustrative recipe economics. */
   // Prototype-only outlet targets create a realistic mix of above- and below-target results.
-  const MARGINS_TARGET_COGS = {
-    "Roll'd Chatswood": 32.5, "Roll'd Newtown": 30.5, "Roll'd Bondi": 31.8,
-    "Roll'd Parramatta": 31.5, "Roll'd Wynyard": 31.5, "Roll'd Circular Quay": 32
-  };
-  function marginsTargetFor(name){ return MARGINS_TARGET_COGS[name] ?? +(29 + seededRandom(`${name}:cogs-target`)() * 5).toFixed(1); }
+  // Every outlet starts with a 30% target so the feature is visible from the first visit. A user can change it per outlet, or clear it for no
+  // target. Targets are kept in this browser. One number per outlet, used for every period, so past periods are judged against the same target.
+  const MARGINS_STARTING_TARGET = 30;
+  const MARGINS_TARGETS_KEY = 'nomni.marginsTargets.v1';
+  let marginsTargetOverrides = (() => { try { return JSON.parse(localStorage.getItem(MARGINS_TARGETS_KEY)) || {}; } catch { return {}; } })();
+  // null = no target (cleared). An outlet nobody has touched has the starting target.
+  function marginsTargetFor(name){
+    if(Object.prototype.hasOwnProperty.call(marginsTargetOverrides, name)){ const set = marginsTargetOverrides[name]; return Number.isFinite(set) ? set : null; }
+    return MARGINS_STARTING_TARGET;
+  }
+  // Set targets: one COGS % per outlet, in a dialog. Saving re-draws the Margins tab, so the GP% tile, the vs-target bars, the COGS chart and
+  // At a glance all move to the new targets.
+  const targetModalEl = document.getElementById('targetModal'), targetList = document.getElementById('targetList'), targetForm = document.getElementById('targetForm');
+  const targetSummary = document.getElementById('targetSummary'), targetBulkInput = document.getElementById('targetBulkInput');
+  const targetDialog = makeDialog(targetModalEl, () => targetList.querySelector('input'));
+  const parseTarget = text => { const value = parseFloat(String(text).trim().replace(',', '.')); return Number.isFinite(value) && value > 0 && value < 100 ? Math.round(value * 10) / 10 : null; };
+  const isBlank = input => input.value.trim() === '';   // blank = no target for that outlet
+  const targetInputs = () => [...targetList.querySelectorAll('input[data-outlet]')];
+  function updateTargetSummary(){
+    const data = getMarginsData('All outlets', currentPeriod);
+    const weights = new Map((data?.outlets || []).map(outlet => [outlet.name, outlet.revenue]));
+    let weighted = 0, total = 0, counted = 0;
+    const inputs = targetInputs();
+    inputs.forEach(input => { const value = parseTarget(input.value), revenue = weights.get(input.dataset.outlet) || 0; if(value !== null && revenue){ weighted += value * revenue; total += revenue; counted++; } });
+    targetSummary.innerHTML = !total ? 'No group target yet. Enter a target for at least one outlet.'
+      : `Group target <strong>${(weighted / total).toFixed(1)}%</strong> (${counted < inputs.length ? `${counted} of ${inputs.length} outlets, ` : 'outlets '}averaged by ${currentPeriod.toLowerCase()} revenue)`;
+  }
+  function fillTargetList(values){
+    const data = getMarginsData('All outlets', currentPeriod), actual = new Map((data?.outlets || []).map(outlet => [outlet.name, outlet.actual]));
+    const names = SALES_OUTLET_ROWS.map(outlet => outlet.name).sort(outletNameCollator.compare);
+    // The outlet being viewed comes first.
+    if(currentScope !== 'All outlets' && names.includes(currentScope)) names.splice(0, 0, ...names.splice(names.indexOf(currentScope), 1));
+    targetList.innerHTML = names.map(name => `<div class="target-row${name === currentScope ? ' is-selected' : ''}"><label class="target-row-name" for="target-${escapeHtml(name)}">${escapeHtml(name)}${actual.has(name) ? `<small>COGS ${actual.get(name).toFixed(1)}% ${currentPeriod.toLowerCase()}</small>` : ''}</label>`
+      + `<span class="target-input"><input id="target-${escapeHtml(name)}" data-outlet="${escapeHtml(name)}" inputmode="decimal" autocomplete="off" value="${values[name]}" data-initial="${values[name]}" placeholder="Not set" aria-label="Target COGS % for ${escapeHtml(name)}" /><span aria-hidden="true">%</span></span><span class="target-error" hidden></span></div>`).join('');
+    updateTargetSummary();
+  }
+  function openTargetDialog(trigger){
+    const values = {}; SALES_OUTLET_ROWS.forEach(outlet => { const target = marginsTargetFor(outlet.name); values[outlet.name] = target === null ? '' : target.toFixed(1); });
+    targetBulkInput.value = ''; targetBulkInput.classList.remove('invalid');
+    fillTargetList(values); targetDialog.open(trigger);
+  }
+  document.addEventListener('click', event => { const trigger = event.target.closest('[data-set-targets]'); if(trigger) openTargetDialog(trigger); });
+  targetList.addEventListener('input', event => { const input = event.target.closest('input'); if(!input) return; input.classList.remove('invalid'); input.closest('.target-row').querySelector('.target-error').hidden = true; updateTargetSummary(); });
+  document.getElementById('targetBulkApply').addEventListener('click', () => {
+    const value = parseTarget(targetBulkInput.value);
+    targetBulkInput.classList.toggle('invalid', value === null);
+    if(value === null){ targetBulkInput.focus(); return; }
+    targetInputs().forEach(input => { input.value = value.toFixed(1); input.classList.remove('invalid'); input.closest('.target-row').querySelector('.target-error').hidden = true; });
+    updateTargetSummary();
+  });
+  targetBulkInput.addEventListener('keydown', event => { if(event.key === 'Enter'){ event.preventDefault(); document.getElementById('targetBulkApply').click(); } });
+  targetBulkInput.addEventListener('input', () => targetBulkInput.classList.remove('invalid'));
+  document.getElementById('targetClear').addEventListener('click', () => { targetInputs().forEach(input => { input.value = ''; input.classList.remove('invalid'); input.closest('.target-row').querySelector('.target-error').hidden = true; }); updateTargetSummary(); targetInputs()[0]?.focus(); });
+  document.getElementById('targetCancel').addEventListener('click', () => targetDialog.close());
+  document.getElementById('targetModalClose').addEventListener('click', () => targetDialog.close());
+  targetForm.addEventListener('submit', event => {
+    event.preventDefault();
+    // Only outlets the user changed are stored. The rest keep following the starting target, so a future change to it (or a new outlet)
+    // reaches everyone who never set their own.
+    const next = { ...marginsTargetOverrides }; let firstInvalid = null;
+    targetInputs().forEach(input => {
+      const blank = isBlank(input), value = blank ? null : parseTarget(input.value), error = input.closest('.target-row').querySelector('.target-error');
+      const invalid = !blank && value === null;
+      input.classList.toggle('invalid', invalid); error.hidden = !invalid;
+      if(invalid){ error.textContent = 'Enter a percentage between 0 and 100, or leave blank'; firstInvalid ||= input; }
+      else if(input.value.trim() !== input.dataset.initial) next[input.dataset.outlet] = value;   // changed; blank -> null: no target
+    });
+    if(firstInvalid){ firstInvalid.focus(); return; }
+    marginsTargetOverrides = next;
+    try { localStorage.setItem(MARGINS_TARGETS_KEY, JSON.stringify(next)); } catch { /* storage unavailable: the targets still apply for this visit */ }
+    targetDialog.close();
+    renderMarginsTab();
+  });
   // Allocate the existing sample wastage and variance totals across outlets, then use the remainder as each
   // outlet's sample theoretical cost. One allocation serves group and outlet scopes, so the rows reconcile.
   function marginsTheoreticalAllocations(allPairs, period, cogsOffset){
@@ -3638,11 +3807,13 @@
     // Same revenue weighting and period offset as the COGS summary card.
     const cogsPct = pairs.reduce((sum, pair) => sum + pair.base.cogs * pair.revenue, 0) / revenue + context.cogsOffset;
     const cogsValue = revenue * cogsPct / 100;
-    const targetPct = pairs.reduce((sum, pair) => sum + marginsTargetFor(pair.name) * pair.revenue, 0) / revenue;
+    // Group target: outlet targets averaged by revenue, over the outlets that have one (null when none does).
+    const targeted = pairs.filter(pair => marginsTargetFor(pair.name) !== null), targetedRevenue = targeted.reduce((sum, pair) => sum + pair.revenue, 0);
+    const targetPct = targetedRevenue ? targeted.reduce((sum, pair) => sum + marginsTargetFor(pair.name) * pair.revenue, 0) / targetedRevenue : null;
     const allocations = marginsTheoreticalAllocations(allPairs, period, context.cogsOffset);
     // Keep the whole POS comparison list visible at outlet scope, like Revenue by outlet on Sales.
     const outlets = allocations.map(row => ({ name: row.name, revenue: row.revenue, trendActual: row.actual, actual: +row.actual.toFixed(1), target: marginsTargetFor(row.name),
-      gapValue: row.revenue * (row.actual - marginsTargetFor(row.name)) / 100,
+      gapValue: marginsTargetFor(row.name) === null ? null : row.revenue * (row.actual - marginsTargetFor(row.name)) / 100,
       theoreticalPct: row.theoreticalPct, theoreticalGapValue: row.cogsValue - row.theoreticalValue }));
     const selectedNames = new Set(pairs.map(pair => pair.name));
     const selectedAllocations = allocations.filter(row => selectedNames.has(row.name));
@@ -3690,7 +3861,8 @@
       return outlets.reduce((sum, outlet) => sum + outlet.values[index] * outlet.revenues[index], 0) / revenue;
     });
     const groupAverage = outlets.reduce((sum, outlet) => sum + outlet.average * outlet.revenue, 0) / totalRevenue;
-    const target = outlets.reduce((sum, outlet) => sum + outlet.target * outlet.revenue, 0) / totalRevenue;
+    const targetedOutlets = outlets.filter(outlet => outlet.target !== null), targetedRevenue = targetedOutlets.reduce((sum, outlet) => sum + outlet.revenue, 0);
+    const target = targetedRevenue ? targetedOutlets.reduce((sum, outlet) => sum + outlet.target * outlet.revenue, 0) / targetedRevenue : null;
     const selectedOutlet = outlets.find(outlet => outlet.name === data.scope);
     return { labels, outlets, groupValues, groupAverage, target, selectedOutlet,
       scopeValues: selectedOutlet?.values || groupValues, scopeCovers: source.covers };
@@ -3735,8 +3907,8 @@
     const granularity = (COVERS_SPEND_PERIOD[data.period] || COVERS_SPEND_PERIOD['This month']).granularity;
     const grain = { daily: 'day', weekly: 'week', monthly: 'month' }[granularity];
     // Worked out from the figures as displayed (one decimal), the way COGS by outlet does, so the sentence adds up.
-    const gp = +data.gpPct.toFixed(1), target = +(100 - data.targetPct).toFixed(1);
-    const difference = +(gp - target).toFixed(1);
+    const gp = +data.gpPct.toFixed(1), hasTarget = data.targetPct !== null, target = hasTarget ? +(100 - data.targetPct).toFixed(1) : null;
+    const difference = hasTarget ? +(gp - target).toFixed(1) : null;
     // Line, wash and end-dot follow the pill (change on the previous period) exactly as the tiles beside this one do.
     // Where GP stands against target is read from the dashed line, so a second colour never contradicts the pill.
     const direction = Math.abs(Math.round(gpChange * 10) / 10) < .05 ? 'trend-flat' : gpChange > 0 ? 'trend-up' : 'trend-down';
@@ -3754,31 +3926,31 @@
     }
     // At least a 2-point window, centred on the data and the target: a small wobble stays small, a real miss is obvious.
     // (One point of GP is worth about 1% of revenue, so a full point should be clearly visible.)
-    const lo = Math.min(target, ...values), hi = Math.max(target, ...values);
+    const lo = Math.min(...(hasTarget ? [target] : []), ...values), hi = Math.max(...(hasTarget ? [target] : []), ...values);
     const mid = (lo + hi) / 2, half = Math.max((hi - lo) / 2 * 1.35, 1);
     const domainMax = mid + half, span = half * 2;
     const W = 400, H = 200;
     const x = index => index / (values.length - 1) * W;
     const y = value => (domainMax - value) / span * H;
     const linePath = values.map((value, index) => `${index ? 'L' : 'M'} ${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(' ');
-    const label = `GP% by ${grain}, target ${target.toFixed(1)}%: ${values.map((value, index) => `${labels[index]} ${value.toFixed(1)}%`).join(', ')}`;
+    const label = `GP% by ${grain}${hasTarget ? `, target ${target.toFixed(1)}%` : ', no target set'}: ${values.map((value, index) => `${labels[index]} ${value.toFixed(1)}%`).join(', ')}`;
     wrap.innerHTML = head
       + `<div class="margins-gp-plot">`
       + `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" tabindex="0" aria-label="${escapeHtml(label)}">`
       + `<path class="mini-chart-area" d="${linePath} L ${W},${H} L 0,${H} Z" fill="url(#${patternId})" mask="url(#mcFade)"></path>`
-      + `<line x1="0" y1="${y(target).toFixed(1)}" x2="${W}" y2="${y(target).toFixed(1)}" stroke="var(--ink-mute)" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"></line>`
+      + (hasTarget ? `<line x1="0" y1="${y(target).toFixed(1)}" x2="${W}" y2="${y(target).toFixed(1)}" stroke="var(--ink-mute)" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"></line>` : '')
       + `<polyline class="mini-chart-line" points="${values.map((value, index) => `${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(' ')}"></polyline>`
       + `<line class="mini-chart-crosshair" x1="0" y1="0" x2="0" y2="${H}"></line>`
       + values.map((value, index) => `<circle class="mini-chart-point" cx="${x(index).toFixed(1)}" cy="${y(value).toFixed(1)}" r="4"></circle>`).join('')
       + `<rect class="mini-chart-hit-area" x="0" y="0" width="${W}" height="${H}" fill="transparent"></rect></svg>`
       + `</div>`
-      + `<div class="mini-chart-axis"><span>${escapeHtml(labels[0])}</span><span class="margins-gp-target-key"><i aria-hidden="true"></i>Target ${target.toFixed(1)}%</span><span>${escapeHtml(labels.at(-1))}</span></div>`;
+      + `<div class="mini-chart-axis"><span>${escapeHtml(labels[0])}</span>${hasTarget ? `<button class="margins-gp-target-key margins-target-link" type="button" data-set-targets data-col-info="setTarget" data-col-info-text="Change the target COGS %"><i aria-hidden="true"></i>Target ${target.toFixed(1)}%</button>` : `<button class="margins-gp-target-key margins-target-link" type="button" data-set-targets>Set a target</button>`}<span>${escapeHtml(labels.at(-1))}</span></div>`;
     // How the number is worked out, in plain words. Nothing else is derived for this tile.
     const isGroup = data.scope === 'All outlets' && data.outlets.length > 1;
-    const standing = difference === 0 ? 'on target' : `${Math.abs(difference).toFixed(1)} pts ${difference > 0 ? 'above' : 'below'} target`;
+    const standing = !hasTarget ? '' : difference === 0 ? 'on target' : `${Math.abs(difference).toFixed(1)} pts ${difference > 0 ? 'above' : 'below'} target`;
     const info = document.createElement('button');
     info.className = 'col-info'; info.type = 'button'; info.dataset.colInfo = 'gpPercent';
-    info.dataset.colInfoText = `GP% = (revenue − COGS) ÷ revenue${isGroup ? ', worked out across all outlets together' : ''}. One point per ${grain}. Target: ${isGroup ? 'each outlet’s own target, weighted by revenue' : 'set for this outlet'}. Currently ${standing}.`;
+    info.dataset.colInfoText = `GP% = (revenue − COGS) ÷ revenue${isGroup ? ', worked out across all outlets together' : ''}. One point per ${grain}. ${hasTarget ? `Target: ${isGroup ? 'each outlet’s own target, weighted by revenue' : 'set for this outlet'}. Currently ${standing}.` : 'No target set.'}`;
     info.setAttribute('aria-label', 'About GP%'); info.textContent = 'i';
     wrap.querySelector('.mini-chart-name').appendChild(info);
     container.appendChild(wrap);
@@ -3793,7 +3965,7 @@
         point.classList.toggle('is-active', isActive);
         point.setAttribute('r', isActive ? '5.5' : '4');
       });
-      showChartTip(points[index], `${labels[index]}\nGP: ${values[index].toFixed(1)}%\nTarget: ${target.toFixed(1)}%`);
+      showChartTip(points[index], `${labels[index]}\nGP: ${values[index].toFixed(1)}%${hasTarget ? `\nTarget: ${target.toFixed(1)}%` : ''}`);
     };
     const deactivate = () => {
       if(active < 0) return;
@@ -3870,10 +4042,11 @@
   let marginsOutletFilter = 'all';
   let lastMarginsOutletScope = null;
   function marginsReference(outlet){ return marginsComparison === 'target' ? outlet.target : outlet.theoreticalPct; }
-  function marginsDifference(outlet){ return +(outlet.actual - marginsReference(outlet)).toFixed(1); }
+  // An outlet with no target has nothing to be over or under: no difference, and it only appears under "All".
+  function marginsDifference(outlet){ const reference = marginsReference(outlet); return reference === null ? null : +(outlet.actual - reference).toFixed(1); }
   function marginsOutletPosition(outlet){
     const difference = marginsDifference(outlet);
-    return difference > 0 ? 'over' : difference < 0 ? 'under' : 'at';
+    return difference === null ? 'none' : difference > 0 ? 'over' : difference < 0 ? 'under' : 'at';
   }
   function renderMarginsBullets(data){
     const body = document.getElementById('marginsBulletsBody');
@@ -3881,33 +4054,37 @@
     const multiOutlet = data.outlets.length > 1;
     if(!multiOutlet) marginsOutletFilter = 'all';
     const referenceLabel = marginsComparison === 'target' ? 'target' : 'theoretical';
-    const counts = { all: data.outlets.length, over: 0, under: 0, at: 0 };
+    const counts = { all: data.outlets.length, over: 0, under: 0, at: 0, none: 0 };
     data.outlets.forEach(outlet => counts[marginsOutletPosition(outlet)]++);
     const visible = data.outlets.filter(outlet => marginsOutletFilter === 'all' || marginsOutletPosition(outlet) === marginsOutletFilter);
-    const scaleMax = Math.max(40, ...data.outlets.map(outlet => Math.ceil(Math.max(outlet.actual, marginsReference(outlet)) / 5) * 5));
+    const scaleMax = Math.max(40, ...data.outlets.map(outlet => Math.ceil(Math.max(outlet.actual, marginsReference(outlet) ?? 0) / 5) * 5));
     const controls = document.createElement('div'); controls.className = 'margins-bullet-controls';
     controls.innerHTML = `<div class="outlet-filter-chips" role="group" aria-label="Filter outlets by COGS difference from ${referenceLabel}"><button class="outlet-filter-chip" type="button" data-margins-outlet-filter="all" aria-pressed="${marginsOutletFilter === 'all'}">All ${counts.all}</button><button class="outlet-filter-chip" type="button" data-margins-outlet-filter="over" aria-pressed="${marginsOutletFilter === 'over'}">Over ${counts.over}</button><button class="outlet-filter-chip" type="button" data-margins-outlet-filter="under" aria-pressed="${marginsOutletFilter === 'under'}">Under ${counts.under}</button></div>`;
     controls.querySelectorAll('[data-margins-outlet-filter]').forEach(button => button.addEventListener('click', () => { marginsOutletFilter = button.dataset.marginsOutletFilter; renderMarginsBullets(data); }));
+    // "Set targets" sits on the filter row (right-aligned). A single outlet has no filter chips, so the row is just this link.
+    controls.insertAdjacentHTML('beforeend', '<button class="margins-set-target" type="button" data-set-targets><span class="material-symbols-outlined" aria-hidden="true">flag</span>Set targets</button>');
+    if(!multiOutlet) controls.querySelector('.outlet-filter-chips').remove();
     const head = document.createElement('div'); head.className = 'margins-bullet-head';
     head.innerHTML = `<span>Outlet</span><span>Actual COGS</span><span>vs ${referenceLabel}</span>`;
     const list = document.createElement('div'); list.className = 'margins-bullet-list'; list.tabIndex = 0; list.setAttribute('role', 'region'); list.setAttribute('aria-label', 'COGS by outlet list, scrollable');
     let selectedRow = null;
-    [...visible].sort((a, b) => marginsDifference(b) - marginsDifference(a) || a.name.localeCompare(b.name)).forEach(outlet => {
+    [...visible].sort((a, b) => (marginsDifference(b) ?? -Infinity) - (marginsDifference(a) ?? -Infinity) || a.name.localeCompare(b.name)).forEach(outlet => {
       const reference = marginsReference(outlet);
       const difference = marginsDifference(outlet);
+      const noReference = reference === null;
       const gapValue = marginsComparison === 'target' ? outlet.gapValue : outlet.theoreticalGapValue;
-      const over = difference > 0, under = difference < 0;
-      const status = over ? `${money(Math.abs(gapValue), 10)} over` : under ? `${money(Math.abs(gapValue), 10)} under` : `At ${referenceLabel}`;
+      const over = !noReference && difference > 0, under = !noReference && difference < 0;
+      const status = noReference ? 'No target' : over ? `${money(Math.abs(gapValue), 10)} over` : under ? `${money(Math.abs(gapValue), 10)} under` : `At ${referenceLabel}`;
       const row = document.createElement('div'); row.className = 'margins-bullet-row';
       if(multiOutlet && outlet.name === data.scope){ row.classList.add('is-selected'); row.setAttribute('aria-current', 'true'); selectedRow = row; }
       row.innerHTML = `<span class="margins-bullet-name" title="${escapeHtml(outlet.name)}">${escapeHtml(outlet.name)}</span>`
-        + `<span class="margins-bullet-measure" tabindex="0" role="img" aria-label="${escapeHtml(outlet.name)}: actual COGS ${outlet.actual.toFixed(1)}%; ${referenceLabel} ${reference.toFixed(1)}%; difference ${difference > 0 ? '+' : ''}${difference.toFixed(1)} percentage points"><span class="margins-bullet-track">`
+        + `<span class="margins-bullet-measure" tabindex="0" role="img" aria-label="${escapeHtml(outlet.name)}: actual COGS ${outlet.actual.toFixed(1)}%; ${noReference ? `no ${referenceLabel} set` : `${referenceLabel} ${reference.toFixed(1)}%; difference ${difference > 0 ? '+' : ''}${difference.toFixed(1)} percentage points`}"><span class="margins-bullet-track">`
         + `<span class="margins-bullet-actual" style="left:0;width:${(outlet.actual / scaleMax * 100).toFixed(1)}%;background:${over ? 'var(--viz-div-neg2)' : under ? 'var(--spinach)' : 'var(--ink-mute)'}"></span>`
-        + `<span class="margins-bullet-reference" style="left:${(reference / scaleMax * 100).toFixed(1)}%" aria-hidden="true"></span>`
+        + (noReference ? '' : `<span class="margins-bullet-reference" style="left:${(reference / scaleMax * 100).toFixed(1)}%" aria-hidden="true"></span>`)
         + `</span><strong>${outlet.actual.toFixed(1)}%</strong></span>`
-        + `<span class="margins-bullet-gap${over ? ' is-over' : ''}"><span class="margins-bullet-mobile-label">vs ${referenceLabel}</span><strong>${difference > 0 ? '+' : ''}${difference.toFixed(1)} pts</strong><span>${status}</span></span>`;
+        + `<span class="margins-bullet-gap${over ? ' is-over' : ''}"><span class="margins-bullet-mobile-label">vs ${referenceLabel}</span><strong>${noReference ? '—' : `${difference > 0 ? '+' : ''}${difference.toFixed(1)} pts`}</strong><span>${status}</span></span>`;
       const measure = row.querySelector('.margins-bullet-measure');
-      const tip = `${outlet.name}\n${marginsComparison === 'target' ? 'Target' : 'Theoretical'} COGS: ${reference.toFixed(1)}%\nActual COGS: ${outlet.actual.toFixed(1)}%`;
+      const tip = `${outlet.name}\n${noReference ? `No ${referenceLabel} set` : `${marginsComparison === 'target' ? 'Target' : 'Theoretical'} COGS: ${reference.toFixed(1)}%`}\nActual COGS: ${outlet.actual.toFixed(1)}%`;
       measure.addEventListener('mouseenter', () => showChartTip(measure, tip));
       measure.addEventListener('focus', () => showChartTip(measure, tip));
       measure.addEventListener('mouseleave', hideChartTip);
@@ -3915,7 +4092,7 @@
       list.appendChild(row);
     });
     if(!visible.length){ const empty = document.createElement('p'); empty.className = 'margins-bullet-empty'; empty.textContent = 'No outlets in this group.'; list.appendChild(empty); }
-    const children = multiOutlet ? [controls, head, list] : [head, list];
+    const children = [controls, head, list];
     body.replaceChildren(...children);
     list.scrollTop = previousScrollTop;
     if(selectedRow && data.scope !== lastMarginsOutletScope){
@@ -3959,6 +4136,7 @@
     const body = document.getElementById('marginsTrendBody');
     const sample = marginsSampleCogsSeries(data);
     const { labels, outlets: allOutlets, groupValues, groupAverage, target } = sample;
+    const hasTarget = target !== null;   // no group target when no outlet has one: no target line, band or legend entry
     const ranked = [...allOutlets].sort((a, b) => b.average - a.average || a.name.localeCompare(b.name));
     const selectedOutlet = ranked.find(outlet => outlet.name === data.scope);
     const singleOutletAccount = SALES_OUTLET_ROWS.length === 1;
@@ -3974,7 +4152,7 @@
     const groupStrokeWidth = selectedOutlet ? 1.5 : 3;
     const outletStrokeWidth = selectedOutlet || singleOutletAccount ? 3 : 1.5;
     const drawLines = singleOutletAccount ? visibleOutlets : selectedOutlet ? [plottedLines[0], ...visibleOutlets] : [...visibleOutlets, plottedLines[0]];
-    const low = Math.min(target - 1, ...plottedLines.flatMap(line => line.values)), high = Math.max(target + 1, ...plottedLines.flatMap(line => line.values));
+    const low = Math.min(...(hasTarget ? [target - 1] : []), ...plottedLines.flatMap(line => line.values)), high = Math.max(...(hasTarget ? [target + 1] : []), ...plottedLines.flatMap(line => line.values));
     const domainMin = Math.floor(low) - .5, domainMax = Math.ceil(high) + .5, domainSpan = domainMax - domainMin;
     const plotWidth = 1000, plotHeight = 300;
     const x = index => index / (groupValues.length - 1) * plotWidth;
@@ -3983,7 +4161,7 @@
     const tickStep = domainSpan > 7 ? 2 : 1;
     for(let value = Math.ceil(domainMin / tickStep) * tickStep; value < domainMax; value += tickStep) ticks.push(value);
     const points = values => values.map((value, index) => `${x(index).toFixed(1)},${y(value).toFixed(1)}`).join(' ');
-    const bandTop = y(target + 1), bandHeight = y(target - 1) - bandTop;
+    const bandTop = hasTarget ? y(target + 1) : 0, bandHeight = hasTarget ? y(target - 1) - bandTop : 0;
     const dateTickIndexes = [...new Set([0, 1, 2, 3, 4].map(step => Math.round(step * (labels.length - 1) / 4)))];
     const hitWidth = plotWidth / (labels.length - 1);
     const targetLegendLabel = singleOutletAccount ? 'Target' : 'Group target';
@@ -3997,20 +4175,20 @@
     body.innerHTML = `<p class="margins-trend-current"><span>${(selectedOutlet?.average ?? groupAverage).toFixed(1)}%</span><span class="margins-trend-current-scope">${escapeHtml(currentScopeLabel)}</span></p>`
       + `<div class="margins-trend-chart">`
       + `<div class="margins-trend-y-axis" aria-hidden="true">${ticks.map(value => `<span style="top:${(y(value) / plotHeight * 100).toFixed(2)}%">${value}%</span>`).join('')}</div>`
-      + `<div class="margins-trend-plot" style="--endpoint-y:${(y(focalLine.values.at(-1)) / plotHeight * 100).toFixed(2)}%;--trend-color:${focalLine.color}"><svg viewBox="0 0 ${plotWidth} ${plotHeight}" preserveAspectRatio="none" aria-label="COGS percentage trends for ${trendScopeLabel} from ${escapeHtml(labels[0])} to ${escapeHtml(labels.at(-1))}; ${targetLegendLabel.toLowerCase()} ${target.toFixed(1)}% with a one-point tolerance band">`
-      + `<rect x="0" y="${bandTop.toFixed(1)}" width="${plotWidth}" height="${bandHeight.toFixed(1)}" fill="var(--sidebar-bg-2)"></rect>`
+      + `<div class="margins-trend-plot" style="--endpoint-y:${(y(focalLine.values.at(-1)) / plotHeight * 100).toFixed(2)}%;--trend-color:${focalLine.color}"><svg viewBox="0 0 ${plotWidth} ${plotHeight}" preserveAspectRatio="none" aria-label="COGS percentage trends for ${trendScopeLabel} from ${escapeHtml(labels[0])} to ${escapeHtml(labels.at(-1))}${hasTarget ? `; ${targetLegendLabel.toLowerCase()} ${target.toFixed(1)}% with a one-point tolerance band` : '; no target set'}">`
+      + (hasTarget ? `<rect x="0" y="${bandTop.toFixed(1)}" width="${plotWidth}" height="${bandHeight.toFixed(1)}" fill="var(--sidebar-bg-2)"></rect>` : '')
       + ticks.map(value => `<line x1="0" y1="${y(value).toFixed(1)}" x2="${plotWidth}" y2="${y(value).toFixed(1)}" stroke="var(--rule)" stroke-width="1" vector-effect="non-scaling-stroke"></line>`).join('')
-      + `<line x1="0" y1="${y(target).toFixed(1)}" x2="${plotWidth}" y2="${y(target).toFixed(1)}" stroke="var(--ink-mute)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"></line>`
+      + (hasTarget ? `<line x1="0" y1="${y(target).toFixed(1)}" x2="${plotWidth}" y2="${y(target).toFixed(1)}" stroke="var(--ink-mute)" stroke-width="1.5" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"></line>` : '')
       + drawLines.map(line => `<polyline points="${points(line.values)}" fill="none" stroke="${line.color}" stroke-width="${line.name === 'All outlets' ? groupStrokeWidth : outletStrokeWidth}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></polyline>`).join('')
       + `<line class="margins-trend-crosshair" x1="0" y1="0" x2="0" y2="${plotHeight}" stroke="var(--ink-mute-strong)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>`
-      + groupValues.map((value, index) => `<rect class="margins-trend-hit" data-trend-index="${index}" x="${(index === 0 ? 0 : x(index) - hitWidth / 2).toFixed(1)}" y="0" width="${index === 0 || index === labels.length - 1 ? hitWidth / 2 : hitWidth}" height="${plotHeight}" fill="transparent" tabindex="0" role="img" aria-label="${escapeHtml(`${labels[index]}: ${plottedLines.map(line => `${line.name} ${line.values[index].toFixed(1)}%`).join('; ')}; ${targetLegendLabel.toLowerCase()} ${target.toFixed(1)}%`)}"></rect>`).join('')
+      + groupValues.map((value, index) => `<rect class="margins-trend-hit" data-trend-index="${index}" x="${(index === 0 ? 0 : x(index) - hitWidth / 2).toFixed(1)}" y="0" width="${index === 0 || index === labels.length - 1 ? hitWidth / 2 : hitWidth}" height="${plotHeight}" fill="transparent" tabindex="0" role="img" aria-label="${escapeHtml(`${labels[index]}: ${plottedLines.map(line => `${line.name} ${line.values[index].toFixed(1)}%`).join('; ')}${hasTarget ? `; ${targetLegendLabel.toLowerCase()} ${target.toFixed(1)}%` : ''}`)}"></rect>`).join('')
       + `</svg><span class="margins-trend-endpoint" aria-hidden="true"></span>${plottedLines.map(line => `<span class="margins-trend-active" style="--trend-color:${line.color}" aria-hidden="true"></span>`).join('')}</div><div class="margins-trend-x-axis" aria-hidden="true">${dateTickIndexes.map(index => `<span>${escapeHtml(labels[index])}</span>`).join('')}</div></div>`
-      + `<div class="margins-trend-legend">${singleOutletAccount ? '' : `<span><i style="border-top-width:${groupStrokeWidth}px" aria-hidden="true"></i>${selectedOutlet ? `All outlets avg ${groupAverage.toFixed(1)}%` : `<strong>All outlets avg ${groupAverage.toFixed(1)}%</strong>`}</span>`}${visibleOutlets.map(outlet => `<span><i style="border-top-color:${outlet.color};border-top-width:${outletStrokeWidth}px" aria-hidden="true"></i>${selectedOutlet || singleOutletAccount ? `<strong>${escapeHtml(outlet.name)} avg ${outlet.average.toFixed(1)}%</strong>` : `${escapeHtml(outlet.name)} avg ${outlet.average.toFixed(1)}%`}</span>`).join('')}<span><i class="target-key" aria-hidden="true"></i>${targetLegendLabel} ${target.toFixed(1)}%</span><span><i class="band-key" aria-hidden="true"></i>${toleranceLegendLabel}</span></div>`;
+      + `<div class="margins-trend-legend">${singleOutletAccount ? '' : `<span><i style="border-top-width:${groupStrokeWidth}px" aria-hidden="true"></i>${selectedOutlet ? `All outlets avg ${groupAverage.toFixed(1)}%` : `<strong>All outlets avg ${groupAverage.toFixed(1)}%</strong>`}</span>`}${visibleOutlets.map(outlet => `<span><i style="border-top-color:${outlet.color};border-top-width:${outletStrokeWidth}px" aria-hidden="true"></i>${selectedOutlet || singleOutletAccount ? `<strong>${escapeHtml(outlet.name)} avg ${outlet.average.toFixed(1)}%</strong>` : `${escapeHtml(outlet.name)} avg ${outlet.average.toFixed(1)}%`}</span>`).join('')}${hasTarget ? `<span><i class="target-key" aria-hidden="true"></i>${targetLegendLabel} ${target.toFixed(1)}%</span><span><i class="band-key" aria-hidden="true"></i>${toleranceLegendLabel}</span>` : `<span><button class="margins-target-link" type="button" data-set-targets>Set a target</button></span>`}</div>`;
     const svg = body.querySelector('svg'), plot = body.querySelector('.margins-trend-plot'), crosshair = svg.querySelector('.margins-trend-crosshair'), markers = [...plot.querySelectorAll('.margins-trend-active')];
     const activate = index => {
       crosshair.setAttribute('x1', x(index)); crosshair.setAttribute('x2', x(index)); crosshair.style.opacity = '1';
       markers.forEach((marker, lineIndex) => { marker.style.left = `${x(index) / plotWidth * 100}%`; marker.style.top = `${y(plottedLines[lineIndex].values[index]) / plotHeight * 100}%`; marker.style.opacity = '1'; });
-      showChartTip(markers[0], `${labels[index]}\n${plottedLines.map(line => `${line.name}: ${line.values[index].toFixed(1)}%`).join('\n')}\n${targetLegendLabel}: ${target.toFixed(1)}%`);
+      showChartTip(markers[0], `${labels[index]}\n${plottedLines.map(line => `${line.name}: ${line.values[index].toFixed(1)}%`).join('\n')}${hasTarget ? `\n${targetLegendLabel}: ${target.toFixed(1)}%` : ''}`);
     };
     const deactivate = () => { crosshair.style.opacity = '0'; markers.forEach(marker => { marker.style.opacity = '0'; }); hideChartTip(); };
     svg.querySelectorAll('.margins-trend-hit').forEach(hit => {
@@ -4320,14 +4498,14 @@
     const context = PERIOD_CARD_CONTEXT[data.period], price = marginsPriceImpact(data);
     const input = {
       comparison: context.comparison,
-      gp: { value: data.gpPct, target: 100 - data.targetPct, change: -context.cogsChangePts },
+      gp: { value: data.gpPct, target: data.targetPct === null ? null : 100 - data.targetPct, change: -context.cogsChangePts },
       costs: { revenue: data.revenue, wastage: data.wastageValue, variance: data.varianceValue },
       priceImpact: price ? { value: price.impact, changePct: price.changePct } : null,
     };
-    if(data.scope === 'All outlets') input.outlets = data.outlets.map(outlet => ({ name: outlet.name, gp: 100 - outlet.actual, target: 100 - outlet.target }));
+    if(data.scope === 'All outlets') input.outlets = data.outlets.map(outlet => ({ name: outlet.name, gp: 100 - outlet.actual, target: outlet.target === null ? null : 100 - outlet.target }));
     // Gross profit at each point of the GP% tile, against the same target line.
     const sample = marginsSampleCogsSeries(data), unit = { daily: 'day', weekly: 'week', monthly: 'month' }[COVERS_SPEND_PERIOD[data.period]?.granularity] || 'day';
-    input.trend = { unit, target: 100 - data.targetPct, points: sample.labels.map((label, index) => ({ label, gp: 100 - sample.scopeValues[index] })) };
+    input.trend = { unit, target: data.targetPct === null ? null : 100 - data.targetPct, points: sample.labels.map((label, index) => ({ label, gp: 100 - sample.scopeValues[index] })) };
     // COGS by sales category for the selected outlets (the panel's own outlet filter doesn't change this).
     const categories = getMarginsCategoryRows(data.scope, data.period);
     if(categories.rows.length) input.categories = { overall: categories.overallCogsPct, rows: categories.rows.map(row => ({ name: row.name, cogsPct: row.cogsPct, salesShare: row.salesShare })) };
@@ -4390,7 +4568,6 @@
   document.addEventListener('click', event => { if(event.target.closest('[data-stub]')) event.preventDefault(); });
 
   /* --- Data status: a footer row inside each tab's "At a glance" box. Shown only when there is a gap. --- */
-  function statusPopoverRow(label, value, detail, link){ return `<div class="data-status-item"><div class="data-status-row"><span>${label}</span><span class="data-status-value">${value}</span></div><div class="data-status-detail"><span>${detail}</span>${statusPopoverLink(link)}</div></div>`; }
   // A link is a label (a stub for a page that doesn't exist yet) or { text, href }, which opens in a new tab.
   function statusPopoverLink(link){
     if(!link) return '';
@@ -4413,6 +4590,7 @@
   }
   function openStatusModal(title, bodyHtml, trigger){
     statusModalTitle.textContent = title;
+    statusModalClose.setAttribute('aria-label', `Close ${title.toLowerCase()}`);
     statusModalBody.innerHTML = bodyHtml;
     statusModalTrigger = trigger;
     statusModal.classList.add('open');
@@ -4429,64 +4607,110 @@
   statusModalClose.addEventListener('click', closeStatusModal);
   statusModal.addEventListener('click', event => { if(event.target === statusModal) closeStatusModal(); });
 
+  // Data status on Sales and Margins (same content): the two things that limit these figures.
+  //   1. outlets not connected to POS  -> their sales aren't in the figures at all
+  //   2. POS items (products and variants) not mapped      -> they can't be costed (theoretical COGS, menu margin)
+  // Mapping is counted per outlet as products mapped out of total, the way the HQ POS mapping page counts it.
+  const POS_MAPPING_FLOOR = 90;   // an outlet under this share mapped shows in amber
+  function posMappingFor(name){
+    const rand = seededRandom(`${name}:pos-mapping`);
+    const pick = (total, share) => ({ total, mapped: share > .97 ? total : Math.round(total * share) });
+    const products = pick(34 + Math.floor(rand() * 70), 1 - Math.pow(rand(), 2.4) * .42);
+    const variants = pick(Math.round(products.total * (1.4 + rand() * 1.2)), 1 - Math.pow(rand(), 2.4) * .42);
+    const mapped = products.mapped + variants.mapped, total = products.total + variants.total;
+    return { name, products, variants, mapped, total, pct: Math.round(mapped / total * 100) };
+  }
+  function posStatus(){
+    const all = currentScope === 'All outlets';
+    const names = SALES_OUTLET_ROWS.map(row => row.name).filter(name => all || name === currentScope);
+    const rows = names.map(posMappingFor).sort((a, b) => a.pct - b.pct || a.name.localeCompare(b.name));
+    const sum = (key, field) => rows.reduce((acc, row) => acc + row[key][field], 0);
+    const mapped = rows.reduce((acc, row) => acc + row.mapped, 0), total = rows.reduce((acc, row) => acc + row.total, 0);
+    return { missing: all ? OUTLETS_WITHOUT_POS : [], rows, mapped, total, pct: total ? Math.round(mapped / total * 100) : null,
+      products: { mapped: sum('products', 'mapped'), total: sum('products', 'total') }, variants: { mapped: sum('variants', 'mapped'), total: sum('variants', 'total') } };
+  }
+  function posStatusModalBody(status){
+    const single = status.rows.length === 1 ? status.rows[0] : null;
+    const tiles = [];
+    if(status.missing.length) tiles.push({ id: 'missing', label: 'Outlets not connected', value: status.missing.length, detail: `of ${DASHBOARD_OUTLETS.length} outlets` });
+    if(status.total) tiles.push({ id: 'mapping', label: 'POS items mapped', value: `${status.pct}%`, detail: single ? `${status.products.mapped.toLocaleString('en-SG')} products mapped<br>${status.variants.mapped.toLocaleString('en-SG')} variants mapped` : (low => `${plural(low, 'outlet', 'outlets')} under ${POS_MAPPING_FLOOR}%`)(status.rows.filter(row => row.pct < POS_MAPPING_FLOOR).length) });
+    const interactive = tiles.length > 1;
+    const tileHtml = tiles.map((tile, index) => `<${interactive ? 'button type="button" role="tab" aria-selected="' + (index === 0) + '" aria-controls="posPanel-' + tile.id + '"' : 'div'} class="coverage-stat no-link${interactive ? ' is-tab' : ''}${interactive && index === 0 ? ' is-active' : ''}" data-pos-tab="${tile.id}"><span class="coverage-stat-label">${tile.label}</span><span class="coverage-stat-value">${tile.value}</span><span class="coverage-stat-detail">${tile.detail}</span></${interactive ? 'button' : 'div'}>`).join('');
+    const section = (id, title, hint, inner, hidden) => `<div class="pos-status-section" id="posPanel-${id}" role="${interactive ? 'tabpanel' : 'group'}"${hidden ? ' hidden' : ''}>${title ? `<div class="pos-status-head"><span>${title}</span>${hint ? `<small>${hint}</small>` : ''}</div>` : ''}${inner}</div>`;
+    const missing = status.missing.length ? section('missing', 'Not connected to POS', '', `<ul class="data-status-list">${status.missing.map(name => `<li><span class="data-status-name">${escapeHtml(name)}</span><a class="procure-link" href="#outlets" data-stub>Connect<span class="material-symbols-outlined link-chevron" aria-hidden="true">chevron_right</span></a></li>`).join('')}</ul>`, false) : '';
+    const list = status.rows.length > 1 ? `<ul class="pos-map-list">${status.rows.map(row => `<li><span><span class="pos-map-name">${escapeHtml(row.name)}</span><span class="pos-map-sub">${row.products.mapped} of ${row.products.total} products · ${row.variants.mapped} of ${row.variants.total} variants</span></span><span class="pos-map-pct${row.pct < POS_MAPPING_FLOOR ? ' procure-below' : ''}">${row.pct}%</span></li>`).join('')}</ul>` : '';
+    const mapping = status.rows.length > 1 ? section('mapping', single ? '' : 'POS mapping by outlet', single ? '' : `Under ${POS_MAPPING_FLOOR}% in amber`, list, !!missing) : '';
+    return `<div class="coverage-stats${tiles.length === 1 ? ' is-single' : ''}"${interactive ? ' role="tablist" aria-label="POS coverage"' : ''}>${tileHtml}</div>${missing}${mapping}`;
+  }
+  statusModalBody.addEventListener('click', event => {
+    const tab = event.target.closest('[data-pos-tab]'); if(!tab || tab.tagName !== 'BUTTON') return;
+    statusModalBody.querySelectorAll('[data-pos-tab]').forEach(item => { const on = item === tab; item.classList.toggle('is-active', on); item.setAttribute('aria-selected', String(on)); });
+    statusModalBody.querySelectorAll('.pos-status-section').forEach(panel => { panel.hidden = panel.id !== `posPanel-${tab.dataset.posTab}`; });
+  });
+  // The footer shows when either thing needs attention; the sentence leads with outlets that aren't connected.
+  function updatePosStatusFooter(noun, footer, text){
+    const status = posStatus(), lowRows = status.rows.filter(row => row.pct < POS_MAPPING_FLOOR);
+    footer.hidden = !(status.missing.length || lowRows.length);
+    if(footer.hidden) return '';
+    const total = DASHBOARD_OUTLETS.length, connected = total - OUTLETS_WITHOUT_POS.length, parts = [];
+    if(status.missing.length) parts.push(status.missing.length === 1
+      ? `${noun} cover ${connected} of ${total} outlets — ${status.missing[0]} isn’t connected to POS.`
+      : `${noun} cover ${connected} of ${total} outlets — ${status.missing.length} aren’t connected to POS.`);
+    if(lowRows.length) parts.push(currentScope === 'All outlets'
+      ? `${lowRows.length} of ${status.rows.length} outlets have under ${POS_MAPPING_FLOOR}% of POS items mapped.`
+      : `${status.pct}% of POS items at ${currentScope} are mapped.`);
+    text.textContent = parts.join(' ');
+    return posStatusModalBody(status);
+  }
   const salesStatusFooter = document.getElementById('salesStatusFooter'), salesStatusText = document.getElementById('salesStatusText'), salesStatusDetails = document.getElementById('salesStatusDetails');
-  let salesStatusModalBody = '';
-  function updateSalesStatusFooter(){
-    const missing = OUTLETS_WITHOUT_POS;
-    const show = currentScope === 'All outlets' && missing.length > 0;
-    salesStatusFooter.hidden = !show;
-    if(!show) return;
-    const total = DASHBOARD_OUTLETS.length, connected = total - missing.length;
-    salesStatusText.textContent = missing.length === 1
-      ? `Sales cover ${connected} of ${total} outlets — ${missing[0]} isn’t connected to POS.`
-      : `Sales cover ${connected} of ${total} outlets — ${missing.length} aren’t connected to POS.`;
-    salesStatusModalBody = missingPosModalBody(missing);
-  }
-  // The dialog has room to spare, so every outlet is listed up front rather than truncated behind "View all".
-  function missingPosModalBody(missing){
-    const listed = missing.map(name => `<li><span class="data-status-name">${escapeHtml(name)}</span><a class="procure-link" href="#outlets" data-stub>Connect →</a></li>`).join('');
-    return `<div class="data-status-row"><span>Not connected to POS</span><span class="data-status-value">${plural(missing.length, 'outlet')}</span></div><ul class="data-status-list">${listed}</ul>`;
-  }
-  // Margins needs sales as well as costs, so it has the same gap as Sales: outlets without POS aren't in these figures.
   const marginsStatusFooter = document.getElementById('marginsStatusFooter'), marginsStatusText = document.getElementById('marginsStatusText'), marginsStatusDetails = document.getElementById('marginsStatusDetails');
-  let marginsStatusModalBody = '';
-  function updateMarginsStatusFooter(){
-    const missing = OUTLETS_WITHOUT_POS;
-    const show = currentScope === 'All outlets' && missing.length > 0;
-    marginsStatusFooter.hidden = !show;
-    if(!show) return;
-    const total = DASHBOARD_OUTLETS.length, connected = total - missing.length;
-    marginsStatusText.textContent = missing.length === 1
-      ? `Margins cover ${connected} of ${total} outlets — ${missing[0]} isn’t connected to POS.`
-      : `Margins cover ${connected} of ${total} outlets — ${missing.length} aren’t connected to POS.`;
-    marginsStatusModalBody = missingPosModalBody(missing);
-  }
-  marginsStatusDetails.addEventListener('click', event => openStatusModal('Data status', marginsStatusModalBody, event.currentTarget));
-  salesStatusDetails.addEventListener('click', event => openStatusModal('Data status', salesStatusModalBody, event.currentTarget));
+  let salesStatusModalBody = '', marginsStatusModalBody = '';
+  function updateSalesStatusFooter(){ salesStatusModalBody = updatePosStatusFooter('Sales', salesStatusFooter, salesStatusText); }
+  function updateMarginsStatusFooter(){ marginsStatusModalBody = updatePosStatusFooter('Margins', marginsStatusFooter, marginsStatusText); }
+  marginsStatusDetails.addEventListener('click', event => openStatusModal('POS coverage', marginsStatusModalBody, event.currentTarget));
+  salesStatusDetails.addEventListener('click', event => openStatusModal('POS coverage', salesStatusModalBody, event.currentTarget));
 
   const spendStatusFooter = document.getElementById('spendStatusFooter'), spendStatusText = document.getElementById('spendStatusText'), spendStatusDetails = document.getElementById('spendStatusDetails');
   let spendStatusModalBody = '';
+  // Invoice coverage: two gaps in the Spend data that a user can act on, and one that just needs time.
+  //   orders with no invoice  -> spend is understated (Review orders)
+  //   invoices not linked     -> left out of the Order accuracy checks (Review invoices)
+  //   invoices processing     -> spend updates when they finish (nothing to do)
+  // The footer, and so the dialog, shows when either kind of gap exists.
   function updateSpendStatusFooter(){
     const data = getProcureData();
-    const show = INVOICES_MISSING && data?.current.missing > 0;
-    spendStatusFooter.hidden = !show;
-    if(!show) return;
+    if(!data){ spendStatusFooter.hidden = true; return; }
     const side = data.current;
-    const deliveryWord = plural(side.missing, 'delivery', 'deliveries'), verb = side.missing === 1 ? 'has' : 'have';
+    const unlinked = Math.max(0, Math.round(side.invoices - side.linkedInvoices));
+    const hasMissing = INVOICES_MISSING && side.missing > 0;
+    spendStatusFooter.hidden = !(hasMissing || unlinked > 0);
+    if(spendStatusFooter.hidden) return;
     const place = currentScope === 'All outlets' ? '' : ` at ${currentScope}`;
-    spendStatusText.textContent = `${deliveryWord}${place} ${verb} no invoice yet, so spend may be understated by about ${money(side.missingOrderValue, 100)}.`;
-    // View missing: the Orders page, filtered to Invoicing status > No linked invoice, for the period and outlet on screen. The link
-    // also carries how many deliveries each outlet is missing an invoice for, so the sample orders there match this dialog.
+    // Missing invoices lead: they change the spend totals themselves.
+    spendStatusText.textContent = hasMissing
+      ? `${plural(side.missing, 'order')}${place} ${side.missing === 1 ? 'has' : 'have'} no invoice yet, so spend may be understated by about ${money(side.missingOrderValue)}.`
+      : `${plural(unlinked, 'invoice')}${place} ${unlinked === 1 ? 'isn’t' : 'aren’t'} linked to an order, so ${unlinked === 1 ? 'it’s' : 'they’re'} left out of the accuracy checks.`;
+    // Review orders: the Orders page, filtered to Invoicing status > No linked invoice, for the period and outlet on screen. The link
+    // also carries how many orders each outlet is missing an invoice for, so the sample orders there match this dialog.
     const range = PERIOD_DATE_RANGES[currentPeriod].current;
     const missingByOutlet = encodeURIComponent(JSON.stringify(data.perOutlet.map(outlet => [outlet.name, outlet.current.missing])));
     const outletParam = currentScope !== 'All outlets' ? `&outlet=${encodeURIComponent(currentScope)}` : '';
     const missingOrdersHref = `Procure%20-%20Orders.html?invoicing=no-linked-invoice${outletParam}&from=${range.start}&to=${range.end}&orders=${missingByOutlet}`;
-    spendStatusModalBody = `<p class="data-status-summary">≈ ${money(side.missingOrderValue, 100)} of deliveries without an invoice</p>`
-      + statusPopoverRow('Deliveries with an invoice', percent(side.invoices / side.deliveries), `${side.missing} missing${side.processing ? ` · ${side.processing} processing` : ''}`, { text: 'View missing →', href: missingOrdersHref })
-      + statusPopoverRow('Linked to an order', percent(side.linkedInvoices / side.invoices), `${money(side.unlinkedValue, 10)} unlinked`, '')
-      + statusPopoverRow('Fully matched', percent(side.fullyMatched / side.invoices), '', { text: '3-way match →', href: 'Procure%20-%203-way%20Match.html' });
+    // Each gap is a stat block: what it is, how many, the impact, and where to act. The first one that needs action gets the tint. Side by side
+    // when there are two.
+    const stats = [];
+    const stat = (label, count, detail, link) => {
+      stats.push(`<div class="coverage-stat${stats.length ? '' : ' is-tinted'}"><span class="coverage-stat-label">${label}</span>`
+        + `<div class="coverage-stat-value">${count.toLocaleString('en-SG')}</div>`
+        + `<p class="coverage-stat-detail">${detail}</p>${statusPopoverLink(link)}</div>`);
+    };
+    if(hasMissing) stat('Orders with no invoice', side.missing, `About <strong>${money(side.missingOrderValue)}</strong> is missing from spend`, { text: 'Review orders<span class="material-symbols-outlined link-chevron" aria-hidden="true">chevron_right</span>', href: missingOrdersHref });
+    if(unlinked > 0) stat('Unlinked invoices', unlinked, `<strong>${money(side.unlinkedValue)}</strong> is left out of the accuracy checks`, 'Review invoices<span class="material-symbols-outlined link-chevron" aria-hidden="true">chevron_right</span>');
+    spendStatusModalBody = `<p class="data-status-context">${escapeHtml(currentScope)} · ${escapeHtml(range.label)}</p>`
+      + `<div class="coverage-stats${stats.length === 1 ? ' is-single' : ''}">${stats.join('')}</div>`
+      + (side.processing ? `<p class="data-status-note">${plural(side.processing, 'invoice')} ${side.processing === 1 ? 'is' : 'are'} still processing. Spend will update when ${side.processing === 1 ? 'it finishes' : 'they finish'}.</p>` : '');
   }
-  spendStatusDetails.addEventListener('click', event => openStatusModal('Data status', spendStatusModalBody, event.currentTarget));
+  spendStatusDetails.addEventListener('click', event => openStatusModal('Invoice coverage', spendStatusModalBody, event.currentTarget));
 
   window.salesTabReady = true;
   updateDashboard();  renderSalesChannels();
