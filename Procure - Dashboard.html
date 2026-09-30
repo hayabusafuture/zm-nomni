@@ -508,6 +508,8 @@
      header hands its shadow over, so the two read as one bar. */
   .dashboard-tabs-bar { position: sticky; top: calc(var(--chrome-top) + var(--sticky-context-h, 0px)); z-index: 14; isolation: isolate; }
   .dashboard-tabs-bar::before { content: ""; position: absolute; z-index: -1; top: 0; bottom: -1px; left: calc(-1 * var(--tabs-bleed-left, 0px)); right: calc(-1 * var(--tabs-bleed-right, 0px)); background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--rule); box-shadow: 0 2px 5px rgba(26,31,43,.06); opacity: 0; pointer-events: none; }
+  /* The scope and period menus open over the tab rail (z-index 14), not under it. */
+  .overview-title { position: relative; z-index: 16; }
   .dashboard-tabs-bar.is-docked { border-bottom-color: transparent; }
   .dashboard-tabs-bar.is-docked::before { opacity: 1; transition: opacity .18s ease; }
   .sticky-header.tabs-docked { box-shadow: none; }
@@ -1581,19 +1583,12 @@
   window.addEventListener('resize', measureStickyTabs);
   new ResizeObserver(measureStickyTabs).observe(stickyContext);
   measureStickyTabs();
-  // Full screen: hides the topbar and side menu, and asks the browser for full screen too (if it refuses, the page
-  // still goes full screen inside the window). Esc or the floating button leaves it.
+  // Full screen: hides the topbar and side menu only. The browser's own frame stays. Esc or the floating button leaves it.
   const fullscreenToggle = document.getElementById('fullscreenToggle'), fullscreenExit = document.getElementById('fullscreenExit');
-  function setFullscreenMode(on, { native = true } = {}){
+  function setFullscreenMode(on){
     document.body.classList.toggle('is-fullscreen', on);
     fullscreenToggle.setAttribute('aria-pressed', String(on));
     fullscreenExit.hidden = !on;
-    if(native){
-      try {
-        if(on && !document.fullscreenElement) document.documentElement.requestFullscreen?.()?.catch(() => {});
-        else if(!on && document.fullscreenElement) document.exitFullscreen?.()?.catch(() => {});
-      } catch { /* no browser full screen: the in-page mode still applies */ }
-    }
     measureStickyTabs();
     (on ? fullscreenExit : fullscreenToggle).focus({ preventScroll: true });
   }
@@ -1604,7 +1599,6 @@
     if(document.querySelector('.picker-menu.open, .top-items-picker-menu.open, #statusModal.open')) return;   // Esc closes those first
     setFullscreenMode(false);
   });
-  document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement && document.body.classList.contains('is-fullscreen')) setFullscreenMode(false, { native: false }); });
   const dashboardTabs = Array.from(document.querySelectorAll('.dashboard-tab'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
   dashboardTabs.forEach((tab, tabIndex) => tab.addEventListener('click', () => { const wasDocked = dashboardTabsBar.classList.contains('is-docked'); dashboardTabs.forEach(item => { const isSelected = item === tab; item.classList.toggle('active', isSelected); item.setAttribute('aria-selected', String(isSelected)); }); tabPanels.forEach((panel, panelIndex) => panel.classList.toggle('active', panelIndex === tabIndex)); if(window.salesTabReady) { recheckKeyTakeawayWidth(); refreshProcureFades(); if(tab.id === 'tab-spend') centreSelectedSpendOutlet(); }
