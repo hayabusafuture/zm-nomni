@@ -42,7 +42,6 @@
     --viz-line-neutral: var(--ink-mute-strong);
     /* .main's own horizontal padding, exposed so the sticky header can bleed exactly to its edges regardless of breakpoint */
     --main-pad-x: 44px;
-    --chrome-top: 56px;   /* height of the topbar; 0 in full screen mode */
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-width: 320px; background: color-mix(in srgb, var(--cream) 20%, var(--panel)); }
@@ -78,20 +77,22 @@
   .workspace { max-width: 1120px; margin: 0 auto; }
   /* The sticky header is a literal duplicate of #overviewTitle (same markup, same .overview-title styling,
      same live picker controls) — not a simplified mirror — sitting flush under the topbar. */
-  .sticky-header-shell { position: sticky; top: var(--chrome-top); z-index: 15; height: 0; overflow: visible; pointer-events: none; }
+  .sticky-header-shell { position: sticky; top: 56px; z-index: 15; height: 0; overflow: visible; pointer-events: none; }
   /* Frosted glass, bled to .main's full edges via --main-pad-x (negative margin out, matching padding back in)
      so the panel spans the whole content column instead of stopping at the workspace's centred 1120px. */
   .sticky-header { margin: 0 calc(-1 * var(--main-pad-x)); padding: 0 var(--main-pad-x); background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 2px 5px rgba(26,31,43,.06); opacity: 0; transform: translateY(-8px); }
   /* Fades in on arrival only. Leaving is instant, so the header and the tab rail (which share one surface while docked) never show separately. */
   .sticky-header.is-visible { opacity: 1; transform: translateY(0); pointer-events: auto; transition: opacity .18s ease, transform .18s ease; }
-  .sticky-header-summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; max-width: 1120px; margin: 0 auto; padding: 14px 0 8px; }
+  .sticky-header-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 1120px; margin: 0 auto; padding: 14px 0; }
+  .sticky-header.tabs-docked .sticky-header-summary { padding-bottom: 8px; }
   .sticky-header-scope { color: var(--ink); font-size: 21px; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
   .sticky-header-range { position: relative; display: inline-flex; align-items: baseline; padding-left: 18px; white-space: nowrap; }
   .sticky-header-separator { position: absolute; top: 50%; left: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--ink-mute); transform: translateY(-50%); }
   .sticky-header-period { color: var(--ink-mute); font-size: 21px; font-weight: 400; letter-spacing: -.02em; white-space: nowrap; }
   .sticky-header-comparison { margin-left: auto; color: var(--spinach); font-size: 14px; font-weight: 500; white-space: nowrap; }
   @media (max-width: 720px) {
-    .sticky-header-summary { gap: 6px 10px; padding: 10px 0 6px; }
+    .sticky-header-summary { gap: 6px 10px; padding: 10px 0 12px; }
+    .sticky-header.tabs-docked .sticky-header-summary { padding-bottom: 6px; }
     .sticky-header-scope, .sticky-header-period { font-size: 17px; }
     .sticky-header-range { padding-left: 14px; }
     .sticky-header-comparison { flex-basis: 100%; margin-left: 0; font-size: 12px; }
@@ -506,27 +507,18 @@
   /* The tab rail docks under the sticky scope/period header. Its offset is that header's height (measured in JS, since
      it wraps on narrow screens). Once docked it takes the header's frosted surface, bled to the same edges, and the
      header hands its shadow over, so the two read as one bar. */
-  .dashboard-tabs-bar { position: sticky; top: calc(var(--chrome-top) + var(--sticky-context-h, 0px)); z-index: 14; isolation: isolate; }
+  .dashboard-tabs-bar { position: sticky; top: calc(56px + var(--sticky-context-h, 0px)); z-index: 14; isolation: isolate; }
   .dashboard-tabs-bar::before { content: ""; position: absolute; z-index: -1; top: 0; bottom: -1px; left: calc(-1 * var(--tabs-bleed-left, 0px)); right: calc(-1 * var(--tabs-bleed-right, 0px)); background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--rule); box-shadow: 0 2px 5px rgba(26,31,43,.06); opacity: 0; pointer-events: none; }
   /* The scope and period menus open over the tab rail (z-index 14), not under it. */
   .overview-title { position: relative; z-index: 16; }
-  .dashboard-tabs-bar.is-docked { border-bottom-color: transparent; }
+  .dashboard-tabs-bar.is-docked { border-bottom-color: transparent; transition: opacity .2s ease, visibility 0s; }
+  .dashboard-tabs-bar.is-docked .dashboard-tabs { transition: transform .2s ease; }
+  /* Tucked (scrolling down): the tab row slides up behind the header, fades out and leaves the tab order. Only the inner row moves, never the
+     bar itself, because the docked check reads the bar's own position. Transitions only exist while docked, so releasing at the top is instant. */
+  .dashboard-tabs-bar.is-docked.is-tucked { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .2s ease, visibility 0s .2s; }
+  .dashboard-tabs-bar.is-docked.is-tucked .dashboard-tabs { transform: translateY(-100%); }
   .dashboard-tabs-bar.is-docked::before { opacity: 1; transition: opacity .18s ease; }
   .sticky-header.tabs-docked { box-shadow: none; }
-  /* Full screen mode: the topbar and side nav go, and the page takes the whole window. */
-  body.is-fullscreen { --chrome-top: 0px; }
-  body.is-fullscreen .topbar, body.is-fullscreen .sidebar { display: none !important; }
-  body.is-fullscreen .app { grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: 1fr !important; }
-  body.is-fullscreen .main { grid-column: 1 !important; grid-row: 1 !important; }
-  .fullscreen-toggle { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 13px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--ink); font: 600 14px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
-  .fullscreen-toggle:hover { background: var(--row-hover); }
-  .fullscreen-toggle .material-symbols-outlined { color: var(--spinach); font-size: 18px; }
-  .fullscreen-exit { position: fixed; left: 16px; bottom: 16px; z-index: 60; display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); color: var(--ink); box-shadow: 0 2px 8px rgba(26,31,43,.12); font: 600 13px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
-  .fullscreen-exit[hidden] { display: none; }
-  .fullscreen-exit:hover { background: var(--row-hover); }
-  .fullscreen-exit .material-symbols-outlined { color: var(--spinach); font-size: 18px; }
-  .fullscreen-exit kbd { padding: 2px 5px; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink-mute-strong); font: 500 11px/1 "Inter", system-ui, sans-serif; }
-  @media (max-width: 720px) { .fullscreen-toggle .fullscreen-label { display: none; } .fullscreen-toggle { padding: 0 10px; } }
   .dashboard-tabs-bar .dashboard-tabs { flex: 1 1 auto; min-width: 0; margin: 0; padding-top: 0; border-bottom: 0; }
   .dashboard-tabs-bar .dashboard-tab { padding-top: 6px; }
 
@@ -1088,7 +1080,7 @@
     </div>
   </aside>
 <main class="main"><div class="sticky-header-shell"><div class="sticky-header" id="stickyContext" aria-label="Selected data scope and period"><div class="sticky-header-summary"><span class="sticky-header-scope" id="stickyScope">All outlets</span><span class="sticky-header-range"><span class="sticky-header-separator" aria-hidden="true"></span><span class="sticky-header-period" id="stickyPeriod">1–21 September 2026</span></span><span class="sticky-header-comparison" id="stickyComparison">Compared with 1–21 August 2026</span></div></div></div><div class="workspace">
-    <div class="page-head"><div><p class="welcome-date" id="welcomeDate"></p><h1 class="welcome" id="welcomeGreeting">Good morning, William</h1></div><div class="page-actions"><button class="fullscreen-toggle" id="fullscreenToggle" type="button" aria-pressed="false" title="Hide the top bar and side menu"><span class="material-symbols-outlined" aria-hidden="true">fullscreen</span><span class="fullscreen-label">Full screen</span></button><div class="new-action"><button class="quick-action" id="newActionButton" type="button" aria-expanded="false" aria-controls="newActionMenu"><span class="material-symbols-outlined">add</span>New</button><div class="picker-menu new-menu" id="newActionMenu"><a href="Procure%20-%20New%20Order%20-%20Item.html"><span class="material-symbols-outlined">format_list_bulleted</span>Order by item</a><a href="Procure%20-%20New%20Order%20-%20Supplier.html"><span class="material-symbols-outlined">local_shipping</span>Order by supplier</a><a href="Freemium/procure-trial-invoices.html"><span class="material-symbols-outlined">upload</span>Upload invoice</a></div></div></div></div>
+    <div class="page-head"><div><p class="welcome-date" id="welcomeDate"></p><h1 class="welcome" id="welcomeGreeting">Good morning, William</h1></div><div class="page-actions"><div class="new-action"><button class="quick-action" id="newActionButton" type="button" aria-expanded="false" aria-controls="newActionMenu"><span class="material-symbols-outlined">add</span>New</button><div class="picker-menu new-menu" id="newActionMenu"><a href="Procure%20-%20New%20Order%20-%20Item.html"><span class="material-symbols-outlined">format_list_bulleted</span>Order by item</a><a href="Procure%20-%20New%20Order%20-%20Supplier.html"><span class="material-symbols-outlined">local_shipping</span>Order by supplier</a><a href="Freemium/procure-trial-invoices.html"><span class="material-symbols-outlined">upload</span>Upload invoice</a></div></div></div></div>
     <div class="overview-title" id="overviewTitle" role="heading" aria-level="2"><span>Here’s the performance of</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="scope"><span data-picker-label="scope">all outlets</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="scope"></div></div></div><span>for</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="period"><span data-picker-label="period">this month</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="period"><button class="picker-option selected">This month</button><button class="picker-option">Last 30 days</button><button class="picker-option">Last month</button><button class="picker-option">Last 3 months</button><button class="picker-option">This year</button></div></div></div><span class="period-comparison">Compared with 1–21 August 2026</span></div>
     <section class="overview" aria-label="Operations and performance overview">
       <div class="metric-grid">
@@ -1246,7 +1238,6 @@
     <div class="modal-body" id="statusModalBody"></div>
   </div>
 </div>
-<button class="fullscreen-exit" id="fullscreenExit" type="button" hidden><span class="material-symbols-outlined" aria-hidden="true">fullscreen_exit</span>Exit full screen<kbd>Esc</kbd></button>
 <div class="proto-data-toggle" id="protoDataToggle" role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-data-label">Prototype data</span><button type="button" data-proto-outlets="1">1 outlet</button><button type="button" data-proto-outlets="10">10 outlets</button><button type="button" data-proto-outlets="30">30 outlets</button></div>
 <div class="inspect-tip" id="inspectTip"></div>
 <div class="chart-tip" id="chartTip"></div>
@@ -1561,15 +1552,23 @@
   const overviewTitle = document.getElementById('overviewTitle');
   const stickyContext = document.getElementById('stickyContext');
   const dashboardTabsBar = document.querySelector('.dashboard-tabs-bar');
+  // The scope/period header appears once the tab rail has scrolled up to where the header sits. From then on the rail
+  // is only shown while the user scrolls up: scrolling down tucks it away under the header, scrolling up brings it back.
+  let lastScrollY = window.scrollY, tabsTucked = true;
   function updateStickyContextVisibility(){
     if(!stickyContext || !overviewTitle) return;
-    // The scope/period header and the tab rail arrive together: both appear at the moment the rail reaches the
-    // bottom of where the header sits (the header's height is measured even while it is hidden).
-    const chromeTop = document.body.classList.contains('is-fullscreen') ? 0 : 56;
-    const docked = dashboardTabsBar.getBoundingClientRect().top <= chromeTop + stickyContext.offsetHeight + 0.5;
+    // Docked = the rail has reached the bottom of the header. Nothing ever transforms the bar itself, so its position is always true.
+    const docked = dashboardTabsBar.getBoundingClientRect().top <= 56 + stickyContext.offsetHeight + 0.5;
+    const tucked = docked && tabsTucked;
     stickyContext.classList.toggle('is-visible', docked);
     dashboardTabsBar.classList.toggle('is-docked', docked);
-    stickyContext.classList.toggle('tabs-docked', docked);
+    dashboardTabsBar.classList.toggle('is-tucked', tucked);
+    stickyContext.classList.toggle('tabs-docked', docked && !tucked);   // one shared surface only while the rail is showing
+  }
+  function onScrollDirection(){
+    const y = window.scrollY, delta = y - lastScrollY;
+    if(Math.abs(delta) >= 6){ tabsTucked = delta > 0; lastScrollY = y; }   // ignore jitter
+    updateStickyContextVisibility();
   }
   // The header's height sets where the rail docks; the rail's surface bleeds out to the header's edges.
   function measureStickyTabs(){
@@ -1579,31 +1578,15 @@
     root.setProperty('--tabs-bleed-right', `${Math.max(0, main.right - workspace.right)}px`);
     updateStickyContextVisibility();
   }
-  window.addEventListener('scroll', updateStickyContextVisibility, { passive: true });
+  window.addEventListener('scroll', onScrollDirection, { passive: true });
   window.addEventListener('resize', measureStickyTabs);
   new ResizeObserver(measureStickyTabs).observe(stickyContext);
   measureStickyTabs();
-  // Full screen: hides the topbar and side menu only. The browser's own frame stays. Esc or the floating button leaves it.
-  const fullscreenToggle = document.getElementById('fullscreenToggle'), fullscreenExit = document.getElementById('fullscreenExit');
-  function setFullscreenMode(on){
-    document.body.classList.toggle('is-fullscreen', on);
-    fullscreenToggle.setAttribute('aria-pressed', String(on));
-    fullscreenExit.hidden = !on;
-    measureStickyTabs();
-    (on ? fullscreenExit : fullscreenToggle).focus({ preventScroll: true });
-  }
-  fullscreenToggle.addEventListener('click', () => setFullscreenMode(true));
-  fullscreenExit.addEventListener('click', () => setFullscreenMode(false));
-  document.addEventListener('keydown', event => {
-    if(event.key !== 'Escape' || !document.body.classList.contains('is-fullscreen')) return;
-    if(document.querySelector('.picker-menu.open, .top-items-picker-menu.open, #statusModal.open')) return;   // Esc closes those first
-    setFullscreenMode(false);
-  });
   const dashboardTabs = Array.from(document.querySelectorAll('.dashboard-tab'));
   const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
   dashboardTabs.forEach((tab, tabIndex) => tab.addEventListener('click', () => { const wasDocked = dashboardTabsBar.classList.contains('is-docked'); dashboardTabs.forEach(item => { const isSelected = item === tab; item.classList.toggle('active', isSelected); item.setAttribute('aria-selected', String(isSelected)); }); tabPanels.forEach((panel, panelIndex) => panel.classList.toggle('active', panelIndex === tabIndex)); if(window.salesTabReady) { recheckKeyTakeawayWidth(); refreshProcureFades(); if(tab.id === 'tab-spend') centreSelectedSpendOutlet(); }
     // Scrolled past the tab rail: start the new tab from the top of its contents, just under the docked rail.
-    if(wasDocked){ const panel = tabPanels[tabIndex], dockedBottom = dashboardTabsBar.getBoundingClientRect().bottom; window.scrollTo({ top: Math.max(0, window.scrollY + panel.getBoundingClientRect().top - dockedBottom - 16), behavior: 'instant' }); updateStickyContextVisibility(); } }));
+    if(wasDocked){ const panel = tabPanels[tabIndex], dockedBottom = dashboardTabsBar.getBoundingClientRect().bottom; window.scrollTo({ top: Math.max(0, window.scrollY + panel.getBoundingClientRect().top - dockedBottom - 16), behavior: 'instant' }); tabsTucked = false; lastScrollY = window.scrollY; updateStickyContextVisibility(); } }));
   const newActionButton = document.getElementById('newActionButton'); const newActionMenu = document.getElementById('newActionMenu');
   newActionButton.addEventListener('click', () => { const willOpen = !newActionMenu.classList.contains('open'); document.querySelectorAll('.picker-menu').forEach(menu => { if(menu !== newActionMenu) menu.classList.remove('open'); }); newActionMenu.classList.toggle('open', willOpen); newActionButton.setAttribute('aria-expanded', String(willOpen)); });
   document.addEventListener('click', event => { if(!event.target.closest('.new-action') && newActionMenu.classList.contains('open')) { newActionMenu.classList.remove('open'); newActionButton.setAttribute('aria-expanded', 'false'); } });
