@@ -228,6 +228,7 @@
     position: sticky;
     top: 56px;
     height: calc(100vh - 56px);
+    z-index: 1;
   }
   .brand {
     display: flex;
@@ -527,6 +528,7 @@
   .input--placed { width: 180px; }
 
   .filter-right { margin-left: auto; }
+  .filter-control { position: relative; }
   .filter-btn {
     color: #1A8040;
     background: transparent;
@@ -540,6 +542,33 @@
     gap: 6px;
     padding: 6px 4px;
   }
+  .filter-btn[aria-expanded="true"], .filter-btn.is-filtered { color: var(--seaweed); }
+  .filter-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; margin-left: 4px; padding: 0 6px; border-radius: 999px; background: var(--nomni-green); color: var(--seaweed); font-size: 11px; font-weight: 700; }
+  .filter-count[hidden] { display: none; }
+  .orders-filter-menu, .orders-invoice-submenu { position: absolute; z-index: 30; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); box-shadow: 0 8px 24px rgba(26,31,43,.14); }
+  .orders-filter-menu { top: calc(100% + 8px); right: 0; display: none; width: 220px; padding: 8px 0; }
+  .orders-filter-menu.open, .orders-invoice-submenu.open { display: block; }
+  .orders-filter-category { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 40px; padding: 0 14px; border: 0; background: transparent; color: var(--spinach); font: 500 14px/1.3 "Inter", system-ui, sans-serif; text-align: left; }
+  button.orders-filter-category { cursor: pointer; }
+  button.orders-filter-category:hover, .orders-filter-category[aria-expanded="true"] { background: var(--row-hover); color: var(--seaweed); }
+  .orders-filter-category-count { min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: var(--nomni-green); color: var(--seaweed); font-size: 11px; font-weight: 700; }
+  .orders-filter-category-count[hidden] { display: none; }
+  .orders-filter-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding: 8px 12px 0; border-top: 1px solid var(--rule); }
+  .orders-filter-reset, .orders-filter-apply { min-height: 34px; padding: 0 12px; border: 0; border-radius: 6px; font: 600 13px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .orders-filter-reset { background: transparent; color: var(--spinach); }
+  .orders-filter-reset:hover { background: var(--mint); }
+  .orders-filter-apply { background: var(--nomni-green); color: var(--seaweed); }
+  .orders-filter-apply:hover { background: var(--primary-hover); }
+  .orders-invoice-submenu { top: 168px; right: calc(100% + 8px); display: none; width: 264px; padding: 12px; }
+  .orders-outlet-submenu { top: 8px; max-height: min(440px, 70vh); overflow-y: auto; }
+  .orders-filter-search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 1px solid #dcdee3; border-radius: 6px; color: var(--ink-mute); }
+  .orders-filter-search input { width: 100%; border: 0; outline: 0; color: var(--ink); font: 14px/1.2 "Inter", system-ui, sans-serif; }
+  .orders-filter-select-all { display: block; margin: 12px 0 8px; padding: 0; border: 0; background: transparent; color: var(--spinach); font: 600 13px/1.3 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .orders-filter-check { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--ink); font-size: 14px; cursor: pointer; }
+  .orders-filter-check[hidden] { display: none; }
+  .orders-filter-check input { width: 17px; height: 17px; margin: 0; accent-color: var(--spinach); }
+  .invoice-linked-check { display: inline-flex; align-items: center; justify-content: center; color: var(--spinach); font-size: 20px; font-weight: 700; line-height: 1; }
+  @media (max-width: 720px) { .orders-invoice-submenu { right: 0; top: calc(100% + 8px); } }
 
   /* ---------- Table ---------- */
   .table-wrap {
@@ -1099,10 +1128,38 @@
         </label>
         <button class="btn btn-tertiary">Search</button>
         <div class="filter-right">
-          <button class="filter-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16l-6 8v6l-4-2v-4L4 5z"/></svg>
-            Filter
-          </button>
+          <div class="filter-control" id="ordersFilterControl">
+            <button class="filter-btn" id="ordersFilterButton" type="button" aria-expanded="false" aria-controls="ordersFilterMenu">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16l-6 8v6l-4-2v-4L4 5z"/></svg>
+              Filter <span class="filter-count" id="ordersFilterCount" hidden>1</span>
+            </button>
+            <div class="orders-filter-menu" id="ordersFilterMenu">
+              <button class="orders-filter-category" id="outletFilterToggle" type="button" aria-expanded="false" aria-controls="ordersOutletSubmenu">
+                <span>Outlet</span><span class="orders-filter-category-count" id="outletFilterCount" hidden>1</span>
+              </button>
+              <div class="orders-filter-category">Supplier</div>
+              <div class="orders-filter-category">Order status</div>
+              <div class="orders-filter-category">Acknowledgement status</div>
+              <button class="orders-filter-category" id="invoiceFilterToggle" type="button" aria-expanded="false" aria-controls="ordersInvoiceSubmenu">
+                <span>Invoicing status</span><span class="orders-filter-category-count" id="invoiceFilterCount" hidden>1</span>
+              </button>
+              <div class="orders-filter-category">Receiving status</div>
+              <div class="orders-filter-category">BC sync status</div>
+              <div class="orders-filter-category">Order type</div>
+              <div class="orders-filter-footer"><button class="orders-filter-reset" id="ordersFilterReset" type="button">Reset</button><button class="orders-filter-apply" id="ordersFilterApply" type="button">Apply</button></div>
+              <div class="orders-invoice-submenu" id="ordersInvoiceSubmenu" aria-label="Invoicing status filters">
+                <label class="orders-filter-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="invoiceFilterSearch" type="search" placeholder="Search" aria-label="Search invoicing statuses"></label>
+                <button class="orders-filter-select-all" id="invoiceSelectAll" type="button">Select all</button>
+                <label class="orders-filter-check" data-invoice-option><input type="checkbox" value="invoiced"> <span>Invoiced</span></label>
+                <label class="orders-filter-check" data-invoice-option><input type="checkbox" value="no-linked-invoice"> <span>No linked invoice</span></label>
+              </div>
+              <div class="orders-invoice-submenu orders-outlet-submenu" id="ordersOutletSubmenu" aria-label="Outlet filters">
+                <label class="orders-filter-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="outletFilterSearch" type="search" placeholder="Search" aria-label="Search outlets" /></label>
+                <button class="orders-filter-select-all" id="outletSelectAll" type="button">Select all</button>
+                <div id="outletFilterOptions"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1131,7 +1188,7 @@
 
       <!-- Pagination -->
       <div class="pager">
-        <div class="count">Showing <b>1</b> to <b>162</b> of <b>162</b> entries</div>
+        <div class="count" id="ordersResultCount">Showing <b>1</b> to <b>162</b> of <b>162</b> entries</div>
         <input class="page-input" value="1" />
       </div>
 
@@ -1145,7 +1202,7 @@
   const rows = [
     { date:"29/04/2026", code:"202604179415", supplier:"Good Tiding Pte Ltd (T)", outlet:"Test Outlet ZM", amount:"S$142.79", placed:"",           status:"REJECTED",  emailState:"Email Delivered", invoiced:"", updated:"22/04/2026", muted:true },
     { date:"13/05/2026", code:"202604215764", supplier:"Good Tiding Pte Ltd (T)", outlet:"Test Outlet ZM", amount:"S$16.35",  placed:"",           status:"PLACED",    emailState:"",                invoiced:"", updated:"22/04/2026", attach:true },
-    { date:"29/04/2026", code:"202604222228", supplier:"Good Tiding Pte Ltd (T)", outlet:"Test Outlet ZM", amount:"S$390.47", placed:"21/04/2026", status:"PLACED",    emailState:"",                invoiced:"", updated:"21/04/2026", attach:true },
+    { date:"29/04/2026", code:"202604222228", supplier:"Good Tiding Pte Ltd (T)", outlet:"Test Outlet ZM", amount:"S$390.47", placed:"21/04/2026", status:"PLACED",    emailState:"",                invoiced:"", updated:"21/04/2026", attach:true, invoiceLinked:true },
     { date:"",           code:"202604204607", supplier:"GMP Packaging(T1)",       outlet:"Test Outlet ZM", amount:"S$53.41",  placed:"",           status:"REJECTED",  emailState:"Email Delivered", invoiced:"", updated:"",          muted:true, statusIcon:true },
     { date:"20/04/2026", code:"202604193346", supplier:"GMP Packaging(T1)",       outlet:"Test Outlet ZM", amount:"S$18.53",  placed:"20/04/2026", status:"PLACED",    emailState:"Email Opened",    invoiced:"", updated:"20/04/2026", statusIcon:true },
     { date:"21/04/2026", code:"202604204184", supplier:"GMP Packaging(T1)",       outlet:"Test Outlet ZM", amount:"S$562.44", placed:"20/04/2026", status:"PLACED",    emailState:"Email Opened",    invoiced:"", updated:"20/04/2026" },
@@ -1153,10 +1210,10 @@
     { date:"22/04/2026", code:"202604204173", supplier:"Coca-Cola (T)",           outlet:"Test Outlet ZM", amount:"S$598.41", placed:"",           status:"CANCELLED", emailState:"",                invoiced:"", updated:"",          muted:true },
     // page 2 continuation (from 2nd screenshot)
     { date:"",           code:"202602262938", supplier:"",                        outlet:"",               amount:"",         placed:"",           status:"",          emailState:"Email Opened",    invoiced:"", updated:"",          muted:true, hideStatusChip:true },
-    { date:"26/02/2026", code:"202602242646", supplier:"Coca-Cola (T)",           outlet:"Test Outlet ZM", amount:"S$29.43",  placed:"24/02/2026", status:"PLACED",    emailState:"Email Opened",    invoiced:"", updated:"26/02/2026", dotOk:true },
+    { date:"26/02/2026", code:"202602242646", supplier:"Coca-Cola (T)",           outlet:"Test Outlet ZM", amount:"S$29.43",  placed:"24/02/2026", status:"PLACED",    emailState:"Email Opened",    invoiced:"", updated:"26/02/2026", dotOk:true, invoiceLinked:true },
     { date:"25/02/2026", code:"202602230315", supplier:"Test Supplier2",          outlet:"Test Outlet ZM", amount:"S$552.75", placed:"",           status:"REJECTED",  emailState:"Email Delivered", invoiced:"", updated:"24/02/2026", muted:true, statusIcon:true },
     { date:"23/02/2026", code:"202602231280", supplier:"Coca-Cola (T)",           outlet:"Test Outlet ZM", amount:"S$130.80", placed:"23/02/2026", status:"PLACED",    emailState:"Email Delivered", invoiced:"", updated:"23/02/2026", attach:true },
-    { date:"23/02/2026", code:"202602221193", supplier:"Coca-Cola (T)",           outlet:"Test Outlet ZM", amount:"S$130.80", placed:"22/02/2026", status:"PLACED",    emailState:"Email Delivered", invoiced:"", updated:"22/02/2026", attach:true },
+    { date:"23/02/2026", code:"202602221193", supplier:"Coca-Cola (T)",           outlet:"Test Outlet ZM", amount:"S$130.80", placed:"22/02/2026", status:"PLACED",    emailState:"Email Delivered", invoiced:"", updated:"22/02/2026", attach:true, invoiceLinked:true },
     { date:"23/02/2026", code:"202602220777", supplier:"Coca-Cola (T)",           outlet:"Test Outlet ZM", amount:"S$130.80", placed:"22/02/2026", status:"PLACED",    emailState:"Email Delivered", invoiced:"", updated:"22/02/2026" },
     { date:"23/02/2026", code:"202602210948", supplier:"Test Supplier2",          outlet:"Test Outlet ZM", amount:"S$552.75", placed:"",           status:"REJECTED",  emailState:"Email Delivered", invoiced:"", updated:"",          muted:true, statusIcon:true },
     { date:"21/02/2026", code:"202602121368", supplier:"Paranakan Trading Pte Ltd (T)", outlet:"Abacus Cafe (TEST)", amount:"S$16.35", placed:"",    status:"REJECTED",  emailState:"",                invoiced:"", updated:"21/02/2026", muted:true },
@@ -1165,6 +1222,36 @@
   if (new URLSearchParams(location.search).get('demo') === '1') {
     rows.forEach(function(row){ if (row.outlet) row.outlet = 'Nomni Kitchen — Tanjong Pagar'; });
   }
+
+  // Opened from the Dashboard's Data status ("View missing"): ?orders=[[outlet, missingCount], ...]&from=YYYY-MM-DD&to=YYYY-MM-DD
+  // replaces the fixed sample rows with orders for those outlets in that range: exactly the missing ones the Dashboard counted, plus
+  // a couple of invoiced orders per outlet for context. Dates and suppliers are sample values.
+  (function(){
+    const params = new URLSearchParams(location.search);
+    let counts = null;
+    try { counts = JSON.parse(params.get('orders') || 'null'); } catch(error) { counts = null; }
+    const iso = /^(\d{4})-(\d{2})-(\d{2})$/;
+    const from = iso.exec(params.get('from') || ''), to = iso.exec(params.get('to') || '');
+    if(!Array.isArray(counts) || !from || !to) return;
+    const start = new Date(+from[1], +from[2] - 1, +from[3]), end = new Date(+to[1], +to[2] - 1, +to[3]);
+    const span = Math.max(1, Math.round((end - start) / 864e5) + 1);
+    const suppliers = ['Sunrise Poultry Distributors', 'Green Valley Produce', 'Harbour Seafood Supply', 'Northside Meats', 'Pantry Wholesale', 'Eastview Dairy', 'Coastal Beverages', 'Asia Pacific Foods', 'Packright Co', 'Metro Dry Goods', 'Fresh Herb Co', "Baker's Lane Bakery", 'CleanPro Supplies', 'Island Spices'];
+    const seeded = text => { let h = 1779033703 ^ text.length; for(let i = 0; i < text.length; i++){ h = Math.imul(h ^ text.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); } return () => { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; };
+    const two = value => String(value).padStart(2, '0');
+    const dmy = date => `${two(date.getDate())}/${two(date.getMonth() + 1)}/${date.getFullYear()}`;
+    const generated = [];
+    counts.forEach(([outlet, missing]) => {
+      const rand = seeded(`${outlet}:orders`), invoicedSample = 2;
+      for(let index = 0; index < (missing | 0) + invoicedSample; index++){
+        const delivery = new Date(start.getTime() + Math.floor(rand() * span) * 864e5), placed = new Date(delivery.getTime() - (1 + Math.floor(rand() * 3)) * 864e5);
+        const linked = index >= (missing | 0);
+        generated.push({ date: dmy(delivery), code: `${delivery.getFullYear()}${two(delivery.getMonth() + 1)}${two(delivery.getDate())}${String(1000 + Math.floor(rand() * 9000))}`, supplier: suppliers[Math.floor(rand() * suppliers.length)], outlet,
+          amount: `S$${(60 + rand() * 840).toFixed(2)}`, placed: dmy(placed), status: 'PLACED', emailState: 'Email Delivered', invoiced: '', updated: dmy(delivery), invoiceLinked: linked, time: delivery.getTime() });
+      }
+    });
+    generated.sort((a, b) => b.time - a.time || b.code.localeCompare(a.code));
+    rows.length = 0; rows.push(...generated);
+  })();
 
   const chipSvgWarning = `<span class="chip-icon" title="Issue"><svg width="15" height="15" viewBox="0 0 24 24" fill="#e9a23b"><path d="M12 2L1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg></span>`;
 
@@ -1179,7 +1266,23 @@
   const attachSvg = `<span class="attach" title="Attachment"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12l-8.5 8.5a5 5 0 0 1-7-7L14 5a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 8"/></svg></span>`;
   const okDotSvg = `<span class="dot-ok" title="Confirmed"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1fbf5f"><circle cx="12" cy="12" r="10"/><path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
 
-  document.getElementById("rows").innerHTML = rows.map(r => {
+  const invoiceCheckSvg = `<span class="invoice-linked-check" title="Linked invoice" aria-label="Linked invoice"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m4 12 5 5L20 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  const rowsBodyEl = document.getElementById("rows");
+  const resultsCountEl = document.getElementById("ordersResultCount");
+  let activeInvoiceStatuses = [];
+  let stagedInvoiceStatuses = new Set();
+  let activeOutlets = [];
+  let stagedOutlets = new Set();
+  let activeDateRange = null;   // { from: Date, to: Date }, only when opened with a date range in the link
+  const parseDMY = text => { const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text || ''); return match ? new Date(+match[3], +match[2] - 1, +match[1]) : null; };
+  function renderRows(){
+    const visibleRows = rows.filter(row => {
+      if(activeInvoiceStatuses.length && !activeInvoiceStatuses.includes(row.invoiceLinked || row.invoiced ? 'invoiced' : 'no-linked-invoice')) return false;
+      if(activeOutlets.length && !activeOutlets.includes(row.outlet)) return false;
+      if(activeDateRange){ const date = parseDMY(row.date); if(!date || date < activeDateRange.from || date > activeDateRange.to) return false; }
+      return true;
+    });
+    rowsBodyEl.innerHTML = visibleRows.map(r => {
     const mutedCls = r.muted ? "muted" : "";
     const dateBlock = r.date ? `
       <div class="date">${r.date}${r.dotOk ? okDotSvg : ""}</div>
@@ -1196,13 +1299,158 @@
         <td class="amount">${r.amount || ""}</td>
         <td>${r.placed || ""}</td>
         <td>${statusCell}</td>
-        <td>${r.invoiced || ""}</td>
+        <td>${r.invoiceLinked ? invoiceCheckSvg : (r.invoiced || "")}</td>
         <td>${r.updated || ""}</td>
       </tr>`;
-  }).join("");
+    }).join("");
+    const count = visibleRows.length;
+    resultsCountEl.innerHTML = `Showing <b>${count ? 1 : 0}</b> to <b>${count}</b> of <b>${count}</b> entries`;
+  }
+  renderRows();
+
+  const ordersFilterControl = document.getElementById('ordersFilterControl');
+  const ordersFilterButton = document.getElementById('ordersFilterButton');
+  const ordersFilterMenu = document.getElementById('ordersFilterMenu');
+  const ordersInvoiceSubmenu = document.getElementById('ordersInvoiceSubmenu');
+  const invoiceFilterToggle = document.getElementById('invoiceFilterToggle');
+  const invoiceFilterCount = document.getElementById('invoiceFilterCount');
+  const ordersFilterCount = document.getElementById('ordersFilterCount');
+  const invoiceChecks = [...ordersInvoiceSubmenu.querySelectorAll('input[type="checkbox"]')];
+  const invoiceOptions = [...ordersInvoiceSubmenu.querySelectorAll('[data-invoice-option]')];
+  const invoiceSelectAll = document.getElementById('invoiceSelectAll');
+  function syncInvoiceFilterControls(){
+    invoiceChecks.forEach(check => { check.checked = stagedInvoiceStatuses.has(check.value); });
+    const selectedCount = stagedInvoiceStatuses.size ? 1 : 0;
+    invoiceFilterCount.hidden = !selectedCount;
+    invoiceFilterCount.textContent = String(selectedCount);
+    invoiceSelectAll.textContent = stagedInvoiceStatuses.size === invoiceChecks.length ? 'Deselect all' : 'Select all';
+  }
+  // Outlet filter: the outlets that appear in the orders, as a second submenu beside the first.
+  const ordersOutletSubmenu = document.getElementById('ordersOutletSubmenu');
+  const outletFilterToggle = document.getElementById('outletFilterToggle');
+  const outletFilterCount = document.getElementById('outletFilterCount');
+  const outletFilterOptions = document.getElementById('outletFilterOptions');
+  const outletSelectAll = document.getElementById('outletSelectAll');
+  const escapeAttr = text => String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  function renderOutletOptions(){
+    const names = [...new Set(rows.map(row => row.outlet).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' }));
+    outletFilterOptions.innerHTML = names.map(name => `<label class="orders-filter-check" data-outlet-option><input type="checkbox" value="${escapeAttr(name)}"> <span>${escapeAttr(name)}</span></label>`).join('');
+  }
+  const outletChecks = () => [...outletFilterOptions.querySelectorAll('input[type="checkbox"]')];
+  function syncOutletFilterControls(){
+    outletChecks().forEach(check => { check.checked = stagedOutlets.has(check.value); });
+    const selected = stagedOutlets.size ? 1 : 0;
+    outletFilterCount.hidden = !selected;
+    outletFilterCount.textContent = String(selected);
+    outletSelectAll.textContent = stagedOutlets.size === outletChecks().length ? 'Deselect all' : 'Select all';
+  }
+  function closeOrdersFilter(){
+    ordersFilterMenu.classList.remove('open');
+    ordersInvoiceSubmenu.classList.remove('open');
+    ordersOutletSubmenu.classList.remove('open');
+    ordersFilterButton.setAttribute('aria-expanded', 'false');
+    invoiceFilterToggle.setAttribute('aria-expanded', 'false');
+    outletFilterToggle.setAttribute('aria-expanded', 'false');
+  }
+  function showFilterSubmenu(which){
+    const showInvoice = which === 'invoice', showOutlet = which === 'outlet';
+    ordersInvoiceSubmenu.classList.toggle('open', showInvoice);
+    ordersOutletSubmenu.classList.toggle('open', showOutlet);
+    invoiceFilterToggle.setAttribute('aria-expanded', String(showInvoice));
+    outletFilterToggle.setAttribute('aria-expanded', String(showOutlet));
+  }
+  ordersFilterButton.addEventListener('click', event => {
+    event.stopPropagation();
+    const opening = !ordersFilterMenu.classList.contains('open');
+    if(opening){
+      stagedInvoiceStatuses = new Set(activeInvoiceStatuses);
+      stagedOutlets = new Set(activeOutlets);
+      syncInvoiceFilterControls(); syncOutletFilterControls();
+      showFilterSubmenu(activeInvoiceStatuses.length ? 'invoice' : activeOutlets.length ? 'outlet' : '');
+    }
+    ordersFilterMenu.classList.toggle('open', opening);
+    ordersFilterButton.setAttribute('aria-expanded', String(opening));
+  });
+  invoiceFilterToggle.addEventListener('click', () => showFilterSubmenu(ordersInvoiceSubmenu.classList.contains('open') ? '' : 'invoice'));
+  outletFilterToggle.addEventListener('click', () => showFilterSubmenu(ordersOutletSubmenu.classList.contains('open') ? '' : 'outlet'));
+  outletFilterOptions.addEventListener('change', event => {
+    const check = event.target.closest('input[type="checkbox"]'); if(!check) return;
+    if(check.checked) stagedOutlets.add(check.value); else stagedOutlets.delete(check.value);
+    syncOutletFilterControls();
+  });
+  outletSelectAll.addEventListener('click', () => {
+    stagedOutlets = stagedOutlets.size === outletChecks().length ? new Set() : new Set(outletChecks().map(check => check.value));
+    syncOutletFilterControls();
+  });
+  document.getElementById('outletFilterSearch').addEventListener('input', event => {
+    const query = event.target.value.trim().toLowerCase();
+    outletFilterOptions.querySelectorAll('[data-outlet-option]').forEach(option => { option.hidden = !option.textContent.toLowerCase().includes(query); });
+  });
+  invoiceChecks.forEach(check => check.addEventListener('change', () => {
+    if(check.checked) stagedInvoiceStatuses.add(check.value);
+    else stagedInvoiceStatuses.delete(check.value);
+    syncInvoiceFilterControls();
+  }));
+  invoiceSelectAll.addEventListener('click', () => {
+    stagedInvoiceStatuses = stagedInvoiceStatuses.size === invoiceChecks.length
+      ? new Set()
+      : new Set(invoiceChecks.map(check => check.value));
+    syncInvoiceFilterControls();
+  });
+  document.getElementById('invoiceFilterSearch').addEventListener('input', event => {
+    const query = event.target.value.trim().toLowerCase();
+    invoiceOptions.forEach(option => { option.hidden = !option.textContent.toLowerCase().includes(query); });
+  });
+  document.getElementById('ordersFilterApply').addEventListener('click', () => {
+    activeInvoiceStatuses = [...stagedInvoiceStatuses];
+    activeOutlets = [...stagedOutlets];
+    const activeCount = (activeInvoiceStatuses.length ? 1 : 0) + (activeOutlets.length ? 1 : 0);
+    ordersFilterCount.hidden = !activeCount;
+    ordersFilterCount.textContent = String(activeCount);
+    ordersFilterButton.classList.toggle('is-filtered', activeCount > 0);
+    renderRows();
+    closeOrdersFilter();
+  });
+  document.getElementById('ordersFilterReset').addEventListener('click', () => {
+    stagedInvoiceStatuses = new Set();
+    activeInvoiceStatuses = [];
+    stagedOutlets = new Set();
+    activeOutlets = [];
+    ordersFilterCount.hidden = true;
+    ordersFilterButton.classList.remove('is-filtered');
+    document.getElementById('invoiceFilterSearch').value = '';
+    document.getElementById('outletFilterSearch').value = '';
+    invoiceOptions.forEach(option => { option.hidden = false; });
+    outletFilterOptions.querySelectorAll('[data-outlet-option]').forEach(option => { option.hidden = false; });
+    syncInvoiceFilterControls(); syncOutletFilterControls();
+    renderRows();
+  });
+  document.addEventListener('click', event => { if(!ordersFilterControl.contains(event.target)) closeOrdersFilter(); });
+  document.addEventListener('keydown', event => { if(event.key === 'Escape') closeOrdersFilter(); });
+
+  // Opened from the Dashboard (see the sample orders above): ?invoicing=no-linked-invoice&outlet=<name>&from=YYYY-MM-DD&to=YYYY-MM-DD
+  // applies the Invoicing status and Outlet filters and the date range, as if they had been chosen and applied.
+  renderOutletOptions(); syncOutletFilterControls();
+  (function(){
+    const params = new URLSearchParams(location.search);
+    const invoicing = (params.get('invoicing') || '').split(',').filter(value => invoiceChecks.some(check => check.value === value));
+    const outlets = params.getAll('outlet').filter(name => outletChecks().some(check => check.value === name));
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const read = iso => { const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return match ? new Date(+match[1], +match[2] - 1, +match[3]) : null; };
+    const label = date => `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    const from = read(params.get('from')), to = read(params.get('to'));
+    if(from && to){
+      document.querySelector('.input--date span').textContent = `${label(from)} - ${label(to)}`;
+      // The date range only filters the sample orders built for it; the fixed sample rows keep their own dates.
+      if(params.get('orders')) activeDateRange = { from, to };
+    }
+    if(invoicing.length) stagedInvoiceStatuses = new Set(invoicing);
+    if(outlets.length) stagedOutlets = new Set(outlets);
+    if(invoicing.length || outlets.length || activeDateRange){ syncInvoiceFilterControls(); syncOutletFilterControls(); document.getElementById('ordersFilterApply').click(); }
+  })();
 
   // Row click → detail page
-  document.getElementById("rows").addEventListener("click", function(e) {
+  rowsBodyEl.addEventListener("click", function(e) {
     var row = e.target.closest("tr");
     if (row) window.location.href = "Procure - Order Detail.html";
   });

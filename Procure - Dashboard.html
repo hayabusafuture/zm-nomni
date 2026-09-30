@@ -509,8 +509,61 @@
      header hands its shadow over, so the two read as one bar. */
   .dashboard-tabs-bar { position: sticky; top: calc(56px + var(--sticky-context-h, 0px)); z-index: 14; isolation: isolate; }
   .dashboard-tabs-bar::before { content: ""; position: absolute; z-index: -1; top: 0; bottom: -1px; left: calc(-1 * var(--tabs-bleed-left, 0px)); right: calc(-1 * var(--tabs-bleed-right, 0px)); background: color-mix(in srgb, var(--panel) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--rule); box-shadow: 0 2px 5px rgba(26,31,43,.06); opacity: 0; pointer-events: none; }
+  /* Order by supplier: the same dialog as on the Orders page (its own class names, as .modal-* is the data-status dialog). */
+  .supplier-modal { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; padding: 24px; background: rgba(10,20,15,.48); }
+  .supplier-modal.open { display: flex; }
+  .supplier-modal-card { position: relative; display: flex; flex-direction: column; width: 490px; max-width: 100%; max-height: calc(100vh - 48px); overflow: hidden; border-radius: 14px; background: #fff; box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+  .supplier-modal-close { position: absolute; top: 16px; right: 20px; display: flex; align-items: center; padding: 4px; border: 0; border-radius: 4px; background: transparent; color: var(--ink-mute); cursor: pointer; }
+  .supplier-modal-close:hover { color: var(--ink); }
+  .supplier-modal-head { flex: 0 0 auto; padding: 22px 24px 18px; border-bottom: 1px solid var(--rule); text-align: center; }
+  .supplier-modal-eyebrow { margin-bottom: 4px; color: var(--ink-2); font-size: 12px; font-weight: 400; }
+  .supplier-modal-outlet { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: var(--spinach); font: 700 21px/1.3 "Inter", system-ui, sans-serif; letter-spacing: -.01em; cursor: pointer; }
+  .supplier-modal-outlet .chev { width: 8px; height: 8px; border-width: 1.5px; }
+  .supplier-modal-search-wrap { flex: 0 0 auto; padding: 12px 16px 10px; border-bottom: 1px solid var(--rule); }
+  .supplier-modal-search { width: 100%; padding: 9px 14px 9px 38px; border: 1px solid #dcdee3; border-radius: 8px; outline: none; background: #fafafa url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8f98' stroke-width='2' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center; color: var(--ink); font: 400 14px/1.4 "Inter", system-ui, sans-serif; }
+  .supplier-modal-search:focus { border-color: var(--nomni-green); background-color: #fff; }
+  .supplier-modal-search::placeholder { color: var(--ink-mute); }
+  .supplier-modal-list { flex: 1; overflow-y: auto; padding: 4px 0; }
+  .supplier-modal-item { display: flex; align-items: center; gap: 14px; padding: 13px 20px; color: var(--ink); text-decoration: none; transition: background .12s; }
+  .supplier-modal-item:hover { background: #f7f8fa; }
+  .supplier-modal-item[hidden] { display: none; }
+  .supplier-modal-avatar { display: flex; flex: 0 0 40px; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #ede0f5; color: var(--nomni-green); font: 700 11px/1 "Hanken Grotesk", system-ui, sans-serif; letter-spacing: -.02em; }
+  .supplier-modal-avatar.muted { background: #e8eaef; color: var(--ink-2); }
+  .supplier-modal-info { flex: 1; min-width: 0; }
+  .supplier-modal-name { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 14px; font-weight: 600; }
+  .supplier-modal-sub { margin-top: 2px; color: var(--ink-mute); font-size: 11px; }
+  .supplier-modal-delivery { flex: 0 0 auto; color: var(--ink-2); font-size: 11px; white-space: nowrap; }
+  .supplier-modal-add-icon { display: flex; flex: 0 0 40px; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--mint); color: var(--nomni-green); font-size: 21px; font-weight: 300; line-height: 1; }
+  .supplier-modal .badge-new { padding: 2px 6px; border-radius: 4px; background: var(--mint); color: #0a8a3a; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+  .supplier-modal-empty { padding: 22px 20px; color: var(--ink-mute); font-size: 13px; text-align: center; }
+  .supplier-modal-foot { flex: 0 0 auto; padding: 12px 20px 16px; border-top: 1px solid var(--rule); color: var(--ink-mute); font-size: 11px; line-height: 1.5; }
+  /* Upload invoice: "Select outlet", then "Upload for <outlet>" (the upload dialog from the trial Invoices page). */
+  .outlet-modal, .upload-dialog { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; padding: 24px; background: rgba(10,20,15,.46); }
+  .outlet-modal.open, .upload-dialog.open { display: flex; }
+  .outlet-modal-card { display: flex; flex-direction: column; width: 800px; max-width: 100%; max-height: calc(100vh - 48px); padding: 32px 40px 36px; border-radius: 12px; background: var(--panel); box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+  .outlet-modal-head, .upload-dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .outlet-modal-head { flex: 0 0 auto; margin-bottom: 26px; }
+  .outlet-modal-head h2, .upload-dialog-head h2 { margin: 0; color: var(--ink); font-size: 21px; font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
+  .outlet-modal-close, .upload-dialog-close { display: flex; align-items: center; padding: 4px; border: 0; border-radius: 4px; background: transparent; color: var(--spinach); cursor: pointer; }
+  .upload-dialog-close { color: var(--ink-mute); }
+  .outlet-modal-close:hover { color: var(--seaweed); }
+  .upload-dialog-close:hover { color: var(--ink); }
+  .outlet-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 30px; overflow-y: auto; padding: 2px; }
+  .outlet-option { display: block; width: 100%; padding: 12px 20px; border: 1px solid var(--rule); border-radius: 2px; background: var(--panel); color: var(--ink); font: inherit; text-align: left; cursor: pointer; transition: border-color .12s, background .12s; }
+  .outlet-option:hover { border-color: var(--spinach); background: #FBFDFB; }
+  .outlet-option:focus-visible { outline: 2px solid var(--spinach); outline-offset: 2px; }
+  .outlet-option-name { display: block; font-size: 16px; font-weight: 700; line-height: 1.3; letter-spacing: -.01em; }
+  .outlet-option-address { display: block; margin-top: 3px; color: var(--ink-mute-strong); font-size: 13px; line-height: 1.35; }
+  .upload-dialog-card { width: 620px; max-width: 100%; max-height: calc(100vh - 48px); overflow-y: auto; padding: 28px 32px 30px; border-radius: 12px; background: var(--panel); box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+  .upload-dialog-head { margin-bottom: 20px; }
+  .upload-dropzone { display: grid; place-items: center; min-height: 130px; padding: 20px; border: 2px dashed #D9DBE1; border-radius: 12px; background: #FAFAFB; color: var(--ink-mute); text-align: center; }
+  .upload-dropzone strong { color: var(--spinach); }
+  .upload-dropzone .material-symbols-outlined { font-size: 30px; }
+  .upload-help { margin: 10px 0 0; color: var(--ink-mute); font-size: 12px; text-align: center; }
+  @media (max-width: 640px) { .outlet-modal-card { padding: 24px 20px 26px; } .outlet-modal-grid { grid-template-columns: minmax(0, 1fr); } .upload-dialog-card { padding: 22px 20px 24px; } }
   /* The scope and period menus open over the tab rail (z-index 14), not under it. */
   .overview-title { position: relative; z-index: 16; }
+  .page-actions { position: relative; z-index: 17; }   /* the New menu opens over the title row, not under it */
   .dashboard-tabs-bar.is-docked { border-bottom-color: transparent; transition: opacity .2s ease, visibility 0s; }
   .dashboard-tabs-bar.is-docked .dashboard-tabs { transition: transform .2s ease; }
   /* Tucked (scrolling down): the tab row slides up behind the header, fades out and leaves the tab order. Only the inner row moves, never the
@@ -1080,7 +1133,7 @@
     </div>
   </aside>
 <main class="main"><div class="sticky-header-shell"><div class="sticky-header" id="stickyContext" aria-label="Selected data scope and period"><div class="sticky-header-summary"><span class="sticky-header-scope" id="stickyScope">All outlets</span><span class="sticky-header-range"><span class="sticky-header-separator" aria-hidden="true"></span><span class="sticky-header-period" id="stickyPeriod">1–21 September 2026</span></span><span class="sticky-header-comparison" id="stickyComparison">Compared with 1–21 August 2026</span></div></div></div><div class="workspace">
-    <div class="page-head"><div><p class="welcome-date" id="welcomeDate"></p><h1 class="welcome" id="welcomeGreeting">Good morning, William</h1></div><div class="page-actions"><div class="new-action"><button class="quick-action" id="newActionButton" type="button" aria-expanded="false" aria-controls="newActionMenu"><span class="material-symbols-outlined">add</span>New</button><div class="picker-menu new-menu" id="newActionMenu"><a href="Procure%20-%20New%20Order%20-%20Item.html"><span class="material-symbols-outlined">format_list_bulleted</span>Order by item</a><a href="Procure%20-%20New%20Order%20-%20Supplier.html"><span class="material-symbols-outlined">local_shipping</span>Order by supplier</a><a href="Freemium/procure-trial-invoices.html"><span class="material-symbols-outlined">upload</span>Upload invoice</a></div></div></div></div>
+    <div class="page-head"><div><p class="welcome-date" id="welcomeDate"></p><h1 class="welcome" id="welcomeGreeting">Good morning, William</h1></div><div class="page-actions"><div class="new-action"><button class="quick-action" id="newActionButton" type="button" aria-expanded="false" aria-controls="newActionMenu"><span class="material-symbols-outlined">add</span>New</button><div class="picker-menu new-menu" id="newActionMenu"><a href="Procure%20-%20New%20Order%20-%20Item.html"><span class="material-symbols-outlined">format_list_bulleted</span>Order by item</a><a href="Procure%20-%20New%20Order%20-%20Supplier.html" id="orderBySupplierLink"><span class="material-symbols-outlined">local_shipping</span>Order by supplier</a><a href="Freemium/procure-trial-invoices.html" id="uploadInvoiceLink"><span class="material-symbols-outlined">upload</span>Upload invoice</a></div></div></div></div>
     <div class="overview-title" id="overviewTitle" role="heading" aria-level="2"><span>Here’s the performance of</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="scope"><span data-picker-label="scope">all outlets</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="scope"></div></div></div><span>for</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="period"><span data-picker-label="period">this month</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="period"><button class="picker-option selected">This month</button><button class="picker-option">Last 30 days</button><button class="picker-option">Last month</button><button class="picker-option">Last 3 months</button><button class="picker-option">This year</button></div></div></div><span class="period-comparison">Compared with 1–21 August 2026</span></div>
     <section class="overview" aria-label="Operations and performance overview">
       <div class="metric-grid">
@@ -1236,6 +1289,31 @@
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="statusModalTitle">
     <div class="modal-header"><h2 class="modal-title" id="statusModalTitle">Data status</h2><button class="modal-close" id="statusModalClose" aria-label="Close data status"><span class="material-symbols-outlined">close</span></button></div>
     <div class="modal-body" id="statusModalBody"></div>
+  </div>
+</div>
+<div class="supplier-modal" id="supplierModal" role="dialog" aria-modal="true" aria-label="Select supplier" aria-hidden="true">
+  <div class="supplier-modal-card">
+    <button class="supplier-modal-close" id="supplierModalClose" type="button" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+    <div class="supplier-modal-head">
+      <div class="supplier-modal-eyebrow">Create a new order for:</div>
+      <button class="supplier-modal-outlet" id="supplierModalOutlet" type="button"></button>
+    </div>
+    <div class="supplier-modal-search-wrap"><input type="text" class="supplier-modal-search" id="supplierModalSearch" placeholder="Search suppliers" aria-label="Search suppliers" autocomplete="off" /></div>
+    <div class="supplier-modal-list" id="supplierModalList"></div>
+    <div class="supplier-modal-foot">Suppliers with no orders from this outlet for more than 365 days will be automatically removed from this list.</div>
+  </div>
+</div>
+<div class="outlet-modal" id="outletModal" role="dialog" aria-modal="true" aria-labelledby="outletModalTitle" aria-hidden="true">
+  <div class="outlet-modal-card">
+    <div class="outlet-modal-head"><h2 id="outletModalTitle">Select outlet</h2><button class="outlet-modal-close" id="outletModalClose" type="button" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="outlet-modal-grid" id="outletModalGrid"></div>
+  </div>
+</div>
+<div class="upload-dialog" id="uploadDialog" role="dialog" aria-modal="true" aria-labelledby="uploadDialogTitle" aria-hidden="true">
+  <div class="upload-dialog-card">
+    <div class="upload-dialog-head"><h2 id="uploadDialogTitle">Upload for <span id="uploadDialogOutlet"></span></h2><button class="upload-dialog-close" id="uploadDialogClose" type="button" aria-label="Close upload dialog"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="upload-dropzone"><span><span class="material-symbols-outlined" aria-hidden="true">cloud_upload</span><br />Drag and drop files here or <strong>click to upload</strong></span></div>
+    <p class="upload-help">JPG, PNG, PDF files only — max 2MB each</p>
   </div>
 </div>
 <div class="proto-data-toggle" id="protoDataToggle" role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-data-label">Prototype data</span><button type="button" data-proto-outlets="1">1 outlet</button><button type="button" data-proto-outlets="10">10 outlets</button><button type="button" data-proto-outlets="30">30 outlets</button></div>
@@ -1590,6 +1668,103 @@
   const newActionButton = document.getElementById('newActionButton'); const newActionMenu = document.getElementById('newActionMenu');
   newActionButton.addEventListener('click', () => { const willOpen = !newActionMenu.classList.contains('open'); document.querySelectorAll('.picker-menu').forEach(menu => { if(menu !== newActionMenu) menu.classList.remove('open'); }); newActionMenu.classList.toggle('open', willOpen); newActionButton.setAttribute('aria-expanded', String(willOpen)); });
   document.addEventListener('click', event => { if(!event.target.closest('.new-action') && newActionMenu.classList.contains('open')) { newActionMenu.classList.remove('open'); newActionButton.setAttribute('aria-expanded', 'false'); } });
+  // "Order by supplier" opens the same supplier picker as the Orders page. It is a stand-in here: choosing a supplier
+  // doesn't go anywhere, and the list is this prototype's own suppliers.
+  const supplierModal = document.getElementById('supplierModal'), supplierModalList = document.getElementById('supplierModalList');
+  const supplierModalSearch = document.getElementById('supplierModalSearch'), supplierModalClose = document.getElementById('supplierModalClose');
+  const SUPPLIER_NEXT_DELIVERIES = ['1 Oct (Thu)', '2 Oct (Fri)', '5 Oct (Mon)', '6 Oct (Tue)'], SUPPLIER_BELOW_PAR = { 0: 4, 3: 2 };
+  function renderSupplierModal(){
+    const outlet = currentScope !== 'All outlets' ? currentScope : [...DASHBOARD_OUTLETS].sort()[0];
+    document.getElementById('supplierModalOutlet').innerHTML = `${escapeHtml(outlet)} <span class="chev" aria-hidden="true"></span>`;
+    supplierModalList.innerHTML = PROCURE_SUPPLIERS.map((supplier, index) => {
+      const initials = supplier.name.split(/\s+/).slice(0, 2).map(word => word[0]).join('').toUpperCase(), below = SUPPLIER_BELOW_PAR[index];
+      return `<a href="#" class="supplier-modal-item" data-stub data-name="${escapeHtml(supplier.name.toLowerCase())}"><div class="supplier-modal-avatar${below ? '' : ' muted'}">${initials}</div>`
+        + `<div class="supplier-modal-info"><div class="supplier-modal-name">${escapeHtml(supplier.name)}</div><div class="supplier-modal-sub">${escapeHtml(supplier.category)}${below ? ` &bull; ${below} item(s) below par` : ''}</div></div>`
+        + `<div class="supplier-modal-delivery">Next delivery: ${SUPPLIER_NEXT_DELIVERIES[index % SUPPLIER_NEXT_DELIVERIES.length]}</div></a>`;
+    }).join('') + '<div class="supplier-modal-empty" id="supplierModalEmpty" hidden>No suppliers match your search.</div>'
+      + '<a href="#" class="supplier-modal-item" id="supplierModalAdd" data-stub><div class="supplier-modal-add-icon">+</div><div class="supplier-modal-info"><div class="supplier-modal-name">Add supplier <span class="badge-new">NEW</span></div><div class="supplier-modal-sub">Supplier not listed here? Search &amp; add from our supplier directory</div></div></a>';
+  }
+  function filterSupplierModal(){
+    const query = supplierModalSearch.value.trim().toLowerCase(); let shown = 0;
+    supplierModalList.querySelectorAll('.supplier-modal-item[data-name]').forEach(item => { const match = !query || item.dataset.name.includes(query); item.hidden = !match; if(match) shown++; });
+    document.getElementById('supplierModalEmpty').hidden = shown > 0;
+  }
+  function trapSupplierModal(event){
+    if(event.key === 'Escape'){ closeSupplierModal(); return; }
+    if(event.key !== 'Tab') return;
+    const focusable = [...supplierModal.querySelectorAll('button, input, a[href]')].filter(el => el.offsetParent !== null);
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if(event.shiftKey && document.activeElement === first){ event.preventDefault(); last.focus(); }
+    else if(!event.shiftKey && document.activeElement === last){ event.preventDefault(); first.focus(); }
+  }
+  function openSupplierModal(){
+    newActionMenu.classList.remove('open'); newActionButton.setAttribute('aria-expanded', 'false');
+    renderSupplierModal(); supplierModalSearch.value = '';
+    supplierModal.classList.add('open'); supplierModal.setAttribute('aria-hidden', 'false');
+    supplierModalSearch.focus();
+    document.addEventListener('keydown', trapSupplierModal);
+  }
+  function closeSupplierModal(){
+    supplierModal.classList.remove('open'); supplierModal.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', trapSupplierModal);
+    newActionButton.focus();
+  }
+  document.getElementById('orderBySupplierLink').addEventListener('click', event => { event.preventDefault(); openSupplierModal(); });
+  supplierModalClose.addEventListener('click', closeSupplierModal);
+  supplierModal.addEventListener('click', event => { if(event.target === supplierModal) closeSupplierModal(); });
+  supplierModalSearch.addEventListener('input', filterSupplierModal);
+
+  // "Upload invoice": pick an outlet first, then the upload dialog for it (as on the trial Invoices page). The upload dialog is only
+  // shown to mark where it appears in the flow: it takes no files.
+  function makeDialog(overlay, initialFocus){
+    let returnTo = null;
+    const trap = event => {
+      if(event.key === 'Escape'){ dialog.close(); return; }
+      if(event.key !== 'Tab') return;
+      const focusable = [...overlay.querySelectorAll('button, input:not([hidden]), a[href], label[tabindex]')].filter(el => el.offsetParent !== null);
+      if(!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if(event.shiftKey && document.activeElement === first){ event.preventDefault(); last.focus(); }
+      else if(!event.shiftKey && document.activeElement === last){ event.preventDefault(); first.focus(); }
+    };
+    const dialog = {
+      open(trigger){ returnTo = trigger; overlay.classList.add('open'); overlay.setAttribute('aria-hidden', 'false'); (initialFocus() || overlay.querySelector('button'))?.focus(); document.addEventListener('keydown', trap); },
+      close({ restoreFocus = true } = {}){ overlay.classList.remove('open'); overlay.setAttribute('aria-hidden', 'true'); document.removeEventListener('keydown', trap); if(restoreFocus) returnTo?.focus(); },
+      handOver(){ const trigger = returnTo; dialog.close({ restoreFocus: false }); return trigger; },
+    };
+    overlay.addEventListener('click', event => { if(event.target === overlay) dialog.close(); });
+    return dialog;
+  }
+  const outletModalEl = document.getElementById('outletModal'), outletModalGrid = document.getElementById('outletModalGrid');
+  const uploadDialogEl = document.getElementById('uploadDialog');
+  const outletDialog = makeDialog(outletModalEl, () => outletModalGrid.querySelector('.outlet-option'));
+  const uploadDialog = makeDialog(uploadDialogEl, () => document.getElementById('uploadDialogClose'));
+  // Sample street addresses, fixed per outlet, so the cards look like the real dialog.
+  const OUTLET_STREETS = ['Neil Road', 'Jalan Riang', 'Keong Saik Road', 'Amoy Street', 'Club Street', 'Tanjong Pagar Road', 'Telok Ayer Street', 'Robertson Quay', 'Dempsey Road', 'Orchard Road'];
+  function outletAddress(name){
+    const rand = seededRandom(`${name}:address`);
+    return `${1 + Math.floor(rand() * 180)} ${OUTLET_STREETS[Math.floor(rand() * OUTLET_STREETS.length)]}, Singapore ${String(80000 + Math.floor(rand() * 19999)).padStart(6, '0')}`;
+  }
+  function openUploadDialog(outlet, trigger){
+    document.getElementById('uploadDialogOutlet').textContent = outlet;
+    uploadDialog.open(trigger);
+  }
+  function openOutletDialog(){
+    newActionMenu.classList.remove('open'); newActionButton.setAttribute('aria-expanded', 'false');
+    const outlets = [...DASHBOARD_OUTLETS].sort(outletNameCollator.compare);
+    // A single-outlet account has nothing to choose.
+    if(outlets.length === 1){ openUploadDialog(outlets[0], newActionButton); return; }
+    outletModalGrid.innerHTML = outlets.map(name => `<button type="button" class="outlet-option" data-outlet="${escapeHtml(name)}"><span class="outlet-option-name">${escapeHtml(name)}</span><span class="outlet-option-address">${escapeHtml(outletAddress(name))}</span></button>`).join('');
+    outletDialog.open(newActionButton);
+  }
+  document.getElementById('uploadInvoiceLink').addEventListener('click', event => { event.preventDefault(); openOutletDialog(); });
+  document.getElementById('outletModalClose').addEventListener('click', () => outletDialog.close());
+  outletModalGrid.addEventListener('click', event => {
+    const option = event.target.closest('.outlet-option'); if(!option) return;
+    const trigger = outletDialog.handOver();
+    openUploadDialog(option.dataset.outlet, trigger);
+  });
+  document.getElementById('uploadDialogClose').addEventListener('click', () => uploadDialog.close());
   // "Here's the performance of [scope] for [period]." — periods read naturally with or without "the" ("for this month" vs "for the last 30 days"), so this can't be a blanket lowercase-first-letter transform.
   const periodHeadlinePhrases = { 'This month': 'this month', 'Last 30 days': 'the last 30 days', 'Last month': 'last month', 'Last 3 months': 'the last 3 months', 'This year': 'this year' };
   document.querySelectorAll('[data-menu="period"] .picker-option').forEach(option => { const label = option.textContent.trim(); option.dataset.period = label; option.innerHTML = `<span>${label}</span><span class="picker-option-date">${periodOptionDates[label]}</span>`; });
@@ -1607,7 +1782,7 @@
     button.setAttribute('aria-expanded', String(willOpen));
   }));
   document.addEventListener('click', event => {
-    if(event.target.closest('.picker')) return;
+    if(event.target.closest('.picker, .new-action')) return;   // the New menu is also a .picker-menu and closes itself
     document.querySelectorAll('.picker-menu.open').forEach(menu => menu.classList.remove('open'));
     pickerButtons.forEach(button => button.setAttribute('aria-expanded', 'false'));
   });
@@ -4171,7 +4346,13 @@
   document.addEventListener('click', event => { if(event.target.closest('[data-stub]')) event.preventDefault(); });
 
   /* --- Data status: a footer row inside each tab's "At a glance" box. Shown only when there is a gap. --- */
-  function statusPopoverRow(label, value, detail, link){ return `<div class="data-status-item"><div class="data-status-row"><span>${label}</span><span class="data-status-value">${value}</span></div><div class="data-status-detail"><span>${detail}</span>${link ? `<a class="procure-link" href="#" data-stub>${link}</a>` : ''}</div></div>`; }
+  function statusPopoverRow(label, value, detail, link){ return `<div class="data-status-item"><div class="data-status-row"><span>${label}</span><span class="data-status-value">${value}</span></div><div class="data-status-detail"><span>${detail}</span>${statusPopoverLink(link)}</div></div>`; }
+  // A link is a label (a stub for a page that doesn't exist yet) or { text, href }, which opens in a new tab.
+  function statusPopoverLink(link){
+    if(!link) return '';
+    if(typeof link === 'string') return `<a class="procure-link" href="#" data-stub>${link}</a>`;
+    return `<a class="procure-link" href="${escapeHtml(link.href)}" target="_blank" rel="noopener">${link.text}</a>`;
+  }
   // One popover wiring per footer: open on the Details button, close on Escape, an outside click, or the button again.
   // A single shared dialog: the trigger only needs to hand it a title and body, and remember who opened it so
   // focus can return there on close. Tab is trapped inside the card while it's open.
@@ -4250,8 +4431,14 @@
     const deliveryWord = plural(side.missing, 'delivery', 'deliveries'), verb = side.missing === 1 ? 'has' : 'have';
     const place = currentScope === 'All outlets' ? '' : ` at ${currentScope}`;
     spendStatusText.textContent = `${deliveryWord}${place} ${verb} no invoice yet, so spend may be understated by about ${money(side.missingOrderValue, 100)}.`;
+    // View missing: the Orders page, filtered to Invoicing status > No linked invoice, for the period and outlet on screen. The link
+    // also carries how many deliveries each outlet is missing an invoice for, so the sample orders there match this dialog.
+    const range = PERIOD_DATE_RANGES[currentPeriod].current;
+    const missingByOutlet = encodeURIComponent(JSON.stringify(data.perOutlet.map(outlet => [outlet.name, outlet.current.missing])));
+    const outletParam = currentScope !== 'All outlets' ? `&outlet=${encodeURIComponent(currentScope)}` : '';
+    const missingOrdersHref = `Procure%20-%20Orders.html?invoicing=no-linked-invoice${outletParam}&from=${range.start}&to=${range.end}&orders=${missingByOutlet}`;
     spendStatusModalBody = `<p class="data-status-summary">≈ ${money(side.missingOrderValue, 100)} of deliveries without an invoice</p>`
-      + statusPopoverRow('Deliveries with an invoice', percent(side.invoices / side.deliveries), `${side.missing} missing${side.processing ? ` · ${side.processing} processing` : ''}`, 'View missing →')
+      + statusPopoverRow('Deliveries with an invoice', percent(side.invoices / side.deliveries), `${side.missing} missing${side.processing ? ` · ${side.processing} processing` : ''}`, { text: 'View missing →', href: missingOrdersHref })
       + statusPopoverRow('Linked to an order', percent(side.linkedInvoices / side.invoices), `${money(side.unlinkedValue, 10)} unlinked`, '')
       + statusPopoverRow('Fully matched', percent(side.fullyMatched / side.invoices), '', '3-way match →');
   }
