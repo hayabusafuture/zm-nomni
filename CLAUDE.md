@@ -761,7 +761,6 @@ Copy the full `:root` variable block, topbar, and sidebar verbatim from an exist
 - Procure — Recipes · Test Outlet ZM: Procure - Recipes - Outlet.html
 - Procure — Recipes · Bar BQ Chicken: Procure - Recipes - Detail.html
 - Procure — Inventory: Procure - Inventory.html
-- Procure — Inventory · Roll'd - Broadway: Procure - Inventory - Outlet.html
 - Procure — HQ · Recipe library: Procure - HQ - Recipe Library.html
 - Procure — HQ · NSW Metro: Procure - HQ - Outlet Groups - Detail.html
 - Forgot password — Nomni Procure: Procure - Forgot Password.html
