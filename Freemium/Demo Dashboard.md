@@ -239,7 +239,9 @@ Source: `../Procure - Inventory.html?demo=1`
 - Uses the more realistic freemium Inventory layout in demo mode.
 - Removes trial conversion, setup and tour chrome.
 - Uses a separate demo-only local inventory store.
-- Shows three inventory lists and seven tracked sample items.
+- Shows three inventory lists and 15 tracked sample items: nine supplier SKUs, two recipes, two sub-recipes and two Group SKUs. Each Group SKU contains two supplier items using the same inventory UOM.
+- Saved default samples receive a one-time additive update, preserving existing edits and avoiding duplicates.
+- PWF-1736 adds sample List created/deleted, Group SKU created/deleted, and Added to list/Removed from list events to the root Inventory Activity tab. Every item dialog shows Added to list/Removed from list in Stock on Hand and Activity history, with list context, UOM and blank quantities for membership events. In Activity history, membership-event timestamps use plain text because they are not clickable. Activity history filters and CSV exports include these events; Incoming is unchanged. These are illustrative entries, not an automatic audit log of prototype mutations.
 
 Available:
 
