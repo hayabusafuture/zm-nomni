@@ -84,6 +84,10 @@ Primary visual references are:
 
 [`Demo Dashboard.md`](Demo%20Dashboard.md) is the source of truth for demo scope, safety rules, section capabilities, hidden controls, sample data, planned work, and change history. Keep it updated when the demo changes.
 
+The root Inventory prototype now seeds 15 tracked sample items across three lists: nine supplier SKUs, two recipes, two sub-recipes and two Group SKUs. Saved instances of the previous seven-item default sample receive a one-time additive update; the separate trial Inventory page retains its empty onboarding flow.
+
+PWF-1736 adds sample List created/deleted, Group SKU created/deleted, and Added to list/Removed from list events to the root Inventory Activity tab. Every item dialog shows Added to list/Removed from list in Stock on Hand and Activity history, with list context, UOM and blank quantities for membership events. In Activity history, membership-event timestamps use plain text because they are not clickable. Activity history filters and CSV exports include these events; Incoming is unchanged. These are illustrative entries, not an automatic audit log of prototype mutations.
+
 Generated preview screenshots:
 
 - `Freemium/nomni-procure-top-preview.png`
