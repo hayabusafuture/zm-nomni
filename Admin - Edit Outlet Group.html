@@ -1750,6 +1750,12 @@ const individuallyDisabledItems = new Set(); // item indices disabled individual
 const scopeExcludedItems = new Set();      // item indices excluded only in this group/outlet
 let itemStatusFilter = 'available';
 const selectedItemIndices = new Set();
+// Group and outlet pages: availability changes (Exclude / Include) are logged against this group or outlet.
+function nomniLogScope(module, action, record, extra) {
+  var scope = window.isIndividualOutletPrototype ? (new URLSearchParams(window.location.search).get('outlet') || '') : ((document.getElementById('groupPageTitle') || {}).textContent || '').trim();
+  if (!scope || !record) return;
+  nomniLogActivity(Object.assign({ module: module, action: action, record: record, scope: scope, tab: module }, extra || {}));
+}
 let pendingScopeExclusion = null;
 
 function scopeExclusionTarget() {
@@ -2060,11 +2066,13 @@ function toggleInventoryExclusion(name, hasIncludedSku) {
   if (scopeExcludedInventory.has(name)) {
     if (!hasIncludedSku) { openSkuAvailabilityInfo(); return; }
     scopeExcludedInventory.delete(name);
+    nomniLogScope('inventory', 'Included', name);
     showToast(window.isIndividualOutletPrototype ? 'Inventory item included in this outlet' : 'Inventory item included in this group');
     renderScopeInventory();
   } else {
     requestScopeExclusion('“' + name + '”', function() {
       scopeExcludedInventory.add(name);
+      nomniLogScope('inventory', 'Excluded', name);
       renderScopeInventory();
       showToast(window.isIndividualOutletPrototype ? 'Inventory item excluded from this outlet' : 'Inventory item excluded from this group');
     });
@@ -2079,11 +2087,13 @@ function toggleInventorySkuExclusion(index) {
       return;
     }
     scopeExcludedInventorySkus.delete(index);
+    nomniLogScope('inventory', 'Included', item.name);
     renderScopeInventory();
     showToast(window.isIndividualOutletPrototype ? 'SKU included in inventory for this outlet' : 'SKU included in inventory for this group');
   } else {
     requestScopeExclusion('SKU “' + item.name + '” from Inventory', function() {
       scopeExcludedInventorySkus.add(index);
+      nomniLogScope('inventory', 'Excluded', item.name);
       renderScopeInventory();
       showToast(window.isIndividualOutletPrototype ? 'SKU excluded from inventory for this outlet' : 'SKU excluded from inventory for this group');
     });
@@ -2291,6 +2301,8 @@ function bulkItemAction(action) {
       if (action === 'exclude') scopeExcludedItems.add(rawIdx);
       else { scopeExcludedItems.delete(rawIdx); individuallyDisabledItems.delete(rawIdx); scopeExcludedInventorySkus.delete(rawIdx); }
     });
+    const bulkNames = Array.from(selectedItemIndices).map(function(rawIdx) { return (ITEMS[rawIdx] || {}).name; }).filter(Boolean);
+    if (bulkNames.length) nomniLogScope('market-list', action === 'exclude' ? 'Excluded' : 'Included', bulkNames.length === 1 ? bulkNames[0] : bulkNames.length + ' SKUs', bulkNames.length > 1 ? { itemsLabel: 'SKU', items: bulkNames } : undefined);
     selectedItemIndices.clear();
     renderItems();
     renderScopeInventory();
@@ -3135,11 +3147,13 @@ document.getElementById('ogRecBody').addEventListener('keydown', function(event)
 function toggleOgRecipeExclusion(name) {
   if (ogRecipeExclusions.has(name)) {
     ogRecipeExclusions.delete(name);
+    nomniLogScope('recipes', 'Included', name);
     showToast(window.isIndividualOutletPrototype ? 'Recipe included in this outlet' : 'Recipe included in this group');
     renderOgRec();
   } else {
     requestScopeExclusion('“' + name + '”', function() {
       ogRecipeExclusions.add(name);
+      nomniLogScope('recipes', 'Excluded', name);
       renderOgRec();
       showToast(window.isIndividualOutletPrototype ? 'Recipe excluded from this outlet' : 'Recipe excluded from this group');
     });
@@ -3195,6 +3209,7 @@ function closeGroupSupDisableWarning() {
 function confirmGroupSupDisable() {
   if (!pendingGroupSupName) return;
   groupDisabledSuppliers.add(pendingGroupSupName);
+  nomniLogScope('suppliers', 'Excluded', pendingGroupSupName);
   // Auto-disable all items from this supplier
   ITEMS.forEach((item, i) => { if (item.supplier === pendingGroupSupName) groupDisabledItems.add(i); });
   closeGroupSupDisableWarning();
@@ -3211,6 +3226,7 @@ function closeGroupSupReactivateOverlay() {
 function confirmGroupSupReactivate(alsoItems) {
   if (!pendingGroupSupName) return;
   groupDisabledSuppliers.delete(pendingGroupSupName);
+  nomniLogScope('suppliers', 'Included', pendingGroupSupName);
   if (alsoItems) {
     ITEMS.forEach((item, i) => { if (item.supplier === pendingGroupSupName) groupDisabledItems.delete(i); });
   }
@@ -3273,6 +3289,7 @@ function closeItemDisableConfirm() {
 function confirmItemDisable() {
   if (pendingItemIdx === null) return;
   scopeExcludedItems.add(pendingItemIdx);
+  nomniLogScope('market-list', 'Excluded', (ITEMS[pendingItemIdx] || {}).name);
   closeItemDisableConfirm();
   showToast(window.isIndividualOutletPrototype ? 'SKU excluded from this outlet' : 'SKU excluded from this group');
   if (window.isIndividualOutletPrototype) renderIndividualOverviewItems(); else renderItems();
@@ -3292,6 +3309,7 @@ function includeLinkedInventoryItem(rawIdx) {
 function confirmItemEnable() {
   if (pendingItemIdx === null) return;
   scopeExcludedItems.delete(pendingItemIdx);
+  nomniLogScope('market-list', 'Included', (ITEMS[pendingItemIdx] || {}).name);
   individuallyDisabledItems.delete(pendingItemIdx);
   scopeExcludedInventorySkus.delete(pendingItemIdx);
   includeLinkedInventoryItem(pendingItemIdx);
@@ -3580,5 +3598,24 @@ function showToast(msg) {
 })();
 </script>
 
+<script>
+// Adds an event to the shared HQ activity log (the same browser storage the HQ Activity tab reads).
+function nomniLogActivity(entry) {
+  try {
+    var key = 'nomni-hq-activity-log-v3', months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], now = new Date();
+    var log = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!Array.isArray(log)) log = [];
+    var scopes = (Array.isArray(entry.scope) ? entry.scope : [entry.scope || 'HQ']).filter(Boolean);
+    var event = Object.assign({
+      date: String(now.getDate()).padStart(2, '0') + ' ' + months[now.getMonth()] + ' ' + now.getFullYear(),
+      time: String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0'),
+      user: 'William Arya', actorType: 'admin'
+    }, entry, { scope: scopes[0] || 'HQ' });
+    if (scopes.length > 1) event.scopes = scopes;
+    log.unshift(event);
+    localStorage.setItem(key, JSON.stringify(log));
+  } catch (e) {}
+}
+</script>
 </body>
 </html>

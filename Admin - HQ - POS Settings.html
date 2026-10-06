@@ -248,7 +248,7 @@
   window.openDeleteDialog = function(){ var input=document.getElementById('deleteConfirmInput'); if (input) input.value=''; document.getElementById('deleteDialog').classList.add('open'); if (!outlet) updateDeleteConfirmation(); };
   window.closeDeleteDialog = function(){ document.getElementById('deleteDialog').classList.remove('open'); };
   window.updateDeleteConfirmation = function(){ document.querySelector('#deleteDialog .btn-danger').disabled = document.getElementById('deleteConfirmInput').value.trim().toLowerCase() !== 'delete'; };
-  window.confirmDeleteMappings = function(){ if (outlet) { var suffix=':' + outlet; Object.keys(localStorage).filter(function(key){ return key.indexOf('nomniPosOutletMapping:v2:') === 0 && key.slice(-suffix.length) === suffix; }).forEach(function(key){ localStorage.removeItem(key); }); closeDeleteDialog(); location.href = mappingUrl; return; } if (document.getElementById('deleteConfirmInput').value.trim().toLowerCase() !== 'delete') return; localStorage.removeItem(storageKey); localStorage.removeItem('nomniHqPosApiKey'); localStorage.removeItem('nomniPosApiKey'); localStorage.removeItem('nomniPosHqConfigured'); closeDeleteDialog(); location.href = mappingUrl; };
+  window.confirmDeleteMappings = function(){ if (outlet) { var suffix=':' + outlet; var removedKeys = Object.keys(localStorage).filter(function(key){ return key.indexOf('nomniPosOutletMapping:v2:') === 0 && key.slice(-suffix.length) === suffix; }); removedKeys.forEach(function(key){ localStorage.removeItem(key); }); if (removedKeys.length) nomniLogActivity({ module: 'pos-mapping', action: 'Removed', record: removedKeys.length + ' mapping' + (removedKeys.length === 1 ? '' : 's'), scope: outlet, tab: 'pos-mapping' }); closeDeleteDialog(); location.href = mappingUrl; return; } if (document.getElementById('deleteConfirmInput').value.trim().toLowerCase() !== 'delete') return; nomniLogActivity({ module: 'pos-mapping', action: 'Removed', record: 'All POS mappings', scope: 'HQ', tab: 'pos-mapping' }); localStorage.removeItem(storageKey); localStorage.removeItem('nomniHqPosApiKey'); localStorage.removeItem('nomniPosApiKey'); localStorage.removeItem('nomniPosHqConfigured'); closeDeleteDialog(); location.href = mappingUrl; };
 
   const locationSettingsRow = document.getElementById('locationSettingsRow');
   if (!outlet && locationSettingsRow) locationSettingsRow.remove();
@@ -257,5 +257,24 @@
     if (outlet) localStorage.setItem(storageKey, document.getElementById('locationId').value || 'prototype-location-id');
     location.href = mappingUrl;
   };
+</script>
+<script>
+// Adds an event to the shared HQ activity log (the same browser storage the HQ Activity tab reads).
+function nomniLogActivity(entry) {
+  try {
+    var key = 'nomni-hq-activity-log-v3', months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], now = new Date();
+    var log = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!Array.isArray(log)) log = [];
+    var scopes = (Array.isArray(entry.scope) ? entry.scope : [entry.scope || 'HQ']).filter(Boolean);
+    var event = Object.assign({
+      date: String(now.getDate()).padStart(2, '0') + ' ' + months[now.getMonth()] + ' ' + now.getFullYear(),
+      time: String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0'),
+      user: 'William Arya', actorType: 'admin'
+    }, entry, { scope: scopes[0] || 'HQ' });
+    if (scopes.length > 1) event.scopes = scopes;
+    log.unshift(event);
+    localStorage.setItem(key, JSON.stringify(log));
+  } catch (e) {}
+}
 </script>
 </body></html>

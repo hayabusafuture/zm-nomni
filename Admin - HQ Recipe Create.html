@@ -4559,12 +4559,86 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     });
   }
 
+  // ── Activity log: one event per save, listing what changed ──────────────
+  var recipeActivityBaseline = null;
+  function recipeActivityParseTable(html) {
+    var body = document.createElement('tbody');
+    body.innerHTML = html || '';
+    return Array.prototype.slice.call(body.querySelectorAll('tr')).map(function(row) {
+      var nameEl = row.querySelector('.ing-name-main');
+      if (!nameEl) return null;
+      var qty = row.querySelector('.qty-input'), uom = row.querySelector('.uom-select');
+      var name = (nameEl.childNodes[0] ? nameEl.childNodes[0].textContent : nameEl.textContent).trim();
+      return { name: name, qty: qty ? qty.value.trim() : '', uom: uom ? uom.value : '' };
+    }).filter(Boolean);
+  }
+  function recipeActivitySnapshot() {
+    var tables = {}, assignments = {}, titles = {};
+    VAR_KEY_ORDER.forEach(function(key) {
+      var html = key === currentVar ? serializeIngredientTable() : ING_TABLE_HTML_BY_VAR[key];
+      tables[key] = html ? recipeActivityParseTable(html) : null;
+      assignments[key] = (VAR_ASSIGNMENTS[key] || []).slice();
+      titles[key] = VAR_META[key] ? VAR_META[key].title : key;
+    });
+    return {
+      name: document.getElementById('recipeName').value.trim(),
+      portion: document.getElementById('portion').value.trim(),
+      instructions: document.getElementById('cookingTA').value.trim(),
+      cost: VAR_META.base ? VAR_META.base.costNum : 0,
+      tables: tables, assignments: assignments, titles: titles
+    };
+  }
+  function recipeActivityChanges(before, after) {
+    var changes = [];
+    if (before.name !== after.name) changes.push({ field: 'Name', from: before.name, to: after.name });
+    if (before.portion !== after.portion) changes.push({ field: 'Portion', from: before.portion, to: after.portion });
+    if (before.instructions !== after.instructions) changes.push({ field: 'Instructions', from: '', to: 'Edited' });
+    Object.keys(after.tables).forEach(function(key) {
+      var now = after.tables[key], was = before.tables[key];
+      if (!now || !was) return;
+      var prefix = key === 'base' ? '' : after.titles[key] + ' · ';
+      var previous = {}, seen = {};
+      was.forEach(function(row) { previous[row.name] = row; });
+      now.forEach(function(row) {
+        seen[row.name] = true;
+        var old = previous[row.name];
+        if (!old) changes.push({ field: prefix + row.name, from: '', to: 'Added · ' + row.qty + ' ' + row.uom });
+        else if (old.qty !== row.qty || old.uom !== row.uom) changes.push({ field: prefix + row.name, from: old.qty + ' ' + old.uom, to: row.qty + ' ' + row.uom });
+      });
+      was.forEach(function(row) { if (!seen[row.name]) changes.push({ field: prefix + row.name, from: row.qty + ' ' + row.uom, to: 'Removed' }); });
+    });
+    Object.keys(after.assignments).forEach(function(key) {
+      if (!before.assignments[key]) return;
+      var names = function(ids) { return ids.map(assignmentLabel).join(', '); };
+      var x = names(before.assignments[key]), y = names(after.assignments[key]);
+      if (x !== y) changes.push({ field: 'Assigned to · ' + after.titles[key], from: x, to: y });
+    });
+    Object.keys(after.titles).forEach(function(key) {
+      if (!(key in before.titles)) changes.push({ field: 'Variation', from: '', to: after.titles[key] + ' added' });
+      else if (before.titles[key] !== after.titles[key]) changes.push({ field: 'Variation name', from: before.titles[key], to: after.titles[key] });
+    });
+    Object.keys(before.titles).forEach(function(key) { if (!(key in after.titles)) changes.push({ field: 'Variation', from: before.titles[key], to: 'Removed' }); });
+    if (before.cost !== after.cost) changes.push({ field: 'Food cost', from: '$' + Number(before.cost).toFixed(2), to: '$' + Number(after.cost).toFixed(2) });
+    return changes;
+  }
+  function logRecipeSave(before) {
+    var after = recipeActivitySnapshot();
+    recipeActivityBaseline = after;
+    if (!before || document.body.classList.contains('summary-only-recipe')) return;
+    var changes = recipeActivityChanges(before, after);
+    if (!changes.length) return;
+    nomniLogActivity({ module: 'recipes', action: 'Updated', record: after.name, scope: 'HQ', tab: 'recipes', changes: changes });
+  }
+  window.addEventListener('load', function() { recipeActivityBaseline = recipeActivitySnapshot(); });
+
   function completeRecipeSave(message) {
+    var activityBefore = recipeActivityBaseline;
     var saved = persistRecipeState();
     if (!saved) {
       showToast('Could not save this recipe in the prototype.');
       return;
     }
+    logRecipeSave(activityBefore);
     unsavedVariations.clear();
     setTabDirtyStates();
     updateSaveStatus();
@@ -4765,6 +4839,25 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
     document.getElementById('userMenu').classList.toggle('open');
   });
   document.addEventListener('click', function() { document.getElementById('userMenu').classList.remove('open'); });
+</script>
+<script>
+// Adds an event to the shared HQ activity log (the same browser storage the HQ Activity tab reads).
+function nomniLogActivity(entry) {
+  try {
+    var key = 'nomni-hq-activity-log-v3', months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], now = new Date();
+    var log = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!Array.isArray(log)) log = [];
+    var scopes = (Array.isArray(entry.scope) ? entry.scope : [entry.scope || 'HQ']).filter(Boolean);
+    var event = Object.assign({
+      date: String(now.getDate()).padStart(2, '0') + ' ' + months[now.getMonth()] + ' ' + now.getFullYear(),
+      time: String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0'),
+      user: 'William Arya', actorType: 'admin'
+    }, entry, { scope: scopes[0] || 'HQ' });
+    if (scopes.length > 1) event.scopes = scopes;
+    log.unshift(event);
+    localStorage.setItem(key, JSON.stringify(log));
+  } catch (e) {}
+}
 </script>
 </body>
 </html>
