@@ -4653,6 +4653,10 @@ const ACTIVITY_LOG = [
   actSeed(10, '11:05', 'Priya Nair', 'hq-user', 'recipes', 'Disabled', 'Char Siu Chicken', 'HQ', 'recipes'),
   actSeed(11, '14:35', 'Jocelyn Tan', 'admin', 'outlet-groups', 'Updated', 'Family Dining Express', 'Family Dining Express', 'outlet-groups', { changes: [{ field: 'Description', from: 'Casual dining outlets', to: 'Casual dining outlets (Singapore central)' }] }),
   actSeed(12, '13:10', 'James Tan', 'hq-user', 'market-list', 'Updated', 'Chicken Thigh Boneless 2kg', 'HQ', 'market-list', { source: 'Manual edit', changes: [{ field: 'Price', from: '$7.20', to: '$7.40' }, { field: 'Custom name', from: '', to: 'Chicken Thigh 2kg' }, { field: 'UOM', from: '', to: 'per case added' }] }),
+  actSeed(5, '16:20', 'Priya Nair', 'hq-user', 'recipes', 'Enabled', 'Char Siu Chicken', 'HQ', 'recipes'),
+  actSeed(7, '10:30', 'James Tan', 'hq-user', 'suppliers', 'Restored', 'Harbour Provisions', 'HQ', 'suppliers'),
+  actSeed(12, '15:10', 'Marcus Tan', 'hq-user', 'pos-mapping', 'Mapped', 'Chargrill Signature Beef Burger', 'HQ', 'pos-mapping', { changes: [{ field: 'Mapped to', from: '', to: 'Chargrill Signature Burger' }] }),
+  actSeed(17, '11:40', 'Yora Milenda', 'admin', 'pos-mapping', 'Mapped', 'Hainanese Chicken Rice Bowl', 'Chargrill @ 301 Punggol', 'pos-mapping', { changes: [{ field: 'Mapped to', from: 'Hainanese Chicken Rice', to: 'Chargrill Hainanese Rice' }] }),
   actSeed(13, '10:20', 'Marcus Tan', 'hq-user', 'market-list', 'Updated', '12 SKUs', 'HQ', 'market-list', { source: 'Manual edit', itemsLabel: 'SKU', itemsTotal: 12, items: [{ name: 'Chicken Thigh Boneless 2kg', from: '$6.80', to: '$7.20' }, { name: 'Thai Hom Mali Jasmine Rice AA Grade 25kg', from: '$1.20', to: '$1.35' }, { name: 'Chilled Wagyu Striploin MS3 4/5kg', from: '$48.50', to: '$51.00' }, { name: 'Fresh Hen Eggs Grade A 30pcs Tray', from: '$7.90', to: '$8.40' }, { name: 'Japanese Short Grain Rice 10kg', from: '$21.00', to: '$22.50' }] }),
   actSeed(14, '15:55', 'System', 'system', 'pos-mapping', 'Added', '6 POS variants', 'HQ', 'pos-mapping', { itemsLabel: 'Variant', items: ['Iced Lemon Tea · Large', 'Iced Lemon Tea · Regular', 'Wagyu Beef Burger · Double patty', 'Wagyu Beef Burger · Add cheese', 'Garlic Fries · Large'], itemsTotal: 6 }),
   actSeed(18, '12:15', 'James Tan', 'hq-user', 'market-list', 'Disabled', 'Natural Bamboo BBQ Grill Skewer Flat Blade 30cm 100pcs Bag', 'HQ', 'market-list'),
@@ -4748,7 +4752,7 @@ function emitHqChange(detail) {
   window.dispatchEvent(new CustomEvent(HQ_CHANGE_EVENT, { detail: detail || {} }));
 }
 // Overview "Activity": how many events each module logged in the last 30 days. Selecting a row opens the Activity tab filtered to that module.
-const ACT_SUMMARY_DAYS = 30;
+const ACT_SUMMARY_DAYS = 90;
 const ACT_SUMMARY_MODULES = ['market-list', 'suppliers', 'recipes', 'inventory', 'pos-mapping', 'outlet-groups', 'hq'];
 function renderActivitySummary() {
   const feed = document.getElementById('overviewRecentActivity');
@@ -5620,6 +5624,13 @@ function saveRecAvailability() {
   config.record[outletKey] = selected.filter(function(scope) { return config.outlets.includes(scope); });
   if (typeof config.afterSave === 'function') config.afterSave(new Set(selected));
   config.save();
+  // Availability changes made from HQ: scopes added are Included, scopes removed are Excluded.
+  const wasSelected = config.initialSelected || new Set();
+  const addedScopes = selected.filter(function(scope) { return !wasSelected.has(scope); });
+  const removedScopes = Array.from(wasSelected).filter(function(scope) { return selected.indexOf(scope) < 0; });
+  const availModule = config.render === renderSuppliers ? 'suppliers' : (config.render === renderMl ? 'market-list' : (config.render === renderRec ? 'recipes' : 'inventory'));
+  if (addedScopes.length) addPrototypeActivity(availModule, 'Included', config.record.name, availModule, addedScopes, 'William Arya');
+  if (removedScopes.length) addPrototypeActivity(availModule, 'Excluded', config.record.name, availModule, removedScopes, 'William Arya');
   closeRecGroupsDialog();
   config.render();
   showHqToast(config.toast, config.record.name);
