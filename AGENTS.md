@@ -743,7 +743,6 @@ Copy the full `:root` variable block, topbar, and sidebar verbatim from an exist
 - Forgot password — Nomni Procure: Procure - Forgot Password.html
 - Procure — HQ · NSW Metro: Procure - HQ - Outlet Groups - Detail.html
 - Procure — HQ · Recipe library: Procure - HQ - Recipe Library.html
-- Procure — Inventory · Roll'd - Broadway: Procure - Inventory - Outlet.html
 - Procure — Inventory: Procure - Inventory.html
 - Procure — Recipes · Bar BQ Chicken: Procure - Recipes - Detail.html
 - Procure — Recipes · Test Outlet ZM: Procure - Recipes - Outlet.html
