@@ -1219,7 +1219,7 @@ const PRICE_REVIEW_KEY='nomni-hq-price-review-v2';
 const PRICE_REVIEW_WINDOW_DAYS=90;
 const pageParams=new URLSearchParams(window.location.search);
 const isNewHQContext=pageParams.get('new')==='1'||pageParams.has('created-hq')||pageParams.get('demo-hq')==='new';
-const HQ_ACTIVITY_STATE_KEY='nomni-hq-activity-log-v1';
+const HQ_ACTIVITY_STATE_KEY='nomni-hq-activity-log-v3';
 const PRICE_SCOPE_TARGETS=[{key:'group:Chargrill Outlets',name:'Chargrill Outlets',current:5.00,outletCount:4},{key:'group:Family Dining Express',name:'Family Dining Express',current:4.80,outletCount:6},{key:'outlet:(WF 139) Chargrill @ 139 Tampines',name:'(WF 139) Chargrill @ 139 Tampines',current:4.70},{key:'outlet:(WF 290) Garden Express @ 290 Sengkang',name:'(WF 290) Garden Express @ 290 Sengkang',current:4.55}];
 let changes=isNewHQContext?[]:seedChanges.map(function(change){return Object.assign({status:'new'},change);}),selected=null,acceptedChange=null,scopePrices=Object.fromEntries(PRICE_SCOPE_TARGETS.map(function(scope){return [scope.key,scope.current];}));
 if(!isNewHQContext){try { const saved=JSON.parse(localStorage.getItem(PRICE_REVIEW_KEY)||'null'); if(saved&&Array.isArray(saved.changes)){changes=saved.changes;if(saved.scopePrices)Object.assign(scopePrices,saved.scopePrices);}else if(saved&&Array.isArray(saved.pending)&&Array.isArray(saved.reviewed)){changes=saved.pending.map(function(change){return Object.assign({status:'new'},change);}).concat(saved.reviewed.map(function(change){return Object.assign({status:change.result&&change.result.indexOf('Kept')===0?'skipped':'updated'},change);}));} } catch(e) {}}
@@ -1228,13 +1228,30 @@ changes=changes.map(normaliseChange);
 const money=n=>'$'+n.toFixed(2);
 function persistPriceReviews(){if(!isNewHQContext)localStorage.setItem(PRICE_REVIEW_KEY,JSON.stringify({changes:changes,scopePrices:scopePrices}));}
 function escapeActivityText(value){return String(value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function addPriceChangeActivity(change){
+function logPriceReviewActivity(item,scopes,detail){
   if(isNewHQContext)return;
-  const now=new Date(),months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],scope=change.group||change.outlet||'Master';
-  let activity=[];
-  try{const saved=JSON.parse(localStorage.getItem(HQ_ACTIVITY_STATE_KEY)||'[]');if(Array.isArray(saved))activity=saved;}catch(e){}
-  activity.unshift({date:String(now.getDate()).padStart(2,'0')+' '+months[now.getMonth()]+' '+now.getFullYear(),time:String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'),user:'William Arya',module:'market-list',text:'Invoice price accepted for <strong>'+escapeActivityText(change.item)+'</strong> — '+money(change.old)+' → '+money(change.next),scope:scope,tab:'market-list'});
-  localStorage.setItem(HQ_ACTIVITY_STATE_KEY,JSON.stringify(activity));
+  try{
+    const now=new Date(),months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    let log=JSON.parse(localStorage.getItem(HQ_ACTIVITY_STATE_KEY)||'[]');
+    if(!Array.isArray(log))log=[];
+    const event=Object.assign({date:String(now.getDate()).padStart(2,'0')+' '+months[now.getMonth()]+' '+now.getFullYear(),time:String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'),user:'William Arya',actorType:'hq-user',module:'market-list',action:'Updated',record:item,scope:scopes[0],tab:'market-list',source:'Price changes review'},detail);
+    if(scopes.length>1)event.scopes=scopes;
+    log.unshift(event);
+    localStorage.setItem(HQ_ACTIVITY_STATE_KEY,JSON.stringify(log));
+  }catch(e){}
+}
+function addPriceChangeActivity(change){
+  logPriceReviewActivity(change.item,[change.group||change.outlet||'HQ'],{changes:[{field:'Price',from:money(change.old),to:money(change.next)}]});
+}
+// One event for every location chosen. When their previous prices are the same it is a plain "before -> after";
+// when they differ, the row expands to a Location / Before / After table so the exact old prices stay visible.
+function logApplyElsewhereActivity(item,scopeKeys,price){
+  const locations=scopeKeys.map(function(key){const target=PRICE_SCOPE_TARGETS.find(function(scope){return scope.key===key;});return {name:target?target.name:key,before:scopePrices[key]};});
+  const uniform=locations.every(function(location){return location.before===locations[0].before;});
+  const names=locations.map(function(location){return location.name;});
+  logPriceReviewActivity(item,names,uniform
+    ?{changes:[{field:'Price',from:money(locations[0].before),to:money(price)}]}
+    :{itemsLabel:'Location',items:locations.map(function(location){return {name:location.name,from:money(location.before),to:money(price)};})});
 }
 function showPriceToast(copy){const toast=document.getElementById('priceToast');document.getElementById('priceToastCopy').textContent=copy;toast.classList.add('show');window.clearTimeout(window.priceToastTimer);window.priceToastTimer=window.setTimeout(function(){toast.classList.remove('show');},3600);}
 function dateInputValue(date){return date.toISOString().slice(0,10);}
@@ -1250,7 +1267,7 @@ function openApplyElsewhere(change){acceptedChange=change;const sourceKey=priceC
 function updateApplyElsewhereSave(){const boxes=Array.from(document.querySelectorAll('#applyElsewhereRows input'));const selected=boxes.filter(function(input){return input.checked;});const all=document.getElementById('applyElsewhereAll');document.getElementById('applyElsewhereSave').disabled=!selected.length;all.checked=boxes.length>0&&selected.length===boxes.length;all.indeterminate=selected.length>0&&selected.length<boxes.length;}
 function toggleAllApplyElsewhere(checked){document.querySelectorAll('#applyElsewhereRows input').forEach(function(input){input.checked=checked;});updateApplyElsewhereSave();}
 function closeApplyElsewhere(){document.getElementById('applyElsewhere').classList.remove('open');acceptedChange=null;}
-function confirmApplyElsewhere(){if(!acceptedChange)return;const selectedScopes=Array.from(document.querySelectorAll('#applyElsewhereRows input:checked')).map(function(input){return input.value;});if(!selectedScopes.length)return;const acceptedPrice=acceptedChange.next,selectedNames=PRICE_SCOPE_TARGETS.filter(function(scope){return selectedScopes.includes(scope.key);}).map(function(scope){return scope.name;});selectedScopes.forEach(function(scopeKey){scopePrices[scopeKey]=acceptedPrice;changes.forEach(function(change){if(change.status==='new'&&change.item===acceptedChange.item&&priceChangeScopeKey(change)===scopeKey){change.old=acceptedPrice;change.status='skipped';}});});persistPriceReviews();closeApplyElsewhere();render();showPriceToast(acceptedPrice+' applied to '+selectedNames.length+' location'+(selectedNames.length===1?'':'s')+'.');}
+function confirmApplyElsewhere(){if(!acceptedChange)return;const selectedScopes=Array.from(document.querySelectorAll('#applyElsewhereRows input:checked')).map(function(input){return input.value;});if(!selectedScopes.length)return;const acceptedPrice=acceptedChange.next,selectedNames=PRICE_SCOPE_TARGETS.filter(function(scope){return selectedScopes.includes(scope.key);}).map(function(scope){return scope.name;});logApplyElsewhereActivity(acceptedChange.item,selectedScopes,acceptedPrice);selectedScopes.forEach(function(scopeKey){scopePrices[scopeKey]=acceptedPrice;changes.forEach(function(change){if(change.status==='new'&&change.item===acceptedChange.item&&priceChangeScopeKey(change)===scopeKey){change.old=acceptedPrice;change.status='skipped';}});});persistPriceReviews();closeApplyElsewhere();render();showPriceToast(acceptedPrice+' applied to '+selectedNames.length+' location'+(selectedNames.length===1?'':'s')+'.');}
 function confirmUpdate(){if(!selected)return;const today=new Date(),scopeKey=priceChangeScopeKey(selected),accepted=selected;selected.status='updated';selected.updatedAt=String(today.getDate()).padStart(2,'0')+'/'+String(today.getMonth()+1).padStart(2,'0')+'/'+today.getFullYear();scopePrices[scopeKey]=selected.next;changes.forEach(function(change){if(change.id!==selected.id&&change.status==='new'&&change.item===selected.item&&priceChangeScopeKey(change)===scopeKey)change.status='skipped';});addPriceChangeActivity(selected);persistPriceReviews();closeModal();render();showPriceToast(money(accepted.next)+' applied to '+(accepted.group||accepted.outlet)+'.');openApplyElsewhere(accepted)}
 if(isNewHQContext){let hqName='New HQ';try{const createdName=pageParams.get('created-hq');const saved=createdName?JSON.parse(localStorage.getItem('nomniCreatedHQs')||'[]').find(hq=>hq&&hq.name===createdName):JSON.parse(localStorage.getItem('nomniNewHQ')||'null');if(saved&&saved.name)hqName=saved.name;}catch(e){}document.getElementById('pricePageBackName').textContent=hqName;document.getElementById('pricePageBackLink').href='Procure - HQ - Dashboard.html'+window.location.search+'#market-list';document.title=hqName+' — Price changes';const sidebarHqName=document.getElementById('sidebarHqName');if(sidebarHqName)sidebarHqName.textContent=hqName;document.querySelectorAll('.sidebar-hq-option').forEach(function(option){option.classList.toggle('active',option.dataset.hq==='new');});document.querySelectorAll('.nav a[href^="Procure - HQ - Dashboard.html"]').forEach(function(link){const hash=link.getAttribute('href').split('#')[1]||'';link.href='Procure - HQ - Dashboard.html'+window.location.search+(hash?'#'+hash:'');});}
 setDefaultPriceReviewRange();

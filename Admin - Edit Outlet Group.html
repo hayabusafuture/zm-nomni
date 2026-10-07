@@ -1549,15 +1549,32 @@ function renderMiniOutlets() {
   }
 }
 
-function switchToTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+// Each tab has its own URL (#skus, #inventory, #recipes, #suppliers, #outlets, #activity): switching tabs adds a history
+// entry, Back / Forward switch tabs, and a link with a tab name in the hash opens that tab. The SKUs tab is the 'overview' panel.
+function switchToTab(name, fromHistory) {
+  name = { skus: 'overview' }[name] || name;
   const t = document.querySelector('.tab[data-tab="' + name + '"]');
-  if (t) t.classList.add('active');
   const p = document.getElementById('panel-' + name);
-  if (p) p.classList.add('active');
+  if (!t || !p) return false;
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  p.classList.add('active');
   if (name === 'activity' && window.refreshGroupActivity) window.refreshGroupActivity();
+  const hash = '#' + (name === 'overview' ? 'skus' : name);
+  if (!fromHistory && window.location.hash !== hash) {
+    try { history.pushState(null, '', hash); } catch (e) {}
+  }
+  return true;
 }
+function applyTabFromUrl() {
+  const name = window.location.hash.replace('#', '');
+  if (name) { switchToTab(name, true); return; }
+  const first = document.querySelector('.tab');
+  if (first) switchToTab(first.dataset.tab, true);
+}
+window.addEventListener('popstate', applyTabFromUrl);
+window.addEventListener('hashchange', applyTabFromUrl);
 
 const ITEMS = [
   // Poultry
@@ -2992,12 +3009,7 @@ function confirmCopySetup() {
 
 // ── Tabs ───────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', function() {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    this.classList.add('active');
-    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
-  });
+  tab.addEventListener('click', function() { switchToTab(this.dataset.tab); });
 });
 
 // ── Recipes tab ────────────────────────────────────────────
@@ -3197,7 +3209,7 @@ function toggleOgRecipeExclusion(name) {
 }
 function setOgRecPage(p) { ogRecPage = p; renderOgRec(); window.scrollTo(0,0); }
 renderOgRec();
-if (window.location.hash === '#recipes') switchToTab('recipes');
+if (window.location.hash) applyTabFromUrl();
 
 document.getElementById('modalClearBtn').style.visibility = 'hidden';
 if (!window.isIndividualOutletPrototype) renderOutlets();
@@ -3793,6 +3805,16 @@ const ACTIVITY_LOG = [
   actSeed(7, '10:30', 'James Tan', 'hq-user', 'suppliers', 'Restored', 'Harbour Provisions', 'HQ', 'suppliers'),
   actSeed(12, '15:10', 'Marcus Tan', 'hq-user', 'pos-mapping', 'Mapped', 'Chargrill Signature Beef Burger', 'HQ', 'pos-mapping', { changes: [{ field: 'Mapped to', from: '', to: 'Chargrill Signature Burger' }, { field: 'Quantity', from: '', to: '1 portion' }] }),
   actSeed(17, '11:40', 'Yora Milenda', 'admin', 'pos-mapping', 'Mapped', 'Hainanese Chicken Rice Bowl', 'Chargrill @ 301 Punggol', 'pos-mapping', { changes: [{ field: 'Mapped to', from: 'Hainanese Chicken Rice', to: 'Chargrill Hainanese Rice' }, { field: 'Quantity', from: '', to: '1 portion' }] }),
+  actSeed(6, '11:05', 'James Tan', 'hq-user', 'hq', 'Added', 'Nadia Yusof', 'HQ', 'users', { changes: [{ field: 'Type', from: '', to: 'Regular' }, { field: 'Permissions', from: '', to: 'Manage user accounts' }] }),
+  actSeed(19, '09:20', 'Jocelyn Tan', 'admin', 'hq', 'Updated', 'Marcus Tan', 'HQ', 'users', { changes: [{ field: 'Type', from: 'Regular', to: 'Owner' }, { field: 'Permissions', from: 'Manage user accounts', to: 'All permissions' }] }),
+  actSeed(28, '16:45', 'Marcus Tan', 'hq-user', 'hq', 'Disabled', 'Farah Ismail', 'HQ', 'users'),
+  actSeed(41, '10:10', 'Marcus Tan', 'hq-user', 'hq', 'Removed', 'Ryan Teo', 'HQ', 'users'),
+  actSeed(9, '14:05', 'Priya Nair', 'hq-user', 'market-list', 'Updated', 'Chicken Thigh Boneless 2kg', 'Chargrill Outlets', 'market-list', { source: 'Price changes review', changes: [{ field: 'Price', from: '$6.80', to: '$7.20' }] }),
+  actSeed(9, '14:06', 'Priya Nair', 'hq-user', 'market-list', 'Updated', 'Chicken Thigh Boneless 2kg', ['Family Dining Express', 'Chargrill @ 301 Punggol'], 'market-list', { source: 'Price changes review', itemsLabel: 'Location', items: [{ name: 'Family Dining Express', from: '$6.50', to: '$7.20' }, { name: 'Chargrill @ 301 Punggol', from: '$6.80', to: '$7.20' }] }),
+  actSeed(31, '13:30', 'James Tan', 'hq-user', 'market-list', 'Disabled', 'Light Soy Sauce 1.8L', 'HQ', 'market-list'),
+  actSeed(37, '10:50', 'James Tan', 'hq-user', 'market-list', 'Removed', 'Canola Oil 17L', 'HQ', 'market-list'),
+  actSeed(46, '15:15', 'James Tan', 'hq-user', 'market-list', 'Restored', 'Baby Spinach 500g', 'HQ', 'market-list'),
+  actSeed(22, '12:25', 'Marcus Tan', 'hq-user', 'pos-mapping', 'Mapped', 'Wagyu Beef Burger · Double patty', 'HQ', 'pos-mapping', { changes: [{ field: 'Mapped to', from: '', to: 'Wagyu Patty 180g' }, { field: 'Behaviour', from: '', to: 'Add/Modify item' }, { field: 'Quantity', from: '', to: '1 unit' }] }),
   actSeed(13, '10:20', 'Marcus Tan', 'hq-user', 'market-list', 'Updated', '12 SKUs', 'HQ', 'market-list', { source: 'Manual edit', itemsLabel: 'SKU', itemsTotal: 12, items: [{ name: 'Chicken Thigh Boneless 2kg', from: '$6.80', to: '$7.20' }, { name: 'Thai Hom Mali Jasmine Rice AA Grade 25kg', from: '$1.20', to: '$1.35' }, { name: 'Chilled Wagyu Striploin MS3 4/5kg', from: '$48.50', to: '$51.00' }, { name: 'Fresh Hen Eggs Grade A 30pcs Tray', from: '$7.90', to: '$8.40' }, { name: 'Japanese Short Grain Rice 10kg', from: '$21.00', to: '$22.50' }] }),
   actSeed(14, '15:55', 'System', 'system', 'pos-mapping', 'Added', '6 POS variants', 'HQ', 'pos-mapping', { itemsLabel: 'Variant', items: ['Iced Lemon Tea · Large', 'Iced Lemon Tea · Regular', 'Wagyu Beef Burger · Double patty', 'Wagyu Beef Burger · Add cheese', 'Garlic Fries · Large'], itemsTotal: 6 }),
   actSeed(18, '12:15', 'James Tan', 'hq-user', 'market-list', 'Disabled', 'Natural Bamboo BBQ Grill Skewer Flat Blade 30cm 100pcs Bag', 'HQ', 'market-list'),
@@ -3804,8 +3826,7 @@ const ACTIVITY_LOG = [
   actSeed(35, '08:45', 'System', 'system', 'market-list', 'Flagged', 'Chicken Thigh Boneless 2kg', 'Chargrill Outlets', 'market-list', { source: 'Automatic invoice digitisation', changes: [{ field: 'Price', from: '$6.80', to: '$7.20' }] }),
   actSeed(38, '10:15', 'James Tan', 'hq-user', 'outlet-groups', 'Removed', 'Chargrill @ 301 Punggol', 'Family Dining Express', 'outlet-groups'),
   actSeed(42, '15:20', 'Jocelyn Tan', 'admin', 'outlet-groups', 'Added', '3 outlets', 'HQ', 'outlet-groups', { itemsLabel: 'Outlet', items: ['Garden Express @ 088 Clementi', 'Chargrill @ 301 Punggol', 'Chargrill @ 107 Serangoon'] }),
-  actSeed(45, '11:00', 'Ashley Wong', 'admin', 'hq', 'Updated', 'Garden Cuisine HQ', 'HQ', 'overview', { changes: [{ field: 'HQ name', from: 'Garden Cuisine', to: 'Garden Cuisine HQ' }] }),
-  actSeed(48, '09:20', 'Jenni Farstephanie', 'admin', 'hq', 'Added', 'Priya Nair', 'HQ', 'overview', { changes: [{ field: 'Role', from: '', to: 'HQ user' }] }),
+  actSeed(48, '09:20', 'Jenni Farstephanie', 'admin', 'hq', 'Added', 'Priya Nair', 'HQ', 'users', { changes: [{ field: 'Type', from: '', to: 'Regular' }] }),
   actSeed(52, '14:40', 'Priya Nair', 'hq-user', 'recipes', 'Created', 'Wagyu Beef Burger with Caramelised Onion Relish', 'HQ', 'recipes', { itemsLabel: 'Ingredient', items: ['Australian Wagyu Beef Minced 1kg', 'Brioche Burger Bun 6pcs', 'Brown Onion 1kg', 'Cheddar Cheese Slices 1kg'] }),
   actSeed(56, '10:35', 'System', 'system', 'pos-mapping', 'Added', '9 POS products', 'HQ', 'pos-mapping', { itemsLabel: 'Product', itemsTotal: 9, items: ['Chargrill Chicken Wrap', 'Teriyaki Pork Bowl', 'Sparkling Water', 'Kids Chicken Nuggets'] }),
   actSeed(21, '11:15', 'Aisyah Rahman', 'hq-user', 'suppliers', 'Updated', 'Rice & Grain Co', 'Family Dining Express', 'suppliers', { changes: [{ field: 'Minimum order', from: '$200.00', to: '$350.00' }] }),

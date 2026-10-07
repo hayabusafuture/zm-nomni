@@ -1058,5 +1058,51 @@
   syncProcureUserScope();
 })();
 </script>
+<script>
+// HQ user changes made here are written to the shared HQ Activity log: a new HQ user is Added; an existing one is Updated
+// when their type (Regular / Owner) or permissions change. Name, email and job title edits are not logged.
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (!params.get('hq')) return;
+  var fromProcure = params.get('procure') === '1';
+  var isEditing = !!params.get('name');
+  function snapshot() {
+    var owner = document.getElementById('hqOwnerToggle').classList.contains('on');
+    var granted = Array.from(document.querySelectorAll('#hqPermGroup .hq-feat-item')).filter(function(item) { return item.querySelector('input').checked; })
+      .map(function(item) { return item.querySelector('.hq-feat-label').textContent.trim(); });
+    return { type: owner ? 'Owner' : 'Regular', permissions: owner ? 'All permissions' : (granted.join(', ') || 'None') };
+  }
+  var before = snapshot();
+  function logEntry(action, name, changes) {
+    try {
+      var key = 'nomni-hq-activity-log-v3', months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], now = new Date();
+      var log = JSON.parse(localStorage.getItem(key) || '[]');
+      if (!Array.isArray(log)) log = [];
+      log.unshift({
+        date: String(now.getDate()).padStart(2, '0') + ' ' + months[now.getMonth()] + ' ' + now.getFullYear(),
+        time: String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0'),
+        user: 'William Arya', actorType: fromProcure ? 'hq-user' : 'admin',
+        module: 'hq', action: action, record: name, scope: 'HQ', tab: 'users', changes: changes
+      });
+      localStorage.setItem(key, JSON.stringify(log));
+    } catch (e) {}
+  }
+  document.getElementById('saveBtn').addEventListener('click', function() {
+    if (!hasHQ()) return;
+    var name = ((document.getElementById('firstNameInput').value || '') + ' ' + (document.getElementById('lastNameInput').value || '')).trim() || 'New user';
+    var after = snapshot();
+    var changes = [];
+    if (isEditing) {
+      if (before.type !== after.type) changes.push({ field: 'Type', from: before.type, to: after.type });
+      if (before.permissions !== after.permissions) changes.push({ field: 'Permissions', from: before.permissions === 'None' ? '' : before.permissions, to: after.permissions === 'None' ? '' : after.permissions });
+      if (changes.length) logEntry('Updated', name, changes);
+    } else {
+      changes.push({ field: 'Type', from: '', to: after.type });
+      if (after.permissions !== 'None') changes.push({ field: 'Permissions', from: '', to: after.permissions });
+      logEntry('Added', name, changes);
+    }
+  });
+})();
+</script>
 </body>
 </html>

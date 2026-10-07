@@ -403,6 +403,22 @@
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
   }
 
+  function nomniLogActivity(entry) {
+    try {
+      var key = 'nomni-hq-activity-log-v3', months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], now = new Date();
+      var log = JSON.parse(localStorage.getItem(key) || '[]');
+      if (!Array.isArray(log)) log = [];
+      var event = Object.assign({
+        date: String(now.getDate()).padStart(2, '0') + ' ' + months[now.getMonth()] + ' ' + now.getFullYear(),
+        time: String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0'),
+        user: 'William Arya', actorType: 'admin', scope: 'HQ'
+      }, entry);
+      log.unshift(event);
+      localStorage.setItem(key, JSON.stringify(log));
+    } catch (e) {}
+  }
+  function logHqUserActivity(action, name, changes) { nomniLogActivity({ module: 'hq', action: action, record: name, scope: 'HQ', tab: 'users', changes: changes }); }
+
   function toggleRowActions(btn) {
     var menu = btn.nextElementSibling;
     var isOpen = menu.classList.contains('open');
@@ -466,6 +482,7 @@
     var u = HQ_USERS[idx];
     if (!u || u.hqOwner) return;
     u.active = !u.active;
+    logHqUserActivity(u.active ? 'Enabled' : 'Disabled', u.name);
     showHqToast(u.active ? 'User enabled' : 'User disabled', u.name + ' has been ' + (u.active ? 'enabled' : 'disabled') + ' for this HQ.');
     renderHqUsers();
   }
@@ -486,6 +503,7 @@
     var u = HQ_USERS[idx];
     if (u.hqOwner) { showHqToast('Can\'t remove an HQ Owner', 'Ask a Nomni Admin to change ownership first.'); return; }
     if (!window.confirm('Remove ' + u.name + '\'s access to ' + u.hq + '?')) return;
+    logHqUserActivity('Removed', u.name);
     HQ_USERS.splice(idx, 1);
     renderHqUsers();
     showHqToast('HQ access removed', u.name + ' can no longer access this HQ.');
@@ -541,6 +559,7 @@
       hq: currentHqName(), name: platformUser.name, jobTitle: platformUser.jobTitle, email: platformUser.email,
       hqOwner: false, active: true, lastActive: 'Just now'
     });
+    logHqUserActivity('Added', platformUser.name, [{ field: 'Type', from: '', to: 'Regular' }]);
     closeAddUserModal();
     renderHqUsers();
     showHqToast('User added', platformUser.name + ' now has access to ' + currentHqName() + '.');

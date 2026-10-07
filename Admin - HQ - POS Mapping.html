@@ -188,7 +188,7 @@ body.procure-context .nav a.active svg { color:#1A8040; }
         overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
         overlay.querySelector('.hq-confirm-remove').onclick = () => {
           const item = variant || product;
-          nomniLogActivity({ module: 'pos-mapping', action: 'Removed', record: variant ? product.name + ' · ' + variant.name : product.name, scope: 'HQ', tab: 'pos-mapping', changes: [{ field: 'Mapped to', from: item.target || '', to: '' }, { field: 'Quantity', from: nomniQtyLabel(item.targetQty || 1, item.targetType), to: '' }] });
+          nomniLogActivity({ module: 'pos-mapping', action: 'Removed', record: variant ? product.name + ' · ' + variant.name : product.name, scope: 'HQ', tab: 'pos-mapping', changes: [{ field: 'Mapped to', from: item.target || '', to: '' }].concat(variant && item.behaviour ? [{ field: 'Behaviour', from: item.behaviour, to: '' }] : [], [{ field: 'Quantity', from: nomniQtyLabel(item.targetQty || 1, item.targetType), to: '' }]) });
           item.mapped = false; delete item.target; delete item.targetType; delete item.ingredients; delete item.resultTarget; delete item.resultType;
           if (!variant) { localStorage.setItem('nomniHqPosMappingRemoved:' + product.code, '1'); (product.variants || []).forEach(v => { v.mapped = false; delete v.target; delete v.targetType; delete v.ingredients; }); }
           close(); renderList();
