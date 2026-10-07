@@ -2593,6 +2593,8 @@ function closeDeleteGroupModal() {
 
 function confirmDeleteGroup() {
   if (!pendingDeleteGroupRow) { closeDeleteGroupModal(); return; }
+  const activityGroupName = pendingDeleteGroupRow.querySelector('.og-name') ? pendingDeleteGroupRow.querySelector('.og-name').textContent.trim() : '';
+  if (activityGroupName) addPrototypeActivity('outlet-groups', 'Removed', activityGroupName, 'outlet-groups', 'HQ', 'William Arya');
   const tbody = pendingDeleteGroupRow.closest('tbody');
   const deletedGroupName = pendingDeleteGroupRow.querySelector('.og-name') ? pendingDeleteGroupRow.querySelector('.og-name').textContent.trim() : '';
 
@@ -4700,7 +4702,7 @@ const ACT_ACTIONS = {
 };
 // Events saved before the structured format only have a sentence; fall back to it.
 function actAction(a) { return a.action || 'Updated'; }
-function actRecord(a) { return a.record != null ? String(a.record) : String(a.text || '').replace(/<[^>]*>/g, ''); }
+function actRecord(a) { var name = a.record != null ? String(a.record) : String(a.text || '').replace(/<[^>]*>/g, ''); return a.module === 'outlet-groups' ? actCurrentName(name) : name; }
 function actSentence(a) {
   const action = ACT_ACTIONS[actAction(a)] || ACT_ACTIONS['Updated'];
   return '<strong>' + actEsc(actRecord(a)) + '</strong> ' + action.verb;
@@ -4711,7 +4713,23 @@ function actEsc(value) {
 }
 // Scope: an event can apply to several groups and outlets at once (adding SKUs or a supplier to chosen targets),
 // stored as `scopes`; `scope` always holds the first one. HQ-wide events use the single scope "HQ".
-function actScopes(a) { return a.scopes && a.scopes.length ? a.scopes : [a.scope || 'HQ']; }
+// Renaming a group keeps its history: events store names, so each rename is remembered and applied whenever events are read.
+const ACT_RENAMES_KEY = 'nomni-hq-group-renames-v1';
+function actRenames() { try { return JSON.parse(localStorage.getItem(ACT_RENAMES_KEY) || '{}') || {}; } catch (e) { return {}; } }
+function actCurrentName(name) {
+  const renames = actRenames();
+  let current = name, guard = 0;
+  while (renames[current] && guard++ < 10) current = renames[current];
+  return current;
+}
+function actRegisterRename(oldName, newName) {
+  if (!oldName || !newName || oldName === newName) return;
+  const renames = actRenames();
+  delete renames[newName];
+  renames[oldName] = newName;
+  try { localStorage.setItem(ACT_RENAMES_KEY, JSON.stringify(renames)); } catch (e) {}
+}
+function actScopes(a) { return (a.scopes && a.scopes.length ? a.scopes : [a.scope || 'HQ']).map(actCurrentName); }
 function actScopeLabel(a) {
   const names = actScopes(a);
   return names.length <= 2 ? names.join(', ') : names.slice(0, 2).join(', ') + ' +' + (names.length - 2);
@@ -4926,7 +4944,7 @@ function resetProcureHqPrototypeData() {
   if (!window.confirm('Clear all locally saved data for this Procure HQ prototype?')) return;
   var params = new URLSearchParams(window.location.search);
   var hqName = params.get('created-hq') || params.get('hq');
-  var keys = ['nomniNewHQ','nomniNewHQToastPending','nomniCreatedHQs','nomniHqDetails','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniOutletGroupsByHq','nomniHqPrototypeState','nomniHqPrototypeState:demo-new','nomniHqManagedOutlets','nomniHqManagedOutlets:preview:new','nomni-hq-created-items-v1','nomni-hq-item-lifecycle-v1','nomni-hq-item-exclusions-v1','nomni-hq-supplier-state-v1','nomni-hq-recipe-state-v1','nomni-hq-recipe-food-cost-threshold-v1','nomni-hq-recipe-draft-v3','nomni-hq-inventory-state-v1','nomni-hq-price-review-v1','nomni-hq-price-review-v2','nomni-hq-activity-log-v1','nomni-hq-activity-log-v2','nomni-hq-activity-log-v3','nomniPosApiKey','nomniPosLocationId','nomniPosConfiguredOutlets','nomniHqPosApiKey'];
+  var keys = ['nomniNewHQ','nomniNewHQToastPending','nomniCreatedHQs','nomniHqDetails','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniOutletGroupsByHq','nomniHqPrototypeState','nomniHqPrototypeState:demo-new','nomniHqManagedOutlets','nomniHqManagedOutlets:preview:new','nomni-hq-created-items-v1','nomni-hq-item-lifecycle-v1','nomni-hq-item-exclusions-v1','nomni-hq-supplier-state-v1','nomni-hq-recipe-state-v1','nomni-hq-recipe-food-cost-threshold-v1','nomni-hq-recipe-draft-v3','nomni-hq-inventory-state-v1','nomni-hq-price-review-v1','nomni-hq-price-review-v2','nomni-hq-activity-log-v1','nomni-hq-activity-log-v2','nomni-hq-activity-log-v3','nomni-hq-group-renames-v1','nomniPosApiKey','nomniPosLocationId','nomniPosConfiguredOutlets','nomniHqPosApiKey'];
   if (hqName) keys.push('nomniHqManagedOutlets:new:' + hqName, 'nomniHqDetails:new:' + hqName);
   keys.forEach(function(key) { localStorage.removeItem(key); });
   Object.keys(localStorage).forEach(function(key) {
@@ -5811,6 +5829,7 @@ function saveGroupSettings() {
       var settingsAction = row.querySelector('[data-group-description]');
       if (settingsAction) settingsAction.dataset.groupDescription = description;
     }
+    actRegisterRename(oldName, newName);
     var groupChanges = [];
     if (oldName !== newName) groupChanges.push({ field: 'Group name', from: oldName, to: newName });
     if (previousGroupDescription !== description) groupChanges.push({ field: 'Description', from: previousGroupDescription, to: description });
