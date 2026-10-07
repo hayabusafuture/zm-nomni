@@ -836,12 +836,19 @@ body.supplier-settings-open { overflow:hidden; }
 .act-table .act-changes thead th { position: static; padding: 8px 12px; border-top: none; background: #fff; }
 .act-table .act-changes tbody td { padding: 8px 12px; background: #fff !important; vertical-align: top; }
 .act-table .act-changes tbody tr:last-child td { border-bottom: none; }
-.act-summary-row .activity-body { align-self: center; }
-.act-summary-row { align-items: center; }
-.act-summary-row .act-recent-chev { margin-top: 0; }
-.act-summary-count { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; margin-left: auto; padding-left: 12px; }
-.act-summary-row.is-zero .activity-text, .act-summary-row.is-zero .act-summary-count { color: var(--ink-mute); font-weight: 400; }
-.act-panel-sub { font-size: 12px; color: var(--ink-mute); font-weight: 400; margin-left: 8px; }
+.act-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 8px; }
+.act-tile { display: flex; flex-direction: column; align-items: flex-start; border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; background: #fff; cursor: pointer; text-align: left; font: inherit; color: var(--ink); transition: background .12s, border-color .12s; }
+.act-tile:hover { background: var(--row-hover); border-color: #dcdee3; }
+.act-tile:focus-visible { outline: 2px solid var(--nomni-green); outline-offset: 2px; }
+.act-tile-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-mute); }
+.act-tile-label i { display: block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.act-tile-count { display: flex; align-items: baseline; gap: 6px; margin: 8px 0 3px; }
+.act-tile-count b { font-size: 26px; font-weight: 600; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.act-tile-when { font-size: 12px; color: var(--ink-mute); }
+.act-quiet { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-mute); padding: 10px 2px 4px; }
+.act-quiet i { display: block; width: 8px; height: 8px; border-radius: 50%; background: #dcdee3; }
+.act-panel-sub { display: block; font-size: 12px; color: var(--ink-mute); font-weight: 400; margin: 3px 0 0; }
+.panel-label-text:has(> .act-panel-sub) { flex-direction: column; align-items: flex-start; gap: 0; }
 .act-recent-link { cursor: pointer; transition: background .12s; }
 .act-recent-link:hover { background: var(--row-hover); }
 .act-recent-link:focus-visible { outline: 2px solid var(--nomni-green); outline-offset: -2px; }
@@ -1793,10 +1800,10 @@ body.supplier-settings-open { overflow:hidden; }
           <!-- Recent activity -->
           <div>
             <div class="panel-label-row" style="margin-bottom:12px">
-              <span class="panel-label-text">Activity<span class="act-panel-sub" id="overviewActivityPeriod"></span></span>
-              <button onclick="navigateToTab('activity')" style="font-size: 14px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View all →</button>
+              <span class="panel-label-text">Recent changes<span class="act-panel-sub" id="overviewActivityPeriod"></span></span>
+              <button onclick="navigateToTab('activity')" style="font-size: 14px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View activity →</button>
             </div>
-            <div class="activity-feed" id="overviewRecentActivity">
+            <div class="act-tiles" id="overviewRecentActivity">
               <div class="activity-item">
                 <div class="activity-dot" style="background:#2AC864"></div>
                 <div class="activity-body">
@@ -4774,27 +4781,41 @@ const HQ_CHANGE_EVENT = 'nomni:hq-change';
 function emitHqChange(detail) {
   window.dispatchEvent(new CustomEvent(HQ_CHANGE_EVENT, { detail: detail || {} }));
 }
-// Overview "Activity": how many events each module logged in the last 30 days. Selecting a row opens the Activity tab filtered to that module.
-const ACT_SUMMARY_DAYS = 90;
-const ACT_SUMMARY_MODULES = ['market-list', 'suppliers', 'recipes', 'inventory', 'pos-mapping', 'outlet-groups', 'hq'];
+// Overview "Recent changes": one tile per module that changed in the last 30 days, newest first, so anything new stands out.
+// Selecting a tile opens the Activity tab filtered to that module.
+const ACT_SUMMARY_DAYS = 30;
+function actAgo(date, today) {
+  const days = Math.round((today - date) / 86400000);
+  return days <= 0 ? 'today' : (days === 1 ? '1 day ago' : days + ' days ago');
+}
 function renderActivitySummary() {
   const feed = document.getElementById('overviewRecentActivity');
   if (!feed || typeof ACTIVITY_LOG === 'undefined') return;
-  const since = new Date(); since.setHours(0, 0, 0, 0); since.setDate(since.getDate() - ACT_SUMMARY_DAYS);
-  const counts = {};
-  ACTIVITY_LOG.forEach(function(a) { if (parseActDate(a.date) >= since) counts[a.module] = (counts[a.module] || 0) + 1; });
-  const total = ACT_SUMMARY_MODULES.reduce(function(sum, key) { return sum + (counts[key] || 0); }, 0);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const since = new Date(today); since.setDate(since.getDate() - ACT_SUMMARY_DAYS);
+  const byModule = {};
+  ACTIVITY_LOG.forEach(function(a) {
+    const when = parseActDate(a.date);
+    if (when < since) return;
+    const entry = byModule[a.module] || (byModule[a.module] = { count: 0, last: when, lastTime: a.time || '' });
+    entry.count += 1;
+    if (when > entry.last || (+when === +entry.last && String(a.time || '') > entry.lastTime)) { entry.last = when; entry.lastTime = a.time || ''; }
+  });
   const label = document.getElementById('overviewActivityPeriod');
-  if (label) label.textContent = 'Last ' + ACT_SUMMARY_DAYS + ' days · ' + total + ' event' + (total === 1 ? '' : 's');
-  feed.innerHTML = ACT_SUMMARY_MODULES.map(function(key) {
-    const module = ACT_MODULE[key];
-    const count = counts[key] || 0;
-    return '<div class="activity-item act-recent-link act-summary-row' + (count ? '' : ' is-zero') + '" role="button" tabindex="0" onclick="openActivityModule(\'' + key + '\')" onkeydown="if(event.target===this&&(event.key===\'Enter\'||event.key===\' \')){event.preventDefault();openActivityModule(\'' + key + '\')}">' +
-      '<div class="activity-dot" style="background:' + module.color + '"></div>' +
-      '<div class="activity-body"><div class="activity-text">' + actEsc(module.label) + '</div></div>' +
-      '<span class="act-summary-count">' + count + '</span>' +
-      '<svg class="act-recent-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>' +
-    '</div>';
+  if (label) label.textContent = 'Last ' + ACT_SUMMARY_DAYS + ' days';
+  const keys = Object.keys(byModule).filter(function(key) { return ACT_MODULE[key]; })
+    .sort(function(a, b) { return (byModule[b].last - byModule[a].last) || String(byModule[b].lastTime).localeCompare(String(byModule[a].lastTime)); });
+  if (!keys.length) {
+    feed.innerHTML = '<div class="act-quiet"><i aria-hidden="true"></i>No changes in the last ' + ACT_SUMMARY_DAYS + ' days</div>';
+    return;
+  }
+  feed.innerHTML = keys.map(function(key) {
+    const module = ACT_MODULE[key], entry = byModule[key];
+    return '<button type="button" class="act-tile" onclick="openActivityModule(\'' + key + '\')">' +
+      '<span class="act-tile-label"><i style="background:' + module.color + '"></i>' + actEsc(module.label) + '</span>' +
+      '<span class="act-tile-count"><b>' + entry.count + '</b></span>' +
+      '<span class="act-tile-when">Last change ' + actAgo(entry.last, today) + '</span>' +
+    '</button>';
   }).join('');
 }
 function openActivityModule(key) {
@@ -10237,7 +10258,7 @@ var panel = document.getElementById('panel-outlet-groups');
       '</div></div>' +
     '</div>' +
     '<div id="newHqOverviewRail" style="display:flex;flex-direction:column;gap:20px;position:sticky;top:72px">' +
-      '<div><div class="panel-label-row" style="margin-bottom:12px"><span class="panel-label-text">Activity</span><button onclick="navigateToTab(\'activity\')" style="font-size:14px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View all →</button></div>' +
+      '<div><div class="panel-label-row" style="margin-bottom:12px"><span class="panel-label-text">Recent changes</span><button onclick="navigateToTab(\'activity\')" style="font-size:14px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View activity →</button></div>' +
         '<div class="activity-feed"><div class="activity-item"><div class="activity-dot" style="background:#8a8f98"></div><div class="activity-body"><div class="activity-text"><strong>HQ created</strong></div><div class="activity-time">Today · William Arya</div></div></div></div>' +
       '</div>' +
     '</div>' +
@@ -10550,7 +10571,7 @@ function renderCreatedOutletGroup() {
           '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#F3F4F6;color:#6B7280;font-size:10px;font-weight:700;flex-shrink:0">○</span>' +
           '<span style="color:#6B7280;font-weight:500">' + outletNames.length + ' outlet' + (outletNames.length === 1 ? '' : 's') + ' not connected to POS</span>' +
         '</div></div></div>' +
-      '<div><div class="panel-label-row" style="margin-bottom:12px"><span class="panel-label-text">Activity</span><button onclick="navigateToTab(\'activity\')" style="font-size:14px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View all →</button></div>' +
+      '<div><div class="panel-label-row" style="margin-bottom:12px"><span class="panel-label-text">Recent changes</span><button onclick="navigateToTab(\'activity\')" style="font-size:14px;font-weight:600;color:var(--spinach);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">View activity →</button></div>' +
         '<div class="activity-feed">' +
           '<div class="activity-item"><div class="activity-dot" style="background:#2AC864"></div><div class="activity-body"><div class="activity-text"><strong>' + safeName + '</strong> outlet group created</div><div class="activity-time">Today · William Arya</div></div></div>' +
           '<div class="activity-item"><div class="activity-dot" style="background:#8a8f98"></div><div class="activity-body"><div class="activity-text"><strong>HQ created</strong></div><div class="activity-time">Today · William Arya</div></div></div>' +
