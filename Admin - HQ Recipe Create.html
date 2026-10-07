@@ -2364,6 +2364,30 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       unitPrice = match ? Number(match[2].replace(/,/g, '')) : NaN;
     }
     var quantity = Number(String(qtyInput.value).replace(/[^0-9.]/g, ''));
+    // All-locations view: every location prices the ingredient differently, so show the amount as a range and
+    // apply the quantity change to each location's cost (the header range then moves with it).
+    if (!activeRecipeTarget()) {
+      var previousQuantity = row.dataset.costQty !== undefined ? Number(row.dataset.costQty) : Number(String(qtyInput.defaultValue).replace(/[^0-9.]/g, ''));
+      row.dataset.costQty = String(quantity);
+      var costItemName = row.dataset.inventoryItem;
+      var costUom = (row.querySelector('.uom-select') || {}).value || '';
+      var costFixed = Number(row.dataset.fixedCost);
+      var perLocation = RECIPE_COST_TARGETS.map(function(target) {
+        return { target: target, unit: costItemName ? recipeAverageUnitPrice(optionsForRecipeScope(costItemName, target), costUom) : (Number.isFinite(costFixed) ? costFixed : NaN) };
+      });
+      var locationPrices = perLocation.map(function(entry) { return entry.unit; }).filter(Number.isFinite);
+      if (!locationPrices.length || !Number.isFinite(quantity)) return;
+      amount.textContent = recipeRange(locationPrices.map(function(price) { return price * quantity; }), recipeMoney);
+      if (Number.isFinite(previousQuantity) && quantity !== previousQuantity) {
+        perLocation.forEach(function(entry) {
+          if (!Number.isFinite(entry.unit)) return;
+          var adjustmentKey = recipeCostAdjustmentKey(entry.target);
+          recipeCostAdjustments[adjustmentKey] = (recipeCostAdjustments[adjustmentKey] || 0) + entry.unit * (quantity - previousQuantity);
+        });
+        updateRecipeCostContextUI();
+      }
+      return;
+    }
     if (!Number.isFinite(unitPrice) || !Number.isFinite(quantity) || /Varies|—/.test(unit.textContent)) return;
     var currency = (String(unit.textContent).match(/(S\$|A\$|\$)/) || ['','$'])[1];
     var previous = String(amount.textContent).match(/(?:S\$|A\$|\$)([0-9,.]+)/);
@@ -4580,11 +4604,18 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       assignments[key] = (VAR_ASSIGNMENTS[key] || []).slice();
       titles[key] = VAR_META[key] ? VAR_META[key].title : key;
     });
+    var costs = {};
+    VAR_KEY_ORDER.forEach(function(key) {
+      var ids = key === 'base' ? RECIPE_COST_TARGETS.map(function(target) { return target.id; }) : (VAR_ASSIGNMENTS[key] || []);
+      var targets = RECIPE_COST_TARGETS.filter(function(target) { return ids.indexOf(target.id) !== -1; });
+      if (!targets.length) targets = RECIPE_COST_TARGETS;
+      costs[key] = recipeRange(targets.map(function(target) { return target.cost + (recipeCostAdjustments[key + ':' + target.id] || 0); }), recipeMoney);
+    });
     return {
       name: document.getElementById('recipeName').value.trim(),
       portion: document.getElementById('portion').value.trim(),
       instructions: document.getElementById('cookingTA').value.trim(),
-      cost: VAR_META.base ? VAR_META.base.costNum : 0,
+      costs: costs,
       tables: tables, assignments: assignments, titles: titles
     };
   }
@@ -4618,7 +4649,9 @@ Rest for 5 minutes before slicing into half-rack portions.</textarea>
       else if (before.titles[key] !== after.titles[key]) changes.push({ field: 'Variation name', from: before.titles[key], to: after.titles[key] });
     });
     Object.keys(before.titles).forEach(function(key) { if (!(key in after.titles)) changes.push({ field: 'Variation', from: before.titles[key], to: 'Removed' }); });
-    if (before.cost !== after.cost) changes.push({ field: 'Food cost', from: '$' + Number(before.cost).toFixed(2), to: '$' + Number(after.cost).toFixed(2) });
+    Object.keys(after.costs).forEach(function(key) {
+      if (before.costs[key] && before.costs[key] !== after.costs[key]) changes.push({ field: 'Food cost' + (key === 'base' ? '' : ' · ' + after.titles[key]), from: before.costs[key], to: after.costs[key] });
+    });
     return changes;
   }
   function logRecipeSave(before) {
