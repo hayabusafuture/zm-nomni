@@ -853,6 +853,13 @@ body.supplier-settings-open { overflow:hidden; }
 .act-to { font-weight: 600; }
 .act-items { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 .act-items-more { color: var(--ink-mute); }
+.act-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.act-detail-head .act-detail-title { margin: 0; }
+.act-csv, .act-load-more { font: 600 13px Inter, sans-serif; color: var(--spinach); background: none; border: 0; padding: 0; cursor: pointer; }
+.act-csv:hover, .act-load-more:hover { text-decoration: underline; }
+.act-load-more { margin-top: 10px; }
+.act-load-more[disabled] { color: var(--ink-mute); cursor: default; text-decoration: none; }
+.pager-btn.wide { width: auto; padding: 0 12px; }
 
 /* ── Picker modals (Flow 1 & 2) ── */
 .picker-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: none; align-items: flex-start; justify-content: center; padding-top: 60px; }
@@ -4919,7 +4926,75 @@ function actChangeCell(a) {
   const sub = a.source || '';
   return (main || '<span class="act-none">—</span>') + (sub ? '<div class="act-sub">' + esc(sub) + '</div>' : '');
 }
-function actDetailHtml(a) {
+const ACT_ITEM_PAGE = 10; // the real build would load a bigger page (for example 50); small here so the behaviour shows in the sample data
+const actItemsShown = {};
+const actItemsLoading = {};
+const ACT_ITEM_POOL = {
+  SKU: ['Chicken Thigh Boneless 2kg', 'Thai Hom Mali Jasmine Rice AA Grade 25kg', 'Chilled Wagyu Striploin MS3 4/5kg', 'Fresh Hen Eggs Grade A 30pcs Tray', 'Japanese Short Grain Rice 10kg', 'Light Soy Sauce 1.8L', 'Baby Spinach 500g', 'Salted Butter 5kg', 'Fresh Salmon Fillet 1kg', 'Cherry Tomato 1kg', 'Brown Onion 10kg', 'Canola Oil 17L'],
+  Recipe: ['BBQ Pork Ribs', 'Char Siu Chicken', 'Teriyaki Pork Bowl', 'Chargrill Chicken Wrap', 'Garden Salad', 'Wagyu Beef Burger', 'Garlic Fries', 'Iced Lemon Tea'],
+  Product: ['Chargrill Chicken Wrap', 'Teriyaki Pork Bowl', 'Sparkling Water', 'Kids Chicken Nuggets', 'Garlic Fries', 'Wagyu Beef Burger', 'Iced Lemon Tea'],
+  Variant: ['Iced Lemon Tea · Large', 'Garlic Fries · Large', 'Wagyu Beef Burger · Add cheese', 'Wagyu Beef Burger · Double patty'],
+  Item: ['Item']
+};
+// Sample data holds only a few real names per event; the rest is filled in so the on-demand loading can be shown.
+// In the real build the full list is stored with the event and fetched in pages when the row is expanded.
+function actAllItems(a) {
+  const total = a.itemsTotal || (a.items || []).length;
+  const real = a.items || [];
+  const realNames = real.map(function(item) { return typeof item === 'object' ? item.name : item; });
+  const pool = (ACT_ITEM_POOL[a.itemsLabel || 'Item'] || ACT_ITEM_POOL.Item).filter(function(name) { return realNames.indexOf(name) < 0; });
+  const all = real.slice();
+  for (let i = real.length; i < total; i++) {
+    const n = i - real.length;
+    const name = pool[n % pool.length] + (n >= pool.length ? ' · ' + (Math.floor(n / pool.length) + 1) : '');
+    if (actIsPriced(a)) {
+      const base = 2 + ((i * 7) % 40) + 0.2;
+      all.push({ name: name, from: '$' + base.toFixed(2), to: '$' + (base * 1.05).toFixed(2) });
+    } else all.push(name);
+  }
+  return all;
+}
+function actItemsVisible(a) {
+  const total = a.itemsTotal || (a.items || []).length;
+  return Math.min(actItemsShown[actKey(a)] || ACT_ITEM_PAGE, total);
+}
+function actLoadMoreItems(i) {
+  const a = actPageItems[i];
+  if (!a) return;
+  const key = actKey(a);
+  actItemsLoading[key] = true;
+  renderActivityPage();
+  setTimeout(function() {
+    actItemsShown[key] = (actItemsShown[key] || ACT_ITEM_PAGE) + ACT_ITEM_PAGE;
+    delete actItemsLoading[key];
+    renderActivityPage();
+  }, 350);
+}
+function actCsvText(a) {
+  const q = function(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+  const priced = actIsPriced(a);
+  const head = ['Date', 'Time', 'Who', 'Action', 'Record', 'Scope', a.itemsLabel || 'Item'].concat(priced ? ['Before', 'After'] : []);
+  const lines = [head.map(q).join(',')];
+  actAllItems(a).forEach(function(item) {
+    const row = [a.date, a.time, actActorName(a), actAction(a), actRecord(a), actScopes(a).join('; '), typeof item === 'object' ? item.name : item];
+    if (priced) row.push(item.from, item.to);
+    lines.push(row.map(q).join(','));
+  });
+  return lines.join('\r\n');
+}
+function actDownloadCsv(i) {
+  const a = actPageItems[i];
+  if (!a) return;
+  const blob = new Blob([actCsvText(a)], { type: 'text/csv;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'activity-' + actRecord(a).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + a.date.replace(/ /g, '-') + '.csv';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function() { URL.revokeObjectURL(link.href); }, 1000);
+}
+function actDetailHtml(a, i) {
   let html = '';
   if (a.changes && a.changes.length > 2) {
     html += '<div><div class="act-detail-title">Changes (' + a.changes.length + ')</div><table class="act-changes"><thead><tr><th>Field</th><th>Before</th><th>After</th></tr></thead><tbody>' +
@@ -4928,11 +5003,16 @@ function actDetailHtml(a) {
   if (a.items && a.items.length) {
     const total = a.itemsTotal || a.items.length;
     const label = a.itemsLabel || 'Item';
-    const more = total > a.items.length ? '<div class="act-items-more">+ ' + (total - a.items.length) + ' more</div>' : '';
-    html += '<div><div class="act-detail-title">' + actEsc(label) + 's (' + total + ')</div>' + (actIsPriced(a)
+    const shown = actItemsVisible(a);
+    const visible = actAllItems(a).slice(0, shown);
+    const loading = !!actItemsLoading[actKey(a)];
+    const more = total > shown
+      ? '<button type="button" class="act-load-more" ' + (loading ? 'disabled' : '') + ' onclick="actLoadMoreItems(' + i + ')">' + (loading ? 'Loading…' : 'Load more (' + (total - shown) + ' remaining)') + '</button>'
+      : '';
+    html += '<div><div class="act-detail-head"><div class="act-detail-title">' + actEsc(label) + 's (' + total + ')</div><button type="button" class="act-csv" onclick="actDownloadCsv(' + i + ')">Download CSV</button></div>' + (actIsPriced(a)
       ? '<table class="act-changes"><thead><tr><th>' + actEsc(label) + '</th><th>Before</th><th>After</th></tr></thead><tbody>' +
-          a.items.map(function(item) { return '<tr><td>' + actEsc(item.name) + '</td>' + actBeforeAfter(item.from, item.to) + '</tr>'; }).join('') + '</tbody></table>'
-      : '<ul class="act-items">' + a.items.map(function(item) { return '<li>' + actEsc(typeof item === 'object' ? item.name : item) + '</li>'; }).join('') + '</ul>') + more + '</div>';
+          visible.map(function(item) { return '<tr><td>' + actEsc(item.name) + '</td>' + actBeforeAfter(item.from, item.to) + '</tr>'; }).join('') + '</tbody></table>'
+      : '<ul class="act-items">' + visible.map(function(item) { return '<li>' + actEsc(typeof item === 'object' ? item.name : item) + '</li>'; }).join('') + '</ul>') + more + '</div>';
   }
   const scopeNames = actScopes(a);
   if (scopeNames.length > 2) {
@@ -4976,19 +5056,17 @@ function renderActivityPage() {
       '<td><span class="act-record">' + actEsc(actRecord(a)) + '</span></td>' +
       '<td>' + actChangeCell(a) + '</td>' +
       '<td class="act-chev-cell">' + (exp ? '<svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>' : '') + '</td>' +
-    '</tr>' + (open ? '<tr class="act-detail-row"><td colspan="7">' + actDetailHtml(a) + '</td></tr>' : '');
+    '</tr>' + (open ? '<tr class="act-detail-row"><td colspan="7">' + actDetailHtml(a, i) + '</td></tr>' : '');
   }).join('');
   feed.innerHTML = '<table class="ml-table act-table"><colgroup><col style="width:84px"><col style="width:140px"><col style="width:200px"><col style="width:112px"><col style="width:26%"><col><col style="width:40px"></colgroup>' +
     '<thead><tr><th>When</th><th>Who</th><th>Area</th><th>Action</th><th>Record</th><th>Change</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
 
-  const totalPages = Math.max(1, Math.ceil(total / ACT_PER_PAGE));
+  // Cursor-style paging: Newer / Older only, no page numbers and no jumping, and no total (the real build loads "the 50 after the last one seen").
   const from = start + 1, to = Math.min(start + ACT_PER_PAGE, total);
-  let btns = '<button class="pager-btn" ' + (actPage===1?'disabled':'') + ' onclick="setActPage(' + (actPage-1) + ')">‹</button>';
-  for (let p = 1; p <= totalPages; p++) {
-    btns += '<button class="pager-btn' + (p===actPage?' active':'') + '" onclick="setActPage(' + p + ')">' + p + '</button>';
-  }
-  btns += '<button class="pager-btn" ' + (actPage===totalPages?'disabled':'') + ' onclick="setActPage(' + (actPage+1) + ')">›</button>';
-  pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + ' entries</span><div class="pager-btns">' + btns + '</div>';
+  const hasOlder = start + ACT_PER_PAGE < total;
+  const btns = '<button class="pager-btn wide" ' + (actPage===1?'disabled':'') + ' onclick="setActPage(' + (actPage-1) + ')">‹ Newer</button>' +
+    '<button class="pager-btn wide" ' + (hasOlder?'':'disabled') + ' onclick="setActPage(' + (actPage+1) + ')">Older ›</button>';
+  pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + '</span><div class="pager-btns">' + btns + '</div>';
 }
 
 function setActPage(p) { actPage = p; renderActivityPage(); window.scrollTo(0,0); }
