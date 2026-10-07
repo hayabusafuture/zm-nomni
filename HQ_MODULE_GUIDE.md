@@ -72,10 +72,6 @@ These actions change membership and inheritance; they do not remove the HQ maste
 - Shows operational prompts, including pending price changes, ungrouped outlets, recipes above food-cost target and outlets not connected to POS.
 - The price-change prompt opens the HQ Price changes page.
 
-### Recent activity
-
-- Shows recent prototype activity for the HQ, with a link to the full Activity tab.
-
 ## Suppliers
 
 - Supplier order settings are configured independently for every available outlet group and every available ungrouped outlet; there is no HQ-level default. A grouped outlet can additionally receive its own explicit exception without changing the group’s settings.
@@ -209,7 +205,7 @@ Activity is the audit-style record for the HQ.
 - **System events** are only for work no person triggered: automatic invoice digitisation, which flags a price change (a user's later acceptance in Price changes is a separate event under their name), and scheduled POS syncs, which add products. A sync reports new **POS products** and, separately, new **POS variants** on existing products, because POS mapping works at both levels. Cascades, such as disabling a supplier that disables its items, belong to the person who acted. Automatic price updates are not shown at HQ level because invoice price changes go through Price changes review.
 - **Filters:** search (also matches record, field values and item names), module, action, user, scope and date range. Admin also has an **actor type** filter; Procure does not. User and scope lists are built from the recorded events.
 - **Coverage:** prices (manual, invoice, group exceptions), catalogue items added or made available, supplier link/availability/settings/override changes/remove/restore, inventory item create/update/delete/enable/disable, outlet group create/settings/membership, recipe lifecycle, **recipe edits**, **Exclude and Include** on group and outlet pages, and **POS mapping** (details below). **Not yet logged:** HQ details edits and HQ user changes, Price changes review decisions, and food cost changes caused only by an ingredient price change (the SKU price change is the logged cause).
-- **Overview "Recent changes"** is a way to notice whether anything is new, not a summary. It shows one tile for each module that changed in the **last 30 days**, newest first. A tile gives the module, the number of changes as a bare number (a bulk action counts once) and "Last change 2 days ago" (or "today"). Modules with no changes in the period are not shown, and if nothing changed the panel shows one line, "No changes in the last 30 days". Selecting a tile opens the Activity tab filtered to that module and the same 30-day range; the **View activity** link opens the Activity tab. The panel counts every change, including the signed-in user's own.
+- **No activity panel on the Overview.** The Overview does not summarise recent activity: HQ users are not expected to routinely oversee changes made by other people. The full record stays in the Activity tab, and the Overview Health check still refreshes when changes are made.
 - **Prototype data:** seed events use dates relative to today (about 12 weeks of history plus older setup events), so the default 90-day view is never empty. Only events created during the session are stored in the browser, and Admin and Procure share them until **Reset prototype** is used. A new HQ starts with no seed events.
 - The reset control is deliberately kept outside the product UI at the lower-left of the prototype; it clears browser-stored demonstration state.
 
