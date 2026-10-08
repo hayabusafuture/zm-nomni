@@ -3682,7 +3682,8 @@ const ACT_MODULE = {
 // Activity events: who (actor + type), what (headline text, record, field-level changes or
 // affected items), where (scope/module), why (source) and knock-on effects (impact).
 // Seed events use dates relative to today so the default 90-day window is never empty.
-const ACT_CONTEXT = 'admin';
+// Opened from Procure (?procure=1) the tab behaves as Procure does: staff appear only as Nomni Support and there is no actor-type filter.
+const ACT_CONTEXT = (function () { var q = new URLSearchParams(window.location.search); return q.get('procure') === '1' && q.get('admin') !== '1' ? 'procure' : 'admin'; })();
 // The signed-in persona: Nomni staff in Admin, an HQ user in Procure.
 const ACT_DEFAULT_ACTOR = { name: 'William Arya', type: ACT_CONTEXT === 'procure' ? 'hq-user' : 'admin' };
 const ACT_ACTOR_TYPES = {
@@ -4068,7 +4069,7 @@ function renderActivityPage() {
       var scopes = actScopes(a);
       // The page already says which group or outlet this is, so the scope is shown only when it adds something (a member outlet, or several scopes).
       var showScope = !(scopes.length === 1 && scopeBase(scopes[0]) === here);
-      var staffLabel = actActorType(a) === 'admin' ? '<div class="act-sub">Nomni Support</div>' : '';
+      var staffLabel = ACT_CONTEXT === 'admin' && actActorType(a) === 'admin' ? '<div class="act-sub">Nomni Support</div>' : '';
       return '<tr' + rowAttrs + '>' +
         '<td><div>' + actEsc(actShortDate(a.date)) + '</div><div class="act-sub">' + actEsc(a.time) + '</div></td>' +
         '<td><div class="act-who">' + actEsc(actActorName(a)) + '</div>' + staffLabel + '</td>' +
@@ -4094,7 +4095,7 @@ function mount() {
       '<div class="ml-search-wrap" style="min-width:200px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" class="ml-search-input" id="gaSearch" placeholder="Search activity…" oninput="renderGroupActivity()" /></div>' +
       '<select class="ml-filter-select" id="gaModule" onchange="renderGroupActivity()"></select>' +
       '<select class="ml-filter-select" id="gaAction" onchange="renderGroupActivity()"></select>' +
-      '<select class="ml-filter-select" id="gaType" onchange="renderGroupActivity()"></select>' +
+      '<select class="ml-filter-select" id="gaType"' + (ACT_CONTEXT === 'procure' ? ' style="display:none"' : '') + ' onchange="renderGroupActivity()"></select>' +
       '<select class="ml-filter-select" id="gaUser" onchange="renderGroupActivity()"></select>' +
       '<select class="ml-filter-select" id="gaRange" onchange="renderGroupActivity()"><option value="90">Last 90 days</option><option value="30">Last 30 days</option><option value="180">Last 6 months</option><option value="365">Last year</option><option value="0">All time</option></select>' +
     '</div><div id="gaFeed"></div><div id="gaPager" class="ml-pager-wrap"></div>';
