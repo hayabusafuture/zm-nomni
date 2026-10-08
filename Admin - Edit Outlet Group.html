@@ -4079,11 +4079,11 @@ function renderActivityPage() {
         '<td class="act-chev-cell">' + (exp ? '<svg class="act-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>' : '') + '</td>' +
         '</tr>' + (open ? '<tr class="act-detail-row"><td colspan="7">' + actDetailHtml(a, i) + '</td></tr>' : '');
     }).join('') + '</tbody></table>';
-  var totalPages = Math.max(1, Math.ceil(total / PER_PAGE)), from = start + 1, to = Math.min(start + PER_PAGE, total);
-  var btns = '<button class="pager-btn" ' + (currentPage === 1 ? 'disabled' : '') + ' onclick="setActPage(' + (currentPage - 1) + ')">‹</button>';
-  for (var p = 1; p <= totalPages; p++) btns += '<button class="pager-btn' + (p === currentPage ? ' active' : '') + '" onclick="setActPage(' + p + ')">' + p + '</button>';
-  btns += '<button class="pager-btn" ' + (currentPage === totalPages ? 'disabled' : '') + ' onclick="setActPage(' + (currentPage + 1) + ')">›</button>';
-  pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + ' of ' + total + ' entries</span><div class="pager-btns">' + btns + '</div>';
+  // Cursor-style paging: Newer / Older only, no page numbers and no total (the real build loads "the 50 after the last one seen").
+  var from = start + 1, to = Math.min(start + PER_PAGE, total), hasOlder = start + PER_PAGE < total;
+  var btns = '<button class="pager-btn wide" ' + (currentPage === 1 ? 'disabled' : '') + ' onclick="setActPage(' + (currentPage - 1) + ')">‹ Newer</button>' +
+    '<button class="pager-btn wide" ' + (hasOlder ? '' : 'disabled') + ' onclick="setActPage(' + (currentPage + 1) + ')">Older ›</button>';
+  pager.innerHTML = '<span class="pager-info">Showing ' + from + '–' + to + '</span><div class="pager-btns">' + btns + '</div>';
 }
 function setActPage(p) { currentPage = p; renderActivityPage(); }
 function mount() {
