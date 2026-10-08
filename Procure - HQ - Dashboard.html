@@ -10531,7 +10531,10 @@ function confirmOverviewSplitGroup() {
 document.addEventListener('click', function(event) {
   var outletName = event.target.closest('#ogTable tr[data-ungrouped-name] .og-name');
   if (!outletName) return;
-  window.location.href = 'Admin - Edit Outlet Group.html?from=hq&outlet=' + encodeURIComponent(outletName.textContent.trim());
+  // Stay in Procure: the group / outlet page switches to its Procure shell when it is opened with procure=1 and the HQ name.
+  var hqTitle = document.querySelector('.page-title');
+  var hqName = new URLSearchParams(window.location.search).get('hq') || (hqTitle && hqTitle.textContent.trim()) || 'Garden Cuisine HQ';
+  window.location.href = 'Admin - Edit Outlet Group.html?from=hq&procure=1&hq=' + encodeURIComponent(hqName) + '&outlet=' + encodeURIComponent(outletName.textContent.trim());
 });
 
 function applyCompletedOutletSplit() {
