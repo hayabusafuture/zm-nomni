@@ -703,6 +703,15 @@
 }
 
 </style>
+<style id="handoff-inspector-css">
+/* Handoff inspectors (Aa = typography, Box = layout). Colours follow the topbar text so they suit the green Admin bar and the dark Procure bar. */
+.inspector-btns { display: inline-flex; align-items: center; gap: 6px; margin-right: 8px; }
+.inspector-btns .font-inspector-btn { background: transparent; color: inherit; opacity: .78; border: 1px solid rgba(128,128,128,.5); border-color: color-mix(in srgb, currentColor 40%, transparent); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 3px 8px; border-radius: 6px; font: 700 11px/1.4 monospace; }
+.inspector-btns .font-inspector-btn:hover { opacity: 1; background: color-mix(in srgb, currentColor 12%, transparent); }
+.inspector-btns .font-inspector-btn.active { opacity: 1; background: #2AC864; color: #0E3727; border-color: #2AC864; }
+#inspector-tip { position: fixed; background: #1a1f2b; color: #fff; font: 600 11px/1.5 monospace; padding: 6px 9px; border-radius: 4px; pointer-events: none; z-index: 99999; display: none; white-space: pre; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.insp-outline { outline: 1.5px solid #6C4DF2 !important; outline-offset: -1px; }
+</style>
 </head>
 <body>
 <div class="app">
@@ -715,7 +724,7 @@
         <div class="brand-sub">Procure Admin</div>
       </div>
     </div>
-    <div class="topbar-right">
+    <div class="topbar-right"><div class="inspector-btns"><button class="font-inspector-btn" data-insp="aa" title="Typography inspector">Aa</button><button class="font-inspector-btn" data-insp="box" title="Layout inspector">Box</button></div>
       <a href="https://support.zeemart.co/en/" target="_blank" class="help-btn">
         <span class="material-symbols-outlined">help</span> Help
       </a>
@@ -4107,6 +4116,38 @@ window.refreshGroupActivity = function () { populateFilters(); renderActivityPag
 window.toggleActEntry = toggleActEntry;
 window.setActPage = setActPage;
 mount();
+})();
+</script>
+<div id="inspector-tip"></div>
+<script>
+// Handoff inspectors (Aa = typography, Box = layout). Hover to read, click to pin, Escape to clear.
+(function() {
+  var tip = document.getElementById('inspector-tip'), mode = null, last = null, pinned = false;
+  var colorTokens = { '#1a1f2b':'--ink', '#8a8f98':'--ink-mute', '#c7c9cf':'--ink-soft', '#1a8040':'--spinach', '#2ac864':'--nomni-green', '#0e3727':'--seaweed', '#e2ffe6':'--mint', '#e7e8ec':'--rule', '#ffffff':'white' };
+  function hex(c) { var m = c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/); if (!m) return c; if (m[4] === '0') return 'transparent';
+    var h = '#' + [m[1],m[2],m[3]].map(function(n){ return (+n).toString(16).padStart(2,'0'); }).join(''); return colorTokens[h] ? h + ' \u00b7 ' + colorTokens[h] : h; }
+  function set(m) { mode = (mode === m) ? null : m; pinned = false;
+    document.querySelectorAll('.inspector-btns [data-insp]').forEach(function(b){ b.classList.toggle('active', mode === b.dataset.insp); });
+    document.body.style.cursor = mode ? 'crosshair' : ''; tip.style.display = 'none'; if (last) last.classList.remove('insp-outline'); last = null; }
+  function text(el) { var s = getComputedStyle(el);
+    if (mode === 'aa') return s.fontSize + ' \u00b7 ' + s.fontWeight + ' \u00b7 ' + hex(s.color) + '\n' + s.fontFamily.split(',')[0].replace(/"/g,'');
+    var r = el.getBoundingClientRect();
+    return Math.round(r.width) + ' \u00d7 ' + Math.round(r.height) + '\npadding ' + s.padding + '\nmargin ' + s.margin + '\nradius ' + s.borderRadius + '\nborder ' + s.borderTopWidth + ' ' + s.borderTopStyle + ' ' + hex(s.borderTopColor) + '\nbg ' + hex(s.backgroundColor) + '\n' + s.display + (s.gap !== 'normal' ? ' \u00b7 gap ' + s.gap : '') + ' \u00b7 ' + s.position + ' \u00b7 ' + s.boxSizing; }
+  document.addEventListener('mouseover', function(e) {
+    if (!mode || pinned || e.target.closest('.inspector-btns') || e.target === tip) return;
+    if (last) last.classList.remove('insp-outline'); last = e.target;
+    if (mode === 'box') last.classList.add('insp-outline');
+    tip.textContent = text(e.target); tip.style.display = 'block';
+  });
+  document.addEventListener('mousemove', function(e) { if (!mode || pinned) return;
+    tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = Math.min(e.clientY + 14, innerHeight - tip.offsetHeight - 8) + 'px'; });
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.inspector-btns [data-insp]');
+    if (btn) { e.preventDefault(); e.stopPropagation(); set(btn.dataset.insp); return; }
+    if (!mode) return;
+    e.preventDefault(); e.stopPropagation(); pinned = !pinned;
+  }, true);
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && mode) set(mode); });
 })();
 </script>
 </body>
