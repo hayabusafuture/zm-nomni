@@ -602,6 +602,7 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Procure — Cost of Goods Sold: Procure - COGS.html
 - Your temporary Nomni Procure password: SendGrid/SendGrid - Temporary Password.html
 - Admin — Users: Admin - Users.html
 - Procure — Reports: Procure - Reports.html
