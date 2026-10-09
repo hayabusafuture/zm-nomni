@@ -7350,14 +7350,17 @@ function renderGroupSkuContent() {
   var table = body ? body.closest('table') : null;
   var targetUom = document.getElementById('groupSkuUom').value.trim();
   var showConversion = groupSkuDraft.items.length > 0;
+  var emptyNote = document.getElementById('groupSkuEmptyNote');
   var costField = document.getElementById('groupSkuCostField');
   if (costField) costField.hidden = showConversion;
   var head = table ? table.querySelector('thead tr') : null;
   if (head) head.innerHTML = '<th style="width:52%;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Item</th><th style="width:70px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">UOM</th>' + (showConversion ? '<th style="width:250px;min-width:250px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Convert existing UOM</th>' : '');
   if (!groupSkuDraft.items.length) {
     if (table) table.style.display = 'none';
-    body.innerHTML = '<tr><td colspan="2" style="padding:16px 0;color:var(--ink-mute);font-size:13px">No items added yet.</td></tr>';
+    body.innerHTML = '';
+    if (emptyNote) emptyNote.hidden = false;
   } else {
+    if (emptyNote) emptyNote.hidden = true;
     if (table) table.style.display = '';
     body.innerHTML = groupSkuDraft.items.map(function(item) {
       var needsConversion = groupSkuNeedsConversion(item, targetUom);
@@ -7368,7 +7371,7 @@ function renderGroupSkuContent() {
       var conversionRequired = item.conversionRequired && !item.conversionConfirmed;
       var conversion = showConversion ? '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + (needsConversion ? '<div class="inventory-conversion"><span>1 ' + hqSettingsEscape(groupSkuUomLabel(item.conversionFlipped ? item.uom : targetUom)) + '</span><span>=</span><input class="inventory-inline-field" type="number" min="0.001" step="any" value="' + conversionValue + '" placeholder="Enter rate" aria-label="Conversion rate for ' + hqSettingsEscape(item.name) + '"' + (conversionRequired ? ' aria-invalid="true"' : '') + ' oninput="updateGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\',this.value,this)" /><span>' + hqSettingsEscape(groupSkuUomLabel(item.conversionFlipped ? targetUom : item.uom)) + '</span><button class="inventory-flip" type="button" onclick="flipGroupSkuContentConversion(\'' + item.name.replace(/'/g,"\\'") + '\')"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>Flip units</button></div>' : '<span class="inventory-not-required">Not required</span>') + '</td>' : '';
       return '<tr>' +
-        '<td style="padding:12px 10px 12px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" data-group-content-check="' + hqSettingsEscape(item.name) + '" onchange="updateGroupSkuDeleteVisibility()" style="margin-top:3px" />' +
+        '<td style="padding:12px 10px 12px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" data-group-content-check="' + hqSettingsEscape(item.name) + '" onchange="updateGroupSkuDeleteVisibility()" style="margin-top:3px;width:16px;height:16px;flex:none" />' +
           '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:flex;align-items:center;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + optionStatus + '</span></span></label></td>' +
         '<td style="padding:12px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(groupSkuUomLabel(item.uom)) + '</td>' + conversion +
       '</tr>';
@@ -7440,11 +7443,30 @@ function openGroupSkuPicker() {
 function closeGroupSkuPicker() {
   document.getElementById('groupSkuPickerOverlay').classList.remove('open');
 }
+function groupSkuOrderingUoms(option) {
+  var source = Number.isInteger(option.sourceItemIdx) ? ITEMS[option.sourceItemIdx] : ITEMS.find(function(item) { return item.name === option.name; });
+  var raw = source ? (Array.isArray(source.uom) ? source.uom : [source.uom]) : [option.uom];
+  return raw.filter(Boolean).map(function(u) { return groupSkuUomLabel(String(u).replace(/^per\s+/i, '')); }).join(', ');
+}
+function groupSkuPickerCandidates() {
+  var inDraft = new Set((groupSkuDraft.items || []).map(function(i) { return i.name; }));
+  var out = [];
+  INV_ITEMS.forEach(function(rec, idx) {
+    if (rec.type !== 'group' || idx === groupSkuDraft.editIndex) return;
+    var options = rec.constituents || [];
+    options.forEach(function(c) {
+      if (inDraft.has(c.name)) return;
+      var scopeItem = { groups: c.groups ? [] : (rec.groups || []), outlets: c.outlets ? [] : (rec.outlets || []), constituents: [c] };
+      if (!groupSkuAvailableInSelectedScope(scopeItem)) return;
+      out.push({ name: c.name, supplier: c.supplier, option: c, record: rec, uom: c.uom || rec.uom, shared: options.length > 1 || rec.name !== c.name });
+    });
+  });
+  return out;
+}
 function renderGroupSkuPickerSupplierOptions() {
   var select = document.getElementById('groupSkuPickerSupplier');
-  var used = groupSkuUsedNames();
-  var suppliers = INV_ITEMS.filter(function(i){ return i.type === 'group' && i.autoIncluded && !used.has(i.name) && groupSkuAvailableInSelectedScope(i); }).map(function(i){ return i.constituents && i.constituents[0] ? i.constituents[0].supplier : ''; }).filter(function(v,i,a){ return v && a.indexOf(v) === i; }).sort();
-  select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(s){ return '<option value="' + hqSettingsEscape(s) + '">' + supplierDisplayName(s) + '</option>'; }).join('');
+  var suppliers = groupSkuPickerCandidates().map(function(c) { return c.supplier; }).filter(function(v, i, a) { return v && a.indexOf(v) === i; }).sort();
+  select.innerHTML = '<option value="">All suppliers</option>' + suppliers.map(function(s) { return '<option value="' + hqSettingsEscape(s) + '">' + supplierDisplayName(s) + '</option>'; }).join('');
 }
 function setGroupSkuPickerSearch(v) { groupSkuPickerSearch = v; renderGroupSkuPickerList(); }
 function setGroupSkuPickerSupplier(v) { groupSkuPickerSupplier = v; renderGroupSkuPickerList(); }
@@ -7596,40 +7618,48 @@ function flipGroupSkuPickerConversion(name) {
   groupSkuPickerConversions[name].flipped = !groupSkuPickerConversions[name].flipped;
   renderGroupSkuPickerList();
 }
+function showSkuMoveTip(el) {
+  var tip = document.getElementById('skuMoveTip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'skuMoveTip';
+    tip.setAttribute('role', 'tooltip');
+    tip.style.cssText = 'position:fixed;z-index:2000;max-width:240px;padding:8px 10px;border-radius:7px;background:#1A1F2B;color:#fff;font-size:12px;line-height:1.4;pointer-events:none;display:none;box-shadow:0 8px 22px rgba(14,55,39,.22)';
+    document.body.appendChild(tip);
+  }
+  tip.textContent = el.dataset.tip || '';
+  tip.style.display = 'block';
+  var r = el.getBoundingClientRect();
+  tip.style.left = Math.max(8, r.left + r.width / 2 - tip.offsetWidth / 2) + 'px';
+  tip.style.top = (r.bottom + 6) + 'px';
+}
+function hideSkuMoveTip() {
+  var tip = document.getElementById('skuMoveTip');
+  if (tip) tip.style.display = 'none';
+}
 function renderGroupSkuPickerList() {
-  var used = groupSkuUsedNames();
   var q = groupSkuPickerSearch.toLowerCase();
-  var candidates = INV_ITEMS.filter(function(item) {
-    if (item.type !== 'group' || !item.autoIncluded) return false;
-    if (used.has(item.name)) return false;
-    if (!groupSkuAvailableInSelectedScope(item)) return false;
-    var option = item.constituents && item.constituents[0];
-    if (!option) return false;
-    if (groupSkuPickerSupplier && option.supplier !== groupSkuPickerSupplier) return false;
-    if (q && item.name.toLowerCase().indexOf(q) === -1) return false;
+  var candidates = groupSkuPickerCandidates().filter(function(c) {
+    if (groupSkuPickerSupplier && c.supplier !== groupSkuPickerSupplier) return false;
+    if (q && c.name.toLowerCase().indexOf(q) === -1) return false;
     return true;
   });
-  candidates.sort(function(a, b) {
-    var targetUom = groupSkuPickerTargetUom();
-    if (targetUom) {
-      var aDifferent = groupSkuPickerNeedsConversion(a) ? 1 : 0;
-      var bDifferent = groupSkuPickerNeedsConversion(b) ? 1 : 0;
-      if (aDifferent !== bDifferent) return bDifferent - aDifferent;
-    }
-    return a.uom.localeCompare(b.uom) || a.name.localeCompare(b.name);
-  });
+  candidates.sort(function(a, b) { return a.name.localeCompare(b.name); });
   var body = document.getElementById('groupSkuPickerBody');
   var head = document.querySelector('#groupSkuPickerOverlay thead tr');
-  if (head) head.innerHTML = '<th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">SKU</th><th style="width:80px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">UOM</th>';
+  if (head) head.innerHTML = '<th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">SKU</th><th style="width:130px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Ordering UOMs</th>';
   if (!candidates.length) {
-    body.innerHTML = '<tr><td colspan="2" style="padding:24px 0;text-align:center;color:var(--ink-mute);font-size:13px">No matching items.</td></tr>';
+    body.innerHTML = '<tr><td colspan="2" style="padding:24px 0;text-align:center;color:var(--ink-mute);font-size:13px">' + (ITEMS.length ? 'No SKUs found. Try a different search or supplier.' : 'There are no SKUs to add yet. Add SKUs to the market list in Items first.') + '</td></tr>';
   } else {
-    body.innerHTML = candidates.map(function(item) {
-      var checked = groupSkuPickerSelected.has(item.name);
+    body.innerHTML = candidates.map(function(c) {
+      var checked = groupSkuPickerSelected.has(c.name);
+      var note = checked && c.shared
+        ? '<span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#7A5F00;margin-top:4px">Will be removed from its current inventory item<span tabindex="0" role="img" aria-label="Current inventory item: ' + hqSettingsEscape(c.record.name) + '" data-tip="' + hqSettingsEscape(c.record.name) + '" onmouseenter="showSkuMoveTip(this)" onmouseleave="hideSkuMoveTip()" onfocus="showSkuMoveTip(this)" onblur="hideSkuMoveTip()" onclick="event.preventDefault()" style="display:inline-flex;cursor:default"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span></span>'
+        : '';
       return '<tr>' +
-        '<td style="padding:10px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleGroupSkuPickerItem(\'' + item.name.replace(/'/g,"\\'") + '\',this.checked)" style="margin-top:3px" />' +
-          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(item.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.constituents[0].supplier) + '</span></span></label></td>' +
-        '<td style="padding:10px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px">' + hqSettingsEscape(item.uom) + '</td>' +
+        '<td style="padding:10px 0;border-top:1px solid var(--rule)"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer"><input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="toggleGroupSkuPickerItem(\'' + c.name.replace(/'/g, "\\'") + '\',this.checked)" style="margin-top:3px;width:16px;height:16px;flex:none" />' +
+          '<span><span style="display:block;font-size:14px;color:var(--ink)">' + hqSettingsEscape(c.name) + '</span><span style="display:block;font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(c.supplier) + '</span>' + note + '</span></label></td>' +
+        '<td style="padding:10px 0;border-top:1px solid var(--rule);color:var(--ink-mute);font-size:14px;vertical-align:top">' + hqSettingsEscape(groupSkuOrderingUoms(c.option)) + '</td>' +
       '</tr>';
     }).join('');
   }
@@ -7645,16 +7675,17 @@ function toggleGroupSkuPickerItem(name, checked) {
   renderGroupSkuPickerList();
 }
 function confirmGroupSkuPicker() {
-  var chosen = INV_ITEMS.filter(function(item) { return item.type === 'group' && item.autoIncluded && groupSkuPickerSelected.has(item.name); });
+  var chosen = groupSkuPickerCandidates().filter(function(c) { return groupSkuPickerSelected.has(c.name); });
   if (!chosen.length) return;
   var targetUom = groupSkuPickerTargetUom() || chosen[0].uom;
-  chosen.forEach(function(item) {
-    var cfg = groupSkuPickerConversions[item.name] || { conversion: 1, flipped: false };
-    var option = item.constituents[0];
-    groupSkuDraft.items.push(Object.assign({}, option, { inventoryUom: targetUom, conversion: cfg.conversion, conversionFlipped: cfg.flipped }));
+  chosen.forEach(function(c) {
+    var option = Object.assign({}, c.option, { uom: c.uom, inventoryUom: targetUom, conversion: 1, conversionFlipped: false, conversionRequired: false, conversionConfirmed: true });
+    if (groupSkuNeedsConversion(option, targetUom)) requireGroupSkuConversion(option, targetUom);
+    groupSkuDraft.items.push(option);
   });
-  if (!document.getElementById('groupSkuUom').value.trim() && chosen[0]) document.getElementById('groupSkuUom').value = targetUom;
+  if (!document.getElementById('groupSkuUom').value.trim() && chosen[0]) setGroupSkuInventoryUom(targetUom);
   closeGroupSkuPicker();
+  hideSkuMoveTip();
   renderGroupSkuContent();
 }
 function saveGroupSku() {
@@ -7694,6 +7725,13 @@ function saveGroupSku() {
     par: par, constituents: groupSkuDraft.items.slice(),
     sourceUomConversions: (groupSkuDraft.sourceUomConversions || []).slice()
   };
+  var movedSkuNames = new Set(entry.constituents.map(function(option) { return option.name; }));
+  INV_ITEMS.forEach(function(record, recordIdx) {
+    if (record.type !== 'group' || record.autoIncluded || recordIdx === groupSkuDraft.editIndex) return;
+    var before = (record.constituents || []).length;
+    record.constituents = (record.constituents || []).filter(function(option) { return !movedSkuNames.has(option.name); });
+    if (record.constituents.length !== before) record.detail = record.constituents.length + ' option' + (record.constituents.length === 1 ? '' : 's');
+  });
   entry.constituents.forEach(function(option) {
     if (Number.isInteger(option.sourceItemIdx) && ITEMS[option.sourceItemIdx]) ITEMS[option.sourceItemIdx].inventoryItemName = name;
   });
@@ -9950,6 +9988,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
       <div>
         <label class="field-label" style="margin-bottom:10px">Buying options (optional):</label>
         <p style="margin:-4px 0 10px;font-size:14px;line-height:1.45;color:var(--ink-mute)">Add SKUs so purchases received against them automatically increase this item’s stock.</p>
+        <div id="groupSkuEmptyNote" style="padding:14px;border:1px dashed var(--rule);border-radius:8px;font-size:13px;color:var(--ink-mute);margin-bottom:4px">No buying options yet. Add SKUs, or leave it empty if this item is only used in recipes.</div>
         <table style="width:100%;border-collapse:collapse">
           <thead><tr><th style="text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">Item</th><th style="width:70px;text-align:left;font-size:12px;font-weight:600;color:var(--ink-mute);padding-bottom:8px">UOM</th></tr></thead>
           <tbody id="groupSkuContentBody"></tbody>

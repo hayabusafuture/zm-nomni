@@ -146,21 +146,53 @@ Inventory is the HQ's list of **stock-tracked items** used for stocktaking and r
     - At HQ, the SKU's buying option stays on the item and is marked **Disabled**; the item itself stays Active.
     - At group/outlet scope, an unavailable buying option (disabled, removed, excluded at HQ, group, outlet or supplier level) stays listed but is left out of the item's **Unit cost** average. The auto-created item for a **Removed** SKU is dropped from the scope's list.
     - Excluding an inventory item at a scope is a separate action on the Inventory tab. **Include** is blocked while every SKU behind the item is excluded there; the prompt says to include the SKU in the SKUs tab first.
-  - **Admin** row actions are **Edit**, **Merge with another item…** (Item rows) and **Disable / Enable / Restore**. A disabled item remains visible but cannot be used for stock counting or ordering. The delete-with-dependency-check code exists in `Admin - HQ Settings.html` but no control reaches it, so Admin currently cannot delete an item.
-  - **Procure** (`Procure - HQ - Dashboard.html`) row actions add a red **Delete** for Item rows (**Remove** for recipe rows). Delete is **blocked** while the item is used by a recipe or POS mapping; the dialog lists the dependencies and links to Recipes. The check matches by name only.
+  - Row actions, in Admin and Procure alike, are **Edit**, **Merge with another item…** (Item rows) and **Disable / Enable / Restore**. A disabled item remains visible but cannot be used for stock counting or ordering. **There is no delete.** The delete-with-dependency-check code (`requestDeleteGroupSku`) is still in both pages but no control reaches it.
   - Removing selected buying options from an item confirms that they stop being buying options; they remain in Inventory as their own auto-created items.
   - A SKU that is Removed from the market list leaves existing Inventory and Recipe references as historical records; they cannot be newly selected.
 - **Inventory item settings.** Recipe and Sub-recipe rows (and counting setup) open a settings page (`?inventoryItem=<name>#inventory`) with **Inventory UOM**, **PAR level** and **UOMs used for stock counts and adjustments**. Catalogue UOMs cannot be edited or removed; extra UOMs are added with a conversion to the Inventory UOM (with **Flip units**). Quantities convert to the Inventory UOM when saved.
 - **Activity.** Inventory create, update, delete, enable/disable and restore events are logged under the Inventory area at HQ scope.
 
+### Inventory: UOMs, buying options and merging (target behaviour)
+
+> **Status:** built in `Admin - HQ Settings.html` and `Procure - HQ - Dashboard.html`. Until 2026-10-09 the **Add SKUs** picker listed only single-SKU auto items; it now lists SKUs as described below.
+
+**Three UOM concepts**
+
+| UOM | How many | Where | Converts against |
+|---|---|---|---|
+| **Ordering UOM** | Several | On the SKU | The SKU's own base UOM |
+| **Inventory UOM** | One | On the inventory item | One of the SKU's ordering UOMs |
+| **Recipe UOM** | Optional, several | On a recipe line (a SKU or an item) | The Inventory UOM |
+
+- An auto-created item takes one of its SKU's ordering UOMs as its Inventory UOM, because an inventory item cannot hold a SKU with several UOMs. The user can rename the item and change the Inventory UOM, with a conversion against one of the ordering UOMs.
+- **Stock and history belong to the inventory item, not to its SKUs.** A combined item shows one on-hand balance (for example "Coca Cola" with "Coca Cola (Malaysia)" and "Coca Cola (local)" has no separate figures per SKU).
+
+**Add SKUs (button under Buying options)**
+
+- **Stays, and keeps listing SKUs** (SKU name, supplier, ordering UOMs), not items. Buying options are what can be ordered from suppliers, and auto-created items can be renamed, so listing items would be confusing. A SKU that already belongs to a combined item stays selectable.
+- **It is a move, not an add.** Every SKU already exists in inventory as its own item, so choosing one merges that item into this one. An empty item (created from scratch, for example for a recipe-only ingredient) is filled this way once suppliers are known.
+- **One note only, shown when the row is selected.** It appears if the SKU's current item has **more than one buying option**, or if the item's **name differs from the SKU's name** (a single-SKU item that was renamed), and always reads **Will be removed from its current inventory item**, in the warning text colour. A small info icon beside it shows the item's name on hover or focus, using the same dark tooltip as the Procure Dashboard (`.col-info-tip`: one shared tooltip on `<body>`, so it is not clipped by the scrolling dialog). One wording for every case avoids a row such as "Coca Cola: will be removed from "Coca Cola"". A SKU in its own single-SKU item that still carries the SKU's name shows no note, whether or not it is used in recipes, because the merge keeps recipes and mappings working.
+- **No conversion in the picker.** The picker only selects. Chosen SKUs land in the Buying options table of the item dialog, and the existing **Convert source Inventory UOMs** block there asks for the one-time conversion ("1 <ordering UOM> = N <Inventory UOM>", with **Flip units**) when the SKU's counted UOM differs from the item's Inventory UOM. The SKU's other ordering UOMs follow from its own conversions. Recipe UOMs need no prompt.
+- **Empty states.** No search or supplier match: "No SKUs found". HQ has no SKUs at all: a prompt to add SKUs in Items first. Because SKUs in combined items stay selectable, "every SKU is already combined" is not an empty state.
+- **Empty section copy** on a new item: "No buying options yet. Add SKUs, or leave it empty if this item is only used in recipes."
+- **Recipes** are not added through this button. Adding recipes to Inventory is a separate, future entry point.
+
+**What a merge does** (applies to Add SKUs, Merge with another item and Combine buying options)
+
+- **The merged item is replaced by the destination item.** No alias or retired record remains, and it disappears from the Inventory list.
+- **References are repointed, not re-expressed.** Recipes, POS mappings and past counts that used the merged item now point to the destination and **keep their own UOM and quantity**. The old Inventory UOM → new Inventory UOM conversion (the SKU's ordering-UOM conversion chained with the one the user entered) is folded into each reference, so every Recipe UOM still resolves and recipe consumption does not change.
+- **Stock and history carry over when a whole item is merged in:** when a SKU's own single-SKU item is merged, that item's on-hand balance is added to the destination, converted; past counts and movements keep the UOM they were recorded in and are converted only when totalled. **Moving a SKU out of a combined item moves no stock**, because stock belongs to the item, not to its SKUs: the balance stays on the item the SKU left, and the destination only gains the buying option.
+- **One-way.** Removing a buying option later gives that SKU a fresh item with no stock; recipes and mappings stay on the destination.
+- **Activity:** one **Updated** event on the destination item names the SKUs added.
+
 ### Inventory: known prototype leftovers
 
 Checked against the code on 2026-10-09. Cosmetic or dead code only; no behaviour gaps were confirmed.
 
-- **Dead "Add to inventory" picker.** `Procure - HQ - Dashboard.html` still ships `addInvSkuModal` / `addInvRecipeModal` and `getInvAvailSkus` with no callers; they belong to the old model.
+- **Dead "Add to inventory" picker.** `Admin - HQ Settings.html` and `Procure - HQ - Dashboard.html` still ship `addInvSkuModal` / `addInvRecipeModal` and `getInvAvailSkus` with no callers; they belong to the old model.
 - **Internal "Group SKU" naming.** The UI says "inventory item" and the type filter says "Item", but the code and ids still use `group` / `groupSku*` (`recipe.groupSkuNames`, `openGroupSkuModal`), and `Admin - HQ - POS Mapping.html` still has a `'Group SKU'` type check.
 - **Stale static markup** on the group and ungrouped-outlet Inventory panels (a fixed "28" count, a "Manage inventory" button, a hidden "Add to Inventory" card in the SKU dialog) is overwritten or hidden at runtime.
-- **Admin delete** exists as code (`requestDeleteGroupSku`) but no Admin control calls it; Procure has the Delete action.
+- **Delete code** (`requestDeleteGroupSku` and its dialogs) is still in both pages but nothing calls it, because items can only be disabled.
 - **Empty-state copy** ("Add SKUs to start seeing items appearing here or create a new item") assumes the list can be empty, which cannot happen once SKUs auto-create items.
 
 Group and outlet Inventory tabs are deliberately limited to Exclude / Include: combine, merge, Inventory UOM, PAR and counting UOMs are HQ-level setup only. The Create SKU page's **Keep as a separate inventory item** / **Add to an existing inventory item** is a real choice, and the recipe ingredient picker lists SKU-named items because each SKU's auto-created item shares its name.
@@ -458,7 +490,7 @@ The implemented demonstration flows use browser-local state and persist through 
 | HQ suppliers | Partial | Relationship settings and lifecycle changes persist in the prototype; finish dependency reporting. |
 | HQ items | Built | Create item save/return/list refresh, catalogue validation and access/lifecycle behaviour are implemented. |
 | HQ price changes | Partial | Review state persists locally; confirm the page’s product scope and workflow. |
-| HQ inventory | Partial | Auto-created 1:1 inventory items, combine/merge of buying options, counting UOM setup and scope-aware buying-option availability persist locally. Open: Admin has no delete control; PAR levels exist only on the HQ item (no group-scope PAR templates are built). |
+| HQ inventory | Partial | Auto-created 1:1 inventory items, combine/merge of buying options, counting UOM setup and scope-aware buying-option availability persist locally. Open: items can be disabled but not deleted; PAR levels exist only on the HQ item (no group-scope PAR templates are built). |
 | HQ recipes | Partial | Recipe lifecycle, availability, history and editor variation changes persist locally; complete validation. |
 | HQ POS mapping | Partial | Fully flesh out the end-to-end mapping flow and its dependency rules. |
 | Cost and pricing model | Product decision | Define the effective unit-cost calculation and display rules across HQ, group and outlet scopes. |
