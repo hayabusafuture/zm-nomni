@@ -4772,6 +4772,10 @@ function resetAdminHqPrototypeData() {
   var keys = ['nomniNewHQ','nomniNewHQToastPending','nomniCreatedHQs','nomniHqDetails','nomniNewOutletGroup','nomniNewOutletGroupToastPending','nomniHqPrototypeState','nomniHqManagedOutlets','nomni-hq-created-items-v1','nomni-hq-item-lifecycle-v1','nomni-hq-item-exclusions-v1','nomni-hq-supplier-state-v1','nomni-hq-recipe-state-v1','nomni-hq-recipe-food-cost-threshold-v1','nomni-hq-recipe-draft-v3','nomni-hq-inventory-state-v1','nomni-hq-price-review-v1','nomni-hq-price-review-v2','nomni-hq-activity-log-v1','nomni-hq-activity-log-v2','nomni-hq-activity-log-v3','nomni-hq-group-renames-v1','nomniPosApiKey','nomniPosLocationId','nomniPosConfiguredOutlets','nomniHqPosApiKey'];
   if (hqName) keys.push('nomniHqManagedOutlets:new:' + hqName, 'nomniHqDetails:new:' + hqName);
   keys.forEach(function(key) { localStorage.removeItem(key); });
+  // POS mapping state is saved per product / outlet: HQ mappings that were removed, and outlet-specific mappings
+  Object.keys(localStorage).forEach(function(key) {
+    if (key.indexOf('nomniHqPosMappingRemoved:') === 0 || key.indexOf('nomniPosOutletMapping:') === 0) localStorage.removeItem(key);
+  });
   window.location.href = 'Admin - Buyers.html#outlet-groups';
 }
 
