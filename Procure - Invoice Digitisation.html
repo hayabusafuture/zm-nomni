@@ -942,6 +942,7 @@
   .preview-footer { display: flex; justify-content: space-between; padding: 14px 18px; color: #fff; font-size: 12px; }
   .detail-field .supplier-hint { grid-column: 2; font-size: 12px; color: var(--ink-mute); line-height: 1.5; }
   .supplier-hint strong { color: var(--ink); font-weight: 600; }
+  .uen-diff { padding: 0; border-radius: 0; background: #FFE58F; color: inherit; font-weight: inherit; }
   .supplier-hint-link { border: 0; background: transparent; padding: 0; color: var(--spinach); font: inherit; font-weight: 700; cursor: pointer; }
   .supplier-hint-link:hover { color: var(--seaweed); text-decoration: underline; }
   .supplier-search { display: flex; gap: 10px; }
@@ -960,7 +961,11 @@
   .supplier-empty-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
   .btn:disabled, .btn:disabled:hover { background: #E6E8EC; border-color: #E6E8EC; color: #9AA0A8; cursor: not-allowed; transform: none; }
 
-  .supplier-dialog { width: 560px; }
+  .supplier-dialog { width: 560px; transition: width .15s ease; }
+  .supplier-dialog.is-wide { width: 720px; }
+  .acra-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: 24px; }
+  .acra-head .sf-title + p { margin-top: 4px; }
+  .acra-sub { margin-top: 2px; color: var(--ink-mute); font-size: 12px; font-weight: 400; }
   .supplier-dialog .sku-head { padding: 28px 32px 0; border-bottom: 0; }
   .supplier-dialog .sku-head h2 { letter-spacing: -.02em; }
   .supplier-dialog .sku-body { gap: 0; padding: 20px 32px 28px; }
@@ -1366,11 +1371,17 @@
   </main>
 </div>
 
-<div class="sku-modal" data-supplier-modal hidden><div class="sku-card supplier-dialog" role="dialog" aria-modal="true" aria-labelledby="supplier-modal-title"><div class="sku-head"><h2 id="supplier-modal-title" data-supplier-modal-title>Add supplier</h2><button class="modal-close" type="button" data-supplier-close aria-label="Close"><span class="material-symbols-outlined">close</span></button></div><div class="sku-body">
+<div class="sku-modal" data-supplier-modal hidden><div class="sku-card supplier-dialog" data-supplier-dialog role="dialog" aria-modal="true" aria-labelledby="supplier-modal-title"><div class="sku-head"><h2 id="supplier-modal-title" data-supplier-modal-title>Add supplier</h2><button class="modal-close" type="button" data-supplier-close aria-label="Close"><span class="material-symbols-outlined">close</span></button></div><div class="sku-body">
   <div data-supplier-view="search">
     <form class="supplier-search" data-supplier-search-form><input type="text" data-supplier-query placeholder="Company name or UEN/ABN" aria-label="Search suppliers" /><button class="btn btn-secondary" type="submit">Search</button></form>
     <p class="supplier-help">Unique Entity Number (UEN) is a 9 or 10 digit identification number for businesses/entities operating in Singapore.</p>
     <div data-supplier-results></div>
+  </div>
+  <div data-supplier-view="acra" hidden>
+    <form class="supplier-search" data-acra-search-form><input type="text" data-acra-query placeholder="Company name or UEN/ABN" aria-label="Search the company registry" /><button class="btn btn-secondary" type="submit">Search</button></form>
+    <p class="supplier-help">Unique Entity Number (UEN) is a 9 or 10 digit identification number for businesses/entities operating in Singapore.</p>
+    <div class="acra-head"><div><h3 class="sf-title">Results from ACRA</h3><p class="supplier-help" data-acra-count></p></div><button class="supplier-hint-link" type="button" data-back-to-nomni>Back to searching within Nomni Procure</button></div>
+    <div data-acra-results></div>
   </div>
   <form class="supplier-form" data-supplier-view="details" data-supplier-form novalidate hidden>
     <div class="supplier-summary" data-supplier-summary hidden><strong data-summary-name></strong><span data-summary-uen></span><span data-summary-address></span></div>
@@ -1378,13 +1389,21 @@
       <div class="sf-field"><label for="new-supplier-name">Name <span class="required-mark">*</span></label><input id="new-supplier-name" data-new-name /></div>
       <div class="sf-row two">
         <div class="sf-field"><label for="new-supplier-reg">Company Reg. No.</label><input id="new-supplier-reg" data-new-reg /></div>
-        <div class="sf-field"><label for="new-supplier-alias">Also known as (optional)</label><input id="new-supplier-alias" /></div>
+        <div class="sf-field"><label for="new-supplier-alias">Trading name (optional)</label><input id="new-supplier-alias" /></div>
       </div>
       <div class="sf-field"><label for="new-supplier-address-1">Address</label><input id="new-supplier-address-1" data-new-address-1 placeholder="Address Line 1" /></div>
       <div class="sf-row address">
         <div class="sf-field"><input id="new-supplier-address-2" data-new-address-2 placeholder="Address Line 2" aria-label="Address Line 2" /></div>
         <div class="sf-field"><input id="new-supplier-postcode" data-new-postcode inputmode="numeric" placeholder="Postcode" aria-label="Postcode" /></div>
       </div>
+    </div>
+    <div class="sf-group" data-supplier-registry-fields hidden>
+      <div class="sf-field"><label for="reg-address-1">Address <span class="required-mark">*</span></label><input id="reg-address-1" data-reg-address-1 placeholder="Address Line 1" /></div>
+      <div class="sf-row address">
+        <div class="sf-field"><input id="reg-address-2" data-reg-address-2 placeholder="Address Line 2" aria-label="Address Line 2" /></div>
+        <div class="sf-field"><input id="reg-postcode" data-reg-postcode inputmode="numeric" placeholder="Postcode" aria-label="Postcode" /></div>
+      </div>
+      <div class="sf-field"><label for="reg-trading">Trading name (optional)</label><input id="reg-trading" placeholder="e.g. Cafe ABC, John's Deli" /><span class="sf-hint">Use this if the supplier trades under a different name</span></div>
     </div>
     <section class="sf-group">
       <h3 class="sf-title">Send order notifications to…</h3>
@@ -1495,7 +1514,8 @@
     document.querySelector('[data-publish-total]').textContent = 'S$' + (subtotal + gstTotal).toFixed(2);
   }
   function updateDetailsGate() {
-    var incomplete = !document.querySelector('#digitise-supplier').value || !document.querySelector('#digitise-date').value.trim();
+    var supplierValue = document.querySelector('#digitise-supplier').value;
+    var incomplete = !supplierValue || supplierValue === '__add__' || !document.querySelector('#digitise-date').value.trim();
     document.querySelector('[data-digitise-form]').classList.toggle('is-details-incomplete', incomplete);
   }
   document.querySelector('#digitise-supplier').addEventListener('change', updateDetailsGate);
@@ -1566,7 +1586,7 @@
   var supplierForm = document.querySelector('[data-supplier-form]');
   var supplierSubmit = document.querySelector('[data-supplier-submit]');
   var supplierBack = document.querySelector('[data-supplier-back]');
-  var supplierState = {mode:'link', supplier:null, backToSearch:false};
+  var supplierState = {mode:'link', supplier:null, backView:null};
   var previousSupplierValue = '';
   function sv(sel){ return supplierModal.querySelector(sel); }
   var nameNoise = ['pte', 'ltd', 'limited', 'private', 'co', 'company', 'inc', 'llp', 'the'];
@@ -1577,22 +1597,62 @@
     return row[b.length];
   }
   function similarName(a, b) { a = normaliseName(a); b = normaliseName(b); return Boolean(a && b) && editDistance(a, b) <= Math.max(1, Math.floor(Math.max(a.length, b.length) * 0.15)); }
-  // The UEN is the stronger identifier: when the invoice has one it decides the match. Names are only compared when there is no UEN.
+  // An exact UEN match decides. If the invoice UEN matches nobody but the name is close to a Nomni supplier, that supplier is still
+  // suggested and the part of its UEN that differs from the invoice is highlighted. Without a UEN, only names are compared.
   function findDbSupplier() {
     var uen = (activeUpload.uen || '').trim().toLowerCase(), name = (activeUpload.supplier || '').trim();
-    if (uen) return supplierDb.filter(function(item){ return item.reg.toLowerCase() === uen; })[0] || null;
-    return name ? (supplierDb.filter(function(item){ return similarName(item.name, name); })[0] || null) : null;
+    var byName = name ? (supplierDb.filter(function(item){ return similarName(item.name, name); })[0] || null) : null;
+    if (uen) return supplierDb.filter(function(item){ return item.reg.toLowerCase() === uen; })[0] || byName;
+    return byName;
   }
+  // Highlights the one stretch of `target` that differs from `source` (what OCR read): everything between the shared start and shared end,
+  // or all of it when OCR read nothing for that field.
+  function diffMarkup(target, source) {
+    source = String(source || '').trim();
+    if (!source) return '<mark class="uen-diff">' + safe(target) + '</mark>';
+    var tl = target.toLowerCase(), sl = source.toLowerCase(), start = 0, endT = target.length, endS = source.length;
+    while (start < endT && start < endS && tl[start] === sl[start]) start++;
+    while (endT > start && endS > start && tl[endT - 1] === sl[endS - 1]) { endT--; endS--; }
+    if (start === endT) return safe(target);
+    return safe(target.slice(0, start)) + '<mark class="uen-diff">' + safe(target.slice(start, endT)) + '</mark>' + safe(target.slice(endT));
+  }
+  function highlightUenDiff(reg) { return diffMarkup(reg, activeUpload.uen); }
+  function highlightNameDiff(name) { return diffMarkup(name, activeUpload.supplier); }
   function updateSupplierHint() {
     if (supplierSelect.value) { supplierHint.hidden = true; return; }
     var match = findDbSupplier();
-    if (match) supplierHint.innerHTML = 'Suggested: <strong>' + safe(match.name) + '</strong> <button class="supplier-hint-link" type="button" data-hint-suggest>Add supplier</button>';
+    if (match) supplierHint.innerHTML = 'Suggested: <strong>' + highlightNameDiff(match.name) + '</strong>' + ' (' + highlightUenDiff(match.reg) + ')' + ' <button class="supplier-hint-link" type="button" data-hint-suggest>Add supplier</button>';
     else supplierHint.innerHTML = 'Not in your supplier list? <button class="supplier-hint-link" type="button" data-hint-search>Add supplier</button>';
     supplierHint.hidden = false;
   }
   function showSupplierView(view) {
     supplierModal.querySelector('[data-supplier-view="search"]').hidden = view !== 'search';
+    supplierModal.querySelector('[data-supplier-view="acra"]').hidden = view !== 'acra';
     supplierForm.hidden = view !== 'details';
+    if (view !== 'details') sv('[data-supplier-modal-title]').textContent = 'Add supplier';
+    supplierModal.querySelector('[data-supplier-dialog]').classList.toggle('is-wide', view === 'search' || view === 'acra');
+  }
+  // Demo registry (ACRA) records, matched by name or UEN.
+  var acraDb = [
+    {name:'NOMNI PTE. LTD.', reg:'201525600G', street:'NEIL ROAD', postcode:'088855'},
+    {name:'NOMNI SEA HOLDING PTE. LTD.', reg:'202323483W', street:'NEIL ROAD', postcode:'088855'},
+    {name:'UNOMNI PTE. LTD.', reg:'202321291G', street:'BUKIT BATOK CRESCENT', postcode:'658065'},
+    {name:'BELLYGOOD CATERER PTE. LTD.', reg:'201912345K', street:'KAKI BUKIT ROAD 3', postcode:'417808'}
+  ];
+  function renderAcraResults(query) {
+    var q = query.trim().toLowerCase(), box = sv('[data-acra-results]'), count = sv('[data-acra-count]');
+    var hits = q ? acraDb.filter(function(item){ return item.name.toLowerCase().indexOf(q) >= 0 || item.reg.toLowerCase().indexOf(q) >= 0; }) : [];
+    count.textContent = hits.length + (hits.length === 1 ? ' result' : ' results');
+    if (!hits.length) {
+      box.innerHTML = '<div class="supplier-empty"><h3>No results</h3><p>Please check for any spelling mistakes or try another keyword.</p><div class="supplier-empty-actions"><button class="btn btn-primary" type="button" data-create-new>Create new supplier</button></div></div>';
+      return;
+    }
+    box.innerHTML = '<div class="supplier-results"><table><thead><tr><th>Supplier</th><th>Company Reg. No.</th><th></th></tr></thead><tbody>' + hits.map(function(item){ return '<tr><td class="cell-title">' + safe(item.name) + '<div class="acra-sub">' + safe(item.street) + ', Singapore ' + safe(item.postcode) + '</div></td><td>' + safe(item.reg) + '</td><td><button class="btn btn-primary" type="button" data-pick-acra="' + acraDb.indexOf(item) + '">Add to My Supplier</button></td></tr>'; }).join('') + '</tbody></table></div>';
+  }
+  function openAcra(query) {
+    showSupplierView('acra');
+    sv('[data-acra-query]').value = query || '';
+    renderAcraResults(query || '');
   }
   function renderSupplierResults(query) {
     var q = query.trim().toLowerCase(), box = sv('[data-supplier-results]');
@@ -1602,7 +1662,7 @@
       box.innerHTML = '<div class="supplier-empty"><h3>No results</h3><p>Please check for any spelling mistakes or try another keyword.</p><div class="supplier-empty-actions"><button class="btn btn-tertiary" type="button" data-expanded-search>Try expanded search</button><button class="btn btn-primary" type="button" data-create-new>Create new supplier</button></div></div>';
       return;
     }
-    box.innerHTML = '<div class="supplier-results"><table><thead><tr><th>Supplier</th><th>Company Reg. No.</th><th>Supplier type</th><th></th></tr></thead><tbody>' + hits.map(function(item, i){ return '<tr><td class="cell-title">' + safe(item.name) + '</td><td>' + safe(item.reg) + '</td><td>' + safe(item.type) + '</td><td><button class="btn btn-primary" type="button" data-pick-supplier="' + supplierDb.indexOf(item) + '">Add to My Supplier</button></td></tr>'; }).join('') + '</tbody></table></div><p class="supplier-help">Supplier not listed here? <button class="supplier-hint-link" type="button" data-create-new>Create new</button></p>';
+    box.innerHTML = '<div class="supplier-results"><table><thead><tr><th>Supplier</th><th>Company Reg. No.</th><th>Supplier type</th><th></th></tr></thead><tbody>' + hits.map(function(item, i){ return '<tr><td class="cell-title">' + safe(item.name) + '</td><td>' + safe(item.reg) + '</td><td>' + safe(item.type) + '</td><td><button class="btn btn-primary" type="button" data-pick-supplier="' + supplierDb.indexOf(item) + '">Add to My Supplier</button></td></tr>'; }).join('') + '</tbody></table></div><p class="supplier-help">Supplier not listed here? <button class="supplier-hint-link" type="button" data-expanded-search>Try expanded search</button> or <button class="supplier-hint-link" type="button" data-create-new>Create new</button></p>';
   }
   function resetContact() {
     var email = sv('[data-supplier-email]');
@@ -1617,29 +1677,38 @@
     return sv('[data-no-email]').checked && Boolean(sv('[data-whatsapp]').value.trim() || sv('[data-sms]').value.trim());
   }
   function updateSupplierSubmit() {
-    var ok = contactReady() && (supplierState.mode === 'link' || sv('[data-new-name]').value.trim());
+    var ok = contactReady();
+    if (supplierState.mode === 'create') ok = ok && Boolean(sv('[data-new-name]').value.trim());
+    if (supplierState.mode === 'registry') ok = ok && Boolean(sv('[data-reg-address-1]').value.trim() && sv('[data-reg-postcode]').value.trim());
     supplierSubmit.disabled = !ok;
   }
-  function openSupplierDetails(mode, supplier, backToSearch) {
-    supplierState = {mode:mode, supplier:supplier, backToSearch:backToSearch};
+  function openSupplierDetails(mode, supplier, backView) {
+    supplierState = {mode:mode, supplier:supplier, backView:backView};
     resetContact();
-    var link = mode === 'link';
-    sv('[data-supplier-summary]').hidden = !link;
-    sv('[data-supplier-create-fields]').hidden = link;
-    sv('[data-supplier-modal-title]').textContent = link ? 'Add supplier' : 'Create supplier';
-    supplierSubmit.textContent = link ? 'Add supplier' : 'Create & add supplier';
-    supplierBack.textContent = backToSearch ? 'Back' : 'Cancel';
-    if (link) { sv('[data-summary-name]').textContent = supplier.name; sv('[data-summary-uen]').textContent = 'UEN ' + supplier.reg; sv('[data-summary-address]').textContent = supplier.address; }
-    else {
+    var link = mode === 'link', create = mode === 'create', registry = mode === 'registry';
+    sv('[data-supplier-summary]').hidden = create;
+    sv('[data-summary-address]').hidden = registry;
+    sv('[data-supplier-create-fields]').hidden = !create;
+    sv('[data-supplier-registry-fields]').hidden = !registry;
+    sv('[data-supplier-modal-title]').textContent = create ? 'Create supplier' : registry ? 'Add this supplier?' : 'Add supplier';
+    supplierSubmit.textContent = create ? 'Create & add supplier' : 'Add supplier';
+    supplierBack.textContent = backView ? 'Back' : 'Cancel';
+    if (!create) { sv('[data-summary-name]').innerHTML = (link && supplier === findDbSupplier()) ? highlightNameDiff(supplier.name) : safe(supplier.name); sv('[data-summary-uen]').innerHTML = 'UEN ' + (link && supplier === findDbSupplier() ? highlightUenDiff(supplier.reg) : safe(supplier.reg)); sv('[data-summary-address]').textContent = link ? supplier.address : ''; }
+    if (create) {
       sv('[data-new-name]').value = supplier.name || ''; sv('[data-new-reg]').value = supplier.reg || '';
       sv('[data-new-address-1]').value = supplier.address || ''; sv('[data-new-address-2]').value = ''; sv('[data-new-postcode]').value = supplier.postcode || '';
       supplierModal.querySelector('#new-supplier-alias').value = '';
+    }
+    if (registry) {
+      var sameCompany = (activeUpload.uen || '').trim().toLowerCase() === supplier.reg.toLowerCase();
+      sv('[data-reg-address-1]').value = sameCompany ? (activeUpload.address || '') : ''; sv('[data-reg-address-2]').value = ''; sv('[data-reg-postcode]').value = supplier.postcode || '';
+      supplierModal.querySelector('#reg-trading').value = '';
     }
     showSupplierView('details'); updateSupplierSubmit();
   }
   function openSupplierModal(startView, query) {
     supplierModal.hidden = false; document.body.style.overflow = 'hidden';
-    if (startView === 'suggest') { openSupplierDetails('link', findDbSupplier(), false); return; }
+    if (startView === 'suggest') { openSupplierDetails('link', findDbSupplier(), null); return; }
     sv('[data-supplier-modal-title]').textContent = 'Add supplier';
     showSupplierView('search');
     sv('[data-supplier-query]').value = query || '';
@@ -1658,21 +1727,26 @@
       supplierSelect.value = previousSupplierValue;
       openSearchFromDetected();
     }
-    previousSupplierValue = supplierSelect.value; updateSupplierHint();
+    previousSupplierValue = supplierSelect.value; updateSupplierHint(); updateDetailsGate();
   });
   sv('[data-supplier-search-form]').addEventListener('submit', function(event){ event.preventDefault(); renderSupplierResults(sv('[data-supplier-query]').value); });
+  sv('[data-acra-search-form]').addEventListener('submit', function(event){ event.preventDefault(); renderAcraResults(sv('[data-acra-query]').value); });
   supplierModal.addEventListener('click', function(event){
     if (event.target === supplierModal) { closeSupplierModal(); return; }
     var pick = event.target.closest('[data-pick-supplier]');
-    if (pick) openSupplierDetails('link', supplierDb[Number(pick.getAttribute('data-pick-supplier'))], true);
+    if (pick) openSupplierDetails('link', supplierDb[Number(pick.getAttribute('data-pick-supplier'))], 'search');
+    var pickAcra = event.target.closest('[data-pick-acra]');
+    if (pickAcra) openSupplierDetails('registry', acraDb[Number(pickAcra.getAttribute('data-pick-acra'))], 'acra');
+    if (event.target.closest('[data-expanded-search]')) openAcra(sv('[data-supplier-query]').value);
+    if (event.target.closest('[data-back-to-nomni]')) showSupplierView('search');
     if (event.target.closest('[data-create-new]')) {
-      var q = sv('[data-supplier-query]').value.trim(), looksLikeUen = /^[0-9]{8,9}[A-Za-z]$|^[0-9]{9,10}$/.test(q);
-      openSupplierDetails('create', {name: looksLikeUen ? (activeUpload.supplier || '') : (q || activeUpload.supplier || ''), reg: looksLikeUen ? q : (activeUpload.uen || ''), address: activeUpload.address || '', postcode: activeUpload.postcode || ''}, true);
+      var fromAcra = !sv('[data-supplier-view="acra"]').hidden;
+      var q = (fromAcra ? sv('[data-acra-query]') : sv('[data-supplier-query]')).value.trim(), looksLikeUen = /^[0-9]{8,9}[A-Za-z]$|^[0-9]{9,10}$/.test(q);
+      openSupplierDetails('create', {name: looksLikeUen ? (activeUpload.supplier || '') : (q || activeUpload.supplier || ''), reg: looksLikeUen ? q : (activeUpload.uen || ''), address: activeUpload.address || '', postcode: activeUpload.postcode || ''}, fromAcra ? 'acra' : 'search');
     }
-    if (event.target.closest('[data-expanded-search]')) showInvoiceToast('Expanded search', 'Searching the company registry is not available in this prototype.');
   });
   document.querySelectorAll('[data-supplier-close]').forEach(function(button){ button.addEventListener('click', closeSupplierModal); });
-  supplierBack.addEventListener('click', function(){ if (supplierState.backToSearch) showSupplierView('search'); else closeSupplierModal(); });
+  supplierBack.addEventListener('click', function(){ if (supplierState.backView) showSupplierView(supplierState.backView); else closeSupplierModal(); });
   sv('[data-no-email]').addEventListener('change', function(){
     var email = sv('[data-supplier-email]');
     if (this.checked) email.value = '';
@@ -1688,7 +1762,7 @@
   supplierForm.addEventListener('submit', function(event){
     event.preventDefault();
     if (supplierSubmit.disabled) return;
-    var name = supplierState.mode === 'link' ? supplierState.supplier.name : sv('[data-new-name]').value.trim();
+    var name = supplierState.mode === 'create' ? sv('[data-new-name]').value.trim() : supplierState.supplier.name;
     if (!Array.from(supplierSelect.options).some(function(option){ return option.value === name; })) {
       var option = document.createElement('option'); option.value = name; option.textContent = name;
       supplierSelect.insertBefore(option, supplierSelect.querySelector('option[value="__add__"]'));
