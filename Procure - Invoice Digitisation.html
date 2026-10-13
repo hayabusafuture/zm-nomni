@@ -976,6 +976,24 @@
   .supplier-summary span { color: var(--ink-mute); font-size: 12px; }
   .sf-group { display: grid; gap: 18px; }
   .sf-title { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+  .sf-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .sf-copy { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 14px; white-space: nowrap; }
+  .sf-copy[hidden] { display: none; }
+  .sf-picker { position: relative; min-width: 0; }
+  .sf-picker-btn { max-width: 210px; height: 36px; display: inline-flex; align-items: center; gap: 4px; padding: 0 8px 0 12px; border: 1px solid #D8DAE0; border-radius: 6px; background: #fff; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
+  .sf-picker-btn:hover, .sf-picker-btn[aria-expanded="true"] { border-color: var(--nomni-green); }
+  .sf-picker-btn span:first-child { overflow: hidden; text-overflow: ellipsis; }
+  .sf-picker-btn .material-symbols-outlined { font-size: 20px; color: var(--ink-mute); }
+  .sf-picker-btn.is-empty span:first-child { color: var(--ink-mute); font-weight: 400; }
+  .sf-picker-pop { position: absolute; z-index: 10; top: calc(100% + 6px); right: 0; width: 300px; padding: 8px; border: 1px solid #E0E2E8; border-radius: 8px; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+  .sf-picker-pop[hidden] { display: none; }
+  .sf-picker-pop input { width: 100%; height: 36px; padding: 0 12px; border: 1px solid #DCDEE3; border-radius: 6px; font: inherit; }
+  .sf-picker-pop input:focus { border-color: var(--nomni-green); outline: 0; box-shadow: 0 0 0 3px rgba(42,200,100,.12); }
+  .sf-picker-pop ul { max-height: 220px; margin: 8px 0 0; padding: 0; overflow-y: auto; list-style: none; }
+  .sf-picker-item { width: 100%; display: block; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+  .sf-picker-item:hover, .sf-picker-item:focus-visible { background: var(--mint); outline: 0; }
+  .sf-picker-item[aria-selected="true"] { font-weight: 600; }
+  .sf-picker-empty { padding: 10px; color: var(--ink-mute); font-size: 12px; }
   .sf-field { display: grid; gap: 6px; min-width: 0; }
   .sf-field label { font-size: 14px; font-weight: 600; }
   .sf-field input { width: 100%; height: 40px; padding: 0 12px; border: 1px solid #D8DAE0; border-radius: 6px; background: #fff; color: var(--ink); font: inherit; }
@@ -995,6 +1013,7 @@
   .sf-defaults summary .material-symbols-outlined { font-size: 20px; color: var(--ink-mute); transition: transform .15s ease; }
   .sf-defaults[open] summary .material-symbols-outlined { transform: rotate(90deg); }
   .sf-defaults dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 24px; margin: 14px 0 0; padding: 16px; border-radius: 8px; background: #F7F8FA; font-size: 14px; }
+  .sf-schedule { display: contents; }
   .sf-defaults dt { color: var(--ink-mute); }
   .sf-defaults dd { margin: 0; font-weight: 600; }
   .sf-defaults p { margin: 10px 0 0; color: var(--ink-mute); font-size: 12px; }
@@ -1408,16 +1427,28 @@
       <div class="sf-field"><label for="reg-trading">Trading name (optional)</label><input id="reg-trading" placeholder="e.g. Cafe ABC, John's Deli" /><span class="sf-hint">Use this if the supplier trades under a different name</span></div>
     </div>
     <section class="sf-group">
-      <h3 class="sf-title">Order settings</h3>
+      <div class="sf-head">
+        <h3 class="sf-title">Order settings</h3>
+        <div class="sf-copy" data-copy-settings hidden>
+          <span>Copy settings from</span>
+          <div class="sf-picker">
+            <button class="sf-picker-btn is-empty" type="button" data-picker-toggle aria-haspopup="listbox" aria-expanded="false"><span data-picker-label>Select</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button>
+            <div class="sf-picker-pop" data-picker-pop hidden>
+              <input type="search" data-picker-search placeholder="Search" aria-label="Search outlets" autocomplete="off" />
+              <ul role="listbox" data-picker-list></ul>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="sf-field"><label for="supplier-email">Send order notifications to…</label><input id="supplier-email" data-supplier-email type="email" placeholder="Email" /><span class="sf-hint">Separate multiple email addresses with comma</span></div>
       <label class="sf-check"><input type="checkbox" data-no-email /><span><strong>No email address?</strong> Tick to confirm</span></label>
-      <div class="sf-field"><label for="supplier-whatsapp">WhatsApp <span class="required-mark" data-contact-required hidden>*</span></label><input id="supplier-whatsapp" data-whatsapp type="tel" placeholder="Enter Mobile Number" /><span class="sf-hint" data-contact-help hidden>Add a WhatsApp or SMS number so we can reach this supplier.</span></div>
+      <div class="sf-field"><label for="supplier-whatsapp">WhatsApp <span class="required-mark" data-contact-required hidden>*</span></label><input id="supplier-whatsapp" data-whatsapp type="tel" placeholder="Enter Mobile Number" /></div>
       <div class="sf-field" data-sms-field hidden><label for="supplier-sms">SMS</label><input id="supplier-sms" data-sms type="tel" placeholder="Enter Mobile Number" /></div>
       <button class="sf-more" type="button" data-more-contact aria-expanded="false"><span data-more-label>More</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button>
     </section>
     <details class="sf-defaults">
-      <summary><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>Ordering defaults</summary>
-      <dl><dt>Min. order</dt><dd>S$0, orders below it are blocked</dd><dt>Delivery days</dt><dd>Monday to Sunday</dd><dt>Cutoff</dt><dd>2 day(s) earlier at 12:00 PM</dd></dl>
+      <summary><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span><span data-defaults-title>Ordering defaults</span></summary>
+      <dl><dt>Min. order</dt><dd data-def-min>S$0, orders below it are blocked</dd><div class="sf-schedule" data-def-schedule><dt>Monday to Sunday</dt><dd>Cutoff 2 day(s) earlier at 12:00 PM</dd></div></dl>
       <p>You can change these later in <a class="sf-link" href="Procure - Outlets.html" target="_blank" rel="noopener">Outlets &gt; Suppliers</a>.</p>
     </details>
     <div class="supplier-foot"><button class="btn btn-tertiary" type="button" data-supplier-back>Back</button><button class="btn btn-primary" type="submit" data-supplier-submit disabled>Add supplier</button></div>
@@ -1669,7 +1700,7 @@
   function resetContact() {
     var email = sv('[data-supplier-email]');
     email.value = ''; email.disabled = false; sv('[data-no-email]').checked = false; sv('[data-whatsapp]').value = ''; sv('[data-sms]').value = '';
-    sv('[data-sms-field]').hidden = true; sv('[data-contact-required]').hidden = true; sv('[data-contact-help]').hidden = true;
+    sv('[data-sms-field]').hidden = true; sv('[data-contact-required]').hidden = true;
     var more = sv('[data-more-contact]'); more.setAttribute('aria-expanded', 'false'); sv('[data-more-label]').textContent = 'More';
     supplierModal.querySelector('.sf-defaults').open = false;
   }
@@ -1688,6 +1719,8 @@
     supplierState = {mode:mode, supplier:supplier, backView:backView};
     resetContact();
     var link = mode === 'link', create = mode === 'create', registry = mode === 'registry';
+    sv('[data-copy-settings]').hidden = true; showDefaults(baseSettings, 'Ordering defaults'); closePicker();
+    if (link) preparePicker(supplier);
     sv('[data-supplier-summary]').hidden = create;
     sv('[data-summary-address]').hidden = registry;
     sv('[data-supplier-create-fields]').hidden = !create;
@@ -1753,13 +1786,81 @@
     var email = sv('[data-supplier-email]');
     if (this.checked) email.value = '';
     email.disabled = this.checked;
-    sv('[data-contact-required]').hidden = !this.checked; sv('[data-contact-help]').hidden = !this.checked;
+    sv('[data-contact-required]').hidden = !this.checked;
     updateSupplierSubmit();
   });
   sv('[data-more-contact]').addEventListener('click', function(){
     var open = sv('[data-sms-field]').hidden;
     sv('[data-sms-field]').hidden = !open; this.setAttribute('aria-expanded', String(open)); sv('[data-more-label]').textContent = open ? 'Less' : 'More';
   });
+
+  // ---- Copy settings from (existing suppliers only) ----
+  var weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  // sched(['Monday', ...], daysEarlier, time): the delivery days that share one cutoff. Settings join several of these when the cutoff differs by day.
+  function sched(days, n, time) { return days.map(function(day){ return {day:day, n:n, time:time}; }); }
+  function span(from, to) { return weekDays.slice(weekDays.indexOf(from), weekDays.indexOf(to) + 1); }
+  var baseSettings = {email:'', whatsapp:'', sms:'', min:0, block:true, schedule: sched(weekDays, 2, '12:00 PM')};
+  // Demo data: each supplier has default settings, plus the outlets (that this user can access) already linked to it.
+  var supplierSettings = {
+    '123456789': {defaults:{email:'orders@kpp.sg', whatsapp:'', sms:'', min:100, block:true, schedule: sched(span('Monday', 'Friday'), 1, '3:00 PM')}, outlets:[
+      {name:'Nomni Kitchen — Tanjong Pagar', s:{email:'tp.orders@kpp.sg', whatsapp:'+6591110001', sms:'', min:200, block:true, schedule: sched(span('Monday', 'Friday'), 2, '12:00 PM').concat(sched(['Saturday'], 1, '6:00 PM'))}},
+      {name:'Nomni Kitchen — Orchard', s:{email:'', whatsapp:'+6592220002', sms:'', min:0, block:false, schedule: sched(['Tuesday', 'Thursday', 'Saturday'], 1, '5:00 PM')}}]},
+    '201231515C': {defaults:{email:'hello@cremeconcepts.sg', whatsapp:'', sms:'', min:50, block:true, schedule: sched(span('Monday', 'Saturday'), 2, '12:00 PM')}, outlets:[
+      {name:'Nomni Kitchen — Orchard', s:{email:'orders@cremeconcepts.sg', whatsapp:'+6593330003', sms:'', min:80, block:true, schedule: sched(span('Monday', 'Wednesday'), 1, '2:00 PM').concat(sched(span('Thursday', 'Friday'), 2, '10:00 AM'))}}]},
+    '200823206G': {defaults:{email:'sales@tsawines.sg', whatsapp:'+6598765432', sms:'', min:300, block:true, schedule: sched(span('Monday', 'Friday'), 3, '12:00 PM')}, outlets:[]},
+    '202304488M': {defaults:{email:'orders@enoteca.sg', whatsapp:'', sms:'', min:0, block:false, schedule: sched(weekDays, 2, '12:00 PM')}, outlets:[
+      {name:'Nomni Kitchen — Tanjong Pagar', s:{email:'', whatsapp:'', sms:'+6594440004', min:120, block:true, schedule: sched(span('Wednesday', 'Saturday'), 2, '11:00 AM')}}]}
+  };
+  var pickerItems = [];
+  function settingsMin(sett) { return 'S$' + sett.min + (sett.block ? ', orders below it are blocked' : ''); }
+  // "Monday to Friday", "Tuesday, Thursday and Saturday": consecutive days collapse into a range.
+  function dayRuns(days) {
+    var idx = days.map(function(d){ return weekDays.indexOf(d); }).sort(function(a, b){ return a - b; }), runs = [], i = 0;
+    while (i < idx.length) { var j = i; while (j + 1 < idx.length && idx[j + 1] === idx[j] + 1) j++; runs.push(j > i ? weekDays[idx[i]] + ' to ' + weekDays[idx[j]] : weekDays[idx[i]]); i = j + 1; }
+    return runs.length > 1 ? runs.slice(0, -1).join(', ') + ' and ' + runs[runs.length - 1] : runs[0];
+  }
+  function scheduleRows(schedule) {
+    var groups = [], byKey = {};
+    schedule.forEach(function(entry){ var key = entry.n + '|' + entry.time; if (!byKey[key]) { byKey[key] = {n:entry.n, time:entry.time, days:[]}; groups.push(byKey[key]); } byKey[key].days.push(entry.day); });
+    return groups.map(function(g){ return '<dt>' + safe(dayRuns(g.days)) + '</dt><dd>Cutoff ' + g.n + ' day(s) earlier at ' + safe(g.time) + '</dd>'; }).join('');
+  }
+  function showDefaults(sett, title) {
+    sv('[data-def-min]').textContent = settingsMin(sett); sv('[data-def-schedule]').innerHTML = scheduleRows(sett.schedule);
+    sv('[data-defaults-title]').textContent = title;
+  }
+  function setPickerLabel(text) { var btn = sv('[data-picker-toggle]'); sv('[data-picker-label]').textContent = text || 'Select'; btn.classList.toggle('is-empty', !text); }
+  function closePicker() { sv('[data-picker-pop]').hidden = true; sv('[data-picker-toggle]').setAttribute('aria-expanded', 'false'); }
+  function renderPicker(filter) {
+    var q = (filter || '').trim().toLowerCase(), list = sv('[data-picker-list]');
+    var shown = pickerItems.filter(function(item){ return !q || item.label.toLowerCase().indexOf(q) >= 0; });
+    list.innerHTML = shown.length ? shown.map(function(item){ return '<li><button class="sf-picker-item" type="button" role="option" aria-selected="' + (item.label === sv('[data-picker-label]').textContent) + '" data-picker-item="' + pickerItems.indexOf(item) + '">' + safe(item.label) + '</button></li>'; }).join('') : '<li class="sf-picker-empty">No outlets found</li>';
+  }
+  function preparePicker(supplier) {
+    var data = supplierSettings[supplier.reg] || {defaults: baseSettings, outlets: []};
+    pickerItems = [{label:'Default settings', s:data.defaults}].concat(data.outlets.map(function(o){ return {label:o.name, s:o.s}; }));
+    setPickerLabel(''); closePicker(); sv('[data-picker-search]').value = '';
+    sv('[data-copy-settings]').hidden = false; showDefaults(baseSettings, 'Ordering defaults');
+  }
+  function applyCopiedSettings(item) {
+    var sett = item.s, email = sv('[data-supplier-email]'), none = sv('[data-no-email]');
+    none.checked = !sett.email; email.disabled = !sett.email; email.value = sett.email || '';
+    sv('[data-contact-required]').hidden = Boolean(sett.email);
+    sv('[data-whatsapp]').value = sett.whatsapp || ''; sv('[data-sms]').value = sett.sms || '';
+    var showSms = Boolean(sett.sms), more = sv('[data-more-contact]');
+    sv('[data-sms-field]').hidden = !showSms; more.setAttribute('aria-expanded', String(showSms)); sv('[data-more-label]').textContent = showSms ? 'Less' : 'More';
+    showDefaults(sett, 'Copied from ' + item.label); supplierModal.querySelector('.sf-defaults').open = true;
+    setPickerLabel(item.label); closePicker(); updateSupplierSubmit();
+  }
+  sv('[data-picker-toggle]').addEventListener('click', function(){
+    var pop = sv('[data-picker-pop]'), open = pop.hidden;
+    if (open) { renderPicker(''); sv('[data-picker-search]').value = ''; }
+    pop.hidden = !open; this.setAttribute('aria-expanded', String(open));
+    if (open) sv('[data-picker-search]').focus();
+  });
+  sv('[data-picker-search]').addEventListener('input', function(){ renderPicker(this.value); });
+  sv('[data-picker-list]').addEventListener('click', function(event){ var item = event.target.closest('[data-picker-item]'); if (item) applyCopiedSettings(pickerItems[Number(item.getAttribute('data-picker-item'))]); });
+  sv('[data-copy-settings]').addEventListener('keydown', function(event){ if (event.key === 'Escape' && !sv('[data-picker-pop]').hidden) { event.stopPropagation(); closePicker(); sv('[data-picker-toggle]').focus(); } });
+  document.addEventListener('click', function(event){ if (!event.target.closest('[data-copy-settings]')) closePicker(); });
   supplierForm.addEventListener('input', updateSupplierSubmit);
   supplierForm.addEventListener('submit', function(event){
     event.preventDefault();
