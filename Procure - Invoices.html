@@ -1254,9 +1254,9 @@
   var doneButton = document.querySelector('[data-upload-done]');
   var uploadSeeds = [
     {outlet:'Test Outlet ZM', name:'bellygood-hola-001.pdf', invoiceNumber:'Hola-test-001', invoiceDate:'05/10/2026', supplier:'Bellygood Caterer', uen:'201912345K', address:'12 Kaki Bukit Road 3', postcode:'417808', reviewed:true},
-    {outlet:'Nomni Kitchen — Tanjong Pagar', name:'kpp-inv44.pdf', invoiceNumber:'INv44', invoiceDate:'22/09/2026', supplier:'KPP Pte Lt', uen:'', address:'', postcode:'', reviewed:true},
+    {outlet:'Nomni Kitchen — Tanjong Pagar', editor:{name:'Siti Rahman', org:'procure'}, name:'kpp-inv44.pdf', invoiceNumber:'INv44', invoiceDate:'22/09/2026', supplier:'KPP Pte Lt', uen:'', address:'', postcode:'', reviewed:true},
     {outlet:'Test Outlet ZM', name:'scan-0921.jpg', invoiceNumber:'', invoiceDate:'', supplier:'', uen:'', address:'', postcode:'', reviewed:false},
-    {outlet:'Nomni Kitchen — Orchard', name:'tsa-wines-tw0042.pdf', invoiceNumber:'TW-0042', invoiceDate:'18/09/2026', supplier:'TSA Wines Pte Ltd', uen:'200823206Q', address:'60 Alexandra Terrace', postcode:'119939', reviewed:true},
+    {outlet:'Nomni Kitchen — Orchard', editor:{name:'Keith Tan', org:'nomni'}, name:'tsa-wines-tw0042.pdf', invoiceNumber:'TW-0042', invoiceDate:'18/09/2026', supplier:'TSA Wines Pte Ltd', uen:'200823206Q', address:'60 Alexandra Terrace', postcode:'119939', reviewed:true},
     {outlet:'Test Outlet ZM', name:'img-4471.png', invoiceNumber:'', invoiceDate:'', supplier:'Creme Concept', uen:'201231515C', address:'', postcode:'', reviewed:false},
     {outlet:'Nomni Kitchen — Tanjong Pagar', name:'fresh-fields-ff8931.pdf', invoiceNumber:'FF-8931', invoiceDate:'21/09/2026', supplier:'Fresh Fields Produce', linkedSupplier:'Fresh Fields Produce', matchedOrder:true, uen:'', address:'', postcode:'', reviewed:true},
     {outlet:'Test Outlet ZM', name:'harbour-seafood-scan.jpg', invoiceNumber:'', invoiceDate:'24/09/2026', supplier:'Harbour Seafood Co.', linkedSupplier:'Harbour Seafood Co.', uen:'', address:'', postcode:'', reviewed:false},
@@ -1266,7 +1266,7 @@
   var uploads = [];
   uploadSeeds.forEach(function(seed, i){
     var day = String(28 - i).padStart(2, '0');
-    uploads.push({outlet:seed.outlet, name:seed.name, time:day + '/09/2026 ' + String(9 + i).padStart(2, '0') + ':' + String((i * 13) % 60).padStart(2, '0'), processed:false, previewUrl:'', invoiceNumber:seed.invoiceNumber, invoiceDate:seed.invoiceDate, supplier:seed.supplier, linkedSupplier:seed.linkedSupplier || '', matchedOrder:Boolean(seed.matchedOrder), uen:seed.uen, address:seed.address, postcode:seed.postcode, reviewed:seed.reviewed});
+    uploads.push({outlet:seed.outlet, editor:seed.editor || null, name:seed.name, time:day + '/09/2026 ' + String(9 + i).padStart(2, '0') + ':' + String((i * 13) % 60).padStart(2, '0'), processed:false, previewUrl:'', invoiceNumber:seed.invoiceNumber, invoiceDate:seed.invoiceDate, supplier:seed.supplier, linkedSupplier:seed.linkedSupplier || '', matchedOrder:Boolean(seed.matchedOrder), uen:seed.uen, address:seed.address, postcode:seed.postcode, reviewed:seed.reviewed});
   });
   document.querySelectorAll('[data-invoice-outlet]').forEach(function(node){
     if (node.tagName === 'INPUT') node.value = venueName;
@@ -1332,19 +1332,27 @@
   }
   // Everything but the final verification is done: the upload is ready to be reviewed.
   function isReadyForReview(item) { return completionSteps(item).filter(function(step){ return step.done; }).length === 4; }
+  // Who is working on the upload. A person editing it (Procure user or Nomni team member) makes it "In progress by <name>".
+  // When only Zeemart System (OCR) has worked on it there is nobody "in progress", so the Improved dropdown shows no header at all;
+  // the Current version keeps the live behaviour and still names Zeemart System.
+  function editorHead(item, ready) {
+    if (item.editor) return '<div class="completion-head"><strong>In progress</strong><small>by ' + safe(item.editor.name) + (item.editor.org === 'nomni' ? ' (Nomni)' : '') + '</small></div>';
+    if (protoVersion === 'current') return '<div class="completion-head"><strong>' + (ready ? 'Ready for review' : 'In progress') + '</strong><small>by Zeemart System</small></div>';
+    return '';
+  }
   // Improved version: one pill with the first thing that is blocking the upload, the full list stays in the dropdown.
   var blockerText = ['Supplier not identified', 'Invoice number missing', 'Invoice date missing', 'No PO linked'];
   function blockingMarkup(item) {
     var steps = completionSteps(item), ready = isReadyForReview(item), first = -1, missing = 0;
     for (var i = 0; i < 4; i++) { if (!steps[i].done) { missing++; if (first < 0) first = i; } }
     var label = ready ? 'Ready for review' : blockerText[first] + (missing > 1 ? '<span class="blocker-more">+ ' + (missing - 1) + ' more</span>' : '');
-    return '<div class="completion is-pill"><button class="blocker-pill' + (ready ? ' is-ready' : '') + '" type="button" aria-expanded="false" data-completion-toggle>' + label + '<span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="completion-popover" hidden><div class="completion-head"><strong>' + (ready ? 'Ready for review' : 'In progress') + '</strong><small>by Zeemart System</small></div>' + steps.map(function(step){ return '<div class="completion-step' + (step.done ? ' is-done' : '') + '"><span class="completion-tick"><span class="material-symbols-outlined" aria-hidden="true">check</span></span>' + step.label + '</div>'; }).join('') + '</div></div>';
+    return '<div class="completion is-pill"><button class="blocker-pill' + (ready ? ' is-ready' : '') + '" type="button" aria-expanded="false" data-completion-toggle>' + label + '<span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="completion-popover" hidden>' + editorHead(item, ready) + '' + steps.map(function(step){ return '<div class="completion-step' + (step.done ? ' is-done' : '') + '"><span class="completion-tick"><span class="material-symbols-outlined" aria-hidden="true">check</span></span>' + step.label + '</div>'; }).join('') + '</div></div>';
   }
   function statusMarkup(item) { return protoVersion === 'current' ? completionMarkup(item) : blockingMarkup(item); }
   function completionMarkup(item) {
     var steps = completionSteps(item), done = steps.filter(function(step){ return step.done; }).length;
     var ready = isReadyForReview(item);
-    return '<div class="completion"><div class="completion-track"><div class="completion-fill" style="width:' + (done * 20) + '%"></div></div><div class="completion-copy"><span>' + (ready ? 'Ready for review' : 'In progress') + '</span><button class="completion-toggle" type="button" aria-expanded="false" data-completion-toggle>' + (ready ? '' : done + ' of 5') + '<span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></div><div class="completion-popover" hidden><div class="completion-head"><strong>' + (ready ? 'Ready for review' : 'In progress') + '</strong><small>by Zeemart System</small></div>' + steps.map(function(step){ return '<div class="completion-step' + (step.done ? ' is-done' : '') + '"><span class="completion-tick"><span class="material-symbols-outlined" aria-hidden="true">check</span></span>' + step.label + '</div>'; }).join('') + '</div></div>';
+    return '<div class="completion"><div class="completion-track"><div class="completion-fill" style="width:' + (done * 20) + '%"></div></div><div class="completion-copy"><span>' + (ready ? 'Ready for review' : 'In progress') + '</span><button class="completion-toggle" type="button" aria-expanded="false" data-completion-toggle>' + (ready ? '' : done + ' of 5') + '<span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></div><div class="completion-popover" hidden>' + editorHead(item, ready) + '' + steps.map(function(step){ return '<div class="completion-step' + (step.done ? ' is-done' : '') + '"><span class="completion-tick"><span class="material-symbols-outlined" aria-hidden="true">check</span></span>' + step.label + '</div>'; }).join('') + '</div></div>';
   }
   function renderUploads() {
     var body = document.querySelector('[data-upload-rows]'); body.innerHTML = '';
