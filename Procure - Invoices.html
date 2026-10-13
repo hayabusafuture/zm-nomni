@@ -1334,9 +1334,9 @@
   function isReadyForReview(item) { return completionSteps(item).filter(function(step){ return step.done; }).length === 4; }
   // Who is working on the upload. A person editing it (Procure user or Nomni team member) makes it "In progress by <name>".
   // When only Zeemart System (OCR) has worked on it there is nobody "in progress", so the Improved dropdown shows no header at all;
-  // the Current version keeps the live behaviour and still names Zeemart System.
+  // the Current version keeps the live behaviour: it still names Zeemart System and does not add "(Nomni)" after a Nomni team member's name.
   function editorHead(item, ready) {
-    if (item.editor) return '<div class="completion-head"><strong>In progress</strong><small>by ' + safe(item.editor.name) + (item.editor.org === 'nomni' ? ' (Nomni)' : '') + '</small></div>';
+    if (item.editor) return '<div class="completion-head"><strong>In progress</strong><small>by ' + safe(item.editor.name) + (item.editor.org === 'nomni' && protoVersion !== 'current' ? ' (Nomni)' : '') + '</small></div>';
     if (protoVersion === 'current') return '<div class="completion-head"><strong>' + (ready ? 'Ready for review' : 'In progress') + '</strong><small>by Zeemart System</small></div>';
     return '';
   }
