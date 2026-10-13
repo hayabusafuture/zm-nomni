@@ -80,12 +80,21 @@
 
   /* Breadcrumb */
   .breadcrumb { margin-bottom: 10px; }
-  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-mute); font-size: 13px; font-weight: 500; text-decoration: none; transition: color .13s; }
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: var(--spinach); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .13s; }
   .back-link:hover { color: var(--seaweed); }
+  .back-link svg { width: 14px; height: 14px; stroke-width: 2.5; }
 
   /* Page title */
-  .page-title { font-size: 26px; font-weight: 800; margin: 0 0 16px; letter-spacing: -0.03em;; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .page-title { font-size: 24px; font-weight: 700; margin: 0 0 16px; letter-spacing: -0.03em; }
   .title-divider { height: 1px; background: var(--rule); margin: 0 0 28px; }
+  /* Tabs: Details | Activity log (same pattern as Items) */
+  .page-tabs { display: flex; gap: 28px; border-bottom: 1px solid var(--rule); margin: 0 -40px 28px; padding: 0 40px; }
+  .page-tab { all: unset; box-sizing: border-box; position: relative; padding: 10px 2px 14px; color: var(--ink-mute); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .page-tab:hover, .page-tab.active { color: var(--ink); }
+  .page-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--primary); border-radius: 2px; }
+  #panelActivity { display: none; }
+  html[data-tab="activity"] #panelActivity { display: block; }
+  html[data-tab="activity"] #panelDetails, html[data-tab="activity"] .sticky-footer { display: none; }
 
   /* Section headings */
   .section-heading { font-size: 21px; font-weight: 700; margin: 32px 0 14px; letter-spacing: -0.02em; color: var(--ink); }
@@ -352,13 +361,17 @@
     <!-- Breadcrumb + title run full width -->
     <div class="breadcrumb">
       <a href="Procure - Users.html" class="back-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
         Users
       </a>
     </div>
-    <h1 class="page-title">Edit user</h1>
-    <div class="title-divider"></div>
+    <h1 class="page-title" id="userTitle">William Arya (Zeemart)</h1>
+    <div class="page-tabs" role="tablist" aria-label="User sections">
+      <button class="page-tab active" type="button" role="tab" data-tab="details" aria-selected="true">Details</button>
+      <button class="page-tab" type="button" role="tab" data-tab="activity" aria-selected="false">Activity log</button>
+    </div>
 
+    <div id="panelDetails">
     <div class="form-body">
 
       <!-- ── Basic information ── -->
@@ -367,22 +380,22 @@
       <div class="form-row">
         <div class="field-group">
           <label class="field-label">First name</label>
-          <input type="text" class="field-input" value="William" />
+          <input type="text" class="field-input" id="fFirst" value="William" />
         </div>
         <div class="field-group">
           <label class="field-label">Last name</label>
-          <input type="text" class="field-input" value="Arya (Zeemart)" />
+          <input type="text" class="field-input" id="fLast" value="Arya (Zeemart)" />
         </div>
       </div>
 
       <div class="field-group">
         <label class="field-label">Job title</label>
-        <input type="text" class="field-input" value="Staff" />
+        <input type="text" class="field-input" id="fJob" value="Staff" />
       </div>
 
       <div class="field-group">
         <label class="field-label">Email</label>
-        <input type="email" class="field-input" value="william@zeemart.co" />
+        <input type="email" class="field-input" id="fEmail" value="william@zeemart.co" />
         <label class="checkbox-row">
           <input type="checkbox" />
           <span>Send email notifications to outlet email instead of the email above</span>
@@ -391,7 +404,7 @@
 
       <div class="field-group">
         <label class="field-label">Mobile phone</label>
-        <input type="tel" class="field-input" value="+6598159051" />
+        <input type="tel" class="field-input" id="fMobile" value="+6598159051" />
         <span class="field-hint">Used for SMS notifications. If the number is 91234567 and country code is 65, enter +6591234567</span>
       </div>
 
@@ -621,6 +634,11 @@
       </label>
 
     </div><!-- /form-body -->
+    </div><!-- /panelDetails -->
+
+    <div id="panelActivity" role="tabpanel" aria-label="Activity log">
+      <!-- Activity log: intentionally empty for now -->
+    </div>
   </main>
 </div>
 
@@ -660,6 +678,29 @@
   </div>
 </div>
 
+<script>
+  // User from the Users list (?user=&jobtitle=&email=&mobile=), tab from ?tab=details|activity
+  (function () {
+    var q = new URLSearchParams(location.search), root = document.documentElement;
+    var name = q.get('user');
+    if (name) {
+      var parts = name.split(' '), first = parts.shift();
+      document.getElementById('fFirst').value = first;
+      document.getElementById('fLast').value = parts.join(' ');
+      document.getElementById('fJob').value = q.get('jobtitle') || '';
+      document.getElementById('fEmail').value = q.get('email') || '';
+      document.getElementById('fMobile').value = q.get('mobile') || '';
+    }
+    document.getElementById('userTitle').textContent = name || (document.getElementById('fFirst').value + ' ' + document.getElementById('fLast').value).trim();
+    function setTab(tab, push) {
+      root.dataset.tab = tab;
+      document.querySelectorAll('.page-tab').forEach(function (t) { var on = t.dataset.tab === tab; t.classList.toggle('active', on); t.setAttribute('aria-selected', String(on)); });
+      if (push) { var url = new URL(location.href); url.searchParams.set('tab', tab); history.replaceState(null, '', url); }
+    }
+    setTab(q.get('tab') === 'activity' ? 'activity' : 'details', false);
+    document.querySelector('.page-tabs').addEventListener('click', function (e) { var t = e.target.closest('.page-tab'); if (t) setTab(t.dataset.tab, true); });
+  })();
+</script>
 <script>
   // User menu
   document.getElementById('userMenuBtn').addEventListener('click', function(e) {

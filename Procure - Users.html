@@ -5,6 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="_assets/favicon.svg" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Procure — Users</title>
+<script>document.documentElement.dataset.ver=new URLSearchParams(location.search).get('version')==='current'?'current':'improved'</script>
 <script>if(new URLSearchParams(location.search).get('demo')==='1')document.documentElement.classList.add('demo-boot')</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -75,6 +76,78 @@
   .nav-hq-wrap a.active { background: rgba(42,200,100,.16); color: var(--seaweed); font-weight: 600; }
   .nav-hq-wrap a.active .ms-icon { color: var(--spinach); }
 
+  /* Prototype version toggle (Shift+D to hide) */
+  .proto-version-toggle { position: fixed; right: 16px; bottom: 16px; z-index: 60; display: flex; align-items: center; gap: 2px; padding: 4px 4px 4px 10px; border: 1px solid var(--rule); border-radius: 8px; background: #fff; box-shadow: 0 2px 8px rgba(26,31,43,.12); color: #5F6570; font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .proto-version-toggle[hidden] { display: none; }
+  .proto-version-label { margin-right: 6px; }
+  .proto-version-toggle button { padding: 5px 8px; border: 0; border-radius: 5px; background: transparent; color: #5F6570; font: inherit; cursor: pointer; }
+  .proto-version-toggle button:hover { background: var(--sidebar-bg); color: var(--ink); }
+  .proto-version-toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  /* Current = live page; Improved adds the proposed changes (Last login) */
+  html[data-ver="current"] .col-lastlogin { display: none; }
+  /* Live site shows the user type as plain text, no coloured badge */
+  html[data-ver="current"] .role-chip { background: none; color: inherit; font-size: inherit; font-weight: 400; letter-spacing: 0; text-transform: none; padding: 0; border-radius: 0; }
+
+  /* Sortable columns (Improved only) */
+  .sort-btn { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 6px; cursor: default; }
+  html[data-ver="improved"] .sortable .sort-btn { cursor: pointer; }
+  html[data-ver="improved"] .sortable .sort-btn:hover { color: var(--ink); }
+  .sort-ind { display: none; position: relative; width: 8px; height: 16px; flex: 0 0 auto; }
+  .sort-ind::before, .sort-ind::after { content: ""; position: absolute; left: 1px; width: 4px; height: 4px; border: solid #B9BCC3; border-width: 1.5px 1.5px 0 0; }
+  .sort-ind::before { top: 3px; transform: rotate(-45deg); }
+  .sort-ind::after { bottom: 3px; transform: rotate(135deg); }
+  html[data-ver="improved"] .sort-ind { display: inline-block; }
+  html[data-ver="improved"] .sortable .sort-btn:hover .sort-ind::before, html[data-ver="improved"] .sortable .sort-btn:hover .sort-ind::after { border-color: var(--ink-mute); }
+  /* Sorted: a single chevron, centred, pointing the way the list is ordered */
+  html[data-ver="improved"] .sortable[aria-sort="ascending"] .sort-ind::before { border-color: var(--seaweed); top: 6px; }
+  html[data-ver="improved"] .sortable[aria-sort="ascending"] .sort-ind::after { display: none; }
+  html[data-ver="improved"] .sortable[aria-sort="descending"] .sort-ind::after { border-color: var(--seaweed); bottom: 6px; }
+  html[data-ver="improved"] .sortable[aria-sort="descending"] .sort-ind::before { display: none; }
+
+  .no-results { display: none; padding: 40px 14px; text-align: center; color: var(--ink-mute); font-size: 14px; border: 1px solid var(--rule); border-top: 0; border-radius: 0 0 6px 6px; margin-top: -1px; }
+  .no-results.show { display: block; }
+  .col-outlets { min-width: 130px; color: var(--ink-2); white-space: nowrap; }
+  .col-logins { width: 110px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  /* Activity columns are part of the Improved version only */
+  html[data-ver="current"] .improved-only { display: none; }
+  html[data-ver="current"] .col-outlets, html[data-ver="current"] .col-logins, html[data-ver="current"] .col-actions { display: none; }
+
+  /* Filter button + menu (same pattern as Invoices) */
+  .invoice-filter-link { min-height: 36px; display: inline-flex; align-items: center; gap: 7px; margin-left: auto; padding: 0 6px; border: 0; background: transparent; color: var(--spinach); font: inherit; font-weight: 600; cursor: pointer; }
+  .filter-control { position: relative; margin-left: auto; }
+  .filter-control .invoice-filter-link { margin-left: 0; }
+  .filter-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--nomni-green); color: var(--seaweed); font-size: 11px; font-weight: 700; }
+  .filter-count[hidden] { display: none; }
+  .orders-filter-menu, .orders-invoice-submenu { position: absolute; z-index: 30; border: 1px solid var(--rule); border-radius: 8px; background: #fff; box-shadow: 0 8px 24px rgba(26,31,43,.14); }
+  .orders-filter-menu { top: calc(100% + 8px); right: 0; display: none; width: 220px; padding: 8px 0; }
+  .orders-filter-menu.open, .orders-invoice-submenu.open { display: block; }
+  .orders-filter-category { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 40px; padding: 0 14px; border: 0; background: transparent; color: var(--spinach); font: 500 14px/1.3 "Inter", system-ui, sans-serif; text-align: left; cursor: pointer; }
+  .orders-filter-category:hover, .orders-filter-category[aria-expanded="true"] { background: var(--row-hover); color: var(--seaweed); }
+  .orders-filter-category-count { min-width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; background: var(--nomni-green); color: var(--seaweed); font-size: 11px; font-weight: 700; }
+  .orders-filter-category-count[hidden] { display: none; }
+  .orders-filter-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding: 8px 12px 0; border-top: 1px solid var(--rule); }
+  .orders-filter-reset, .orders-filter-apply { min-height: 34px; padding: 0 12px; border: 0; border-radius: 6px; font: 600 13px/1 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .orders-filter-reset { background: transparent; color: var(--spinach); }
+  .orders-filter-reset:hover { background: var(--mint); }
+  .orders-filter-apply { background: var(--nomni-green); color: var(--seaweed); }
+  .orders-filter-apply:hover { background: var(--primary-hover); }
+  .orders-filter-search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 1px solid #dcdee3; border-radius: 6px; color: var(--ink-mute); }
+  .orders-filter-search input { width: 100%; border: 0; outline: 0; color: var(--ink); font: 14px/1.2 "Inter", system-ui, sans-serif; }
+  .orders-filter-select-all { display: block; margin: 12px 0 8px; padding: 0; border: 0; background: transparent; color: var(--spinach); font: 600 13px/1.3 "Inter", system-ui, sans-serif; cursor: pointer; }
+  .orders-filter-check { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--ink); font-size: 14px; cursor: pointer; }
+  .orders-filter-check[hidden] { display: none; }
+  .orders-filter-check input { width: 17px; height: 17px; margin: 0; accent-color: var(--spinach); }
+  .orders-invoice-submenu { top: 8px; right: calc(100% + 8px); display: none; width: 264px; padding: 12px; }
+
+  /* Row Actions (same pattern as Invoices / Inventory) */
+  .col-actions { width: 100px; }
+  .row-actions-toggle { display: inline-flex; align-items: center; gap: 3px; border: 0; background: transparent; color: var(--spinach); font: inherit; font-weight: 600; cursor: pointer; padding: 0; }
+  .row-actions-toggle .material-symbols-outlined { font-size: 18px; }
+  .row-actions-menu { position: fixed; z-index: 400; min-width: 160px; padding: 6px; background: #fff; border: 1px solid #e0e2e8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+  .row-actions-menu[hidden] { display: none; }
+  .row-actions-menu button { display: block; width: 100%; text-align: left; padding: 9px 12px; border: 0; border-radius: 6px; background: none; color: var(--spinach); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .row-actions-menu button:hover { background: var(--mint); }
+
   /* Main */
   .main { grid-column: 2; grid-row: 2; padding: 32px 40px 56px; min-width: 0; background: #fff; }
 
@@ -84,18 +157,24 @@
   .btn-primary:hover { background: #0E3727; color: var(--nomni-green); border-color: #0E3727; }
 
   /* Page header */
-  .page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
-  .page-title { font-size: 26px; font-weight: 800; margin: 0; letter-spacing: -0.03em;; font-family: "Hanken Grotesk", system-ui, sans-serif; }
+  .page-head { display: flex; align-items: center; justify-content: space-between; margin: -32px -40px 32px; padding: 28px 40px 16px; border-bottom: 1px solid var(--rule); gap: 16px; }
+  .page-title { font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.03em; }
   .page-head-right { display: flex; align-items: center; gap: 10px; }
 
   /* Filter row */
-  .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-  .search-wrap { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 36px; width: 260px; }
+  .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .search-wrap { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 12px; height: 38px; width: 226px; }
   .search-wrap svg { color: var(--ink-mute); flex: 0 0 auto; }
   .search-wrap input { border: 0; outline: 0; background: transparent; font: inherit; color: var(--ink); width: 100%; font-size: 14px; }
   .search-wrap input::placeholder { color: var(--ink-mute); }
   .filter-select { font-family: inherit; font-size: 14px; color: var(--ink); background: #fff; border: 1px solid #dcdee3; border-radius: 6px; padding: 0 28px 0 10px; height: 36px; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; outline: none; }
   .actions-right { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+  .sel-bar { display: flex; align-items: center; gap: 24px; height: 38px; }
+  .sel-bar[hidden] { display: none; }
+  .sel-count { font-size: 14px; font-weight: 600; color: var(--ink); padding-left: 24px; }
+  .sel-clear { background: transparent; border: 0; font: inherit; font-size: 14px; font-weight: 600; color: var(--spinach); cursor: pointer; padding: 0; }
+  .sel-delete { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border: 0; border-radius: 6px; background: var(--mint); color: #D0291E; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .13s; }
+  .sel-delete:hover { background: #C6F2CE; }
   .action-btn { background: transparent; border: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--spinach); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 6px; transition: background .13s; }
   .action-btn:hover { background: #f0faf3; }
   .action-btn.del { color: #D0291E; }
@@ -109,21 +188,27 @@
   .check.indeterminate::after { content: ""; position: absolute; left: 2px; top: 5px; width: 8px; height: 2px; background: #fff; }
 
   /* Table */
-  .table-wrap { overflow-x: auto; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; }
   table.users-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
-  .users-table thead th { text-align: left; font-weight: 600; color: var(--ink-mute); padding: 12px 14px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #fff; font-size: 12px; white-space: nowrap; }
-  .users-table tbody td { padding: 13px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; background: #fff; transition: background .1s; }
+  .users-table thead th { text-align: left; font-weight: 600; color: var(--ink); padding: 14px 14px; border-top: 0; border-bottom: 1px solid var(--rule); background: #fff; font-size: 12px; white-space: nowrap; }
+  .users-table tbody td { padding: 16px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; background: #fff; transition: background .1s; }
+  .users-table tbody tr:last-child td { border-bottom: 0; }
   .users-table tbody tr:hover td { background: var(--row-hover); }
   .users-table tbody tr { cursor: pointer; }
+  .user-checkbox { width: 16px; height: 16px; accent-color: var(--nomni-green); cursor: pointer; vertical-align: middle; margin: 0; }
   .col-check { width: 36px; padding-right: 0 !important; }
   .col-name { min-width: 220px; }
   .col-jobtitle { min-width: 130px; color: var(--ink-2); }
   .col-role { width: 110px; }
   .col-email { min-width: 200px; color: var(--ink-2); }
+  .col-lastlogin { width: 170px; color: var(--ink-2); white-space: nowrap; }
   .col-mobile { width: 140px; color: var(--ink-mute); }
 
   /* User name cell */
-  .user-cell { display: flex; align-items: center; gap: 0; }
+  .user-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .user-title { display: none; font-size: 12px; font-weight: 400; color: var(--ink-mute); line-height: 1.3; }
+  html[data-ver="improved"] .user-title { display: block; }
+  html[data-ver="improved"] .col-jobtitle, html[data-ver="improved"] .col-jobtitle-cell { display: none; }
   .user-avt { display: none; }
   .user-name { font-weight: 600; color: var(--ink); }
 
@@ -467,7 +552,7 @@
       <div class="page-head-right">
         <button class="btn btn-primary" id="inviteBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          Invite user
+          Add new user
         </button>
       </div>
     </div>
@@ -475,137 +560,192 @@
     <div class="filter-row">
       <div class="search-wrap">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Search by name or email" />
+        <input type="text" id="userSearch" placeholder="Search name" />
       </div>
-      <select class="filter-select">
-        <option value="">All roles</option>
-        <option>Owner</option>
-        <option>Admin</option>
-        <option>Standard</option>
-        <option>Basic</option>
-        <option>Guest</option>
-        <option>Custom</option>
-      </select>
-      <div class="actions-right">
-        <button class="action-btn del" id="deleteSelBtn" style="display:none">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          Delete selected
+      <div class="filter-control improved-only" data-filter-control>
+        <button class="invoice-filter-link" type="button" data-filter-button aria-expanded="false"><img class="filter-icon" src="_assets/filter-blue.svg" width="20" height="20" alt="" aria-hidden="true" />Filter <span class="filter-count" data-filter-count hidden>0</span></button>
+        <div class="orders-filter-menu" data-filter-menu>
+          <div data-filter-categories></div>
+          <div class="orders-filter-footer"><button class="orders-filter-reset" type="button" data-filter-reset>Reset</button><button class="orders-filter-apply" type="button" data-filter-apply>Apply</button></div>
+          <div data-filter-submenus></div>
+        </div>
+      </div>
+      <div class="sel-bar" id="selBar" hidden>
+        <span class="sel-count" id="selCount">0 selected</span>
+        <button class="sel-clear" id="selClear" type="button">Clear</button>
+        <button class="sel-delete" id="deleteSelBtn" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          Delete
         </button>
       </div>
     </div>
 
     <div class="table-wrap">
-      <table class="users-table">
+      <table class="users-table" id="usersTable">
         <thead>
           <tr>
-            <th class="col-check"><span class="check" id="checkAll"></span></th>
-            <th class="col-name">Name</th>
+            <th class="col-check"><input class="user-checkbox" type="checkbox" id="checkAll" aria-label="Select all users" /></th>
+            <th class="col-name sortable" data-sort-key="name" aria-sort="none"><button type="button" class="sort-btn">Name<span class="sort-ind" aria-hidden="true"></span></button></th>
             <th class="col-jobtitle">Job title</th>
-            <th class="col-role">Role</th>
+            <th class="col-role">User type</th>
+            <th class="col-outlets">Outlet(s)</th>
             <th class="col-email">Email</th>
             <th class="col-mobile">Mobile</th>
+            <th class="col-lastlogin sortable" data-sort-key="lastlogin" aria-sort="none"><button type="button" class="sort-btn">Last login<span class="sort-ind" aria-hidden="true"></span></button></th>
+            <th class="col-logins">Logins (30d)</th>
+            <th class="col-actions">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
-            <td><div class="user-cell"><div class="user-avt" style="background:#7F6AD0">WA</div><span class="user-name">William Arya (Zeemart)</span></div></td>
-            <td>Staff</td>
+          <tr class="user-row" data-outlets="Nomni Kitchen|Nomni Bar">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
+            <td><div class="user-cell"><div class="user-avt" style="background:#7F6AD0">WA</div><span class="user-name">William Arya (Zeemart)</span><span class="user-title">Staff</span></div></td>
+            <td class="col-jobtitle-cell">Staff</td>
             <td><span class="role-chip role-owner">Owner</span></td>
+            <td class="col-outlets">All outlets</td>
             <td>william@zeemart.co</td>
             <td>+6598159051</td>
+            <td class="col-lastlogin">13 Oct 2026, 09:42</td>
+            <td class="col-logins">24</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
-            <td><div class="user-cell"><div class="user-avt" style="background:#1A8040">AK</div><span class="user-name">Adeline Kusuma</span></div></td>
-            <td>Staff</td>
+          <tr class="user-row" data-outlets="Nomni Kitchen">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
+            <td><div class="user-cell"><div class="user-avt" style="background:#1A8040">AK</div><span class="user-name">Adeline Kusuma</span><span class="user-title">Staff</span></div></td>
+            <td class="col-jobtitle-cell">Staff</td>
             <td><span class="role-chip role-standard">Standard</span></td>
+            <td class="col-outlets">Nomni Kitchen</td>
             <td>adeline@zeemart.asia</td>
             <td>+65912345678</td>
+            <td class="col-lastlogin">13 Oct 2026, 08:15</td>
+            <td class="col-logins">19</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
-            <td><div class="user-cell"><div class="user-avt" style="background:#D05C2A">AM</div><span class="user-name">Amit Malhotra</span></div></td>
-            <td>Owner</td>
+          <tr class="user-row" data-outlets="Nomni Kitchen|Nomni Bar">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
+            <td><div class="user-cell"><div class="user-avt" style="background:#D05C2A">AM</div><span class="user-name">Amit Malhotra</span><span class="user-title">Owner</span></div></td>
+            <td class="col-jobtitle-cell">Owner</td>
             <td><span class="role-chip role-admin">Admin</span></td>
+            <td class="col-outlets">Nomni Kitchen +1</td>
             <td>amitmalhotra76@icloud.com</td>
             <td>+6598388880</td>
+            <td class="col-lastlogin">12 Oct 2026, 17:03</td>
+            <td class="col-logins">11</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
-            <td><div class="user-cell"><div class="user-avt" style="background:#2A8A6A">NS</div><span class="user-name">Narendra Sagadevan</span></div></td>
-            <td>Store manager</td>
+          <tr class="user-row" data-outlets="Nomni Bar">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
+            <td><div class="user-cell"><div class="user-avt" style="background:#2A8A6A">NS</div><span class="user-name">Narendra Sagadevan</span><span class="user-title">Store manager</span></div></td>
+            <td class="col-jobtitle-cell">Store manager</td>
             <td><span class="role-chip role-standard">Standard</span></td>
+            <td class="col-outlets">Nomni Bar</td>
             <td>naren@zeemart.co</td>
             <td>+658012318012</td>
+            <td class="col-lastlogin">12 Oct 2026, 11:27</td>
+            <td class="col-logins">17</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
-            <td><div class="user-cell"><div class="user-avt" style="background:#5A4ABB">PC</div><span class="user-name">Paran Chinniah</span></div></td>
-            <td>Manager</td>
+          <tr class="user-row" data-outlets="Nomni Kitchen|Nomni Bar">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
+            <td><div class="user-cell"><div class="user-avt" style="background:#5A4ABB">PC</div><span class="user-name">Paran Chinniah</span><span class="user-title">Manager</span></div></td>
+            <td class="col-jobtitle-cell">Manager</td>
             <td><span class="role-chip role-admin">Admin</span></td>
+            <td class="col-outlets">All outlets</td>
             <td>paran@zeemart.asia</td>
             <td>+6591682610</td>
+            <td class="col-lastlogin">10 Oct 2026, 14:50</td>
+            <td class="col-logins">9</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
-            <td><div class="user-cell"><div class="user-avt" style="background:#C0732A">SI</div><span class="user-name">Sindoora Iyer</span></div></td>
-            <td>Liven Staff</td>
+          <tr class="user-row" data-outlets="Nomni Kitchen">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
+            <td><div class="user-cell"><div class="user-avt" style="background:#C0732A">SI</div><span class="user-name">Sindoora Iyer</span><span class="user-title">Liven Staff</span></div></td>
+            <td class="col-jobtitle-cell">Liven Staff</td>
             <td><span class="role-chip role-basic">Basic</span></td>
+            <td class="col-outlets">Nomni Kitchen</td>
             <td>sindoora.iyer@liven.com.au</td>
             <td>+6512345678</td>
+            <td class="col-lastlogin">8 Oct 2026, 16:21</td>
+            <td class="col-logins">4</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
+          <tr class="user-row" data-outlets="Nomni Bar">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
             <td><div class="user-cell"><div class="user-avt" style="background:#1F77C4">AL</div><span class="user-name">Alpine Liven</span></div></td>
-            <td class="cell-muted">—</td>
+            <td class="col-jobtitle-cell cell-muted">—</td>
             <td><span class="role-chip role-basic">Basic</span></td>
+            <td class="col-outlets">Nomni Bar</td>
             <td>alpine.dwi@liven.com.au</td>
             <td>+65812142141</td>
+            <td class="col-lastlogin">6 Oct 2026, 10:08</td>
+            <td class="col-logins">3</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
+          <tr class="user-row" data-outlets="Nomni Kitchen">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
             <td><div class="user-cell"><div class="user-avt" style="background:#4A90A4">AA</div><span class="user-name">Amanda Alviana</span></div></td>
-            <td class="cell-muted">—</td>
+            <td class="col-jobtitle-cell cell-muted">—</td>
             <td><span class="role-chip role-basic">Basic</span></td>
+            <td class="col-outlets">Nomni Kitchen</td>
             <td>amanda@zeemart.asia</td>
             <td>+6512345678</td>
+            <td class="col-lastlogin">2 Oct 2026, 09:36</td>
+            <td class="col-logins">2</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
+          <tr class="user-row" data-outlets="Nomni Bar">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
             <td><div class="user-cell"><div class="user-avt" style="background:#8A6ABB">AC</div><span class="user-name">Aaron Carl</span></div></td>
-            <td class="cell-muted">—</td>
+            <td class="col-jobtitle-cell cell-muted">—</td>
             <td><span class="role-chip role-guest">Guest</span></td>
+            <td class="col-outlets">Nomni Bar</td>
             <td>aaron.carl@liven.com.au</td>
             <td>+6512345678</td>
+            <td class="col-lastlogin">29 Sep 2026, 13:12</td>
+            <td class="col-logins">1</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
+          <tr class="user-row" data-outlets="Nomni Kitchen">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
             <td><div class="user-cell"><div class="user-avt" style="background:#B8A83A">NK</div><span class="user-name">Nishikaa Muthukrishnan</span></div></td>
-            <td class="cell-muted">—</td>
+            <td class="col-jobtitle-cell cell-muted">—</td>
             <td><span class="role-chip role-basic">Basic</span></td>
+            <td class="col-outlets">Nomni Kitchen</td>
             <td>nishikaa.muthukrishnan@liven.com.au</td>
             <td>+6512345678</td>
+            <td class="col-lastlogin">21 Sep 2026, 15:44</td>
+            <td class="col-logins">1</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
+          <tr class="user-row" data-outlets="Nomni Kitchen">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
             <td><div class="user-cell"><div class="user-avt" style="background:#D0291E">TC</div><span class="user-name">Test Claude</span></div></td>
-            <td class="cell-muted">—</td>
+            <td class="col-jobtitle-cell cell-muted">—</td>
             <td><span class="role-chip role-custom">Custom</span></td>
+            <td class="col-outlets">Nomni Kitchen</td>
             <td>claudeai@zeemart.co</td>
             <td>+6512345678</td>
+            <td class="col-lastlogin cell-muted">Never</td>
+            <td class="col-logins cell-muted">0</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
-          <tr class="user-row">
-            <td class="col-check"><span class="check row-check"></span></td>
-            <td><div class="user-cell"><div class="user-avt" style="background:#1A5F8A">WA</div><span class="user-name">William Arya</span></div></td>
-            <td>Tester</td>
+          <tr class="user-row" data-outlets="Nomni Kitchen">
+            <td class="col-check"><input class="user-checkbox row-check" type="checkbox" aria-label="Select user" /></td>
+            <td><div class="user-cell"><div class="user-avt" style="background:#1A5F8A">WA</div><span class="user-name">William Arya</span><span class="user-title">Tester</span></div></td>
+            <td class="col-jobtitle-cell">Tester</td>
             <td><span class="role-chip role-standard">Standard</span></td>
+            <td class="col-outlets">Nomni Kitchen</td>
             <td>hayabusa.futur.e@gmail.com</td>
             <td>+6591234567</td>
+            <td class="col-lastlogin cell-muted">Never</td>
+            <td class="col-logins cell-muted">0</td>
+            <td class="col-actions"><button class="row-actions-toggle" type="button" aria-haspopup="menu" aria-expanded="false">Actions <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <div class="no-results" id="noResults">No users match your filters.</div>
 
     <div class="pager">
       <span class="count">Showing <b>1 to 12</b> of <b>47</b> entries</span>
@@ -670,6 +810,37 @@
   </div>
 </div>
 
+<div class="proto-version-toggle" data-proto-version role="group" aria-label="Prototype version" title="Prototype version — Shift+D to hide"><span class="proto-version-label">Prototype version</span><button type="button" data-version="current">Current</button><button type="button" data-version="improved">Improved</button></div>
+
+<script>
+  // Prototype version: 'improved' (default) or 'current' (live page). ?version=current|improved
+  (function () {
+    var root = document.documentElement;
+    var toggle = document.querySelector('[data-proto-version]');
+    function apply() {
+      toggle.querySelectorAll('[data-version]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-version') === root.dataset.ver));
+      });
+    }
+    toggle.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-version]'); if (!b) return;
+      root.dataset.ver = b.getAttribute('data-version'); apply();
+      var url = new URL(location.href); url.searchParams.set('version', root.dataset.ver); history.replaceState(null, '', url);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey || e.key.toLowerCase() !== 'd') return;
+      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      toggle.hidden = !toggle.hidden;
+    });
+    apply();
+  })();
+</script>
+
+<div class="row-actions-menu" id="rowActionsMenu" role="menu" hidden>
+  <button type="button" role="menuitem" data-row-action="edit">Edit</button>
+  <button type="button" role="menuitem" data-row-action="activity">Activity log</button>
+</div>
+
 <!-- Delete Confirm Modal -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-card sm">
@@ -698,38 +869,220 @@
   document.addEventListener('click', () => document.getElementById('userMenu').classList.remove('open'));
 
   // Row click → User Detail
+  // Link to the Edit user page for a row: ?user=&jobtitle=&email=&mobile=[&tab=activity]
+  function cellText(row, cls) {
+    var th = document.querySelector('#usersTable thead th.' + cls);
+    return th ? row.children[Array.from(th.parentNode.children).indexOf(th)].textContent.trim() : '';
+  }
+  function userDetailUrl(row, tab) {
+    var title = row.querySelector('.col-jobtitle-cell');
+    var params = new URLSearchParams({
+      user: row.querySelector('.user-name').textContent.trim(),
+      jobtitle: title && title.textContent.trim() !== '—' ? title.textContent.trim() : '',
+      email: cellText(row, 'col-email'),
+      mobile: cellText(row, 'col-mobile')
+    });
+    if (tab) params.set('tab', tab);
+    return 'Procure - User Detail.html?' + params.toString();
+  }
+
   document.querySelectorAll('.user-row').forEach(row => {
     row.addEventListener('click', function(e) {
-      if (e.target.closest('.col-check')) return;
-      window.location.href = 'Procure - User Detail.html';
+      if (e.target.closest('.col-check, .col-actions')) return;
+      window.location.href = userDetailUrl(row);
     });
   });
 
   // Checkbox logic
-  function updateDeleteBtn() {
-    const count = document.querySelectorAll('.row-check.checked').length;
-    document.getElementById('deleteSelBtn').style.display = count > 0 ? 'inline-flex' : 'none';
-    const total = document.querySelectorAll('.row-check').length;
+  const rowChecks = () => Array.from(document.querySelectorAll('.user-row:not([hidden]) .row-check'));
+  function updateSelection() {
+    const rows = rowChecks();
+    const count = rows.filter(c => c.checked).length;
+    const total = rows.length;
+    document.getElementById('selBar').hidden = count === 0;
+    document.querySelectorAll('.filter-row .search-wrap, .filter-row .filter-control').forEach(el => { el.style.display = count > 0 ? 'none' : ''; });
+    document.getElementById('selCount').textContent = count + ' selected';
     const allChk = document.getElementById('checkAll');
-    allChk.classList.toggle('checked', count === total && total > 0);
-    allChk.classList.toggle('indeterminate', count > 0 && count < total);
-    if (count === total && total > 0) allChk.classList.remove('indeterminate');
+    allChk.checked = count === total && total > 0;
+    allChk.indeterminate = count > 0 && count < total;
   }
 
-  document.querySelectorAll('.row-check').forEach(chk => {
-    chk.addEventListener('click', function(e) {
-      e.stopPropagation();
-      this.classList.toggle('checked');
-      updateDeleteBtn();
-    });
+  rowChecks().forEach(chk => {
+    chk.addEventListener('click', e => e.stopPropagation());
+    chk.addEventListener('change', updateSelection);
   });
 
-  document.getElementById('checkAll').addEventListener('click', function() {
-    const all = document.querySelectorAll('.row-check');
-    const allChecked = document.querySelectorAll('.row-check.checked').length === all.length;
-    all.forEach(c => allChecked ? c.classList.remove('checked') : c.classList.add('checked'));
-    updateDeleteBtn();
+  document.getElementById('checkAll').addEventListener('change', function() {
+    rowChecks().forEach(c => { c.checked = this.checked; });
+    updateSelection();
   });
+
+  document.getElementById('selClear').addEventListener('click', () => {
+    rowChecks().forEach(c => { c.checked = false; });
+    updateSelection();
+  });
+
+  // Column sorting (Improved version). First click: Name A–Z, Last login newest first.
+  function makeSortable(table, rowSel, valueFn, onSort) {
+    var tbody = table.querySelector('tbody');
+    var heads = table.querySelectorAll('th.sortable');
+    var original = Array.from(tbody.querySelectorAll(rowSel));
+    function sortBy(th, dir) {
+      if (document.documentElement.dataset.ver !== 'improved') return;
+      var key = th.dataset.sortKey;
+      dir = dir || (th.getAttribute('aria-sort') === 'ascending' ? 'descending'
+          : th.getAttribute('aria-sort') === 'descending' ? 'ascending'
+          : (key === 'name' ? 'ascending' : 'descending'));
+      heads.forEach(function (h) { h.setAttribute('aria-sort', 'none'); });
+      th.setAttribute('aria-sort', dir);
+      var sign = dir === 'ascending' ? 1 : -1;
+      original.slice().sort(function (a, b) {
+        var x = valueFn(a, key), y = valueFn(b, key);
+        return (typeof x === 'string' ? x.localeCompare(y) : x - y) * sign;
+      }).forEach(function (r) { tbody.appendChild(r); });
+      if (onSort) onSort();
+    }
+    heads.forEach(function (th) { th.addEventListener('click', function () { sortBy(th); }); });
+    return {
+      resort: function () { var th = table.querySelector('th.sortable:not([aria-sort="none"])'); if (th) sortBy(th, th.getAttribute('aria-sort')); },
+      applyDefault: function (key, dir) {
+        if (document.documentElement.dataset.ver === 'improved') {
+          sortBy(table.querySelector('th[data-sort-key="' + key + '"]'), dir);
+        } else {
+          heads.forEach(function (h) { h.setAttribute('aria-sort', 'none'); });
+          original.forEach(function (r) { tbody.appendChild(r); });
+        }
+      }
+    };
+  }
+  function loginTime(row) {
+    var d = Date.parse(row.querySelector('.col-lastlogin').textContent.trim().replace(',', ''));
+    return isNaN(d) ? -1 : d;
+  }
+  var usersSort = makeSortable(document.getElementById('usersTable'), 'tr.user-row', function (row, key) {
+    return key === 'name' ? row.querySelector('.user-name').textContent.trim().toLowerCase() : loginTime(row);
+  });
+  function applyDefaults() { usersSort.applyDefault('name', 'ascending'); } // Users: A–Z
+  new MutationObserver(applyDefaults).observe(document.documentElement, { attributes: true, attributeFilter: ['data-ver'] });
+  applyDefaults();
+
+  // Search + Filter menu (User type, Outlets) — Improved version. Same pattern as Invoices.
+  var filterCats = [
+    { key: 'type', label: 'User type', options: ['Owner', 'Admin', 'Standard', 'Basic', 'Guest', 'Custom'] },
+    { key: 'outlet', label: 'Outlets', options: ['Nomni Kitchen', 'Nomni Bar'] }
+  ];
+  var applied = { type: [], outlet: [] }, draft = null;
+  var filterControl = document.querySelector('[data-filter-control]'), filterMenu = document.querySelector('[data-filter-menu]'), filterButton = document.querySelector('[data-filter-button]');
+  function buildFilterMenu() {
+    document.querySelector('[data-filter-categories]').innerHTML = filterCats.map(function (c) {
+      return '<button class="orders-filter-category" type="button" aria-expanded="false" data-filter-cat="' + c.key + '"><span>' + c.label + '</span><span class="orders-filter-category-count" data-cat-count="' + c.key + '" hidden>0</span></button>';
+    }).join('');
+    document.querySelector('[data-filter-submenus]').innerHTML = filterCats.map(function (c, i) {
+      return '<div class="orders-invoice-submenu" data-filter-sub="' + c.key + '" style="top:' + (8 + i * 40) + 'px" aria-label="' + c.label + ' filters"><label class="orders-filter-search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" placeholder="Search" aria-label="Search ' + c.label.toLowerCase() + '" data-filter-search="' + c.key + '" /></label><button class="orders-filter-select-all" type="button" data-filter-all="' + c.key + '">Select all</button>'
+        + c.options.map(function (o) { return '<label class="orders-filter-check" data-filter-option="' + c.key + '"><input type="checkbox" value="' + o + '" data-filter-check="' + c.key + '" /> <span>' + o + '</span></label>'; }).join('') + '</div>';
+    }).join('');
+  }
+  function syncFilterMenu() {
+    var d = draft || applied;
+    document.querySelectorAll('[data-filter-check]').forEach(function (b) { b.checked = d[b.getAttribute('data-filter-check')].indexOf(b.value) >= 0; });
+    filterCats.forEach(function (c) { var badge = document.querySelector('[data-cat-count="' + c.key + '"]'); badge.textContent = d[c.key].length; badge.hidden = d[c.key].length === 0; });
+  }
+  function updateFilterButton() {
+    var n = filterCats.filter(function (c) { return applied[c.key].length; }).length;
+    var badge = document.querySelector('[data-filter-count]'); badge.textContent = n; badge.hidden = n === 0;
+  }
+  function closeFilterMenu() {
+    filterMenu.classList.remove('open'); filterButton.setAttribute('aria-expanded', 'false'); draft = null;
+    document.querySelectorAll('[data-filter-sub]').forEach(function (x) { x.classList.remove('open'); });
+    document.querySelectorAll('[data-filter-cat]').forEach(function (x) { x.setAttribute('aria-expanded', 'false'); });
+    syncFilterMenu();
+  }
+  function filterUsers() {
+    var improved = document.documentElement.dataset.ver === 'improved';
+    var q = document.getElementById('userSearch').value.trim().toLowerCase();
+    var types = improved ? applied.type : [], outlets = improved ? applied.outlet : [];
+    var shown = 0;
+    document.querySelectorAll('#usersTable tr.user-row').forEach(function (row) {
+      var rowOutlets = row.dataset.outlets.split('|');
+      var ok = (!q || row.querySelector('.user-name').textContent.toLowerCase().indexOf(q) > -1)
+            && (!types.length || types.indexOf(row.querySelector('.role-chip').textContent.trim()) > -1)
+            && (!outlets.length || outlets.some(function (o) { return rowOutlets.indexOf(o) > -1; }));
+      row.hidden = !ok;
+      if (!ok) row.querySelector('.row-check').checked = false;
+      if (ok) shown++;
+    });
+    document.getElementById('noResults').classList.toggle('show', shown === 0);
+    updateSelection();
+  }
+  filterButton.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (filterMenu.classList.contains('open')) { closeFilterMenu(); return; }
+    draft = { type: applied.type.slice(), outlet: applied.outlet.slice() };
+    syncFilterMenu(); filterMenu.classList.add('open'); filterButton.setAttribute('aria-expanded', 'true');
+  });
+  filterControl.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var cat = e.target.closest('[data-filter-cat]');
+    if (cat) {
+      var key = cat.getAttribute('data-filter-cat'), sub = document.querySelector('[data-filter-sub="' + key + '"]'), open = !sub.classList.contains('open');
+      document.querySelectorAll('[data-filter-sub]').forEach(function (x) { x.classList.remove('open'); });
+      document.querySelectorAll('[data-filter-cat]').forEach(function (x) { x.setAttribute('aria-expanded', 'false'); });
+      if (open) { sub.classList.add('open'); cat.setAttribute('aria-expanded', 'true'); sub.querySelector('input[type="search"]').focus(); }
+      return;
+    }
+    var all = e.target.closest('[data-filter-all]');
+    if (all) {
+      var k = all.getAttribute('data-filter-all');
+      draft[k] = Array.from(document.querySelectorAll('[data-filter-option="' + k + '"]')).filter(function (l) { return !l.hidden; }).map(function (l) { return l.querySelector('input').value; });
+      syncFilterMenu();
+    }
+  });
+  filterControl.addEventListener('change', function (e) {
+    var box = e.target.closest('[data-filter-check]'); if (!box) return;
+    var list = draft[box.getAttribute('data-filter-check')], at = list.indexOf(box.value);
+    if (box.checked && at < 0) list.push(box.value);
+    if (!box.checked && at >= 0) list.splice(at, 1);
+    syncFilterMenu();
+  });
+  filterControl.addEventListener('input', function (e) {
+    var search = e.target.closest('[data-filter-search]'); if (!search) return;
+    var k = search.getAttribute('data-filter-search'), q = search.value.trim().toLowerCase();
+    document.querySelectorAll('[data-filter-option="' + k + '"]').forEach(function (l) { l.hidden = q && l.textContent.toLowerCase().indexOf(q) < 0; });
+  });
+  document.querySelector('[data-filter-apply]').addEventListener('click', function () { applied = draft || applied; closeFilterMenu(); updateFilterButton(); filterUsers(); });
+  document.querySelector('[data-filter-reset]').addEventListener('click', function () { applied = { type: [], outlet: [] }; closeFilterMenu(); updateFilterButton(); filterUsers(); });
+  document.addEventListener('click', function (e) { if (!e.target.closest('[data-filter-control]')) closeFilterMenu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && filterMenu.classList.contains('open')) closeFilterMenu(); });
+  document.getElementById('userSearch').addEventListener('input', filterUsers);
+  new MutationObserver(filterUsers).observe(document.documentElement, { attributes: true, attributeFilter: ['data-ver'] });
+  buildFilterMenu(); syncFilterMenu();
+
+  // Row Actions menu: Edit, Activity log
+  (function () {
+    var menu = document.getElementById('rowActionsMenu'), openToggle = null;
+    function close() { menu.hidden = true; if (openToggle) openToggle.setAttribute('aria-expanded', 'false'); openToggle = null; }
+    document.querySelectorAll('.row-actions-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (openToggle === btn) { close(); return; }
+        close(); openToggle = btn; btn.setAttribute('aria-expanded', 'true');
+        menu.dataset.row = String(Array.from(document.querySelectorAll('.user-row')).indexOf(btn.closest('.user-row')));
+        menu.hidden = false;
+        var r = btn.getBoundingClientRect();
+        menu.style.top = (r.bottom + 6) + 'px';
+        menu.style.left = Math.max(8, r.right - menu.offsetWidth) + 'px';
+      });
+    });
+    menu.addEventListener('click', function (e) {
+      var item = e.target.closest('[data-row-action]'); if (!item) return;
+      var action = item.dataset.rowAction, row = document.querySelectorAll('.user-row')[Number(menu.dataset.row)]; close();
+      window.location.href = userDetailUrl(row, action === 'activity' ? 'activity' : '');
+    });
+    document.addEventListener('click', close);
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  })();
 
   // Invite modal
   const inviteModal = document.getElementById('inviteModal');
