@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>document.documentElement.dataset.case=new URLSearchParams(location.search).get('data')==='none'?'none':'approvers'</script>
 <meta charset="utf-8" />
 <link rel="icon" type="image/svg+xml" href="_assets/favicon.svg" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -402,6 +403,96 @@
     background: var(--primary);
     border-radius: 2px;
   }
+
+
+  .tab { cursor: pointer; text-decoration: none; }
+  .back-link { text-decoration: none; font-size: 14px; }
+  .back-link svg { width: 14px; height: 14px; stroke-width: 2.5; }
+  .main { display: flex; flex-direction: column; }
+  .content.details-content { padding-bottom: 0; flex: 1; }
+  .details-form { max-width: 586px; margin: 16px auto 40px; }
+  .sub-title { margin: 0 0 18px; font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+  .details-form h2 { margin: 0 0 18px; font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+  .field-group { margin-bottom: 16px; }
+  .field-row { display: flex; gap: 12px; margin-bottom: 8px; }
+  .field-row > * { flex: 1; min-width: 0; }
+  .field-label { display: block; font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .field-input { width: 100%; padding: 9px 12px; border: 1px solid #dcdee3; border-radius: 6px; font: inherit; font-size: 14px; color: var(--ink); outline: none; background: #fff; transition: border-color .13s; }
+  .field-input:focus { border-color: var(--nomni-green); }
+  .field-input::placeholder { color: var(--ink-mute); }
+  .field-input:disabled { background: #ebedf0; color: var(--ink-mute); cursor: not-allowed; }
+  .field-select { appearance: none; cursor: pointer; padding-right: 28px; background: #fff url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; }
+  .field-hint { display: block; margin-top: 4px; font-size: 12px; color: var(--ink-mute); }
+  .check-row { display: flex; align-items: center; gap: 8px; margin: -4px 0 16px; font-size: 14px; cursor: pointer; }
+  .check-row input { width: 18px; height: 18px; accent-color: var(--nomni-green); }
+  .file-row { display: flex; }
+  .file-row .field-input { border-radius: 6px 0 0 6px; }
+  .file-row .btn { border-radius: 0 6px 6px 0; }
+  .form-footer { position: sticky; bottom: 0; display: flex; justify-content: flex-end; align-items: center; padding: 14px 40px; background: #fff; border-top: 1px solid var(--rule); box-shadow: 0 -4px 12px rgba(0,0,0,.04); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  .users-wrap { max-width: 586px; margin: 16px auto 40px; }
+  .users-wrap h2 { margin: 0 0 8px; font-size: 21px; font-weight: 700; letter-spacing: -.02em; }
+  .users-sub { margin: 0 0 20px; font-size: 12px; color: var(--ink-mute); }
+  .users-toolbar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 24px; border-bottom: 1px solid var(--rule); }
+  .users-toolbar .search-wrap { width: 214px; }
+  .users-table { width: 100%; border-collapse: collapse; }
+  .users-table th { padding: 22px 0 10px; font-size: 14px; font-weight: 600; text-align: left; }
+  .users-table th.col-val { text-align: right; padding-right: 16px; width: 100px; line-height: 1.3; }
+  .users-table td { padding: 20px 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .user-cell { display: flex; align-items: center; gap: 14px; }
+  .trash-btn { border: 0; background: none; padding: 2px 4px; color: var(--spinach); cursor: pointer; display: inline-flex; }
+  .user-name { font-size: 14px; font-weight: 600; }
+  .user-role { font-size: 12px; color: var(--ink-mute); }
+  .user-role { display: flex; align-items: center; gap: 8px; }
+  tr.case-none-row { display: none; }
+  html[data-case="none"] tr.case-none-row { display: table-row; }
+  html[data-case="none"] tr.case-approvers-row { display: none; }
+  .no-approver-banner { display: none; margin: 0 0 20px; padding: 12px 16px; background: #FFF3CD; border-radius: 8px; color: #7A5F00; font-size: 13px; line-height: 1.45; }
+  html[data-case="none"] .no-approver-banner { display: block; }
+  .no-approver-banner strong { font-weight: 700; }
+  .proto-version-toggle { position: fixed; right: 16px; bottom: 16px; z-index: 60; display: flex; align-items: center; gap: 2px; padding: 4px 4px 4px 10px; border: 1px solid #F1E3A0; border-radius: 8px; background: #FFF9DB; box-shadow: 0 2px 8px rgba(26,31,43,.12); color: #5F6570; font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .proto-version-toggle[hidden] { display: none; }
+  .proto-version-label { margin-right: 6px; }
+  .proto-version-toggle button { padding: 5px 8px; border: 0; border-radius: 5px; background: transparent; color: #5F6570; font: inherit; cursor: pointer; }
+  .proto-version-toggle button:hover { background: rgba(201,145,27,.16); color: var(--ink); }
+  .proto-version-toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .user-role .role-sep { color: var(--ink-soft); }
+  .cant-approve { font-size: 12px; font-weight: 500; color: #7A5F00; cursor: help; }
+  .cant-approve:focus-visible { outline: 2px solid #7A5F00; outline-offset: 2px; border-radius: 2px; }
+  .col-info-tip { position: absolute; z-index: 1000; max-width: 240px; padding: 8px 10px; border-radius: 7px; background: var(--ink); color: var(--panel); box-shadow: 0 8px 22px rgba(14,55,39,.22); font: 500 12px/1.45 "Inter", system-ui, sans-serif; text-transform: none; letter-spacing: 0; white-space: normal; pointer-events: none; }
+  .col-info-tip[hidden] { display: none; }
+  .users-table td.col-val { width: 100px; text-align: right; }
+  .users-table .field-input { width: 100px; }
+  .approval-box { margin-top: 16px; padding: 24px 26px 28px; background: #f4f4f5; border-radius: 8px; }
+  .approval-row { display: flex; align-items: center; gap: 12px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); font-weight: 600; }
+  .approval-row .field-input { width: auto; font-weight: 400; }
+  .approval-box ul { margin: 18px 0 18px; padding-left: 22px; font-size: 12px; color: var(--ink-mute); line-height: 1.5; }
+  .approval-box .check-row { margin: 14px 0; }
+  .approval-box .field-hint { margin: -4px 0 14px 24px; }
+  [data-mode] { display: none; }
+  .approval-mode-level [data-mode="level"], .approval-mode-limit [data-mode="limit"] { display: revert; }
+  .approval-mode-level tr[data-mode], .approval-mode-limit tr[data-mode] { display: table-row; }
+
+  .sub-section { max-width: 666px; margin: 8px auto 40px; padding: 40px 40px 0; border-top: 1px solid var(--rule); }
+  .sub-plan { display: flex; justify-content: space-between; align-items: center; padding: 26px 30px; background: #f3f3f3; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--ink-mute); }
+  .sub-plan a { color: var(--ink-mute); text-decoration: none; }
+  .sub-plan a:hover { color: var(--ink); }
+  .sub-note { margin: 16px 0 0; font-size: 12px; line-height: 1.6; color: var(--ink-mute); }
+  .sub-note strong { font-weight: 600; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: flex; align-items: flex-start; justify-content: center; padding-top: 72px; }
+  .modal-overlay[hidden] { display: none; }
+  .modal-card { background: #fff; border-radius: 12px; width: 480px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); display: flex; flex-direction: column; overflow: hidden; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px 0; }
+  .modal-title { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+  .modal-close { border: 0; background: none; font-size: 24px; line-height: 1; color: var(--ink-mute); cursor: pointer; }
+  .modal-body { padding: 14px 24px 20px; font-size: 14px; line-height: 1.5; }
+  .modal-body a { color: var(--spinach); font-weight: 600; }
+  .modal-foot { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; padding: 14px 24px 18px; border-top: 1px solid var(--rule); }
+  .modal-foot .link-danger { background: none; border: 0; color: #d0291e; font-weight: 600; cursor: pointer; font: inherit; font-weight: 600; }
+  .users-table .field-input:disabled { background-color: #ebedf0; color: var(--ink-mute); }
+  .field-select:disabled { background-color: #ebedf0; cursor: not-allowed; }
+  .stub { padding: 60px 0; text-align: center; color: var(--ink-mute); }
 
   .content { padding: 32px 40px 56px; }
   .view { display: none; }
@@ -842,16 +933,98 @@
     <section class="page-header">
       <h1 class="page-title">Test Outlet ZM</h1>
       <nav class="tabs" aria-label="Outlet setup tabs">
-        <a class="tab" href="#">Details</a>
-        <a class="tab" href="#">Users</a>
-        <a class="tab" href="#">Settings</a>
-        <a class="tab active" href="#">Suppliers</a>
-        <a class="tab" href="#">Integration</a>
+        <a class="tab active" href="#details" data-tab="details">Details</a>
+        <a class="tab" href="#users" data-tab="users">Users</a>
+        <a class="tab" href="#settings" data-tab="settings">Settings</a>
+        <a class="tab" href="#suppliers" data-tab="suppliers">Suppliers</a>
+        <a class="tab" href="#integration" data-tab="integration">Integration</a>
       </nav>
     </section>
 
-    <div class="content">
-      <section class="view active" data-view="suppliers">
+    <div class="content details-content" id="detailsContent">
+      <section class="view active" data-view="details">
+        <form class="details-form" id="detailsForm" onsubmit="return false">
+          <h2>Basic information</h2>
+          <div class="field-group">
+            <label class="field-label" for="company">Company</label>
+            <input class="field-input" id="company" value="Tester Company" disabled />
+          </div>
+          <label class="check-row"><input type="checkbox" /> Use a different billing entity for Purchase Orders</label>
+          <div class="field-group">
+            <label class="field-label" for="outletName">Outlet name</label>
+            <input class="field-input" id="outletName" value="Test Outlet ZM" />
+            <span class="field-hint">Use "Brand Name (Outlet Name)" format if there are multiple outlets under the same brand</span>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Address</label>
+            <div class="field-row">
+              <select class="field-input field-select" aria-label="Country"><option>Singapore</option><option>Australia</option><option>Malaysia</option></select>
+              <input class="field-input" value="123456" placeholder="Post code" aria-label="Postal code" />
+            </div>
+            <div class="field-row"><input class="field-input" value="new road, singapore123" placeholder="Address Line 1" aria-label="Address line 1" /></div>
+            <div class="field-row"><input class="field-input" placeholder="Address Line 2" aria-label="Address line 2" /></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="logo">Logo</label>
+            <div class="file-row">
+              <input class="field-input" id="logo" readonly aria-label="Logo file" />
+              <button class="btn btn-primary" type="button" id="browseLogo">Browse</button>
+              <input type="file" id="logoFile" accept="image/jpeg,image/png" hidden />
+            </div>
+            <span class="field-hint">JPEG, PNG files only - max 5MB</span>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="outletEmail">Outlet email</label>
+            <input class="field-input" id="outletEmail" type="email" />
+          </div>
+        </form>
+        <div class="sub-section">
+          <h2 class="sub-title">Procure subscription</h2>
+          <div class="sub-plan"><span>Premium</span><a href="#" id="manageSub">Manage subscription</a></div>
+          <p class="sub-note"><strong>To view invoices for subscription payments</strong>, go to “Invoices”, then click “Filter” &gt; “Supplier” and select “Zeemart Pte Ltd”</p>
+        </div>
+      </section>
+      <section class="view" data-view="users">
+        <div class="users-wrap approval-mode-level" id="usersWrap">
+          <h2>Users</h2>
+          <p class="users-sub">Manage users and approval flows within the outlet</p>
+          <div class="no-approver-banner" role="alert"><strong>No users at this outlet can approve orders.</strong> At least one user must have the &#39;Approve orders&#39; permission.</div>
+          <div class="users-toolbar">
+            <label class="search-wrap"><span class="search-icon" aria-hidden="true"></span><input type="text" aria-label="Search users" /></label>
+            <button class="btn btn-primary" type="button"><span class="plus-icon" aria-hidden="true"></span>Add member</button>
+          </div>
+          <table class="users-table" data-mode="level"><thead><tr><th>Name</th><th class="col-val">User level</th></tr></thead><tbody>
+<tr class="case-approvers-row"><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">William Arya</div><div class="user-role">Standard</div></div></div></td><td class="col-val"><select class="field-input field-select" aria-label="User level"><option></option><option selected>0</option><option>1</option><option>2</option><option>3</option></select></td></tr>
+<tr class="case-approvers-row"><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">William Arya (Zeemart)</div><div class="user-role">Owner</div></div></div></td><td class="col-val"><select class="field-input field-select" aria-label="User level"><option></option><option>0</option><option selected>1</option><option>2</option><option>3</option></select></td></tr>
+<tr><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">Zeemart Tester</div><div class="user-role">Basic<span class="role-sep" aria-hidden="true">&bull;</span><span class="cant-approve" tabindex="0" data-tip="This user does not have the &#39;Approve orders&#39; permission, so they are skipped in the approval workflow.">Can&#39;t approve orders</span></div></div></div></td><td class="col-val"><select class="field-input field-select" aria-label="User level" disabled><option>0</option><option>1</option><option>2</option><option>3</option></select></td></tr>
+<tr><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">Farhan Faiz</div><div class="user-role">Custom<span class="role-sep" aria-hidden="true">&bull;</span><span class="cant-approve" tabindex="0" data-tip="This user does not have the &#39;Approve orders&#39; permission, so they are skipped in the approval workflow.">Can&#39;t approve orders</span></div></div></div></td><td class="col-val"><select class="field-input field-select" aria-label="User level"><option></option><option>0</option><option selected>1</option><option>2</option><option>3</option></select></td></tr>
+<tr class="case-none-row"><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">William Arya</div><div class="user-role">Custom<span class="role-sep" aria-hidden="true">&bull;</span><span class="cant-approve" tabindex="0" data-tip="This user does not have the &#39;Approve orders&#39; permission, so they are skipped in the approval workflow.">Can&#39;t approve orders</span></div></div></div></td><td class="col-val"><select class="field-input field-select" aria-label="User level"><option></option><option selected>0</option><option>1</option><option>2</option><option>3</option></select></td></tr>
+</tbody></table>
+          <table class="users-table" data-mode="limit"><thead><tr><th>Name</th><th class="col-val">Order limit (S$)</th></tr></thead><tbody>
+<tr class="case-approvers-row"><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">William Arya</div><div class="user-role">Standard</div></div></div></td><td class="col-val"><input class="field-input" aria-label="Order limit" value="0" /></td></tr>
+<tr class="case-approvers-row"><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">William Arya (Zeemart)</div><div class="user-role">Owner</div></div></div></td><td class="col-val"><input class="field-input" aria-label="Order limit" value="" /></td></tr>
+<tr><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">Zeemart Tester</div><div class="user-role">Basic<span class="role-sep" aria-hidden="true">&bull;</span><span class="cant-approve" tabindex="0" data-tip="This user does not have the &#39;Approve orders&#39; permission, so they are skipped in the approval workflow.">Can&#39;t approve orders</span></div></div></div></td><td class="col-val"><input class="field-input" aria-label="Order limit" value="0" disabled /></td></tr>
+<tr><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">Farhan Faiz</div><div class="user-role">Custom<span class="role-sep" aria-hidden="true">&bull;</span><span class="cant-approve" tabindex="0" data-tip="This user does not have the &#39;Approve orders&#39; permission, so they are skipped in the approval workflow.">Can&#39;t approve orders</span></div></div></div></td><td class="col-val"><input class="field-input" aria-label="Order limit" value="500" /></td></tr>
+<tr class="case-none-row"><td><div class="user-cell"><button class="trash-btn" type="button" aria-label="Remove user"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button><div><div class="user-name">William Arya</div><div class="user-role">Custom<span class="role-sep" aria-hidden="true">&bull;</span><span class="cant-approve" tabindex="0" data-tip="This user does not have the &#39;Approve orders&#39; permission, so they are skipped in the approval workflow.">Can&#39;t approve orders</span></div></div></div></td><td class="col-val"><input class="field-input" aria-label="Order limit" value="200" /></td></tr>
+</tbody></table>
+          <div class="approval-box">
+            <div class="approval-row">Approval workflow:
+              <select class="field-input field-select" id="approvalMode"><option value="limit">Based on user's order limit (default)</option><option value="level" selected>Based on user level</option></select>
+            </div>
+            <ul data-mode="level"><li>Orders created by users with lower level will need approval from users at higher levels regardless of the order value.</li><li>'Basic' users are always in lowest user level.</li><li>Users without the 'Approve orders' permission are skipped in the approval workflow, regardless of their user level or order limit.</li></ul>
+            <div data-mode="limit">
+              <ul><li>Orders over the value of user's limit has to be approved by a user with higher limit (if there are any).</li><li>If the outlet does not require approval workflow, leave 'order limit' for all users empty.</li><li>'Basic' users always require approval and have order limit of $0.</li><li>Users without the 'Approve orders' permission are skipped in the approval workflow, regardless of their user level or order limit.</li></ul>
+              <label class="check-row"><input type="checkbox" id="exceptChk" /> Apply this workflow to orders to all suppliers, except:</label>
+              <select class="field-input field-select" id="exceptSupplier" aria-label="Select supplier"><option>Select supplier</option></select>
+              <span class="field-hint">Orders to the selected suppliers do not require any approval. Basic users will not be able to place orders to these suppliers.</span>
+              <label class="check-row"><input type="checkbox" /> Show order creator instead of final approver as contact person for orders</label>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="view" data-view="settings"><p class="stub">Settings tab is not part of this prototype.</p></section>
+      <section class="view" data-view="integration"><p class="stub">Integration tab is not part of this prototype.</p></section>
+      <section class="view" data-view="suppliers">
         <div class="toolbar">
           <div class="toolbar-left">
             <label class="search-wrap">
@@ -879,7 +1052,17 @@
         </div>
       </section>
     </div>
+    <div class="form-footer" id="formFooter">
+      <button class="btn btn-primary" type="button" id="saveBtn" disabled>Save</button>
+    </div>
   </main>
+</div>
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div class="modal-header"><h3 class="modal-title" id="modalTitle"></h3><button type="button" class="modal-close" aria-label="Close" data-close>&times;</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
 </div>
 <script>
 (function(){
@@ -1090,6 +1273,7 @@
     tip.style.display = 'none';
     highlightElement(null);
   });
+
 })();
 </script>
 <script>
@@ -1113,6 +1297,92 @@
   document.getElementById('hqModeBtn').addEventListener('click', function() {
     window.location.href = 'Procure - HQ - Dashboard.html';
   });
+</script>
+<script>
+(function(){
+  var form=document.getElementById('detailsForm'),save=document.getElementById('saveBtn'),initial={};
+  var tabs=document.querySelectorAll('.tab[data-tab]'),views=document.querySelectorAll('.view'),footer=document.getElementById('formFooter');
+  function show(name){
+    if(!document.querySelector('.view[data-view="'+name+'"]')) name='details';
+    tabs.forEach(function(t){t.classList.toggle('active',t.dataset.tab===name)});
+    views.forEach(function(v){v.classList.toggle('active',v.dataset.view===name)});
+    footer.style.display=(name==='details'||name==='users')?'flex':'none';
+    save.disabled=name==='details'?!isDirty():false;
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+t.dataset.tab);show(t.dataset.tab)})});
+  show(location.hash.slice(1)||'details');
+  window.addEventListener('hashchange',function(){show(location.hash.slice(1)||'details')});
+  
+  function fields(){return form.querySelectorAll('input:not([disabled]),select')}
+  function snap(){fields().forEach(function(f,i){initial[i]=f.type==='checkbox'?f.checked:f.value})}
+  function isDirty(){var d=false;fields().forEach(function(f,i){if((f.type==='checkbox'?f.checked:f.value)!==initial[i])d=true});return d}
+  function dirty(){save.disabled=!isDirty()}
+  var mode=document.getElementById('approvalMode'),wrap=document.getElementById('usersWrap');
+  mode.addEventListener('change',function(){wrap.className='users-wrap approval-mode-'+mode.value});
+  snap();dirty();form.addEventListener('input',dirty);form.addEventListener('change',dirty);
+  document.getElementById('browseLogo').addEventListener('click',function(){document.getElementById('logoFile').click()});
+  document.getElementById('logoFile').addEventListener('change',function(){document.getElementById('logo').value=this.files[0]?this.files[0].name:'';dirty()});
+  save.addEventListener('click',function(){snap();dirty()});
+
+  /* modals */
+  var ov=document.getElementById('modalOverlay'),mt=document.getElementById('modalTitle'),mb=document.getElementById('modalBody'),mf=document.getElementById('modalFoot');
+  function modal(title,body,btns){mt.textContent=title;mb.innerHTML=body;mf.innerHTML='';btns.forEach(function(b){var e=document.createElement('button');e.type='button';e.className=b.cls;e.textContent=b.label;e.addEventListener('click',b.fn||close);mf.appendChild(e)});ov.hidden=false}
+  function close(){ov.hidden=true}
+  ov.addEventListener('click',function(e){if(e.target===ov||e.target.hasAttribute('data-close'))close()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
+  function endSub(){modal('End this subscription?','If you end the subscription today, it will continue to run until 22 Oct 2025. After that date, access to the outlet\u2019s data may be suspended, or some features will be unavailable when the outlet is selected. If you would like to change to a different plan, please contact Procure (using the live chat) instead of ending the subscription.',[{label:'No, keep my subscription',cls:'btn btn-primary'},{label:'Yes, end subscription',cls:'link-danger'}])}
+  document.getElementById('manageSub').addEventListener('click',function(e){e.preventDefault();modal('Manage subscription','If you would like to upgrade or change to a different plan, please contact Procure (using the chat button in bottom left corner) instead of ending the subscription. <a href="#">View available subscription plans and pricing</a>',[{label:"I\u2019d like to end the subscription",cls:'link-danger',fn:endSub}])});
+  /* users: supplier select enabled only when exception checkbox ticked; limit validation on save */
+  var exc=document.getElementById('exceptChk'),sup=document.getElementById('exceptSupplier');
+  sup.disabled=true;exc.addEventListener('change',function(){sup.disabled=!exc.checked});
+  save.addEventListener('click',function(){
+    if(document.querySelector('.view.active').dataset.view!=='users'||mode.value!=='limit')return;
+    var inputs=document.querySelectorAll('table[data-mode=limit] .field-input:not(:disabled)');
+    var anyEmpty=Array.prototype.some.call(inputs,function(i){return !i.value.trim()});
+    if(!anyEmpty)modal("Can't save changes",'At least one user must have no order limits. Please clear the limit from one or more users before saving.',[{label:'OK',cls:'btn btn-primary'}]);
+  });
+})();
+</script>
+<script>
+(function(){
+  var tip=document.createElement('div');tip.className='col-info-tip';tip.id='cantApproveTip';tip.setAttribute('role','tooltip');tip.hidden=true;document.body.appendChild(tip);
+  var owner=null;
+  function show(el){owner=el;tip.textContent=el.dataset.tip;tip.hidden=false;el.setAttribute('aria-describedby','cantApproveTip');
+    var r=el.getBoundingClientRect(),w=tip.offsetWidth;
+    tip.style.left=Math.max(8,Math.min(window.innerWidth-w-8,r.left+r.width/2-w/2))+'px';
+    tip.style.top=(r.bottom+8+window.scrollY)+'px';}
+  function hide(){if(owner)owner.removeAttribute('aria-describedby');owner=null;tip.hidden=true;}
+  document.addEventListener('mouseover',function(e){var t=e.target.closest('[data-tip]');if(t)show(t);});
+  document.addEventListener('mouseout',function(e){var t=e.target.closest('[data-tip]');if(t&&!t.contains(e.relatedTarget)&&document.activeElement!==t)hide();});
+  document.addEventListener('focusin',function(e){var t=e.target.closest('[data-tip]');if(t)show(t);});
+  document.addEventListener('focusout',function(e){if(e.target.closest('[data-tip]'))hide();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')hide();});
+  window.addEventListener('scroll',hide,true);
+})();
+</script>
+<div class="proto-version-toggle" data-proto-case role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-version-label">Prototype data</span><button type="button" data-case="approvers">Approvers available</button><button type="button" data-case="none">No approver</button></div>
+<script>
+  // Prototype data: 'approvers' (default) or 'none'. ?data=approvers|none
+  (function () {
+    var root = document.documentElement;
+    var toggle = document.querySelector('[data-proto-case]');
+    function apply() {
+      toggle.querySelectorAll('[data-case]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-case') === root.dataset.case));
+      });
+    }
+    toggle.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-case]'); if (!b) return;
+      root.dataset.case = b.getAttribute('data-case'); apply();
+      var url = new URL(location.href); url.searchParams.set('data', root.dataset.case); history.replaceState(null, '', url);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey || e.key.toLowerCase() !== 'd') return;
+      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      toggle.hidden = !toggle.hidden;
+    });
+    apply();
+  })();
 </script>
 </body>
 </html>
