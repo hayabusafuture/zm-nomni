@@ -552,7 +552,7 @@ Rules:
 - Title is 24px / 700 / Inter, letter-spacing -.03em. Tabs are 14px / 600, `--ink-2`, active `--ink` with a 2px `--primary` underline.
 - Expected positions at 1440px (below the 56px topbar): title top 84px, tabs top 144px. Pages with a back link start the title lower by the link height.
 - Header actions (New, Upload, Help, outlet picker) sit on the title row, right-aligned.
-- Tab hover: inactive tabs get a 2px dark grey (`#4B5058`) underline via `::after` (same geometry as the active green one), text goes to `--ink`.
+- Tab hover: inactive tabs get a 2px dark grey (`#B9BCC3`) underline via `::after` (same geometry as the active green one), text goes to `--ink`.
 
 ### Filter Row Pattern
 ```css
