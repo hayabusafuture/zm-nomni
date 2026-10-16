@@ -451,8 +451,9 @@
   .no-approver-banner { display: none; margin: 0 0 20px; padding: 12px 16px; background: #FFF3CD; border-radius: 8px; color: #7A5F00; font-size: 13px; line-height: 1.45; }
   html[data-case="none"] .no-approver-banner { display: block; }
   .no-approver-banner strong { font-weight: 700; }
-  .proto-version-toggle { position: fixed; right: 16px; bottom: 16px; z-index: 60; display: flex; align-items: center; gap: 2px; padding: 4px 4px 4px 10px; border: 1px solid #F1E3A0; border-radius: 8px; background: #FFF9DB; box-shadow: 0 2px 8px rgba(26,31,43,.12); color: #5F6570; font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .proto-version-toggle { position: fixed; top: 13px; right: 434px; z-index: 60; display: flex; align-items: center; gap: 2px; padding: 4px 4px 4px 10px; border: 1px solid #F1E3A0; border-radius: 8px; background: #FFF9DB; box-shadow: 0 2px 8px rgba(26,31,43,.12); color: #5F6570; font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
   .proto-version-toggle[hidden] { display: none; }
+  .proto-version-toggle.off-tab { display: none !important; }
   .proto-version-label { margin-right: 6px; }
   .proto-version-toggle button { padding: 5px 8px; border: 0; border-radius: 5px; background: transparent; color: #5F6570; font: inherit; cursor: pointer; }
   .proto-version-toggle button:hover { background: rgba(201,145,27,.16); color: var(--ink); }
@@ -1313,6 +1314,7 @@
     tabs.forEach(function(t){t.classList.toggle('active',t.dataset.tab===name)});
     views.forEach(function(v){v.classList.toggle('active',v.dataset.view===name)});
     footer.style.display=(name==='details'||name==='users')?'flex':'none';
+    var pt=document.querySelector('[data-proto-case]'); if(pt) pt.classList.toggle('off-tab',name!=='users');
     save.disabled=name==='details'?!isDirty():false;
   }
   tabs.forEach(function(t){t.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+t.dataset.tab);show(t.dataset.tab)})});
@@ -1366,7 +1368,7 @@
   window.addEventListener('scroll',hide,true);
 })();
 </script>
-<div class="proto-version-toggle" data-proto-case role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-version-label">Prototype data</span><button type="button" data-case="approvers">Approvers available</button><button type="button" data-case="none">No approver</button></div>
+<div class="proto-version-toggle off-tab" data-proto-case role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-version-label">Prototype data</span><button type="button" data-case="approvers">Approvers available</button><button type="button" data-case="none">No approver</button></div>
 <script>
   // Prototype data: 'approvers' (default) or 'none'. ?data=approvers|none
   (function () {
@@ -1388,6 +1390,7 @@
       toggle.hidden = !toggle.hidden;
     });
     apply();
+    toggle.classList.toggle('off-tab', (location.hash.slice(1) || 'details') !== 'users');
   })();
 </script>
 </body>
