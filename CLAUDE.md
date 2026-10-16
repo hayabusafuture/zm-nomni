@@ -528,12 +528,30 @@ Split layout:
 /* right hero panel: ~45% width, background image/gradient */
 ```
 
-### Page Header Pattern (list pages)
+### Page Header Pattern (all Procure pages with a title)
+
+Reference: `Procure - Outlets.html`. Every page must use this so title and tabs sit in the same place everywhere.
+
 ```css
-.page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 16px; }
-.page-title { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; margin: 0; }
-/* right: .page-actions / .page-head-right — flex, gap: 10px */
+.main { padding-top: 0; }                       /* header owns the top spacing */
+.page-head {                                    /* full-bleed: cancels .main's 40px side padding */
+  margin: 0 -40px 24px; padding: 28px 40px 16px;
+  border-bottom: 1px solid var(--rule); background: #fff;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px;
+}
+.page-title { margin: 0; min-height: 34px; display: flex; align-items: center;
+  font: 700 24px/1.4 "Inter", system-ui, sans-serif; letter-spacing: -.03em; }  /* Inter, not Hanken Grotesk */
+.page-head > .page-actions { margin: -4px 0; }  /* buttons never push the title down */
+.page-head .tabs { flex: 0 0 100%; margin: 26px 0 -17px; padding: 0; }          /* underline lands on the rule */
+.page-head .tab  { padding: 10px 0 14px; }
 ```
+
+Rules:
+- Order inside the header: optional back link (`margin-bottom: 5px`) → title row (+ actions on the right) → tabs. Tabs go **inside** the header, never below it.
+- The rule under title/tabs always spans the full width: no left/right padding or inset margin on the border line.
+- Title is 24px / 700 / Inter, letter-spacing -.03em. Tabs are 14px / 600, `--ink-2`, active `--ink` with a 2px `--primary` underline.
+- Expected positions at 1440px (below the 56px topbar): title top 84px, tabs top 144px. Pages with a back link start the title lower by the link height.
+- Header actions (New, Upload, Help, outlet picker) sit on the title row, right-aligned.
 
 ### Filter Row Pattern
 ```css
