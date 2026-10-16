@@ -435,6 +435,7 @@
   .mini-chart-gridline { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
   .mini-chart-axis { display: flex; justify-content: space-between; margin-top: 6px; color: var(--ink-mute-strong); font-size: 12px; font-weight: 400; line-height: 1; }
   .mini-chart-y-label { fill: var(--ink-mute-strong); font: 500 11px/1 "Inter", system-ui, sans-serif; }
+  .mini-chart-axis-note { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; }
   .mini-chart-axis-line { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
   .mini-chart { color: var(--ink-mute-strong); }
   .mini-chart.trend-up { color: var(--spinach); }
@@ -3488,8 +3489,8 @@
   }
   // One shared tooltip on <body> avoids clipping inside the scrolling supplier table.
   const COL_INFO = {
-    purchases: 'Total invoiced supplier spend for the selected outlets and period. Deliveries without an invoice are excluded, so this figure may be understated.',
-    unexplainedVariance: 'Actual food cost minus theoretical recipe cost and wastage.',
+    purchases: 'Total invoiced supplier spend for the selected outlets and period.',
+    foodCostAboveTarget: 'Estimated recipe costs above your food-cost targets, summed for each outlet and day. Below-target results do not offset these amounts.',
     cogs: 'Theoretical: from POS sales and recipe costs.',
     gpPercent: 'Theoretical gross profit: 100% minus theoretical COGS %.',
     priceImpact: 'Extra cost from supplier price changes: each change’s price difference × quantity bought since. Counts items with an invoiced price in both periods. The % is against the old prices.',
@@ -3769,33 +3770,23 @@
     targetDialog.close();
     renderMarginsTab();
   });
-  // Allocate the existing sample wastage and variance totals across outlets, then use the remainder as each
-  // outlet's sample theoretical cost. One allocation serves group and outlet scopes, so the rows reconcile.
+  // Allocate the sample wastage total across outlets, so group and outlet scopes reconcile.
   function marginsTheoreticalAllocations(allPairs, period, cogsOffset){
     const allocationScope = allPairs.length === 1 ? allPairs[0].name : 'All outlets';
     const groupRand = seededRandom(`${allocationScope}:${period}:margins`);
     groupRand(); // Keep the first draw reserved for the existing recipe-mapping estimate.
     const wastageShare = .036 + groupRand() * .01;
-    const varianceShare = .05 + groupRand() * .016;
     const candidates = allPairs.map(pair => {
       const actual = pair.base.cogs + cogsOffset;
       const cogsValue = pair.revenue * actual / 100;
       return {
         name: pair.name, revenue: pair.revenue, actual, cogsValue,
-        wastageWeight: cogsValue * (.75 + seededRandom(`${pair.name}:${period}:wastage-weight`)() * .5),
-        varianceWeight: cogsValue * (.75 + seededRandom(`${pair.name}:${period}:variance-weight`)() * .5)
+        wastageWeight: cogsValue * (.75 + seededRandom(`${pair.name}:${period}:wastage-weight`)() * .5)
       };
     });
     const groupCogs = candidates.reduce((sum, row) => sum + row.cogsValue, 0);
     const totalWastageWeight = candidates.reduce((sum, row) => sum + row.wastageWeight, 0);
-    const totalVarianceWeight = candidates.reduce((sum, row) => sum + row.varianceWeight, 0);
-    return candidates.map(row => {
-      const wastageValue = groupCogs * wastageShare * row.wastageWeight / totalWastageWeight;
-      const varianceValue = groupCogs * varianceShare * row.varianceWeight / totalVarianceWeight;
-      const theoreticalValue = row.cogsValue - wastageValue - varianceValue;
-      return { ...row, wastageValue, varianceValue, theoreticalValue,
-        theoreticalPct: theoreticalValue / row.revenue * 100 };
-    });
+    return candidates.map(row => ({ ...row, wastageValue: groupCogs * wastageShare * row.wastageWeight / totalWastageWeight }));
   }
   function getMarginsData(scope = currentScope, period = currentPeriod){
     const context = PERIOD_CARD_CONTEXT[period];
@@ -3813,28 +3804,28 @@
     const allocations = marginsTheoreticalAllocations(allPairs, period, context.cogsOffset);
     // Keep the whole POS comparison list visible at outlet scope, like Revenue by outlet on Sales.
     const outlets = allocations.map(row => ({ name: row.name, revenue: row.revenue, trendActual: row.actual, actual: +row.actual.toFixed(1), target: marginsTargetFor(row.name),
-      gapValue: marginsTargetFor(row.name) === null ? null : row.revenue * (row.actual - marginsTargetFor(row.name)) / 100,
-      theoreticalPct: row.theoreticalPct, theoreticalGapValue: row.cogsValue - row.theoreticalValue }));
+      aboveTarget: null }));
     const selectedNames = new Set(pairs.map(pair => pair.name));
     const selectedAllocations = allocations.filter(row => selectedNames.has(row.name));
     const rand = seededRandom(`${scope}:${period}:margins`);
     const assumedMappedPct = 78 + Math.round(rand() * 10);
     const wastageValue = selectedAllocations.reduce((sum, row) => sum + row.wastageValue, 0);
-    const varianceValue = selectedAllocations.reduce((sum, row) => sum + row.varianceValue, 0);
-    const theoreticalValue = selectedAllocations.reduce((sum, row) => sum + row.theoreticalValue, 0);
-    return { scope, period, names: pairs.map(pair => pair.name), revenue, cogsPct, cogsValue, gpPct: 100 - cogsPct,
-      targetPct, outlets, assumedMappedPct, wastageValue, varianceValue, theoreticalValue,
-      wastageSharePct: wastageValue / cogsValue * 100, varianceSharePct: varianceValue / cogsValue * 100,
-      wastagePts: wastageValue / revenue * 100, variancePts: varianceValue / revenue * 100 };
+    const result = { scope, period, names: pairs.map(pair => pair.name), revenue, cogsPct, cogsValue, gpPct: 100 - cogsPct,
+      targetPct, outlets, assumedMappedPct, wastageValue,
+      wastageSharePct: wastageValue / cogsValue * 100, wastagePts: wastageValue / revenue * 100 };
+    // Food cost above target, worked out once here so the tile, the outlet panel and the summary all read the same figures.
+    result.aboveTarget = marginsAboveTarget(result);
+    result.outlets.forEach(outlet => { outlet.aboveTarget = result.aboveTarget.byOutlet.get(outlet.name) ?? null; });
+    return result;
   }
   // Deterministic sample history at the same daily, weekly or monthly grain as the covers chart.
   // Each outlet's revenue-weighted COGS rate reconciles to its selected-period figure; GP is its exact inverse.
-  function marginsSampleCogsSeries(data){
+  function marginsSampleCogsSeries(data, seedTag = ''){
     const period = COVERS_SPEND_PERIOD[data.period] || COVERS_SPEND_PERIOD['This month'];
     const coversFor = scope => SALES_DATA[scope]?.covers?.[period.granularity]?.[period.key];
     const source = coversFor(data.scope) || coversFor(data.outlets[0]?.name);
     const labels = source.labels;
-    const sharedRand = seededRandom(`${data.period}:cogs-common-samples`);
+    const sharedRand = seededRandom(`${data.period}${seedTag}:cogs-common-samples`);
     let commonDrift = 0;
     const common = labels.map(() => {
       commonDrift = commonDrift * .28 + (sharedRand() - .5) * 1.5;
@@ -3845,7 +3836,7 @@
       const covers = coversFor(outlet.name)?.covers || labels.map(() => 1);
       const coverTotal = covers.reduce((sum, value) => sum + value, 0);
       const revenues = covers.map(value => value / coverTotal * outlet.revenue);
-      const rand = seededRandom(`${outlet.name}:${data.period}:cogs-samples`);
+      const rand = seededRandom(`${outlet.name}:${data.period}${seedTag}:cogs-samples`);
       let localDrift = 0;
       const raw = labels.map((_, index) => {
         localDrift = localDrift * .2 + (rand() - .5) * 2.6;
@@ -3866,6 +3857,40 @@
     const selectedOutlet = outlets.find(outlet => outlet.name === data.scope);
     return { labels, outlets, groupValues, groupAverage, target, selectedOutlet,
       scopeValues: selectedOutlet?.values || groupValues, scopeCovers: source.covers };
+  }
+  // Food cost above target. For each outlet and each interval of the sample history (a day; a week or a month for the longer
+  // periods), the recipe cost of that interval's mapped sales minus what the outlet's OWN target COGS % allows, counted only
+  // when positive. Good days and good outlets never offset bad ones. An outlet with no target, or no sales, is left out.
+  // The same calculation runs on the comparison period (the previous period's revenue and COGS, from the cards' own context).
+  // Whole dollars throughout, shared out so that the outlet figures and the daily points add up to the headline exactly.
+  function marginsAboveTarget(data){
+    const selected = new Set(data.names);
+    const sum = list => list.reduce((total, value) => total + value, 0);
+    const compute = (source, seedTag) => {
+      const sample = marginsSampleCogsSeries(source, seedTag);
+      const perOutlet = new Map(), daily = sample.labels.map(() => 0);
+      sample.outlets.forEach(outlet => {
+        if(outlet.target === null) return;
+        const amounts = outlet.revenues.map((revenue, index) => revenue * Math.max(0, outlet.values[index] - outlet.target) / 100);
+        perOutlet.set(outlet.name, amounts);
+        if(selected.has(outlet.name)) amounts.forEach((amount, index) => { daily[index] += amount; });
+      });
+      return { labels: sample.labels, perOutlet, daily };
+    };
+    const current = compute(data, '');
+    const eligible = data.names.filter(name => current.perOutlet.has(name));
+    const base = { labels: current.labels, included: eligible.length, selected: data.names.length, byOutlet: new Map() };
+    if(!eligible.length) return { ...base, status: 'insufficient', total: null, previousTotal: null, daily: [] };
+    const previousRevenue = new Map(SALES_OUTLET_ROWS.map(row => [row.name, periodRevenuePair(row, data.period).previousRevenue]));
+    const cogsChange = PERIOD_CARD_CONTEXT[data.period].cogsChangePts;
+    const previous = compute({ ...data, outlets: data.outlets.map(outlet => ({ ...outlet, revenue: previousRevenue.get(outlet.name) || outlet.revenue, trendActual: outlet.trendActual - cogsChange })) }, ':previous');
+    const totals = eligible.map(name => sum(current.perOutlet.get(name)));
+    const total = Math.round(sum(totals));
+    const shares = distributeWhole(total, totals);
+    eligible.forEach((name, index) => base.byOutlet.set(name, shares[index]));
+    current.perOutlet.forEach((amounts, name) => { if(!base.byOutlet.has(name)) base.byOutlet.set(name, Math.round(sum(amounts))); });
+    const previousTotal = Math.round(sum(eligible.filter(name => previous.perOutlet.has(name)).map(name => sum(previous.perOutlet.get(name)))));
+    return { ...base, status: 'ok', total, previousTotal, daily: distributeWhole(total, current.daily) };
   }
   // Allocate the period total to recorded intervals, with quiet and busy intervals rather than a smooth slope.
   function marginsSampleAmountSeries(seed, total, covers, sparse){
@@ -3901,14 +3926,13 @@
   // GP is 100 − COGS). Deliberately plain: one point per interval on the same axis as the tiles beside it, and each
   // point is that interval's own GP, so the points average (weighted by revenue) to the headline number.
   // Anatomy is the stat-tile contract shared by the strip: label, value, delta pill, sparkline, two axis labels.
-  // Everything else (cadence, standing against target, how many outlets miss) lives in the "i" tooltip, as it does for
-  // Unexplained variance. The target is one dashed hairline, labelled once on the axis row instead of in a legend.
+  // Everything else (how it is worked out, and the target) lives in the "i" tooltip, as it does for
+  // the other tiles. The target is one dashed hairline, labelled once on the axis row instead of in a legend.
   function renderMarginsGpTile(container, data, sample, gpChange){
     const granularity = (COVERS_SPEND_PERIOD[data.period] || COVERS_SPEND_PERIOD['This month']).granularity;
     const grain = { daily: 'day', weekly: 'week', monthly: 'month' }[granularity];
     // Worked out from the figures as displayed (one decimal), the way COGS by outlet does, so the sentence adds up.
     const gp = +data.gpPct.toFixed(1), hasTarget = data.targetPct !== null, target = hasTarget ? +(100 - data.targetPct).toFixed(1) : null;
-    const difference = hasTarget ? +(gp - target).toFixed(1) : null;
     // Line, wash and end-dot follow the pill (change on the previous period) exactly as the tiles beside this one do.
     // Where GP stands against target is read from the dashed line, so a second colour never contradicts the pill.
     const direction = Math.abs(Math.round(gpChange * 10) / 10) < .05 ? 'trend-flat' : gpChange > 0 ? 'trend-up' : 'trend-down';
@@ -3947,10 +3971,9 @@
       + `<div class="mini-chart-axis"><span>${escapeHtml(labels[0])}</span>${hasTarget ? `<button class="margins-gp-target-key margins-target-link" type="button" data-set-targets data-col-info="setTarget" data-col-info-text="GP% target is 100% minus the target COGS %. Click to change."><i aria-hidden="true"></i>Target ${target.toFixed(1)}%</button>` : `<button class="margins-gp-target-key margins-target-link" type="button" data-set-targets data-col-info="setTarget" data-col-info-text="Set a target COGS %. GP% target is 100% minus that.">Set a target</button>`}<span>${escapeHtml(labels.at(-1))}</span></div>`;
     // How the number is worked out, in plain words. Nothing else is derived for this tile.
     const isGroup = data.scope === 'All outlets' && data.outlets.length > 1;
-    const standing = !hasTarget ? '' : difference === 0 ? 'on target' : `${Math.abs(difference).toFixed(1)} pts ${difference > 0 ? 'above' : 'below'} target`;
     const info = document.createElement('button');
-    info.className = 'col-info'; info.type = 'button'; info.dataset.colInfo = 'gpPercent';
-    info.dataset.colInfoText = `Theoretical GP% = (revenue − theoretical COGS) ÷ revenue${isGroup ? ', worked out across all outlets together' : ''}. ${hasTarget ? `Target: ${isGroup ? 'each outlet’s own target, weighted by revenue' : 'set for this outlet'}. Currently ${standing}.` : 'No target set.'}`;
+    info.className = 'col-info'; info.type = 'button'; info.title = ''; info.dataset.colInfo = 'gpPercent';   // title='' stops the tile name's own title tooltip showing as a second one
+    info.dataset.colInfoText = `Theoretical GP% = (revenue − theoretical COGS) ÷ revenue${isGroup ? ', worked out across all outlets together' : ''}. ${hasTarget ? `Target: ${isGroup ? 'each outlet’s own target, weighted by revenue' : 'set for this outlet'}.` : 'No target set.'}`;
     info.setAttribute('aria-label', 'About GP%'); info.textContent = 'i';
     wrap.querySelector('.mini-chart-name').appendChild(info);
     container.appendChild(wrap);
@@ -3994,11 +4017,22 @@
     const sample = marginsSampleCogsSeries(data);
     const periods = sample.labels;
     const wastageChange = Math.round((rand() - .55) * 26);
-    const varianceChange = Math.round((rand() - .35) * 30);
     // Gross profit is 100% minus COGS, so it moves by the COGS card's change, sign flipped: the two always agree.
     const gpChange = -PERIOD_CARD_CONTEXT[data.period].cogsChangePts;
     const wastageTotal = Math.round(data.wastageValue / 10) * 10;
-    const varianceTotal = Math.round(data.varianceValue / 10) * 10;
+    const above = data.aboveTarget, aboveOk = above.status === 'ok';
+    // Change on the comparison period, worked out the same way. From a prior value of zero a percentage means nothing, so show dollars.
+    let aboveChange = 0, aboveDelta = '';
+    if(aboveOk){
+      const diff = above.total - above.previousTotal;
+      if(above.previousTotal === 0){
+        aboveChange = diff;
+        aboveDelta = diff === 0 ? '<span class="delta-pill flat">flat</span>' : `<span class="delta-pill ${diff > 0 ? 'neg' : 'pos'}"><span class="material-symbols-outlined" aria-hidden="true">${diff > 0 ? 'trending_up' : 'trending_down'}</span>S$${Math.abs(diff).toLocaleString('en-SG')}</span>`;
+      } else {
+        aboveChange = diff / above.previousTotal * 100;
+        aboveDelta = changePillHtml(aboveChange, { decimals: Math.abs(aboveChange) < 1 ? 1 : 0 });
+      }
+    }
     const price = marginsPriceImpact(data);
     const priceTotal = price ? Math.round(Math.abs(price.impact) / 10) * 10 : null;
     const grain = COVERS_SPEND_PERIOD[data.period]?.granularity === 'daily' ? 'day'
@@ -4007,9 +4041,10 @@
       { label: 'Recorded wastage', value: wastageTotal, prefix: 'S$', decimals: 0,
         delta: changePillHtml(wastageChange), change: wastageChange, costSide: true,
         trend: marginsSampleAmountSeries(`${data.scope}:${data.period}:wastage-samples`, wastageTotal, sample.scopeCovers, false) },
-      { label: 'Unexplained variance', value: varianceTotal, prefix: 'S$', decimals: 0, infoKey: 'unexplainedVariance',
-        delta: changePillHtml(varianceChange), change: varianceChange, costSide: true,
-        trend: marginsSampleAmountSeries(`${data.scope}:${data.period}:variance-samples`, varianceTotal, sample.scopeCovers, true) },
+      { label: 'Food cost above target', value: aboveOk ? above.total : null, prefix: 'S$', decimals: 0, infoKey: 'foodCostAboveTarget',
+        delta: aboveDelta, change: aboveChange, costSide: true, trend: above.daily, pointLabel: 'Above target',
+        emptyText: `Insufficient data<br><small>${above.included} of ${above.selected} ${above.selected === 1 ? 'outlet has' : 'outlets have'} a target</small>`,
+        coverage: aboveOk && above.included < above.selected ? { text: `Based on ${above.included} of ${above.selected} outlets`, title: `Based on ${above.included} of ${above.selected} outlets with a target. Outlets with no target are left out.` } : null },
       { label: 'Supplier price impact', value: priceTotal, prefix: 'S$', decimals: 0, infoKey: 'priceImpact',
         signed: price && priceTotal ? (price.impact < 0 ? -1 : 1) : 0, pointLabel: price?.impact < 0 ? 'Saving' : 'Extra cost',
         delta: price ? changePillHtml(price.changePct, { decimals: 1 }) : '', change: price?.changePct ?? 0, costSide: true,
@@ -4021,18 +4056,24 @@
       if(card.value == null){
         const empty = document.createElement('div'); empty.className = 'mini-chart spend-outlet-chart';
         empty.innerHTML = `<div class="mini-chart-head"><span class="mini-chart-name">${card.label}</span><span class="mini-chart-value">—</span></div>`;
-        renderEmptyState(empty, 'No price data for this period.'); body.appendChild(empty);
+        renderEmptyState(empty, card.emptyText || 'No price data for this period.'); body.appendChild(empty);
         return;
       }
       buildMiniLineChart(body, { name: card.label, pointLabel: card.pointLabel || `${card.label} this ${grain}`, periods, values: card.trend,
         unitPrefix: card.prefix || '', unitSuffix: card.suffix || '', decimals: card.decimals,
         headline: { value: card.value }, directionChange: card.change, costSide: card.costSide, deltaHtml: card.delta,
         zeroBaseline: true, stretch: true, chartClass: 'spend-outlet-chart' });
+      // Coverage sits in the date row under the chart, like the GP% target, so it never pushes the chart out of line with its neighbours.
+      if(card.coverage){
+        const axis = body.lastElementChild.querySelector('.mini-chart-axis'), note = document.createElement('span');
+        note.className = 'mini-chart-axis-note'; note.textContent = card.coverage.text; note.title = card.coverage.title;
+        axis.insertBefore(note, axis.lastElementChild);
+      }
       // The chart plots the size of the effect; the headline says which way it went (extra cost or a saving).
       if(card.signed) body.lastElementChild.querySelector('.mini-chart-value').textContent = `${card.signed < 0 ? '−' : '+'}S$${card.value.toLocaleString('en-SG')}`;
       if(card.infoKey){
         const icon = document.createElement('button');
-        icon.className = 'col-info'; icon.type = 'button'; icon.dataset.colInfo = card.infoKey;
+        icon.className = 'col-info'; icon.type = 'button'; icon.title = ''; icon.dataset.colInfo = card.infoKey;   // title='' stops the tile name's own title tooltip showing as a second one
         icon.setAttribute('aria-label', `About ${card.label.toLowerCase()}`); icon.textContent = 'i';
         body.lastElementChild.querySelector('.mini-chart-name').appendChild(icon);
       }
@@ -4071,9 +4112,8 @@
       const reference = marginsReference(outlet);
       const difference = marginsDifference(outlet);
       const noReference = reference === null;
-      const gapValue = outlet.gapValue;
       const over = !noReference && difference > 0, under = !noReference && difference < 0;
-      const status = noReference ? 'No target' : over ? `${money(Math.abs(gapValue), 10)} over` : under ? `${money(Math.abs(gapValue), 10)} under` : `At ${referenceLabel}`;
+      const status = noReference ? 'No target' : outlet.aboveTarget > 0 ? `${money(outlet.aboveTarget)} above target` : 'None above target';
       const row = document.createElement('div'); row.className = 'margins-bullet-row';
       if(multiOutlet && outlet.name === data.scope){ row.classList.add('is-selected'); row.setAttribute('aria-current', 'true'); selectedRow = row; }
       row.innerHTML = `<span class="margins-bullet-name" title="${escapeHtml(outlet.name)}">${escapeHtml(outlet.name)}</span>`
@@ -4467,7 +4507,7 @@
     const input = {
       comparison: context.comparison,
       gp: { value: data.gpPct, target: data.targetPct === null ? null : 100 - data.targetPct, change: -context.cogsChangePts },
-      costs: { revenue: data.revenue, wastage: data.wastageValue, variance: data.varianceValue },
+      costs: { revenue: data.revenue, wastage: data.wastageValue, aboveTarget: data.aboveTarget.status === 'ok' ? data.aboveTarget.total : null },
       priceImpact: price ? { value: price.impact, changePct: price.changePct } : null,
     };
     if(data.scope === 'All outlets') input.outlets = data.outlets.map(outlet => ({ name: outlet.name, gp: 100 - outlet.actual, target: outlet.target === null ? null : 100 - outlet.target }));

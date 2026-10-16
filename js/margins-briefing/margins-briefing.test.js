@@ -26,7 +26,7 @@ function base(){
     categories: { overall: 31.5, rows: [
       { name: 'Mains', cogsPct: 36.8, salesShare: 52.4 }, { name: 'Sides', cogsPct: 32.9, salesShare: 7 }, { name: 'Starters', cogsPct: 30.3, salesShare: 13 },
       { name: 'Desserts', cogsPct: 23.5, salesShare: 5 }, { name: 'Beverages', cogsPct: 21.0, salesShare: 22 }] },
-    costs: { revenue: 63080, wastage: 1204, variance: 1893 },
+    costs: { revenue: 63080, wastage: 1204, aboveTarget: 1893 },
     priceImpact: { value: 650, changePct: 3.2 }
   };
 }
@@ -79,28 +79,29 @@ test('no outlet sentence for a single outlet view', () => {
   allTexts(d).forEach(t => assert.ok(!/Only/.test(t), t));
 });
 const WASTAGE = '(?:[Rr]ecorded wastage|[Ll]ogged wastage|[Ww]astage on record|[Ww]astage)';
-const VARIANCE = '(?:[Uu]nexplained variance|variance left unexplained|unaccounted-for variance)';
-test('wastage and variance are amounts rounded like the tiles, with their share of revenue', () => {
+const ABOVE = '(?:estimated food cost above target|estimated recipe cost above your targets|estimated food cost above the targets)';
+test('wastage and food cost above target are two separate amounts, never added up', () => {
   const shapes = new Set(), nouns = new Set();
-  const A = new RegExp(WASTAGE + ' (is|came to) S\\$1,200 and ' + VARIANCE + ' (is|was) S\\$1,890, (together 4\\.9% of revenue|4\\.9% of revenue combined)\\.');
-  const B = new RegExp(WASTAGE + ' \\(S\\$1,200\\) and ' + VARIANCE + ' \\(S\\$1,890\\) (add up to|come to) 4\\.9% of revenue\\.');
-  const C = new RegExp(WASTAGE + ': S\\$1,200\\. [A-Za-z -]+: S\\$1,890\\. Together that is 4\\.9% of revenue\\.');
+  const A = new RegExp('^' + WASTAGE + ' is S\\$1,200\\. ' + ABOVE + ' is S\\$1,893\\.$', 'i');
+  const B = new RegExp('^' + ABOVE + ' is S\\$1,893, and ' + WASTAGE + ' is S\\$1,200\\.$', 'i');
+  const C = new RegExp('^' + WASTAGE + ' came to S\\$1,200; ' + ABOVE + ' came to S\\$1,893\\.$', 'i');
   allTexts(base()).forEach(t => {
-    const costs = t.split(/(?<=\.) (?=[A-Z])/).filter(x => /wastage/i.test(x)).join(' ');
-    const m = A.exec(t) || B.exec(t) || C.exec(t);
-    assert.ok(m, t);
-    shapes.add(B.test(t) ? 1 : C.test(t) ? 2 : 0);
+    const joined = t.split(/(?<=\.) (?=[A-Z0-9])/).filter(x => /wastage|above (the |your )?targets?/i.test(x)).join(' '), costs = joined;
+    assert.ok(A.test(joined) || B.test(joined) || C.test(joined), t);
+    shapes.add(B.test(joined) ? 1 : C.test(joined) ? 2 : 0);
     nouns.add(costs.match(/[Rr]ecorded wastage|[Ll]ogged wastage|[Ww]astage on record|[Ww]astage/)[0].toLowerCase());
-    const a = A.exec(t); if (a) assert.strictEqual(a[1] === 'came to', a[2] === 'was', 'tense should match: ' + t);
+    assert.ok(!/together|combined|add up|in total|total (cost|loss)|\bloss|overspen|lost\b/i.test(costs), 'must not total or call it a loss: ' + costs);
   });
   assert.strictEqual(shapes.size, 3, 'expected three different shapes');
   assert.ok(nouns.size >= 3, 'the wastage term should vary; got ' + [...nouns]);
 });
-test('one cost line at zero is left out, with no combined share', () => {
-  const d = base(); d.costs.variance = 0;
-  allTexts(d).forEach(t => assert.ok(new RegExp(WASTAGE + ' (is|came to) S\\$1,200\\.').test(t) && !/variance|together|combined|add up|come to 4/i.test(t), t));
-  d.costs.wastage = 0; allTexts(d).forEach(t => assert.ok(!/wastage|variance/i.test(t), t));
-  d.costs.variance = 1893; allTexts(d).forEach(t => assert.ok(new RegExp(VARIANCE.replace('[Uu]', '[Uu]') + ' (is|came to) S\\$1,890\\.', 'i').test(t) && !/wastage/i.test(t), t));
+test('one cost line at zero, or without enough data, is left out', () => {
+  const d = base(); d.costs.aboveTarget = 0;
+  allTexts(d).forEach(t => assert.ok(new RegExp(WASTAGE + ' (is|came to) S\\$1,200\\.').test(t) && !/above (the |your )?targets?|estimated/i.test(t), t));
+  d.costs.aboveTarget = null; allTexts(d).forEach(t => assert.ok(!/above (the |your )?targets?|NaN|undefined/i.test(t), t));
+  d.costs.aboveTarget = 1893; d.costs.wastage = 0;
+  allTexts(d).forEach(t => assert.ok(new RegExp(ABOVE + ' (is|came to) S\\$1,893\\.', 'i').test(t) && !/wastage/i.test(t), t));
+  d.costs.aboveTarget = 0; allTexts(d).forEach(t => assert.ok(!/wastage|above (the |your )?targets?/i.test(t), t));
 });
 test('supplier price impact: extra cost, saving, nothing', () => {
   const up = /Supplier price changes (added S\$650 to costs|pushed costs up by S\$650), 3\.2% (more than at the old prices|above the old prices)\.|Compared with the old prices, the same purchases cost S\$650 \(3\.2%\) more\.|(Price changes from suppliers|Suppliers' price changes) added S\$650 to costs \(3\.2%\)\./;
@@ -120,7 +121,7 @@ test('never claims a cause, in any wording', () => {
   allTexts(base()).forEach(t => assert.ok(!causal.test(t), t));
 });
 test('every figure traces to the input, in every wording', () => {
-  const allowed = new Set(['68.5', '0.4', '1.9', '4', '2', '1.6', '0.5', '1,200', '1,890', '4.9', '650', '3.2',
+  const allowed = new Set(['68.5', '0.4', '1.9', '4', '2', '1.6', '0.5', '1,200', '1,893', '650', '3.2',
     '5', '10', '66.9', '36.8', '21.0', '52', '31.5', '32.9', '3']);
   allTexts(base()).forEach(t => (t.match(/\d+(?:,\d{3})*(?:\.\d+)?/g) || []).forEach(n => assert.ok(allowed.has(n), 'unexpected number ' + n + ' in: ' + t)));
 });
@@ -195,13 +196,13 @@ test('the lead: gross profit by default; something else only when clearly more n
   assert.strictEqual(r.findings[0], 'outlets'); assert.ok(r.findings.includes('gp'));
   const q = quietGp(base()); q.outlets = q.outlets.map(o => ({ ...o, gp: o.target + 1 })); q.priceImpact = { value: 40, changePct: 0.3 };
   assert.strictEqual(summariseMarginsTab(q).findings[0], 'gp');
-  const p = quietGp(base()); p.outlets = p.outlets.map(o => ({ ...o, gp: o.target + 1 })); p.costs = { revenue: 63080, wastage: 100, variance: 100 }; p.priceImpact = { value: 3000, changePct: 7 };
+  const p = quietGp(base()); p.outlets = p.outlets.map(o => ({ ...o, gp: o.target + 1 })); p.costs = { revenue: 63080, wastage: 100, aboveTarget: 100 }; p.priceImpact = { value: 3000, changePct: 7 };
   p.trend.points = p.trend.points.map(x => ({ ...x, gp: 70 })); p.categories.rows = p.categories.rows.map(r => ({ ...r, cogsPct: 30 }));
   SEEDS.forEach(seed => assert.strictEqual(summariseMarginsTab(p, { seed }).findings[0], 'price'));   // a lead never moves
 });
 test('a statement keeps its wording when the order changes', () => {
   const a = base(), b = quietGp(base()); b.outlets = b.outlets.map(o => ({ ...o, gp: o.target - 2 }));
-  const costs = t => t.split(/(?<=\.) (?=[A-Z])/).find(x => /wastage|variance/i.test(x));
+  const costs = t => t.split(/(?<=\.) (?=[A-Z])/).find(x => /wastage|above (the |your )?targets?/i.test(x));
   assert.strictEqual(costs(full(a, 5)), costs(full(b, 5)));
 });
 test('stays within the word limit and always keeps the gross profit sentence', () => {
@@ -219,7 +220,7 @@ test('random scenarios: no NaN, no causal words, within the limit, every stateme
     if (rnd() > .2) d.gp.target = 55 + rnd() * 25;
     if (rnd() > .2) d.gp.change = (rnd() - .5) * 8;
     if (rnd() > .3) d.outlets = Array.from({ length: 2 + Math.floor(rnd() * 28) }, (_, k) => ({ name: 'Outlet ' + k, gp: 55 + rnd() * 25, target: 55 + rnd() * 25 }));
-    if (rnd() > .2) d.costs = { revenue: rnd() * 90000, wastage: rnd() * 3000, variance: rnd() > .3 ? rnd() * 3000 : 0 };
+    if (rnd() > .2) d.costs = { revenue: rnd() * 90000, wastage: rnd() * 3000, aboveTarget: rnd() > .3 ? rnd() * 3000 : (rnd() > .5 ? null : 0) };
     if (rnd() > .3) d.priceImpact = { value: (rnd() - .4) * 3000, changePct: (rnd() - .4) * 8 };
     if (rnd() > .3) d.trend = { unit: ['day', 'week', 'month'][Math.floor(rnd() * 3)], target: 55 + rnd() * 25, points: Array.from({ length: Math.floor(rnd() * 32) }, (_, k) => ({ label: k + ' Sep', gp: 55 + rnd() * 25 })) };
     if (rnd() > .3) d.categories = { overall: 20 + rnd() * 20, rows: Array.from({ length: Math.floor(rnd() * 7) }, (_, k) => ({ name: 'Cat ' + k, cogsPct: 15 + rnd() * 30, salesShare: rnd() * 60 })) };

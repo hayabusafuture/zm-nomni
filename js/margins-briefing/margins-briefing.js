@@ -14,7 +14,7 @@
  *     outlets   which outlets are below target, and by how much (group view only)
  *     trend     how many days/weeks/months gross profit was below target, and the lowest
  *     category  which sales categories have the highest and lowest COGS
- *     costs     wastage and unexplained variance, as amounts and as a share of revenue
+ *     costs     recorded wastage and estimated food cost above target, as two separate amounts
  *     price     what supplier price changes added to (or took off) costs
  *   Gross profit is always said. Of the rest, at most three are said (four
  *   sentences in all), so the briefing stays short: the more notable ones win.
@@ -39,9 +39,10 @@
  *   each other's explanation: nothing links them by cause, and nothing in the
  *   data could show that they do. No "because", no "driven by", no "which
  *   suggests". Every number is a figure the tab shows, or simple arithmetic on
- *   those figures (a difference, a count, a share). Wastage and variance are
- *   stated as amounts only. Their trend isn't reported: the tab has no
- *   reliable comparison for them yet.
+ *   those figures (a difference, a count, a share). Wastage and food cost above
+ *   target are stated as amounts only, and never added together or called a loss:
+ *   they can overlap, and the second is an estimate from recipe costs. Their
+ *   trend isn't reported.
  *
  * ------------------------------------------------------------------------
  * INPUT: the Margins tab's own data, already normalised.
@@ -63,7 +64,7 @@
  *     overall,                         // overall COGS %
  *     rows: [{ name, cogsPct, salesShare }]   // salesShare in % of sales
  *   },
- *   costs?: { revenue, wastage, variance },   // S$; wastage and variance are recorded amounts
+ *   costs?: { revenue, wastage, aboveTarget },   // S$; wastage is recorded, aboveTarget (null when there is not enough data) is estimated from recipe costs
  *   priceImpact?: { value, changePct } | null // S$ signed (+ = extra cost), % on the same purchases
  * }
  *
@@ -258,33 +259,29 @@
   function costFinding(d) {
     var c = d.costs;
     if (!c) return [];
-    var w = isNum(c.wastage) ? c.wastage : 0, v = isNum(c.variance) ? c.variance : 0;
-    var w10 = round10(w), v10 = round10(v);
-    if (w10 <= 0 && v10 <= 0) return [];
-    var share = isNum(c.revenue) && c.revenue > 0 ? r1((w + v) / c.revenue * 100) : null;
-    var score = 0.2 + clamp((share || 0) / 6) * 0.3;
+    var w = isNum(c.wastage) ? c.wastage : 0, a = isNum(c.aboveTarget) ? c.aboveTarget : 0;
+    // Wastage is rounded to S$10 like its tile; food cost above target is the tile's whole-dollar figure, so the two match.
+    var w10 = round10(w), a10 = Math.round(a);
+    if (w10 <= 0 && a10 <= 0) return [];
+    // How big the above-target cost is against revenue. Used only to score the statement; it is never said, and never added to wastage.
+    var share = isNum(c.revenue) && c.revenue > 0 ? r1(a / c.revenue * 100) : 0;
+    var score = 0.2 + clamp(share / 3) * 0.3;
     return [{
       key: 'costs', score: score,
       say: function (pick) {
-        // The tab's own labels are "Recorded wastage" and "Unexplained variance"; the sentence says the same things in other words.
+        // The tab's own labels are "Recorded wastage" and "Food cost above target"; the sentence says the same things in other words.
+        // The second is always "estimated": it comes from recipe costs, not from what was bought or counted.
         var W = pick(['recorded wastage', 'logged wastage', 'wastage on record', 'wastage']);
-        var V = pick(['unexplained variance', 'variance left unexplained', 'unaccounted-for variance']);
-        var s;
-        if (w10 > 0 && v10 > 0) {
-          var z = share === null ? null : share.toFixed(1) + '% of revenue';
-          // Three different shapes, not three rewordings of one sentence.
-          var shape = z === null ? 0 : pick([0, 1, 2]);
-          if (shape === 1) return cap(W) + ' (' + money(w10) + ') and ' + V + ' (' + money(v10) + ') ' + pick(['add up to ', 'come to ']) + z + '.';
-          if (shape === 2) return cap(W) + ': ' + money(w10) + '. ' + cap(V) + ': ' + money(v10) + '. Together that is ' + z + '.';
-          var past = pick([false, true]);   // one tense for both halves
-          s = cap(W) + (past ? ' came to ' : ' is ') + money(w10) + ' and ' + V + (past ? ' was ' : ' is ') + money(v10);
-          if (z !== null) s += pick([', together ' + z, ', ' + z + ' combined']);
-        } else if (w10 > 0) {
-          s = cap(W) + pick([' is ', ' came to ']) + money(w10);
-        } else {
-          s = cap(V) + pick([' is ', ' came to ']) + money(v10);
+        var A = pick(['estimated food cost above target', 'estimated recipe cost above your targets', 'estimated food cost above the targets']);
+        if (w10 > 0 && a10 > 0) {
+          // Three different shapes, not three rewordings of one sentence. None of them adds the two amounts up.
+          var shape = pick([0, 1, 2]);
+          if (shape === 1) return cap(A) + ' is ' + money(a10) + ', and ' + W + ' is ' + money(w10) + '.';
+          if (shape === 2) return cap(W) + ' came to ' + money(w10) + '; ' + A + ' came to ' + money(a10) + '.';
+          return cap(W) + ' is ' + money(w10) + '. ' + cap(A) + ' is ' + money(a10) + '.';
         }
-        return s + '.';
+        if (w10 > 0) return cap(W) + pick([' is ', ' came to ']) + money(w10) + '.';
+        return cap(A) + pick([' is ', ' came to ']) + money(a10) + '.';
       }
     }];
   }
@@ -325,7 +322,7 @@
   // A hash of the figures as they are displayed, so sub-display noise never changes the wording.
   function hashData(d) {
     var o = (d.outlets || []).map(function (x) { return [x.name, isNum(x.gp) ? r1(x.gp) : null, isNum(x.target) ? r1(x.target) : null]; });
-    var c = d.costs ? [round10(d.costs.wastage || 0), round10(d.costs.variance || 0), Math.round(d.costs.revenue || 0)] : null;
+    var c = d.costs ? [round10(d.costs.wastage || 0), Math.round(d.costs.aboveTarget || 0), Math.round(d.costs.revenue || 0)] : null;
     var p = d.priceImpact ? [round10(d.priceImpact.value), isNum(d.priceImpact.changePct) ? r1(d.priceImpact.changePct) : null] : null;
     var g = [r1(d.gp.value), isNum(d.gp.target) ? r1(d.gp.target) : null, isNum(d.gp.change) ? r1(d.gp.change) : null];
     var t = d.trend && d.trend.points ? [d.trend.unit, isNum(d.trend.target) ? r1(d.trend.target) : null, d.trend.points.map(function (x) { return [x.label, isNum(x.gp) ? r1(x.gp) : null]; })] : null;
