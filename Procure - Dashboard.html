@@ -4684,6 +4684,24 @@
   updateDashboard();  renderSalesChannels();
   renderCovers();
   renderSpendPerHead();
+
+  // Each tab has its own address: #sales, #spend, #margins, #trends. Clicking a tab adds a history entry (the page does
+  // not jump), opening a link or using back/forward selects the tab it names, and no hash means the first tab.
+  const tabHash = tab => tab.id.replace('tab-', '');
+  const tabIndexFromHash = () => { const name = location.hash.slice(1).toLowerCase(); return dashboardTabs.findIndex(tab => tabHash(tab) === name); };
+  let tabFromAddress = false;
+  dashboardTabs.forEach(tab => tab.addEventListener('click', () => {
+    if(tabFromAddress || tabIndexFromHash() === dashboardTabs.indexOf(tab)) return;
+    const url = new URL(location.href); url.hash = tabHash(tab); history.pushState(null, '', url);
+  }));
+  function selectTabFromAddress(){
+    const index = tabIndexFromHash(), target = dashboardTabs[index >= 0 ? index : 0];
+    if(target.classList.contains('active')) return;
+    tabFromAddress = true; target.click(); tabFromAddress = false;
+  }
+  window.addEventListener('popstate', selectTabFromAddress);
+  window.addEventListener('hashchange', selectTabFromAddress);
+  selectTabFromAddress();
 </script>
 <script>
 (function(){
