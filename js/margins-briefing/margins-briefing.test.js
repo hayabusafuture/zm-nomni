@@ -82,9 +82,9 @@ const WASTAGE = '(?:[Rr]ecorded wastage|[Ll]ogged wastage|[Ww]astage on record|[
 const ABOVE = '(?:estimated food cost above target|estimated recipe cost above your targets|estimated food cost above the targets)';
 test('wastage and food cost above target are two separate amounts, never added up', () => {
   const shapes = new Set(), nouns = new Set();
-  const A = new RegExp('^' + WASTAGE + ' is \\$1,200\\. ' + ABOVE + ' is \\$1,893\\.$', 'i');
-  const B = new RegExp('^' + ABOVE + ' is \\$1,893, and ' + WASTAGE + ' is \\$1,200\\.$', 'i');
-  const C = new RegExp('^' + WASTAGE + ' came to \\$1,200; ' + ABOVE + ' came to \\$1,893\\.$', 'i');
+  const A = new RegExp('^' + WASTAGE + ' is \\$1,204\\. ' + ABOVE + ' is \\$1,893\\.$', 'i');
+  const B = new RegExp('^' + ABOVE + ' is \\$1,893, and ' + WASTAGE + ' is \\$1,204\\.$', 'i');
+  const C = new RegExp('^' + WASTAGE + ' came to \\$1,204; ' + ABOVE + ' came to \\$1,893\\.$', 'i');
   allTexts(base()).forEach(t => {
     const joined = t.split(/(?<=\.) (?=[A-Z0-9])/).filter(x => /wastage|above (the |your )?targets?/i.test(x)).join(' '), costs = joined;
     assert.ok(A.test(joined) || B.test(joined) || C.test(joined), t);
@@ -97,7 +97,7 @@ test('wastage and food cost above target are two separate amounts, never added u
 });
 test('one cost line at zero, or without enough data, is left out', () => {
   const d = base(); d.costs.aboveTarget = 0;
-  allTexts(d).forEach(t => assert.ok(new RegExp(WASTAGE + ' (is|came to) \\$1,200\\.').test(t) && !/above (the |your )?targets?|estimated/i.test(t), t));
+  allTexts(d).forEach(t => assert.ok(new RegExp(WASTAGE + ' (is|came to) \\$1,204\\.').test(t) && !/above (the |your )?targets?|estimated/i.test(t), t));
   d.costs.aboveTarget = null; allTexts(d).forEach(t => assert.ok(!/above (the |your )?targets?|NaN|undefined/i.test(t), t));
   d.costs.aboveTarget = 1893; d.costs.wastage = 0;
   allTexts(d).forEach(t => assert.ok(new RegExp(ABOVE + ' (is|came to) \\$1,893\\.', 'i').test(t) && !/wastage/i.test(t), t));
@@ -134,9 +134,9 @@ test('supplier price impact: extra cost, saving, nothing', () => {
   allTexts(base()).forEach(t => { assert.ok(up.test(t), t); shapes.add(/Compared with the old prices/.test(t) ? 1 : /\(3\.2%\)\./.test(t) ? 2 : 0); });
   assert.strictEqual(shapes.size, 3, 'expected three different shapes');
   const d = base(); d.priceImpact = { value: -234, changePct: -2.1 };
-  const down = /Supplier price changes (took \$230 off costs|lowered costs by \$230), 2\.1% (less than at the old prices|below the old prices)\.|Compared with the old prices, the same purchases cost \$230 \(2\.1%\) less\.|(Price changes from suppliers|Suppliers' price changes) took \$230 off costs \(2\.1%\)\./;
+  const down = /Supplier price changes (took \$234 off costs|lowered costs by \$234), 2\.1% (less than at the old prices|below the old prices)\.|Compared with the old prices, the same purchases cost \$234 \(2\.1%\) less\.|(Price changes from suppliers|Suppliers' price changes) took \$234 off costs \(2\.1%\)\./;
   allTexts(d).forEach(t => assert.ok(down.test(t), t));
-  d.priceImpact = { value: 4, changePct: 0.1 }; allTexts(d).forEach(t => assert.ok(!/price changes|Compared with the old/i.test(t), t));
+  d.priceImpact = { value: 0, changePct: 0.1 }; allTexts(d).forEach(t => assert.ok(!/price changes|Compared with the old/i.test(t), t));
   d.priceImpact = null; allTexts(d).forEach(t => assert.ok(!/price changes|Compared with the old/i.test(t), t));
 });
 test('the price line says nothing about panels or tracking', () => {
@@ -146,7 +146,7 @@ test('never claims a cause, in any wording', () => {
   allTexts(base()).forEach(t => assert.ok(!causal.test(t), t));
 });
 test('every figure traces to the input, in every wording', () => {
-  const allowed = new Set(['68.5', '0.4', '1.9', '4', '2', '1.6', '0.5', '1,200', '1,893', '650', '3.2',
+  const allowed = new Set(['68.5', '0.4', '1.9', '4', '2', '1.6', '0.5', '1,204', '1,893', '650', '3.2',
     '5', '10', '66.9', '36.8', '21.0', '52', '31.5', '32.9', '3']);
   allTexts(base()).forEach(t => (t.match(/\d+(?:,\d{3})*(?:\.\d+)?/g) || []).forEach(n => assert.ok(allowed.has(n), 'unexpected number ' + n + ' in: ' + t)));
 });

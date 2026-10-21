@@ -264,8 +264,8 @@
     var c = d.costs;
     if (!c) return [];
     var w = isNum(c.wastage) ? c.wastage : 0, a = isNum(c.aboveTarget) ? c.aboveTarget : 0;
-    // Wastage is rounded to $10 like its tile; food cost above target is the tile's whole-dollar figure, so the two match.
-    var w10 = round10(w), a10 = Math.round(a);
+    // Wastage and food cost above target are whole dollars, like their tiles, so the sentence matches the tile.
+    var w10 = whole(w), a10 = Math.round(a);
     if (w10 <= 0 && a10 <= 0) return [];
     // How big the above-target cost is against revenue. Used only to score the statement; it is never said, and never added to wastage.
     var share = isNum(c.revenue) && c.revenue > 0 ? r1(a / c.revenue * 100) : 0;
@@ -293,7 +293,7 @@
   function priceFinding(d) {
     var p = d.priceImpact;
     if (!p || !isNum(p.value)) return [];
-    var amount = round10(Math.abs(p.value));
+    var amount = whole(Math.abs(p.value));
     if (amount === 0) return [];
     var up = p.value > 0;
     var pct = isNum(p.changePct) ? r1(Math.abs(p.changePct)).toFixed(1) + '%' : null;
@@ -350,9 +350,9 @@
   // A hash of the figures as they are displayed, so sub-display noise never changes the wording.
   function hashData(d) {
     var o = (d.outlets || []).map(function (x) { return [x.name, isNum(x.gp) ? r1(x.gp) : null, isNum(x.target) ? r1(x.target) : null]; });
-    var c = d.costs ? [round10(d.costs.wastage || 0), Math.round(d.costs.aboveTarget || 0), Math.round(d.costs.revenue || 0)] : null;
+    var c = d.costs ? [whole(d.costs.wastage || 0), Math.round(d.costs.aboveTarget || 0), Math.round(d.costs.revenue || 0)] : null;
     var mp = d.menuPrice ? [Math.round(d.menuPrice.amount || 0), d.menuPrice.recipes || 0, d.menuPrice.ingredient || '', d.menuPrice.outlet || ''] : null;
-    var p = d.priceImpact ? [round10(d.priceImpact.value), isNum(d.priceImpact.changePct) ? r1(d.priceImpact.changePct) : null] : null;
+    var p = d.priceImpact ? [whole(d.priceImpact.value), isNum(d.priceImpact.changePct) ? r1(d.priceImpact.changePct) : null] : null;
     var g = [r1(d.gp.value), isNum(d.gp.target) ? r1(d.gp.target) : null, isNum(d.gp.change) ? r1(d.gp.change) : null];
     var t = d.trend && d.trend.points ? [d.trend.unit, isNum(d.trend.target) ? r1(d.trend.target) : null, d.trend.points.map(function (x) { return [x.label, isNum(x.gp) ? r1(x.gp) : null]; })] : null;
     var k = d.categories && d.categories.rows ? d.categories.rows.map(function (x) { return [x.name, isNum(x.cogsPct) ? r1(x.cogsPct) : null, isNum(x.salesShare) ? Math.round(x.salesShare) : null]; }) : null;
@@ -378,7 +378,7 @@
   function isNum(v) { return typeof v === 'number' && isFinite(v); }
   function clamp(v) { return Math.max(0, Math.min(1, v)); }
   function r1(v) { return Math.round(v * 10) / 10; }
-  function round10(v) { return Math.round(v / 10) * 10; }
+  function whole(v) { return Math.round(v); }
   function pts(v) { return Math.abs(r1(v)).toFixed(1) + ' pts'; }
   function money(v) { return '$' + Math.round(v).toLocaleString('en-SG'); }
   function wordCount(s) { return s.trim().split(/\s+/).filter(Boolean).length; }
