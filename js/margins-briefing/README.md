@@ -27,6 +27,7 @@ Up to six kinds of statement. Each is left out when there is nothing to say:
 4. **Category**: which sales categories have the highest and lowest COGS, or how many run above the overall COGS. It uses COGS by sales category for the selected outlets.
 5. **Recorded wastage and estimated food cost above target**, as two separate amounts (wastage rounded to S$10 like its tile; food cost above target in whole dollars, like its tile). They are never added together or called a loss: they can overlap, and the second is an estimate from recipe costs, not from purchases or stock counts.
 6. **Supplier price impact**: what supplier price changes added to, or took off, costs. What it covers (items with a price in both periods) is in the tile's "i" tooltip, not repeated in the sentence.
+7. **Menu price**: recipes whose ingredient cost rose while their menu price has not changed, with the estimated extra cost this period (cost increase per serve × units sold). It names the ingredient when there is only one, and the outlet when one is selected. It states the amount as a fact and never says why; the dashboard leaves it out when the POS data is too incomplete to trust (see the gate in `PRICE_TO_MENU`).
 
 Gross profit plus **at most three others** are said (four sentences), so the briefing stays short. The three chosen are the highest scoring, so a quiet trend or a small price move drops out.
 

@@ -16,6 +16,7 @@
  *     category  which sales categories have the highest and lowest COGS
  *     costs     recorded wastage and estimated food cost above target, as two separate amounts
  *     price     what supplier price changes added to (or took off) costs
+ *     menuPrice recipes whose ingredient cost rose while their menu price has not changed, and the estimated extra cost
  *   Gross profit is always said. Of the rest, at most three are said (four
  *   sentences in all), so the briefing stays short: the more notable ones win.
  *
@@ -66,6 +67,8 @@
  *   },
  *   costs?: { revenue, wastage, aboveTarget },   // S$; wastage is recorded, aboveTarget (null when there is not enough data) is estimated from recipe costs
  *   priceImpact?: { value, changePct } | null // S$ signed (+ = extra cost), % on the same purchases
+ *   menuPrice?: { amount, recipes, ingredient, outlet } | null  // amount: S$ extra ingredient cost this period on `recipes` recipes whose menu
+ *                                      // price has not changed; ingredient: one ingredient's name or null; outlet: the outlet name when one outlet is selected, else null
  * }
  *
  * RETURNS  text, words, findings (the keys of what was said, in order)
@@ -96,7 +99,8 @@
       .concat(trendFinding(data))
       .concat(categoryFinding(data))
       .concat(costFinding(data))
-      .concat(priceFinding(data));
+      .concat(priceFinding(data))
+      .concat(menuPriceFinding(data));
     found.forEach(function (f) { f.nudged = f.score + (hashString(seed + f.key) / 4294967296 - 0.5) * CONFIG.nudge; });
 
     // Which facts: gross profit, then the highest-scoring others.
@@ -309,6 +313,30 @@
     }];
   }
 
+  function menuPriceFinding(d) {
+    var m = d.menuPrice;
+    if (!m || !isNum(m.amount) || !isNum(m.recipes) || m.recipes < 1 || Math.round(m.amount) <= 0) return [];
+    var share = d.costs && isNum(d.costs.revenue) && d.costs.revenue > 0 ? m.amount / d.costs.revenue * 100 : 0;
+    var score = 0.35 + clamp(share / 0.5) * 0.45;   // above the cost lines (the amount is a finding in its own right), below a clear outlets or gross profit story
+    return [{
+      key: 'menuPrice', score: score,
+      say: function (pick) {
+        // Facts side by side, no cause: the amount is the cost increase per serve times units sold, which is how it is defined.
+        var amt = money(m.amount), n = Math.round(m.recipes), one = n === 1;
+        var recipes = n + (one ? ' recipe' : ' recipes');
+        var prices = one ? 'menu price has' : 'menu prices have';
+        var rises = (m.ingredient ? String(m.ingredient).toLowerCase() + ' price rises' : 'ingredient price rises');
+        var s;
+        switch (pick([0, 1, 2])) {
+          case 1: s = recipes + (one ? ' carries' : ' carry') + ' an estimated ' + amt + ' of extra ingredient cost from ' + rises + ', and ' + (one ? 'its menu price has' : 'their menu prices have') + ' not changed.'; break;
+          case 2: s = 'The ' + prices + ' not changed on ' + recipes + ' whose ingredient costs rose, an estimated ' + amt + ' extra.'; break;
+          default: s = cap(rises) + ' add an estimated ' + amt + ' to ' + recipes + ' whose ' + prices + ' not changed.';
+        }
+        return m.outlet ? 'At ' + m.outlet + ', ' + s.charAt(0).toLowerCase() + s.slice(1) : s;
+      }
+    }];
+  }
+
   /* ════════════════════════════════════════════════════════════════════
      INPUT CHECK & HELPERS
      ════════════════════════════════════════════════════════════════════ */
@@ -323,11 +351,12 @@
   function hashData(d) {
     var o = (d.outlets || []).map(function (x) { return [x.name, isNum(x.gp) ? r1(x.gp) : null, isNum(x.target) ? r1(x.target) : null]; });
     var c = d.costs ? [round10(d.costs.wastage || 0), Math.round(d.costs.aboveTarget || 0), Math.round(d.costs.revenue || 0)] : null;
+    var mp = d.menuPrice ? [Math.round(d.menuPrice.amount || 0), d.menuPrice.recipes || 0, d.menuPrice.ingredient || '', d.menuPrice.outlet || ''] : null;
     var p = d.priceImpact ? [round10(d.priceImpact.value), isNum(d.priceImpact.changePct) ? r1(d.priceImpact.changePct) : null] : null;
     var g = [r1(d.gp.value), isNum(d.gp.target) ? r1(d.gp.target) : null, isNum(d.gp.change) ? r1(d.gp.change) : null];
     var t = d.trend && d.trend.points ? [d.trend.unit, isNum(d.trend.target) ? r1(d.trend.target) : null, d.trend.points.map(function (x) { return [x.label, isNum(x.gp) ? r1(x.gp) : null]; })] : null;
     var k = d.categories && d.categories.rows ? d.categories.rows.map(function (x) { return [x.name, isNum(x.cogsPct) ? r1(x.cogsPct) : null, isNum(x.salesShare) ? Math.round(x.salesShare) : null]; }) : null;
-    return hashString(JSON.stringify([d.comparison, g, o, t, k, c, p]));
+    return hashString(JSON.stringify(mp ? [d.comparison, g, o, t, k, c, p, mp] : [d.comparison, g, o, t, k, c, p]));
   }
   function hashString(str) {
     var h = 2166136261;

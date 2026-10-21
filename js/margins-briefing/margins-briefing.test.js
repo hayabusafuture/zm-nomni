@@ -103,6 +103,31 @@ test('one cost line at zero, or without enough data, is left out', () => {
   allTexts(d).forEach(t => assert.ok(new RegExp(ABOVE + ' (is|came to) S\\$1,893\\.', 'i').test(t) && !/wastage/i.test(t), t));
   d.costs.aboveTarget = 0; allTexts(d).forEach(t => assert.ok(!/wastage|above (the |your )?targets?/i.test(t), t));
 });
+test('menu price: recipes whose ingredient cost rose while the menu price has not changed', () => {
+  const d = base(); d.menuPrice = { amount: 420, recipes: 3, ingredient: 'Chicken thigh fillet', outlet: null };
+  const A = /^Chicken thigh fillet price rises add an estimated S\$420 to 3 recipes whose menu prices have not changed\.$/;
+  const B = /^3 recipes carry an estimated S\$420 of extra ingredient cost from chicken thigh fillet price rises, and their menu prices have not changed\.$/;
+  const C = /^The menu prices have not changed on 3 recipes whose ingredient costs rose, an estimated S\$420 extra\.$/;
+  const shapes = new Set();
+  SEEDS.forEach(seed => {
+    const r = summariseMarginsTab(d, { seed, unlimited: true });
+    const line = r.text.split(/(?<=\.) (?=[A-Z0-9])/).find(x => /S\$420/.test(x));
+    assert.ok(line && (A.test(line) || B.test(line) || C.test(line)), line);
+    shapes.add(A.test(line) ? 0 : B.test(line) ? 1 : 2);
+    assert.ok(!causal.test(line) && !/\bloss|overspen|lost\b/i.test(line), line);
+  });
+  assert.strictEqual(shapes.size, 3, 'expected three different shapes');
+});
+test('menu price: one recipe, one outlet, several ingredients, and nothing to say', () => {
+  const d = base(); d.menuPrice = { amount: 62, recipes: 1, ingredient: null, outlet: "Roll'd Bondi" };
+  SEEDS.forEach(seed => {
+    const line = summariseMarginsTab(d, { seed, unlimited: true }).text.split(/(?<=\.) (?=[A-Z0-9])/).find(x => /S\$62/.test(x));
+    assert.ok(/^At Roll'd Bondi, /.test(line) && /1 recipe\b/.test(line) && !/1 recipes/.test(line), line);
+    assert.ok(/menu price has not changed|its menu price has not changed|1 recipe carries/.test(line) && !/menu prices? have/.test(line), line);
+    assert.ok(/ingredient (price rises|costs)/.test(line), line);
+  });
+  [null, { amount: 0, recipes: 2 }, { amount: 100, recipes: 0 }].forEach(m => { const e = base(); e.menuPrice = m; allTexts(e).forEach(t => assert.ok(!/menu price/.test(t), t)); });
+});
 test('supplier price impact: extra cost, saving, nothing', () => {
   const up = /Supplier price changes (added S\$650 to costs|pushed costs up by S\$650), 3\.2% (more than at the old prices|above the old prices)\.|Compared with the old prices, the same purchases cost S\$650 \(3\.2%\) more\.|(Price changes from suppliers|Suppliers' price changes) added S\$650 to costs \(3\.2%\)\./;
   const shapes = new Set();
@@ -221,6 +246,7 @@ test('random scenarios: no NaN, no causal words, within the limit, every stateme
     if (rnd() > .2) d.gp.change = (rnd() - .5) * 8;
     if (rnd() > .3) d.outlets = Array.from({ length: 2 + Math.floor(rnd() * 28) }, (_, k) => ({ name: 'Outlet ' + k, gp: 55 + rnd() * 25, target: 55 + rnd() * 25 }));
     if (rnd() > .2) d.costs = { revenue: rnd() * 90000, wastage: rnd() * 3000, aboveTarget: rnd() > .3 ? rnd() * 3000 : (rnd() > .5 ? null : 0) };
+    if (rnd() > .5) d.menuPrice = { amount: rnd() * 3000, recipes: 1 + Math.floor(rnd() * 5), ingredient: rnd() > .5 ? 'Baby spinach' : null, outlet: rnd() > .7 ? 'Roll\'d Bondi' : null };
     if (rnd() > .3) d.priceImpact = { value: (rnd() - .4) * 3000, changePct: (rnd() - .4) * 8 };
     if (rnd() > .3) d.trend = { unit: ['day', 'week', 'month'][Math.floor(rnd() * 3)], target: 55 + rnd() * 25, points: Array.from({ length: Math.floor(rnd() * 32) }, (_, k) => ({ label: k + ' Sep', gp: 55 + rnd() * 25 })) };
     if (rnd() > .3) d.categories = { overall: 20 + rnd() * 20, rows: Array.from({ length: Math.floor(rnd() * 7) }, (_, k) => ({ name: 'Cat ' + k, cogsPct: 15 + rnd() * 30, salesShare: rnd() * 60 })) };
