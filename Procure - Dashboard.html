@@ -215,8 +215,17 @@
   .picker-option:hover, .picker-option.selected { background: var(--mint); color: var(--seaweed); font-weight: 600; }
 
   .overview { display: grid; grid-template-columns: 1fr; gap: 16px; }
-  .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border: 1px solid var(--overview-rule); border-radius: 16px; background: var(--panel); box-shadow: 0 1px 2px rgba(26,31,43,.08), 0 8px 20px rgba(26,31,43,.06); }
-  .metric { position: relative; display: flex; height: 146px; padding: 22px 24px; box-sizing: border-box; flex-direction: column; border-left: 1px solid var(--overview-rule); overflow: hidden; }
+  /* Summary cards: a window of up to 4 cards (2 on tablets, 1 on phones) over a longer row. Arrows sit on the window's edges. */
+  .metric-carousel { --metric-visible: 4; position: relative; min-width: 0; }
+  .metric-viewport { overflow: hidden; border: 1px solid var(--overview-rule); border-radius: 16px; background: var(--panel); box-shadow: 0 1px 2px rgba(26,31,43,.08), 0 8px 20px rgba(26,31,43,.06); }
+  .metric-grid { display: flex; transition: transform .32s cubic-bezier(.4, 0, .2, 1); }
+  .metric-nav { position: absolute; top: 50%; z-index: 2; display: grid; place-items: center; width: 32px; height: 32px; margin-top: -16px; padding: 0; border: 1px solid var(--overview-rule); border-radius: 50%; background: var(--panel); color: var(--ink); box-shadow: 0 2px 8px rgba(26,31,43,.14); cursor: pointer; transition: background-color .15s ease; }
+  .metric-nav:hover { background: var(--row-hover); }
+  .metric-nav .material-symbols-outlined { font-size: 20px; }
+  .metric-nav[hidden] { display: none; }
+  .metric-nav-prev { left: -16px; } .metric-nav-next { right: -16px; }
+  @media (prefers-reduced-motion: reduce) { .metric-grid { transition: none; } }
+  .metric { position: relative; display: flex; flex: 0 0 calc(100% / var(--metric-visible)); height: 146px; padding: 22px 24px; box-sizing: border-box; flex-direction: column; border-left: 1px solid var(--overview-rule); overflow: hidden; }
   .metric:first-child { border-left: 0; } .metric-label { display: flex; align-items: baseline; gap: 7px; color: var(--seaweed); font-size: 14px; font-weight: 600; }
   .metric-label .material-symbols-outlined { align-self: center; font-size: 16px; color: var(--spinach); } .metric-coverage { margin-left: 2px; padding: 0; border: 0; background: transparent; color: var(--ink-mute); font: 500 11px/1.4 "Inter", system-ui, sans-serif; letter-spacing: .01em; cursor: help; } .metric-coverage:hover, .metric-coverage:focus-visible { color: var(--ink-mute-strong); text-decoration: underline; } .metric-coverage:focus-visible { outline: 2px solid var(--spinach); outline-offset: 2px; border-radius: 2px; } .metric-content { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 20px; } .metric-unavailable { margin-top: 22px; color: var(--ink-mute); font-size: 13px; font-weight: 500; } .metric-value { margin: 0; color: var(--seaweed); font: 700 32px/1 "Hanken Grotesk", system-ui, sans-serif; letter-spacing: -.022em; font-variant-numeric: tabular-nums; }
   .metric-trend { display: inline-flex; align-items: center; gap: 3px; margin: 0; color: var(--spinach); font-size: 14px; font-weight: 500; }
@@ -237,6 +246,11 @@
   .sales-no-pos { display: none; padding: 56px 24px; }
   #panel-sales.no-pos > .sales-no-pos { display: block; }
   #panel-sales.no-pos > :not(.sales-no-pos) { display: none; }
+  /* An account with no POS-connected outlet: no Sales or Margins, so no tabs and no Revenue or COGS cards. */
+  .no-pos-account .dashboard-tabs-bar, .no-pos-account [data-metric-card="revenue"], .no-pos-account [data-metric-card="cogs"] { display: none; }
+  .no-pos-account .overview { margin-bottom: 24px; }
+  #panel-margins.no-pos > .sales-no-pos { display: block; }
+  #panel-margins.no-pos > :not(.sales-no-pos) { display: none; }
   .sales-no-pos .material-symbols-outlined { color: var(--ink-mute-strong); font-size: 28px; }
   .sales-no-pos-title { margin: 8px 0 4px; color: var(--ink); font-size: 15px; font-weight: 700; }
   .sales-no-pos-body { max-width: 420px; margin: 0 auto; line-height: 1.5; }
@@ -474,8 +488,8 @@
 
   button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--nomni-green); outline-offset: 3px; }
   @media (max-width: 1280px) { .app { grid-template-columns: 64px 1fr; } .sidebar { position: fixed; top: 56px; left: 0; width: 64px; height: calc(100vh - 56px); overflow: hidden; transition: width .2s ease; z-index: 4; } .sidebar:hover { width: 232px; box-shadow: 2px 0 12px rgba(0,0,0,.12); } .nav a { white-space: nowrap; } .sidebar .nav-label, .sidebar .nav .badge, .sidebar .nav .warn-icon { display: none; } .sidebar:hover .nav-label { display: inline; } .sidebar:hover .nav .badge { display: inline-flex; } .sidebar:hover .nav .warn-icon { display: inline-flex; } }
-  @media (max-width: 1050px) { .overview { grid-template-columns: 1fr; } .metric-grid { grid-template-columns: repeat(2, 1fr); } .metric:nth-child(3) { border-left: 0; border-top: 1px solid var(--overview-rule); } }
-  @media (max-width: 720px) { :root { --main-pad-x: 18px; } .main { padding: 28px var(--main-pad-x) 48px; } .page-head { align-items: flex-start; flex-direction: column; margin-bottom: 0; } .page-actions { width: 100%; } .quick-action { flex: 1; justify-content: center; } .context-controls { width: 100%; } .context-controls.inline-context { width: auto; } .picker { flex: 1; } .inline-context .picker { flex: 0 0 auto; } .picker-button { width: 100%; justify-content: space-between; } .inline-context .picker-button { width: auto; } .period-comparison { flex-basis: 100%; margin: 6px 0 0; } .metric-grid { grid-template-columns: 1fr; } .metric { height: auto; min-height: 154px; border-top: 1px solid var(--overview-rule); border-left: 0; } .metric:first-child { border-top: 0; } .outlet-card > .insight-card-sub { flex-basis: 100%; margin: 4px 0 16px; } .user > span:not(.chev) { display: none; } }
+  @media (max-width: 1050px) { .overview { grid-template-columns: 1fr; } .metric-carousel { --metric-visible: 2; } }
+  @media (max-width: 720px) { :root { --main-pad-x: 18px; } .main { padding: 28px var(--main-pad-x) 48px; } .page-head { align-items: flex-start; flex-direction: column; margin-bottom: 0; } .page-actions { width: 100%; } .quick-action { flex: 1; justify-content: center; } .context-controls { width: 100%; } .context-controls.inline-context { width: auto; } .picker { flex: 1; } .inline-context .picker { flex: 0 0 auto; } .picker-button { width: 100%; justify-content: space-between; } .inline-context .picker-button { width: auto; } .period-comparison { flex-basis: 100%; margin: 6px 0 0; } .metric-carousel { --metric-visible: 1; } .metric-nav-prev { left: 6px; } .metric-nav-next { right: 6px; } .metric { height: auto; min-height: 154px; } .outlet-card > .insight-card-sub { flex-basis: 100%; margin: 4px 0 16px; } .user > span:not(.chev) { display: none; } }
 
   /* ── Sidebar mode switcher / HQ selector (from previous dashboard) ── */
   .sidebar-mode-wrap { padding: 10px 10px 0; flex-shrink: 0; }
@@ -1248,12 +1262,16 @@
     <div class="page-head"><div><p class="welcome-date" id="welcomeDate"></p><h1 class="welcome" id="welcomeGreeting">Good morning, William</h1></div><div class="page-actions"><div class="new-action"><button class="quick-action" id="newActionButton" type="button" aria-expanded="false" aria-controls="newActionMenu"><span class="material-symbols-outlined">add</span>New</button><div class="picker-menu new-menu" id="newActionMenu"><a href="Procure%20-%20New%20Order%20-%20Item.html"><span class="material-symbols-outlined">format_list_bulleted</span>Order by item</a><a href="Procure%20-%20New%20Order%20-%20Supplier.html" id="orderBySupplierLink"><span class="material-symbols-outlined">local_shipping</span>Order by supplier</a><a href="Freemium/procure-trial-invoices.html" id="uploadInvoiceLink"><span class="material-symbols-outlined">upload</span>Upload invoice</a></div></div></div></div>
     <div class="overview-title" id="overviewTitle" role="heading" aria-level="2"><span>Here’s the performance of</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="scope"><span data-picker-label="scope">all outlets</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="scope"></div></div></div><span>for</span><div class="context-controls inline-context"><div class="picker"><button class="picker-button" aria-expanded="false" data-picker="period"><span data-picker-label="period">this month</span><span class="material-symbols-outlined">expand_more</span></button><div class="picker-menu" data-menu="period"><button class="picker-option selected">This month</button><button class="picker-option">Last 30 days</button><button class="picker-option">Last month</button><button class="picker-option">Last 3 months</button><button class="picker-option">This year</button></div></div></div><span class="period-comparison">Compared with 1–21 August 2026</span></div>
     <section class="overview" aria-label="Operations and performance overview">
-      <div class="metric-grid">
+      <div class="metric-carousel" id="metricCarousel"><div class="metric-viewport"><div class="metric-grid" id="metricGrid">
         <article class="metric"><div class="metric-label"><span class="material-symbols-outlined">shopping_cart</span>Purchases<button class="col-info" type="button" data-col-info="purchases" aria-label="How purchases is calculated">i</button></div><div class="metric-content"><div class="metric-value" data-metric="purchases">S$28,760</div><div class="metric-trend"><span class="material-symbols-outlined">trending_up</span><span data-trend="purchases">6% vs last month</span></div></div></article>
         <article class="metric"><div class="metric-label"><span class="material-symbols-outlined">payments</span>Average invoice value</div><div class="metric-content"><div class="metric-value" data-metric="invoiceValue">S$649</div><div class="metric-trend"><span class="material-symbols-outlined">trending_up</span><span data-trend="invoiceValue">20% vs last month</span></div></div></article>
         <article class="metric" data-metric-card="revenue"><div class="metric-label"><span class="material-symbols-outlined">payments</span>Revenue<button class="metric-coverage" type="button" data-metric-coverage="revenue" data-col-info="coverage" hidden></button></div><div class="metric-content"><div class="metric-value" data-metric="revenue">S$42,180</div><div class="metric-trend"><span class="material-symbols-outlined">trending_up</span><span data-trend="revenue">8% vs last month</span></div></div><div class="metric-unavailable" data-unavailable="revenue" hidden>POS data unavailable</div></article>
         <article class="metric" data-metric-card="cogs"><div class="metric-label"><span class="material-symbols-outlined">percent</span>COGS<button class="col-info" type="button" data-col-info="cogs" aria-label="How COGS is calculated">i</button><button class="metric-coverage" type="button" data-metric-coverage="cogs" data-col-info="coverage" hidden></button></div><div class="metric-content"><div class="metric-value" data-metric="cogs">31.2%</div><div class="metric-trend"><span class="material-symbols-outlined">trending_down</span><span data-trend="cogs">1.9 pts vs last month</span></div></div><div class="metric-unavailable" data-unavailable="cogs" hidden>POS data unavailable</div></article>
-      </div>
+        <article class="metric" data-metric-card="orders"><div class="metric-label"><span class="material-symbols-outlined">shopping_bag</span>Orders placed</div><div class="metric-content"><div class="metric-value" data-metric="orders">48</div><div class="metric-trend"><span class="material-symbols-outlined">trending_up</span><span data-trend="orders">4% vs last month</span></div></div></article>
+        <article class="metric" data-metric-card="billing"><div class="metric-label"><span class="material-symbols-outlined">receipt_long</span>Billing discrepancies<button class="col-info" type="button" data-col-info="billing" aria-label="How billing discrepancies is calculated">i</button></div><div class="metric-content"><div class="metric-value" data-metric="billing">S$1,240</div><div class="metric-trend"><span class="material-symbols-outlined">trending_down</span><span data-trend="billing">8% vs last month</span></div></div></article>
+      </div></div>
+      <button class="metric-nav metric-nav-prev" id="metricPrev" type="button" aria-label="Previous cards" hidden><span class="material-symbols-outlined" aria-hidden="true">chevron_left</span></button>
+      <button class="metric-nav metric-nav-next" id="metricNext" type="button" aria-label="More cards" hidden><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></button></div>
     </section>
     <div class="dashboard-tabs-bar"><div class="dashboard-tabs" role="tablist" aria-label="Dashboard insights"><button class="dashboard-tab active" type="button" role="tab" aria-selected="true" aria-controls="panel-sales" id="tab-sales"><span class="material-symbols-outlined" aria-hidden="true">point_of_sale</span>Sales</button><button class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-spend" id="tab-spend"><span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span>Spend &amp; procurement</button><button class="dashboard-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-margins" id="tab-margins"><span class="material-symbols-outlined" aria-hidden="true">percent</span>Margins</button></div></div>
     <div class="tab-panels">
@@ -1379,6 +1397,7 @@
         </div>
       </section>
       <section class="tab-panel" id="panel-margins" role="tabpanel" aria-labelledby="tab-margins">
+        <div class="tab-placeholder sales-no-pos" id="marginsNoPos"><span class="material-symbols-outlined" aria-hidden="true">percent</span><p class="sales-no-pos-title">No margin data for this outlet</p><p class="sales-no-pos-body" id="marginsNoPosBody"></p></div>
         <div class="insight-row-full"><div class="margins-overview">
           <div class="ai-summary key-takeaway" id="marginsTakeaway" hidden><h3 class="key-takeaway-title" id="marginsTakeawayTitle"><svg class="key-takeaway-logo" viewBox="0 0 514.202 584.713" aria-hidden="true" focusable="false"><path fill="currentColor" d="M 77.918 113.681 C 78.718 109.922 82.408 107.521 86.167 108.321 L 429.699 181.338 C 433.459 182.138 435.861 185.827 435.06 189.586 L 429.247 217.011 C 427.158 226.755 424.339 236.152 420.858 245.166 L 491.59 230.131 C 495.35 229.331 499.039 231.732 499.84 235.491 L 508.577 276.593 C 538.965 419.459 443.101 559.923 296.311 581.988 C 160.938 602.313 35.242 506.605 6.837 373.032 L 0.154 341.674 C -0.647 337.916 1.755 334.227 5.515 333.426 L 123.309 308.403 C 79.971 264.238 59.887 198.391 73.532 134.145 L 77.883 113.716 L 77.918 113.681 Z M 342.572 0.154 C 346.331 -0.647 350.021 1.755 350.822 5.514 L 352.806 14.771 C 363.005 62.729 330.841 109.887 281.551 117.3 C 236.125 124.122 193.902 91.999 184.364 47.138 L 183.076 41.152 C 182.276 37.393 184.677 33.704 188.437 32.903 L 342.572 0.154 Z"/></svg><span class="key-takeaway-label">At a glance</span></h3><span class="ai-summary-skeleton" id="marginsTakeawaySkeleton" aria-hidden="true" hidden><span></span><span></span></span><p class="key-takeaway-text is-clamped" id="marginsTakeawayText" aria-labelledby="marginsTakeawayTitle"></p><button class="key-takeaway-toggle" id="marginsTakeawayToggle" type="button" aria-expanded="false" aria-controls="marginsTakeawayText" hidden>View all</button><a class="key-takeaway-link" id="marginsTakeawayLink" href="#marginsDriftBody" hidden>See recipes<span class="material-symbols-outlined link-chevron" aria-hidden="true">chevron_right</span></a><div class="key-takeaway-footer" id="marginsStatusFooter" hidden><span class="key-takeaway-footer-icon" aria-hidden="true">i</span><p class="key-takeaway-footer-text" id="marginsStatusText"></p><button class="key-takeaway-footer-details" id="marginsStatusDetails" type="button" aria-haspopup="dialog" aria-controls="statusModal">Details</button></div></div>
           <div class="insight-card margins-key-overview" role="region" aria-label="Margins key numbers"><div class="mini-chart-row" id="marginsKeyBody"></div></div>
@@ -1439,7 +1458,7 @@
     </form>
   </div>
 </div>
-<div class="proto-data-toggle" id="protoDataToggle" role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-data-label">Prototype data</span><button type="button" data-proto-outlets="1">1 outlet</button><button type="button" data-proto-outlets="10">10 outlets</button><button type="button" data-proto-outlets="30">30 outlets</button></div>
+<div class="proto-data-toggle" id="protoDataToggle" role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-data-label">Prototype data</span><button type="button" data-proto-outlets="1">1 outlet</button><button type="button" data-proto-outlets="10">10 outlets</button><button type="button" data-proto-outlets="30">30 outlets</button><button type="button" data-proto-outlets="nopos" title="10 outlets, none connected to a POS">No POS</button></div>
 <div class="inspect-tip" id="inspectTip"></div>
 <div class="chart-tip" id="chartTip"></div>
 <script src="js/heatmap-summary/heatmap-summary.js"></script>
@@ -1476,6 +1495,7 @@
   const PROTOTYPE_DATA_SETS = {
     1: { names: ["Roll'd Bondi"], withoutPos: [] },
     10: { names: TEN_OUTLETS, withoutPos: ["Roll'd World Square"] },
+    nopos: { names: TEN_OUTLETS, withoutPos: TEN_OUTLETS },
     30: {
       names: [...TEN_OUTLETS, ...['Surry Hills', 'Darlinghurst', 'Pyrmont', 'Ultimo', 'Redfern', 'Glebe', 'Marrickville', 'Leichhardt', 'Balmain', 'Mosman', 'Neutral Bay', 'North Sydney', 'St Leonards', 'Macquarie Park', 'Ryde', 'Burwood', 'Strathfield', 'Rhodes', 'Hurstville', 'Westfield Sydney Level 5 Food Court'].map(suburb => `Roll'd ${suburb}`)],
       withoutPos: ["Roll'd World Square", "Roll'd Glebe", "Roll'd Ryde", "Roll'd Rhodes"],
@@ -1675,7 +1695,10 @@
   let DASHBOARD_OUTLETS = [], OUTLETS_WITHOUT_POS = [], PROCUREMENT_ONLY_OUTLETS = {}, outletBases = {};
   let SALES_DATA = {}, SALES_OUTLET_ROWS = [], SPEND_DATA = null, PROCURE_DATA = null, prototypeOutletCount = 10;
   function hasOutletGroup(){ return DASHBOARD_OUTLETS.length > 1; }
-  function initialPrototypeOutletCount(){ const requested = Number(new URLSearchParams(location.search).get('outlets')); return PROTOTYPE_DATA_SETS[requested] ? requested : 10; }
+  // True for an outlet without a POS, and for "All outlets" when none of them has one (the No POS data set).
+  function accountLacksPos(){ return DASHBOARD_OUTLETS.length > 0 && OUTLETS_WITHOUT_POS.length === DASHBOARD_OUTLETS.length; }
+  function scopeLacksPos(scope){ return scope === 'All outlets' ? accountLacksPos() : OUTLETS_WITHOUT_POS.includes(scope); }
+  function initialPrototypeOutletCount(){ const requested = new URLSearchParams(location.search).get('outlets'); return PROTOTYPE_DATA_SETS[requested] ? (requested === 'nopos' ? requested : Number(requested)) : 10; }
   function loadPrototypeDataSet(count){
     const set = PROTOTYPE_DATA_SETS[count];
     prototypeOutletCount = count;
@@ -1705,6 +1728,13 @@
   function formatCurrency(value){ return `S$${Math.round(value).toLocaleString('en-SG')}`; }
   // Purchases and Average invoice value use the Spend tab's invoiced total; the latter divides by invoice count.
   // Each card value comes with its change, so the card can colour it by which way the business wants it to go.
+  // Billing discrepancies = billed above the ordered price + invoiced but not received: the "At stake" total on the Spend tab.
+  function billingCard(procurement){
+    const stake = side => Math.round(side.discrepancies.over.value) + Math.round(side.discrepancies.notReceived.value);
+    const now = stake(procurement.current), before = stake(procurement.previous);
+    const comparison = PERIOD_CARD_CONTEXT[currentPeriod].comparison;
+    return { value: formatCurrency(now), change: before ? pctChange(now, before) : now - before, unit: '%', trend: before ? `${Math.abs(Math.round(pctChange(now, before)))}% ${comparison}` : now === before ? `No change ${comparison}` : `${formatCurrency(Math.abs(now - before))} ${now > before ? 'more' : 'less'} ${comparison}` };
+  }
   function getDashboardData(scope, period){
     const context = PERIOD_CARD_CONTEXT[period];
     const procurement = getProcureData(scope, period);
@@ -1715,6 +1745,8 @@
       purchases: { value: formatCurrency(procurement.current.spend), change: pctChange(procurement.current.spend, procurement.previous.spend), unit: '%' },
       invoiceValue: currentInvoice == null || previousInvoice == null ? null : { value: formatCurrency(currentInvoice), change: pctChange(currentInvoice, previousInvoice), unit: '%' },
       revenue: null, cogs: null,
+      orders: { value: String(procurement.current.orders), change: pctChange(procurement.current.orders, procurement.previous.orders), unit: '%' },
+      billing: billingCard(procurement),
     };
     // Revenue comes from the same series Revenue by outlet renders, so the summary card and the panel always
     // agree; the group is the sum of its POS outlets rather than a separately hand-set figure.
@@ -1726,12 +1758,12 @@
       cards.revenue = { value: formatCurrency(revenue), change: pctChange(revenue, pairs.reduce((sum, pair) => sum + pair.previousRevenue, 0)), unit: '%' };
       cards.cogs = { value: `${cogs.toFixed(1)}%`, change: context.cogsChangePts, unit: ' pts' };
     }
-    Object.values(cards).forEach(card => { if(card){ const size = card.unit === '%' ? Math.abs(Math.round(card.change)) : Math.abs(card.change).toFixed(1); card.trend = `${size}${card.unit} ${context.comparison}`; } });
+    Object.values(cards).forEach(card => { if(card && !card.trend){ const size = card.unit === '%' ? Math.abs(Math.round(card.change)) : Math.abs(card.change).toFixed(1); card.trend = `${size}${card.unit} ${context.comparison}`; } });
     return cards;
   }
   // Revenue side: up green, down amber. Cost side: up amber, down green. Average invoice value is neutral — a
   // larger invoice is neither better nor worse in itself.
-  const CARD_POLARITY = { revenue: 'revenue', cogs: 'cost', purchases: 'cost', invoiceValue: 'neutral' };
+  const CARD_POLARITY = { revenue: 'revenue', cogs: 'cost', purchases: 'cost', invoiceValue: 'neutral', orders: 'neutral', billing: 'cost' };
   function renderMetricCard(metric, card){
     const value = document.querySelector(`[data-metric="${metric}"]`), trend = value.closest('.metric').querySelector('.metric-trend');
     value.textContent = card ? card.value : '—';
@@ -1743,13 +1775,28 @@
     trend.classList.toggle('is-down', polarity !== 'neutral' && direction !== 0 && !good);
     trend.querySelector('.material-symbols-outlined').textContent = direction > 0 ? 'trending_up' : direction < 0 ? 'trending_down' : 'trending_flat';
   }
+  // Carousel: show up to --metric-visible of the cards that are on screen; arrows move by a page. Cards outside the window are inert.
+  let metricOffset = 0;
+  function updateMetricCarousel(step = 0){
+    const carousel = document.getElementById('metricCarousel'), grid = document.getElementById('metricGrid');
+    const cards = [...grid.children].filter(card => getComputedStyle(card).display !== 'none');
+    const visible = Number(getComputedStyle(carousel).getPropertyValue('--metric-visible')) || 4, maxOffset = Math.max(0, cards.length - visible);
+    metricOffset = Math.min(maxOffset, Math.max(0, metricOffset + step * visible));
+    grid.style.transform = `translateX(${-metricOffset * 100 / visible}%)`;
+    cards.forEach((card, index) => { const inWindow = index >= metricOffset && index < metricOffset + visible; card.inert = !inWindow; card.setAttribute('aria-hidden', String(!inWindow)); });
+    document.getElementById('metricPrev').hidden = metricOffset === 0;
+    document.getElementById('metricNext').hidden = metricOffset >= maxOffset;
+  }
+  document.getElementById('metricPrev').addEventListener('click', () => updateMetricCarousel(-1));
+  document.getElementById('metricNext').addEventListener('click', () => updateMetricCarousel(1));
+  window.addEventListener('resize', () => updateMetricCarousel());
   function updateMetricCoverage(scope){ const isAllOutlets = scope === 'All outlets', hasPos = !OUTLETS_WITHOUT_POS.includes(scope), available = isAllOutlets ? DASHBOARD_OUTLETS.filter(outlet => !OUTLETS_WITHOUT_POS.includes(outlet)).length : hasPos ? 1 : 0, total = isAllOutlets ? DASHBOARD_OUTLETS.length : 1; ['revenue', 'cogs'].forEach(metric => { const coverage = document.querySelector(`[data-metric-coverage="${metric}"]`), metricLabel = metric === 'cogs' ? 'COGS' : 'Revenue', explanation = `${metricLabel} data is available for ${available} of ${total} outlet${total === 1 ? '' : 's'} in this view.`; coverage.hidden = !isAllOutlets; coverage.textContent = `${available} of ${total} outlet${total === 1 ? '' : 's'}`; coverage.dataset.colInfoText = explanation; coverage.setAttribute('aria-label', explanation); }); }
   // Source of truth for the current selection — the exact keys getDashboardData/outletBases/PERIOD_CARD_CONTEXT expect.
   // The headline and the sticky bar below only ever display derived text; neither is read back for data lookups.
   let currentScope = 'All outlets';
   let currentPeriod = 'This month';
   loadPrototypeDataSet(initialPrototypeOutletCount());
-  function updateDashboard(){ const scope = currentScope, period = currentPeriod, cards = getDashboardData(scope, period), lacksPos = OUTLETS_WITHOUT_POS.includes(scope); ['purchases', 'invoiceValue', 'revenue', 'cogs'].forEach(metric => renderMetricCard(metric, cards?.[metric])); ['revenue', 'cogs'].forEach(metric => { document.querySelector(`[data-metric-card="${metric}"] .metric-content`).hidden = lacksPos; document.querySelector(`[data-unavailable="${metric}"]`).hidden = !lacksPos; }); updateMetricCoverage(scope); const salesPanel = document.getElementById('panel-sales'); salesPanel.classList.toggle('no-pos', lacksPos); if(lacksPos) document.getElementById('salesNoPosBody').textContent = `${scope} isn’t connected to a POS, so there’s no sales, covers or item data to show. Purchases and other procurement data above are still available.`; if(window.salesTabReady && !lacksPos) { renderHeatmap(document.querySelector('[data-heatmap-mode].active')?.dataset.heatmapMode || 'thisPeriod'); renderOutlets(); renderTopItems(); renderSalesChannels(); renderCovers(); renderSpendPerHead(); renderSalesBriefing(); updateSalesStatusFooter(); } if(window.salesTabReady) { renderSpendTab(); renderMarginsTab(); } }
+  function updateDashboard(){ const scope = currentScope, period = currentPeriod, cards = getDashboardData(scope, period), lacksPos = scopeLacksPos(scope), noPosAccount = accountLacksPos(); document.body.classList.toggle('no-pos-account', noPosAccount); if(noPosAccount && !document.getElementById('tab-spend').classList.contains('active')) document.getElementById('tab-spend').click(); ['purchases', 'invoiceValue', 'revenue', 'cogs', 'orders', 'billing'].forEach(metric => renderMetricCard(metric, cards?.[metric])); updateMetricCarousel(); ['revenue', 'cogs'].forEach(metric => { document.querySelector(`[data-metric-card="${metric}"] .metric-content`).hidden = lacksPos; document.querySelector(`[data-unavailable="${metric}"]`).hidden = !lacksPos; }); updateMetricCoverage(scope); const salesPanel = document.getElementById('panel-sales'); salesPanel.classList.toggle('no-pos', lacksPos); if(lacksPos) document.getElementById('salesNoPosBody').textContent = `${scope} isn’t connected to a POS, so there’s no sales, covers or item data to show. Purchases and other procurement data above are still available.`; if(window.salesTabReady && !lacksPos) { renderHeatmap(document.querySelector('[data-heatmap-mode].active')?.dataset.heatmapMode || 'thisPeriod'); renderOutlets(); renderTopItems(); renderSalesChannels(); renderCovers(); renderSpendPerHead(); renderSalesBriefing(); updateSalesStatusFooter(); } if(window.salesTabReady) { renderSpendTab(); renderMarginsTab(); } }
   const overviewTitle = document.getElementById('overviewTitle');
   const stickyContext = document.getElementById('stickyContext');
   const dashboardTabsBar = document.querySelector('.dashboard-tabs-bar');
@@ -1759,7 +1806,9 @@
   function updateStickyContextVisibility(){
     if(!stickyContext || !overviewTitle) return;
     // Docked = the rail has reached the bottom of the header. Nothing ever transforms the bar itself, so its position is always true.
-    const docked = dashboardTabsBar.getBoundingClientRect().top <= 56 + stickyContext.offsetHeight + 0.5;
+    // With no tabs (an account without POS) the summary cards are the anchor instead.
+    const noTabs = document.body.classList.contains('no-pos-account'), anchor = noTabs ? document.querySelector('.overview') : dashboardTabsBar;
+    const docked = (noTabs ? anchor.getBoundingClientRect().bottom : anchor.getBoundingClientRect().top) <= 56 + stickyContext.offsetHeight + 0.5;
     const tucked = docked && tabsTucked && !tabsHovered;   // hovering the header (or the rail) brings the tabs back
     stickyContext.classList.toggle('is-visible', docked);
     dashboardTabsBar.classList.toggle('is-docked', docked);
@@ -3032,7 +3081,7 @@
   /* Prototype data toggle. ?outlets=1|10|30 wins over the default; switching rewrites the URL with replaceState so
      a copied link reproduces the view, and resets scope because the selected outlet may not exist in the new set. */
   const protoDataToggle = document.getElementById('protoDataToggle');
-  function renderPrototypeToggle(){ protoDataToggle.querySelectorAll('[data-proto-outlets]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.protoOutlets) === prototypeOutletCount))); }
+  function renderPrototypeToggle(){ protoDataToggle.querySelectorAll('[data-proto-outlets]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.protoOutlets === String(prototypeOutletCount)))); }
   function switchPrototypeDataSet(count){
     if(count === prototypeOutletCount) return;
     loadPrototypeDataSet(count);
@@ -3040,7 +3089,7 @@
     spendShowAll = false; lastOutletsScope = null;
     renderScopeMenu(); renderPrototypeToggle(); updateDashboard();
   }
-  protoDataToggle.addEventListener('click', event => { const button = event.target.closest('[data-proto-outlets]'); if(button) switchPrototypeDataSet(Number(button.dataset.protoOutlets)); });
+  protoDataToggle.addEventListener('click', event => { const button = event.target.closest('[data-proto-outlets]'); if(button) switchPrototypeDataSet(button.dataset.protoOutlets === 'nopos' ? 'nopos' : Number(button.dataset.protoOutlets)); });
   document.addEventListener('keydown', event => {
     if(!event.shiftKey || event.metaKey || event.ctrlKey || event.altKey || event.key.toLowerCase() !== 'd') return;
     if(event.target.closest?.('input, textarea, select, [contenteditable="true"]')) return;
@@ -3491,6 +3540,7 @@
   // One shared tooltip on <body> avoids clipping inside the scrolling supplier table.
   const COL_INFO = {
     purchases: 'Total invoiced supplier spend for the selected outlets and period.',
+    billing: 'Billed above the ordered price, plus invoiced but not received.',
     foodCostAboveTarget: 'Estimated recipe costs above your food-cost targets, summed for each outlet and day. Below-target results do not offset these amounts.',
     cogs: 'Theoretical: from POS sales and recipe costs.',
     gpPercent: 'Theoretical gross profit: 100% minus theoretical COGS %.',
@@ -4628,6 +4678,9 @@
   function renderMarginsTab(){
     const data = getMarginsData();
     const ids = ['marginsKeyBody', 'marginsBulletsBody', 'marginsTrendBody', 'marginsCategoryBody', 'marginsMenuBody', 'marginsDriftBody'];
+    const lacksPos = scopeLacksPos(currentScope), marginsPanel = document.getElementById('panel-margins');
+    marginsPanel.classList.toggle('no-pos', lacksPos);
+    if(lacksPos) document.getElementById('marginsNoPosBody').textContent = `${currentScope} isn’t connected to a POS, so there’s no theoretical COGS, gross profit or recipe margin to show. Purchases and other procurement data are still available.`;
     if(!data){
       ids.forEach(id => renderEmptyState(document.getElementById(id), 'Margins are unavailable without POS data.'));
       renderMarginsCategories();
@@ -4808,7 +4861,7 @@
     const url = new URL(location.href); url.hash = tabHash(tab); history.pushState(null, '', url);
   }));
   function selectTabFromAddress(){
-    const index = tabIndexFromHash(), target = dashboardTabs[index >= 0 ? index : 0];
+    const index = tabIndexFromHash(), target = accountLacksPos() ? document.getElementById('tab-spend') : dashboardTabs[index >= 0 ? index : 0];
     if(target.classList.contains('active')) return;
     tabFromAddress = true; target.click(); tabFromAddress = false;
   }
