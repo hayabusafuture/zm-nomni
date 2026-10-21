@@ -65,9 +65,9 @@
  *     overall,                         // overall COGS %
  *     rows: [{ name, cogsPct, salesShare }]   // salesShare in % of sales
  *   },
- *   costs?: { revenue, wastage, aboveTarget },   // S$; wastage is recorded, aboveTarget (null when there is not enough data) is estimated from recipe costs
- *   priceImpact?: { value, changePct } | null // S$ signed (+ = extra cost), % on the same purchases
- *   menuPrice?: { amount, recipes, ingredient, outlet } | null  // amount: S$ extra ingredient cost this period on `recipes` recipes whose menu
+ *   costs?: { revenue, wastage, aboveTarget },   // $; wastage is recorded, aboveTarget (null when there is not enough data) is estimated from recipe costs
+ *   priceImpact?: { value, changePct } | null // $ signed (+ = extra cost), % on the same purchases
+ *   menuPrice?: { amount, recipes, ingredient, outlet } | null  // amount: $ extra ingredient cost this period on `recipes` recipes whose menu
  *                                      // price has not changed; ingredient: one ingredient's name or null; outlet: the outlet name when one outlet is selected, else null
  * }
  *
@@ -264,7 +264,7 @@
     var c = d.costs;
     if (!c) return [];
     var w = isNum(c.wastage) ? c.wastage : 0, a = isNum(c.aboveTarget) ? c.aboveTarget : 0;
-    // Wastage is rounded to S$10 like its tile; food cost above target is the tile's whole-dollar figure, so the two match.
+    // Wastage is rounded to $10 like its tile; food cost above target is the tile's whole-dollar figure, so the two match.
     var w10 = round10(w), a10 = Math.round(a);
     if (w10 <= 0 && a10 <= 0) return [];
     // How big the above-target cost is against revenue. Used only to score the statement; it is never said, and never added to wastage.
@@ -380,7 +380,7 @@
   function r1(v) { return Math.round(v * 10) / 10; }
   function round10(v) { return Math.round(v / 10) * 10; }
   function pts(v) { return Math.abs(r1(v)).toFixed(1) + ' pts'; }
-  function money(v) { return 'S$' + Math.round(v).toLocaleString('en-SG'); }
+  function money(v) { return '$' + Math.round(v).toLocaleString('en-SG'); }
   function wordCount(s) { return s.trim().split(/\s+/).filter(Boolean).length; }
   function and(a) { return a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
 

@@ -26,7 +26,7 @@ It picks the strongest findings (up to three), from:
 
 - **Spend change**, split by supplier. Always included when spend moved.
 - **Price rises** of 5% or more, grouped by item: where (one outlet by name, several by count, "all" when it's every outlet) and by how much at most.
-- **Price discrepancies**: the Order accuracy headline, naming a supplier that holds half or more, plus "not received" only when it's above S$0.
+- **Price discrepancies**: the Order accuracy headline, naming a supplier that holds half or more, plus "not received" only when it's above $0.
 - **A supplier under 90%** on fill rate or price accuracy, judged on the figure shown.
 - **An outlet moving against the group** (group view only), or the biggest mover when the group is flat.
 
@@ -36,7 +36,7 @@ When two findings are about the same supplier, they're told as one story, with t
 
 > Two things stand out for Sunrise Poultry Distributors: it raised the price of chicken thigh fillet by up to 14.3% at all 30 outlets, and it had 65% of its invoice lines at the ordered price. Overall, spend fell 4%, split between Green Valley Produce and Sunrise Poultry Distributors.
 
-- If the supplier also holds most of the spend change, spend opens the story ("Spend fell 2%, and most of that is Sunrise… (−S$555), which also…").
+- If the supplier also holds most of the spend change, spend opens the story ("Spend fell 2%, and most of that is Sunrise… (−$555), which also…").
 - Otherwise spend becomes a line of context, after the story when the story is stronger and before it when it isn't. So the briefing doesn't always open with "Spend…".
 - A story is short: spend plus one fact, or two facts. The supplier is named once.
 - Other findings follow as their own sentences, some with a joining word ("Elsewhere,", "Separately,").
@@ -67,6 +67,6 @@ Thresholds live in `CONFIG` and were set against synthetic data. The ones most l
 
 - `flatSpendPct` — below this, spend is "steady"
 - `priceRisePct` — the smallest price rise worth saying
-- `minDiscrepancy` — S$ above the ordered price before it's mentioned
+- `minDiscrepancy` — $ above the ordered price before it's mentioned
 - `outletDivergencePct` / `outletMoverPct` — how far an outlet must move
 - `superlativeMarginPts` — how clearly an item must lead before it's called "the largest"

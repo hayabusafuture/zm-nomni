@@ -63,4 +63,4 @@ All thresholds live in `CONFIG` and were tuned against synthetic data. Expect to
 
 - Online and delivery orders are bucketed by when they were **placed**, not fulfilled.
 - Built for a Mon→Sun, hour-column grid. Dayparts are fixed (lunch 11am–2pm, dinner 5–9pm, etc.) in `DAYPARTS`.
-- Currency is formatted as S$. Change `money()` for other markets.
+- Currency is formatted as $. Change `money()` for other markets.

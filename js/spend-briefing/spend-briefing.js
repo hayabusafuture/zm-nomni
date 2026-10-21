@@ -65,7 +65,7 @@
     offsetShare: 0.3,          // a supplier pulling the other way must offset this share of the change
     priceRisePct: 5,           // a price rise must be at least this to mention
     superlativeMarginPts: 2,   // "the largest" needs this lead over the runner-up
-    minDiscrepancy: 50,        // S$ invoiced above the ordered price before it's worth saying
+    minDiscrepancy: 50,        // $ invoiced above the ordered price before it's worth saying
     discrepancyNameShare: 0.5, // one supplier must hold this share of it to be named
     reliabilityFloor: 90,      // a rate shown under this (in %) is mentioned
     outletDivergencePct: 5,    // an outlet must move this much against the group
@@ -495,7 +495,7 @@
   function abs(p) { return Math.abs(Math.round(p)) + '%'; }
   function pct1(p) { var r = Math.round(Math.abs(p) * 10) / 10; return r + '%'; }
   function dirWord(p) { var r = Math.round(p); return r === 0 ? 'flat' : (r > 0 ? 'up ' : 'down ') + Math.abs(r) + '%'; }
-  function money(v) { return 'S$' + Math.round(v).toLocaleString('en-SG'); }
+  function money(v) { return '$' + Math.round(v).toLocaleString('en-SG'); }
   function signedMoney(v) { var r = Math.round(v); return (r > 0 ? '+' : r < 0 ? '−' : '') + money(Math.abs(r)); }
   function wordCount(s) { return s.trim().split(/\s+/).filter(Boolean).length; }
   function numWord(n) { return ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][n] || String(n); }

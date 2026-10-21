@@ -69,7 +69,7 @@ test('same data with its own memory returns the cached text', () => {
 test('spend change is always included, split by supplier', () => {
   const r = summariseSpendTab(base());
   assert.ok(r.findings.some(f => f.key === 'spend'));
-  assert.match(r.text, /Sunrise Poultry Distributors \(−S\$555\)|S\$555 of the 2% drop/);
+  assert.match(r.text, /Sunrise Poultry Distributors \(−\$555\)|\$555 of the 2% drop/);
 });
 
 test('a big spend change leads; a small one can become context', () => {
@@ -97,14 +97,14 @@ test('two suppliers share the change when neither holds 60%', () => {
     { id: 'c', name: 'Gamma', spend: 1000, previousSpend: 1100 }
   ];
   d.spend = { current: 3000, previous: 4000 };
-  assert.match(summariseSpendTab(d).text, /Alpha \(−S\$500\) and Beta \(−S\$400\)/);
+  assert.match(summariseSpendTab(d).text, /Alpha \(−\$500\) and Beta \(−\$400\)/);
 });
 
 test('a supplier offsetting 30%+ of the change is named as going the other way', () => {
   const d = base(); d.discrepancies.over.value = 0; d.reliability = []; d.priceMoves = []; d.outlets = [];
   d.suppliers = [{ id: 'a', name: 'Alpha', spend: 1000, previousSpend: 2000 }, { id: 'b', name: 'Beta', spend: 1400, previousSpend: 1000 }];
   d.spend = { current: 2400, previous: 3000 };
-  assert.match(summariseSpendTab(d).text, /Beta went the other way \(\+S\$400\)/);
+  assert.match(summariseSpendTab(d).text, /Beta went the other way \(\+\$400\)/);
 });
 
 test('facts about one supplier are told as one story, without repeating its name', () => {
@@ -113,7 +113,7 @@ test('facts about one supplier are told as one story, without repeating its name
     const t = summariseSpendTab(d, { generation: g }).text;
     const mentions = t.split('Sunrise Poultry Distributors').length - 1;
     assert.ok(mentions === 1, 'named ' + mentions + ' times: ' + t);
-    assert.match(t, /65% of its invoice lines at the ordered price|65% of invoice lines|S\$490 of the S\$690/);
+    assert.match(t, /65% of its invoice lines at the ordered price|65% of invoice lines|\$490 of the \$690/);
   }
 });
 
@@ -136,14 +136,14 @@ test('discrepancies name a supplier only with half or more', () => {
   d.spend = { current: 36478, previous: 36846 };
   d.reliability = []; d.priceMoves = []; d.outlets = [];
   const r = summariseSpendTab(d);
-  assert.match(r.text, /S\$690 was invoiced above the ordered price\.|Invoices came in S\$690 above/);
+  assert.match(r.text, /\$690 was invoiced above the ordered price\.|Invoices came in \$690 above/);
 });
 
-test('not received is mentioned only when it is above S$0', () => {
+test('not received is mentioned only when it is above $0', () => {
   const d = base(); d.reliability = []; d.outlets = []; d.priceMoves = [];
   assert.doesNotMatch(summariseSpendTab(d).text, /not received/);
   d.discrepancies.notReceived = { value: 120, count: 2 };
-  assert.match(summariseSpendTab(d).text, /S\$120 (was )?invoiced but not received/);
+  assert.match(summariseSpendTab(d).text, /\$120 (was )?invoiced but not received/);
 });
 
 test('small discrepancies are not mentioned', () => {

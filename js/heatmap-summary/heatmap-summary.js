@@ -801,7 +801,7 @@
   function abs(p) { return Math.abs(Math.round(p)) + '%'; }
   function signed(p) { var r = Math.round(p); return (r > 0 ? '+' : r < 0 ? '−' : '') + Math.abs(r) + '%'; }
   function round1(v) { return String(Math.round(v * 10) / 10); }
-  function money(v) { return 'S$' + Math.round(v).toLocaleString('en-SG'); }
+  function money(v) { return '$' + Math.round(v).toLocaleString('en-SG'); }
   function hourLabel(h) { return (h % 12 === 0 ? 12 : h % 12) + (h < 12 ? 'am' : 'pm'); }
   function approxWord(f) {
     if (f >= 0.47 && f <= 0.53) return 'half';

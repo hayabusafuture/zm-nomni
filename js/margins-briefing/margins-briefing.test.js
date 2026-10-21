@@ -82,9 +82,9 @@ const WASTAGE = '(?:[Rr]ecorded wastage|[Ll]ogged wastage|[Ww]astage on record|[
 const ABOVE = '(?:estimated food cost above target|estimated recipe cost above your targets|estimated food cost above the targets)';
 test('wastage and food cost above target are two separate amounts, never added up', () => {
   const shapes = new Set(), nouns = new Set();
-  const A = new RegExp('^' + WASTAGE + ' is S\\$1,200\\. ' + ABOVE + ' is S\\$1,893\\.$', 'i');
-  const B = new RegExp('^' + ABOVE + ' is S\\$1,893, and ' + WASTAGE + ' is S\\$1,200\\.$', 'i');
-  const C = new RegExp('^' + WASTAGE + ' came to S\\$1,200; ' + ABOVE + ' came to S\\$1,893\\.$', 'i');
+  const A = new RegExp('^' + WASTAGE + ' is \\$1,200\\. ' + ABOVE + ' is \\$1,893\\.$', 'i');
+  const B = new RegExp('^' + ABOVE + ' is \\$1,893, and ' + WASTAGE + ' is \\$1,200\\.$', 'i');
+  const C = new RegExp('^' + WASTAGE + ' came to \\$1,200; ' + ABOVE + ' came to \\$1,893\\.$', 'i');
   allTexts(base()).forEach(t => {
     const joined = t.split(/(?<=\.) (?=[A-Z0-9])/).filter(x => /wastage|above (the |your )?targets?/i.test(x)).join(' '), costs = joined;
     assert.ok(A.test(joined) || B.test(joined) || C.test(joined), t);
@@ -97,21 +97,21 @@ test('wastage and food cost above target are two separate amounts, never added u
 });
 test('one cost line at zero, or without enough data, is left out', () => {
   const d = base(); d.costs.aboveTarget = 0;
-  allTexts(d).forEach(t => assert.ok(new RegExp(WASTAGE + ' (is|came to) S\\$1,200\\.').test(t) && !/above (the |your )?targets?|estimated/i.test(t), t));
+  allTexts(d).forEach(t => assert.ok(new RegExp(WASTAGE + ' (is|came to) \\$1,200\\.').test(t) && !/above (the |your )?targets?|estimated/i.test(t), t));
   d.costs.aboveTarget = null; allTexts(d).forEach(t => assert.ok(!/above (the |your )?targets?|NaN|undefined/i.test(t), t));
   d.costs.aboveTarget = 1893; d.costs.wastage = 0;
-  allTexts(d).forEach(t => assert.ok(new RegExp(ABOVE + ' (is|came to) S\\$1,893\\.', 'i').test(t) && !/wastage/i.test(t), t));
+  allTexts(d).forEach(t => assert.ok(new RegExp(ABOVE + ' (is|came to) \\$1,893\\.', 'i').test(t) && !/wastage/i.test(t), t));
   d.costs.aboveTarget = 0; allTexts(d).forEach(t => assert.ok(!/wastage|above (the |your )?targets?/i.test(t), t));
 });
 test('menu price: recipes whose ingredient cost rose while the menu price has not changed', () => {
   const d = base(); d.menuPrice = { amount: 420, recipes: 3, ingredient: 'Chicken thigh fillet', outlet: null };
-  const A = /^Chicken thigh fillet price rises add an estimated S\$420 to 3 recipes whose menu prices have not changed\.$/;
-  const B = /^3 recipes carry an estimated S\$420 of extra ingredient cost from chicken thigh fillet price rises, and their menu prices have not changed\.$/;
-  const C = /^The menu prices have not changed on 3 recipes whose ingredient costs rose, an estimated S\$420 extra\.$/;
+  const A = /^Chicken thigh fillet price rises add an estimated \$420 to 3 recipes whose menu prices have not changed\.$/;
+  const B = /^3 recipes carry an estimated \$420 of extra ingredient cost from chicken thigh fillet price rises, and their menu prices have not changed\.$/;
+  const C = /^The menu prices have not changed on 3 recipes whose ingredient costs rose, an estimated \$420 extra\.$/;
   const shapes = new Set();
   SEEDS.forEach(seed => {
     const r = summariseMarginsTab(d, { seed, unlimited: true });
-    const line = r.text.split(/(?<=\.) (?=[A-Z0-9])/).find(x => /S\$420/.test(x));
+    const line = r.text.split(/(?<=\.) (?=[A-Z0-9])/).find(x => /\$420/.test(x));
     assert.ok(line && (A.test(line) || B.test(line) || C.test(line)), line);
     shapes.add(A.test(line) ? 0 : B.test(line) ? 1 : 2);
     assert.ok(!causal.test(line) && !/\bloss|overspen|lost\b/i.test(line), line);
@@ -121,7 +121,7 @@ test('menu price: recipes whose ingredient cost rose while the menu price has no
 test('menu price: one recipe, one outlet, several ingredients, and nothing to say', () => {
   const d = base(); d.menuPrice = { amount: 62, recipes: 1, ingredient: null, outlet: "Roll'd Bondi" };
   SEEDS.forEach(seed => {
-    const line = summariseMarginsTab(d, { seed, unlimited: true }).text.split(/(?<=\.) (?=[A-Z0-9])/).find(x => /S\$62/.test(x));
+    const line = summariseMarginsTab(d, { seed, unlimited: true }).text.split(/(?<=\.) (?=[A-Z0-9])/).find(x => /\$62/.test(x));
     assert.ok(/^At Roll'd Bondi, /.test(line) && /1 recipe\b/.test(line) && !/1 recipes/.test(line), line);
     assert.ok(/menu price has not changed|its menu price has not changed|1 recipe carries/.test(line) && !/menu prices? have/.test(line), line);
     assert.ok(/ingredient (price rises|costs)/.test(line), line);
@@ -129,12 +129,12 @@ test('menu price: one recipe, one outlet, several ingredients, and nothing to sa
   [null, { amount: 0, recipes: 2 }, { amount: 100, recipes: 0 }].forEach(m => { const e = base(); e.menuPrice = m; allTexts(e).forEach(t => assert.ok(!/menu price/.test(t), t)); });
 });
 test('supplier price impact: extra cost, saving, nothing', () => {
-  const up = /Supplier price changes (added S\$650 to costs|pushed costs up by S\$650), 3\.2% (more than at the old prices|above the old prices)\.|Compared with the old prices, the same purchases cost S\$650 \(3\.2%\) more\.|(Price changes from suppliers|Suppliers' price changes) added S\$650 to costs \(3\.2%\)\./;
+  const up = /Supplier price changes (added \$650 to costs|pushed costs up by \$650), 3\.2% (more than at the old prices|above the old prices)\.|Compared with the old prices, the same purchases cost \$650 \(3\.2%\) more\.|(Price changes from suppliers|Suppliers' price changes) added \$650 to costs \(3\.2%\)\./;
   const shapes = new Set();
   allTexts(base()).forEach(t => { assert.ok(up.test(t), t); shapes.add(/Compared with the old prices/.test(t) ? 1 : /\(3\.2%\)\./.test(t) ? 2 : 0); });
   assert.strictEqual(shapes.size, 3, 'expected three different shapes');
   const d = base(); d.priceImpact = { value: -234, changePct: -2.1 };
-  const down = /Supplier price changes (took S\$230 off costs|lowered costs by S\$230), 2\.1% (less than at the old prices|below the old prices)\.|Compared with the old prices, the same purchases cost S\$230 \(2\.1%\) less\.|(Price changes from suppliers|Suppliers' price changes) took S\$230 off costs \(2\.1%\)\./;
+  const down = /Supplier price changes (took \$230 off costs|lowered costs by \$230), 2\.1% (less than at the old prices|below the old prices)\.|Compared with the old prices, the same purchases cost \$230 \(2\.1%\) less\.|(Price changes from suppliers|Suppliers' price changes) took \$230 off costs \(2\.1%\)\./;
   allTexts(d).forEach(t => assert.ok(down.test(t), t));
   d.priceImpact = { value: 4, changePct: 0.1 }; allTexts(d).forEach(t => assert.ok(!/price changes|Compared with the old/i.test(t), t));
   d.priceImpact = null; allTexts(d).forEach(t => assert.ok(!/price changes|Compared with the old/i.test(t), t));
