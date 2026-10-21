@@ -1237,7 +1237,7 @@
     rows.forEach(function(row){ if (row.outlet) row.outlet = 'Nomni Kitchen — Tanjong Pagar'; });
   }
 
-  // Opened from the Dashboard's Data status ("View missing"): ?orders=[[outlet, missingCount], ...]&from=YYYY-MM-DD&to=YYYY-MM-DD
+  // Opened from the Dashboard's Data status ("View missing") or its Orders placed card: ?orders=[[outlet, missingCount, totalOrders?], ...]&from=YYYY-MM-DD&to=YYYY-MM-DD
   // replaces the fixed sample rows with orders for those outlets in that range: exactly the missing ones the Dashboard counted, plus
   // a couple of invoiced orders per outlet for context. Dates and suppliers are sample values.
   (function(){
@@ -1254,9 +1254,10 @@
     const two = value => String(value).padStart(2, '0');
     const dmy = date => `${two(date.getDate())}/${two(date.getMonth() + 1)}/${date.getFullYear()}`;
     const generated = [];
-    counts.forEach(([outlet, missing]) => {
-      const rand = seeded(`${outlet}:orders`), invoicedSample = 2;
-      for(let index = 0; index < (missing | 0) + invoicedSample; index++){
+    counts.forEach(([outlet, missing, placedTotal]) => {
+      // A third number is the outlet's total orders for the range (the Dashboard's Orders placed card); without it, the missing ones plus a couple of invoiced ones.
+      const rand = seeded(`${outlet}:orders`), invoicedSample = 2, rowCount = placedTotal != null ? Math.max(placedTotal | 0, missing | 0) : (missing | 0) + invoicedSample;
+      for(let index = 0; index < rowCount; index++){
         const delivery = new Date(start.getTime() + Math.floor(rand() * span) * 864e5), placed = new Date(delivery.getTime() - (1 + Math.floor(rand() * 3)) * 864e5);
         const linked = index >= (missing | 0);
         generated.push({ date: dmy(delivery), code: `${delivery.getFullYear()}${two(delivery.getMonth() + 1)}${two(delivery.getDate())}${String(1000 + Math.floor(rand() * 9000))}`, supplier: suppliers[Math.floor(rand() * suppliers.length)], outlet,

@@ -609,6 +609,11 @@
     cursor: pointer;
   }
   .invoice-filter-link .material-symbols-outlined { font-size: 20px; }
+  .invoice-filters .filter-control { margin-left: auto; }
+  .invoice-filters .filter-control .invoice-filter-link { margin-left: 0; }
+  .inv-filter-options { padding: 2px 14px 10px; max-height: 220px; overflow-y: auto; }
+  .inv-filter-options[hidden] { display: none; }
+  .invoice-result-count { margin: 0 0 12px; color: var(--ink-mute); font-size: 13px; }
   .invoice-table-wrap {
     overflow-x: auto;
     border: 1px solid var(--rule);
@@ -1193,11 +1198,18 @@
             <input type="text" placeholder="Select date" aria-label="Select invoice date" />
           </label>
           <button class="btn btn-primary" type="button" data-invoice-search-button>Search</button>
-          <button class="invoice-filter-link" type="button"><img class="filter-icon" src="_assets/filter-blue.svg" width="20" height="20" alt="" aria-hidden="true" />Filter</button>
+          <div class="filter-control" data-inv-filter-control>
+            <button class="invoice-filter-link" type="button" data-inv-filter-button aria-expanded="false"><img class="filter-icon" src="_assets/filter-blue.svg" width="20" height="20" alt="" aria-hidden="true" />Filter <span class="filter-count" data-inv-filter-count hidden>0</span></button>
+            <div class="orders-filter-menu" data-inv-filter-menu>
+              <div data-inv-filter-body></div>
+              <div class="orders-filter-footer"><button class="orders-filter-reset" type="button" data-inv-filter-reset>Reset</button><button class="orders-filter-apply" type="button" data-inv-filter-apply>Apply</button></div>
+            </div>
+          </div>
         </div>
         <div class="invoice-empty" data-processed-empty>
           <div><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span><h2>No invoices yet</h2><p>Upload an invoice to digitise it and keep your records organised.</p><button class="btn btn-primary" type="button" data-upload-invoice>Upload invoice</button></div>
         </div>
+        <p class="invoice-result-count" data-invoice-result-count hidden></p>
         <div class="invoice-table-wrap" data-processed-table hidden>
           <table class="invoice-table">
             <thead>
@@ -1397,7 +1409,7 @@
     var icon = inv.status === 'ok' ? ' <span class="material-symbols-outlined">check_circle</span>' : inv.status === 'error' ? ' <span class="material-symbols-outlined is-error">cancel</span>' : '';
     var exportCell = inv.exported ? '<span class="export-chip">Exported</span>' : '<button class="export-link" type="button">Export to Xero <span class="material-symbols-outlined">chevron_right</span></button>';
     var actions = inv.exported ? '<button class="invoice-actions" type="button">Actions <span class="material-symbols-outlined">expand_more</span></button>' : '';
-    row.innerHTML = '<td><input class="invoice-checkbox" type="checkbox" data-invoice-select aria-label="Select invoice ' + safe(inv.number) + '" /></td><td>' + safe(inv.date) + '</td><td class="invoice-number">' + safe(inv.number) + '</td><td>' + safe(inv.supplier) + '</td><td>' + safe(venueName) + '</td><td>' + safe(inv.due) + '</td><td class="invoice-total"><span class="invoice-total-check">' + safe(inv.total) + icon + '</span></td><td>' + exportCell + '</td><td>' + actions + '</td>';
+    row.innerHTML = '<td><input class="invoice-checkbox" type="checkbox" data-invoice-select aria-label="Select invoice ' + safe(inv.number) + '" /></td><td>' + safe(inv.date) + '</td><td class="invoice-number">' + safe(inv.number) + '</td><td>' + safe(inv.supplier) + '</td><td>' + safe(inv.outlet || venueName) + '</td><td>' + safe(inv.due) + '</td><td class="invoice-total"><span class="invoice-total-check">' + safe(inv.total) + icon + '</span></td><td>' + exportCell + '</td><td>' + actions + '</td>';
     return row;
   }
   var seedInvoices = [
@@ -1412,7 +1424,6 @@
     {date:'18/09/2026', number:'INV-007', supplier:'', due:'18/09/2026', total:formatMoney(56.90), status:'error'}
   ];
   var invoiceRowsBody = document.querySelector('[data-invoice-rows]');
-  seedInvoices.forEach(function(inv){ invoiceRowsBody.appendChild(buildInvoiceRow(inv)); });
   document.querySelector('[data-processed-empty]').hidden = true; document.querySelector('[data-processed-table]').hidden = false;
 
   var selectionBar = document.querySelector('[data-invoice-selection]');
@@ -1436,6 +1447,106 @@
     invoiceRowsBody.querySelectorAll('[data-invoice-select]').forEach(function(box){ box.checked = false; });
     updateInvoiceSelection();
   });
+
+  // ---- Opened from the Dashboard (Average invoice value card): ?outlet=<name>&from=YYYY-MM-DD&to=YYYY-MM-DD&invoices=[[outlet, count, spend], ...]
+  // replaces the sample rows with that many invoices per outlet in that range, adding up to the spend the card counted.
+  // Dates, suppliers and invoice numbers are sample values.
+  var invoiceRange = null, invoiceFilters2 = {outlet: [], supplier: []}, draftInvoiceFilters = null;
+  (function(){
+    var params = new URLSearchParams(window.location.search), iso = /^(\d{4})-(\d{2})-(\d{2})$/, from = iso.exec(params.get('from') || ''), to = iso.exec(params.get('to') || ''), counts = null;
+    try { counts = JSON.parse(params.get('invoices') || 'null'); } catch (error) { counts = null; }
+    if (!Array.isArray(counts) || !from || !to) return;
+    var start = new Date(+from[1], +from[2] - 1, +from[3]), end = new Date(+to[1], +to[2] - 1, +to[3]), span = Math.max(1, Math.round((end - start) / 864e5) + 1);
+    invoiceRange = {from: start, to: end};
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], label = function(d){ return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear(); };
+    var dateInput = document.querySelector('.invoice-control.date input'); if (dateInput) dateInput.value = label(start) + ' - ' + label(end);
+    var suppliers = ['Sunrise Poultry Distributors', 'Green Valley Produce', 'Harbour Seafood Supply', 'Northside Meats', 'Pantry Wholesale', 'Eastview Dairy', 'Coastal Beverages', 'Asia Pacific Foods', 'Packright Co', 'Metro Dry Goods', 'Fresh Herb Co', 'Bakehouse Supplies'];
+    var seeded = function(text){ var h = 1779033703 ^ text.length; for (var i = 0; i < text.length; i++) { h = Math.imul(h ^ text.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); } return function(){ h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; }; };
+    var two = function(n){ return String(n).padStart(2, '0'); }, dmy = function(d){ return two(d.getDate()) + '/' + two(d.getMonth() + 1) + '/' + d.getFullYear(); };
+    var generated = [];
+    counts.forEach(function(entry){
+      var outlet = entry[0], n = entry[1] | 0, cents = Math.round(entry[2] * 100); if (n < 1) return;
+      var rand = seeded(outlet + ':invoices'), weights = [], sum = 0, i;
+      for (i = 0; i < n; i++) { var w = .25 + rand() * 1.5; weights.push(w); sum += w; }
+      var raw = weights.map(function(w){ return w / sum * cents; }), whole = raw.map(Math.floor), left = cents - whole.reduce(function(a, b){ return a + b; }, 0);
+      raw.map(function(value, index){ return [value - whole[index], index]; }).sort(function(a, b){ return b[0] - a[0]; }).slice(0, left).forEach(function(pair){ whole[pair[1]] += 1; });
+      var tag = outlet.replace(/[^A-Za-z]/g, '').slice(-3).toUpperCase();
+      for (i = 0; i < n; i++) {
+        var day = new Date(start.getTime() + Math.floor(rand() * span) * 864e5), due = new Date(day.getTime() + 14 * 864e5), exported = rand() < .45;
+        generated.push({date: dmy(day), time: day.getTime(), number: 'INV-' + tag + '-' + (1001 + i), supplier: suppliers[Math.floor(rand() * suppliers.length)], outlet: outlet, due: dmy(due), amount: whole[i] / 100, total: formatMoney(whole[i] / 100), status: exported ? 'ok' : undefined, exported: exported});
+      }
+    });
+    generated.sort(function(a, b){ return b.time - a.time || a.number.localeCompare(b.number); });
+    seedInvoices = generated;
+  })();
+  function invoiceAmount(inv) { return inv.amount != null ? inv.amount : parseFloat(String(inv.total).replace(/[^0-9.]/g, '')) || 0; }
+  function invoiceDate(inv) { var m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(inv.date || ''); return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null; }
+  function matchesInvoiceFilters(inv) {
+    if (invoiceFilters2.outlet.length && invoiceFilters2.outlet.indexOf(inv.outlet || venueName) < 0) return false;
+    if (invoiceFilters2.supplier.length && invoiceFilters2.supplier.indexOf(inv.supplier || 'N/A') < 0) return false;
+    if (invoiceRange) { var d = invoiceDate(inv); if (!d || d < invoiceRange.from || d > invoiceRange.to) return false; }
+    return true;
+  }
+  function renderInvoiceRows() {
+    var shown = seedInvoices.filter(matchesInvoiceFilters), total = shown.reduce(function(sum, inv){ return sum + invoiceAmount(inv); }, 0);
+    invoiceRowsBody.innerHTML = '';
+    shown.forEach(function(inv){ invoiceRowsBody.appendChild(buildInvoiceRow(inv)); });
+    var counter = document.querySelector('[data-invoice-result-count]');
+    counter.hidden = !invoiceRange && !invoiceFilters2.outlet.length && !invoiceFilters2.supplier.length;
+    counter.textContent = shown.length + (shown.length === 1 ? ' invoice' : ' invoices') + ' · ' + formatMoney(total);
+    if (!shown.length) invoiceRowsBody.innerHTML = '<tr><td class="no-match" colspan="9">No invoices match these filters.</td></tr>';
+    updateInvoiceSelection();
+  }
+  var invFilterControl = document.querySelector('[data-inv-filter-control]'), invFilterMenu = document.querySelector('[data-inv-filter-menu]'), invFilterButton = document.querySelector('[data-inv-filter-button]');
+  function invFilterCategories() {
+    var outlets = [], suppliers = [];
+    seedInvoices.forEach(function(inv){ var o = inv.outlet || venueName, sp = inv.supplier || 'N/A'; if (outlets.indexOf(o) < 0) outlets.push(o); if (suppliers.indexOf(sp) < 0) suppliers.push(sp); });
+    suppliers.sort(function(a, b){ return a === 'N/A' ? 1 : b === 'N/A' ? -1 : a.localeCompare(b); });
+    return [{key: 'outlet', label: 'Outlet', options: outlets.sort()}, {key: 'supplier', label: 'Supplier', options: suppliers}];
+  }
+  function buildInvFilterMenu() {
+    document.querySelector('[data-inv-filter-body]').innerHTML = invFilterCategories().map(function(cat){
+      return '<button class="orders-filter-category" type="button" aria-expanded="false" data-inv-cat="' + cat.key + '"><span>' + cat.label + '</span><span class="orders-filter-category-count" data-inv-cat-count="' + cat.key + '" hidden>0</span></button>'
+        + '<div class="inv-filter-options" data-inv-options="' + cat.key + '" hidden>' + cat.options.map(function(option){ return '<label class="orders-filter-check"><input type="checkbox" data-inv-check="' + cat.key + '" value="' + safe(option) + '" />' + safe(option) + '</label>'; }).join('') + '</div>';
+    }).join('');
+  }
+  function syncInvFilterMenu() {
+    var draft = draftInvoiceFilters || invoiceFilters2;
+    document.querySelectorAll('[data-inv-check]').forEach(function(box){ box.checked = draft[box.getAttribute('data-inv-check')].indexOf(box.value) >= 0; });
+    ['outlet', 'supplier'].forEach(function(key){ var badge = document.querySelector('[data-inv-cat-count="' + key + '"]'); if (badge) { badge.textContent = draft[key].length; badge.hidden = draft[key].length === 0; } });
+  }
+  function updateInvFilterButton() {
+    var active = ['outlet', 'supplier'].filter(function(key){ return invoiceFilters2[key].length; }).length, badge = document.querySelector('[data-inv-filter-count]');
+    badge.textContent = active; badge.hidden = active === 0; invFilterButton.classList.toggle('is-filtered', active > 0);
+  }
+  function closeInvFilterMenu() { invFilterMenu.classList.remove('open'); invFilterButton.setAttribute('aria-expanded', 'false'); draftInvoiceFilters = null; }
+  invFilterButton.addEventListener('click', function(event){
+    event.stopPropagation();
+    if (invFilterMenu.classList.contains('open')) { closeInvFilterMenu(); return; }
+    draftInvoiceFilters = {outlet: invoiceFilters2.outlet.slice(), supplier: invoiceFilters2.supplier.slice()};
+    syncInvFilterMenu(); invFilterMenu.classList.add('open'); invFilterButton.setAttribute('aria-expanded', 'true');
+  });
+  invFilterControl.addEventListener('click', function(event){
+    event.stopPropagation();
+    var cat = event.target.closest('[data-inv-cat]'); if (!cat) return;
+    var key = cat.getAttribute('data-inv-cat'), options = document.querySelector('[data-inv-options="' + key + '"]'), open = options.hidden;
+    document.querySelectorAll('[data-inv-options]').forEach(function(item){ item.hidden = true; });
+    document.querySelectorAll('[data-inv-cat]').forEach(function(item){ item.setAttribute('aria-expanded', 'false'); });
+    if (open) { options.hidden = false; cat.setAttribute('aria-expanded', 'true'); }
+  });
+  invFilterControl.addEventListener('change', function(event){
+    var box = event.target.closest('[data-inv-check]'); if (!box) return;
+    var list = draftInvoiceFilters[box.getAttribute('data-inv-check')], at = list.indexOf(box.value);
+    if (box.checked && at < 0) list.push(box.value); if (!box.checked && at >= 0) list.splice(at, 1);
+    syncInvFilterMenu();
+  });
+  document.querySelector('[data-inv-filter-apply]').addEventListener('click', function(){ invoiceFilters2 = draftInvoiceFilters || invoiceFilters2; closeInvFilterMenu(); updateInvFilterButton(); renderInvoiceRows(); });
+  document.querySelector('[data-inv-filter-reset]').addEventListener('click', function(){ invoiceFilters2 = {outlet: [], supplier: []}; closeInvFilterMenu(); syncInvFilterMenu(); updateInvFilterButton(); renderInvoiceRows(); });
+  document.addEventListener('click', function(event){ if (!event.target.closest('[data-inv-filter-control]')) closeInvFilterMenu(); });
+  document.addEventListener('keydown', function(event){ if (event.key === 'Escape' && invFilterMenu.classList.contains('open')) closeInvFilterMenu(); });
+  // Opened with an outlet in the link: that outlet's filter is already applied.
+  (function(){ var outlets = new URLSearchParams(window.location.search).getAll('outlet'); if (outlets.length) invoiceFilters2.outlet = outlets; })();
+  buildInvFilterMenu(); syncInvFilterMenu(); updateInvFilterButton(); renderInvoiceRows();
   function safe(value) { return String(value || '').replace(/[&<>"']/g, function(char){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]; }); }
 
   // ---- Filters (menu ported from the Orders page) ----
