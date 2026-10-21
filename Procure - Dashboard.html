@@ -1488,7 +1488,7 @@
     'This month': { current: { start: '2026-09-01', end: '2026-09-21', label: '1–21 September 2026' }, previous: { start: '2026-08-01', end: '2026-08-21', label: '1–21 August 2026' } },
     'Last 30 days': { current: { start: '2026-08-23', end: '2026-09-21', label: '23 August–21 September 2026' }, previous: { start: '2026-07-24', end: '2026-08-22', label: '24 July–22 August 2026' } },
     'Last month': { current: { start: '2026-08-01', end: '2026-08-31', label: '1–31 August 2026' }, previous: { start: '2026-07-01', end: '2026-07-31', label: '1–31 July 2026' } },
-    'Last 3 months': { current: { start: '2026-07-01', end: '2026-09-21', label: '1 July–21 September 2026' }, previous: { start: '2026-03-01', end: '2026-05-31', label: '1 March–31 May 2026' } },
+    'Last 3 months': { current: { start: '2026-06-01', end: '2026-08-31', label: '1 June–31 August 2026' }, previous: { start: '2026-03-01', end: '2026-05-31', label: '1 March–31 May 2026' } },
     'This year': { current: { start: '2026-01-01', end: '2026-09-21', label: '1 January–21 September 2026' }, previous: { start: '2025-01-01', end: '2025-09-21', label: '1 January–21 September 2025' } },
   };
   const periodOptionDates = Object.fromEntries(Object.entries(PERIOD_DATE_RANGES).map(([period, ranges]) => [period, ranges.current.label]));
@@ -1559,7 +1559,7 @@
     { description: 'Thai jasmine rice (premium), 10 kg bag', supplier: 'Asia Pacific Foods', unit: 'kg', weekly: 30, price: 2.20, previous: 2.35, groupPrice: true },
   ];
   // Days in each period and in the one it is compared with.
-  const PROCURE_PERIOD_DAYS = { 'This month': [21, 21], 'Last 30 days': [30, 30], 'Last month': [31, 31], 'Last 3 months': [83, 92], 'This year': [264, 264] };
+  const PROCURE_PERIOD_DAYS = { 'This month': [21, 21], 'Last 30 days': [30, 30], 'Last month': [31, 31], 'Last 3 months': [92, 92], 'This year': [264, 264] };
   // Outstanding invoices belong to recent deliveries: every period that includes this month carries all of them,
   // "Last month" only the older ones. Previous periods are fully reconciled.
   const MISSING_INVOICES_BY_SET = { 1: 2, 10: 14, 30: 41 };
@@ -3012,7 +3012,7 @@
     'This month':    { granularity: 'daily', key: 'thisMonth', subtitle: '1–21 September 2026', xLabelEvery: 5 },
     'Last month':    { granularity: 'daily', key: 'lastMonth', subtitle: '1–31 August 2026', xLabelEvery: 5 },
     'Last 30 days':  { granularity: 'daily', key: 'last30', subtitle: '23 August–21 September 2026', xLabelEvery: 5 },
-    'Last 3 months': { granularity: 'weekly', key: 'last3Months', subtitle: '1 July–21 September 2026', xLabelEvery: 2 },
+    'Last 3 months': { granularity: 'weekly', key: 'last3Months', subtitle: '1 June–31 August 2026', xLabelEvery: 2 },
     'This year':     { granularity: 'monthly', key: 'thisYear', subtitle: '1 January–21 September 2026', xLabelEvery: 1 },
   };
   function resolvedCoversSpendPeriod(){ return COVERS_SPEND_PERIOD[currentPeriod] || COVERS_SPEND_PERIOD['This month']; }
@@ -3386,26 +3386,44 @@
     if(!rows.length){ renderEmptyState(body, 'No category spend to show for this selection.'); return; }
     body.replaceChildren(procureScrollTable(spendBreakdownTable(rows, 'Category'), 'Spend by category list'));
   }
+  // The prototype holds a fixed list of items, so their raw values don't add up to what was invoiced. Each item is scaled to its supplier's
+  // invoiced spend (the listed items stand for ITEM_COVERAGE of it), and an "Other items" row carries the rest, so the list adds up to
+  // Purchases. In production the list is the real items, with the smallest folded into "Other items".
+  const ITEM_COVERAGE = .6;
+  function scaledItemSpend(side){
+    const bySupplier = {};
+    PROCURE_SKUS.forEach(sku => { bySupplier[sku.supplier] = (bySupplier[sku.supplier] || 0) + (side.skus[sku.description]?.value || 0); });
+    return Object.fromEntries(PROCURE_SKUS.map(sku => {
+      const raw = side.skus[sku.description]?.value || 0, base = bySupplier[sku.supplier], supplierSpend = side.suppliers[sku.supplier]?.spend || 0;
+      return [sku.description, base ? raw / base * supplierSpend * ITEM_COVERAGE : 0];
+    }));
+  }
   function renderSpendByItem(data){
     const body = document.getElementById('spendCategoryBody');
     // This prototype stores selected-period SKU totals, not historical invoice lines. Keep a seeded history
     // per item and scope; the monthly series ends at the real prototype July/August totals.
     const lastMonth = getProcureData(currentScope, 'Last month');
     const unit = resolvedTrendWindow().unit;
+    const now = scaledItemSpend(data.current), before = scaledItemSpend(data.previous);
+    const augustItems = scaledItemSpend(lastMonth.current), julyItems = scaledItemSpend(lastMonth.previous);
     const rows = PROCURE_SKUS.map(sku => ({
       name: sku.description, sub: sku.supplier,
-      spend: data.current.skus[sku.description]?.value || 0,
-      previous: data.previous.skus[sku.description]?.value || 0,
-      trend: procureItemSpendTrend(sku, unit, lastMonth),
+      spend: now[sku.description] || 0,
+      previous: before[sku.description] || 0,
+      trend: seededProcureSpendTrend(`${currentScope}:${sku.description}:${unit}:spend-trend`, unit, julyItems[sku.description] || augustItems[sku.description] || 0, augustItems[sku.description] || 0),
     })).filter(row => row.spend > 0 || row.previous > 0);
     rows.sort((a, b) => b.spend - a.spend);
+    const sum = values => Object.values(values).reduce((total, value) => total + value, 0);
+    const otherNow = Math.max(0, data.current.spend - sum(now)), otherBefore = Math.max(0, data.previous.spend - sum(before));
+    if(otherNow > 0 || otherBefore > 0){
+      const august = Math.max(1, lastMonth.current.spend - sum(augustItems)), july = Math.max(1, lastMonth.previous.spend - sum(julyItems));
+      rows.push({ name: 'Other items', sub: 'All other suppliers and items', spend: otherNow, previous: otherBefore, trend: seededProcureSpendTrend(`${currentScope}:other-items:${unit}:spend-trend`, unit, july, august) });
+    }
     if(!rows.length){ renderEmptyState(body, 'No item spend to show for this selection.'); return; }
+    // Whole dollars, shared out by largest remainder, so the rows add up to the Purchases card exactly.
+    const whole = distributeWhole(Math.round(data.current.spend), rows.map(row => row.spend));
+    rows.forEach((row, index) => { row.spend = whole[index]; });
     body.replaceChildren(procureScrollTable(spendBreakdownTable(rows, 'Item'), 'Spend by item list'));
-  }
-  function procureItemSpendTrend(sku, unit, lastMonth){
-    const august = lastMonth.current.skus[sku.description]?.value || 0;
-    const july = lastMonth.previous.skus[sku.description]?.value || august;
-    return seededProcureSpendTrend(`${currentScope}:${sku.description}:${unit}:spend-trend`, unit, july, august);
   }
   function seededProcureSpendTrend(seed, unit, july, august){
     const random = seededRandom(seed);

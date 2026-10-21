@@ -479,12 +479,13 @@
         key: 'daypartShift', subject: 'daypart:' + up.name,
         score: clamp((up.chg - down.chg) / 30),
         render: function (pick) {
-          if (up.chg > 0 && down.chg < 0) return pick([
+          var flat = CONFIG.flatPct;
+          // Both ends must clear the flat band, or "slipped 0%" gets said.
+          if (up.chg > flat && down.chg < -flat) return pick([
             up.label + ' is up ' + abs(up.chg) + ' on last month, while ' + down.lower + ' slipped ' + abs(down.chg) + '.',
             'Growth came from ' + up.lower + ' (' + signed(up.chg) + '); ' + down.lower + ' went the other way (' + signed(down.chg) + ').',
             up.label + ' pulled ahead, up ' + abs(up.chg) + ', as ' + down.lower + ' eased ' + abs(down.chg) + '.'
           ]);
-          var flat = CONFIG.flatPct;
           if (down.chg > flat) return pick([
             'Every service is ahead of last month, led by ' + up.lower + ' at ' + signed(up.chg) + '.',
             'Gains are across the board, with ' + up.lower + ' out in front (' + signed(up.chg) + ').'
@@ -513,7 +514,9 @@
       if (isFinite(c) && cells([row]).length) dayChg.push({ d: d, chg: c });
     });
     dayChg.sort(function (a, b) { return b.chg - a.chg; });
-    if (dayChg.length >= 2) {
+    // A day only counts as having moved if it clears the flat band; otherwise a day that "fell furthest" can round to 0%.
+    var dayFlat = CONFIG.flatPct;
+    if (dayChg.length >= 2 && (dayChg[0].chg > dayFlat || dayChg[dayChg.length - 1].chg < -dayFlat)) {
       var dUp = dayChg[0], dDown = dayChg[dayChg.length - 1];
       var downLeads = Math.abs(dDown.chg) > Math.abs(dUp.chg);
       findings.push({
@@ -521,7 +524,7 @@
         score: clamp((dUp.chg - dDown.chg) / 38),
         render: function (pick) {
           var U = DAY_PLURAL[dUp.d], D = DAY_PLURAL[dDown.d];
-          if (dUp.chg > 0 && dDown.chg < 0) {
+          if (dUp.chg > dayFlat && dDown.chg < -dayFlat) {
             // Lead with the larger move. A −45% day behind a +3% day is the
             // story told backwards.
             if (downLeads) return pick([
@@ -537,8 +540,8 @@
           }
           var mover = downLeads ? dDown : dUp, M = DAY_PLURAL[mover.d];
           return pick([
-            M + ' moved most, at ' + signed(mover.chg) + ' on last month.',
-            'Of all days, ' + M + ' changed the most (' + signed(mover.chg) + ').'
+            M + ' moved most, at ' + signed(mover.chg) + ' on last month; the other days held steady.',
+            'Of all days, ' + M + ' changed the most (' + signed(mover.chg) + '), while the rest held steady.'
           ]);
         }
       });
