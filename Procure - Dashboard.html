@@ -1346,7 +1346,11 @@
           <div class="insight-card">
             <div class="insight-card-head">
               <div class="insight-card-heading">
-                <h3>Top items</h3>
+                <h3>Item performance</h3>
+              </div>
+              <div class="spend-category-tabs" role="tablist" aria-label="Item ranking">
+                <button class="spend-category-tab active" id="topItemsBest" type="button" role="tab" aria-selected="true" data-top-items-order="best">Best sellers</button>
+                <button class="spend-category-tab" id="topItemsSlowest" type="button" role="tab" aria-selected="false" data-top-items-order="slowest">Slowest</button>
               </div>
               <div class="top-items-picker">
                 <button class="top-items-picker-button" id="topItemsCategoryButton" type="button" aria-expanded="false" aria-controls="topItemsCategoryMenu"><span id="topItemsCategoryLabel">All</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button>
@@ -2737,7 +2741,7 @@
   }
 
   /* --- Block 3: top items — show every mock item in the selected POS category --- */
-  let topItemsCategory = 'all';
+  let topItemsCategory = 'all', topItemsOrder = 'best', resetTopItemsScroll = false;
   function syncTopItemsCategories(){
     const categories = getSalesData()?.topItems?.categories || [];
     if(topItemsCategory !== 'all' && !categories.some(category => category.name === topItemsCategory)) topItemsCategory = 'all';
@@ -2753,9 +2757,10 @@
   }
   function renderTopItems(){
     const body = document.getElementById('topItemsBody');
-    const previousScrollTop = body.querySelector('.top-items-scroll-wrap')?.scrollTop || 0;
+    const previousScrollTop = resetTopItemsScroll ? 0 : (body.querySelector('.top-items-scroll-wrap')?.scrollTop || 0);
+    resetTopItemsScroll = false;
     const data = getSalesData();
-    if(!data){ renderEmptyState(body, 'Top items are unavailable without POS data.'); return; }
+    if(!data){ renderEmptyState(body, 'Item performance is unavailable without POS data.'); return; }
     syncTopItemsCategories();
     const { categories } = data.topItems;
     const allItems = categories.flatMap(category => category.items);
@@ -2773,7 +2778,8 @@
     const tbody = document.createElement('tbody');
 
     displayCategories.forEach(category => {
-      const byRevenue = [...category.items].sort((a, b) => b.revenue - a.revenue);
+      // Slowest leaves out items with no sales: they can't be told apart from items that are no longer on the menu.
+      const byRevenue = topItemsOrder === 'best' ? [...category.items].sort((a, b) => b.revenue - a.revenue) : category.items.filter(item => item.revenue > 0).sort((a, b) => a.revenue - b.revenue);
       byRevenue.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `<td><span class="top-item-name" title="${item.name}">${item.name}</span></td><td class="num top-item-value">${item.openPriced ? '—' : item.timesSold.toLocaleString('en-SG')}</td><td class="num top-item-value top-item-revenue">$${item.revenue.toLocaleString('en-SG')}</td><td>${trendSparkline(trendFor(item))}</td>`;
@@ -2786,12 +2792,18 @@
     wrap.className = 'top-items-scroll-wrap';
     wrap.tabIndex = 0;
     wrap.setAttribute('role', 'region');
-    wrap.setAttribute('aria-label', 'Top items list, scrollable');
+    wrap.setAttribute('aria-label', 'Item performance list, scrollable');
     wrap.appendChild(table);
     body.replaceChildren(wrap);
     wrap.scrollTop = previousScrollTop;
   }
 
+  document.querySelectorAll('[data-top-items-order]').forEach(tab => tab.addEventListener('click', () => {
+    topItemsOrder = tab.dataset.topItemsOrder; resetTopItemsScroll = true;
+    document.querySelectorAll('[data-top-items-order]').forEach(item => { const selected = item === tab; item.classList.toggle('active', selected); item.setAttribute('aria-selected', String(selected)); });
+    trackEvent('Dashboard_Sales-ItemPerformance_Ranking-Toggled', { ranking: topItemsOrder });
+    renderTopItems();
+  }));
   const topItemsCategoryButton = document.getElementById('topItemsCategoryButton');
   const topItemsCategoryLabel = document.getElementById('topItemsCategoryLabel');
   const topItemsCategoryMenu = document.getElementById('topItemsCategoryMenu');
