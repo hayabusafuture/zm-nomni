@@ -4934,6 +4934,10 @@
     const missingByOutlet = encodeURIComponent(JSON.stringify(data.perOutlet.map(outlet => [outlet.name, outlet.current.missing])));
     const outletParam = currentScope !== 'All outlets' ? `&outlet=${encodeURIComponent(currentScope)}` : '';
     const missingOrdersHref = `Procure%20-%20Orders.html?invoicing=no-linked-invoice${outletParam}&from=${range.start}&to=${range.end}&orders=${missingByOutlet}`;
+    // Review invoices: the 3-way match report (By invoice) with Variance type > No linked order applied, for the period and outlet on screen.
+    // The link also carries how many invoices each outlet has unlinked, and their value, so the sample invoices there match this dialog.
+    const unlinkedByOutlet = encodeURIComponent(JSON.stringify(data.perOutlet.map(outlet => [outlet.name, Math.max(0, Math.round(outlet.current.invoices - outlet.current.linkedInvoices))]).filter(x => x[1] > 0)));
+    const unlinkedHref = `Procure%20-%203-way%20Match.html?variance=No%20linked%20order${outletParam}&from=${range.start}&to=${range.end}&unlinked=${unlinkedByOutlet}&value=${Math.round(side.unlinkedValue)}`;
     // Each gap is a stat block: what it is, how many, the impact, and where to act. The first one that needs action gets the tint. Side by side
     // when there are two.
     const stats = [];
@@ -4943,7 +4947,7 @@
         + `<p class="coverage-stat-detail">${detail}</p>${statusPopoverLink(link)}</div>`);
     };
     if(hasMissing) stat('Orders with no invoice', side.missing, `About <strong>${money(side.missingOrderValue)}</strong> is missing from spend`, { text: 'Review orders<span class="material-symbols-outlined link-chevron" aria-hidden="true">chevron_right</span>', href: missingOrdersHref });
-    if(unlinked > 0) stat('Unlinked invoices', unlinked, `<strong>${money(side.unlinkedValue)}</strong> is left out of the accuracy checks`, 'Review invoices<span class="material-symbols-outlined link-chevron" aria-hidden="true">chevron_right</span>');
+    if(unlinked > 0) stat('Unlinked invoices', unlinked, `<strong>${money(side.unlinkedValue)}</strong> is left out of the accuracy checks`, { text: 'Review invoices<span class="material-symbols-outlined link-chevron" aria-hidden="true">chevron_right</span>', href: unlinkedHref });
     spendStatusModalBody = `<p class="data-status-context">${escapeHtml(currentScope)} · ${escapeHtml(range.label)}</p>`
       + `<div class="coverage-stats${stats.length === 1 ? ' is-single' : ''}">${stats.join('')}</div>`
       + (side.processing ? `<p class="data-status-note">${plural(side.processing, 'invoice')} ${side.processing === 1 ? 'is' : 'are'} still processing. Spend will update when ${side.processing === 1 ? 'it finishes' : 'they finish'}.</p>` : '');
