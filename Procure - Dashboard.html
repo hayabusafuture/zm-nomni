@@ -291,6 +291,7 @@
   .insight-card-head h3 { margin: 0; color: var(--ink); font-size: 21px; font-weight: 700; letter-spacing: -.01em; white-space: nowrap; }
   .insight-card-sub { margin: 0 0 16px; color: var(--ink-mute-strong); font-size: 12px; }
   .insight-empty { padding: 36px 12px; color: var(--ink-mute-strong); font-size: 13px; text-align: center; }
+  .insight-empty.is-list { display: flex; align-items: center; justify-content: center; padding: 0 12px; }
 
   /* Delta pills — the only place polarity gets colour; green means "up", amber means "down".
      One icon family (Material Symbols trending_up/trending_down/trending_flat) everywhere a delta appears. */
@@ -883,8 +884,18 @@
   .margins-bullet-reference { position: absolute; top: -4px; width: 2px; height: 18px; border-radius: 1px; background: var(--seaweed); transform: translateX(-50%); pointer-events: none; }
   .margins-bullet-gap { display: flex; flex-direction: column; align-items: flex-end; color: var(--ink-mute-strong); font-size: 10px; line-height: 1.25; text-align: right; white-space: nowrap; }
   .margins-bullet-gap.is-over strong { color: var(--viz-div-neg2); }
+  .margins-bullet-head.is-perf, .margins-bullet-row.is-perf { grid-template-columns: minmax(100px, 1.3fr) 84px 72px 64px; }
+  .margins-bullet-head.is-perf > :nth-child(2), .margins-bullet-head.is-perf > :nth-child(3) { text-align: right; }
+  #panel-margins .margins-outlet-card .top-items-picker { align-self: center; }
+  .margins-bullet-head.is-perf > :nth-child(4), .margins-perf-trend { text-align: center; }
+  .margins-perf-trend .outlet-sparkline { margin: 0 auto; }
+  .margins-perf-name { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .margins-perf-name small { color: var(--ink-mute-strong); font-size: 11px; font-weight: 400; }
+  .margins-perf-name .margins-bullet-name { display: inline-flex; align-items: center; gap: 6px; }
+  .margins-perf-metric { display: flex; flex-direction: column; align-items: flex-end; color: var(--ink-mute-strong); font-size: 11px; line-height: 1.3; white-space: nowrap; }
+  .margins-perf-metric strong { color: var(--ink); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .margins-perf-change { display: flex; justify-content: flex-end; }
   .margins-bullet-mobile-label { display: none; }
-  .margins-bullet-empty { margin: 18px 0; color: var(--ink-mute-strong); font-size: 12px; }
   .margins-trend-card { display: flex; flex-direction: column; }
   .margins-trend-scope { flex: 0 1 auto; margin-left: auto; color: var(--ink-mute-strong); font-size: 11px; line-height: 1.3; text-align: right; }
   @media (min-width: 1181px) { #panel-margins .insight-row-2col:nth-of-type(2) > .insight-card { height: 470px; } }
@@ -955,7 +966,7 @@
   .margins-menu-table { width: 100%; min-width: 0; }
   #marginsMenuBody .procure-table-wrap { max-height: 360px; }
   #marginsDriftBody .procure-table-wrap { max-height: 360px; }
-  /* Side by side with Recipe cost drift, the card is as tall as that one: the list takes the height it's given (and scrolls past it) instead of stopping at a fixed height with a gap below. */
+  /* Side by side with Recipe cost impact, the card is as tall as that one: the list takes the height it's given (and scrolls past it) instead of stopping at a fixed height with a gap below. */
   .margins-menu-card { display: flex; flex-direction: column; min-height: 0; }
   .margins-menu-card #marginsMenuBody { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
   .margins-menu-card .outlet-scroll-frame { display: flex; flex: 1 1 auto; min-height: 0; }
@@ -972,7 +983,9 @@
   .margins-drift-table { min-width: 0; }
   .margins-drift-table col.margins-drift-name-col { width: calc(100% - 274px); }
   .margins-drift-table col.margins-drift-price-col { width: 120px; }
-  .margins-drift-price { color: var(--ink-mute-strong); font-size: 12px; white-space: nowrap; }
+  .margins-drift-impact { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.3; white-space: nowrap; }
+  .margins-drift-impact strong { color: var(--ink); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .margins-drift-impact small { color: var(--ink-mute-strong); font-size: 10px; }
   .margins-drift-summary { margin: 0 0 12px; color: var(--ink-mute-strong); font-size: 12px; line-height: 1.45; text-wrap: pretty; }
   .margins-drift-summary strong { color: var(--ink); font-weight: 600; }
   .margins-drift-controls { margin: 0 0 12px; }
@@ -1435,13 +1448,13 @@
           <div class="insight-card margins-key-overview" role="region" aria-label="Margins key numbers"><div class="mini-chart-row" id="marginsKeyBody"></div></div>
         </div></div>
         <div class="insight-row-2col">
-          <div class="insight-card margins-outlet-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Theoretical COGS by outlet</h3></div></div><div id="marginsBulletsBody"></div></div>
+          <div class="insight-card margins-outlet-card"><div class="insight-card-head"><div class="insight-card-heading"><h3 id="marginsOutletTitle">Outlet performance</h3></div><div class="top-items-picker" id="marginsOutletMetricPicker"><button class="top-items-picker-button" id="marginsOutletMetricButton" type="button" aria-expanded="false" aria-controls="marginsOutletMetricMenu"><span id="marginsOutletMetricLabel">Gross profit $</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="top-items-picker-menu" id="marginsOutletMetricMenu" role="listbox" aria-label="Outlet metric"><button class="top-items-picker-option active" type="button" role="option" aria-selected="true" data-margins-outlet-metric="gpValue">Gross profit $</button><button class="top-items-picker-option" type="button" role="option" aria-selected="false" data-margins-outlet-metric="gpPct">Gross profit %</button><button class="top-items-picker-option" type="button" role="option" aria-selected="false" data-margins-outlet-metric="target">COGS vs target</button></div></div></div><div id="marginsBulletsBody"></div></div>
           <div class="insight-card margins-trend-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Theoretical COGS</h3></div><span class="margins-trend-scope" id="marginsTrendScopeNote"></span></div><div id="marginsTrendBody"></div></div>
         </div>
         <div class="insight-row-full"><div class="insight-card margins-category-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Theoretical COGS by sales category</h3></div><div class="top-items-picker margins-category-filter" id="marginsCategoryFilter" hidden><button class="top-items-picker-button" id="marginsCategoryOutletButton" type="button" aria-expanded="false" aria-controls="marginsCategoryOutletMenu" aria-label="Filter COGS by outlet"><span id="marginsCategoryOutletLabel">All outlets</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="top-items-picker-menu" id="marginsCategoryOutletMenu" role="listbox" aria-label="Filter COGS by outlet"></div></div></div><div class="margins-category-legend" id="marginsCategoryLegend" hidden></div><div id="marginsCategoryBody"></div></div></div>
         <div class="insight-row-2col">
           <div class="insight-card margins-menu-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Menu item margin</h3></div><div class="outlet-sort margins-menu-sort"><button class="outlet-sort-button" id="marginsMenuSortButton" type="button" aria-expanded="false" aria-controls="marginsMenuSortMenu"><span id="marginsMenuSortLabel">Margin %</span><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button><div class="outlet-sort-menu" id="marginsMenuSortMenu" role="listbox" aria-label="Sort menu items"><button class="outlet-sort-option active" type="button" role="option" aria-selected="true" data-margins-menu-sort="margin">Margin %</button><button class="outlet-sort-option" type="button" role="option" aria-selected="false" data-margins-menu-sort="volume">Times sold</button></div></div></div><div id="marginsMenuBody"></div></div>
-          <div class="insight-card margins-drift-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Recipe cost drift</h3></div></div><div id="marginsDriftBody"></div></div>
+          <div class="insight-card margins-drift-card"><div class="insight-card-head"><div class="insight-card-heading"><h3>Recipe cost impact</h3></div></div><div id="marginsDriftBody"></div></div>
         </div>
       </section>
     </div>
@@ -1496,7 +1509,7 @@
 <script src="js/heatmap-summary/heatmap-summary.js"></script>
 <script src="js/sales-briefing/sales-briefing.js"></script>
 <script src="js/spend-briefing/spend-briefing.js"></script>
-<script src="js/margins-briefing/margins-briefing.js"></script>
+<script src="js/margins-briefing/margins-briefing.js?v=2026-10-24a"></script>
 <script>
   const welcomeGreeting = document.getElementById('welcomeGreeting');
   const welcomeDate = document.getElementById('welcomeDate');
@@ -1829,7 +1842,7 @@
   const METRIC_PANELS = {
     purchases: { tab: 'spend', panel: () => document.getElementById('spendSupplierBody').closest('.insight-card') },
     revenue: { tab: 'sales', panel: () => document.querySelector('.outlet-card') },
-    cogs: { tab: 'margins', panel: () => document.querySelector('.margins-outlet-card') },
+    cogs: { tab: 'margins', panel: () => document.querySelector('.margins-outlet-card'), beforeOpen: () => setMarginsOutletMetric('target') },   // the COGS card lands on the COGS view
     billing: { tab: 'spend', panel: () => document.getElementById('orderAccuracyBody').closest('.insight-card') },
   };
   function updateMetricLinks(cards, lacksPos){
@@ -1856,6 +1869,7 @@
     const target = METRIC_PANELS[link.dataset.metricLink], tab = document.getElementById(`tab-${target.tab}`);
     if(!tab.classList.contains('active')) tab.click();
     setTimeout(() => {
+      target.beforeOpen?.();
       const panel = target.panel(); if(!panel) return;
       window.scrollTo({ top: Math.max(0, panel.getBoundingClientRect().top + window.scrollY - 150), behavior: 'smooth' });
       panel.classList.remove('panel-flash'); void panel.offsetWidth; panel.classList.add('panel-flash');
@@ -2479,7 +2493,7 @@
     return `<span class="delta-pill ${isPos ? 'pos' : 'neg'}"><span class="material-symbols-outlined" aria-hidden="true">${icon}</span>${Math.abs(rounded)}%</span>`;
   }
   let sparklineGradientId = 0;
-  function sparklineSvg(trend, titleText = null, costSide = false){
+  function sparklineSvg(trend, titleText = null, costSide = false, flatPct = SPARKLINE_FLAT_THRESHOLD_PCT){
     if(!trend || trend.length < 3) return '<svg class="outlet-sparkline outlet-sparkline-empty" viewBox="0 0 64 20" role="img" aria-label="Not enough history yet"><line x1="2" y1="10" x2="62" y2="10" /></svg>';
     const min = Math.min(...trend), max = Math.max(...trend), span = (max - min) || 1;
     const chartTop = 3, chartBottom = 15;
@@ -2489,7 +2503,7 @@
     // (neutral / gradFlat). It is never derived from the delta pill, whose period-vs-previous-period
     // comparison can legitimately disagree with this complete-history trend.
     const trendChangePct = ((trend[trend.length - 1] - trend[0]) / trend[0]) * 100;
-    let direction = Math.abs(trendChangePct) < SPARKLINE_FLAT_THRESHOLD_PCT ? 'trend-flat' : trendChangePct > 0 ? 'trend-up' : 'trend-down';
+    let direction = Math.abs(trendChangePct) < flatPct ? 'trend-flat' : trendChangePct > 0 ? 'trend-up' : 'trend-down';
     if(costSide && direction !== 'trend-flat') direction = direction === 'trend-up' ? 'trend-down' : 'trend-up';
     const gradientId = `sparkline-area-gradient-${sparklineGradientId++}`;
     const accessibleTitle = titleText || `Trend: ${trend.map(v => Math.round(v)).join(' → ')}`;
@@ -2497,8 +2511,8 @@
   }
   // A trend line in a table: hovering or focusing it says which dates it covers, in the same tooltip as the "i" buttons.
   // The native title is dropped so the two don't show together.
-  function trendSparkline(trend, titleText = null, costSide = false){
-    const svg = sparklineSvg(trend, titleText, costSide);
+  function trendSparkline(trend, titleText = null, costSide = false, flatPct = SPARKLINE_FLAT_THRESHOLD_PCT){
+    const svg = sparklineSvg(trend, titleText, costSide, flatPct);
     if(!trend || trend.length < 3) return svg;
     return svg.replace(/ title="[^"]*"/, '').replace('<svg ', `<svg data-col-info="trendRange" data-col-info-text="${resolvedTrendWindow().range}" tabindex="0" `);
   }
@@ -2690,12 +2704,20 @@
   // selected outlet compares, so it highlights that row instead of filtering down to it. An outlet without POS
   // has no Sales data at all (it isn't in the group list either), so it gets the empty state instead.
   let lastOutletsScope = null;
+  // The "no outlets" message of an outlet list takes the space the list had, so the card keeps its height and the message sits in the middle of it.
+  function outletListEmpty(body, fallbackHeight){
+    const previous = body.querySelector('.insight-empty.is-list');
+    const list = body.querySelector('.outlet-scroll-frame, .margins-bullet-list');
+    const height = previous ? previous.offsetHeight : list ? list.offsetHeight + (body.querySelector('.margins-bullet-head')?.offsetHeight || 0) : fallbackHeight;
+    const empty = document.createElement('div'); empty.className = 'insight-empty is-list'; empty.style.height = `${height || fallbackHeight}px`; empty.textContent = 'No outlets for this selection.';
+    return empty;
+  }
   function renderOutlets(){
     const body = document.getElementById('outletRevenueBody');
     if(!getSalesData()){ renderEmptyState(body, 'Revenue by outlet is unavailable without POS data.'); lastOutletsScope = currentScope; return; }
     const previousScrollTop = body.querySelector('.outlet-table-wrap')?.scrollTop || 0;
     const outlets = SALES_OUTLET_ROWS.map(outletMetrics);
-    if(!outlets.length){ renderEmptyState(body, 'Not enough outlet sales data yet.'); return; }
+    if(!outlets.length){ renderEmptyState(body, 'No outlet sales for this selection.'); return; }
     const counts = { all: outlets.length, up: outlets.filter(o => o.direction === 'up').length, down: outlets.filter(o => o.direction === 'down').length };
     const visible = outlets.filter(outlet => outletFilter === 'all' || outlet.direction === outletFilter);
     const ranked = visible.filter(outlet => !outlet.belowFloor).sort((a, b) => Math.abs(outletSort === 'pct' ? b.changePct : b.changeAbs) - Math.abs(outletSort === 'pct' ? a.changePct : a.changeAbs));
@@ -2721,7 +2743,9 @@
     const tbody = document.createElement('tbody');
     let selectedRow = null;
     rows.forEach(outlet => { const row = document.createElement('tr'); if(outlet.belowFloor) row.className = 'outlet-low-volume'; if(outlet === selected){ row.classList.add('outlet-row-selected'); row.setAttribute('aria-current', 'true'); selectedRow = row; } row.innerHTML = `<td><span class="outlet-name" title="${outlet.name}">${middleEllipsis(outlet.name)}</span></td><td class="num">${outletChangeHtml(outlet)}</td><td class="num outlet-revenue">$${outlet.revenue.toLocaleString('en-SG')}</td><td>${trendSparkline(trendFor(outlet), outletSparklineTitle(outlet))}</td>`; tbody.appendChild(row); });
-    table.appendChild(tbody); wrap.appendChild(table); scrollFrame.appendChild(wrap);
+    table.appendChild(tbody); wrap.appendChild(table);
+    scrollFrame.appendChild(wrap);
+    if(!rows.length){ const empty = outletListEmpty(body, 248); body.replaceChildren(...(multiOutlet ? [controls, empty] : [empty])); lastOutletsScope = currentScope; return; }
     const children = multiOutlet ? [controls, scrollFrame] : [scrollFrame];
     const comparisonNote = document.createElement('p'); comparisonNote.className = 'outlet-comparison-note'; comparisonNote.textContent = `% and $ change compare this period with the previous one. The line shows the last ${trendWindow.points} complete ${trendWindow.unit === 'month' ? 'months' : 'weeks'}, so the two can differ.`;
     children.push(comparisonNote);
@@ -2768,7 +2792,7 @@
       ? [{ name: '', items: allItems }]
       : categories.filter(category => category.name === topItemsCategory);
     const displayedItems = displayCategories.flatMap(category => category.items);
-    if(displayedItems.length < 2){ renderEmptyState(body, 'Not enough item sales data yet.'); return; }
+    if(displayedItems.length < 2){ renderEmptyState(body, 'No item sales for this selection.'); return; }
 
     const table = document.createElement('table'); table.className = 'top-items-table';
     const trendWindow = resolvedTrendWindow();
@@ -2824,6 +2848,20 @@
     topItemsCategory = option.dataset.topItemsCategory;
     renderTopItems();
   });
+  const marginsOutletMetricButton = document.getElementById('marginsOutletMetricButton'), marginsOutletMetricMenu = document.getElementById('marginsOutletMetricMenu');
+  marginsOutletMetricButton?.addEventListener('click', event => { event.stopPropagation(); const open = !marginsOutletMetricMenu.classList.contains('open'); marginsOutletMetricMenu.classList.toggle('open', open); marginsOutletMetricButton.setAttribute('aria-expanded', String(open)); });
+  function setMarginsOutletMetric(metric){
+    const option = marginsOutletMetricMenu?.querySelector(`[data-margins-outlet-metric="${metric}"]`); if(!option) return;
+    marginsOutletMetric = metric;
+    marginsOutletMetricMenu.querySelectorAll('[data-margins-outlet-metric]').forEach(item => { const on = item === option; item.classList.toggle('active', on); item.setAttribute('aria-selected', String(on)); });
+    document.getElementById('marginsOutletMetricLabel').textContent = option.textContent.trim();
+    marginsOutletMetricMenu.classList.remove('open'); marginsOutletMetricButton.setAttribute('aria-expanded', 'false');
+    const data = getMarginsData(); if(data) renderMarginsBullets(data);
+  }
+  marginsOutletMetricMenu?.addEventListener('click', event => {
+    const option = event.target.closest('[data-margins-outlet-metric]'); if(option) setMarginsOutletMetric(option.dataset.marginsOutletMetric);
+  });
+  document.addEventListener('click', event => { if(!event.target.closest('#marginsOutletMetricPicker')){ marginsOutletMetricMenu?.classList.remove('open'); marginsOutletMetricButton?.setAttribute('aria-expanded', 'false'); } });
   const outletSortButton = document.getElementById('outletSortButton');
   const outletSortLabel = document.getElementById('outletSortLabel');
   const outletSortMenu = document.getElementById('outletSortMenu');
@@ -3373,7 +3411,7 @@
   function renderSpendBySupplier(data){
     const body = document.getElementById('spendSupplierBody');
     const suppliers = Object.entries(data.current.suppliers).map(([name, row]) => ({ name, value: row.spend, previous: data.previous.suppliers[name]?.spend || 0 })).filter(row => row.value > 0).sort((a, b) => b.value - a.value);
-    if(!suppliers.length){ renderEmptyState(body, 'No supplier invoices in this period.'); return; }
+    if(!suppliers.length){ renderEmptyState(body, 'No supplier invoices for this selection.'); return; }
     const total = suppliers.reduce((sum, row) => sum + row.value, 0), max = suppliers[0].value;
     const lastMonth = getProcureData(currentScope, 'Last month');
     const trendWindow = resolvedTrendWindow();
@@ -3443,7 +3481,7 @@
     const rows = PROCURE_CATEGORIES.map(name => ({ name, spend: Math.max(0, (data.current.categories[name] || 0) - (tbcNow.byCategory[name] || 0)), previous: Math.max(0, (data.previous.categories[name] || 0) - (tbcBefore.byCategory[name] || 0)) })).filter(row => row.spend > 0 || row.previous > 0);
     if(tbcNow.total > 0 || tbcBefore.total > 0) rows.push({ name: 'TBC', spend: tbcNow.total, previous: tbcBefore.total });
     rows.sort((a, b) => b.spend - a.spend);
-    if(!rows.length){ renderEmptyState(body, 'No category spend to show for this selection.'); return; }
+    if(!rows.length){ renderEmptyState(body, 'No category spend for this selection.'); return; }
     // Whole dollars shared out by largest remainder, so the rows add up to the Purchases card exactly.
     const whole = distributeWhole(Math.round(data.current.spend), rows.map(row => row.spend));
     rows.forEach((row, index) => { row.spend = whole[index]; });
@@ -3510,7 +3548,7 @@
       trend: seededProcureSpendTrend(`${currentScope}:${sku.description}:${unit}:spend-trend`, unit, julyItems[sku.description] || augustItems[sku.description] || 0, augustItems[sku.description] || 0),
     })).filter(row => row.spend > 0 || row.previous > 0);
     rows.sort((a, b) => b.spend - a.spend);
-    if(!rows.length){ renderEmptyState(body, 'No item spend to show for this selection.'); return; }
+    if(!rows.length){ renderEmptyState(body, 'No item spend for this selection.'); return; }
     // Whole dollars, shared out by largest remainder, so the rows add up to the Purchases card exactly.
     const whole = distributeWhole(Math.round(data.current.spend), rows.map(row => row.spend));
     rows.forEach((row, index) => { row.spend = whole[index]; });
@@ -3605,7 +3643,7 @@
     const body = document.getElementById('priceMovementBody');
     const rows = priceMovementRows(data);
     const visibleRows = rows.filter(row => priceMovementFilter === 'increases' ? row.change > 0 : priceMovementFilter === 'decreases' ? row.change < 0 : true);
-    if(!visibleRows.length){ renderEmptyState(body, 'No price movements match this filter.'); return; }
+    if(!visibleRows.length){ renderEmptyState(body, 'No price movements for this selection.'); return; }
     const table = document.createElement('table'); table.className = 'outlet-table procure-table procure-price-table';
     table.innerHTML = '<colgroup><col><col class="procure-rate-col"><col class="procure-price-col"></colgroup><thead><tr><th scope="col">Item</th><th scope="col" class="num">Change</th><th scope="col" class="num">Price</th></tr></thead>';
     const tbody = document.createElement('tbody');
@@ -3674,7 +3712,7 @@
     hideColInfo();
     const body = document.getElementById('supplierReliabilityBody');
     const rows = supplierReliabilityRows(data);
-    if(!rows.length){ renderEmptyState(body, 'No supplier invoices in this period.'); return; }
+    if(!rows.length){ renderEmptyState(body, 'No supplier invoices for this selection.'); return; }
     // Whole dollars, shared out by largest remainder so the column adds up to the total in the headline above.
     const { over, notReceived } = data.current.discrepancies;
     const stakeShown = distributeWhole(Math.round(over.value) + Math.round(notReceived.value), rows.map(row => row.atStake));
@@ -3762,7 +3800,7 @@
   function renderSpendByOutlet(){
     const body = document.getElementById('spendOutletBody');
     const all = getProcureData('All outlets');
-    if(!all){ renderEmptyState(body, 'No outlet spend to show for this selection.'); return; }
+    if(!all){ renderEmptyState(body, 'No outlet spend for this selection.'); return; }
     const previousScrollTop = body.querySelector('.outlet-table-wrap')?.scrollTop || 0;
     const trendWindow = resolvedTrendWindow();
     const rows = all.perOutlet.map(outlet => {
@@ -4301,8 +4339,59 @@
     const difference = marginsDifference(outlet);
     return difference === null ? 'none' : difference > 0 ? 'over' : difference < 0 ? 'under' : 'at';
   }
+  // Outlet performance: one metric at a time, chosen in the panel menu. Gross profit $ and % rank the outlets best first, with revenue under the name, the
+  // change against the comparison period, and a trend. COGS vs target is the original worst-first view with the target tick. Mockup: each outlet's change and
+  // trend are drawn from the sample series, not from a previous-period calculation.
+  let marginsOutletMetric = 'gpValue', marginsPerfFilter = 'all';
+  function marginsOutletChange(outlet, groupChangePts){
+    const jitter = (seededRandom(`${outlet.name}:margins-outlet-change`)() - .5) * 2.4;
+    return +(groupChangePts + jitter).toFixed(1);
+  }
+  // The rows behind Outlet performance, also used by the briefing so both quote the same figures.
+  function marginsOutletPerformanceRows(data){
+    const groupChangePts = -PERIOD_CARD_CONTEXT[data.period].cogsChangePts;
+    const sample = marginsSampleCogsSeries(data);
+    return data.outlets.map(outlet => {
+      const gpPct = 100 - outlet.actual, gpValue = outlet.revenue * gpPct / 100, changePts = marginsOutletChange(outlet, groupChangePts);
+      const previousValue = gpValue / (1 + changePts * 1.5 / 100);
+      // The trend is tilted so it ends changePts above where it starts: its colour then agrees with the Change column.
+      const raw = sample.outlets.find(row => row.name === outlet.name)?.values.map(value => 100 - value) || [];
+      const series = raw.map((value, index) => value + (raw.length > 1 ? (changePts - (raw[raw.length - 1] - raw[0])) * index / (raw.length - 1) : 0));
+      return { ...outlet, gpPct, gpValue, changePts, valueChangePct: pctChange(gpValue, previousValue), series, over: outlet.target !== null && outlet.actual > outlet.target };
+    });
+  }
+  function renderMarginsPerformance(data, body){
+    const previousScrollTop = body.querySelector('.margins-bullet-list')?.scrollTop || 0;
+    const byValue = marginsOutletMetric === 'gpValue';
+    const rows = marginsOutletPerformanceRows(data);
+    rows.sort((a, b) => (byValue ? b.gpValue - a.gpValue : b.gpPct - a.gpPct) || a.name.localeCompare(b.name));
+    const changeOf = row => byValue ? row.valueChangePct : row.changePts;
+    const counts = { all: rows.length, up: rows.filter(row => changeOf(row) > 0).length, down: rows.filter(row => changeOf(row) < 0).length };
+    const visible = rows.filter(row => marginsPerfFilter === 'all' || (marginsPerfFilter === 'up' ? changeOf(row) > 0 : changeOf(row) < 0));
+    const controls = document.createElement('div'); controls.className = 'margins-bullet-controls';
+    controls.innerHTML = `<div class="outlet-filter-chips" role="group" aria-label="Filter outlets by change vs the comparison period"><button class="outlet-filter-chip" type="button" data-margins-perf-filter="all" aria-pressed="${marginsPerfFilter === 'all'}">All ${counts.all}</button><button class="outlet-filter-chip" type="button" data-margins-perf-filter="up" aria-pressed="${marginsPerfFilter === 'up'}">Up ${counts.up}</button><button class="outlet-filter-chip" type="button" data-margins-perf-filter="down" aria-pressed="${marginsPerfFilter === 'down'}">Down ${counts.down}</button></div>`;
+    controls.querySelectorAll('[data-margins-perf-filter]').forEach(button => button.addEventListener('click', () => { marginsPerfFilter = button.dataset.marginsPerfFilter; renderMarginsPerformance(data, body); }));
+    if(data.outlets.length < 2) controls.querySelector('.outlet-filter-chips').remove();
+    const head = document.createElement('div'); head.className = 'margins-bullet-head is-perf';
+    head.innerHTML = `<span>Outlet</span><span>${byValue ? 'Gross profit' : 'GP %'}</span><span>Change</span><span>${resolvedTrendWindow().points} ${resolvedTrendWindow().unit.toUpperCase()}S</span>`;
+    const list = document.createElement('div'); list.className = 'margins-bullet-list'; list.tabIndex = 0; list.setAttribute('role', 'region'); list.setAttribute('aria-label', 'Outlet performance list, scrollable');
+    visible.forEach(row => {
+      const change = changeOf(row);
+      const pill = change === 0 ? '<span class="delta-pill flat">flat</span>' : `<span class="delta-pill ${change > 0 ? 'pos' : 'neg'}"><span class="material-symbols-outlined" aria-hidden="true">${change > 0 ? 'trending_up' : 'trending_down'}</span>${Math.abs(change).toFixed(byValue && Math.abs(change) >= 1 ? 0 : 1)}${byValue ? '%' : ' pts'}</span>`;
+      const el = document.createElement('div'); el.className = 'margins-bullet-row is-perf';
+      if(data.outlets.length > 1 && row.name === data.scope){ el.classList.add('is-selected'); el.setAttribute('aria-current', 'true'); }
+      el.innerHTML = `<span class="margins-perf-name"><span class="margins-bullet-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span><small>${money(row.revenue)} revenue</small></span>`
+        + `<span class="margins-perf-metric"><strong>${byValue ? money(row.gpValue) : `${row.gpPct.toFixed(1)}%`}</strong>${byValue ? `${row.gpPct.toFixed(1)}% GP` : `${money(row.gpValue)}`}</span>`
+        + `<span class="margins-perf-change">${pill}</span><span class="margins-perf-trend">${trendSparkline(row.series, `${row.name}: gross profit % over the period`, false, 0.75)}</span>`;
+      list.appendChild(el);
+    });
+    if(!visible.length){ const empty = outletListEmpty(body, 340); body.replaceChildren(controls, empty); return; }
+    body.replaceChildren(controls, head, list);
+    list.scrollTop = previousScrollTop;
+  }
   function renderMarginsBullets(data){
     const body = document.getElementById('marginsBulletsBody');
+    if(marginsOutletMetric !== 'target'){ renderMarginsPerformance(data, body); return; }
     const previousScrollTop = body.querySelector('.margins-bullet-list')?.scrollTop || 0;
     const multiOutlet = data.outlets.length > 1;
     if(!multiOutlet) marginsOutletFilter = 'all';
@@ -4343,7 +4432,7 @@
       measure.addEventListener('blur', hideChartTip);
       list.appendChild(row);
     });
-    if(!visible.length){ const empty = document.createElement('p'); empty.className = 'margins-bullet-empty'; empty.textContent = 'No outlets in this group.'; list.appendChild(empty); }
+    if(!visible.length){ const empty = outletListEmpty(body, 340); body.replaceChildren(controls, empty); lastMarginsOutletScope = data.scope; return; }
     const children = [controls, head, list];
     body.replaceChildren(...children);
     list.scrollTop = previousScrollTop;
@@ -4664,10 +4753,8 @@
     });
     return rows.sort((a, b) => Math.abs(b.invoiceChange) - Math.abs(a.invoiceChange) || b.invoiceChange - a.invoiceChange || a.name.localeCompare(b.name) || a.outlet.localeCompare(b.outlet));
   }
-  // Supplier price rises that reach a recipe whose menu price has not moved. Extra cost = cost increase per serve x units
-  // sold, counted only at outlets whose POS items are mapped well enough to trust the sales (the same 90% as the POS coverage
-  // dialog). Menu price history and units sold are sample data here; the real product reads them from the POS.
-  const PRICE_TO_MENU = { gate: 90 };   // outlets need at least this % of POS items mapped to recipes
+  // Impact of ingredient price changes on the recipes sold: cost change per serve x the number sold in the period, at the outlet that sold them.
+  // Units sold are sample data here; the real product reads them from the POS sales of the items mapped to the recipe.
   let marginsDriftFilter = 'all';
   let marginsDriftKey = null;
   function marginsDriftModel(data){
@@ -4677,16 +4764,16 @@
     const sold = new Map(getMarginsMenuRows(data).map(item => [`${item.name}|${item.outlet}`, item.timesSold * periodScale]));
     rows.forEach(row => {
       const units = sold.get(`${row.name}|${row.outlet}`);
-      row.eligible = units !== undefined && posMappingFor(row.outlet).pct >= PRICE_TO_MENU.gate;
-      row.menuPrice = !row.eligible ? null : seededRandom(`${row.name}:${row.outlet}:menu-price-moved`)() < .3 ? 'raised' : 'unchanged';
-      row.extraCost = row.eligible && row.changeValue > 0 && row.menuPrice === 'unchanged' ? Math.round(row.changeValue * units) : 0;
+      row.eligible = units !== undefined;
+      row.units = Math.round(units || 0);
+      row.impact = Math.round(row.changeValue * row.units);
     });
+    rows.sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact) || Math.abs(b.invoiceChange) - Math.abs(a.invoiceChange) || a.name.localeCompare(b.name) || a.outlet.localeCompare(b.outlet));
     const rising = rows.filter(row => row.changeValue > 0);
     const outlets = new Set(rising.map(row => row.outlet)), trusted = new Set(rising.filter(row => row.eligible).map(row => row.outlet));
     const finding = { status: 'none', of: outlets.size, covered: trusted.size };
-    if(rising.length && !trusted.size) finding.status = 'gated';
-    else if(trusted.size){
-      const affected = rising.filter(row => row.extraCost > 0), total = affected.reduce((sum, row) => sum + row.extraCost, 0);
+    if(trusted.size){
+      const affected = rising.filter(row => row.impact > 0), total = affected.reduce((sum, row) => sum + row.impact, 0);
       if(affected.length){
         const ingredients = [...new Set(affected.map(row => row.ingredient))];
         Object.assign(finding, { status: 'ok', total, recipes: new Set(affected.map(row => row.name)).size,
@@ -4697,39 +4784,34 @@
   }
   function renderMarginsDrift(drift){
     const body = document.getElementById('marginsDriftBody'), all = drift.rows, finding = drift.finding;
-    if(!all.length){ renderEmptyState(body, 'No recipe-linked price changes in this selection.'); return; }
-    const unchanged = row => row.menuPrice === 'unchanged' && row.changeValue > 0;
-    const unchangedCount = all.filter(unchanged).length;
-    if(marginsDriftFilter === 'unchanged' && !unchangedCount) marginsDriftFilter = 'all';
-    const rows = marginsDriftFilter === 'unchanged' ? all.filter(unchanged) : all;
+    if(!all.length){ renderEmptyState(body, 'No recipe-linked price changes for this selection.'); return; }
+    const upCount = all.filter(row => row.changeValue > 0).length, downCount = all.filter(row => row.changeValue < 0).length;
+    if((marginsDriftFilter === 'up' && !upCount) || (marginsDriftFilter === 'down' && !downCount)) marginsDriftFilter = 'all';
+    const rows = marginsDriftFilter === 'up' ? all.filter(row => row.changeValue > 0) : marginsDriftFilter === 'down' ? all.filter(row => row.changeValue < 0) : all;
     const parts = [];
     if(finding.status === 'ok'){
       const one = finding.recipes === 1;
       const summary = document.createElement('p'); summary.className = 'margins-drift-summary';
-      summary.innerHTML = `<strong>${plural(finding.recipes, 'recipe')}</strong> ${one ? 'costs' : 'cost'} an estimated <strong>${money(finding.total)}</strong> more this period from supplier price rises, with ${one ? 'its menu price' : 'menu prices'} unchanged.${finding.covered < finding.of ? ` Based on ${finding.covered} of ${finding.of} outlets.` : ''}`;
-      parts.push(summary);
-    } else if(finding.status === 'gated'){
-      const summary = document.createElement('p'); summary.className = 'margins-drift-summary';
-      summary.textContent = `Not enough connected data to assess what these price rises cost. POS items are mapped below ${PRICE_TO_MENU.gate}% at ${finding.of === 1 ? 'this outlet' : `${finding.of} outlets`}.`;
+      summary.innerHTML = `<strong>${plural(finding.recipes, 'recipe')}</strong> ${one ? 'costs' : 'cost'} an estimated <strong>${money(finding.total)}</strong> more this period from ingredient price rises (cost change per serve × number sold).${finding.covered < finding.of ? ` Based on ${finding.covered} of ${finding.of} outlets.` : ''}`;
       parts.push(summary);
     }
-    if(unchangedCount){
+    if(upCount && downCount){
       const controls = document.createElement('div'); controls.className = 'margins-drift-controls';
-      controls.innerHTML = `<div class="outlet-filter-chips" role="group" aria-label="Filter recipes by menu price"><button class="outlet-filter-chip" type="button" data-drift-filter="all" aria-pressed="${marginsDriftFilter === 'all'}">All ${all.length}</button><button class="outlet-filter-chip" type="button" data-drift-filter="unchanged" aria-pressed="${marginsDriftFilter === 'unchanged'}">Menu price unchanged ${unchangedCount}</button></div>`;
+      controls.innerHTML = `<div class="outlet-filter-chips" role="group" aria-label="Filter recipes by cost change"><button class="outlet-filter-chip" type="button" data-drift-filter="all" aria-pressed="${marginsDriftFilter === 'all'}">All ${all.length}</button><button class="outlet-filter-chip" type="button" data-drift-filter="up" aria-pressed="${marginsDriftFilter === 'up'}">Cost up ${upCount}</button><button class="outlet-filter-chip" type="button" data-drift-filter="down" aria-pressed="${marginsDriftFilter === 'down'}">Cost down ${downCount}</button></div>`;
       controls.querySelectorAll('[data-drift-filter]').forEach(button => button.addEventListener('click', () => { marginsDriftFilter = button.dataset.driftFilter; renderMarginsDrift(drift); }));
       parts.push(controls);
     }
     const table = document.createElement('table'); table.className = 'outlet-table procure-table margins-drift-table';
-    table.innerHTML = '<colgroup><col class="margins-drift-name-col"><col class="margins-drift-cost-col"><col class="margins-drift-price-col"><col class="margins-drift-detail-col"></colgroup><thead><tr><th scope="col">Recipe</th><th scope="col" class="num">Cost change / serve</th><th scope="col" class="num">Menu price</th><th scope="col"><span class="sr-only">Ingredient price change</span></th></tr></thead>';
+    table.innerHTML = '<colgroup><col class="margins-drift-name-col"><col class="margins-drift-cost-col"><col class="margins-drift-price-col"><col class="margins-drift-detail-col"></colgroup><thead><tr><th scope="col">Recipe</th><th scope="col" class="num">Cost change / serve</th><th scope="col" class="num">Impact</th><th scope="col"><span class="sr-only">Ingredient price change</span></th></tr></thead>';
     const tbody = document.createElement('tbody');
     rows.forEach((row, index) => {
       const detailId = `margins-drift-detail-${index}`;
       const tr = document.createElement('tr');
       const signedCostChange = row.changeValue < 0 ? `−${unitPrice(Math.abs(row.changeValue))}` : `+${unitPrice(row.changeValue)}`;
-      const menuPrice = row.menuPrice === 'unchanged' ? 'Unchanged' : row.menuPrice === 'raised' ? 'Raised' : '—';
+      const impact = `${row.impact < 0 ? '−' : row.impact > 0 ? '+' : ''}${money(Math.abs(row.impact))}`;
       tr.innerHTML = `<td><span class="procure-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span><span class="margins-drift-outlet">${escapeHtml(row.outlet)}</span></td>`
         + `<td class="num"><div class="margins-drift-cost-cell"><strong class="margins-drift-value">${signedCostChange}</strong>${changePillHtml(row.invoiceChange, {decimals:1})}</div></td>`
-        + `<td class="num"><span class="margins-drift-price"${row.menuPrice ? '' : ' title="Not enough POS data for this outlet"'}>${menuPrice}</span></td>`
+        + `<td class="num"><span class="margins-drift-impact"><strong>${impact}</strong><small>${row.units.toLocaleString('en-SG')} sold</small></span></td>`
         + `<td><button class="margins-drift-disclosure" type="button" aria-expanded="false" aria-controls="${detailId}" aria-label="Show ingredient price change for ${escapeHtml(row.name)} at ${escapeHtml(row.outlet)}"><span class="material-symbols-outlined" aria-hidden="true">expand_more</span></button></td>`;
       tbody.appendChild(tr);
       const detailRow = document.createElement('tr'); detailRow.className = 'margins-drift-detail-row'; detailRow.hidden = true;
@@ -4748,7 +4830,7 @@
       });
     });
     table.appendChild(tbody);
-    body.replaceChildren(...parts, procureScrollTable(table, 'Recipe cost drift list'));
+    body.replaceChildren(...parts, procureScrollTable(table, 'Recipe cost impact list'));
     refreshProcureFades();
   }
   // Margins "At a glance": local and deterministic, from the figures in the key-numbers strip (see js/margins-briefing).
@@ -4762,9 +4844,9 @@
     marginsTakeawayToggle.textContent = expanded ? 'Show less' : 'View all';
     syncMarginsTakeawayLink();
   }
-  // "See recipes" belongs to the menu-price sentence, which may be clamped out of sight, so it shows only when the full text does.
-  let marginsTakeawayHasMenuPrice = false;
-  function syncMarginsTakeawayLink(){ document.getElementById('marginsTakeawayLink').hidden = !(marginsTakeawayHasMenuPrice && marginsTakeawayExpanded); }
+  // "See recipes" belongs to the recipe cost sentence, which may be clamped out of sight, so it shows only when the full text does.
+  let marginsTakeawayHasRecipeCost = false;
+  function syncMarginsTakeawayLink(){ document.getElementById('marginsTakeawayLink').hidden = !(marginsTakeawayHasRecipeCost && marginsTakeawayExpanded); }
   function updateMarginsTakeawayOverflow(){
     if(marginsTakeawayLoadTimer) return;
     marginsTakeawayText.classList.add('is-clamped');
@@ -4782,9 +4864,17 @@
       gp: { value: data.gpPct, target: data.targetPct === null ? null : 100 - data.targetPct, change: -context.cogsChangePts },
       costs: { revenue: data.revenue, wastage: data.wastageValue, aboveTarget: data.aboveTarget.status === 'ok' ? data.aboveTarget.total : null },
       priceImpact: price ? { value: price.impact, changePct: price.changePct } : null,
-      menuPrice: data.priceToMenu?.status === 'ok' ? { amount: data.priceToMenu.total, recipes: data.priceToMenu.recipes, ingredient: data.priceToMenu.ingredient, outlet: data.priceToMenu.outlet } : null,
+      recipeCost: data.priceToMenu?.status === 'ok' ? { amount: data.priceToMenu.total, recipes: data.priceToMenu.recipes, ingredient: data.priceToMenu.ingredient, outlet: data.priceToMenu.outlet } : null,
     };
-    if(data.scope === 'All outlets') input.outlets = data.outlets.map(outlet => ({ name: outlet.name, gp: 100 - outlet.actual, target: outlet.target === null ? null : 100 - outlet.target }));
+    if(data.scope === 'All outlets'){
+      // Gross profit in dollars and its change are the Outlet performance panel's own figures (change in % to the precision the panel shows).
+      const performance = new Map(marginsOutletPerformanceRows(data).map(row => [row.name, row]));
+      input.outlets = data.outlets.map(outlet => {
+        const row = performance.get(outlet.name), change = row ? row.valueChangePct : null;
+        return { name: outlet.name, gp: 100 - outlet.actual, target: outlet.target === null ? null : 100 - outlet.target,
+          gpValue: row ? Math.round(row.gpValue) : null, gpValueChangePct: change === null ? null : (Math.abs(change) >= 1 ? Math.round(change) : +change.toFixed(1)) };
+      });
+    }
     // Gross profit at each point of the GP% tile, against the same target line.
     const sample = marginsSampleCogsSeries(data), unit = { daily: 'day', weekly: 'week', monthly: 'month' }[COVERS_SPEND_PERIOD[data.period]?.granularity] || 'day';
     input.trend = { unit, target: data.targetPct === null ? null : 100 - data.targetPct, points: sample.labels.map((label, index) => ({ label, gp: 100 - sample.scopeValues[index] })) };
@@ -4799,7 +4889,7 @@
       try { result = MarginsBriefing.summariseMarginsTab(buildMarginsBriefingInput(data)); }
       catch(error){ console.warn('Margins At a glance unavailable:', error); }
     }
-    marginsTakeawayHasMenuPrice = Boolean(result?.findings?.includes('menuPrice')); syncMarginsTakeawayLink();
+    marginsTakeawayHasRecipeCost = Boolean(result?.findings?.includes('recipeCost')); syncMarginsTakeawayLink();
     const hasText = Boolean(result?.text), hasFooter = !marginsStatusFooter.hidden;
     marginsTakeaway.hidden = !hasText && !hasFooter;
     marginsTakeaway.classList.toggle('has-footer-only', !hasText && hasFooter);
@@ -4825,11 +4915,11 @@
     }, 650);
   }
   marginsTakeawayToggle.addEventListener('click', () => setMarginsTakeawayExpanded(!marginsTakeawayExpanded));
-  // "See recipes" opens Recipe cost drift with "Menu price unchanged" selected.
+  // "See recipes" opens Recipe cost impact with "Cost up" selected.
   let marginsLastDrift = null;
   document.getElementById('marginsTakeawayLink').addEventListener('click', event => {
     event.preventDefault();
-    marginsDriftFilter = 'unchanged';
+    marginsDriftFilter = 'up';
     if(marginsLastDrift) renderMarginsDrift(marginsLastDrift);
     document.querySelector('.margins-drift-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });

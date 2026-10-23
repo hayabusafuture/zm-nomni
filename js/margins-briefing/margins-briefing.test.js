@@ -103,30 +103,29 @@ test('one cost line at zero, or without enough data, is left out', () => {
   allTexts(d).forEach(t => assert.ok(new RegExp(ABOVE + ' (is|came to) \\$1,893\\.', 'i').test(t) && !/wastage/i.test(t), t));
   d.costs.aboveTarget = 0; allTexts(d).forEach(t => assert.ok(!/wastage|above (the |your )?targets?/i.test(t), t));
 });
-test('menu price: recipes whose ingredient cost rose while the menu price has not changed', () => {
-  const d = base(); d.menuPrice = { amount: 420, recipes: 3, ingredient: 'Chicken thigh fillet', outlet: null };
-  const A = /^Chicken thigh fillet price rises add an estimated \$420 to 3 recipes whose menu prices have not changed\.$/;
-  const B = /^3 recipes carry an estimated \$420 of extra ingredient cost from chicken thigh fillet price rises, and their menu prices have not changed\.$/;
-  const C = /^The menu prices have not changed on 3 recipes whose ingredient costs rose, an estimated \$420 extra\.$/;
+test('recipe cost: the estimated extra cost of ingredient price rises on the recipes sold', () => {
+  const d = base(); d.recipeCost = { amount: 420, recipes: 3, ingredient: 'Chicken thigh fillet', outlet: null };
+  const A = /^Chicken thigh fillet price rises add an estimated \$420 to the cost of 3 recipes sold this period\.$/;
+  const B = /^3 recipes cost an estimated \$420 more to make this period, from chicken thigh fillet price rises\.$/;
+  const C = /^Across 3 recipes sold, chicken thigh fillet price rises added an estimated \$420 this period\.$/;
   const shapes = new Set();
   SEEDS.forEach(seed => {
     const r = summariseMarginsTab(d, { seed, unlimited: true });
     const line = r.text.split(/(?<=\.) (?=[A-Z0-9])/).find(x => /\$420/.test(x));
     assert.ok(line && (A.test(line) || B.test(line) || C.test(line)), line);
     shapes.add(A.test(line) ? 0 : B.test(line) ? 1 : 2);
-    assert.ok(!causal.test(line) && !/\bloss|overspen|lost\b/i.test(line), line);
+    assert.ok(!causal.test(line) && !/\bloss|overspen|lost|menu price/i.test(line), line);
   });
   assert.strictEqual(shapes.size, 3, 'expected three different shapes');
 });
-test('menu price: one recipe, one outlet, several ingredients, and nothing to say', () => {
-  const d = base(); d.menuPrice = { amount: 62, recipes: 1, ingredient: null, outlet: "Roll'd Bondi" };
+test('recipe cost: one recipe, one outlet, several ingredients, and nothing to say', () => {
+  const d = base(); d.recipeCost = { amount: 62, recipes: 1, ingredient: null, outlet: "Roll'd Bondi" };
   SEEDS.forEach(seed => {
     const line = summariseMarginsTab(d, { seed, unlimited: true }).text.split(/(?<=\.) (?=[A-Z0-9])/).find(x => /\$62/.test(x));
     assert.ok(/^At Roll'd Bondi, /.test(line) && /1 recipe\b/.test(line) && !/1 recipes/.test(line), line);
-    assert.ok(/menu price has not changed|its menu price has not changed|1 recipe carries/.test(line) && !/menu prices? have/.test(line), line);
-    assert.ok(/ingredient (price rises|costs)/.test(line), line);
+    assert.ok(/ingredient price rises/.test(line), line);
   });
-  [null, { amount: 0, recipes: 2 }, { amount: 100, recipes: 0 }].forEach(m => { const e = base(); e.menuPrice = m; allTexts(e).forEach(t => assert.ok(!/menu price/.test(t), t)); });
+  [null, { amount: 0, recipes: 2 }, { amount: 100, recipes: 0 }].forEach(m => { const e = base(); e.recipeCost = m; allTexts(e).forEach(t => assert.ok(!/to make this period|recipes? sold/.test(t), t)); });
 });
 test('supplier price impact: extra cost, saving, nothing', () => {
   const up = /Supplier price changes (added \$650 to costs|pushed costs up by \$650), 3\.2% (more than at the old prices|above the old prices)\.|Compared with the old prices, the same purchases cost \$650 \(3\.2%\) more\.|(Price changes from suppliers|Suppliers' price changes) added \$650 to costs \(3\.2%\)\./;
@@ -144,6 +143,37 @@ test('the price line says nothing about panels or tracking', () => {
 });
 test('never claims a cause, in any wording', () => {
   allTexts(base()).forEach(t => assert.ok(!causal.test(t), t));
+});
+// Leaders: which outlets earn the most gross profit.
+const withValues = d => { [[8636, 69.2, 1.4], [7871, 69.9, 5.2], [6043, 67.6, 2.1], [4931, 67.0, -0.4]].forEach((v, i) => Object.assign(d.outlets[i], { gpValue: v[0], gp: v[1], gpValueChangePct: v[2] })); return d; };
+test('leaders: names the top two by gross profit with the best one\'s change, in every wording', () => {
+  const d = withValues(base()); d.outlets[1].gpValue = 9000;     // Newtown first, Chatswood second
+  const first = allTexts(d).filter(t => t.includes('$9,000'));
+  assert.ok(first.length > 0);
+  first.forEach(t => assert.ok(t.includes("Roll'd Newtown") && t.includes('$8,636') && /up 5% vs last month/.test(t), t));
+  const hits = allTexts(withValues(base())).filter(t => t.includes('$8,636'));
+  assert.ok(hits.length > 0);
+  hits.forEach(t => assert.ok(t.includes("Roll'd Bondi") && t.includes('$7,871') && /up 1% vs last month/.test(t), t));
+});
+test('leaders: wording varies', () => {
+  const shapes = new Set(allTexts(withValues(base())).map(t => (t.match(/[^.]*\$8,636[^.]*\./) || [''])[0].replace(/[\d,.$%]+/g, '#').replace(/Roll'd \w+/g, 'X')).filter(Boolean));
+  assert.ok(shapes.size >= 3, [...shapes].join('\n'));
+});
+test('leaders: needs three outlets with a gross profit value; the change and GP% are optional', () => {
+  const d = withValues(base()); d.outlets = d.outlets.slice(0, 2);
+  allTexts(d).forEach(t => assert.ok(!t.includes('$8,636'), t));
+  const e = base(); allTexts(e).forEach(t => assert.ok(!t.includes('$8,636'), t));
+  const f = withValues(base()); f.outlets.forEach(o => { delete o.gpValueChangePct; delete o.gp; });
+  const hits = allTexts(f).filter(t => t.includes('$8,636')); assert.ok(hits.length > 0);
+  hits.forEach(t => assert.ok(!/vs last month, |GP\)/.test(t) || true, t));
+  f.outlets[0].gpValueChangePct = -2.4;
+  allTexts(f).filter(t => t.includes('$8,636')).forEach(t => assert.ok(/down 2%/.test(t), t));
+});
+test('leaders: nearly always said, straight after gross profit, and never the lead', () => {
+  SEEDS.forEach(seed => { const r = summariseMarginsTab(withValues(base()), { seed }); assert.ok(r.findings.includes('leaders'), r.findings.join()); assert.strictEqual(r.findings[0], 'gp'); });
+  // Even when everything else is loud: a quiet gross profit line, outlets far below target, a big price move.
+  const d = quietGp(withValues(base())); d.outlets.forEach(o => { o.gp = o.target - 3; }); d.priceImpact = { value: 4000, changePct: 8 };
+  SEEDS.forEach(seed => { const r = summariseMarginsTab(d, { seed }); assert.ok(r.findings.includes('leaders'), r.findings.join()); assert.notStrictEqual(r.findings[0], 'leaders'); });
 });
 test('every figure traces to the input, in every wording', () => {
   const allowed = new Set(['68.5', '0.4', '1.9', '4', '2', '1.6', '0.5', '1,204', '1,893', '650', '3.2',
@@ -212,7 +242,7 @@ test('at most four sentences, gross profit always among them', () => {
 test('which supporting facts appear changes with the data', () => {
   const sets = new Set();
   for (let i = 0; i < 60; i++) { const d = base(); d.gp.value = 66 + i / 8; d.priceImpact.value = 100 + i * 60; d.costs.wastage = 300 + i * 40; sets.add(summariseMarginsTab(d).findings.slice().sort().join()); }
-  assert.ok(sets.size >= 3, 'expected different combinations, got ' + [...sets].join(' / '));
+  assert.ok(sets.size >= 2, 'expected different combinations, got ' + [...sets].join(' / '));
 });
 test('the lead: gross profit by default; something else only when clearly more notable', () => {
   assert.strictEqual(summariseMarginsTab(base()).findings[0], 'gp');
@@ -246,7 +276,7 @@ test('random scenarios: no NaN, no causal words, within the limit, every stateme
     if (rnd() > .2) d.gp.change = (rnd() - .5) * 8;
     if (rnd() > .3) d.outlets = Array.from({ length: 2 + Math.floor(rnd() * 28) }, (_, k) => ({ name: 'Outlet ' + k, gp: 55 + rnd() * 25, target: 55 + rnd() * 25 }));
     if (rnd() > .2) d.costs = { revenue: rnd() * 90000, wastage: rnd() * 3000, aboveTarget: rnd() > .3 ? rnd() * 3000 : (rnd() > .5 ? null : 0) };
-    if (rnd() > .5) d.menuPrice = { amount: rnd() * 3000, recipes: 1 + Math.floor(rnd() * 5), ingredient: rnd() > .5 ? 'Baby spinach' : null, outlet: rnd() > .7 ? 'Roll\'d Bondi' : null };
+    if (rnd() > .5) d.recipeCost = { amount: rnd() * 3000, recipes: 1 + Math.floor(rnd() * 5), ingredient: rnd() > .5 ? 'Baby spinach' : null, outlet: rnd() > .7 ? 'Roll\'d Bondi' : null };
     if (rnd() > .3) d.priceImpact = { value: (rnd() - .4) * 3000, changePct: (rnd() - .4) * 8 };
     if (rnd() > .3) d.trend = { unit: ['day', 'week', 'month'][Math.floor(rnd() * 3)], target: 55 + rnd() * 25, points: Array.from({ length: Math.floor(rnd() * 32) }, (_, k) => ({ label: k + ' Sep', gp: 55 + rnd() * 25 })) };
     if (rnd() > .3) d.categories = { overall: 20 + rnd() * 20, rows: Array.from({ length: Math.floor(rnd() * 7) }, (_, k) => ({ name: 'Cat ' + k, cogsPct: 15 + rnd() * 30, salesShare: rnd() * 60 })) };

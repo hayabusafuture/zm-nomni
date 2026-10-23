@@ -3,7 +3,7 @@
 A short briefing for the **Margins** tab: under 100 words, built only from the numbers the tab already shows. Local and deterministic: no network, no model, no random numbers. The same approach as `js/sales-briefing` and `js/spend-briefing`, but simpler: no stored memory, so nothing that applies is ever left out.
 
 ```
-node margins-briefing.test.js     # 28 tests, no dependencies
+node margins-briefing.test.js     # 33 tests, no dependencies
 ```
 
 ## Usage
@@ -19,15 +19,16 @@ The input shape is documented at the top of `margins-briefing.js`. `buildMargins
 
 ## What it says
 
-Up to six kinds of statement. Each is left out when there is nothing to say:
+Up to eight kinds of statement. Each is left out when there is nothing to say:
 
 1. **Gross profit** against target, and against the comparison period. "Gross profit is 68.5%, 0.2 pts above target and up 1.9 pts vs last month." Always said.
 2. **Outlets below target** (group view only): how many, and the two furthest below, by name.
-3. **Trend**: how many days (or weeks, months) gross profit was below target, and the lowest one. It uses the same points as the GP% tile.
-4. **Category**: which sales categories have the highest and lowest COGS, or how many run above the overall COGS. It uses COGS by sales category for the selected outlets.
-5. **Recorded wastage and estimated food cost above target**, as two separate amounts (both in whole dollars, like their tiles). They are never added together or called a loss: they can overlap, and the second is an estimate from recipe costs, not from purchases or stock counts.
-6. **Supplier price impact**: what supplier price changes added to, or took off, costs. What it covers (items with a price in both periods) is in the tile's "i" tooltip, not repeated in the sentence.
-7. **Menu price**: recipes whose ingredient cost rose while their menu price has not changed, with the estimated extra cost this period (cost increase per serve × units sold). It names the ingredient when there is only one, and the outlet when one is selected. It states the amount as a fact and never says why; the dashboard leaves it out when the POS data is too incomplete to trust (see the gate in `PRICE_TO_MENU`).
+3. **Gross profit leaders** (group view, three or more outlets): the outlet with the most gross profit in dollars and the runner-up, with the leader's change vs the comparison period. "Roll'd Chatswood earns the most gross profit, $8,636 (69.2% GP, up 1% vs last month), then Roll'd Bondi at $7,871." The figures are the ones in the **Outlet performance** panel. Four wordings. It scores high enough to be said in nearly every briefing, always straight after the gross profit sentence or the outlets-below-target one, and it never leads.
+4. **Trend**: how many days (or weeks, months) gross profit was below target, and the lowest one. It uses the same points as the GP% tile.
+5. **Category**: which sales categories have the highest and lowest COGS, or how many run above the overall COGS. It uses COGS by sales category for the selected outlets.
+6. **Recorded wastage and estimated food cost above target**, as two separate amounts (both in whole dollars, like their tiles). They are never added together or called a loss: they can overlap, and the second is an estimate from recipe costs, not from purchases or stock counts.
+7. **Supplier price impact**: what supplier price changes added to, or took off, costs. What it covers (items with a price in both periods) is in the tile's "i" tooltip, not repeated in the sentence.
+8. **Recipe cost**: the estimated extra cost this period of ingredient price rises on the recipes sold (cost change per serve × number sold). It names the ingredient when there is only one, and the outlet when one outlet is selected. It states the amount as a fact and never explains it.
 
 Gross profit plus **at most three others** are said (four sentences), so the briefing stays short. The three chosen are the highest scoring, so a quiet trend or a small price move drops out.
 

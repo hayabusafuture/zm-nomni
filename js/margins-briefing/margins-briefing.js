@@ -12,11 +12,12 @@
  *   Up to six kinds of statement; each is left out when there is nothing to say:
  *     gp        gross profit against target, and against the comparison period
  *     outlets   which outlets are below target, and by how much (group view only)
+ *     leaders   which outlets earn the most gross profit, with the change for the best one (group view only, 3+ outlets)
  *     trend     how many days/weeks/months gross profit was below target, and the lowest
  *     category  which sales categories have the highest and lowest COGS
  *     costs     recorded wastage and estimated food cost above target, as two separate amounts
  *     price     what supplier price changes added to (or took off) costs
- *     menuPrice recipes whose ingredient cost rose while their menu price has not changed, and the estimated extra cost
+ *     recipeCost the estimated extra cost this period of ingredient price rises on the recipes sold (cost change per serve x number sold)
  *   Gross profit is always said. Of the rest, at most three are said (four
  *   sentences in all), so the briefing stays short: the more notable ones win.
  *
@@ -55,7 +56,9 @@
  *     target?,                         // target %, revenue-weighted for a group
  *     change?                          // points vs the comparison period
  *   },
- *   outlets?: [{ name, gp, target }],  // group view only: each outlet's GP % and target %
+ *   outlets?: [{ name, gp, target,     // group view only: each outlet's GP % and target %
+ *     gpValue?, gpValueChangePct? }],  //   and, for the leaders statement, its gross profit in $ and how that moved vs the comparison period, in %,
+ *                                      //   as the Outlet performance panel shows them
  *   trend?: {                          // gross profit at each interval of the period
  *     unit: 'day' | 'week' | 'month',
  *     target,                          // gross profit target %
@@ -67,8 +70,8 @@
  *   },
  *   costs?: { revenue, wastage, aboveTarget },   // $; wastage is recorded, aboveTarget (null when there is not enough data) is estimated from recipe costs
  *   priceImpact?: { value, changePct } | null // $ signed (+ = extra cost), % on the same purchases
- *   menuPrice?: { amount, recipes, ingredient, outlet } | null  // amount: $ extra ingredient cost this period on `recipes` recipes whose menu
- *                                      // price has not changed; ingredient: one ingredient's name or null; outlet: the outlet name when one outlet is selected, else null
+ *   recipeCost?: { amount, recipes, ingredient, outlet } | null  // amount: $ extra ingredient cost this period on `recipes` recipes (cost change per serve x
+ *                                      // number sold); ingredient: one ingredient's name or null; outlet: the outlet name when one outlet is selected, else null
  * }
  *
  * RETURNS  text, words, findings (the keys of what was said, in order)
@@ -96,11 +99,12 @@
     var found = []
       .concat(gpFinding(data))
       .concat(outletFinding(data))
+      .concat(leadersFinding(data))
       .concat(trendFinding(data))
       .concat(categoryFinding(data))
       .concat(costFinding(data))
       .concat(priceFinding(data))
-      .concat(menuPriceFinding(data));
+      .concat(recipeCostFinding(data));
     found.forEach(function (f) { f.nudged = f.score + (hashString(seed + f.key) / 4294967296 - 0.5) * CONFIG.nudge; });
 
     // Which facts: gross profit, then the highest-scoring others.
@@ -109,7 +113,7 @@
     var chosen = opts.unlimited ? found.slice() : [gp].concat(others.slice(0, CONFIG.maxStatements - 1));
 
     // The lead: gross profit unless something else is clearly more notable (raw scores, no nudge).
-    var lead = chosen.reduce(function (best, f) { return f.score > best.score ? f : best; }, gp);
+    var lead = chosen.reduce(function (best, f) { return !f.neverLead && f.score > best.score ? f : best; }, gp);
     if (lead !== gp && lead.score < gp.score + CONFIG.leadMargin) lead = gp;
     var ordered = [lead].concat(chosen.filter(function (f) { return f !== lead; }).sort(function (a, b) { return b.nudged - a.nudged; }));
 
@@ -194,6 +198,41 @@
     }];
   }
 
+  function leadersFinding(d) {
+    var list = (d.outlets || []).filter(function (o) { return isNum(o.gpValue) && o.gpValue > 0 && typeof o.name === 'string'; })
+      .sort(function (a, b) { return b.gpValue - a.gpValue || a.name.localeCompare(b.name); });
+    if (list.length < 3) return [];
+    var a = list[0], b = list[1];
+    var total = list.reduce(function (n, o) { return n + o.gpValue; }, 0);
+    var share = a.gpValue / total;                    // how much of the group's gross profit the best outlet earns: used only to score
+    // Which outlets earn the most is the first thing a multi-outlet owner asks, so it scores above the cost, trend, price and category statements
+    // and is nearly always said. It never leads: gross profit does, then this.
+    var score = 0.6 + clamp(share / 0.35) * 0.1 + (isNum(a.gpValueChangePct) ? clamp(Math.abs(a.gpValueChangePct) / 10) * 0.05 : 0);
+    var hasGp = isNum(a.gp), hasChange = isNum(a.gpValueChangePct);
+    function chg(v) { var m = Math.abs(v), t = (m >= 1 ? Math.round(m) : r1(m)); return t === 0 ? null : t + '%'; }
+    function move() {              // "up 5%", "down 2%", or null when it did not move
+      if (!hasChange) return null;
+      var t = chg(a.gpValueChangePct);
+      return t === null ? null : (a.gpValueChangePct > 0 ? 'up ' : 'down ') + t;
+    }
+    return [{
+      key: 'leaders', score: score, neverLead: true,
+      say: function (pick) {
+        var m = move(), cmp = d.comparison;
+        var aV = money(a.gpValue), bV = money(b.gpValue), gpTxt = hasGp ? r1(a.gp).toFixed(1) + '% GP' : null;
+        var inside = [gpTxt, m ? m + ' ' + cmp : null].filter(Boolean);
+        var detail = inside.length ? ' (' + inside.join(', ') + ')' : '';
+        var shapes = [
+          function () { return a.name + ' earns the most gross profit, ' + aV + detail + ', then ' + b.name + ' at ' + bV + '.'; },
+          function () { return 'By gross profit, ' + a.name + ' leads at ' + aV + ' and ' + b.name + ' follows at ' + bV + (m ? '; ' + a.name + ' is ' + m + ' ' + cmp : '') + '.'; },
+          function () { return 'Gross profit is highest at ' + a.name + ' (' + aV + (gpTxt ? ', ' + gpTxt : '') + ') and ' + b.name + ' (' + bV + ')' + (m ? ', with ' + a.name + ' ' + m + ' ' + cmp : '') + '.'; },
+          function () { return a.name + ' brings in the highest gross profit at ' + aV + (m ? ', ' + m + ' ' + cmp : '') + ', ahead of ' + b.name + ' at ' + bV + '.'; }
+        ];
+        return pick(shapes)();
+      }
+    }];
+  }
+
   function trendFinding(d) {
     var t = d.trend;
     if (!t || !Array.isArray(t.points) || !isNum(t.target)) return [];
@@ -239,7 +278,7 @@
     var share = isNum(hi.salesShare) ? Math.round(hi.salesShare) : null;
     var overall = isNum(c.overall) ? r1(c.overall) : null;
     var above = overall === null ? [] : rows.filter(function (r) { return r1(r.cogsPct) > overall; });
-    var score = 0.12 + clamp(spread / 25) * 0.28;
+    var score = 0.08 + clamp(spread / 25) * 0.12;   // a spread that hardly moves between periods: ranked below the cost, trend and leaders statements
     return [{
       key: 'category', score: score,
       say: function (pick) {
@@ -313,24 +352,23 @@
     }];
   }
 
-  function menuPriceFinding(d) {
-    var m = d.menuPrice;
+  function recipeCostFinding(d) {
+    var m = d.recipeCost;
     if (!m || !isNum(m.amount) || !isNum(m.recipes) || m.recipes < 1 || Math.round(m.amount) <= 0) return [];
     var share = d.costs && isNum(d.costs.revenue) && d.costs.revenue > 0 ? m.amount / d.costs.revenue * 100 : 0;
     var score = 0.35 + clamp(share / 0.5) * 0.45;   // above the cost lines (the amount is a finding in its own right), below a clear outlets or gross profit story
     return [{
-      key: 'menuPrice', score: score,
+      key: 'recipeCost', score: score,
       say: function (pick) {
-        // Facts side by side, no cause: the amount is the cost increase per serve times units sold, which is how it is defined.
+        // Facts side by side, no cause: the amount is the cost change per serve times the number sold, which is how it is defined.
         var amt = money(m.amount), n = Math.round(m.recipes), one = n === 1;
         var recipes = n + (one ? ' recipe' : ' recipes');
-        var prices = one ? 'menu price has' : 'menu prices have';
         var rises = (m.ingredient ? String(m.ingredient).toLowerCase() + ' price rises' : 'ingredient price rises');
         var s;
         switch (pick([0, 1, 2])) {
-          case 1: s = recipes + (one ? ' carries' : ' carry') + ' an estimated ' + amt + ' of extra ingredient cost from ' + rises + ', and ' + (one ? 'its menu price has' : 'their menu prices have') + ' not changed.'; break;
-          case 2: s = 'The ' + prices + ' not changed on ' + recipes + ' whose ingredient costs rose, an estimated ' + amt + ' extra.'; break;
-          default: s = cap(rises) + ' add an estimated ' + amt + ' to ' + recipes + ' whose ' + prices + ' not changed.';
+          case 1: s = recipes + (one ? ' costs' : ' cost') + ' an estimated ' + amt + ' more to make this period, from ' + rises + '.'; break;
+          case 2: s = 'Across ' + recipes + ' sold, ' + rises + ' added an estimated ' + amt + ' this period.'; break;
+          default: s = cap(rises) + ' add an estimated ' + amt + ' to the cost of ' + recipes + ' sold this period.';
         }
         return m.outlet ? 'At ' + m.outlet + ', ' + s.charAt(0).toLowerCase() + s.slice(1) : s;
       }
@@ -349,9 +387,9 @@
 
   // A hash of the figures as they are displayed, so sub-display noise never changes the wording.
   function hashData(d) {
-    var o = (d.outlets || []).map(function (x) { return [x.name, isNum(x.gp) ? r1(x.gp) : null, isNum(x.target) ? r1(x.target) : null]; });
+    var o = (d.outlets || []).map(function (x) { return [x.name, isNum(x.gp) ? r1(x.gp) : null, isNum(x.target) ? r1(x.target) : null, isNum(x.gpValue) ? Math.round(x.gpValue) : null, isNum(x.gpValueChangePct) ? r1(x.gpValueChangePct) : null]; });
     var c = d.costs ? [whole(d.costs.wastage || 0), Math.round(d.costs.aboveTarget || 0), Math.round(d.costs.revenue || 0)] : null;
-    var mp = d.menuPrice ? [Math.round(d.menuPrice.amount || 0), d.menuPrice.recipes || 0, d.menuPrice.ingredient || '', d.menuPrice.outlet || ''] : null;
+    var mp = d.recipeCost ? [Math.round(d.recipeCost.amount || 0), d.recipeCost.recipes || 0, d.recipeCost.ingredient || '', d.recipeCost.outlet || ''] : null;
     var p = d.priceImpact ? [whole(d.priceImpact.value), isNum(d.priceImpact.changePct) ? r1(d.priceImpact.changePct) : null] : null;
     var g = [r1(d.gp.value), isNum(d.gp.target) ? r1(d.gp.target) : null, isNum(d.gp.change) ? r1(d.gp.change) : null];
     var t = d.trend && d.trend.points ? [d.trend.unit, isNum(d.trend.target) ? r1(d.trend.target) : null, d.trend.points.map(function (x) { return [x.label, isNum(x.gp) ? r1(x.gp) : null]; })] : null;
