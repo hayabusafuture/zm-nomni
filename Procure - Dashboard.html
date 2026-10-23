@@ -3397,7 +3397,7 @@
       ? `<colgroup><col class="procure-category-name-col"><col class="procure-money-col"><col class="procure-pill-col"><col class="procure-trend-col"></colgroup><thead><tr><th scope="col">Item</th><th scope="col" class="num">Spend</th><th scope="col" class="num">Change</th><th scope="col" title="${trendTitle}">${trendWindow.points} ${trendWindow.unit.toUpperCase()}S</th></tr></thead>`
       : `<colgroup><col class="procure-category-name-col"><col class="procure-bar-col"><col class="procure-money-col"><col class="procure-pill-col"></colgroup><thead><tr><th scope="col">Category</th><th scope="colgroup" colspan="2">Spend</th><th scope="col" class="num">Change</th></tr></thead>`;
     const tbody = document.createElement('tbody');
-    rows.forEach(row => {
+    const addRow = row => {
       const tr = document.createElement('tr');
       const nameCell = row.sub
         ? `<span class="procure-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span><span class="procure-sub">${escapeHtml(row.sub)}</span>`
@@ -3411,28 +3411,77 @@
         tr.innerHTML = `<td>${nameCell}</td><td><span class="procure-share-bar" tabindex="0" role="img" aria-label="${share}" data-share="${share}"><span class="procure-bar" aria-hidden="true"><span style="width:${row.spend / max * 100}%"></span></span></span></td><td class="num"><span class="procure-money">${money(row.spend)}</span></td><td class="num">${costPillHtml(pctChange(row.spend, row.previous))}</td>`;
       }
       tbody.appendChild(tr);
-    });
+    };
+    // The item list is every item, shown ITEM_PAGE_SIZE at a time: the next page is added as the list is scrolled to the end.
+    let shown = 0;
+    table.loadMore = () => { rows.slice(shown, shown + (isItem ? ITEM_PAGE_SIZE : rows.length)).forEach(addRow); shown = Math.min(rows.length, shown + (isItem ? ITEM_PAGE_SIZE : rows.length)); return shown < rows.length; };
+    table.loadMore();
     table.appendChild(tbody);
     return table;
   }
   function renderSpendByCategory(data){
     const body = document.getElementById('spendCategoryBody');
-    const rows = PROCURE_CATEGORIES.map(name => ({ name, spend: data.current.categories[name] || 0, previous: data.previous.categories[name] || 0 })).filter(row => row.spend > 0 || row.previous > 0);
+    // Items with no category yet are pulled out of their supplier's category and listed together under TBC.
+    const tbc = side => {
+      const items = scaledItemSpend(side, side === data.previous), byCategory = {}; let total = 0;
+      ITEM_CATALOGUE.filter(item => item.uncategorised && side.suppliers[item.supplier]).forEach(item => { byCategory[item.category] = (byCategory[item.category] || 0) + items[item.description]; total += items[item.description]; });
+      return { byCategory, total };
+    };
+    const tbcNow = tbc(data.current), tbcBefore = tbc(data.previous);
+    const rows = PROCURE_CATEGORIES.map(name => ({ name, spend: Math.max(0, (data.current.categories[name] || 0) - (tbcNow.byCategory[name] || 0)), previous: Math.max(0, (data.previous.categories[name] || 0) - (tbcBefore.byCategory[name] || 0)) })).filter(row => row.spend > 0 || row.previous > 0);
+    if(tbcNow.total > 0 || tbcBefore.total > 0) rows.push({ name: 'TBC', spend: tbcNow.total, previous: tbcBefore.total });
     rows.sort((a, b) => b.spend - a.spend);
     if(!rows.length){ renderEmptyState(body, 'No category spend to show for this selection.'); return; }
+    // Whole dollars shared out by largest remainder, so the rows add up to the Purchases card exactly.
+    const whole = distributeWhole(Math.round(data.current.spend), rows.map(row => row.spend));
+    rows.forEach((row, index) => { row.spend = whole[index]; });
     body.replaceChildren(procureScrollTable(spendBreakdownTable(rows, 'Category'), 'Spend by category list'));
   }
-  // The prototype holds a fixed list of items, so their raw values don't add up to what was invoiced. Each item is scaled to its supplier's
-  // invoiced spend (the listed items stand for ITEM_COVERAGE of it), and an "Other items" row carries the rest, so the list adds up to
-  // Purchases. In production the list is the real items, with the smallest folded into "Other items".
+  // The prototype holds eight named items with real prices, plus a catalogue of smaller items per supplier, so the By item list is long
+  // enough to scroll. Each supplier's invoiced spend is shared out: the named items take ITEM_COVERAGE of it and the catalogue items split the
+  // rest (the first items biggest), so every item is listed and the list adds up to Purchases. About one in nine catalogue items has no
+  // category yet: it is listed under TBC in Spend by category until it is auto-categorised.
   const ITEM_COVERAGE = .6;
-  function scaledItemSpend(side){
-    const bySupplier = {};
+  const ITEM_PAGE_SIZE = 30;
+  const CATALOGUE_NAMES = {
+    'Sunrise Poultry Distributors': ['Chicken drumsticks 10 kg frozen','Whole chicken 1.6 kg x 10','Chicken wings mid-joint 5 kg','Duck breast 200 g x 10','Chicken breast skinless 5 kg','Chicken liver 1 kg tub','Turkey mince 2 kg','Quail whole x 12'],
+    'Green Valley Produce': ['Roma tomatoes 5 kg tray','Cos lettuce x 12','Brown onions 10 kg bag','Chat potatoes 5 kg','Carrots 10 kg bag','Red capsicum 5 kg','Zucchini 5 kg','Cucumber continental x 20','Mushrooms button 3 kg','Broccoli 5 kg','Pumpkin kent 10 kg','Avocado hass tray x 24'],
+    'Harbour Seafood Supply': ['Barramundi fillet 3 kg','Atlantic salmon side 4 kg','Calamari tubes 2 kg frozen','Mussels live 5 kg','Tuna loin 2 kg','Oysters Pacific x 24','Blue swimmer crab meat 1 kg','Snapper whole 2 kg'],
+    'Northside Meats': ['Pork belly skin on 5 kg','Beef rump cap 3 kg','Beef short rib 4 kg','Lamb leg boneless 2.5 kg','Pork shoulder 6 kg','Beef brisket 8 kg','Sausages pork 3 kg','Bacon rindless 3 kg','Beef sirloin 5 kg','Lamb cutlets 2 kg'],
+    'Pantry Wholesale': ['Canola oil 20 L drum','Tinned tomatoes 2.5 kg x 6','Chickpeas dried 10 kg','Red lentils 10 kg','Coconut milk 400 mL x 24','White vinegar 5 L','Soy sauce 5 L','Tomato paste 4.5 kg','Plain flour 25 kg','Sugar white 25 kg','Pickled jalapenos 3 kg','Olives kalamata 2 kg'],
+    'Eastview Dairy': ['Thickened cream 2 L','Butter unsalted 5 kg','Greek yoghurt 5 kg','Mozzarella shredded 2 kg','Parmesan grated 1 kg','Eggs free range x 360','Cheddar block 5 kg','Sour cream 2 kg'],
+    'Coastal Beverages': ['Sparkling water 330 mL x 24','Cola 330 mL x 24','Orange juice 2 L x 6','Ginger beer 330 mL x 24','Still water 600 mL x 24','Coffee beans 1 kg x 6','Lemonade 1.25 L x 12','Iced tea 500 mL x 12'],
+    'Asia Pacific Foods': ['Basmati rice 10 kg','Rice noodles 5 kg','Sushi rice 10 kg','Coconut cream 4 L','Fish sauce 4 L','Sesame oil 2 L','Panko crumbs 5 kg','Rolled oats 10 kg','Sweet chilli sauce 5 L'],
+    'Packright Co': ['Takeaway container 750 mL x 500','Paper bags kraft x 500','Napkins 2 ply x 3000','Cling wrap 450 mm x 3','Foil roll 300 mm','Coffee cups 8 oz x 1000','Bin liners 120 L x 200','Cutlery set wrapped x 1000'],
+    'Metro Dry Goods': ['Spaghetti 10 kg','Penne 10 kg','Egg noodles 5 kg','Wonton wrappers x 20','Tortilla wraps 25 cm x 120','Lasagne sheets 5 kg','Udon noodles 4 kg'],
+    'Fresh Herb Co': ['Basil bunch x 10','Coriander bunch x 20','Mint bunch x 10','Flat leaf parsley bunch x 20','Thyme 500 g','Rosemary 500 g','Chives bunch x 10'],
+    "Baker's Lane Bakery": ['Sourdough loaf x 12','Brioche buns x 48','Croissant butter x 40','Ciabatta rolls x 36','Turkish bread x 10','Sweet muffin x 24'],
+    'CleanPro Supplies': ['Dishwasher detergent 20 L','Sanitiser 5 L','Glass cleaner 5 L','Floor cleaner 10 L','Hand soap 5 L','Microfibre cloths x 50'],
+    'Island Spices': ['Smoked paprika 1 kg','Cumin ground 1 kg','Sea salt flakes 5 kg','Black pepper cracked 1 kg','Dried chilli flakes 500 g','Garlic powder 1 kg'],
+  };
+  const ITEM_CATALOGUE = Object.entries(CATALOGUE_NAMES).flatMap(([supplier, names]) => {
+    const category = PROCURE_SUPPLIERS.find(item => item.name === supplier)?.category;
+    const random = seededRandom(`catalogue:${supplier}`);
+    return names.map((description, index) => ({ description, supplier, category, uncategorised: random() < .115, weight: 1 / Math.pow(index + 1, 1.05) * (.8 + random() * .4), drift: .85 + random() * .3 }));
+  });
+  function scaledItemSpend(side, previous){
+    const bySupplier = {}, named = {};
     PROCURE_SKUS.forEach(sku => { bySupplier[sku.supplier] = (bySupplier[sku.supplier] || 0) + (side.skus[sku.description]?.value || 0); });
-    return Object.fromEntries(PROCURE_SKUS.map(sku => {
+    const result = Object.fromEntries(PROCURE_SKUS.map(sku => {
       const raw = side.skus[sku.description]?.value || 0, base = bySupplier[sku.supplier], supplierSpend = side.suppliers[sku.supplier]?.spend || 0;
-      return [sku.description, base ? raw / base * supplierSpend * ITEM_COVERAGE : 0];
+      const value = base ? raw / base * supplierSpend * ITEM_COVERAGE : 0;
+      named[sku.supplier] = (named[sku.supplier] || 0) + value;
+      return [sku.description, value];
     }));
+    // The previous period weights each catalogue item a little differently, so the changes aren't all the supplier's change.
+    const weightOf = item => item.weight * (previous ? item.drift : 1);
+    const totals = {};
+    ITEM_CATALOGUE.forEach(item => { totals[item.supplier] = (totals[item.supplier] || 0) + weightOf(item); });
+    ITEM_CATALOGUE.forEach(item => {
+      const supplierSpend = side.suppliers[item.supplier]?.spend || 0;
+      result[item.description] = Math.max(0, supplierSpend - (named[item.supplier] || 0)) * weightOf(item) / totals[item.supplier];
+    });
+    return result;
   }
   function renderSpendByItem(data){
     const body = document.getElementById('spendCategoryBody');
@@ -3440,26 +3489,23 @@
     // per item and scope; the monthly series ends at the real prototype July/August totals.
     const lastMonth = getProcureData(currentScope, 'Last month');
     const unit = resolvedTrendWindow().unit;
-    const now = scaledItemSpend(data.current), before = scaledItemSpend(data.previous);
-    const augustItems = scaledItemSpend(lastMonth.current), julyItems = scaledItemSpend(lastMonth.previous);
-    const rows = PROCURE_SKUS.map(sku => ({
+    const now = scaledItemSpend(data.current), before = scaledItemSpend(data.previous, true);
+    const augustItems = scaledItemSpend(lastMonth.current), julyItems = scaledItemSpend(lastMonth.previous, true);
+    const rows = [...PROCURE_SKUS, ...ITEM_CATALOGUE].map(sku => ({
       name: sku.description, sub: sku.supplier,
       spend: now[sku.description] || 0,
       previous: before[sku.description] || 0,
       trend: seededProcureSpendTrend(`${currentScope}:${sku.description}:${unit}:spend-trend`, unit, julyItems[sku.description] || augustItems[sku.description] || 0, augustItems[sku.description] || 0),
     })).filter(row => row.spend > 0 || row.previous > 0);
     rows.sort((a, b) => b.spend - a.spend);
-    const sum = values => Object.values(values).reduce((total, value) => total + value, 0);
-    const otherNow = Math.max(0, data.current.spend - sum(now)), otherBefore = Math.max(0, data.previous.spend - sum(before));
-    if(otherNow > 0 || otherBefore > 0){
-      const august = Math.max(1, lastMonth.current.spend - sum(augustItems)), july = Math.max(1, lastMonth.previous.spend - sum(julyItems));
-      rows.push({ name: 'Other items', sub: 'All other suppliers and items', spend: otherNow, previous: otherBefore, trend: seededProcureSpendTrend(`${currentScope}:other-items:${unit}:spend-trend`, unit, july, august) });
-    }
     if(!rows.length){ renderEmptyState(body, 'No item spend to show for this selection.'); return; }
     // Whole dollars, shared out by largest remainder, so the rows add up to the Purchases card exactly.
     const whole = distributeWhole(Math.round(data.current.spend), rows.map(row => row.spend));
     rows.forEach((row, index) => { row.spend = whole[index]; });
-    body.replaceChildren(procureScrollTable(spendBreakdownTable(rows, 'Item'), 'Spend by item list'));
+    const itemTable = spendBreakdownTable(rows, 'Item'), itemFrame = procureScrollTable(itemTable, 'Spend by item list'), itemWrap = itemFrame.querySelector('.procure-table-wrap');
+    let more = rows.length > ITEM_PAGE_SIZE;
+    itemWrap.addEventListener('scroll', () => { if(more && itemWrap.scrollTop + itemWrap.clientHeight >= itemWrap.scrollHeight - 40){ more = itemTable.loadMore(); refreshProcureFades(); } }, { passive: true });
+    body.replaceChildren(itemFrame);
   }
   function seededProcureSpendTrend(seed, unit, july, august){
     const random = seededRandom(seed);
