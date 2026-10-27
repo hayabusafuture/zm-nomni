@@ -1080,6 +1080,13 @@ body.supplier-settings-open { overflow:hidden; }
 .hq-paper-line { display:flex; justify-content:space-between; gap:8px; padding:7px 0; border-bottom:1px solid #EEF0F3; }
 .hq-review-main { grid-row:2; display:flex; min-width:0; flex-direction:column; overflow:hidden; }
 .hq-review-title { padding:22px 30px 22px; border-bottom:1px solid var(--rule); }
+/* Prototype toggle, styled like the one on Procure - Users.html (Shift+D to hide) */
+.proto-version-toggle { position: relative; flex: none; margin-right: 12px; z-index: 60; display: flex; align-items: center; gap: 2px; padding: 4px 4px 4px 10px; border: 1px solid #F1E3A0; border-radius: 8px; background: #FFF9DB; box-shadow: 0 2px 8px rgba(26,31,43,.12); color: #5F6570; font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.proto-version-toggle[hidden] { display: none; }
+.proto-version-label { margin-right: 6px; }
+.proto-version-toggle button { padding: 5px 8px; border: 0; border-radius: 5px; background: transparent; color: #5F6570; font: inherit; cursor: pointer; }
+.proto-version-toggle button:hover { background: rgba(201,145,27,.16); color: var(--ink); }
+.proto-version-toggle button[aria-pressed="true"] { background: var(--ink); color: #fff; }
 .hq-review-back { display:inline-flex; align-items:center; gap:5px; margin-bottom:6px; border:0; background:none; padding:0; color:var(--spinach); font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
 .hq-review-title .hq-review-back { margin-bottom:14px; font-size:14px; font-weight:500; }
 .hq-review-title h1 { margin:0; font-size:24px; font-weight:700; letter-spacing:-.03em; }
@@ -1112,8 +1119,29 @@ body.supplier-settings-open { overflow:hidden; }
 .hq-review-field { width:100%; min-width:0; height:40px; box-sizing:border-box; border:1px solid #DCDEE3; border-radius:6px; padding:0 8px; color:var(--ink); font:inherit; font-size:14px; background:#fff; }
 .hq-review-field:focus { outline:2px solid rgba(42,200,100,.18); border-color:var(--nomni-green); }
 .hq-review-remarks { color:var(--ink-mute); font-size:11px; vertical-align:middle !important; }
-.hq-review-table th:nth-child(6) { width:130px !important; }
-.hq-review-remarks button { border:0; background:none; padding:0; color:#1A8040; font:inherit; font-size:11px; font-weight:500; cursor:pointer; text-align:left; }
+.hq-review-table th:nth-child(3) { width:84px !important; }
+.hq-review-table th:nth-child(4) { width:64px !important; }
+.hq-review-table th:nth-child(5) { width:92px !important; }
+.hq-review-table th:nth-child(6) { width:80px !important; }
+.hq-review-table th:nth-child(7) { width:46px !important; }
+.hq-review-table th:nth-child(8) { width:124px !important; }
+.hq-review-table td:nth-child(5) { position:relative; }
+.hq-review-table:not(.has-wet) .hq-review-wet-col { display:none; }
+.hq-review-wet { vertical-align:middle !important; text-align:center; }
+.hq-review-wet input { width:18px; height:18px; accent-color:var(--spinach); cursor:pointer; }
+.hq-review-table tr.has-wet-hint td { padding-bottom:28px; }
+.hq-review-wet-hint { position:absolute; left:8px; bottom:8px; color:var(--ink-mute); font-size:11px; line-height:12px; white-space:nowrap; }
+.hq-review-line-number.is-existing { color:var(--ink); }
+.hq-review-remark { font-size:12px; font-weight:600; }
+.hq-review-remark.is-new { color:#D0291E; }
+.hq-review-remark.is-existing { color:#1A8040; }
+.hq-review-remark.is-price { color:#B45309; }
+.hq-review-gst { vertical-align:middle !important; }
+.hq-review-gst-static { color:var(--ink); font-size:14px; }
+.hq-review-gst-wrap { display:flex; align-items:center; gap:4px; }
+.hq-review-gst-wrap .hq-review-field { flex:1 1 auto; width:auto; }
+.hq-review-gst-unit { flex:0 0 auto; color:var(--ink-mute); font-size:14px; }
+.hq-review-remarks button { border:0; background:none; padding:0; color:#1A8040; font:inherit; font-size:12px; font-weight:600; cursor:pointer; text-align:left; }
 .hq-review-remarks button:hover { color:#146B35; }
 @media (max-width: 900px) { .hq-review-overlay.open { grid-template-columns:1fr; } .hq-review-preview { display:none; } .hq-review-main { grid-row:2; } .hq-review-content,.hq-review-title,.hq-review-invoice-bar { padding-left:18px; padding-right:18px; } }
 /* Config step */
@@ -7977,12 +8005,93 @@ function showPanel(p1Id, p2Id, step) {
 let hqInvoiceScopes = new Set();
 let hqInvoiceFilesReady = false;
 let hqInvoiceRows = [];
-const HQ_INVOICE_SEED_ROWS = [
-  { name:'Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack', code:'KS-WING-1K', uom:'kg', price:5.20, status:'Price change', match:'Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack', cat:'Poultry' },
-  { name:'Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray', code:'KS-BRF-2K', uom:'kg', price:8.20, status:'Matched', match:'Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray', cat:'Poultry' },
-  { name:'Chilled Chicken Liver Fresh Singapore Standard Grade 500g', code:'KS-LIVER-P', uom:'pack', price:6.50, status:'New UOM', match:'Chilled Chicken Liver Fresh Singapore Standard Grade 500g', cat:'Poultry' },
-  { name:'Chilled Chicken Skin Fresh', code:'KS-SKIN-1K', uom:'kg', price:3.40, status:'New item', match:null, cat:'Poultry' }
-];
+// Prototype only: the Review page can be flipped between market datasets to show how the
+// flow differs for Singapore (GST, no WET) and Australia (GST 10% plus WET on alcohol).
+const HQ_INVOICE_DATASETS = {
+  SG: {
+    label:'Singapore', supplier:'Kee Song Group', paperName:'Kee Song Food', paperPlace:'Singapore',
+    legalName:'Kee Song Food Corporation (S) Pte Ltd', invoiceNo:'INV-2026-0142', date:'8 Oct 2025',
+    rows: [
+      { name:'Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack', code:'KS-WING-1K', uom:'kg', price:5.20, status:'Price change', oldPrice:4.80, invoiceGst:9, match:'Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack', cat:'Poultry' },
+      { name:'Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray', code:'KS-BRF-2K', uom:'kg', price:8.20, status:'Matched', invoiceGst:0, match:'Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray', cat:'Poultry' },
+      { name:'Chilled Chicken Liver Fresh Singapore Standard Grade 500g', code:'KS-LIVER-P', uom:'pack', price:6.50, status:'New UOM', invoiceGst:9, match:'Chilled Chicken Liver Fresh Singapore Standard Grade 500g', cat:'Poultry' },
+      { name:'Chilled Chicken Skin Fresh', code:'KS-SKIN-1K', uom:'kg', price:3.40, status:'New item', invoiceGst:null, match:null, cat:'Poultry' },
+      { name:'Chilled Chicken Feet Grade A Fresh 1kg', code:'KS-FEET-1K', uom:'kg', price:2.80, status:'New item', invoiceGst:0, match:null, cat:'Poultry' }
+    ]
+  },
+  AU: {
+    label:'Australia', supplier:'Hunter Valley Wine Merchants', paperName:'Hunter Valley Wine Merchants', paperPlace:'Sydney NSW',
+    legalName:'Hunter Valley Wine Merchants Pty Ltd', invoiceNo:'INV-2026-0318', date:'8 Oct 2025',
+    // The invoice lists unit prices excluding WET and GST; the item record stores the price including
+    // WET for WET items (oldPrice below is that stored, WET-inclusive figure).
+    rows: [
+      { name:'Coonawarra Cabernet Sauvignon 750ml Case of 6', code:'HV-CAB-750', uom:'case', price:96.00, status:'Matched', oldPrice:123.84, wet:true, invoiceGst:10, match:'Coonawarra Cabernet Sauvignon 750ml Case of 6', cat:'Beverages' },
+      { name:'Hunter Valley Semillon 750ml Case of 12', code:'HV-SEM-750', uom:'case', price:150.00, status:'Price change', oldPrice:232.20, wet:true, invoiceGst:10, match:'Hunter Valley Semillon 750ml Case of 12', cat:'Beverages' },
+      { name:'Barossa Shiraz 750ml Case of 6', code:'HV-SHZ-750', uom:'case', price:132.00, status:'New item', wet:false, invoiceGst:10, match:null, cat:'Beverages' },
+      { name:'Sparkling Mineral Water 750ml Case of 12', code:'HV-WTR-750', uom:'case', price:28.00, status:'Matched', wet:false, invoiceGst:10, match:'Sparkling Mineral Water 750ml Case of 12', cat:'Beverages' },
+      { name:'Cold Pressed Apple Juice 1L Carton of 8', code:'HV-AJ-1L', uom:'carton', price:36.00, status:'New UOM', conversion:'1 carton = 8 bottle', wet:false, invoiceGst:10, match:'Cold Pressed Apple Juice 1L Carton of 8', cat:'Beverages' },
+      { name:'Fresh Orange Juice 1L', code:'HV-OJ-1L', uom:'bottle', price:4.20, status:'New item', wet:false, invoiceGst:0, match:null, cat:'Beverages' }
+    ]
+  }
+};
+let hqInvoiceMarket = 'SG';
+function hqInvoiceData() { return HQ_INVOICE_DATASETS[hqInvoiceMarket]; }
+function hqInvoiceSupplier() { return hqInvoiceData().supplier; }
+// Supplier-level default GST/VAT rate (%). A supplier missing here has no default.
+const SUPPLIER_DEFAULT_GST = { 'Kee Song Group': 9, 'Hunter Valley Wine Merchants': 10 };
+const HQ_DEFAULT_GST_BY_MARKET = { SG: 9, AU: 10 };
+document.addEventListener('keydown', function(e) {
+  if (!e.shiftKey || e.metaKey || e.ctrlKey || e.altKey || e.key.toLowerCase() !== 'd') return;
+  if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+  const review = document.getElementById('hqInvoiceReview'); if (!review || !review.classList.contains('open')) return;
+  const toggle = document.querySelector('[data-proto-market]'); if (toggle) toggle.hidden = !toggle.hidden;
+});
+function setHqInvoiceMarket(market) {
+  if (!HQ_INVOICE_DATASETS[market]) return;
+  hqInvoiceMarket = market;
+  hqInvoiceRows = hqInvoiceData().rows.map(function(row) { const copy = Object.assign({}, row); copy.gst = resolveHqInvoiceGst(copy); return copy; });
+  renderHqInvoiceReview(); renderHqInvoicePaper();
+}
+// WET (AU): the item record stores unit prices including WET, flagged per item.
+const HQ_WET_RATE = 29;
+function hqWetInclPrice(price) { return Math.round(Number(price || 0) * (1 + HQ_WET_RATE / 100) * 100) / 100; }
+// Back-calculate the stored (WET-inclusive) price so it compares with the invoice's ex-WET price.
+function hqWetExclPrice(price) { return Math.round(Number(price || 0) / (1 + HQ_WET_RATE / 100) * 100) / 100; }
+function hqInvoiceStoredPrice(row) { return row.wet ? hqWetInclPrice(row.price) : Number(row.price || 0); }
+function hqInvoiceHasWet() { return hqInvoiceRows.some(function(row) { return row.wet !== undefined; }); }
+function updateHqWetHint(index) {
+  const input = document.querySelector('#hqInvoiceReviewRows [data-invoice-row="' + index + '"][data-invoice-field="price"]');
+  const hint = document.getElementById('hqWetHint' + index);
+  if (input && hint) hint.textContent = 'Incl. WET: ' + hqWetInclPrice(input.value).toFixed(2);
+}
+function onHqInvoiceWetToggle() { captureHqInvoiceRows(); renderHqInvoiceReview(); }
+function renderHqInvoicePaper() {
+  const lines = document.getElementById('hqInvoicePaperLines'); if (!lines) return;
+  const data = hqInvoiceData();
+  const setText = function(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; };
+  setText('hqPreviewLabel', '1 of 2 · ' + data.invoiceNo); setText('hqPaperName', data.paperName); setText('hqPaperPlace', data.paperPlace); setText('hqPaperNo', data.invoiceNo);
+  setText('hqReviewInvName', data.invoiceNo); setText('hqReviewInvSub', data.date + ' · ' + data.legalName);
+  document.querySelectorAll('[data-proto-market] [data-market]').forEach(function(button) { button.setAttribute('aria-pressed', String(button.dataset.market === hqInvoiceMarket)); });
+  lines.innerHTML = data.rows.map(function(row) {
+    return '<div class="hq-paper-line"><span>' + escapeOverviewText(row.name) + (row.invoiceGst != null ? '<small style="display:block;color:#6B7280;font-size:11px">GST ' + Number(row.invoiceGst) + '%</small>' : '') + '</span><strong>$' + Number(row.price).toFixed(2) + '</strong></div>';
+  }).join('');
+  const total = document.getElementById('hqInvoicePaperTotal');
+  if (total) total.textContent = '$' + data.rows.reduce(function(sum, row) { return sum + Number(row.price); }, 0).toFixed(2);
+}
+// Existing items always show the rate stored on the item, even if the invoice differs.
+// New items: supplier default unless the invoice shows a different rate; with no
+// supplier default, the invoice rate; with neither, 0.
+function hqItemGstRate(row) {
+  const item = row.match ? ITEMS.find(function(entry) { return entry.name === row.match; }) : null;
+  return item && item.gst != null ? Number(item.gst) : HQ_DEFAULT_GST_BY_MARKET[hqInvoiceMarket];
+}
+function resolveHqInvoiceGst(row, supplier) {
+  if (row.status !== 'New item') return hqItemGstRate(row);
+  const supplierDefault = SUPPLIER_DEFAULT_GST[supplier || hqInvoiceSupplier()];
+  const invoiceRate = row.invoiceGst == null ? null : Number(row.invoiceGst);
+  if (supplierDefault != null) return invoiceRate != null && invoiceRate !== supplierDefault ? invoiceRate : supplierDefault;
+  return invoiceRate != null ? invoiceRate : 0;
+}
 function invoiceScopeEntries() {
   return ML_GROUPS.map(function(name) { return { name:name, type:'group', meta:currentGroupOutletCount(name) + ' outlets' }; }).concat(ML_UNGROUPED_OUTLETS.map(function(name) { return { name:name, type:'outlet', meta:'' }; }));
 }
@@ -8033,8 +8142,8 @@ function addHqInvoiceDemoFiles() {
 function openHqInvoiceReview() {
   if (!hqInvoiceFilesReady) return;
   closeHqInvoiceModal();
-  hqInvoiceRows = HQ_INVOICE_SEED_ROWS.map(function(row) { return Object.assign({}, row); });
-  renderHqInvoiceReview();
+  hqInvoiceRows = hqInvoiceData().rows.map(function(row) { const copy = Object.assign({}, row); copy.gst = resolveHqInvoiceGst(copy); return copy; });
+  renderHqInvoiceReview(); renderHqInvoicePaper();
   const review = document.getElementById('hqInvoiceReview'); review.classList.add('open'); review.setAttribute('aria-hidden', 'false');
 }
 function closeHqInvoiceReview() { const review = document.getElementById('hqInvoiceReview'); review.classList.remove('open'); review.setAttribute('aria-hidden', 'true'); }
@@ -8063,9 +8172,24 @@ function renderHqInvoiceReview() {
   document.getElementById('hqReviewScopeNote').innerHTML = getHqInvoiceTargetSummary();
   document.getElementById('hqInvoiceLineCount').textContent = hqInvoiceRows.length + ' item' + (hqInvoiceRows.length === 1 ? '' : 's');
   document.getElementById('hqInvoiceReviewRows').innerHTML = hqInvoiceRows.map(function(row, index) {
-    const remark = row.status === 'New UOM' ? (row.conversion || ('1 ' + row.uom + ' = 1 kg')) : '';
-    return '<tr><td class="hq-review-line-number">' + (index + 1) + '</td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="name" value="' + escapeOverviewText(row.name) + '"></td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="code" value="' + escapeOverviewText(row.code || '') + '"></td><td><input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="uom" value="' + escapeOverviewText(row.uom) + '"></td><td><input class="hq-review-field" type="number" min="0" step="0.01" data-invoice-row="' + index + '" data-invoice-field="price" value="' + Number(row.price || 0).toFixed(2) + '"></td><td class="hq-review-remarks">' + (remark ? '<button type="button" data-uom-row="' + index + '">' + escapeOverviewText(remark) + ' <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">edit</span></button>' : '—') + '</td><td><button class="hq-review-close" style="width:34px;height:34px" title="Remove item" onclick="removeHqInvoiceReviewRow(' + index + ')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>';
+    let remarksHtml;
+    if (row.status === 'New item') remarksHtml = '<span class="hq-review-remark is-new">New item</span>';
+    else if (row.status === 'New UOM') remarksHtml = '<button type="button" data-uom-row="' + index + '">' + escapeOverviewText(row.conversion || ('1 ' + row.uom + ' = 1 kg')) + ' <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">edit</span></button>';
+    else if (row.status === 'Price change') remarksHtml = '<span class="hq-review-remark is-price">Old price ' + (row.wet ? hqWetExclPrice(row.oldPrice) : Number(row.oldPrice || 0)).toFixed(2) + '</span>';
+    else remarksHtml = '<span class="hq-review-remark is-existing">Existing item</span>';
+    const lineCls = row.status === 'Matched' ? ' is-existing' : '';
+    const field = function(name, extra) { return '<input class="hq-review-field" data-invoice-row="' + index + '" data-invoice-field="' + name + '" ' + extra + '>'; };
+    return '<tr' + (row.wet ? ' class="has-wet-hint"' : '') + '><td class="hq-review-line-number' + lineCls + '">' + (index + 1) + '</td>' +
+      '<td>' + field('name', 'value="' + escapeOverviewText(row.name) + '"') + '</td>' +
+      '<td>' + field('code', 'value="' + escapeOverviewText(row.code || '') + '"') + '</td>' +
+      '<td>' + field('uom', 'value="' + escapeOverviewText(row.uom) + '"') + '</td>' +
+      '<td>' + field('price', 'type="number" min="0" step="0.01" value="' + Number(row.price || 0).toFixed(2) + '" oninput="updateHqWetHint(' + index + ')"') + (row.wet ? '<div class="hq-review-wet-hint" id="hqWetHint' + index + '">Incl. WET: ' + hqWetInclPrice(row.price).toFixed(2) + '</div>' : '') + '</td>' +
+      '<td class="hq-review-gst"><div class="hq-review-gst-wrap">' + field('gst', 'type="number" min="0" max="100" step="0.1" value="' + Number(row.gst || 0) + '" title="' + (row.status === 'New item' ? 'Supplier default or invoice rate' : 'Rate from the item record') + '"') + '<span class="hq-review-gst-unit">%</span></div></td>' +
+      '<td class="hq-review-wet-col hq-review-wet"><input type="checkbox" data-invoice-row="' + index + '" data-invoice-field="wet" title="Item attracts WET"' + (row.wet ? ' checked' : '') + ' onchange="onHqInvoiceWetToggle()"></td>' +
+      '<td class="hq-review-remarks">' + remarksHtml + '</td>' +
+      '<td><button class="hq-review-close" style="width:34px;height:34px" title="Remove item" onclick="removeHqInvoiceReviewRow(' + index + ')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>';
   }).join('');
+  const reviewTable = document.querySelector('.hq-review-table'); if (reviewTable) reviewTable.classList.toggle('has-wet', hqInvoiceHasWet());
   document.querySelectorAll('#hqInvoiceReviewRows .hq-review-remarks button').forEach(function(button) {
     button.onclick = function(event) {
       event.preventDefault();
@@ -8095,8 +8219,8 @@ function openHqNewUomDialog(index) {
 function closeHqNewUomDialog() { const el = document.getElementById('hqNewUomDialog'); if (el) el.remove(); }
 function saveHqNewUomDialog(index) { const row = hqInvoiceRows[index]; row.conversionRate = Number(document.getElementById('hqNewUomRate').value || 1); row.conversionBase = document.getElementById('hqNewUomBase').value; row.conversion = '1 ' + row.uom + ' = ' + row.conversionRate + ' ' + row.conversionBase; closeHqNewUomDialog(); renderHqInvoiceReview(); }
 function flipHqNewUomUnits(index) { const rate = document.getElementById('hqNewUomRate'); if (rate) rate.value = (1 / Number(rate.value || 1)).toFixed(4).replace(/0+$/,'').replace(/\.$/,''); }
-function captureHqInvoiceRows() { document.querySelectorAll('#hqInvoiceReviewRows [data-invoice-field]').forEach(function(input) { const row = hqInvoiceRows[Number(input.dataset.invoiceRow)]; if (!row) return; row[input.dataset.invoiceField] = input.dataset.invoiceField === 'price' ? Number(input.value || 0) : input.value; }); }
-function addHqInvoiceReviewRow() { captureHqInvoiceRows(); hqInvoiceRows.push({name:'', code:'', uom:'kg', price:0, status:'New item', match:null, cat:'Other'}); renderHqInvoiceReview(); const fields = document.querySelectorAll('#hqInvoiceReviewRows [data-invoice-field="name"]'); if (fields.length) fields[fields.length - 1].focus(); }
+function captureHqInvoiceRows() { document.querySelectorAll('#hqInvoiceReviewRows [data-invoice-field]').forEach(function(input) { const row = hqInvoiceRows[Number(input.dataset.invoiceRow)]; if (!row) return; const key = input.dataset.invoiceField; row[key] = input.type === 'checkbox' ? input.checked : ((key === 'price' || key === 'gst') ? Number(input.value || 0) : input.value); }); }
+function addHqInvoiceReviewRow() { captureHqInvoiceRows(); hqInvoiceRows.push((function() { const blank = {name:'', code:'', uom:'kg', price:0, status:'New item', match:null, cat:'Other', invoiceGst:null, wet:false}; blank.gst = resolveHqInvoiceGst(blank); return blank; })()); renderHqInvoiceReview(); const fields = document.querySelectorAll('#hqInvoiceReviewRows [data-invoice-field="name"]'); if (fields.length) fields[fields.length - 1].focus(); }
 function removeHqInvoiceReviewRow(index) { hqInvoiceRows.splice(index, 1); renderHqInvoiceReview(); showHqToast('Item removed from invoice review'); }
 function invoiceUomLabel(uom) { const value = String(uom || 'unit').trim(); return /^per\s/i.test(value) ? value : 'per ' + value; }
 function applyHqInvoiceRow(row) {
@@ -8105,10 +8229,11 @@ function applyHqInvoiceRow(row) {
   const scopeGroups = Array.from(hqInvoiceScopes).filter(function(scope) { return ML_GROUPS.includes(scope); });
   const scopeOutlets = Array.from(hqInvoiceScopes).filter(function(scope) { return ML_UNGROUPED_OUTLETS.includes(scope); });
   if (itemIdx < 0) {
-    ITEMS.push({ name:name, cat:row.cat || 'Other', supplier:'Kee Song Group', price:0, uom:invoiceUomLabel(row.uom), defaultPricing:[{price:null,moq:null}], moq:'', active:true, lifecycle:'active', groupList:scopeGroups.slice(), outletList:scopeOutlets.slice(), uomEnabled:[true], excludedScopes:[], createdAt:new Date().toISOString() });
+    ITEMS.push({ name:name, cat:row.cat || 'Other', supplier:hqInvoiceSupplier(), price:0, uom:invoiceUomLabel(row.uom), defaultPricing:[{price:null,moq:null}], moq:'', active:true, lifecycle:'active', groupList:scopeGroups.slice(), outletList:scopeOutlets.slice(), uomEnabled:[true], excludedScopes:[], gst:Number(row.gst) || 0, wet:!!row.wet, createdAt:new Date().toISOString() });
     itemIdx = ITEMS.length - 1;
   }
   const item = ITEMS[itemIdx];
+  item.gst = Number(row.gst) || 0; item.wet = !!row.wet;
   let uoms = Array.isArray(item.uom) ? item.uom.slice() : [item.uom];
   const targetUom = invoiceUomLabel(row.uom);
   let uomIdx = uoms.findIndex(function(uom) { return String(uom).toLowerCase() === targetUom.toLowerCase(); });
@@ -8122,7 +8247,7 @@ function applyHqInvoiceRow(row) {
   saveItemAccessState(itemIdx);
   const moq = /^(kg|g)$/i.test(String(row.uom).trim()) ? '0' : '1';
   const entries = GROUP_EXCEPTIONS[itemIdx] || (GROUP_EXCEPTIONS[itemIdx] = []);
-  Array.from(hqInvoiceScopes).forEach(function(scope) { const existing = entries.find(function(entry) { return entry.group === scope && entry.uomIdx === uomIdx; }); const update = {group:scope, uomIdx:uomIdx, price:Number(row.price || 0) || null, moq:moq}; if (existing) Object.assign(existing, update); else entries.push(update); });
+  Array.from(hqInvoiceScopes).forEach(function(scope) { const existing = entries.find(function(entry) { return entry.group === scope && entry.uomIdx === uomIdx; }); const update = {group:scope, uomIdx:uomIdx, price:hqInvoiceStoredPrice(row) || null, moq:moq}; if (existing) Object.assign(existing, update); else entries.push(update); });
   return true;
 }
 function saveHqInvoiceReview() {
@@ -8132,7 +8257,7 @@ function saveHqInvoiceReview() {
   const invoiceBefore = validRows.map(function(row) { const matched = row.match ? ITEMS.find(function(item) { return item.name === row.match; }) : null; return matched && matched.price != null ? '$' + Number(matched.price).toFixed(2) : ''; });
   validRows.forEach(applyHqInvoiceRow); renderMl(); if (typeof saveCreatedHqItems === 'function') saveCreatedHqItems();
   const invoiceScopes = Array.from(hqInvoiceScopes);
-  addPrototypeActivity('market-list', 'Updated', validRows.length === 1 ? String(validRows[0].name).trim() : validRows.length + ' SKUs', 'market-list', invoiceScopes.length ? invoiceScopes : 'HQ', 'William Arya', validRows.length === 1 ? { source: 'Uploaded invoice', changes: [{ field: 'Price', from: invoiceBefore[0], to: '$' + Number(validRows[0].price).toFixed(2) }] } : { source: 'Uploaded invoice', itemsLabel: 'SKU', items: validRows.map(function(row, index) { return { name: String(row.name).trim(), from: invoiceBefore[index], to: '$' + Number(row.price).toFixed(2) }; }) });
+  addPrototypeActivity('market-list', 'Updated', validRows.length === 1 ? String(validRows[0].name).trim() : validRows.length + ' SKUs', 'market-list', invoiceScopes.length ? invoiceScopes : 'HQ', 'William Arya', validRows.length === 1 ? { source: 'Uploaded invoice', changes: [{ field: 'Price', from: invoiceBefore[0], to: '$' + hqInvoiceStoredPrice(validRows[0]).toFixed(2) }] } : { source: 'Uploaded invoice', itemsLabel: 'SKU', items: validRows.map(function(row, index) { return { name: String(row.name).trim(), from: invoiceBefore[index], to: '$' + hqInvoiceStoredPrice(row).toFixed(2) }; }) });
   closeHqInvoiceReview(); showHqToast('Invoice saved', validRows.length + ' items added or updated.'); }
 function skipHqInvoiceReview() { closeHqInvoiceReview(); showHqToast('Invoice saved for later', 'No pricing changes were applied.'); }
 
@@ -9647,10 +9772,10 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
 <div class="hq-review-overlay" id="hqInvoiceReview" aria-hidden="true">
   <header class="topbar hq-review-topbar">
     <div class="topbar-left"><div class="brand"><img class="brand-logo-img" src="_assets/nomni_full_greenbar.svg" alt="nomni" /><div class="brand-sub">Procure Admin</div></div></div>
-    <div class="topbar-right"><div class="inspector-btns"><button class="font-inspector-btn" data-insp="aa" title="Typography inspector">Aa</button><button class="font-inspector-btn" data-insp="box" title="Layout inspector">Box</button></div><a href="https://support.zeemart.co/en/" target="_blank" class="help-btn"><span class="material-symbols-outlined">help</span> Help</a><div class="user"><div class="topbar-avt">WA</div><span>William Arya</span><span class="chev"></span></div></div>
+    <div class="topbar-right"><div class="proto-version-toggle" data-proto-market role="group" aria-label="Prototype data" title="Prototype data — Shift+D to hide"><span class="proto-version-label">Prototype data</span><button type="button" data-market="SG" aria-pressed="true" onclick="setHqInvoiceMarket('SG')">Singapore</button><button type="button" data-market="AU" aria-pressed="false" onclick="setHqInvoiceMarket('AU')">Australia</button></div><div class="inspector-btns"><button class="font-inspector-btn" data-insp="aa" title="Typography inspector">Aa</button><button class="font-inspector-btn" data-insp="box" title="Layout inspector">Box</button></div><a href="https://support.zeemart.co/en/" target="_blank" class="help-btn"><span class="material-symbols-outlined">help</span> Help</a><div class="user"><div class="topbar-avt">WA</div><span>William Arya</span><span class="chev"></span></div></div>
   </header>
-  <aside class="hq-review-preview"><div class="hq-review-preview-label">1 of 2 · INV-2026-0142</div><div class="hq-invoice-paper"><div class="hq-invoice-paper-head"><div><h3>Kee Song Food</h3><div>Singapore</div></div><div style="text-align:right">Invoice<br><strong>INV-2026-0142</strong></div></div><div>Bill to: Garden Cuisine HQ</div><hr><div class="hq-paper-line"><span>Chicken wings, fresh</span><strong>$5.20</strong></div><div class="hq-paper-line"><span>Chicken breast fillet</span><strong>$8.20</strong></div><div class="hq-paper-line"><span>Chicken liver, pack</span><strong>$6.50</strong></div><div class="hq-paper-line"><span>Chicken skin, fresh</span><strong>$3.40</strong></div><hr><div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Total</span><span>$23.30</span></div></div></aside>
-  <main class="hq-review-main"><div class="hq-review-title"><button class="hq-review-back" onclick="closeHqInvoiceReview()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>Items</button><h1>Review items</h1><div class="hq-review-scope-note" id="hqReviewScopeNote"></div></div><div class="hq-review-scroll"><div class="hq-review-invoice-bar"><div class="hq-review-invoice-meta"><div class="hq-review-invoice-num">1</div><div><div class="hq-review-invoice-name">INV-2026-0142</div><div class="hq-review-invoice-sub">8 Oct 2025 · Kee Song Food Corporation (S) Pte Ltd</div></div></div><div class="hq-review-actions"><button class="btn btn-tertiary" onclick="skipHqInvoiceReview()">Skip for later</button><button class="btn btn-primary" onclick="saveHqInvoiceReview()">Save invoice</button></div></div><div class="hq-review-content"><div class="hq-review-summary"><span id="hqInvoiceLineCount">4 items</span></div><table class="hq-review-table"><thead><tr><th style="width:30px">#</th><th>Name in invoice</th><th style="width:92px">Product code</th><th style="width:74px">UOM</th><th style="width:82px">Price</th><th style="width:150px">Remarks</th><th style="width:34px"></th></tr></thead><tbody id="hqInvoiceReviewRows"></tbody></table><button class="hq-review-back" style="margin-top:18px" onclick="addHqInvoiceReviewRow()"><span class="material-symbols-outlined" style="font-size:17px">add</span>Add item</button></div></div></main>
+  <aside class="hq-review-preview"><div class="hq-review-preview-label" id="hqPreviewLabel">1 of 2 · INV-2026-0142</div><div class="hq-invoice-paper"><div class="hq-invoice-paper-head"><div><h3 id="hqPaperName">Kee Song Food</h3><div id="hqPaperPlace">Singapore</div></div><div style="text-align:right">Invoice<br><strong id="hqPaperNo">INV-2026-0142</strong></div></div><div>Bill to: Garden Cuisine HQ</div><hr><div id="hqInvoicePaperLines"></div><hr><div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span>Total</span><span id="hqInvoicePaperTotal"></span></div></div></aside>
+  <main class="hq-review-main"><div class="hq-review-title"><button class="hq-review-back" onclick="closeHqInvoiceReview()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>Items</button><h1>Review items</h1><div class="hq-review-scope-note" id="hqReviewScopeNote"></div></div><div class="hq-review-scroll"><div class="hq-review-invoice-bar"><div class="hq-review-invoice-meta"><div class="hq-review-invoice-num">1</div><div><div class="hq-review-invoice-name" id="hqReviewInvName">INV-2026-0142</div><div class="hq-review-invoice-sub" id="hqReviewInvSub">8 Oct 2025 · Kee Song Food Corporation (S) Pte Ltd</div></div></div><div class="hq-review-actions"><button class="btn btn-tertiary" onclick="skipHqInvoiceReview()">Skip for later</button><button class="btn btn-primary" onclick="saveHqInvoiceReview()">Save invoice</button></div></div><div class="hq-review-content"><div class="hq-review-summary"><span id="hqInvoiceLineCount">4 items</span></div><table class="hq-review-table"><thead><tr><th style="width:30px">#</th><th>Name in invoice</th><th style="width:92px">Product code</th><th style="width:74px">UOM</th><th style="width:96px">Price exc. tax</th><th style="width:96px">GST/VAT</th><th class="hq-review-wet-col" style="width:54px">WET</th><th style="width:132px">Remarks</th><th style="width:34px"></th></tr></thead><tbody id="hqInvoiceReviewRows"></tbody></table><button class="hq-review-back" style="margin-top:18px" onclick="addHqInvoiceReviewRow()"><span class="material-symbols-outlined" style="font-size:17px">add</span>Add item</button></div></div></main>
 </div>
 
 <!-- ── Flow 1: Add Item modal ── -->
