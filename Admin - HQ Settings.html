@@ -941,6 +941,9 @@ body.supplier-settings-open { overflow:hidden; }
 .ai-catalogue-name { display:block; font-size:14px; font-weight:500; color:var(--ink); }
 .ai-catalogue-sub { display:flex; align-items:center; flex-wrap:wrap; gap:5px; margin-top:2px; font-size:12px; color:var(--ink-mute); }
 .ai-existing-hq { color:var(--nomni-green); font-weight:500; }
+.ai-catalogue-row .ai-catalogue-uoms { flex:0 0 120px; width:120px; max-width:120px; }
+.ml-table td.ml-code { color:#4a4f5a; font-size:13px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.ai-catalogue-code { flex:0 0 130px; width:130px; color:#4a4f5a; font-size:13px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .ai-catalogue-uoms { display:flex; align-items:center; justify-content:flex-end; gap:4px; flex-shrink:0; max-width:176px; }
 .ai-catalogue-uom { display:inline-block; background:#f0f1f3; border-radius:4px; padding:1px 7px; font-size:11px; font-weight:600; color:var(--ink-mute); }
 .ai-catalogue-uom-more { color:var(--ink-mute); font-size:12px; font-weight:600; white-space:nowrap; }
@@ -1867,7 +1870,7 @@ body.supplier-settings-open { overflow:hidden; }
       <div class="ml-filter-row">
         <div class="ml-search-wrap" style="min-width:270px">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" class="ml-search-input" id="mlSearch" placeholder="Search SKUs or suppliers…" oninput="setMlSearch(this.value)" />
+          <input type="text" class="ml-search-input" id="mlSearch" placeholder="Search SKUs, codes or suppliers…" oninput="setMlSearch(this.value)" />
         </div>
         <select class="ml-filter-select" id="mlSupplierFilter" onchange="setMlSupplierFilter(this.value)">
           <option value="">All suppliers</option>
@@ -1883,6 +1886,7 @@ body.supplier-settings-open { overflow:hidden; }
           <thead>
             <tr>
               <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">SKU <span class="sort-ind"></span></th>
+              <th style="width:150px">Product code</th>
               <th style="width:100px">UOM</th>
               <th id="mlSortTh-price" style="width:180px">Price</th>
               <th style="width:160px">Available to</th>
@@ -2790,11 +2794,11 @@ function supplierTableNameHtml(name) {
 
 // Items data
 const ITEMS = [
-  { name: "Chilled Chicken Thigh Fillet Skinless Boneless IVP 500g", cat: "Poultry", supplier: "Kee Song Group", price: 7.50, uom: "per kg" },
-  { name: "Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray", cat: "Poultry", supplier: "Kee Song Group", price: 8.20, uom: ["per kg", "per tray"] },
-  { name: "Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack", cat: "Poultry", supplier: "Kee Song Group", price: 4.80, uom: ["per kg", "per pack"], defaultPricing: [{ price: 4.80, moq: "10 kg" }, { price: null, moq: null }] },
-  { name: "Chilled Chicken Drumstick Grade A Fresh 1kg Pack", cat: "Poultry", supplier: "Kee Song Group", price: 4.50, uom: "per kg" },
-  { name: "Chilled Chicken Liver Fresh Singapore Standard Grade 500g", cat: "Poultry", supplier: "Kee Song Group", price: 3.20, uom: "per kg" },
+  { name: "Chilled Chicken Thigh Fillet Skinless Boneless IVP 500g", code: "KS-THG-500", cat: "Poultry", supplier: "Kee Song Group", price: 7.50, uom: "per kg" },
+  { name: "Chilled Chicken Breast Fillet Skinless Boneless 2kg Tray", code: "KS-BRF-2K", cat: "Poultry", supplier: "Kee Song Group", price: 8.20, uom: ["per kg", "per tray"] },
+  { name: "Chilled Chicken Mid-Joint Wings Fresh 1kg Vacuum Pack", code: "KS-WING-1K", cat: "Poultry", supplier: "Kee Song Group", price: 4.80, uom: ["per kg", "per pack"], defaultPricing: [{ price: 4.80, moq: "10 kg" }, { price: null, moq: null }] },
+  { name: "Chilled Chicken Drumstick Grade A Fresh 1kg Pack", code: "KS-DRM-1K", cat: "Poultry", supplier: "Kee Song Group", price: 4.50, uom: "per kg" },
+  { name: "Chilled Chicken Liver Fresh Singapore Standard Grade 500g", code: "KS-LIVER-P", cat: "Poultry", supplier: "Kee Song Group", price: 3.20, uom: "per kg" },
   { name: "Chilled Boneless Duck Breast with Skin French Origin 200g Each", cat: "Poultry", supplier: "Kee Song Group", price: 18.00, uom: "per pc" },
   { name: "Chilled Whole Quail Farm Fresh Halal Certified 500g", cat: "Poultry", supplier: "Sustenir Agriculture", price: 6.50, uom: "per pc" },
   { name: "Chilled Chicken Mince 80/20 Lean-to-Fat Ratio 1kg Vacuum", cat: "Poultry", supplier: "Kee Song Group", price: 6.80, uom: "per kg" },
@@ -2859,7 +2863,7 @@ const ITEMS = [
   { name: "AmoyFoods Chilli Garlic Sauce Sichuan Style Catering Size 3kg Plastic Tub", cat: "Sauces", supplier: "AmoyFoods", price: 45.00, uom: "per tub" },
   { name: "Kikkoman Takumi Teriyaki Sauce Original Japanese Recipe 1.9L PET Bottle", cat: "Sauces", supplier: "Kikkoman", price: 14.50, uom: ["per btl", "per case of 6"] },
   { name: "Seng Choon Free Range Chicken Eggs Singapore Grade A Large 30pcs Flat", cat: "Dairy & Eggs", supplier: "Seng Choon Farm", price: 8.50, uom: ["per flat (30)", "per pc"] },
-  { name: "Anchor Unsalted Butter Blocks New Zealand Pasteurised 1kg Carton", cat: "Dairy & Eggs", supplier: "Fonterra", price: 18.80, uom: ["per block", "per ctn of 12"] },
+  { name: "Anchor Unsalted Butter Blocks New Zealand Pasteurised 1kg Carton", code: "FB-BUT-1K", cat: "Dairy & Eggs", supplier: "Fonterra", price: 18.80, uom: ["per block", "per ctn of 12"] },
   { name: "Bulla Thickened Cream Full Fat 35% Butterfat Homogenised 1L Bottle", cat: "Dairy & Eggs", supplier: "Fonterra", price: 7.20, uom: "per L" },
   { name: "Perfect Italiano Shredded Mozzarella Cheese Low Moisture 2kg Catering Bag", cat: "Dairy & Eggs", supplier: "Dairy Farm", price: 28.00, uom: "per bag" },
   { name: "Mainland Grated Parmesan Cheese Premium Aged 12 Months 1kg Catering Pouch", cat: "Dairy & Eggs", supplier: "Fonterra", price: 22.00, uom: "per pouch" },
@@ -2879,13 +2883,13 @@ const ITEMS = [
   { name: "Oyster Bay Marlborough Sauvignon Blanc White Wine 750mL x 6 Bottles Case", cat: "Beverages", supplier: "Moet Hennessy", price: 95.00, uom: "per case" },
   { name: "Coca-Cola Original Taste Carbonated Soft Drink 330mL x 24 Cans Pack", cat: "Beverages", supplier: "F&N", price: 22.00, uom: ["per pack (24)", "per can"] },
   { name: "Coconut Shell Charcoal Briquettes Restaurant Grade Hexagonal 5kg Sack", cat: "Supplies", supplier: "Grill Master SG", price: 12.50, uom: ["per sack (5kg)", "per kg"] },
-  { name: "Aluminised Extra Heavy-Duty Aluminium Foil 30cm Width x 100m Length Roll", cat: "Supplies", supplier: "Grill Master SG", price: 8.80, uom: ["per roll", "per case of 12"] },
+  { name: "Aluminised Extra Heavy-Duty Aluminium Foil 30cm Width x 100m Length Roll", code: "GM-FOIL-30", cat: "Supplies", supplier: "Grill Master SG", price: 8.80, uom: ["per roll", "per case of 12"] },
   { name: "PVC Cling Wrap Food Grade BPA-Free Clear Film 30cm x 300m Roll", cat: "Supplies", supplier: "Globe Pack", price: 6.50, uom: ["per roll", "per case of 12"] },
   { name: "Latex-Free Disposable Vinyl Food-Safe Gloves Powder-Free Large 100pcs Box", cat: "Supplies", supplier: "Globe Pack", price: 12.00, uom: "per box" },
   { name: "Scott Performance Tissue Kitchen Paper Towel 2-Ply Embossed 12 Rolls Pack", cat: "Supplies", supplier: "Globe Pack", price: 18.00, uom: ["per pack (12)", "per roll"] },
   { name: "PackAway Hinged Lid Kraft Pulp Takeaway Box 17cm Square 500ml 50pcs Sleeve", cat: "Supplies", supplier: "Globe Pack", price: 22.00, uom: "per sleeve" },
   { name: "Kraft Brown SOS Paper Bag with Flat Handle Medium 26x12x35cm 100pcs", cat: "Supplies", supplier: "Globe Pack", price: 28.00, uom: "per bundle" },
-  { name: "Bamboo Individual Wrapped Chopsticks Premium Round 23cm 100 Pairs Sleeve", cat: "Supplies", supplier: "Globe Pack", price: 12.00, uom: "per sleeve" },
+  { name: "Bamboo Individual Wrapped Chopsticks Premium Round 23cm 100 Pairs Sleeve", code: "GP-CHP-23", cat: "Supplies", supplier: "Globe Pack", price: 12.00, uom: "per sleeve" },
   { name: "Natural Bamboo BBQ Grill Skewer Flat Blade 30cm Length 100pcs Bag", cat: "Supplies", supplier: "Grill Master SG", price: 4.50, uom: "per bag" },
   { name: "Stainless Steel BBQ Grill Brush Wide Face Replacement Head Heavy Duty", cat: "Supplies", supplier: "Grill Master SG", price: 18.00, uom: "per pc" },
   { name: "Pam Professional Non-Stick Canola Oil Cooking Spray Zero Trans-Fat 500mL", cat: "Supplies", supplier: "Grill Master SG", price: 8.80, uom: "per can" },
@@ -3247,7 +3251,7 @@ function getMlItems() {
   });
   if (mlSearch) {
     const q = mlSearch.toLowerCase();
-    items = items.filter(i => itemDisplayName(i).toLowerCase().includes(q) || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q));
+    items = items.filter(i => itemDisplayName(i).toLowerCase().includes(q) || i.name.toLowerCase().includes(q) || String(i.code || '').toLowerCase().includes(q) || String(i.myCode || '').toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q));
   }
   if (mlSortKey === 'name-asc') items.sort((a,b) => itemDisplayName(a).localeCompare(itemDisplayName(b)));
   else if (mlSortKey === 'name-desc') items.sort((a,b) => itemDisplayName(b).localeCompare(itemDisplayName(a)));
@@ -4106,6 +4110,7 @@ function renderMl() {
       const uom = compactUom(onlyUom.uom);
       return '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
         '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</div></td>' +
+        '<td class="ml-code">' + escapeOverviewText(item.code || '') + '</td>' +
         '<td class="uom-text">' + uom + '</td>' +
         '<td>' + formatItemPriceRange(rawIdx, onlyUom.ui) + '</td>' +
         '<td>' + getAccessInfo(onlyUom.ui).html + '</td>' + actionsTd +
@@ -4114,6 +4119,7 @@ function renderMl() {
 
     const parent = '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
       '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</div></td>' +
+      '<td class="ml-code">' + escapeOverviewText(item.code || '') + '</td>' +
       '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
       '<td></td>' +
       '<td></td>' + actionsTd +
@@ -4122,7 +4128,7 @@ function renderMl() {
     const children = isExpanded ? enabledUoms.map(({ uom, ui }) => {
       const unit = compactUom(uom);
       return '<tr class="ml-uom-row' + (lifecycle === 'active' ? '' : ' ml-inactive') + '">' +
-        '<td class="ml-uom-indent">' + itemDisplayNameHtml(item) + '</td>' +
+        '<td class="ml-uom-indent">' + itemDisplayNameHtml(item) + '</td><td></td>' +
         '<td class="uom-text">' + unit + '</td>' +
         '<td>' + formatItemPriceRange(rawIdx, ui) + '</td>' +
         '<td>' + getAccessInfo(ui).html + '</td><td></td>' +
@@ -8229,7 +8235,7 @@ function applyHqInvoiceRow(row) {
   const scopeGroups = Array.from(hqInvoiceScopes).filter(function(scope) { return ML_GROUPS.includes(scope); });
   const scopeOutlets = Array.from(hqInvoiceScopes).filter(function(scope) { return ML_UNGROUPED_OUTLETS.includes(scope); });
   if (itemIdx < 0) {
-    ITEMS.push({ name:name, cat:row.cat || 'Other', supplier:hqInvoiceSupplier(), price:0, uom:invoiceUomLabel(row.uom), defaultPricing:[{price:null,moq:null}], moq:'', active:true, lifecycle:'active', groupList:scopeGroups.slice(), outletList:scopeOutlets.slice(), uomEnabled:[true], excludedScopes:[], gst:Number(row.gst) || 0, wet:!!row.wet, createdAt:new Date().toISOString() });
+    ITEMS.push({ name:name, code:String(row.code || '').trim(), cat:row.cat || 'Other', supplier:hqInvoiceSupplier(), price:0, uom:invoiceUomLabel(row.uom), defaultPricing:[{price:null,moq:null}], moq:'', active:true, lifecycle:'active', groupList:scopeGroups.slice(), outletList:scopeOutlets.slice(), uomEnabled:[true], excludedScopes:[], gst:Number(row.gst) || 0, wet:!!row.wet, createdAt:new Date().toISOString() });
     itemIdx = ITEMS.length - 1;
   }
   const item = ITEMS[itemIdx];
@@ -8263,15 +8269,15 @@ function skipHqInvoiceReview() { closeHqInvoiceReview(); showHqToast('Invoice sa
 
 // ── Flow 1: Add from supplier catalogue ──
 const CAT_ITEMS = [
-  { id:'c1', name:'CHILLED WHOLE CHICKEN GD A 1.2-1.6KG IND PKT', supplier:'Kee Song Group', uoms:['kg','ctn'], cat:'Poultry' },
+  { id:'c1', code:'KS-WCH-1216', name:'CHILLED WHOLE CHICKEN GD A 1.2-1.6KG IND PKT', supplier:'Kee Song Group', uoms:['kg','ctn'], cat:'Poultry' },
   { id:'c2', name:'FROZ CHICKEN MARYLAND 2PC/PKT 450-500G', supplier:'Kee Song Group', uoms:['pkt'], cat:'Poultry' },
-  { id:'c3', name:'CHILLED CHICKEN BREAST FILLET SKINLESS ~180G', supplier:'Kee Song Group', uoms:['kg','pkt'], cat:'Poultry' },
+  { id:'c3', code:'KS-BRF-180', name:'CHILLED CHICKEN BREAST FILLET SKINLESS ~180G', supplier:'Kee Song Group', uoms:['kg','pkt'], cat:'Poultry' },
   { id:'c4', name:'CHILLED CHICKEN FEET CLEANED PKT ~500G', supplier:'Kee Song Group', uoms:['pkt'], cat:'Poultry' },
-  { id:'c5', name:'US PRIME BEEF RIBEYE BONELESS CHOICE GRADE', supplier:'Meat King', uoms:['kg','pc'], cat:'Beef' },
-  { id:'c6', name:'AUS WAGYU BEEF STRIPLOIN MB5+ PORTIONED', supplier:'Meat King', uoms:['kg'], cat:'Beef' },
+  { id:'c5', code:'MK-RIB-USP', name:'US PRIME BEEF RIBEYE BONELESS CHOICE GRADE', supplier:'Meat King', uoms:['kg','pc'], cat:'Beef' },
+  { id:'c6', code:'MK-WAG-SL5', name:'AUS WAGYU BEEF STRIPLOIN MB5+ PORTIONED', supplier:'Meat King', uoms:['kg'], cat:'Beef' },
   { id:'c7', name:'FROZ PORK BELLY SKINLESS BONELESS SLAB', supplier:'Meat King', uoms:['kg'], cat:'Pork' },
   { id:'c8', name:'CHILLED PORK SHOULDER BOSTON BUTT BONELESS', supplier:'Meat King', uoms:['kg'], cat:'Pork' },
-  { id:'c9', name:'FRESH BABY SPINACH WASHED READY 200G PKT', supplier:'Provenir', uoms:['pkt','ctn'], cat:'Produce' },
+  { id:'c9', code:'PV-SPN-200', name:'FRESH BABY SPINACH WASHED READY 200G PKT', supplier:'Provenir', uoms:['pkt','ctn'], cat:'Produce' },
   { id:'c10', name:'ROMA TOMATOES CLASS A FRESH', supplier:'Provenir', uoms:['kg'], cat:'Produce' },
   { id:'c11', name:'BUTTON MUSHROOMS FRESH 500G NET', supplier:'Provenir', uoms:['pkt'], cat:'Produce' },
   { id:'c12', name:'HOLLANDAISE SAUCE BASE READY-TO-USE 1LTR', supplier:'Deli Hub', uoms:['L','ctn'], cat:'Sauces' },
@@ -8281,8 +8287,8 @@ const CAT_ITEMS = [
 
 const PLATFORM_CATALOGUE_ITEMS = {
   'Rich Products Corporation': [
-    ['FROZEN CROISSANT BUTTER 80G X 60', ['ctn'], 'Frozen & Bakery'],
-    ['NON-DAIRY WHIPPING CREAM 1L X 12', ['ctn','L'], 'Dairy Alternatives'],
+    ['FROZEN CROISSANT BUTTER 80G X 60', ['ctn'], 'Frozen & Bakery', 'RP-CRS-080'],
+    ['NON-DAIRY WHIPPING CREAM 1L X 12', ['ctn','L'], 'Dairy Alternatives', 'RP-WCR-1L'],
     ['FROZEN BLUEBERRY MUFFIN BATTER 3KG', ['tub','kg'], 'Frozen & Bakery'],
     ['READY-TO-BAKE CHOCOLATE COOKIE DOUGH 4KG', ['ctn','kg'], 'Frozen & Bakery'],
     ['VANILLA CAKE BASE MIX 10KG', ['bag','kg'], 'Bakery']
@@ -8354,7 +8360,7 @@ const PLATFORM_CATALOGUE_ITEMS = {
 
 Object.keys(PLATFORM_CATALOGUE_ITEMS).forEach(function(supplier, supplierIndex) {
   PLATFORM_CATALOGUE_ITEMS[supplier].forEach(function(item, itemIndex) {
-    CAT_ITEMS.push({ id:'pc' + supplierIndex + '-' + itemIndex, name:item[0], supplier:supplier, uoms:item[1], cat:item[2] });
+    CAT_ITEMS.push({ id:'pc' + supplierIndex + '-' + itemIndex, name:item[0], code:item[3] || '', supplier:supplier, uoms:item[1], cat:item[2] });
   });
 });
 let aiSel = new Set();
@@ -8455,14 +8461,14 @@ function renderAiList() {
   const sup = document.getElementById('aiSupFilter').value;
   const linkedNames = new Set(SUPPLIERS.map(function(supplier) { return supplier.name; }));
   const filtered = CAT_ITEMS.filter(i => linkedNames.has(i.supplier) &&
-    (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q) || (i.isRecipe ? i.supplier : supplierLabel(i.supplier)).toLowerCase().includes(q)) &&
+    (!q || i.name.toLowerCase().includes(q) || String(i.code || '').toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q) || (i.isRecipe ? i.supplier : supplierLabel(i.supplier)).toLowerCase().includes(q)) &&
     (!sup || i.supplier === sup)
   ).sort(function(a, b) { return formatCatalogueItemName(a.name).localeCompare(formatCatalogueItemName(b.name)); });
   const allFilteredSelected = filtered.length > 0 && filtered.every(i => aiSel.has(i.id));
   document.getElementById('aiList').innerHTML = filtered.length ? '<div class="hq-invoice-list-actions"><label><input type="checkbox" ' + (allFilteredSelected ? 'checked' : '') + ' onchange="toggleAllAiItems()"><span>Select all</span></label></div><div class="hq-invoice-scope-list">' + filtered.map(i => {
     const s = aiSel.has(i.id);
     const existing = getExistingCatalogueItem(i);
-    return '<label class="hq-invoice-scope' + (s ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(i.id) + '" ' + (s ? 'checked' : '') + ' onchange="toggleAiItem(this.value)"><span class="ai-catalogue-row"><span class="ai-catalogue-copy"><span class="ai-catalogue-name">' + formatCatalogueItemName(i.name) + '</span><span class="ai-catalogue-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span><span>·</span>' : '') + supplierDisplayName(i.supplier) + '</span></span>' + renderCatalogueUomSummary(i.uoms) + '</span></label>';
+    return '<label class="hq-invoice-scope' + (s ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(i.id) + '" ' + (s ? 'checked' : '') + ' onchange="toggleAiItem(this.value)"><span class="ai-catalogue-row"><span class="ai-catalogue-copy"><span class="ai-catalogue-name">' + formatCatalogueItemName(i.name) + '</span><span class="ai-catalogue-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span><span>·</span>' : '') + supplierDisplayName(i.supplier) + '</span></span><span class="ai-catalogue-code">' + escapeOverviewText(i.code || '') + '</span>' + renderCatalogueUomSummary(i.uoms) + '</span></label>';
   }).join('') + '</div>' : '<div class="picker-empty">No catalogue items found from the linked suppliers</div>';
   const n = aiSel.size;
   document.getElementById('aiSelLabel').innerHTML = n ? '<strong>' + n + '</strong> item' + (n>1?'s':'') + ' selected' : 'No items selected';
@@ -8474,7 +8480,7 @@ function toggleAllAiItems() {
   const sup = document.getElementById('aiSupFilter').value;
   const linkedNames = new Set(SUPPLIERS.map(function(supplier) { return supplier.name; }));
   const filtered = CAT_ITEMS.filter(i => linkedNames.has(i.supplier) &&
-    (!q || i.name.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
+    (!q || i.name.toLowerCase().includes(q) || String(i.code || '').toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q)) &&
     (!sup || i.supplier === sup)
   ).sort(function(a, b) { return formatCatalogueItemName(a.name).localeCompare(formatCatalogueItemName(b.name)); });
   const allSelected = filtered.length > 0 && filtered.every(i => aiSel.has(i.id));
@@ -8614,7 +8620,7 @@ function confirmAddItems() {
       });
     });
     ITEMS.push({
-      name:src.name, cat:src.cat, supplier:src.supplier, price:null, uom:uoms,
+      name:src.name, code:src.code || '', cat:src.cat, supplier:src.supplier, price:null, uom:uoms,
       defaultPricing:pricing.map(function() { return {price:null, moq:null}; }),
       moq:'', active:true, lifecycle:'active', groupList:groupList.slice(), outletList:outletList.slice(),
       uomEnabled:enabled.map(function() { return true; }), scopeUoms:scopeUoms, excludedScopes:[], createdAt:new Date().toISOString()
@@ -9797,7 +9803,7 @@ document.addEventListener('DOMContentLoaded', function(){ renderPosMappingState(
       <div class="picker-search-row">
         <div class="picker-search-wrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" color="var(--ink-mute)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" placeholder="Search items or suppliers…" id="aiSearch" oninput="renderAiList()" />
+          <input type="text" placeholder="Search items, codes or suppliers…" id="aiSearch" oninput="renderAiList()" />
         </div>
         <select class="picker-select" id="aiSupFilter" onchange="renderAiList()">
           <option value="">All suppliers</option>
