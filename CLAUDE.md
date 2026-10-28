@@ -621,6 +621,8 @@ Before creating any new prototype or adding a component to an existing one, **re
 Copy the full `:root` variable block, topbar, and sidebar verbatim from an existing file — never reconstruct them from scratch. This ensures icon sets, responsive collapse behaviour, app-switcher panel, and user menu stay consistent.
 
 ## Reference prototypes
+- Procure — Review items: Procure - Review Invoice Items.html
+- Procure — Create SKU: Procure - Create SKU.html
 - Procure — Market List: Procure - Market List.html
 - Procure — Add SKU: Procure - Add SKU.html
 - Procure — Invoice Digitisation: Procure - Invoice Digitisation.html
