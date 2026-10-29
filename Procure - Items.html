@@ -774,7 +774,7 @@
   }
   .modal-overlay[hidden] { display: none; }
   .supplier-modal {
-    width: 500px;
+    width: 560px;
     max-width: calc(100vw - 32px);
     border-radius: 18px;
     background: #fff;
@@ -814,6 +814,41 @@
     color: var(--ink-mute);
     font-size: 12px;
   }
+  .match-sub { margin: -8px 0 16px; color: var(--ink-mute); font-size: 14px; }
+  .match-card {
+    display: grid; gap: 2px; padding: 12px 14px; border-radius: 8px;
+    background: var(--mint); color: var(--seaweed);
+  }
+  .match-card strong { font-size: 14px; }
+  .match-card span { font-size: 12px; color: var(--spinach); }
+  .match-stack { display: grid; gap: 18px; margin-top: 18px; }
+  .match-trio { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 12px; }
+  .match-trio .field, .match-pair .field { min-width: 0; }
+  .match-trio label { white-space: nowrap; }
+  .match-stack .select-control, .match-stack .text-control { width: 100%; min-width: 0; height: 38px; box-sizing: border-box; font-size: 14px; }
+  .match-stack .select-control {
+    appearance: none; -webkit-appearance: none; padding: 0 34px 0 12px; cursor: pointer;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%238A8F98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+  }
+  .match-stack .select-control:focus, .match-stack .text-control:focus { border-color: var(--nomni-green); }
+  .match-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .match-inv-title { margin-top: 4px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+  .match-check { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; margin-top: -6px; }
+  .match-box { width: 18px; height: 18px; border: 1.5px solid #C7CDD5; border-radius: 4px; background: #fff; display: grid; place-items: center; color: transparent; font-size: 12px; font-weight: 700; line-height: 1; transition: background-color .13s, border-color .13s; }
+  .match-box.active { background: var(--nomni-green); border-color: var(--nomni-green); color: var(--seaweed); }
+  .match-inv { display: grid; gap: 16px; }
+  .match-inv.is-disabled { opacity: .45; }
+  .match-inv.is-disabled select, .match-inv.is-disabled input { pointer-events: none; background: #F3F4F6; }
+  @media (max-width: 620px) { .match-trio, .match-pair { grid-template-columns: 1fr; } }
+  .supplier-modal { max-height: calc(100vh - 48px); overflow-y: auto; }
+  .text-control {
+    width: 100%; box-sizing: border-box; background: #fff; border: 1px solid #DCDEE3; border-radius: 6px;
+    padding: 10px 12px; font: inherit; font-size: 14px; color: var(--ink); outline: none; transition: border-color .13s;
+  }
+  .text-control:focus { border-color: var(--nomni-green); }
+  .check-row { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
+  .link-btn { border: 0; background: none; padding: 0; color: var(--spinach); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .modal-foot.row { display: flex; align-items: center; gap: 16px; }
   .invoice-modal {
     width: 660px;
     max-width: calc(100vw - 32px);
@@ -1494,19 +1529,62 @@
       <h2 class="modal-title" id="select-supplier-title">Select supplier</h2>
       <button class="modal-close" data-close-supplier type="button" aria-label="Close select supplier dialog">&times;</button>
     </div>
-    <div class="field">
-      <label for="supplierSelect">Supplier</label>
-      <select class="select-control" id="supplierSelect" data-supplier-select>
-        <option value="" selected>Select supplier</option>
-        <option>Paranakan Trading Pte Ltd (T)</option>
-        <option>Test Supplier</option>
-        <option>Test Supplier2</option>
-        <option>Zeemart test supplier 259</option>
-      </select>
-      <p class="field-help" data-supplier-help hidden>Please select a supplier first</p>
+    <div data-step-create>
+      <div class="field">
+        <label for="skuNameInput">SKU name</label>
+        <input class="text-control" id="skuNameInput" data-sku-name type="text" placeholder="Name as shown on the supplier's invoice" autocomplete="off" />
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label for="skuCodeInput">Supplier product code <span style="font-weight:400;color:var(--ink-mute)">(optional)</span></label>
+        <input class="text-control" id="skuCodeInput" data-sku-code type="text" placeholder="Optional" autocomplete="off" />
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label for="supplierSelect">Supplier</label>
+        <select class="select-control" id="supplierSelect" data-supplier-select>
+          <option value="" selected>Select supplier</option>
+          <option>Paranakan Trading Pte Ltd (T)</option>
+          <option>Test Supplier</option>
+          <option>Test Supplier2</option>
+          <option>Zeemart test supplier 259</option>
+        </select>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-primary" data-create-sku type="button" disabled>Continue</button>
+      </div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-primary" data-create-sku type="button">Create new</button>
+    <div data-step-match hidden>
+      <p class="match-sub">This item already exists in the supplier's catalogue. Add it to your market list instead of creating a new one.</p>
+      <div class="match-card">
+        <strong data-match-name></strong>
+        <span data-match-meta></span>
+      </div>
+      <div class="match-stack">
+        <div class="field"><label for="matchMyCode">My product code <span style="font-weight:400;color:var(--ink-mute)">(optional)</span></label><input class="text-control" id="matchMyCode" type="text" placeholder="Optional" autocomplete="off" /></div>
+        <div class="match-trio">
+          <div class="field"><label for="matchUom">UOM</label>
+            <select class="select-control" id="matchUom" data-match-uom>
+              <option value="">Select</option><option>blk</option><option>box</option><option>btl</option><option>ctn</option><option>g</option><option>kg</option><option>ml</option><option>pcs</option><option>pkt</option>
+            </select></div>
+          <div class="field"><label for="matchMoq">Min. order qty</label><input class="text-control" id="matchMoq" data-match-moq type="text" value="1" /></div>
+          <div class="field"><label for="matchPrice">Price before tax (S$)</label><input class="text-control" id="matchPrice" data-match-price type="text" placeholder="0.00" /></div>
+        </div>
+        <div class="match-inv-title">Inventory</div>
+        <label class="match-check" data-match-inv-toggle><span class="match-box" data-match-inv-box aria-hidden="true">✓</span><input type="checkbox" data-match-inventory hidden> Add to Inventory</label>
+        <div class="match-inv" data-match-inv-extra hidden>
+          <div class="field"><label for="matchInvList">Inventory list</label>
+            <select class="select-control" id="matchInvList" data-match-inv-list><option>Select</option><option>Ingredients</option><option>Uncategorised</option></select>
+            <p class="field-help">If no list is selected the item will be added to the Uncategorised list.</p></div>
+          <div class="match-pair">
+            <div class="field"><label for="matchInvUom">Inventory UOM</label>
+              <select class="select-control" id="matchInvUom" data-match-inv-uom><option>blk</option><option>box</option><option>btl</option><option>g</option><option>kg</option><option>pcs</option></select></div>
+            <div class="field"><label for="matchInvPar">Inventory par</label><input class="text-control" id="matchInvPar" type="text" /></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot row">
+        <button class="btn btn-primary" data-match-add type="button" disabled>Add to market list</button>
+        <button class="link-btn" data-match-back type="button">Back</button>
+      </div>
     </div>
   </section>
 </div>
@@ -1629,6 +1707,19 @@
     var supplierModal = document.querySelector('[data-supplier-modal]');
     var supplierSelect = document.querySelector('[data-supplier-select]');
     var createSku = document.querySelector('[data-create-sku]');
+    var skuName = document.querySelector('[data-sku-name]');
+    var skuCode = document.querySelector('[data-sku-code]');
+    var stepCreate = document.querySelector('[data-step-create]');
+    var stepMatch = document.querySelector('[data-step-match]');
+    var matched = null;
+    var matchAdd = document.querySelector('[data-match-add]'), matchBack = document.querySelector('[data-match-back]');
+    var CATALOGUE = [
+      { name: 'Aperol 700ml', code: 'APR-700', supplier: 'Paranakan Trading Pte Ltd (T)', uom: 'btl' },
+      { name: 'Campari 700ml', code: 'CMP-700', supplier: 'Paranakan Trading Pte Ltd (T)', uom: 'btl' },
+      { name: 'Coconut milk 1L', code: 'CM-1L', supplier: 'Test Supplier', uom: 'pkt' },
+      { name: 'Sweet potato', code: 'ZMTEMP-035684', supplier: 'Test Supplier', uom: 'blk' }
+    ];
+    var invTouched = false;
     var supplierHelp = document.querySelector('[data-supplier-help]');
     var invoiceModal = document.querySelector('[data-invoice-modal]');
     var dropZone = document.querySelector('[data-drop-zone]');
@@ -1705,8 +1796,81 @@
     function openAddMenu() { if (addMenu) addMenu.hidden = false; }
     function closeAddMenu() { if (addMenu) addMenu.hidden = true; }
 
+    function syncContinue() {
+      if (createSku) createSku.disabled = !(supplierSelect.value && skuName.value.trim());
+    }
+
+    function showCreateStep() {
+      syncContinue();
+      matched = null;
+      if (stepCreate) stepCreate.hidden = false;
+      if (stepMatch) stepMatch.hidden = true;
+      var title = document.getElementById('select-supplier-title');
+      if (title) title.textContent = 'Create new SKU';
+    }
+
+    // Within the selected supplier's catalogue: name only -> match by name; name + code -> match by code.
+    function findCatalogueSku(name, code, supplier) {
+      name = name.trim().toLowerCase(); code = code.trim().toLowerCase();
+      return CATALOGUE.filter(function(x) {
+        if (x.supplier !== supplier) return false;
+        return code ? x.code.toLowerCase() === code : x.name.toLowerCase() === name;
+      })[0] || null;
+    }
+
+    function q(sel) { return document.querySelector(sel); }
+    function setMatchInventory(on, fromUser) {
+      if (fromUser) invTouched = true;
+      q('[data-match-inventory]').checked = on;
+      q('[data-match-inv-box]').classList.toggle('active', on);
+      var extra = q('[data-match-inv-extra]');
+      extra.hidden = !on;
+      if (q('[data-match-uom]').value) q('[data-match-inv-uom]').value = q('[data-match-uom]').value;
+    }
+    function syncMatchState() {
+      var ready = !!(q('[data-match-uom]').value && q('[data-match-moq]').value.trim() && q('[data-match-price]').value.trim());
+      matchAdd.disabled = !ready;
+      if (!invTouched) setMatchInventory(ready);
+    }
+
+    function showMatchStep(sku) {
+      matched = sku; invTouched = false;
+      stepCreate.hidden = true; stepMatch.hidden = false;
+      q('#select-supplier-title').textContent = 'Add from catalogue';
+      q('[data-match-name]').textContent = sku.name;
+      q('[data-match-meta]').textContent = sku.code + ' \u2022 ' + sku.supplier;
+      q('#matchMyCode').value = '';
+      q('[data-match-uom]').value = sku.uom;
+      q('[data-match-moq]').value = '1';
+      q('[data-match-price]').value = '';
+      q('#matchInvList').selectedIndex = 0; q('#matchInvPar').value = '';
+      setMatchInventory(false);
+      syncMatchState();
+    }
+
+    function addMatchedSku() {
+      var price = parseFloat(q('[data-match-price]').value) || 0;
+      var moq = Number(q('[data-match-moq]').value) || 1;
+      var uom = q('[data-match-uom]').value || matched.uom;
+      var saved = [];
+      try { saved = JSON.parse(localStorage.getItem(STORE) || '[]'); } catch (error) {}
+      saved.push({ name: matched.name, supplier: matched.supplier, price: price, moq: moq, uom: uom });
+      try {
+        localStorage.setItem(STORE, JSON.stringify(saved));
+        sessionStorage.setItem('nomniProcureItemsToast', JSON.stringify({ title: matched.name, copy: 'added to market list' }));
+      } catch (error) {}
+      itemsBody.insertBefore(itemRow({ name: matched.name, supplier: matched.supplier, price: 'S$' + price.toFixed(2) + '/' + uom, moq: 'MOQ: ' + moq + ' ' + uom, last: 'Never' }), itemsBody.firstChild);
+      syncItemsEmptyState();
+      closeSupplierModal();
+      showToast();
+    }
+
     function openSupplierModal() {
       closeAddMenu();
+      if (skuName) skuName.value = '';
+      if (skuCode) skuCode.value = '';
+      if (supplierSelect) supplierSelect.selectedIndex = 0;
+      showCreateStep();
       if (supplierModal) supplierModal.hidden = false;
     }
     function closeSupplierModal() { if (supplierModal) supplierModal.hidden = true; }
@@ -1737,11 +1901,10 @@
     }
 
     function goCreateSku() {
-      if (!supplierSelect || !supplierSelect.value) {
-        if (supplierHelp) supplierHelp.hidden = false;
-        return;
-      }
-      window.location.href = withParams('Procure - Create SKU.html', { selectedSupplier: supplierSelect.value });
+      if (!supplierSelect.value || !skuName.value.trim()) return;
+      var hit = findCatalogueSku(skuName.value, skuCode.value, supplierSelect.value);
+      if (hit) { showMatchStep(hit); return; }
+      window.location.href = withParams('Procure - Create SKU.html', { selectedSupplier: supplierSelect.value, skuName: skuName.value.trim(), skuCode: skuCode.value.trim() });
     }
 
     if (demo && itemsBody) {
@@ -1775,9 +1938,16 @@
     if (dropZone) dropZone.addEventListener('click', addDemoInvoiceFiles);
     if (uploadInvoices) uploadInvoices.addEventListener('click', uploadDemoInvoices);
     if (supplierSelect) supplierSelect.addEventListener('change', function() {
-      if (supplierHelp) supplierHelp.hidden = !!supplierSelect.value;
+      syncContinue();
     });
+    if (skuName) skuName.addEventListener('input', syncContinue);
     if (createSku) createSku.addEventListener('click', goCreateSku);
+    if (matchAdd) matchAdd.addEventListener('click', addMatchedSku);
+    if (matchBack) matchBack.addEventListener('click', showCreateStep);
+    ['[data-match-uom]', '[data-match-moq]', '[data-match-price]'].forEach(function(sel) {
+      q(sel).addEventListener('input', syncMatchState); q(sel).addEventListener('change', syncMatchState);
+    });
+    q('[data-match-inv-toggle]').addEventListener('click', function(event) { event.preventDefault(); setMatchInventory(!q('[data-match-inventory]').checked, true); });
     document.addEventListener('click', function(event) {
       if (!event.target.closest('.add-menu-wrap')) closeAddMenu();
     });
