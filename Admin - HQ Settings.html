@@ -292,6 +292,8 @@ body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); font-size
 .inventory-select-checkbox { appearance:none; box-sizing:border-box; width:16px; height:16px; margin:0 11px 0 6px; border:1.5px solid #8A8F98; border-radius:4px; background:#fff; cursor:pointer; flex:0 0 16px; }
 .inventory-select-checkbox:checked { border-color:var(--seaweed); background:var(--seaweed) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.1 4.8 8.6 9.8 3.5' fill='none' stroke='white' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px 12px no-repeat; }
 .inventory-select-checkbox:focus-visible { outline:2px solid rgba(42,200,100,.35); outline-offset:2px; }
+.inventory-select-checkbox:indeterminate { border-color:var(--seaweed); background:var(--seaweed) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 6h6' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") center/12px no-repeat; }
+.inventory-bulk-btn.is-danger { border-color:#FDD6DC; background:#FDD6DC; color:#D0291E; }
 .ml-table tbody tr:has(.inventory-select-checkbox:checked) td { background:rgba(42,200,100,.07) !important; }
 .pos-mapping-status { display:flex; align-items:center; gap:8px; min-width:0; }
 .pos-mapping-progress { width:64px; height:6px; border-radius:4px; background:#E7E8EC; overflow:hidden; flex:0 0 64px; }
@@ -968,6 +970,8 @@ body.supplier-settings-open { overflow:hidden; }
 .picker-row-uom { font-size: 11px; color: var(--ink-mute); }
 .picker-row-badge { font-size: 11px; font-weight: 600; background: #EFF6FF; color: #2563EB; border-radius: 4px; padding: 2px 7px; }
 .picker-empty { padding: 48px 24px; text-align: center; color: var(--ink-mute); font-size: 14px; }
+.ai-catalogue-empty .ai-empty-title { margin-bottom:4px; color:var(--ink); font-size:16px; font-weight:600; }
+.ai-catalogue-empty .ai-empty-hint { margin-bottom:16px; }
 .picker-foot { padding: 14px 24px; border-top: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
 .picker-sel-label { font-size: 14px; color: var(--ink-mute); }
 .picker-sel-label strong { color: var(--ink); font-weight: 600; }
@@ -1861,7 +1865,7 @@ body.supplier-settings-open { overflow:hidden; }
             <div id="addItemMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e0e2e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:400;min-width:230px;overflow:hidden">
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openHqInvoiceModal()">Add from invoice</div>
               <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';openAddCatalogueModal()">Add from supplier catalogue</div>
-              <div class="row-action-item" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';cacheCreateItemInventoryContext();window.location.href='Admin - HQ Create Item.html'+window.location.search">Create SKU</div>
+              <div class="row-action-item" id="createSkuMenuItem" style="padding:11px 18px;font-size:14px;font-weight:500;cursor:pointer" onclick="addItemMenu.style.display='none';cacheCreateItemInventoryContext();window.location.href='Admin - HQ Create Item.html'+window.location.search">Create SKU</div>
             </div>
           </div>
         </div>
@@ -1881,10 +1885,12 @@ body.supplier-settings-open { overflow:hidden; }
           <option value="disabled">Disabled</option>
         </select>
       </div>
+      <div class="inventory-bulk-actions" id="mlBulkActions"><span class="inventory-bulk-count" id="mlBulkCount">0 selected</span><button type="button" class="inventory-bulk-btn" id="mlBulkEnable" onclick="bulkMlLifecycle('active')">Enable</button><button type="button" class="inventory-bulk-btn" id="mlBulkDisable" onclick="bulkMlLifecycle('disabled')">Disable</button><button type="button" class="inventory-bulk-btn is-danger" onclick="bulkMlLifecycle('removed')">Remove</button><button type="button" class="inventory-bulk-cancel" onclick="clearMlSelection()">Cancel</button></div>
       <div style="overflow:clip">
         <table class="ml-table">
           <thead>
             <tr>
+              <th class="inventory-select-cell"><input type="checkbox" class="inventory-select-checkbox" id="mlSelectAll" aria-label="Select all SKUs on this page" onchange="toggleMlSelectAll(this.checked)"></th>
               <th class="sort-th" id="mlSortTh-name" onclick="setMlSort('name')">SKU <span class="sort-ind"></span></th>
               <th style="width:150px">Product code</th>
               <th style="width:100px">UOM</th>
@@ -3174,9 +3180,71 @@ function applyMasterItemLifecycle(rawIdx, lifecycle) {
   renderMl();
   if (typeof renderInv === 'function') renderInv();
   const messages = { disabled: 'Item disabled across included groups and outlets', active: 'Item restored to the supplier catalogue', removed: 'Item removed from the supplier catalogue' };
-  if (typeof showToast === 'function') showToast(messages[lifecycle]);
+  showHqToast(messages[lifecycle]);
 }
 let pendingMasterItemRemoval = null;
+let pendingBulkRemoval = null;
+const selectedMlIndices = new Set();
+function toggleMlSelection(rawIdx, checked) { if (checked) selectedMlIndices.add(rawIdx); else selectedMlIndices.delete(rawIdx); updateMlBulkActions(); }
+function mlPageItems() { return getMlItems().slice((mlPage - 1) * ML_PER_PAGE, mlPage * ML_PER_PAGE); }
+function toggleMlSelectAll(checked) {
+  mlPageItems().forEach(function(item) { const idx = ITEMS.indexOf(item); if (checked) selectedMlIndices.add(idx); else selectedMlIndices.delete(idx); });
+  renderMl();
+}
+function clearMlSelection() { selectedMlIndices.clear(); renderMl(); }
+function updateMlBulkActions() {
+  const bar = document.getElementById('mlBulkActions'), count = document.getElementById('mlBulkCount');
+  if (!bar || !count) return;
+  const selected = Array.from(selectedMlIndices).filter(function(idx) { return ITEMS[idx]; });
+  const n = selected.length;
+  bar.classList.toggle('is-visible', n > 0);
+  const filterRow = document.querySelector('#panel-market-list .ml-filter-row');
+  if (filterRow) filterRow.style.display = n ? 'none' : '';
+  count.textContent = n + (n === 1 ? ' SKU selected' : ' SKUs selected');
+  const disabledCount = selected.filter(function(idx) { return itemLifecycle(ITEMS[idx]) === 'disabled'; }).length;
+  const activeCount = selected.filter(function(idx) { return itemLifecycle(ITEMS[idx]) === 'active'; }).length;
+  const enableBtn = document.getElementById('mlBulkEnable'), disableBtn = document.getElementById('mlBulkDisable');
+  if (enableBtn) enableBtn.hidden = disabledCount === 0;
+  if (disableBtn) disableBtn.hidden = activeCount === 0;
+  const all = document.getElementById('mlSelectAll');
+  if (all) {
+    const onPage = mlPageItems().map(function(item) { return ITEMS.indexOf(item); });
+    const picked = onPage.filter(function(idx) { return selectedMlIndices.has(idx); }).length;
+    all.checked = onPage.length > 0 && picked === onPage.length;
+    all.indeterminate = picked > 0 && picked < onPage.length;
+  }
+}
+function applyBulkMasterItemLifecycle(indices, lifecycle) {
+  const targets = indices.filter(function(idx) { return ITEMS[idx]; });
+  if (!targets.length) return;
+  const label = targets.length === 1 ? itemDisplayName(ITEMS[targets[0]]) : targets.length + ' SKUs';
+  targets.forEach(function(idx) { saveItemLifecycle(ITEMS[idx], lifecycle); });
+  addPrototypeActivity('market-list', lifecycle === 'removed' ? 'Removed' : (lifecycle === 'disabled' ? 'Disabled' : 'Enabled'), label, 'market-list', 'HQ');
+  selectedMlIndices.clear();
+  renderMl();
+  if (typeof renderInv === 'function') renderInv();
+  const verb = lifecycle === 'removed' ? 'removed' : (lifecycle === 'disabled' ? 'disabled' : 'enabled');
+  showHqToast('SKUs ' + verb, targets.length + ' SKU' + (targets.length === 1 ? '' : 's') + ' ' + verb + '.');
+}
+function bulkMlLifecycle(lifecycle) {
+  const indices = Array.from(selectedMlIndices).filter(function(idx) { return ITEMS[idx]; });
+  const plural = function(list) { return list.length + ' SKU' + (list.length === 1 ? '' : 's'); };
+  if (lifecycle === 'active') {
+    applyBulkMasterItemLifecycle(indices.filter(function(idx) { return itemLifecycle(ITEMS[idx]) === 'disabled'; }), 'active');
+  } else if (lifecycle === 'disabled') {
+    const targets = indices.filter(function(idx) { return itemLifecycle(ITEMS[idx]) === 'active'; });
+    if (!targets.length) return;
+    requestDisableConfirmation('SKUs', plural(targets), 'will remain visible in the HQ market list, but buyers in included outlet groups and ungrouped outlets will not be able to order them. You can enable them again at any time.', function() {
+      applyBulkMasterItemLifecycle(targets, 'disabled');
+    });
+  } else if (lifecycle === 'removed') {
+    if (!indices.length) return;
+    pendingMasterItemRemoval = null;
+    pendingBulkRemoval = indices;
+    document.getElementById('removeMasterItemName').textContent = plural(indices);
+    document.getElementById('removeMasterItemOverlay').classList.add('open');
+  }
+}
 function openRemoveMasterItemModal(rawIdx) {
   pendingMasterItemRemoval = rawIdx;
   document.getElementById('removeMasterItemName').textContent = ITEMS[rawIdx].name;
@@ -3184,9 +3252,16 @@ function openRemoveMasterItemModal(rawIdx) {
 }
 function closeRemoveMasterItemModal() {
   pendingMasterItemRemoval = null;
+  pendingBulkRemoval = null;
   document.getElementById('removeMasterItemOverlay').classList.remove('open');
 }
 function confirmRemoveMasterItem() {
+  if (pendingBulkRemoval) {
+    const list = pendingBulkRemoval;
+    closeRemoveMasterItemModal();
+    applyBulkMasterItemLifecycle(list, 'removed');
+    return;
+  }
   if (pendingMasterItemRemoval === null) return;
   const item = ITEMS[pendingMasterItemRemoval];
   saveItemLifecycle(item, 'removed');
@@ -3194,7 +3269,7 @@ function confirmRemoveMasterItem() {
   mlPage = 1;
   renderMl();
   if (typeof renderInv === 'function') renderInv();
-  if (typeof showToast === 'function') showToast('Item removed from the supplier catalogue');
+  showHqToast('Item removed from the supplier catalogue');
 }
 
 function toggleMlUoms(itemIdx, event) {
@@ -4064,6 +4139,7 @@ function toggleUomAccess(itemIdx, name, uomIdx, enabled) {
 
 function renderMl() {
   const items = getMlItems();
+  selectedMlIndices.forEach(function(idx) { if (items.indexOf(ITEMS[idx]) < 0) selectedMlIndices.delete(idx); });
   const total = items.length;
   const start = (mlPage - 1) * ML_PER_PAGE;
   const page = items.slice(start, start + ML_PER_PAGE);
@@ -4097,6 +4173,7 @@ function renderMl() {
 
     const lifecycle = itemLifecycle(item);
     const stateBadge = '';
+    const selTd = '<td class="inventory-select-cell" onclick="event.stopPropagation()"><input type="checkbox" class="inventory-select-checkbox" aria-label="Select ' + escapeItemDisplayText(itemDisplayName(item)).replace(/"/g, '&quot;') + '"' + (selectedMlIndices.has(rawIdx) ? ' checked' : '') + ' onchange="toggleMlSelection(' + rawIdx + ', this.checked)"></td>';
     const actionsTd = '<td><div class="row-actions-wrap">' +
       '<button class="btn-row-actions" data-actions-btn onclick="event.stopPropagation();toggleRowActions(this)">•••</button>' +
       '<div class="row-actions-menu">' +
@@ -4108,7 +4185,7 @@ function renderMl() {
     if (!isMultiUom) {
       const onlyUom = enabledUoms[0] || { uom: uoms[0], ui: 0 };
       const uom = compactUom(onlyUom.uom);
-      return '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
+      return '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' + selTd +
         '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</div></td>' +
         '<td class="ml-code">' + escapeItemDisplayText(item.code || '') + '</td>' +
         '<td class="uom-text">' + uom + '</td>' +
@@ -4117,7 +4194,7 @@ function renderMl() {
       '</tr>';
     }
 
-    const parent = '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' +
+    const parent = '<tr class="ml-parent-row' + rowEvenClass + (lifecycle === 'active' ? '' : ' ml-inactive') + '" style="cursor:pointer" onclick="openHqItemModal(' + rawIdx + ')">' + selTd +
       '<td><div class="ml-item-name">' + itemDisplayNameHtml(item) + stateBadge + '</div><div style="font-size:12px;color:var(--ink-mute);margin-top:2px">' + supplierDisplayName(item.supplier) + '</div></td>' +
       '<td class="ml-code">' + escapeItemDisplayText(item.code || '') + '</td>' +
       '<td><button class="ml-options-link' + (isExpanded ? ' is-open' : '') + '" onclick="toggleMlUoms(' + rawIdx + ',event)">' + enabledUoms.length + ' options<span class="ml-options-chevron"></span></button></td>' +
@@ -4128,6 +4205,7 @@ function renderMl() {
     const children = isExpanded ? enabledUoms.map(({ uom, ui }) => {
       const unit = compactUom(uom);
       return '<tr class="ml-uom-row' + (lifecycle === 'active' ? '' : ' ml-inactive') + '">' +
+        '<td class="inventory-select-cell"></td>' +
         '<td class="ml-uom-indent">' + itemDisplayNameHtml(item) + '</td><td></td>' +
         '<td class="uom-text">' + unit + '</td>' +
         '<td>' + formatItemPriceRange(rawIdx, ui) + '</td>' +
@@ -4138,6 +4216,7 @@ function renderMl() {
     return parent + children;
   }).join('');
 
+  updateMlBulkActions();
   const totalPages = Math.max(1, Math.ceil(total / ML_PER_PAGE));
   const pager = document.getElementById('mlPager');
   if (!total) { pager.innerHTML = '<span class="pager-info">No items found</span>'; saveHqInventoryState(); return; }
@@ -8456,6 +8535,12 @@ function openAiTargetSummary() {
   document.body.appendChild(overlay);
 }
 function closeAiTargetSummary() { const dialog = document.getElementById('aiTargetSummaryDialog'); if (dialog) dialog.remove(); }
+function createSkuFromCatalogue() {
+  const createLink = document.getElementById('createSkuMenuItem');
+  if (!createLink) return;
+  closeAddItemModal();
+  createLink.click();
+}
 function renderAiList() {
   const q = document.getElementById('aiSearch').value.toLowerCase();
   const sup = document.getElementById('aiSupFilter').value;
@@ -8469,7 +8554,7 @@ function renderAiList() {
     const s = aiSel.has(i.id);
     const existing = getExistingCatalogueItem(i);
     return '<label class="hq-invoice-scope' + (s ? ' is-selected' : '') + '"><input type="checkbox" value="' + escapeOverviewText(i.id) + '" ' + (s ? 'checked' : '') + ' onchange="toggleAiItem(this.value)"><span class="ai-catalogue-row"><span class="ai-catalogue-copy"><span class="ai-catalogue-name">' + formatCatalogueItemName(i.name) + '</span><span class="ai-catalogue-sub">' + (existing ? '<span class="ai-existing-hq">Already in HQ</span><span>·</span>' : '') + supplierDisplayName(i.supplier) + '</span></span><span class="ai-catalogue-code">' + escapeOverviewText(i.code || '') + '</span>' + renderCatalogueUomSummary(i.uoms) + '</span></label>';
-  }).join('') + '</div>' : '<div class="picker-empty">No catalogue items found from the linked suppliers</div>';
+  }).join('') + '</div>' : '<div class="picker-empty ai-catalogue-empty"><div class="ai-empty-title">' + (q.trim() ? 'No results for “' + escapeOverviewText(document.getElementById('aiSearch').value.trim()) + '”' : 'No catalogue items found from the linked suppliers') + '</div><div class="ai-empty-hint">Can’t find it in your linked suppliers’ catalogues? Create the SKU manually.</div><button type="button" class="btn btn-secondary" onclick="createSkuFromCatalogue()">Create SKU</button></div>';
   const n = aiSel.size;
   document.getElementById('aiSelLabel').innerHTML = n ? '<strong>' + n + '</strong> item' + (n>1?'s':'') + ' selected' : 'No items selected';
   document.getElementById('aiNextBtn').disabled = n === 0;
