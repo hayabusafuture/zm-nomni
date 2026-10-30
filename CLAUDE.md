@@ -469,14 +469,21 @@ Pagination:
 
 ### Modals
 
+Position: dialogs are centred horizontally and sit slightly **above** true vertical centre (optical centre, about 40% from the top), so they never look low. Use one shared rule in every prototype; do not hand-tune offsets per dialog.
+
 ```css
-.modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: flex; align-items: flex-start; justify-content: center; padding-top: 72px; }
-.modal-card { background: #fff; border-radius: 12px; width: 580px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); max-height: calc(100vh - 100px); display: flex; flex-direction: column; overflow: hidden; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(10,20,15,.46); z-index: 900; display: flex; align-items: center; justify-content: center; padding: 24px 24px calc(24px + 8vh); }  /* extra bottom padding = optical-centre nudge */
+.modal-card { background: #fff; border-radius: 12px; width: 580px; max-width: calc(100vw - 32px); box-shadow: 0 24px 64px rgba(0,0,0,.22); max-height: calc(92vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
 .modal-header { padding: 20px 24px 0; }
 .modal-title { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
 .modal-body { padding: 20px 24px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 16px; }
 .modal-foot { padding: 14px 24px 18px; border-top: 1px solid var(--rule); }
 ```
+
+- Confirmations, alerts and short forms: centred as above (`.modal-overlay`, `.confirm-overlay`).
+- Dialogs whose height changes while open (search results, steps, expanding sections) use the top-anchored variant (`.picker-overlay`: `align-items: flex-start; padding-top: 60px`, recipe builder dialogs 72px) so the title and buttons do not jump as content changes.
+- Content taller than the viewport scrolls inside `.modal-body`; the card never exceeds `92vh - 48px`.
+- Side drawers (e.g. the invoice viewer on Price changes) slide in from the right, 560px wide, with a dimmed backdrop; they close with X, backdrop click or Esc.
 
 ### Dropdown Menus
 
